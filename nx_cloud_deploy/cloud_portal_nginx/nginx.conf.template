@@ -39,6 +39,7 @@ http {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
             proxy_set_header Host ${DOLLAR}http_host;
             proxy_redirect off;
+            proxy_read_timeout 300s;
 
             proxy_pass   http://app_server;
         }
@@ -107,6 +108,13 @@ http {
         location /fonts/ {
             root /app/app/static/common/static;
             error_page 404 /static/index.html;
+        }
+
+        location /preview/ {
+            root /app/app/static/$CUSTOMIZATION/preview;
+            error_page 404 /static/index.html;
+            sendfile off;
+            expires -1;
         }
 
         location /static {

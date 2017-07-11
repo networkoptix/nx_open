@@ -1,8 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import PermissionsMixin
 from account_backend import AccountManager
 
+from django.utils import timezone
 
-class Account(models.Model):
+
+class Account(PermissionsMixin):
 
     objects = AccountManager()
 
@@ -17,14 +20,21 @@ class Account(models.Model):
     is_staff = models.BooleanField(default=False)
     language = models.CharField(max_length=7, blank=True)
 
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
 
     def get_full_name(self):
-        return self.email
+        return self.first_name + ' ' + self.last_name
 
     def get_short_name(self):
         return self.first_name
+
+    def get_username(self):
+        return self.email
+
+    def __str__(self):
+        return self.get_username()
 
     @staticmethod
     def is_authenticated():

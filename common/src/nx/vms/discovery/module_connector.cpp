@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
@@ -11,15 +12,13 @@ namespace discovery {
 static const auto kUrl =
     lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
 
-static const KeepAliveOptions kKeepAliveOptions(
-    std::chrono::seconds(10), std::chrono::seconds(5), 5);
-
-static const network::RetryPolicy kDefaultDetryPolicy(
-    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(10));
+std::chrono::seconds kDisconnectTimeout(10);
+static const network::RetryPolicy kDefaultRetryPolicy(
+    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_retryPolicy(kDefaultDetryPolicy)
+    m_retryPolicy(kDefaultRetryPolicy)
 {
 }
 
@@ -334,14 +333,12 @@ bool ModuleConnector::Module::saveConnection(
 
     for (const auto& client: m_httpClients)
         client->pleaseStopSync();
-    m_httpClients.clear();
 
-    // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
-    // for reconnect attempt every timeout. It looks like we do not have any options for
-    // old servers.
-    // For new servers we could use WebSocket streams to reduce traffic to WebSocket keep alives.
+    m_httpClients.clear();
+    m_disconnectTimer.reset();
+
     auto socket = client->takeSocket();
-    if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
+    if (!socket->setRecvTimeout(kDisconnectTimeout))
     {
         NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
             m_id, SystemError::getLastOSErrorText()));
@@ -356,11 +353,16 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").args(
-                size, SystemError::toString(code)));
+            NX_VERBOSE(this, lm("Unexpected connection to %1 read size=%2: %3").args(
+                m_id, size, SystemError::toString(code)));
 
             m_socket.reset();
             connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
+
+            // Make sure we report disconnect in a limited time.
+            m_disconnectTimer.reset(new network::aio::Timer(m_timer.getAioThread()));
+            m_disconnectTimer->start(kDisconnectTimeout,
+                [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
     auto ip = m_socket->getForeignAddress().address;

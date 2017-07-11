@@ -84,469 +84,6 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>Könyvjelző</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>Pánik rögzítés</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>Írás naplóba</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>Figyelmeztetés megjleneítése</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>Hang ismétlése</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>Hang lejátszása</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>Beszéd</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>Tárhely hiba</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Hálózati probléma</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Szerver hiba</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Szerver ütközés</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Szerver elindult</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Licence probléma</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Bármilyen szerver hiba</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Bármilyen esemény</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Nem definiált esemény történ itt: %1</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Bemenet: %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Mozgás: %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Tárhely hiba: %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>Hálózati probléma: %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>Esemény %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>Forrás: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Ok: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Ütköző szerver: #%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Alkalom: %1/%2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
-        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP csomag vesztés észlelve, előző = %1 következő = %2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP csomag vesztés észlelve.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O hiba történt: %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Ütköző szerver: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>indítás</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>megállítás</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 alatt</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>Itt: %1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>Ismeretlen esemény történt</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
-        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Általános esemény</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>Felirat: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>Eszköz kimenet</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>Kamera kimenet</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>Eszköz rögzítés</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>Kamera rögzítés</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Bármilyen eszköz hiba</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Bármilyen kamera hiba</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>%1 eszköz szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>%1 kamera szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>Eszköz IP ütközés %1 szerveren</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>Kamera IP ütközés %1 szerveren</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ preset indítás</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>Felirat fólia megjelenítése</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Megjelenítés a riasztás elrendezésen</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>Archív biztonsági mentés kész</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>%1 - általános esemény</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>Bemeneti port: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>Archív biztonsági mentés sikeresen elkészült</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>%1 I/O modul szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Címütközés: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>Archív biztonsági mentés sikertelen: nincs elég hely a megadott tárolón</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>Archív biztonsági mentés sikertelen: céltároló hiba</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>Archív biztonsági mentés sikertelen: hiba a forrás fájl megnyitásakor</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>Archív biztonsági mentés sikertelen: Írási hiba a célfájlban</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>Archív biztonsági mentés sikertelen: fáljegyzék hiba</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>Archív biztonsági mentést a felhasználó megszakította. Az adat lementve %1-ig</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP kérés</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>A szerver váratlanul leállt.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Nincs elég licenc. A felvétel a következő eszközökre le van állítva:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Nincs elég licenc. A felvétel a következő kamerákon le van állítva:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Nincs elég licenc. A felvétel a következő I/O modulokon le van állítva:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Mozgás a kamerákon</numerusform>
-        <numerusform>Mozgás a kamerákon</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Bemeneti jel az eszközökön</numerusform>
-        <numerusform>Bemeneti jel az eszközökön</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Bemeneti jel a kamerákon</numerusform>
-        <numerusform>Bemeneti jel a kamerákon</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Eszközök lekapcsolódva</numerusform>
-        <numerusform>Eszközök lekapcsolódva</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kamerák lekapcsolódva</numerusform>
-        <numerusform>Kamerák lekapcsolódva</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>IP ütközés az eszközöknél</numerusform>
-        <numerusform>IP ütközés az eszközöknél</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>IP ütközés a kameráknál</numerusform>
-        <numerusform>IP ütközés a kameráknál</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>A rögzített videók biztonsági mentése befejeződött, de nem teljes mert az erre szánt idő lejárt. Az adat lementve %1-ig</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>Email küldése</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -874,7 +411,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Kezdés</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -1500,6 +1037,473 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Teljes körű hozzáférés az egész rendszerhez. Felhasználók létrehozása.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>Könyvjeltő</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>Pánik rögzítés</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation>Email küldése</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>Írás naplóba</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>Figyelmeztetés megjleneítése</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>Hang ismétlése</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>Hang lejátszása</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>Beszéd</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>PTZ preset indítás</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>Felirat fólia megjelenítése</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Megjelenítés a riasztás elrendezésen</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>HTTP kérés</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>Eszköz kimenet</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>Kamera kimenet</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>Eszköz rögzítés</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>Kamera rögzítés</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Általános esemény</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>Mozgás a kamerákon</numerusform>
+        <numerusform>Mozgás a kamerákon</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>Tárhely hiba</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>Hálózati probléma</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>Szerver hiba</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>Szerver ütközés</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>Szerver elindult</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>Licence probléma</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>Archív biztonsági mentés kész</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>Bármilyen szerver hiba</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>Bármilyen esemény</translation>
+    </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>IP ütközés a kameráknál</numerusform>
+        <numerusform>IP ütközés a kameráknál</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>Bármilyen eszköz hiba</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>Bármilyen kamera hiba</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>Nem definiált esemény történ itt: %1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>%1 eszköz szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>%1 kamera szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>%1 I/O modul szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>Bemenet: %1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>Mozgás: %1</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>Tárhely hiba: %1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>Hálózati probléma: %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Eszköz IP ütközés %1 szerveren</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Kamera IP ütközés %1 szerveren</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>%1 - általános esemény</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>Ismeretlen esemény történt</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>Esemény %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Forrás: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Felirat: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>Bemeneti port: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Ok: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>Címütközés: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>Ütköző szerver: #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>Ütköző szerver: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Alkalom: %1/%2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP csomag vesztés észlelve, előző = %1 következő = %2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP csomag vesztés észlelve.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>A szerver váratlanul leállt.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O hiba történt: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>Archív biztonsági mentés sikertelen: nincs elég hely a megadott tárolón</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>Archív biztonsági mentés sikertelen: céltároló hiba</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>Archív biztonsági mentés sikertelen: hiba a forrás fájl megnyitásakor</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>Archív biztonsági mentés sikertelen: Írási hiba a célfájlban</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>Archív biztonsági mentés sikertelen: fáljegyzék hiba</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>A rögzített videók biztonsági mentése befejeződött, de nem teljes mert az erre szánt idő lejárt. Az adat lementve %1-ig</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>Archív biztonsági mentés sikeresen elkészült</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>Archív biztonsági mentést a felhasználó megszakította. Az adat lementve %1-ig</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>Nincs elég licenc. A felvétel a következő eszközökre le van állítva:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>Nincs elég licenc. A felvétel a következő kamerákon le van állítva:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>Nincs elég licenc. A felvétel a következő I/O modulokon le van állítva:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>indítás</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>megállítás</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>%1 alatt</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>Itt: %1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Szerepkör</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n felhasználó</numerusform>
+        <numerusform>%n felhasználó</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n szerepkör</numerusform>
+        <numerusform>%n szerepkör</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Minden felhasználó</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Válasszon legalább egy felhasználót</translation>
     </message>
   </context>
   <context>

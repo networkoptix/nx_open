@@ -73,7 +73,6 @@ signals:
     void remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     void syncTimeChanged(qint64 syncTime);
-    void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 
     void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);

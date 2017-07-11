@@ -14,6 +14,7 @@ namespace ec2
 {
     class QnJsonTransactionSerializer;
     class QnUbjsonTransactionSerializer;
+    class QnAbstractTransactionTransport;
 
     class ECConnectionNotificationManager;
     namespace detail {
@@ -60,7 +61,6 @@ namespace ec2
 
         virtual QVector<QnTransportConnectionInfo> connectionsInfo() const = 0;
 
-
         void setHandler(ECConnectionNotificationManager* handler);
         void removeHandler(ECConnectionNotificationManager* handler);
 
@@ -75,6 +75,9 @@ namespace ec2
         void peerFound(QnUuid data, Qn::PeerType peerType);
         void peerLost(QnUuid data, Qn::PeerType peerType);
         void remotePeerUnauthorized(QnUuid id);
+
+        /** Emitted on a new direct connection to a remote peer has been established */
+        void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
     protected:
         bool readApiFullInfoData(
             const Qn::UserAccessData& userAccess,

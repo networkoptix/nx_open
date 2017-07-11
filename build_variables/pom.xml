@@ -147,6 +147,16 @@
                 <version>2.0</version>
                 <executions>
                     <execution>
+                        <id>get_properties_from_cmake</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>${project.basedir}/get_properties_from_cmake.groovy</source>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate_pro_file</id>
                         <phase>generate-sources</phase>
                         <goals>

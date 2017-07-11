@@ -263,6 +263,7 @@ void QnStatusOverlayWidget::setupPreloader()
     m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
     m_preloader->dots()->setDotRadius(8);
     m_preloader->dots()->setDotSpacing(8);
+    m_preloader->setMinimumSize(200, 200); //< For correct downscaling in small items.
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->addItem(m_preloader);

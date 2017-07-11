@@ -1,53 +1,64 @@
-#ifndef QN_RESOURCE_SEARCH_PROXY_MODEL_H
-#define QN_RESOURCE_SEARCH_PROXY_MODEL_H
+#pragma once
 
 #include <QtCore/QMetaType>
 #include <QtCore/QSortFilterProxyModel>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <ui/models/resource/resource_compare_helper.h>
 
 struct QnResourceSearchQuery
 {
     QString text;
-    Qn::ResourceFlags flags;
+    Qn::ResourceFlags flags = 0;
 
-    QnResourceSearchQuery():
-        text(), flags(0) {}
-    QnResourceSearchQuery(const QString& text, Qn::ResourceFlags flags):
-        text(text), flags(flags) {}
+    QnResourceSearchQuery()
+    {
+    }
+
+    QnResourceSearchQuery(const QString& text, Qn::ResourceFlags flags = 0):
+        text(text),
+        flags(flags)
+    {
+    }
 
     bool operator==(const QnResourceSearchQuery& other) const
     {
         return text == other.text && flags == other.flags;
     }
+
+    bool isEmpty() const
+    {
+        return flags == 0 && text.isEmpty();
+    }
 };
 
 /**
- * A resource filtering model that uses resource criteria for filtering.
+ * A resource search filtering model.
  */
 class QnResourceSearchProxyModel: public QSortFilterProxyModel, protected QnResourceCompareHelper
 {
     Q_OBJECT
-    typedef QSortFilterProxyModel base_type;
+    using base_type = QSortFilterProxyModel;
 
 public:
-    explicit QnResourceSearchProxyModel(QObject *parent = 0);
-
-    virtual ~QnResourceSearchProxyModel();
-
-    void addCriterion(const QnResourceCriterion &criterion);
-
-    bool removeCriterion(const QnResourceCriterion &criterion);
-
-    void clearCriteria();
-
-    const QnResourceCriterionGroup &criteria();
+    explicit QnResourceSearchProxyModel(QObject* parent = nullptr);
+    virtual ~QnResourceSearchProxyModel() override;
 
     QnResourceSearchQuery query() const;
     void setQuery(const QnResourceSearchQuery& query);
+
+    enum class DefaultBehavior
+    {
+        showAll,
+        showNone
+    };
+
+    DefaultBehavior defaultBehavor() const;
+    void setDefaultBehavior(DefaultBehavior value);
+
 protected:
 
     // --------------------------------------------------------------
@@ -81,15 +92,12 @@ public slots:
     void invalidateFilterLater();
 
 protected:
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
-    QnResourceCriterionGroup m_criterionGroup;
-    bool m_invalidating;
+    bool m_invalidating = false;
     QnResourceSearchQuery m_query;
+    DefaultBehavior m_defaultBehavior = DefaultBehavior::showAll;
 };
 
-Q_DECLARE_METATYPE(QnResourceSearchProxyModel *)
-
-
-#endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H
+Q_DECLARE_METATYPE(QnResourceSearchProxyModel*)

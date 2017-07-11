@@ -138,7 +138,7 @@ int QnAbstractConnection::sendAsyncRequest(
 
 int QnAbstractConnection::sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
     return sendAsyncRequest(
-        nx_http::Method::Get,
+        nx_http::Method::get,
         object,
         std::move(headers),
         params,
@@ -153,7 +153,7 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamLi
 }
 
 int QnAbstractConnection::sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncRequest(nx_http::Method::Post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
+    return sendAsyncRequest(nx_http::Method::post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
 }
 
 int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
@@ -194,7 +194,7 @@ int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int
 }
 
 int QnAbstractConnection::sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::Get, object, std::move(headers), params, QByteArray(), reply);
+    return sendSyncRequest(nx_http::Method::get, object, std::move(headers), params, QByteArray(), reply);
 }
 
 int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply) {
@@ -202,7 +202,7 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::Post, object, std::move(headers), params, std::move(msgBody), reply);
+    return sendSyncRequest(nx_http::Method::post, object, std::move(headers), params, std::move(msgBody), reply);
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {

@@ -290,6 +290,9 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
     for (const auto& url: server->getAdditionalUrls())
         allowedEndpoints.emplace(url.host(), (uint16_t) url.port(port));
 
+    if (auto address = server->getCloudAddress())
+        allowedEndpoints.emplace(std::move(*address));
+
     std::set<SocketAddress> forbiddenEndpoints;
     for (const auto& url: server->getIgnoredUrls())
         forbiddenEndpoints.emplace(url.host(), (uint16_t) url.port(port));

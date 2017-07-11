@@ -17,6 +17,7 @@ QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::resources")
 void layoutAlreadyExists(QWidget* parent);
 
 bool overrideLayout(QWidget* parent);
+bool overrideLayoutTour(QWidget* parent);
 
 bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
 bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);
@@ -28,6 +29,7 @@ bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts);
 bool deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible);
 
 bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
+bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources);
 
 bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 

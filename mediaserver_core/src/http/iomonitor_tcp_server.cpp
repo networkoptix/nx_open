@@ -41,8 +41,6 @@ QnIOMonitorConnectionProcessor::~QnIOMonitorConnectionProcessor()
     stop();
 }
 
-static const QString kCameraIdParam = "cameraId";
-
 void QnIOMonitorConnectionProcessor::run()
 {
     Q_D(QnIOMonitorConnectionProcessor);
@@ -55,7 +53,8 @@ void QnIOMonitorConnectionProcessor::run()
     if (ready)
     {
         parseRequest();
-        const QString cameraId = QUrlQuery(getDecodedUrl().query()).queryItemValue(kCameraIdParam);
+        const QString cameraId = QUrlQuery(getDecodedUrl().query())
+            .queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
         QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleId(
             resourcePool(), cameraId);
         if (!camera) {
