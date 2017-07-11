@@ -28,6 +28,8 @@ void AsyncClientWithHttpTunneling::connect(
     bool useSsl,
     ConnectHandler handler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_stunClient = std::make_unique<AsyncClient>(m_settings);
     m_stunClient->bindToAioThread(getAioThread());
     m_stunClient->connect(std::move(endpoint), useSsl, std::move(handler));
@@ -38,10 +40,12 @@ bool AsyncClientWithHttpTunneling::setIndicationHandler(
     IndicationHandler handler,
     void* client)
 {
-    if (m_stunClient)
-        return m_stunClient->setIndicationHandler(method, std::move(handler), client);
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
+    if (!m_handledIndications.insert(method).second)
+        return false; //< Handler for this indication has already been supplied.
+
+    invokeOrPostpone(
         std::bind(&AbstractAsyncClient::setIndicationHandler, std::placeholders::_1,
             method, std::move(handler), client));
     return true;
@@ -51,10 +55,9 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     ReconnectHandler handler,
     void* client)
 {
-    if (m_stunClient)
-        return m_stunClient->addOnReconnectedHandler(std::move(handler), client);
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
+    invokeOrPostpone(
         std::bind(&AbstractAsyncClient::addOnReconnectedHandler, std::placeholders::_1,
             std::move(handler), client));
 }
@@ -64,10 +67,9 @@ void AsyncClientWithHttpTunneling::sendRequest(
     RequestHandler handler,
     void* client)
 {
-    if (m_stunClient)
-        return m_stunClient->sendRequest(std::move(request), std::move(handler), client);
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
+    invokeOrPostpone(
         [request = std::move(request), handler = std::move(handler), client](
             AbstractAsyncClient* clientPtr) mutable
         {
@@ -80,17 +82,17 @@ bool AsyncClientWithHttpTunneling::addConnectionTimer(
     TimerHandler handler,
     void* client)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (m_stunClient)
         return m_stunClient->addConnectionTimer(period, std::move(handler), client);
-
-    m_cachedStunClientCalls.push_back(
-        std::bind(&AbstractAsyncClient::addConnectionTimer, std::placeholders::_1,
-            period, std::move(handler), client));
-    return true;
+    return false;
 }
 
 SocketAddress AsyncClientWithHttpTunneling::localAddress() const
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (!m_stunClient)
         return SocketAddress();
     return m_stunClient->localAddress();
@@ -98,6 +100,8 @@ SocketAddress AsyncClientWithHttpTunneling::localAddress() const
 
 SocketAddress AsyncClientWithHttpTunneling::remoteAddress() const
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (!m_stunClient)
         return SocketAddress();
     return m_stunClient->remoteAddress();
@@ -105,22 +109,19 @@ SocketAddress AsyncClientWithHttpTunneling::remoteAddress() const
 
 void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode errorCode)
 {
-    if (m_stunClient)
-        return m_stunClient->closeConnection(errorCode);
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
-        std::bind(&AbstractAsyncClient::closeConnection, std::placeholders::_1,
-            errorCode));
+    invokeOrPostpone(
+        std::bind(&AbstractAsyncClient::closeConnection, std::placeholders::_1, errorCode));
 }
 
 void AsyncClientWithHttpTunneling::cancelHandlers(
     void* client,
     utils::MoveOnlyFunc<void()> handler)
 {
-    if (m_stunClient)
-        return m_stunClient->cancelHandlers(client, std::move(handler));
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
+    invokeOrPostpone(
         [client, handler = std::move(handler)](
             AbstractAsyncClient* clientPtr) mutable
         {
@@ -130,12 +131,11 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
 
 void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
 {
-    if (m_stunClient)
-        return m_stunClient->setKeepAliveOptions(options);
+    QnMutexLocker lock(&m_mutex);
 
-    m_cachedStunClientCalls.push_back(
-        std::bind(&AbstractAsyncClient::setKeepAliveOptions, std::placeholders::_1,
-            std::move(options)));
+    invokeOrPostpone(
+        std::bind(&AbstractAsyncClient::setKeepAliveOptions, 
+            std::placeholders::_1, std::move(options)));
 }
 
 void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handler)
@@ -165,6 +165,8 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
     const QUrl& url,
     ConnectHandler handler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_connectHandler = std::move(handler);
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
     m_httpClient->bindToAioThread(getAioThread());
@@ -191,8 +193,13 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         return;
     }
 
-    m_stunClient = std::make_unique<AsyncClient>(httpClient->takeSocket());
-    makeCachedStunClientCalls();
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        m_stunClient = std::make_unique<AsyncClient>(httpClient->takeSocket());
+        makeCachedStunClientCalls();
+    }
+
     nx::utils::swapAndCall(m_connectHandler, SystemError::noError);
 }
 
@@ -200,6 +207,18 @@ void AsyncClientWithHttpTunneling::makeCachedStunClientCalls()
 {
     for (auto& cachedCall: m_cachedStunClientCalls)
         cachedCall(m_stunClient.get());
+}
+
+void AsyncClientWithHttpTunneling::invokeOrPostpone(
+    nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)> func)
+{
+    if (m_stunClient)
+    {
+        func(m_stunClient.get());
+        return;
+    }
+
+    m_cachedStunClientCalls.push_back(std::move(func));
 }
 
 } // namespace stun
