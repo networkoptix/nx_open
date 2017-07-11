@@ -756,10 +756,7 @@ void QnWorkbenchConnectHandler::reconnectStep()
     else
     {
         executeDelayedParented(
-            [this]
-            {
-                reconnectStep();
-            }, kReconnectDelayMs, m_reconnectHelper.data());
+            [this] { reconnectStep(); }, kReconnectDelayMs, m_reconnectHelper.data());
     }
     return;
 }
