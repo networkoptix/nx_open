@@ -155,9 +155,11 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
     const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
     const auto currentUserId = context()->user()->getId();
+    const auto currentTimeMs = QDateTime::currentMSecsSinceEpoch();
     for (auto& bookmark: bookmarks)
     {
         bookmark.creatorId = currentUserId;
+        bookmark.creationTimeStampMs = currentTimeMs;
         qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
     }
 }
