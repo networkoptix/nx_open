@@ -46,6 +46,11 @@ nx::stun::Message StunOverHttpServerFixture::prepareRequest()
             kStunMethodToUse));
 }
 
+nx::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
+{
+    return m_dispatcher;
+}
+
 void StunOverHttpServerFixture::givenTunnelingServer()
 {
     m_stunOverHttpServer.setupHttpTunneling(

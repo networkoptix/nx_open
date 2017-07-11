@@ -27,6 +27,7 @@ protected:
     QUrl tunnelUrl() const;
     nx::stun::Message popReceivedMessage();
     nx::stun::Message prepareRequest();
+    nx::stun::MessageDispatcher& dispatcher();
 
     void givenTunnelingServer();
     void assertStunClientIsAbleToPerformRequest(AbstractAsyncClient* client);

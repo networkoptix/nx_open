@@ -12,6 +12,9 @@
 namespace nx {
 namespace stun {
 
+/**
+ * Establishes STUN over HTTP tunnel if http url is supplied.
+ */
 class NX_NETWORK_API AsyncClientWithHttpTunneling:
     public AbstractAsyncClient
 {
@@ -58,6 +61,9 @@ public:
 
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
+    /**
+     * @param url http and stun scheme is supported.
+     */
     void connect(const QUrl& url, ConnectHandler handler);
 
 private:

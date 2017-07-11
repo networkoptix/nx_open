@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/stun/async_client_with_http_tunneling.h>
+#include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 
 #include "stun_over_http_server_fixture.h"
@@ -18,7 +20,8 @@ class AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling():
-        m_client(AbstractAsyncClient::Settings())
+        m_client(AbstractAsyncClient::Settings()),
+        m_stunServer(&dispatcher(), false)
     {
     }
 
@@ -33,6 +36,9 @@ protected:
         base_type::SetUp();
 
         givenTunnelingServer();
+
+        ASSERT_TRUE(m_stunServer.bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_stunServer.listen());
     }
 
     void givenScheduledStunRequest()
@@ -57,6 +63,18 @@ protected:
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
     
+    void whenConnectToRegularStunServer()
+    {
+        nx::utils::promise<SystemError::ErrorCode> done;
+        m_client.connect(
+            network::url::Builder().setScheme("stun").setEndpoint(m_stunServer.address()),
+            [&done](SystemError::ErrorCode sysErrorCode)
+            {
+                done.set_value(sysErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, done.get_future().get());
+    }
+
     void thenHttpTunnelIsOpened()
     {
         assertStunClientIsAbleToPerformRequest(&m_client);
@@ -71,9 +89,15 @@ protected:
             std::get<1>(response).header.messageClass);
     }
 
+    void thenConnectionIsEstablished()
+    {
+        assertStunClientIsAbleToPerformRequest(&m_client);
+    }
+
 private:
     stun::AsyncClientWithHttpTunneling m_client;
     nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::stun::Message>> m_responses;
+    nx::stun::SocketServer m_stunServer;
 
     void onResponseReceived(
         SystemError::ErrorCode sysErrorCode,
@@ -94,6 +118,12 @@ TEST_F(AsyncClientWithHttpTunneling, scheduled_stun_request_is_sent_after_tunnel
     givenScheduledStunRequest();
     whenConnectToStunOverHttpServer();
     thenScheduledRequestIsServed();
+}
+
+TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
+{
+    whenConnectToRegularStunServer();
+    thenConnectionIsEstablished();
 }
 
 } // namespace test
