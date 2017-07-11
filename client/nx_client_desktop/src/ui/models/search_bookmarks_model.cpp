@@ -331,6 +331,10 @@ int QnSearchBookmarksModel::sortFieldToColumn(Qn::BookmarkSortField field)
         return Column::kStartTime;
     case Qn::BookmarkDuration:
         return Column::kLength;
+    case Qn::BookmarkCreationTime:
+        return Column::kCreationTime;
+    case Qn::BookmarkCreator:
+        return Column::kCreator;
     case Qn::BookmarkTags:
         return Column::kTags;
     case Qn::BookmarkCameraName:
