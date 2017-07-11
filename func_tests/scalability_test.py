@@ -128,7 +128,9 @@ def measure_merge(servers, merge_timeout):
     wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time, merge_timeout)
     wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time, merge_timeout)
     wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time, merge_timeout)
-    log.info('Total merge duration: %s' % (utils.datetime_utc_now() - start_time))
+    merge_duration = utils.datetime_utc_now() - start_time
+    log.info('Total merge duration: %s', merge_duration)
+    return merge_duration
 
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
@@ -194,7 +196,8 @@ def create_test_data(config, servers):
     pool.join()
 
 
-def test_scalability(config, servers):
+def test_scalability(metrics_saver, config, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
     create_test_data(config, servers)
-    measure_merge(servers, config.MERGE_TIMEOUT)
+    merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
+    metrics_saver.save('merge_duration', merge_duration)

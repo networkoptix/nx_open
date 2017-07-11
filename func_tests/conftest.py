@@ -11,6 +11,7 @@ from netaddr import IPAddress
 from test_utils.utils import SimpleNamespace
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.artifact import ArtifactFactory
+from test_utils.metrics_saver import MetricsSaver
 from test_utils.customization import read_customization_company_name
 from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
@@ -149,7 +150,7 @@ def test_config(request, run_options):
         return SingleTestConfig()
 
 @pytest.fixture
-def artifact_factory(request, run_options):
+def junk_shop_repository(request, init_logging):
     db_capture_plugin = request.config.pluginmanager.getplugin(JUNK_SHOP_PLUGIN_NAME)
     if db_capture_plugin:
         db_capture_repository = db_capture_plugin.repo
@@ -158,6 +159,11 @@ def artifact_factory(request, run_options):
     else:
         db_capture_repository = None
         current_test_run = None
+    return (db_capture_repository, current_test_run)
+
+@pytest.fixture
+def artifact_factory(request, run_options, junk_shop_repository):
+    db_capture_repository, current_test_run = junk_shop_repository
     artifact_path_prefix = os.path.join(
         run_options.work_dir,
         os.path.basename(request.node.nodeid.replace('::', '-').replace('.py', '')))
@@ -165,6 +171,13 @@ def artifact_factory(request, run_options):
     artifact_factory = ArtifactFactory.from_path(db_capture_repository, current_test_run, artifact_set, artifact_path_prefix)
     yield artifact_factory
     artifact_factory.release()
+
+@pytest.fixture
+def metrics_saver(junk_shop_repository):
+    db_capture_repository, current_test_run = junk_shop_repository
+    if not db_capture_repository:
+        log.warning('Junk shop plugin is not available; No metrics will be saved')
+    return MetricsSaver(db_capture_repository, current_test_run)
 
 
 @pytest.fixture(scope='session')
