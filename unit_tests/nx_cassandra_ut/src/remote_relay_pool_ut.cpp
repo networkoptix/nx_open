@@ -1,3 +1,4 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include <model/remote_relay_peer_pool.h>
 #include <nx/casssandra/async_cassandra_connection.h>
@@ -25,15 +26,20 @@ class RemoteRelayPeerPool: public ::testing::Test
 protected:
     virtual void TearDown() override
     {
-        m_relayPool.getConnection()->executeUpdate("DROP KEYSPACE cdb;").wait();
+        m_relayPool->getConnection()->executeUpdate("DROP KEYSPACE cdb;").wait();
     }
 
-    void givenDbWithNotExistentCdbKeyspace()
+    void givenDbWithNotExistentCdbKeyspace() {}
+
+    void givenDbWithExistentCdbKeyspace()
     {
+        cassandra::AsyncConnection connection("127.0.0.1");
+        connection.executeUpdate("CREATE KEYSPACE cdb;").wait();
     }
 
     void whenRelayPoolObjectHasBeenCreated()
     {
+        m_relayPool.reset(new TestRelayPool);
     }
 
     void assertSelectFromTablesResult(
@@ -49,7 +55,7 @@ protected:
 
     void thenKeyspaceAndTableShouldBeCreated()
     {
-        m_relayPool.getConnection()->executeSelect(
+        m_relayPool->getConnection()->executeSelect(
             "SELECT table_name FROM system_schema.tables WHERE keyspace_name = 'cdb';")
             .then(
                 [this](cf::future<std::pair<CassError, cassandra::QueryResult>> selectFuture)
@@ -61,12 +67,21 @@ protected:
     }
 
 private:
-    TestRelayPool m_relayPool;
+    std::unique_ptr<TestRelayPool> m_relayPool;
 };
 
 TEST_F(RemoteRelayPeerPool, CreateDbStructure_NeededStructureDoesNotExist)
 {
     givenDbWithNotExistentCdbKeyspace();
+    whenRelayPoolObjectHasBeenCreated();
+
+    thenKeyspaceAndTableShouldBeCreated();
+}
+
+
+TEST_F(RemoteRelayPeerPool, CreateDbStructure_KeyspaceAlreadyExists)
+{
+    givenDbWithExistentCdbKeyspace();
     whenRelayPoolObjectHasBeenCreated();
 
     thenKeyspaceAndTableShouldBeCreated();
