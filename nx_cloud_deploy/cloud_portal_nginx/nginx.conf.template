@@ -113,7 +113,6 @@ http {
         location /preview/ {
             root /app/app/static/$CUSTOMIZATION/preview;
             error_page 404 /static/index.html;
-            sendfile off;
             expires -1;
         }
 
