@@ -28,6 +28,7 @@
                 SuppressOptionsUI="yes"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
+                SuppressDowngradeFailure="yes"
                 LicenseUrl="License.html" />
         </BootstrapperApplicationRef>
 
