@@ -3,6 +3,7 @@ from .models import *
 
 class CustomContextForm(forms.ModelForm):
 	language = forms.ModelChoiceField(widget=forms.Select, label="Language", queryset=Language.objects.all())
+	image = forms.ImageField()
 
 	class Meta():
 		fields = "__all__"

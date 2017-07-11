@@ -29,7 +29,7 @@ def get_post_parameters(request, context_id, language_id):
 	if not language:
 		language = customization.default_language
 	
-	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
+	form = CustomContextForm(request.POST, request.FILES, initial={'language': language.id, 'context': context.id})
 
 	return context, language, form, customization, user 
 
@@ -103,6 +103,8 @@ def context_edit_view(request, context=None, language=None):
 	else:
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
 		
+		image = request.FILES['image'] if 'image' in request.FILES else ""
+
 		if 'SendReview' in request.data:
 			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
@@ -113,7 +115,8 @@ def context_edit_view(request, context=None, language=None):
 													   'user': request.user,
 													   'has_permission': mysite.has_permission(request),
 													   'site_url': mysite.site_url,
-													   'title': 'Content Editor'})
+													   'title': 'Content Editor',
+													   'image':image})
 
 
 @api_view(["POST"])

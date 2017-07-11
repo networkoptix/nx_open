@@ -14,7 +14,7 @@
     <div> Link to Page: <a href="{{context.url}}">{{ context.url }}</a></div>
     {% endif %}
 </fieldset>
-<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned">
+<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
     <input type="hidden" name="currentLanguage" value="{{ language.id }}">
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
@@ -39,6 +39,10 @@
 {% if preview_link %}
 <div class="submit-row">
 <button onClick="openPreview()">Open Preview</button>
+{% endif %}
+
+{% if image %}
+<div> {{image}}</div>
 {% endif %}
 <script>
     function openPreview(){
