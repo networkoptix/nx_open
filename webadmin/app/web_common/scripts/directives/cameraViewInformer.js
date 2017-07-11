@@ -19,16 +19,24 @@ angular.module('nxCommon')
 
                     //check for flag
                     for(var key in scope.flags){
-                        if(scope.flags[key]){
+                        if(key != 'status' && scope.flags[key]){
                             scope.alertType = key;
                             break;
                         }
                     }
                     
-                    //if status is online dont show any message
-                    if(scope.alertType == 'status' && (scope.flags[scope.alertType] == "Online" || scope.flags[scope.alertType] == "Recording"))
+                    //If position has been selected then there is an archive no message is required
+                    if(scope.flags.positionSelected != undefined)
                     {
                         scope.alertType = null;
+                        return;
+                    }
+
+                    //if status is online dont show any message
+                    if(!scope.alertType && scope.flags.status != undefined
+                                        && !(scope.flags.status == "Online" || scope.flags.status == "Recording"))
+                    {
+                        scope.alertType = 'status';
                     }
                     //if non flag break
                     if(!scope.alertType){
@@ -41,7 +49,7 @@ angular.module('nxCommon')
                     if(scope.alertType == 'status'){
                         scope.title = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
                         scope.message = null;
-                        scope.iconClass = scope.flags[scope.alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
+                        scope.iconClass = scope.flags.status == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
                     }
                     else{
                         scope.iconClass = 'camera-view-error';

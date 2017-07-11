@@ -101,7 +101,7 @@ ng-include{
 
 .timeline{
   position:relative;
-  height:100px;
+  height:100%;
   -webkit-touch-callout: none;
   user-select: none;
   background-color: $additional_light2;
@@ -167,7 +167,9 @@ ng-include{
   margin: 10px auto !important;
 }
 
-.no-timeline .live-button,
+.no-timeline .live-button{
+  line-height: 40px !important;
+}
 .mobile-controls .live-button{
   line-height: 60px !important;
 }

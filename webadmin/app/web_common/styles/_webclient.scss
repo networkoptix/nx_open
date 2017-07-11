@@ -60,7 +60,6 @@
   }
 
   &-panel{
-    white-space: nowrap;
     font-size: 120%;
     min-height: 60px;
     margin: 0px 20px;
@@ -216,19 +215,17 @@ table.webclient-window>tbody>tr>td{
 
   &>*{
     background: transparent;
-    height: 44px;
+    height: 100%
   }
   .icon-left{
     position: absolute;
     text-align: center;
     line-height: 54px;
-    height: 100%;
     width: 44px;
     float: left;
   }
 
   .icons-right{
-    height: 100%;
     float: right;
     display: inline-block;
     position: relative;
@@ -283,6 +280,7 @@ table.webclient-window>tbody>tr>td{
     outline: none !important;
     font-size: 16px;
     border-bottom: 1px solid $light6;
+    line-height: 44px;
     
     &:hover{
       background-color: $light2;
@@ -732,6 +730,10 @@ table.webclient-window>tbody>tr>td{
   }
   .view-panel{
     padding-bottom: 160px;
+
+    &.no-archive{
+      padding-bottom: 60px !important;
+    }
   }
   div.text-center{
     margin: 0 !important;
@@ -795,4 +797,8 @@ table.webclient-window>tbody>tr>td{
   height: 44px;
   width: 40px;
   display: block;
+}
+
+video-title-back-button .glyphicon-arrow-left{
+  color: $light1;
 }

@@ -1350,7 +1350,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
         std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
             m_timeSynchronizationManager.get(), _1));
-    // TODO: #ak register AbstractTimeManager::getPeerTimeInfoList
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
