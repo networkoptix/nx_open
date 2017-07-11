@@ -132,7 +132,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;
 
-    const auto bookmarks = bookmarksDialog->bookmarks();
+    auto bookmarks = bookmarksDialog->bookmarks();
 
     const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
     const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
@@ -154,8 +154,12 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         };
 
     const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
-    for (const auto& bookmark: bookmarks)
+    const auto currentUserId = context()->user()->getId();
+    for (auto& bookmark: bookmarks)
+    {
+        bookmark.creatorId = currentUserId;
         qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
+    }
 }
 
 void QnWorkbenchNotificationsHandler::clear()

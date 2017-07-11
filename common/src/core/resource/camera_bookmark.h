@@ -47,6 +47,17 @@ struct QnCameraBookmark
     /** Id of the bookmark. */
     QnUuid guid;
 
+    /**
+      * Identifier of user who created this bookmark.
+      */
+    QnUuid creatorId;
+
+    /**
+      * Time of bookmark creation in milliseconds since epoch. Equals to startTimeMs
+      * field if bookmark is created by system.
+      */
+    qint64 creationTimeStampMs = 0;
+
     /** Name of the bookmark.*/
     QString name;
 
@@ -54,13 +65,13 @@ struct QnCameraBookmark
     QString description;
 
     /** Time during which recorded period should be preserved, in milliseconds. */
-    qint64 timeout;
+    qint64 timeout = -1;
 
     /** Start time in milliseconds since epoch. */
-    qint64 startTimeMs;
+    qint64 startTimeMs = 0;
 
     /** Duration in milliseconds. */
-    qint64 durationMs;
+    qint64 durationMs = 0;
 
     /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
@@ -70,18 +81,24 @@ struct QnCameraBookmark
 
     QnUuid cameraId;
 
-    QnCameraBookmark():
-        timeout(-1),
-        startTimeMs(0),
-        durationMs(0)
-    {
-    }
+    /**
+      * Returns creation time of bookmark in milliseconds since epoch.
+      * If bookmark is created by system or by older VMS version returns
+      * timestamp that equals to startTimeMs field
+      */
+    qint64 creationTimeMs() const;
+
+    bool isCreatedInOlderVMS() const;
+
+    bool isCreatedBySystem() const;
 
     /** @return True if bookmark is null, false otherwise. */
     bool isNull() const;
 
     /** @return True if bookmark is valid, false otherwise. */
     bool isValid() const;
+
+    QnCameraBookmark();
 
     static QString tagsToString(
         const QnCameraBookmarkTags& tags, const QString& delimiter = lit(", "));
@@ -97,6 +114,8 @@ struct QnCameraBookmark
         const QnBookmarkSortOrder& sortOrder = QnBookmarkSortOrder::defaultOrder,
         const QnBookmarkSparsingOptions& sparsing = QnBookmarkSparsingOptions(),
         int limit = std::numeric_limits<int>().max());
+
+    static QnUuid systemUserId();
 };
 #define QnCameraBookmark_Fields \
     (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)

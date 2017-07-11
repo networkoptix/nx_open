@@ -279,6 +279,38 @@ void QnCameraBookmark::sortBookmarks(
     });
 }
 
+qint64 QnCameraBookmark::creationTimeMs() const
+{
+    return isCreatedInOlderVMS()
+        ? startTimeMs
+        : creationTimeStampMs;
+}
+
+bool QnCameraBookmark::isCreatedInOlderVMS() const
+{
+    return creatorId.isNull();
+}
+
+bool QnCameraBookmark::isCreatedBySystem() const
+{
+    return creatorId == systemUserId();
+}
+
+QnUuid QnCameraBookmark::systemUserId()
+{
+    return QnUuid::fromRfc4122("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
+}
+
+QnCameraBookmark::QnCameraBookmark():
+    guid(QnUuid::createUuid()),
+    creatorId(systemUserId()),
+    timeout(-1),
+    startTimeMs(0),
+    durationMs(0)
+{
+}
+
+
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     QnCommonModule* commonModule,
     const QnMultiServerCameraBookmarkList &source,

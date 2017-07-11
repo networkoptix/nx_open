@@ -13,6 +13,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -169,6 +170,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
+
+    bookmark.creatorId = context()->user()->getId();
     dialog->submitData(bookmark);
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
