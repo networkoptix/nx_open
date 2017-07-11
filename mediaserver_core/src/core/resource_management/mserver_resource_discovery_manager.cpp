@@ -28,8 +28,13 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
+namespace {
+
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
+static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
+
+} // namespace
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 {
@@ -38,6 +43,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
     m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_foreignResourcesRetryCount = 0;
+    m_startupTimer.restart();
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -94,7 +100,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
             }
         }
-        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES)
+        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
+            m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
             m_foreignResourcesRetryCount = 0;
 

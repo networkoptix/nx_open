@@ -2,6 +2,7 @@
 #define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
 
@@ -44,6 +45,7 @@ private:
     QMap<QString, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;
     QnMutex m_discoveryMutex;
+    QElapsedTimer m_startupTimer;
 };
 
 #endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
