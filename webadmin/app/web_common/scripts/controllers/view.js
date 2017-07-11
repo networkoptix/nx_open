@@ -435,9 +435,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             /*
                 If the view port height isnt its full height timeout unil it is
                 This is mainly used for mobile with the uses expands the nav bar
-                50px is the height of the nav bar in its collapsed state
-              
-                Using 60 instead of 50 because the height of the cloudportal navbar is 56.57px.
                 if the viewport passes that threshhold it will take up the entire height.
             */
             if(viewportHeight  < windowHeight - headerHeight){
