@@ -36,7 +36,7 @@ void RemoteRelayPeerPool::prepareDbStructure()
                     return result;
 
                 return m_cassConnection->executeUpdate(
-                    "CREATE TABLE cdb.relay_servers ( \
+                    "CREATE TABLE cdb.relay_peers ( \
                         relay_id            text, \
                         domain_suffix_1     text, \
                         domain_suffix_2     text, \
@@ -101,7 +101,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
 
                 return m_cassConnection->prepareQuery(
                     ("SELECT relay_id \
-                     FROM cdb.relay_servers " + whereStringForFind(domainName)).c_str());
+                     FROM cdb.relay_peers " + whereStringForFind(domainName)).c_str());
             })
         .then(
             [this, sharedContext](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
@@ -109,7 +109,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 auto result = prepareFuture.get();
                 if (result.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Prepare select from cdb.relay_servers failed");
+                    NX_VERBOSE(this, "Prepare select from cdb.relay_peers failed");
                     return cf::make_ready_future(
                         std::make_pair(result.first, cassandra::QueryResult()));
                 }
@@ -123,7 +123,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 auto result = selectFuture.get();
                 if (result.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Select from cdb.relay_servers failed");
+                    NX_VERBOSE(this, "Select from cdb.relay_peers failed");
                     return std::string();
                 }
 
@@ -145,7 +145,9 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
             });
 }
 
-bool RemoteRelayPeerPool::addPeer(const std::string& /*domainName*/, const std::string& /*peerName*/)
+bool RemoteRelayPeerPool::addPeer(
+    const std::string& /*domainName*/,
+    const std::string& /*peerName*/)
 {
 //    if (!m_dbReady)
         return false;
@@ -191,6 +193,11 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
 
     ss << ";";
     return ss.str();
+}
+
+cassandra::AsyncConnection* RemoteRelayPeerPool::getConnection()
+{
+    return m_cassConnection.get();
 }
 
 } // namespace model

@@ -22,6 +22,9 @@ public:
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
     bool addPeer(const std::string& domainName, const std::string& peerName);
 
+protected:
+    cassandra::AsyncConnection* getConnection();
+
 private:
     std::unique_ptr<cassandra::AsyncConnection> m_cassConnection;
     bool m_dbReady = false;
