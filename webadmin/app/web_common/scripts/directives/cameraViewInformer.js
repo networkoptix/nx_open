@@ -26,14 +26,14 @@ angular.module('nxCommon')
                     }
                     
                     //If position has been selected then there is an archive no message is required
-                    if(scope.flags.positionSelected != undefined)
+                    if('positionSelected' in scope.flag && scope.flags.positionSelected != undefined)
                     {
                         scope.alertType = null;
                         return;
                     }
 
                     //if status is online dont show any message
-                    if(!scope.alertType && scope.flags.status != undefined
+                    if(!scope.alertType && 'status' in scope.flags && scope.flags.status != undefined
                                         && !(scope.flags.status == "Online" || scope.flags.status == "Recording"))
                     {
                         scope.alertType = 'status';
