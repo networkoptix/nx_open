@@ -440,7 +440,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 Using 60 instead of 50 because the height of the cloudportal navbar is 56.57px.
                 if the viewport passes that threshhold it will take up the entire height.
             */
-            if(viewportHeight  < windowHeight - 60){
+            if(viewportHeight  < windowHeight - headerHeight){
                 $timeout(updateHeights,100);
                 return;
             }
