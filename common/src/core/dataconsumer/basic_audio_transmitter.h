@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -13,6 +15,7 @@ public:
     QnBasicAudioTransmitter(QnSecurityCamResource* res);
     void setTransmissionUrl(const QUrl& url);
     void setContentType(const nx_http::StringType& contentType);
+    void setNoAuth(bool value);
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
     virtual void prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient) override;
@@ -29,3 +32,5 @@ private:
     QUrl m_url;
     nx_http::StringType m_contentType;
 };
+
+#endif // ENABLE_DATA_PROVIDERS

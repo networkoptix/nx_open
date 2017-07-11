@@ -4163,16 +4163,10 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     m_audioTransmitter->setOutputFormat(format);
     m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
     audioTransmitter->setContentType(params.contentType.toUtf8());
+    audioTransmitter->setNoAuth(params.noAuth);
 
-    QUrl url(getUrl());
-    url.setScheme(lit("http"));
-    if (url.host().isEmpty())
-        url.setHost(getHostAddress());
-    url.setPath(params.urlPath);
-    QUrlQuery query;
-    for (auto itr = params.urlQueryParams.begin(); itr != params.urlQueryParams.end(); ++itr)
-        query.addQueryItem(itr.key(), itr.value());
-    url.setQuery(query);
+    QUrl srcUrl(getUrl());
+    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
     audioTransmitter->setTransmissionUrl(url);
 
     return true;

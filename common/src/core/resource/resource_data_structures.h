@@ -27,11 +27,11 @@ struct TwoWayAudioParams
     int channels = 1;
     int sampleRate = 0;
     QString urlPath;
-    QMap<QString, QString> urlQueryParams;
     QString contentType;
+    bool noAuth = false;
 };
 Q_DECLARE_METATYPE(TwoWayAudioParams);
-#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(urlQueryParams)(contentType)
+#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)
 
 struct QnBounds
 {

@@ -1926,6 +1926,21 @@
         },
         {
             "keys": [
+                "Dahua|IPC-K15P"
+            ],
+            "2WayAudio":
+            {
+                "codec": "ALAW",
+                "bitrateKbps": 64,
+                "sampleRate": 12,
+                "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
+                "contentType": "Audio/G.711A",
+                "noAuth": true
+            }
+            
+        },
+        {
+            "keys": [
                 "Samsung*|XNP-6370*"
             ],
             "ptzMapper": {
