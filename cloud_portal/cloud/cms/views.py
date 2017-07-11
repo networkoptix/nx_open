@@ -125,7 +125,7 @@ def review_version_request(request, context=None, language=None):
 		publish_latest_version(request.user)
 		version = ContentVersion.objects.latest('created_date')
 		contexts = get_records_for_version(version)
-		messages.success(request._request, "Version " + version.id +" has been published")
+		messages.success(request._request, "Version " + str(version.id) +" has been published")
 		return render(request, 'review_records.html', {'version': version.id,
 													   'contexts': contexts,
 													   'user': request.user,
