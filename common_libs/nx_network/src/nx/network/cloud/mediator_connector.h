@@ -6,6 +6,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/stun/async_client.h>
+#include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
@@ -57,9 +58,9 @@ private:
     boost::optional< nx::utils::promise< bool > > m_promise;
     boost::optional< nx::utils::future< bool > > m_future;
 
-    std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
+    std::shared_ptr<stun::AsyncClientWithHttpTunneling> m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
-    boost::optional<SocketAddress> m_mediatorAddress;
+    boost::optional<QUrl> m_mediatorUrl;
     boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 

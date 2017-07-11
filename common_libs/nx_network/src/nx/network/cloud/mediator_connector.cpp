@@ -20,7 +20,7 @@ static stun::AbstractAsyncClient::Settings s_stunClientSettings;
 } // namespace
 
 MediatorConnector::MediatorConnector():
-    m_stunClient(std::make_shared<stun::AsyncClient>(s_stunClientSettings)),
+    m_stunClient(std::make_shared<stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
     m_mediatorUrlFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>()),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
@@ -84,11 +84,9 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
 
 void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning )
 {
-    auto address = nx::network::url::getEndpoint(mediatorUrl);
-
     {
         QnMutexLocker lk( &m_mutex );
-        if (m_promise && (address == m_mediatorAddress))
+        if (m_promise && (mediatorUrl == m_mediatorUrl))
             return;
 
         NX_ASSERT( !m_promise, Q_FUNC_INFO,
@@ -100,13 +98,12 @@ void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning )
 
     if (!suppressWarning)
     {
-        NX_LOGX( lit( "Mediator address is mocked up: %1" )
-                 .arg( address.toString() ), cl_logINFO );
+        NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
     }
 
-    m_mediatorAddress = address;
-    m_mediatorUdpEndpoint = address;
-    m_stunClient->connect( std::move( address ) );
+    m_mediatorUrl = mediatorUrl;
+    m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
+    m_stunClient->connect(nx::network::url::getEndpoint(mediatorUrl));
     m_promise->set_value( true );
 }
 
@@ -141,7 +138,7 @@ boost::optional<SocketAddress> MediatorConnector::udpEndpoint() const
 bool MediatorConnector::isConnected() const
 {
     QnMutexLocker lk(&m_mutex);
-    return static_cast<bool>(m_mediatorAddress);
+    return static_cast<bool>(m_mediatorUrl);
 }
 
 void MediatorConnector::setStunClientSettings(
@@ -184,18 +181,16 @@ void MediatorConnector::fetchEndpoint()
 void MediatorConnector::useMediatorUrl(QUrl url)
 {
     m_stunClient->connect(
-        SocketAddress(url.host(), url.port()),
-        false /* SSL disabled */,
+        url,
         [this](SystemError::ErrorCode code)
         {
             auto setEndpoint =
                 [this]()
             {
                 QnMutexLocker lk(&m_mutex);
-                m_mediatorAddress = m_stunClient->remoteAddress();
-                m_mediatorUdpEndpoint->address = m_mediatorAddress->address;
-                NX_LOGX(lm("Connected to mediator at %1")
-                    .arg(m_mediatorAddress), cl_logDEBUG1);
+                // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
+                m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
+                NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
             };
 
             if (code == SystemError::noError)
