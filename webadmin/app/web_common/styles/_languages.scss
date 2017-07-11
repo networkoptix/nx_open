@@ -56,7 +56,7 @@
 .lang-xs[lang=da] { background-position: 0px   -44px; }
 .lang-xs[lang=de_DE] { background-position: 0px   -55px; }
 .lang-xs[lang=el] { background-position: 0px   -66px; }
-.lang-xs[lang=en] { background-position: 0px   -77px; }
+.lang-xs[lang=en_US] { background-position: 0px   -77px; }
 .lang-xs[lang=es_ES] { background-position: 0px   -88px; }
 .lang-xs[lang=et] { background-position: 0px   -99px; }
 .lang-xs[lang=fi] { background-position: 0px  -110px; }
@@ -90,8 +90,8 @@
 .lang-xs[lang=th_TH] { background-position: 0px  -418px; }
 .lang-xs[lang=tr_TR] { background-position: 0px  -429px; }
 .lang-xs[lang=uk] { background-position: 0px  -440px; }
-.lang-xs[lang=vi] { background-position: 0px  -451px; }
-.lang-xs[lang=zh] { background-position: 0px  -462px; }
+.lang-xs[lang=vi_VN] { background-position: 0px  -451px; }
+.lang-xs[lang=zh_CN] { background-position: 0px  -462px; }
 
 /* Positions in our sprite for sm-sized images */
 .lang-sm[lang=ar] { background-position: 0px  -484px; }
@@ -101,7 +101,7 @@
 .lang-sm[lang=da] { background-position: 0px  -548px; }
 .lang-sm[lang=de_DE] { background-position: 0px  -564px; }
 .lang-sm[lang=el] { background-position: 0px  -580px; }
-.lang-sm[lang=en] { background-position: 0px  -596px; }
+.lang-sm[lang=en_US] { background-position: 0px  -596px; }
 .lang-sm[lang=es_ES] { background-position: 0px  -612px; }
 .lang-sm[lang=et] { background-position: 0px  -628px; }
 .lang-sm[lang=fi] { background-position: 0px  -644px; }
@@ -135,8 +135,8 @@
 .lang-sm[lang=th_TH] { background-position: 0px -1092px; }
 .lang-sm[lang=tr_TR] { background-position: 0px -1108px; }
 .lang-sm[lang=uk] { background-position: 0px -1124px; }
-.lang-sm[lang=vi] { background-position: 0px -1140px; }
-.lang-sm[lang=zh] { background-position: 0px -1156px; }
+.lang-sm[lang=vi_VN] { background-position: 0px -1140px; }
+.lang-sm[lang=zh_CN] { background-position: 0px -1156px; }
 
 /* Positions in our sprite for lg-sized images */
 .lang-lg[lang=ar] { background-position: 0px -1188px; }
@@ -146,7 +146,7 @@
 .lang-lg[lang=da] { background-position: 0px -1276px; }
 .lang-lg[lang=de_DE] { background-position: 0px -1298px; }
 .lang-lg[lang=el] { background-position: 0px -1320px; }
-.lang-lg[lang=en] { background-position: 0px -1342px; }
+.lang-lg[lang=en_US] { background-position: 0px -1342px; }
 .lang-lg[lang=es_ES] { background-position: 0px -1364px; }
 .lang-lg[lang=et] { background-position: 0px -1386px; }
 .lang-lg[lang=fi] { background-position: 0px -1408px; }
@@ -180,8 +180,8 @@
 .lang-lg[lang=th_TH] { background-position: 0px -2024px; }
 .lang-lg[lang=tr_TR] { background-position: 0px -2046px; }
 .lang-lg[lang=uk] { background-position: 0px -2068px; }
-.lang-lg[lang=vi] { background-position: 0px -2090px; }
-.lang-lg[lang=zh] { background-position: 0px -2112px; }
+.lang-lg[lang=vi_VN] { background-position: 0px -2090px; }
+.lang-lg[lang=zh_CN] { background-position: 0px -2112px; }
 
 /* One breaking space if we have an image */
 .lang-xs:before,
@@ -269,27 +269,6 @@ h6>.lang-xs:after { top:  -1px; }
 .btn.btn-lg>.lang-sm:after { top:  -3px; }
 .btn.btn-lg>.lang-xs       { top:   6px; }
 .btn.btn-lg>.lang-xs:after { top:  -6px; }
-
-/*
-Additional languages
-*/
-
-
-
-.lang-xs[lang=vi_VN] { background-position: 0px  -451px; }
-.lang-sm[lang=vi_VN] { background-position: 0px -1140px; }
-.lang-lg[lang=vi_VN] { background-position: 0px -2090px; }
-
-
-.lang-xs[lang=zh_CN] { background-position: 0px  -462px; }
-.lang-sm[lang=zh_CN] { background-position: 0px -1156px; }
-.lang-lg[lang=zh_CN] { background-position: 0px -2112px; }
-
-
-.lang-xs[lang=en_US] { background-position: 0px   -77px; }
-.lang-sm[lang=en_US] { background-position: 0px  -596px; }
-.lang-lg[lang=en_US] { background-position: 0px -1342px; }
-
 
 /*
   Additional flags
