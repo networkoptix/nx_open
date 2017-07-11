@@ -23,9 +23,7 @@ AsyncClient::AsyncClient(
 {
     m_endpoint = tcpConnection->getForeignAddress();
 
-    bindToAioThread(getAioThread());
-    tcpConnection->bindToAioThread(getAioThread());
-
+    bindToAioThread(tcpConnection->getAioThread());
     initializeMessagePipeline(std::move(tcpConnection));
 }
 

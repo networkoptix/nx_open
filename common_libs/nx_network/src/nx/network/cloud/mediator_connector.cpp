@@ -1,7 +1,6 @@
 #include "mediator_connector.h"
 
 #include <nx/network/socket_factory.h>
-#include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
@@ -182,8 +181,7 @@ void MediatorConnector::fetchEndpoint()
 void MediatorConnector::useMediatorUrl(QUrl url)
 {
     m_stunClient->connect(
-        SocketAddress(url.host(), url.port()),
-        false /* SSL disabled */,
+        url,
         [this](SystemError::ErrorCode code)
         {
             auto setEndpoint =

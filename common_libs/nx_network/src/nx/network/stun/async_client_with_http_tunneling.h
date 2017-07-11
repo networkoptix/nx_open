@@ -1,6 +1,11 @@
 #pragma once
 
+#include <list>
+#include <memory>
+
 #include <QtCore/QUrl>
+
+#include <nx/network/http/http_async_client.h>
 
 #include "async_client.h"
 
@@ -10,7 +15,13 @@ namespace stun {
 class NX_NETWORK_API AsyncClientWithHttpTunneling:
     public AbstractAsyncClient
 {
+    using base_type = AbstractAsyncClient;
+
 public:
+    AsyncClientWithHttpTunneling(Settings settings);
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+
     virtual void connect(
         SocketAddress endpoint,
         bool useSsl = false,
@@ -47,11 +58,21 @@ public:
 
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
-    void connect(QUrl url, ConnectHandler handler);
+    void connect(const QUrl& url, ConnectHandler handler);
 
 private:
-    AsyncClient m_stunClient;
+    Settings m_settings;
+    std::unique_ptr<AsyncClient> m_stunClient;
+    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    ConnectHandler m_connectHandler;
+    std::list<nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)>> m_cachedStunClientCalls;
+
+    virtual void stopWhileInAioThread() override;
+
+    void openHttpTunnel(const QUrl& url, ConnectHandler handler);
+    void onHttpConnectionUpgradeDone();
+    void makeCachedStunClientCalls();
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx
