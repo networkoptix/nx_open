@@ -274,7 +274,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case ec2BookmarkAddObject:
         case ec2BookmarkUpdateObject:
         case ec2BookmarkDeleteObject:
-            processJsonReply<QnCameraBookmark>(this, response, handle);
+            emitFinished(this, response.status, handle);
             break;
         case InstallUpdateObject:
         case InstallUpdateUnauthenticatedObject:
