@@ -6,23 +6,23 @@
 
 #include <common/common_module_aware.h>
 
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_misc_data.h"
-#include "utils/db/db_helper.h"
-#include "transaction/transaction_log.h"
+#include <utils/db/db_helper.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/unused.h>
 #include <nx/utils/singleton.h>
-#include "nx/utils/type_utils.h"
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
-#include <database/api/db_resource_api.h>
 #include <nx/fusion/serialization/sql.h>
+
+#include <database/api/db_resource_api.h>
+
+#include "transaction/transaction.h"
+#include "transaction/transaction_log.h"
 
 struct BeforeRestoreDbData;
 
@@ -49,6 +49,7 @@ enum ApiObjectType
     ApiObject_Storage,
     ApiObject_WebPage,
 };
+
 struct ApiObjectInfo
 {
     ApiObjectInfo() {}
@@ -57,6 +58,7 @@ struct ApiObjectInfo
     ApiObjectType type;
     QnUuid id;
 };
+
 class ApiObjectInfoList: public std::vector<ApiObjectInfo>
 {
 public:
@@ -71,12 +73,6 @@ public:
 };
 
 class QnDbManagerAccess;
-
-enum class TransactionLockType
-{
-    Regular, //< do commit as soon as commit() function called
-    Lazy //< delay commit unless regular commit() called
-};
 
 namespace detail
 {
@@ -194,6 +190,7 @@ namespace detail
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
         virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
+        ec2::database::api::QueryCache::Pool* queryCachePool();
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -696,7 +693,7 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
-        void resetPreparedStatements();
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -723,11 +720,12 @@ namespace detail
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
 
-        std::unique_ptr<QSqlQuery> m_insCameraQuery;
-        std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
-        std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
-        std::unique_ptr<QSqlQuery> m_kvPairQuery;
-        ec2::database::api::Context m_resourceContext;
+        ec2::database::api::QueryCache::Pool m_queryCachePool;
+        ec2::database::api::QueryCache m_insertCameraQuery;
+        ec2::database::api::QueryCache m_insertCameraUserAttrQuery;
+        ec2::database::api::QueryCache m_insertCameraScheduleQuery;
+        ec2::database::api::QueryCache m_insertKvPairQuery;
+        ec2::database::api::QueryContext m_resourceQueries;
     };
 
 } // namespace detail

@@ -1,7 +1,7 @@
 
 #include "resource_manager.h"
 #include <QtConcurrent/QtConcurrent>
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"

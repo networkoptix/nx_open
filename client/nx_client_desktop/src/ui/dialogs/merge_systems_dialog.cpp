@@ -135,7 +135,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 {
     ui->urlComboBox->clear();
 
-    for (const auto& server: resourcePool()->getAllIncompatibleResources())
+    for (const auto& server: resourcePool()->getIncompatibleServers())
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());

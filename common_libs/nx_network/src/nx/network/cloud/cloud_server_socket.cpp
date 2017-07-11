@@ -174,6 +174,7 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
                         this,
                         std::placeholders::_1));
                     m_state = State::readyToListen;
+                    /*fallthrough*/
 
                 case State::readyToListen:
                     m_state = State::registeringOnMediator;

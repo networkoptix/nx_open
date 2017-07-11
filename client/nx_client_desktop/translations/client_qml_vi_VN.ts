@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Kết nối</translation>
     </message>
   </context>
   <context>
@@ -92,11 +92,11 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Kết nối đến các máy chủ khác...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Kết nối đến máy chủ...</translation>
     </message>
   </context>
 </TS>

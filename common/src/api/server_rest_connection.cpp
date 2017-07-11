@@ -138,7 +138,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
         return Handle(); //< can't process request now. No internet access
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::Get, prepareUrl(path, emptyRequest.toParams()));
+        nx_http::Method::get, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -163,7 +163,7 @@ Handle ServerConnection::sendStatisticsAsync(
         return Handle();
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
@@ -382,20 +382,52 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     return result;
 }
 
-template <class T>
-T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
+template<typename T,
+    typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
+T parseMessageBody(
+    const Qn::SerializationFormat& format,
+    const nx_http::BufferType& msgBody,
+    bool* success)
 {
-    switch(format)
+    switch (format)
     {
-    case Qn::JsonFormat:
-        return QJson::deserialized(msgBody, T(), success);
-    case Qn::UbjsonFormat:
-        return QnUbjson::deserialized(msgBody, T(), success);
-    default:
-        if (success)
-            *success = false;
-        NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
-        break;
+        case Qn::JsonFormat:
+        {
+            auto restResult = QJson::deserialized(msgBody, QnJsonRestResult(), success);
+            return T(restResult, restResult.deserialized<decltype(T::data)>());
+        }
+        case Qn::UbjsonFormat:
+        {
+            auto restResult = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), success);
+            return T(restResult, restResult.deserialized<decltype(T::data)>());
+        }
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            break;
+    }
+    return T();
+}
+
+template<typename T,
+    typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
+T parseMessageBody(
+    const Qn::SerializationFormat& format,
+    const nx_http::BufferType& msgBody,
+    bool* success)
+{
+    switch (format)
+    {
+        case Qn::JsonFormat:
+            return QJson::deserialized(msgBody, T(), success);
+        case Qn::UbjsonFormat:
+            return QnUbjson::deserialized(msgBody, T(), success);
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            break;
     }
     return T();
 }
@@ -407,7 +439,7 @@ Handle ServerConnection::executeGet(
     REST_CALLBACK(ResultType) callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::Get, prepareUrl(path, params));
+    auto request = prepareRequest(nx_http::Method::get, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -426,7 +458,7 @@ Handle ServerConnection::executePost(
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::Post, prepareUrl(path, params), contentType, messageBody);
+        nx_http::Method::post, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -445,7 +477,7 @@ Handle ServerConnection::executePut(
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::Put, prepareUrl(path, params), contentType, messageBody);
+        nx_http::Method::put, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -461,7 +493,7 @@ Handle ServerConnection::executeDelete(
     REST_CALLBACK(ResultType) callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::Delete, prepareUrl(path, params));
+    auto request = prepareRequest(nx_http::Method::delete_, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -499,7 +531,10 @@ void invoke(REST_CALLBACK(ResultType) callback,
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -525,7 +560,10 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(QByteArray) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -539,7 +577,9 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
             {
                 Q_UNUSED(contentType)
-                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+                bool success = (osErrorCode == SystemError::noError
+                    && statusCode >= nx_http::StatusCode::ok
+                    && statusCode <= nx_http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -551,7 +591,10 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(EmptyResponseType) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -564,7 +607,9 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
             [callback, targetThread, targetThreadGuard, serverId, timer]
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
             {
-                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+                bool success = (osErrorCode == SystemError::noError
+                    && statusCode >= nx_http::StatusCode::ok
+                    && statusCode <= nx_http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -589,7 +634,8 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const nx_http::StringType& contentType,
     const nx_http::StringType& messageBody)
 {
-    const auto server =  commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
+    auto resPool = commonModule()->resourcePool();
+    const auto server = resPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return nx_http::ClientPool::Request();
     const auto connection = commonModule()->ec2Connection();
@@ -648,7 +694,9 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     return request;
 }
 
-Handle ServerConnection::sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback)
+Handle ServerConnection::sendRequest(
+    const nx_http::ClientPool::Request& request,
+    HttpCompletionFunc callback)
 {
     auto httpPool = nx_http::ClientPool::instance();
     QnMutexLocker lock(&m_mutex);
@@ -683,5 +731,12 @@ void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientP
     if (callback)
         callback(requestId, systemError, statusCode, contentType, messageBody);
 };
+
+Handle ServerConnection::getTimeOfServersAsync(
+    Result<MultiServerTimeData>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(lit("/ec2/getTimeOfServers"), QnRequestParamList(), callback, targetThread);
+}
 
 } // namespace rest

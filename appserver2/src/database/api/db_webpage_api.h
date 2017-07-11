@@ -15,7 +15,7 @@ namespace api {
 * @param in layout Web page api data.
 * @returns True if operation was successful, false otherwise.
 */
-bool saveWebPage(ec2::database::api::Context* resourceContext, const ApiWebPageData& webPage);
+bool saveWebPage(ec2::database::api::QueryContext* resourceContext, const ApiWebPageData& webPage);
 
 } // namespace api
 } // namespace database

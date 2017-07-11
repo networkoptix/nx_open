@@ -21,6 +21,7 @@ class LayoutPreviewPainter: public Customized<QObject>
     Q_OBJECT
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
+    Q_PROPERTY(QColor itemBackgroundColor READ itemBackgroundColor WRITE setItemBackgroundColor)
     Q_PROPERTY(QColor fontColor READ fontColor WRITE setFontColor)
 
     using base_type = Customized<QObject>;
@@ -37,6 +38,9 @@ public:
 
     QColor backgroundColor() const;
     void setBackgroundColor(const QColor& value);
+
+    QColor itemBackgroundColor() const;
+    void setItemBackgroundColor(const QColor& value);
 
     QColor fontColor() const;
     void setFontColor(const QColor& value);
@@ -66,6 +70,7 @@ private:
 
     QColor m_frameColor;
     QColor m_backgroundColor;
+    QColor m_itemBackgroundColor;
     QColor m_fontColor;
     QScopedPointer<QnBusyIndicator> m_busyIndicator;
 };
