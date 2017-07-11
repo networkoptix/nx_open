@@ -8,6 +8,13 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/math/math.h>
 
+namespace {
+
+static const auto kCurrentTextPropertyName = QByteArray("currentText");
+static const auto kReadOnlyPropertyName = QByteArray("readOnly");
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -28,19 +35,23 @@ ComboBoxField::ComboBoxField(
     const Qn::TextValidateFunction& validator,
     QWidget* parent)
     :
-    ComboBoxField(parent)
+    base_type(new QComboBox(),
+        PropertyAccessor::create(kCurrentTextPropertyName),
+        PropertyAccessor::create(kReadOnlyPropertyName),
+        AccessorPtr(),
+        false,
+        parent)
 {
     setItems(items);
     setCurrentIndex(currentIndex);
     setValidator(validator);
-
     initialize();
 }
 
 ComboBoxField::ComboBoxField(QWidget* parent):
     base_type(new QComboBox(),
-        PropertyAccessor::create("currentText"),
-        PropertyAccessor::create("readOnly"),
+        PropertyAccessor::create(kCurrentTextPropertyName),
+        PropertyAccessor::create(kReadOnlyPropertyName),
         AccessorPtr(),
         false,
         parent)

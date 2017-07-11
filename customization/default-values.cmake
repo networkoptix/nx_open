@@ -32,7 +32,13 @@ else()
 endif()
 
 # Additional Features
-set(vmax "false")
+set(vmax false)
+# if true, you can use --customization=<path> to specify customization
+set(dynamic.customization false)
+
+# Localization
+set(additionalTranslations)
+set(installer.language "en_US")
+set(installer.cultures "en-us")
 
 set(customization.defines "")
-set(compatibleCustomizations)
