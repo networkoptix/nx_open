@@ -63,7 +63,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
             controller.reset(new QnViewportPtzController(controller));
 
         bool disableNativePresets = false;
-        if(controller->getCapabilities() & Ptz::NativePresetsPtzCapability)
+        if(controller->getCapabilities().testFlag(Ptz::NativePresetsPtzCapability))
         {
             disableNativePresets = !resource->getProperty(
                 Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
@@ -110,7 +110,7 @@ void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVi
 }
 
 void QnServerPtzControllerPool::at_cameraPropertyChanged(
-    const QnResourcePtr &resource, const QString& key)
+    const QnResourcePtr& resource, const QString& key)
 {
     if (key == Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME)
     {

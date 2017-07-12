@@ -302,7 +302,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount);
+    ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
     if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
         ui->checkBoxDisableNativePtzPresets->setChecked(Qt::Checked);
     else if (disabledNativePtzCount != 0)
