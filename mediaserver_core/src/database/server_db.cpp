@@ -1202,12 +1202,19 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit)
 }
 
 
-bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate)
+bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& source, bool isUpdate)
 {
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
-    if (!bookmark.isValid())
+    NX_ASSERT(source.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+    if (!source.isValid())
         return false;
 
+    auto bookmark = source;
+    if (!isUpdate)
+    {
+        // Fills out creation time if is not specified manually
+        if (!bookmark.creationTimeStampMs)
+            bookmark.creationTimeStampMs = bookmark.startTimeMs;
+    }
     const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
 
     QnDbTransactionLocker tran(getTransaction());
