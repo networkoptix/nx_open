@@ -6,7 +6,7 @@ namespace nx {
 namespace hpm {
 namespace http {
 
-const char* GetListeningPeerListHandler::kHandlerPath = "/statistics/listening_peers";
+const char* GetListeningPeerListHandler::kHandlerPath = "/mediator/statistics/listening_peers";
 
 GetListeningPeerListHandler::GetListeningPeerListHandler(const PeerRegistrator& registrator):
     m_registrator(registrator)

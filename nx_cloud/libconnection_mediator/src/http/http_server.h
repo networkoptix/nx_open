@@ -27,6 +27,7 @@ public:
         const PeerRegistrator& peerRegistrator);
 
     void listen();
+    nx_http::MessageDispatcher& messageDispatcher();
 
     std::vector<SocketAddress> m_httpEndpoints;
 
