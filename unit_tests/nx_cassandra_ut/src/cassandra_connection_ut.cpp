@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <nx/casssandra/async_cassandra_connection.h>
+#include "options.h"
 
 namespace nx {
 namespace cassandra {
@@ -28,7 +29,7 @@ protected:
             && lhs.int64Val == rhs.int64Val;
     }
 
-    Connection(): m_connection("127.0.0.1") {}
+    Connection(): m_connection(options()->host.c_str()) {}
 
     virtual void TearDown() override
     {

@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <model/remote_relay_peer_pool.h>
 #include <nx/casssandra/async_cassandra_connection.h>
+#include "options.h"
 
 
 namespace nx {
@@ -33,7 +34,7 @@ protected:
 
     void givenDbWithExistentCdbKeyspace()
     {
-        cassandra::AsyncConnection connection("127.0.0.1");
+        cassandra::AsyncConnection connection(options()->host.c_str());
         connection.executeUpdate("CREATE KEYSPACE cdb;").wait();
     }
 
