@@ -1902,7 +1902,7 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P"
+                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P"
             ],
             "2WayAudio":
             {
@@ -1917,7 +1917,7 @@
         },
         {
             "keys": [
-                "Dahua|DH-IPC-K35P"
+                "Dahua|DH-IPC-K35P", "Dahua|IPC-K35P"
             ],
             "2WayAudio":
             {
