@@ -33,6 +33,11 @@ QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
         parent, &QnScrollableItemsWidget::updateGeometry);
     connect(parent, &QGraphicsWidget::geometryChanged,
         this, &QnScrollableItemsWidgetPrivate::updateContentPosition);
+
+    connect(contentWidget, &QGraphicsWidget::widthChanged,
+        parent, &QnScrollableItemsWidget::contentWidthChanged);
+    connect(contentWidget, &QGraphicsWidget::heightChanged,
+        parent, &QnScrollableItemsWidget::contentHeightChanged);
 }
 
 Qt::Alignment QnScrollableItemsWidgetPrivate::alignment() const

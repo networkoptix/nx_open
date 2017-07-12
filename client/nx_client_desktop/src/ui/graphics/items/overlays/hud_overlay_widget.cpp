@@ -21,7 +21,7 @@ QnResourceTitleItem* QnHudOverlayWidget::title() const
     return d->title;
 }
 
-QGraphicsWidget* QnHudOverlayWidget::content() const
+QnViewportBoundWidget* QnHudOverlayWidget::content() const
 {
     Q_D(const QnHudOverlayWidget);
     return d->content;

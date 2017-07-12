@@ -792,6 +792,25 @@ void QnMediaResourceWidget::setupHud()
     m_compositeOverlay->stackBefore(m_triggersContainer);
 
     setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+
+    const auto updateTriggersMinHeight =
+        [this]()
+        {
+            // Calculate minimum height for downscaling no more than kMaxDownscaleFactor times.
+            static const qreal kMaxDownscaleFactor = 2.0;
+            const auto content = m_hudOverlay->content();
+            const qreal available = content->fixedSize().height() / content->sceneScale();
+            const qreal desired = m_triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
+            const qreal extra = content->size().height() - m_triggersContainer->size().height();
+            const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
+            m_triggersContainer->setMinimumHeight(min);
+        };
+
+    connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
+        this, updateTriggersMinHeight);
+
+    connect(m_triggersContainer, &QnScrollableItemsWidget::contentHeightChanged,
+        this, updateTriggersMinHeight);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
