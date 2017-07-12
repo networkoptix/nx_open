@@ -451,8 +451,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         //wait for the page to load then update
         $timeout(updateHeights);
 
-        var $navButton = $('.navbar-header>button')[0];
-        $navButton.addEventListener('click', navClicked);
+        //var $navButton = $('.navbar-header>button')[0];
+        //$navButton.addEventListener('click', navClicked);
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",$timeout(updateHeights,200));
 
