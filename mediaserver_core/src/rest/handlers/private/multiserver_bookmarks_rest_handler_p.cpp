@@ -262,7 +262,10 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     const auto& action = context.request().action;
     if (action && action->actionType() != nx::vms::event::ActionType::undefinedAction)
+    {
+        action->setReceivedFromRemoteHost(false);
         qnServerDb->saveActionToDB(action);
+    }
 
     return true;
 }
