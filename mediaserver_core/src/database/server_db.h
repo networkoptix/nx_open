@@ -75,7 +75,7 @@ public:
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
 
-    bool addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate);
+    bool addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate);
     void updateBookmarkCount();
 
 private:

@@ -28,7 +28,10 @@ public:
     static QString urlPath;
     static QnCameraBookmarkList getBookmarks(QnCommonModule* commonModule, QnGetBookmarksRequestContext& context);
     static QnCameraBookmarkTagList getBookmarkTags(QnCommonModule* commonModule, QnGetBookmarkTagsRequestContext& context);
-    static bool addBookmark(QnCommonModule* commonModule, QnUpdateBookmarkRequestContext &context);
+    static bool addBookmark(
+        QnCommonModule* commonModule,
+        QnUpdateBookmarkRequestContext &context,
+        const QnUuid& authorityUser);
     static bool updateBookmark(QnCommonModule* commonModule, QnUpdateBookmarkRequestContext &context);
     static bool deleteBookmark(QnCommonModule* commonModule, QnDeleteBookmarkRequestContext &context);
 

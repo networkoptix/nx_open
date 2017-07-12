@@ -1201,34 +1201,37 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit)
     return result;
 }
 
-
-bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& source, bool isUpdate)
+bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate)
 {
-    NX_ASSERT(source.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
-    if (!source.isValid())
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+    if (!bookmark.isValid())
         return false;
-
-    auto bookmark = source;
-    if (!isUpdate)
-    {
-        // Fills out creation time if is not specified manually
-        if (!bookmark.creationTimeStampMs)
-            bookmark.creationTimeStampMs = bookmark.startTimeMs;
-    }
-    const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
 
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
-        insQuery.prepare(insertOrReplace + R"(
-            INTO bookmarks
-                (guid, camera_guid, start_time, duration, name, description, timeout,
-                    creator_guid, created)
-            VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
-                :creatorId, :creationTimeStampMs)
-        )");
+
+        static const auto kUpdateQueryText =
+            R"(
+                UPDATE bookmarks
+                SET camera_guid = :cameraId, start_time = :startTimeMs,
+                    duration = :durationMs, name = :name, description = :description,
+                    timeout = :timeout
+                WHERE guid = :guid)";
+
+        static const auto kAddQueryText =
+            R"(
+                INSERT
+                INTO bookmarks
+                    (guid, camera_guid, start_time, duration, name, description, timeout,
+                        creator_guid, created)
+                VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
+                    :creatorId, :creationTimeStampMs)
+            )";
+
+        insQuery.prepare(isUpdate ? kUpdateQueryText : kAddQueryText);
 
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
@@ -1277,6 +1280,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& source, bool isUpda
 
     {
         QSqlQuery query(m_sdb);
+        const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
         query.prepare(insertOrReplace + R"(
             INTO fts_bookmarks
                 (docid, name, description, tags)

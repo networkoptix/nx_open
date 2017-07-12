@@ -20,6 +20,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+#include <utils/common/synctime.h>
+
 namespace
 {
     static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =
@@ -245,10 +247,16 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
 
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     QnCommonModule* /*commonModule*/,
-    QnUpdateBookmarkRequestContext &context)
+    QnUpdateBookmarkRequestContext &context,
+    const QnUuid& authorityUser)
 {
     /* This request always executed locally. */
-    if (!qnServerDb->addBookmark(context.request().bookmark))
+
+    auto bookmark = context.request().bookmark;
+    bookmark.creatorId = authorityUser;
+    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    if (!qnServerDb->addBookmark(bookmark))
         return false;
 
     const auto& actionData = context.request().actionData;

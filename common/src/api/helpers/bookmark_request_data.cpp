@@ -13,8 +13,6 @@
 
 namespace {
 
-static const auto kCreatorIdParam = lit("creatorId");
-static const auto kCreatedParam = lit("created");
 static const QString kStartTimeParam = lit("startTime");
 static const QString kEndTimeParam = lit("endTime");
 static const QString kSortColumnParam = lit("sortBy");
@@ -47,8 +45,6 @@ QnRequestParamList bookmarksToParam(const QnCameraBookmark& bookmark)
     result.insert(kStartTimeParam, QnLexical::serialized(bookmark.startTimeMs));
     result.insert(kDurationParam, QnLexical::serialized(bookmark.durationMs));
     result.insert(kCameraIdParam, bookmark.cameraId.toString());
-    result.insert(kCreatorIdParam, bookmark.creatorId.toString());
-    result.insert(kCreatedParam, QnLexical::serialized(bookmark.creationTimeStampMs));
 
     for (const QString& tag: bookmark.tags)
         result.insert(kTagParam, tag);
@@ -65,8 +61,6 @@ QnCameraBookmark bookmarkFromParams(const QnRequestParamList& params, QnResource
     bookmark.timeout = QnLexical::deserialized<qint64>(params.value(kTimeoutParam));
     bookmark.startTimeMs = QnLexical::deserialized<qint64>(params.value(kStartTimeParam));
     bookmark.durationMs = QnLexical::deserialized<qint64>(params.value(kDurationParam));
-    bookmark.creationTimeStampMs = QnLexical::deserialized<qint64>(params.value(kCreatedParam));
-    bookmark.creatorId = QnUuid::fromStringSafe(params.value(kCreatorIdParam));
 
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
