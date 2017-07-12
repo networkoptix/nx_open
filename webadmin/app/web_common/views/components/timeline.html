@@ -14,7 +14,7 @@
                  ng-mousedown="mouseDown($event)">
                 <canvas ></canvas>
             </div>
-            <span ng-if="emptyArchive  && liveOnly" class="no-archive-message">
+            <span ng-if="emptyArchive  && liveOnly && !loading" class="no-archive-message">
                 No Archive
             </span>  
         </div>
