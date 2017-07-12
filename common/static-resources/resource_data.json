@@ -28,19 +28,6 @@
                 ]
             },
 
-            "keys": [
-                "Sony|SNC-CX600*"
-            ],
-
-            "2WayAudio":
-            {
-                "codec": "AAC",
-                "bitrateKbps": 64,
-                "sampleRate": 16,
-                "urlPath": "/audio-out/aac16_64.cgi",
-                "contentType": ""
-            },
-
             "preStreamConfigureRequests": [
                 {
                     "templateString": "/command/camera.cgi?ImageCodec2=off",
@@ -57,6 +44,20 @@
             ],
             "highStreamAvailableBitrates": ["16000"],
             "lowStreamAvailableBitrates": ["2000"]
+        },
+        {
+            "keys": [
+                "Sony|SNC-CX600*"
+            ],
+
+            "2WayAudio":
+            {
+                "codec": "AAC",
+                "bitrateKbps": 64,
+                "sampleRate": 16,
+                "urlPath": "/audio-out/aac16_64.cgi",
+                "contentType": ""
+            }
         },
         {
             "keys": [
