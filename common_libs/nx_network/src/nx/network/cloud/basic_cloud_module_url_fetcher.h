@@ -53,8 +53,8 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
-* Looks up online API url of a specified cloud module.
-*/
+ * Looks up online API url of a specified cloud module.
+ */
 template<typename Handler>
 class BasicCloudModuleUrlFetcher:
     public aio::BasicPollable
@@ -76,14 +76,14 @@ public:
     {
         base_type::stopWhileInAioThread();
 
-        //We do not need mutex here since no one uses object anymore
+        // We do not need mutex here since no one uses object anymore
         //    and internal events are delivered in same aio thread.
         m_httpClient.reset();
     }
 
     /**
-    * Default value taken from application setup.
-    */
+     * NOTE: Default value is taken from application settings.
+     */
     void setModulesXmlUrl(QUrl url)
     {
         m_modulesXmlUrl = std::move(url);
@@ -149,7 +149,7 @@ protected:
         QUrl url(str);
         if (url.host().isEmpty())
         {
-            // str could be host:port
+            // str could be host:port.
             const SocketAddress endpoint(str);
             url = QUrl();
             url.setHost(endpoint.address.toString());
