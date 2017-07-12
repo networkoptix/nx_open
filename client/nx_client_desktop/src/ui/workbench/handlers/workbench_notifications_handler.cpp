@@ -423,7 +423,6 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     switch (action->actionType())
     {
         case vms::event::hidePopupAction:
-            qDebug() << "------------- hide popup" << action->getParams().actionId;
             emit notificationRemoved(action);
             break;
         case vms::event::showPopupAction:

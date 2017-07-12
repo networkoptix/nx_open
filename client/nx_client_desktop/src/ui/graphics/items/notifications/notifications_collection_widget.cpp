@@ -259,7 +259,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
     {
-        NX_ASSERT(false, "invalid action type.");
+        NX_ASSERT(false, "Invalid action type.");
         return;
     }
 
