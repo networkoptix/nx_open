@@ -121,29 +121,9 @@ function(nx_copy_package package_dir)
 endfunction()
 
 function (nx_copy_bin_resources input output)
-	file(GLOB files RELATIVE ${input} ${input}/*)
-	foreach (file ${files})
-		message ("copying ${file}")
-		nx_copy("${input}/${file}"
-			DESTINATION "${output}")
-	endforeach(file)
-endfunction()
-
-function (nx_copy_filter_resources input output)
-	file(GLOB files RELATIVE ${input} ${input}/*)
-	foreach (file ${files})
-		set(srcTemplatePath ${input}/${file})
-		if(NOT IS_DIRECTORY ${srcTemplatePath})
-			nx_configure_file(
-				${input}/${file}
-				${output})
-		endif(NOT IS_DIRECTORY ${srcTemplatePath})
-	endforeach(file)
-
-	file(GLOB files RELATIVE ${input} ${input}/**/*)
-	foreach (file ${files})
-		nx_configure_file(
-			${input}/${file}
-			${output}/${file})
-	endforeach(file)
+  file(GLOB files RELATIVE ${input} ${input}/*)
+  foreach(file ${files})
+    message("copying ${file}")
+    nx_copy("${input}/${file}" DESTINATION "${output}")
+  endforeach(file)
 endfunction()

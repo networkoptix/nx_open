@@ -8,10 +8,27 @@ function(set_distribution_names)
         set(suffix)
     endif()
 
-    set(client_distribution_name "${prefix}-client-${releaseVersion.full}-${suffix}"
-        PARENT_SCOPE)
-    set(mobile_client_distribution_name "${prefix}-client-${mobileClientVersion.full}-${suffix}"
-        PARENT_SCOPE)
+    set(artifact.name.client "${prefix}-client-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.server "${prefix}-server-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.bundle "${prefix}-bundle-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.servertool "${prefix}-servertool-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.client_update "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.server_update "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.paxton "${prefix}-paxton-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.paxton_plugin "${prefix}-paxton_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.cdb "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.hpm "${prefix}-hpm-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.client_debug "${prefix}-client_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.server_debug "${prefix}-server_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.misc_debug "${prefix}-misc_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.libs_debug "${prefix}-libs_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.cloud_debug "${prefix}-cloud_debug-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.testcamera "${prefix}-testcamera-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(mobile_client_distribution_name "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
+    set(artifact.name.product "${prefix}" PARENT_SCOPE)
+
+
+    # List of public final names which are to be used everywhere
 endfunction()
 
 set_distribution_names()

@@ -11,7 +11,7 @@ skip_sign = '${windows.skip.sign}' == 'true'
 build_nxtool = '${nxtool}' == 'true'
 build_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
-bin_source_dir = '${libdir}/bin/${build.configuration}'
+bin_source_dir = '${bin_source_dir}'
 
 server_msi_folder = 'bin/msi'
 server_msi_strip_folder = 'bin/strip'
@@ -122,7 +122,7 @@ def get_light_command(folder, msi, suffix):
     command.append('-sice:ICE91')
     command.append('-cultures:${installer.cultures}')
     command.append('-cc')
-    command.append('${libdir}/bin/${build.configuration}/cab')
+    command.append('{0}/cab'.format(bin_source_dir))
     command.append('-reusecab')
     command.append('-loc')
     command.append('OptixTheme_${installer.language}.wxl')
@@ -245,7 +245,7 @@ def add_build_nxtool_commands(commands):
                 None,
                 nxtool_components, nxtool_exe_components,
                 engine_tmp_folder)
-              
+
 def add_build_paxton_commands(commands):
     add_build_commands_msi_exe_generic(commands, 'paxton', 'paxton-exe',
                 paxton_msi_strip_folder, paxton_msi_name,

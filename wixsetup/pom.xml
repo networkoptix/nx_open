@@ -25,6 +25,7 @@
         <ClientQmlDir>${target_bin_path}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
         <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help</rdep.packages>
+        <bin_source_dir>${libdir}/bin/${build.configuration}</bin_source_dir>
     </properties>
 
     <dependencies>
