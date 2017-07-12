@@ -11,6 +11,8 @@
 
 #include <nx/vms/event/strings_helper.h>
 
+#include <business/business_resource_validation.h>
+
 #include <camera/single_thumbnail_loader.h>
 
 #include <core/resource/resource.h>
@@ -293,6 +295,8 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         return; /* Just drop the notification if we already have too many of them in queue. */
 
     vms::event::EventParameters params = action->getRuntimeParams();
+    NX_ASSERT(QnBusiness::hasAccessToSource(params, context()->user())); //< Checked already.
+
     vms::event::EventType eventType = params.eventType;
     QnUuid ruleId = action->getRuleId();
     QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
@@ -305,8 +309,10 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto server = resource.dynamicCast<QnMediaServerResource>();
+    const bool hasViewPermission = accessController()->hasPermissions(resource,
+        Qn::ViewContentPermission);
 
     if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
@@ -324,23 +330,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             return; /* Show 'Alarm Layout' notifications only once for each event of one rule. */
 
         title = tr("Alarm: %1").arg(title);
-    }
-    else
-    {
-        if (vms::event::isSourceCameraRequired(eventType))
-        {
-            NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
-            if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
-                return;
-        }
-
-        if (vms::event::isSourceServerRequired(eventType))
-        {
-            NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
-            /* Only admins should see notifications with servers. */
-            if (!server || !accessController()->hasPermissions(server, Qn::ViewContentPermission))
-                return;
-        }
     }
 
     QStringList tooltip = m_helper->eventDescription(action,
@@ -404,6 +393,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             case vms::event::cameraMotionEvent:
             case vms::event::softwareTriggerEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::OpenInNewTabAction,
@@ -415,6 +405,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
             case vms::event::cameraInputEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::OpenInNewTabAction,
@@ -427,6 +418,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             case vms::event::cameraDisconnectEvent:
             case vms::event::networkIssueEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::CameraSettingsAction,
@@ -441,6 +433,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             case vms::event::serverStartEvent:
             case vms::event::serverFailureEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::ServerSettingsAction,
