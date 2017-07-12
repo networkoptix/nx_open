@@ -505,16 +505,12 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
 void QnNotificationsCollectionWidget::hideEventAction(const vms::event::AbstractActionPtr& action)
 {
-
-    if (action->actionType() == vms::event::hidePopupAction)
+    const auto customPopupId = action->getParams().actionId;
+    const auto it = m_customPopupItems.find(customPopupId);
+    if (it != m_customPopupItems.end())
     {
-        const auto id = action->getParams().actionId;
-        const auto it = m_customPopupItems.find(id);
-        if (it != m_customPopupItems.end())
-        {
-            cleanUpItem(it.value());
-            return;
-        }
+        cleanUpItem(it.value());
+        return;
     }
 
     QnUuid ruleId = action->getRuleId();
