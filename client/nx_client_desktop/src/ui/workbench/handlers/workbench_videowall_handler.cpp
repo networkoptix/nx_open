@@ -748,8 +748,9 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         return;
 
     workbench()->clear();
+    // Action is disabled in videowall mode to make sure it is not displayed in the context menu.
     if (layout)
-        menu()->trigger(action::OpenInNewTabAction, layout);
+        menu()->triggerForced(action::OpenInNewTabAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed()

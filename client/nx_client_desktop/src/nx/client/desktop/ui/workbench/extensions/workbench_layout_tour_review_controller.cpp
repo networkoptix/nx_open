@@ -344,7 +344,9 @@ void LayoutTourReviewController::updatePlaceholders()
         return;
     }
 
-    for (const auto& p: m_dropPlaceholders.keys())
+    // Copy list to avoid crash while iterating.
+    const auto existingPlaceholders = m_dropPlaceholders.keys();
+    for (const auto& p: existingPlaceholders)
     {
         if (!boundingRect.contains(p))
             m_dropPlaceholders.remove(p);

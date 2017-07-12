@@ -110,12 +110,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
     ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
-
-    ui->latestVersionIconLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-
-    ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->latestVersionIconLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png"));
+    ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png"));
     ui->linkCopiedWidget->hide();
 
     setHelpTopic(this, Qn::Administration_Update_Help);

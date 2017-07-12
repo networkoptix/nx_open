@@ -55,8 +55,7 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     if (targetId.isNull())
         return;
 
-    auto server = resourcePool()->getIncompatibleResourceById(targetId, true)
-        .dynamicCast<QnMediaServerResource>();
+    auto server = resourcePool()->getIncompatibleServerById(targetId, true);
     NX_ASSERT(server);
     if (!server)
         return;
@@ -118,8 +117,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     m_mergeError = utils::MergeSystemsStatus::ok;
     m_mergeErrorMessage.clear();
 
-    const auto server = resourcePool()->getIncompatibleResourceById(m_targetId, true)
-        .dynamicCast<QnMediaServerResource>();
+    const auto server = resourcePool()->getIncompatibleServerById(m_targetId, true);
     if (!server)
     {
         const auto compatibleServer =
@@ -180,7 +178,7 @@ void QnConnectToCurrentSystemTool::waitServer()
             finish(success ? NoError : MergeFailed);
         };
 
-    if (resourcePool()->getIncompatibleResourceById(m_targetId, true))
+    if (resourcePool()->getIncompatibleServerById(m_targetId, true))
     {
         finishMerge(true);
         return;
@@ -210,8 +208,7 @@ void QnConnectToCurrentSystemTool::updateServer()
 {
     NX_ASSERT(!m_updateTool);
 
-    const auto server = resourcePool()->getIncompatibleResourceById(m_targetId, true)
-        .dynamicCast<QnMediaServerResource>();
+    const auto server = resourcePool()->getIncompatibleServerById(m_targetId, true);
 
     if (server->getModuleInformation().protoVersion == QnAppInfo::ec2ProtoVersion())
     {

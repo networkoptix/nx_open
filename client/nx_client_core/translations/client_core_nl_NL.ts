@@ -99,7 +99,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <source>System (%1)</source>

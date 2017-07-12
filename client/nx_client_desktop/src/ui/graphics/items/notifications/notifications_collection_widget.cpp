@@ -732,7 +732,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             connect(item, &QnNotificationWidget::linkActivated, this,
                 [item](const QString& link)
                 {
-                    if (link.contains(lit("://"))) //< currently unused
+                    if (link.contains(lit("://")))
                         QDesktopServices::openUrl(link);
                     else
                         item->triggerDefaultAction();

@@ -42,11 +42,15 @@ case "$1" in
         write_my_cnf
         echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
-        /app/env/bin/python manage.py migrate
-        /app/env/bin/python manage.py createcachetable
+        yes "yes" | /app/env/bin/python manage.py migrate
+        yes "yes" | /app/env/bin/python manage.py createcachetable
+        /app/env/bin/python manage.py initdb
+        /app/env/bin/python manage.py readstructure
+        /app/env/bin/python manage.py initbranding
+        /app/env/bin/python manage.py filldata
 
         find /app/app/static | xargs touch
-        exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug
+        exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
         ;;
     celery)
         write_my_cnf

@@ -164,9 +164,9 @@
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
 
-        <MajorUpgrade AllowSameVersionUpgrades="yes"
+        <MajorUpgrade 
+            AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
-            DowngradeErrorMessage="A latter version of [ProductName] is already installed."
             MigrateFeatures="yes" />
 
         <InstallUISequence>

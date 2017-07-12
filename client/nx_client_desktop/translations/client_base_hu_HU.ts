@@ -172,11 +172,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Layout Tour...</source>
-      <translation type="unfinished">Layout Tour...</translation>
+      <translation>Elrendezés túra...</translation>
     </message>
     <message>
       <source>New Layout Tour...</source>
-      <translation type="unfinished">New Layout Tour...</translation>
+      <translation>Új elrendezés túra...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -411,7 +411,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Videófal megnyitása</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -431,7 +431,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Videofal mentése</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -559,7 +559,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Remove from Tour</source>
-      <translation type="unfinished">Remove from Tour</translation>
+      <translation>Eltávolítás a túrák közül</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
@@ -567,7 +567,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Szerkesztés...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -743,11 +743,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Make Layout Tour</source>
-      <translation type="unfinished">Make Layout Tour</translation>
+      <translation>Elrendezés túra készítése</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Beállítások</translation>
     </message>
     <message>
       <source>Close</source>
@@ -924,40 +924,40 @@ több könyvjelző megjelenítéséhez</translation>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <source>Unknown error.</source>
+      <translation>Ismeretlen hiba.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation type="unfinished">License does not exist</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation type="unfinished">License is disabled</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation type="unfinished">License is inactive</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation type="unfinished">Invalid license</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation type="unfinished">License is trial</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation type="unfinished">License is in deactivation process</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation type="unfinished">Invalid hardware id</translation>
+      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation type="unfinished">Limit exceeded</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
   </context>
   <context>
@@ -2375,7 +2375,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>A támogatottság ellenőrzéséhez és bekapcsolásához és bekapcsolásá a &quot;Mozgás&quot; fülre a kamerabeállítások lapon.</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
@@ -2391,7 +2391,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Bekapcsoláshoz és paraméterezéshez kattintson a &quot;Mozgás&quot; fülre a kamerabeállítások lapon.</translation>
     </message>
   </context>
   <context>
@@ -2809,6 +2809,10 @@ to %1</source>
       <source>Connection to Server could not be established.</source>
       <translation>Nem lehet kapcsolatot létesíteni a szerverrel.</translation>
     </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -2927,7 +2931,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; audio enkóder nem található.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -2958,15 +2962,15 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; audio encoder nem található.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; audio eszköz inicialzálása sikertelen.</translation>
     </message>
     <message>
       <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <translation>44.1khz és 48 kHz-es formátumok audio formátumok rögzítését az eszköz nem támogatja. Válasszon más audio ezközt, vagy &quot;semmi&quot; gombot, a képernyő felvétel-beállítások megnyitásához</translation>
     </message>
   </context>
   <context>
@@ -3147,13 +3151,13 @@ to %1</source>
     <message numerus="yes">
       <source>%n Removed subjects</source>
       <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n eltávolított tárgy</numerusform>
         <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>Tárgy eltávolítva</translation>
     </message>
   </context>
   <context>
@@ -3460,7 +3464,7 @@ to %1</source>
     <name>QnLayoutExportTool</name>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
     </message>
     <message>
       <source>Could not export device %1.</source>
@@ -3848,13 +3852,6 @@ to %1</source>
       <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
     </message>
     <message numerus="yes">
-      <source>%n channels</source>
-      <translation type="unfinished">
-        <numerusform>%n channels</numerusform>
-        <numerusform>%n channels</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
         <numerusform>Deactivate licenses?</numerusform>
@@ -3877,17 +3874,6 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation type="unfinished">Please contact Customer Support</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n other</numerusform>
-        <numerusform>Deactivate %n other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3931,6 +3917,24 @@ to %1</source>
     <message>
       <source>Deactivate</source>
       <translation type="unfinished">Deactivate</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4980,11 +4984,11 @@ to %1</source>
     </message>
     <message>
       <source>Layout Tours</source>
-      <translation type="unfinished">Layout Tours</translation>
+      <translation>Elrendezés túrák</translation>
     </message>
     <message>
       <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <translation>Elrendezés túra</translation>
     </message>
   </context>
   <context>
@@ -5157,10 +5161,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Válasszon legalább egy felhasználót</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -5183,30 +5183,30 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation>%1 felhasználó Email címe érvénytelen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
-      <translation>
-        <numerusform>%n/%1 felhasználó Email címe érvénytelen</numerusform>
-        <numerusform>%n/%1 felhasználó Email címe érvénytelen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid Email address %1</source>
-      <translation>%1 Email cím érvénytelen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
-      <translation>
-        <numerusform>%n/%1 további Email cím érvénytelen</numerusform>
-        <numerusform>%n/%1 további Email cím érvénytelen</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Send Email to %1</source>
       <translation>Email küldése %1 címre</translation>
+    </message>
+    <message>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 users have invalid email address</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6059,13 +6059,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation type="unfinished">Select at least one user...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6199,17 +6192,26 @@ to %1</source>
       <translation>A rendszer biztonsági módban fut.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Próbálja ki %1 &amp;mdash; felhőt; csatlakozzon rendszeréhez bárhonnan</translation>
-    </message>
-    <message>
       <source>You cannot receive System notifications by Email.</source>
       <translation>Nem tud rendszerértesítéseket kapni Emailben.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by Email.</source>
       <translation>Nem tudnak rendszerértesítéseket kapni Emailben.</translation>
+    </message>
+    <message>
+      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Kapcsolódás</translation>
     </message>
   </context>
   <context>
@@ -6829,7 +6831,7 @@ to %1</source>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Weboldal</translation>
     </message>
   </context>
   <context>
@@ -6921,7 +6923,7 @@ to %1</source>
     </message>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
     </message>
     <message>
       <source>Export Layout As...</source>
@@ -7383,20 +7385,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation type="unfinished">No user roles found</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation>Felhasználók</translation>
@@ -7404,6 +7398,10 @@ to %1</source>
     <message>
       <source>Custom Users</source>
       <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Minden felhasználó</translation>
     </message>
   </context>
   <context>
@@ -7459,6 +7457,22 @@ to %1</source>
     <message>
       <source>Reason for deactivation</source>
       <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I&apos;m upgrading my machine</source>
+      <translation type="unfinished">I&apos;m upgrading my machine</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
     </message>
   </context>
   <context>
@@ -7660,6 +7674,21 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>Eltávolítás után újból automatikusan hozzáadódhatnak a fához.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7903,7 +7932,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <translation>Elrendezés túra</translation>
     </message>
     <message>
       <source>Layout Tour %1</source>

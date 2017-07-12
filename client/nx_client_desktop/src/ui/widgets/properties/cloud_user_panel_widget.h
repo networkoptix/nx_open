@@ -32,5 +32,8 @@ public:
     static AbstractAccessor* createIconWidthAccessor();
 
 private:
+    void updateManageAccountLink();
+
+private:
     QScopedPointer<Ui::CloudUserPanelWidget> ui;
 };

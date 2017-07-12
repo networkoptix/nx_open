@@ -1945,6 +1945,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
+
+            if (const auto reader = mediaWidget->display()->archiveReader())
+                mediaWidget->item()->setData(Qn::ItemSpeedRole, reader->getSpeed());
         }
     }
 
@@ -1953,7 +1956,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 
     m_inChangeLayout = false;
 }
-
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 {
@@ -2050,6 +2052,13 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
                 if (widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(0, 0);
             }
+        }
+
+        if (auto reader = widget->display()->archiveReader())
+        {
+            const auto speed = widget->item()->data(Qn::ItemSpeedRole);
+            if (speed.canConvert<qreal>())
+                reader->setSpeed(speed.toReal());
         }
 
         bool paused = widget->item()->data<bool>(Qn::ItemPausedRole, false);

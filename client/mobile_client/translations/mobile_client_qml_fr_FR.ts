@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Supprimer connexion &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -284,6 +284,17 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
+    </message>
+  </context>
+  <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
@@ -308,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>PRÉRÉGLAGES</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Préréglages PTZ</translation>
     </message>
   </context>
   <context>
@@ -436,7 +447,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Vérifiez votre connexion réseau ou appuyez sur &quot;%1&quot; pour entrer une adresse de serveur connu.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -456,7 +467,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>Impossible de connecter au Système &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -587,7 +598,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>j MMMM aaaa</translation>
     </message>
   </context>
   <context>

@@ -301,12 +301,14 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->passwordChanged();
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
+QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
 {
-    Q_D(const QnCloudStatusWatcher);
-    return QnEncodedCredentials(
+    Q_D(QnCloudStatusWatcher);
+    const QnEncodedCredentials result(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
+    d->createTemporaryCredentials();
+    return result;
 }
 
 QnCloudStatusWatcher::ErrorCode QnCloudStatusWatcher::error() const
@@ -655,7 +657,8 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
             if (result == api::ResultCode::ok)
                 return;
 
-            if (result == api::ResultCode::notAuthorized)
+            if (result == api::ResultCode::notAuthorized
+                || result == api::ResultCode::credentialsRemovedPermanently)
             {
                 TRACE("Temporary credentials are invalid, creating new");
                 createTemporaryCredentials();

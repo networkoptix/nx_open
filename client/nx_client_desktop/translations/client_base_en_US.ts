@@ -923,39 +923,39 @@ to view more bookmarks</source>
 <context>
     <name>Deactivator</name>
     <message>
-        <source>Unknown error</source>
+        <source>Unknown error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License does not exist</source>
+        <source>License does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License is disabled</source>
+        <source>License is disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License is inactive</source>
+        <source>License is inactive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid license</source>
+        <source>Invalid license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License is trial</source>
+        <source>License is trial.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License is in deactivation process</source>
+        <source>License is in pending deactivation state, but has not been deactivated yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid hardware id</source>
+        <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Limit exceeded</source>
+        <source>Number of deactivations exceeded limit for this license.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2806,6 +2806,10 @@ to %1</source>
         <source>Connection to Server could not be established.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This user is disabled by system administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
@@ -3845,13 +3849,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n channels</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Deactivate licenses?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3871,17 +3868,6 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>%1 of %n licenses cannot be deactivated</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Please contact Customer Support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Deactivate %n other</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -3928,6 +3914,24 @@ to %1</source>
     <message>
         <source>Deactivate</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n channels.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Deactivate %n Other</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5154,10 +5158,6 @@ to %1</source>
 </context>
 <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-        <source>Select at least one user</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation>
@@ -5180,30 +5180,30 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>User %1 has invalid Email address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid Email address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid Email address %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional Email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Send Email to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 has invalid email address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid email address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid email address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6055,13 +6055,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-        <source>Select at least one user...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnSystemAdministrationDialog</name>
     <message>
         <source>General</source>
@@ -6195,16 +6188,25 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You cannot receive System notifications by Email.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>They cannot receive System notifications by Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7379,26 +7381,22 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-        <source>Drag layout here to add it to the tour</source>
+        <source>Drag layout or camera here to add it to the tour</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
-        <source>No user roles found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No users found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Custom Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7454,6 +7452,22 @@ to %1</source>
     </message>
     <message>
         <source>Reason for deactivation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Choose one -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I&apos;m upgrading my machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I accidentally assigned the license to a wrong machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Reason</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7656,6 +7670,21 @@ to %1</source>
     <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing layout tour?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is another layout tour with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from layout tour?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

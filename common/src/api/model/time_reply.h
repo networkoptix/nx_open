@@ -1,11 +1,11 @@
-#ifndef QN_TIME_REPLY_H
-#define QN_TIME_REPLY_H
+#pragma once
 
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
 
-struct QnTimeReply {
+struct QnTimeReply
+{
     /** Utc time in msecs since epoch. */
     qint64 utcTime;
 
@@ -14,9 +14,22 @@ struct QnTimeReply {
     QString timezoneId;
     QString realm;
 };
-
 #define QnTimeReply_Fields (utcTime)(timeZoneOffset)(timezoneId)(realm)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(metatype))
+struct ApiDateTimeData
+{
+    qint64 timeSinseEpochMs = 0;
+    QString timeZoneId;
+    qint64 timeZoneOffsetMs = 0;
+};
+#define ApiDateTimeData_Fields (timeSinseEpochMs)(timeZoneId)(timeZoneOffsetMs)
 
-#endif // QN_TIME_REPLY_H
+struct ApiServerDateTimeData: public ApiDateTimeData
+{
+    QnUuid serverId;
+};
+#define ApiServerDateTimeData_Fields ApiDateTimeData_Fields (serverId)
+
+using ApiMultiserverServerDateTimeDataList = std::vector<ApiServerDateTimeData>;
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTimeReply)(ApiDateTimeData)(ApiServerDateTimeData), (json)(ubjson)(xml)(csv_record)(metatype))

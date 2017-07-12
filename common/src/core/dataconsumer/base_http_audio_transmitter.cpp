@@ -31,7 +31,7 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     m_state(TransmitterState::WaitingForConnection),
     m_transcoder(nullptr),
     m_socket(nullptr),
-    m_uploadMethod(nx_http::Method::Post)
+    m_uploadMethod(nx_http::Method::post)
 {
     connect(
         m_resource, &QnResource::parentIdChanged, this,
@@ -194,7 +194,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
 
     QnMutexLocker lock(&m_mutex);
 
-    if (m_uploadMethod == nx_http::Method::Post)
+    if (m_uploadMethod == nx_http::Method::post)
     {
         httpClient
             ->doPost(
@@ -203,7 +203,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
                 contentBody,
                 true);
     }
-    else if (m_uploadMethod == nx_http::Method::Put)
+    else if (m_uploadMethod == nx_http::Method::put)
     {
         httpClient
             ->doPut(

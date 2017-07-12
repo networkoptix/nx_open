@@ -13,6 +13,11 @@ class TextEditField: public detail::BaseInputField
     using base_type = detail::BaseInputField;
 
 public:
+    static TextEditField* create(
+        const QString& text,
+        const Qn::TextValidateFunction& validator,
+        QWidget* parent = nullptr);
+
     TextEditField(QWidget* parent = nullptr);
 };
 

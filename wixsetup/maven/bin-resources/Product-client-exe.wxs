@@ -28,6 +28,7 @@
                 LicenseUrl="License.html" 
                 ShowFilesInUse="yes"
                 SuppressRepair="yes"
+                SuppressDowngradeFailure="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 

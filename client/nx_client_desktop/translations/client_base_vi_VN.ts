@@ -327,7 +327,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>lối ra</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -747,7 +747,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>Close</source>
@@ -924,40 +924,40 @@ to view more bookmarks</translation>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <source>Unknown error.</source>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation type="unfinished">License does not exist</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation type="unfinished">License is disabled</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation type="unfinished">License is inactive</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation type="unfinished">Invalid license</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation type="unfinished">License is trial</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation type="unfinished">License is in deactivation process</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation type="unfinished">Invalid hardware id</translation>
+      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation type="unfinished">Limit exceeded</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
   </context>
   <context>
@@ -1081,27 +1081,27 @@ to view more bookmarks</translation>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Phóng to</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Thu nhỏ</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Tập trung xa</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Tập trung gần</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Tự động lấy nét</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Thay đổi chế độ dewarping</translation>
     </message>
   </context>
   <context>
@@ -1119,7 +1119,7 @@ to view more bookmarks</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
   </context>
   <context>
@@ -1924,7 +1924,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>tổ ẩn</translation>
     </message>
     <message>
       <source>Device adding is possible for online servers only.</source>
@@ -2207,7 +2207,7 @@ to view more bookmarks</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>ghi âm</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2721,7 +2721,7 @@ to %1</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Tải về</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2783,6 +2783,10 @@ to %1</translation>
     <message>
       <source>Connection to Server could not be established.</source>
       <translation type="unfinished">Connection to Server could not be established.</translation>
+    </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
     </message>
   </context>
   <context>
@@ -3261,11 +3265,11 @@ to %1</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>ghi sự kiện</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Đường mòn kiểm toán</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
@@ -3544,7 +3548,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
   </context>
   <context>
@@ -3645,7 +3649,7 @@ to %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3813,12 +3817,6 @@ to %1</translation>
       <translation type="unfinished">This license is already activated and linked to hardware ID %1 on %2</translation>
     </message>
     <message numerus="yes">
-      <source>%n channels</source>
-      <translation type="unfinished">
-        <numerusform>%n channels</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
         <numerusform>Deactivate licenses?</numerusform>
@@ -3838,16 +3836,6 @@ to %1</translation>
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation type="unfinished">
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation type="unfinished">Please contact Customer Support</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3889,6 +3877,22 @@ to %1</translation>
     <message>
       <source>Deactivate</source>
       <translation type="unfinished">Deactivate</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3981,7 +3985,7 @@ to %1</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>nâng cao</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -4266,7 +4270,7 @@ to %1</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>thiết lập lại</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4672,7 +4676,7 @@ to %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>cao nhất (Hs)</translation>
     </message>
     <message>
       <source>Average</source>
@@ -5101,10 +5105,6 @@ to %1</translation>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Chọn ít nhất một người dùng</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation type="unfinished">
@@ -5124,28 +5124,28 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation type="unfinished">User %1 has invalid Email address</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid Email address %1</source>
-      <translation type="unfinished">Invalid Email address %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Send Email to %1</source>
       <translation type="unfinished">Send Email to %1</translation>
+    </message>
+    <message>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 users have invalid email address</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5245,7 +5245,7 @@ to %1</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Sao lưu</translation>
     </message>
   </context>
   <context>
@@ -5764,11 +5764,11 @@ to %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Sao chép lựa chọn vào Clipboard</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Làm mới</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -5996,13 +5996,6 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation type="unfinished">Select at least one user...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6136,17 +6129,26 @@ to %1</translation>
       <translation type="unfinished">System is running in safe mode.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your servers from anywhere</translation>
-    </message>
-    <message>
       <source>You cannot receive System notifications by Email.</source>
       <translation type="unfinished">You cannot receive System notifications by Email.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by Email.</source>
       <translation type="unfinished">They cannot receive System notifications by Email.</translation>
+    </message>
+    <message>
+      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Kết nối</translation>
     </message>
   </context>
   <context>
@@ -6408,7 +6410,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>tàn tật</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6759,7 +6761,7 @@ to %1</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>trang Web:</translation>
     </message>
   </context>
   <context>
@@ -6785,7 +6787,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>tổ ẩn</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -7033,7 +7035,7 @@ to %1</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Password không có sản phẩm nào.</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
@@ -7239,7 +7241,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>dừng lại</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -7306,20 +7308,12 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation type="unfinished">No user roles found</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation>người sử dụng</translation>
@@ -7327,6 +7321,10 @@ to %1</translation>
     <message>
       <source>Custom Users</source>
       <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tất cả người dùng</translation>
     </message>
   </context>
   <context>
@@ -7382,6 +7380,22 @@ to %1</translation>
     <message>
       <source>Reason for deactivation</source>
       <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I&apos;m upgrading my machine</source>
+      <translation type="unfinished">I&apos;m upgrading my machine</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
     </message>
   </context>
   <context>
@@ -7567,6 +7581,20 @@ to %1</translation>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
     </message>
   </context>
   <context>

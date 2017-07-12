@@ -284,7 +284,6 @@ namespace nx_spl
         *   \return pointer to Storage.
         */
         virtual Storage* STORAGE_METHOD_CALL createStorage(
-            QnCommonModule* commonModule,
             const char* url,
             int*        ecode
         ) = 0;
