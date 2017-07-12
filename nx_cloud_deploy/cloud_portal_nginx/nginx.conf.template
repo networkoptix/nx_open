@@ -111,7 +111,7 @@ http {
         }
 
         location /preview/ {
-            root /app/app/static/$CUSTOMIZATION/preview;
+            root /app/app/static/$CUSTOMIZATION/;
             error_page 404 /static/index.html;
             expires -1;
         }
