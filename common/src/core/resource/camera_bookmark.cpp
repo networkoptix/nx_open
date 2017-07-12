@@ -340,7 +340,7 @@ bool QnCameraBookmark::isCreatedBySystem() const
 
 QnUuid QnCameraBookmark::systemUserId()
 {
-    return QnUuid::fromRfc4122("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
+    return QnUuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
 }
 
 QnCameraBookmark::QnCameraBookmark():
