@@ -491,7 +491,10 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     connect(item, &QnNotificationWidget::actionTriggered, this,
         &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    m_list->addItem(item, action->actionType() == vms::event::playSoundAction);
+    const bool isLockedItem = action->actionType() == vms::event::playSoundAction
+        || (action->actionType() == vms::event::showPopupAction
+            && action->getParams().needConfirmation);
+    m_list->addItem(item, isLockedItem);
 }
 
 void QnNotificationsCollectionWidget::hideEventAction(const vms::event::AbstractActionPtr& action)
