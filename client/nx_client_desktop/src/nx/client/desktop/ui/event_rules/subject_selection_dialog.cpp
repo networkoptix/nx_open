@@ -222,6 +222,11 @@ void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
     validateAllUsers();
 }
 
+void SubjectSelectionDialog::setRoleValidator(Qn::RoleValidator roleValidator)
+{
+    m_roles->setRoleValidator(roleValidator);
+}
+
 void SubjectSelectionDialog::validateAllUsers()
 {
     const auto validationState = m_roles->validateUsers(

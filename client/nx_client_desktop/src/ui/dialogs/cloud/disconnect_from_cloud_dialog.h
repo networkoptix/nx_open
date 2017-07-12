@@ -17,7 +17,7 @@ public:
     virtual void accept() override;
 
 signals:
-    void cloudPassowrdValidated(
+    void cloudPasswordValidated(
         bool success,
         const QString& password);
 

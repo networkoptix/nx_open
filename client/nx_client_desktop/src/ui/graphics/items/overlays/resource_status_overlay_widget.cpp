@@ -19,10 +19,21 @@
 
 namespace {
 
+
+void disableFocus(QGraphicsItem* item)
+{
+    if (item->isWidget())
+    {
+        auto widget = static_cast<QGraphicsWidget*>(item);
+        widget->setFocusPolicy(Qt::NoFocus);
+    }
+}
+
 void makeTransparentForMouse(QGraphicsItem* item)
 {
     item->setAcceptedMouseButtons(Qt::NoButton);
     item->setAcceptHoverEvents(false);
+    disableFocus(item);
 }
 
 QnMaskedProxyWidget* makeMaskedProxy(
@@ -37,6 +48,8 @@ QnMaskedProxyWidget* makeMaskedProxy(
 
     if (transparent)
         makeTransparentForMouse(result);
+
+    disableFocus(result);
 
     return result;
 }

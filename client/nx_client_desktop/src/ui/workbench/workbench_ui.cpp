@@ -359,7 +359,16 @@ action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) c
         case action::TimelineScope:
             return navigator()->currentWidget();
         case action::SceneScope:
-            return action::ParameterTypes::widgets(display()->scene()->selectedItems());
+        {
+            auto selectedItems = display()->scene()->selectedItems();
+            if (selectedItems.empty())
+            {
+                auto focused = dynamic_cast<QnResourceWidget*>(display()->scene()->focusItem());
+                if (focused)
+                    selectedItems.append(focused);
+            }
+            return action::ParameterTypes::widgets(selectedItems);
+        }
         default:
             break;
     }

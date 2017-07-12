@@ -44,8 +44,8 @@ static constexpr qreal kAnimationMinimumOpacity = 0.15;
 
 /* Tooltip adjustments: */
 static constexpr int kHoverEnterDelayMs = 0;
-static constexpr int kHoverLeaveDelayMs = 50;
-static constexpr qreal kToolTipAnimationSpeedFactor = 2.0;
+static constexpr int kHoverLeaveDelayMs = 25;
+static constexpr qreal kToolTipFadeTimeMs = 25;
 static constexpr qreal kToolTipRoundingRadius = 2.0;
 static constexpr qreal kToolTipPadding = 8.0;
 static constexpr qreal kToolTipShadowBlurRadius = 5.0;
@@ -244,6 +244,8 @@ void SoftwareTriggerButtonPrivate::updateToolTipVisibility()
     const bool showToolTip = m_toolTipHoverProcessor->isHovered()
         && !m_toolTip->text().isEmpty()
         && !(m_prolonged && q->isPressed());
+
+    static constexpr qreal kToolTipAnimationSpeedFactor = 1000.0 / kToolTipFadeTimeMs;
 
     const qreal targetOpacity = showToolTip ? kOpaque : kTransparent;
     opacityAnimator(m_toolTip, kToolTipAnimationSpeedFactor)->animateTo(targetOpacity);

@@ -32,7 +32,11 @@ public:
 
     void showAlert(const QString& text);
 
+    // Sets user validator. If it's not set, any user is considered valid.
     void setUserValidator(Qn::UserValidator userValidator);
+
+    // Sets role validator. If it's not set, role validity is determined by validities of its users.
+    void setRoleValidator(Qn::RoleValidator roleValidator);
 
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
