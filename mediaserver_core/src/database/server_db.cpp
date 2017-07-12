@@ -1212,13 +1212,14 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
 
     QnDbTransactionLocker tran(getTransaction());
 
+    qDebug() << "------------------" << bookmark.creationTimeStampMs << bookmark.creatorId;
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
         insQuery.prepare(insertOrReplace + R"(
             INTO bookmarks
                 (guid, camera_guid, start_time, duration, name, description, timeout,
-                    creatorId, created)
+                    creator_guid, created)
             VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
                 :creatorId, :creationTimeStampMs)
         )");
