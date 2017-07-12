@@ -44,6 +44,11 @@ protected:
         m_relayPool.reset(new TestRelayPool(options()->host.c_str()));
     }
 
+    void whenFivePeersHaveBeenAdded()
+    {
+        ASSERT_TRUE(m_relayPool->addPeer("relay1", "someServer.nx.com").get());
+    }
+
     void assertSelectFromTablesResult(
         std::pair<CassError, cassandra::QueryResult>* selectResult)
     {
@@ -66,6 +71,10 @@ protected:
                     assertSelectFromTablesResult(&selectResult);
                     return cf::unit();
                 }).wait();
+    }
+
+    void thenAllOfThemCanBeQueried()
+    {
     }
 
 private:
@@ -91,6 +100,11 @@ TEST_F(RemoteRelayPeerPool, CreateDbStructure_KeyspaceAlreadyExists)
 
 TEST_F(RemoteRelayPeerPool, addPeer)
 {
+    givenDbWithNotExistentCdbKeyspace();
+    whenRelayPoolObjectHasBeenCreated();
+
+    whenFivePeersHaveBeenAdded();
+    thenAllOfThemCanBeQueried();
 }
 
 

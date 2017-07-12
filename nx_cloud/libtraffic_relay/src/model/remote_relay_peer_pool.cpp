@@ -153,12 +153,12 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
         return cf::make_ready_future(false);
 
     return m_cassConnection->prepareQuery(
-        "INSERT INTO cdb.relay_peers \
+        "INSERT INTO cdb.relay_peers ( \
             relay_id, \
             domain_suffix_1, \
             domain_suffix_2, \
             domain_suffix_3, \
-            domain_name_tail VALUES(?, ?, ?, ?, ?);")
+            domain_name_tail ) VALUES(?, ?, ?, ?, ?);")
         .then(
             [this, relayName, domainName](
                 cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
