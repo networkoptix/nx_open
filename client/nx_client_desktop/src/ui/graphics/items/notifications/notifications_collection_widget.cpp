@@ -262,6 +262,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
         return;
 
     widget->setCloseButtonUnavailable();
+    widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
     widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
         [this, businessAction]()
         {
