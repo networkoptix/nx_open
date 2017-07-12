@@ -23,7 +23,7 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
     using base_type = AbstractAsyncClient;
 
 public:
-    AsyncClientWithHttpTunneling(Settings settings);
+    AsyncClientWithHttpTunneling(Settings settings = Settings());
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
@@ -69,12 +69,18 @@ public:
     void connect(const QUrl& url, ConnectHandler handler);
 
 private:
+    struct HandlerContext
+    {
+        IndicationHandler handler;
+        void* client;
+    };
+
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     ConnectHandler m_connectHandler;
     std::list<nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)>> m_cachedStunClientCalls;
-    std::set<int> m_handledIndications;
+    std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
 
     virtual void stopWhileInAioThread() override;

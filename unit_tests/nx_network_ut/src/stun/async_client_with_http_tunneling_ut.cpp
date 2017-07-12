@@ -7,6 +7,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 
+#include "stun_async_client_acceptance_tests.h"
 #include "stun_over_http_server_fixture.h"
 
 namespace nx {
@@ -125,6 +126,13 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
     whenConnectToRegularStunServer();
     thenConnectionIsEstablished();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    StunAsyncClientWithHttpTunneling,
+    StunAsyncClientAcceptanceTest,
+    stun::AsyncClientWithHttpTunneling);
 
 } // namespace test
 } // namespace stun

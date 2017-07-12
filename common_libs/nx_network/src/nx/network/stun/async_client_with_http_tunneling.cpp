@@ -42,12 +42,16 @@ bool AsyncClientWithHttpTunneling::setIndicationHandler(
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (!m_handledIndications.insert(method).second)
-        return false; //< Handler for this indication has already been supplied.
+    if (m_stunClient)
+        return m_stunClient->setIndicationHandler(method, std::move(handler), client);
 
-    invokeOrPostpone(
-        std::bind(&AbstractAsyncClient::setIndicationHandler, std::placeholders::_1,
-            method, std::move(handler), client));
+    if (!m_indicationHandlers.emplace(
+            method,
+            HandlerContext{std::move(handler), client}).second)
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -121,12 +125,29 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
 {
     QnMutexLocker lock(&m_mutex);
 
-    invokeOrPostpone(
-        [client, handler = std::move(handler)](
-            AbstractAsyncClient* clientPtr) mutable
-        {
-            clientPtr->cancelHandlers(client, std::move(handler));
-        });
+    if (m_stunClient)
+        return m_stunClient->cancelHandlers(client, std::move(handler));
+
+    const auto indicationHandlersSizeBak = m_indicationHandlers.size();
+    for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
+    {
+        if (it->second.client == client)
+            it = m_indicationHandlers.erase(it);
+        else
+            ++it;
+    }
+    
+    if (m_indicationHandlers.size() == indicationHandlersSizeBak)
+    {
+        return invokeOrPostpone(
+            [client, handler = std::move(handler)](
+                AbstractAsyncClient* clientPtr) mutable
+            {
+                clientPtr->cancelHandlers(client, std::move(handler));
+            });
+    }
+
+    post([handler = std::move(handler)]() { handler(); });
 }
 
 void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
@@ -207,6 +228,15 @@ void AsyncClientWithHttpTunneling::makeCachedStunClientCalls()
 {
     for (auto& cachedCall: m_cachedStunClientCalls)
         cachedCall(m_stunClient.get());
+
+    for (auto& elem: m_indicationHandlers)
+    {
+        m_stunClient->setIndicationHandler(
+            elem.first,
+            std::move(elem.second.handler),
+            elem.second.client);
+    }
+    m_indicationHandlers.clear();
 }
 
 void AsyncClientWithHttpTunneling::invokeOrPostpone(
