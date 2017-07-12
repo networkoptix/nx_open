@@ -37,14 +37,17 @@ def config(test_config):
         )
 
 @pytest.fixture
-def servers(config, server_factory):
+def servers(metrics_saver, server_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     log.info('Creating %d servers:', config.SERVER_COUNT)
     setup_settings = dict(autoDiscoveryEnabled=False)
-    return [server_factory('server_%04d' % (idx + 1),
+    start_time = utils.datetime_utc_now()
+    server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
                            rest_api_timeout_sec=config.REST_API_TIMEOUT_SEC)
-            for idx in range(config.SERVER_COUNT)]
+                       for idx in range(config.SERVER_COUNT)]
+    metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
+    return server_list
 
 
 def get_response(server, method, api_object, api_method):
@@ -187,16 +190,19 @@ def create_test_data_on_server((config, server, index)):
 
 
 def create_test_data(config, servers):
+    start_time = utils.datetime_utc_now()
     server_tupples = [(config, server, i)
                       for i, server in enumerate(servers)]
     pool = ThreadPool(len(servers))
     pool.map(create_test_data_on_server, server_tupples)
     pool.close()
     pool.join()
+    return utils.datetime_utc_now() - start_time
 
 
 def test_scalability(metrics_saver, config, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
-    create_test_data(config, servers)
+    populate_duration = create_test_data(config, servers)
+    metrics_saver.save('populate_duration', populate_duration)
     merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
     metrics_saver.save('merge_duration', merge_duration)
