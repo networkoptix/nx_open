@@ -166,6 +166,9 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString& log
 
 void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QSet<QString>& logins)
 {
+    if (logins.empty())
+        return;
+
     switch (state)
     {
         case Qt::Checked:
@@ -179,9 +182,6 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QSet<QString
         default:
             break;
     }
-
-    if (state == Qt::PartiallyChecked)
-        return;
 
     emit dataChanged(
         index(0, CheckBoxColumn),
