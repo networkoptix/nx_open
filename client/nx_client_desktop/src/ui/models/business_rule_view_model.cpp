@@ -914,6 +914,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (m_eventParams.metadata.allUsers)
                         return true;
 
+                    if (m_eventParams.metadata.instigators.empty())
+                        return false;
+
                     // TODO: #vkutin #3.2 Create and use proper validation policy,
                     // and avoid code duplication with QnSoftwareTriggerBusinessEventWidget
 
