@@ -59,32 +59,45 @@ TEST(LogLevel, ToString)
     ASSERT_EQ("verbose", toString(Level::verbose));
 }
 
-TEST(LogLevelFilters, FromString)
+void testParsing(const QString& s, Level p, LevelFilters f = {})
 {
-    ASSERT_EQ(
-        (LevelFilters{{"Single", Level::verbose}}),
-        levelFiltersFromString("Single"));
+    LevelSettings settings;
+    settings.parse(s);
+    EXPECT_EQ(LevelSettings(p, f), settings) << s.toStdString();
+}
 
-    ASSERT_EQ(
-        (LevelFilters{{"aaa", Level::debug}, {"bbb", Level::verbose}, {"ccc", Level::info}}),
-        levelFiltersFromString("aaa-debug;bbb;ccc-info"));
+TEST(LogLevelSettings, Parse)
+{
+    testParsing("info", Level::info);
 
-    ASSERT_EQ(
-        (LevelFilters{{"space::Class", Level::info}, {"Class(0x123)", Level::debug}}),
-        levelFiltersFromString("space::Class-i;Class(0x123)-d"));
+    testParsing("debug, verbose[nx::Class]", Level::debug, {{"nx::Class", Level::verbose}});
 
-    ASSERT_EQ(
-        (LevelFilters{
-            {"x", Level::info}, {"y", Level::info}, {"a", Level::verbose}, {"b", Level::verbose}}),
-        levelFiltersFromString("x,y-info;a,b"));
+    testParsing("verbose[nx::Class1, nx::Class2]", kDefaultLevel,
+        {{"nx::Class1", Level::verbose}, {"nx::Class2", Level::verbose}});
 
-    ASSERT_EQ(
-        (LevelFilters{{"First", Level::verbose}}),
-        levelFiltersFromString("First;Second-WrongLevel"));
+    testParsing("verbose[nx::Class1,nx::Class2],warning", Level::warning,
+        {{"nx::Class1", Level::verbose}, {"nx::Class2", Level::verbose}});
 
-    ASSERT_EQ(
-        (LevelFilters{{"Second", Level::verbose}}),
-        levelFiltersFromString("Second;wrong-filter-format"));
+    testParsing("i,d[aaa],v[bbb],i[ccc]", Level::info, {{"aaa", Level::debug},
+        {"bbb", Level::verbose}, {"ccc", Level::info}});
+
+    testParsing("info, info[ space::Class ], debug[ Class(0x123) ]", Level::info,
+        {{"space::Class", Level::info}, {"Class(0x123)", Level::debug}});
+
+    testParsing("info[x,y], verbose[a,b], none", Level::none,
+        {{"x", Level::info}, {"y", Level::info}, {"a", Level::verbose}, {"b", Level::verbose}});
+
+    testParsing("verbose[First], WrongLevel[Second, Third], none[Foth]", kDefaultLevel,
+        {{"First", Level::verbose}, {"Foth", Level::none}});
+
+    testParsing("info, verbose[First, NoBracket", Level::info,
+        {{"First", Level::verbose}, {"NoBracket", Level::verbose}});
+
+    testParsing("info, verbose[First, NoBracket], ] wrongCloser, none[OneMore]", Level::info,
+        {{"First", Level::verbose}, {"NoBracket", Level::verbose}, {"OneMore", Level::none}});
+
+    testParsing("info, verbose[First [NestedBracket] Not], debug[X]", Level::info,
+        {{"First", Level::verbose}, {"NestedBracket", Level::verbose}, {"X", Level::debug}});
 }
 
 } // namespace test

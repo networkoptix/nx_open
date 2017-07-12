@@ -23,17 +23,17 @@ void initialize(
     if (!logger)
         logger = mainLogger();
 
-    if (settings.defaultLevel == Level::undefined)
+    if (settings.level.primary == Level::undefined)
         return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
     {
-        if (settings.defaultLevel == Level::none)
+        if (settings.level.primary == Level::none)
             return;
 
-        logger->setDefaultLevel(settings.defaultLevel);
-        logger->setLevelFilters(settings.levelFilters);
+        logger->setDefaultLevel(settings.level.primary);
+        logger->setLevelFilters(settings.level.filters);
         if (baseName != QLatin1String("-"))
         {
             const auto logDir = settings.directory.isEmpty()
@@ -62,9 +62,10 @@ void initialize(
         write(lm("Binary path: %1").arg(binaryPath));
 
     const auto filePath = logger->filePath();
-    write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
-        toString(settings.defaultLevel).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
-        settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+    write(lm("Log level: %1").arg(settings.level));
+    write(lm("Log maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+        nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
+        filePath ? *filePath : lit("-")));
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
@@ -74,13 +75,11 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 
     if (const auto value = arguments.get("log-level", "ll"))
     {
-        const auto level = levelFromString(*value);
-        NX_CRITICAL(level != Level::undefined);
-        logger->setDefaultLevel(level);
+        LevelSettings level;
+        level.parse(*value);
+        logger->setDefaultLevel(level.primary);
+        logger->setLevelFilters(level.filters);
     }
-
-    if (const auto value = arguments.get("log-level-filters", "llf"))
-        logger->setLevelFilters(levelFiltersFromString(*value));
 
     if (const auto value = arguments.get("log-file", "lf"))
     {

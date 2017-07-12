@@ -82,8 +82,7 @@ int main(int argc, char* argv[])
 
     QnLongRunnablePool runnablePool;
 
-    QString logLevel = "WARN";
-    QString logLevelFilters;
+    QString logLevel = "warning";
     QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
     if (!QDir(installationsDir).exists())
         QDir().mkpath(installationsDir);
@@ -112,7 +111,6 @@ int main(int argc, char* argv[])
     QnCommandLineParser commandLineParser;
     commandLineParser.storeUnparsed(&applicationParameters);
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&logLevelFilters, "--log-level-filters", NULL, QString());
     commandLineParser.addParameter(&logFilePath, "--log-file", NULL, QString());
     commandLineParser.addParameter(&mirrorListUrl, "--mirror-list-url", NULL, QString());
     commandLineParser.addParameter(&quitMode, "quit", NULL, QString(), QVariant(true));
@@ -158,8 +156,7 @@ int main(int argc, char* argv[])
     if (!logFilePath.isEmpty() && !logLevel.isEmpty())
     {
         nx::utils::log::Settings settings;
-        settings.defaultLevel = nx::utils::log::Level::warning;
-        settings.levelFilters = nx::utils::log::levelFiltersFromString(logLevelFilters);
+        settings.level.parse(logLevel);
         settings.maxFileSize = 1024 * 1024 * 10;
         settings.maxBackupCount = 5;
 

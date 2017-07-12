@@ -74,49 +74,116 @@ QString toString(Level level)
     return QLatin1String("unknown");
 }
 
-LevelFilters levelFiltersFromString(const QString& levelFilters)
+
+LevelSettings::LevelSettings(Level primary, LevelFilters filters):
+    primary(primary),
+    filters(std::move(filters))
 {
-    LevelFilters filters;
-    for (const auto& group: levelFilters.splitRef(';', QString::SkipEmptyParts))
+}
+
+bool LevelSettings::operator==(const LevelSettings& rhs) const
+{
+    return primary == rhs.primary && filters == rhs.filters;
+}
+
+void LevelSettings::reset()
+{
+    primary = kDefaultLevel;
+    filters.clear();
+}
+
+QString LevelSettings::toString() const
+{
+    return lit("%1, filters=%2").arg(log::toString(primary).toUpper(), containerString(filters));
+}
+
+static bool isSeparator(const QChar& c)
+{
+    return c == QChar(',') || c == QChar(';') || c == QChar('|');
+};
+
+static bool isOpenBracket(const QChar& c)
+{
+    return c == QChar('[') || c == QChar('{');
+};
+
+static bool isCloseBracket(const QChar& c)
+{
+    return c == QChar(']') || c == QChar('}');
+};
+
+static bool isTokenPart(const QChar& c)
+{
+    return !isSeparator(c) && !isOpenBracket(c) && !isCloseBracket(c);
+}
+
+static QString readToken(const QString& s, int* position)
+{
+    int start = *position;
+    while (*position < s.size() && isTokenPart(s[*position]))
+        ++(*position);
+
+    return s.midRef(start, *position - start).trimmed().toString();
+}
+
+static std::set<QString> readTokenList(const QString& s, int* position)
+{
+    std::set<QString> tokens;
+    if (*position == s.size() || !isOpenBracket(s[*position]))
+        return tokens;
+
+    ++(*position);
+    for (;; ++(*position))
     {
-        const auto parts = group.split('-');
-        if (parts.size() == 0 || parts.size() > 2)
+        auto t = readToken(s, position);
+        if (!t.isEmpty())
+            tokens.insert(std::move(t));
+
+        if (*position == s.size())
+            return tokens;
+
+        if (isCloseBracket(s[*position]))
         {
-            qWarning() << Q_FUNC_INFO << "wrong format in group" << group << "in" << levelFilters;
+            ++position;
+            return tokens;
+        }
+    }
+}
+
+void LevelSettings::parse(const QString& s)
+{
+    if (s.trimmed().isEmpty())
+        return;
+
+    for (int position = 0; position < s.size(); ++position)
+    {
+        if (isSeparator(s[position]))
+            continue;
+
+        const auto levelToken = readToken(s, &position);
+        auto level = levelFromString(levelToken);
+        auto filtersTokens = readTokenList(s, &position);
+
+        if (level == Level::undefined)
+        {
+            qWarning() << Q_FUNC_INFO << "ignore wrong level" << levelToken;
             continue;
         }
 
-        auto level = Level::verbose;
-        if (parts.size() == 2)
+        if (filtersTokens.empty())
         {
-            const auto levelPart = parts[1].toString();
-            const auto parsedLevel = levelFromString(levelPart);
-            if (parsedLevel == Level::undefined)
-            {
-                qWarning() << Q_FUNC_INFO << "invalid level" << levelPart << "in group" << group
-                    << "in" << levelFilters;
-                continue;
-            }
-
-            level = parsedLevel;
+            primary = level;
+            continue;
         }
 
-        const auto nameParts = parts[0].split(',');
-        for (const auto& part: nameParts)
+        for (auto& t : filtersTokens)
         {
-            const auto name = part.toString();
-            if (filters.count(name))
-            {
-                qWarning() << Q_FUNC_INFO << "duplicate name" << name << "in group" << group
-                    << "in" << levelFilters;
-                continue;
-            }
+            if (filters.find(t) != filters.end())
+                qWarning() << Q_FUNC_INFO << "redefine filter" << t;
 
-            filters.emplace(name, level);
+            filters.emplace(std::move(t), level);
         }
     }
-
-    return filters;
 }
 
 } // namespace log

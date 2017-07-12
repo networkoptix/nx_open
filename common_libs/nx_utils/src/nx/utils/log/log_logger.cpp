@@ -53,14 +53,14 @@ void Logger::logForced(Level level, const QString& tag, const QString& message)
 bool Logger::isToBeLogged(Level level, const QString& tag)
 {
     QnMutexLocker lock(&m_mutex);
-    if (level <= m_defaultLevel)
-        return true;
-
     for (const auto& filter: m_levelFilters)
     {
         if (tag.startsWith(filter.first))
             return level <= filter.second;
     }
+
+    if (level <= m_defaultLevel)
+        return true;
 
     return false;
 }

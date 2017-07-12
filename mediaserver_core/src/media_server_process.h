@@ -46,10 +46,7 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
-    QString logLevelFilters;
-
-    // Log level of http requests log.
-    QString msgLogLevel;
+    QString httpLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 

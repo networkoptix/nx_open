@@ -450,18 +450,17 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logLevel = qnSettings->logLevel();
 
     nx::utils::log::Settings logSettings;
-    logSettings.levelFilters = nx::utils::log::levelFiltersFromString(startupParams.logLevelFilters);
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
 
-    logSettings.defaultLevel = nx::utils::log::levelFromString(logLevel);
+    logSettings.level.parse(logLevel);
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
-        logSettings.defaultLevel = nx::utils::log::levelFromString(ec2TranLogLevel);
+        logSettings.level.parse(ec2TranLogLevel);
         nx::utils::log::initialize(
             logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath(),
             QLatin1String("ec2_tran"), ec2logger);

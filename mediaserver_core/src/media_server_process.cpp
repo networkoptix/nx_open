@@ -1040,9 +1040,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
-    commandLineParser.addParameter(&m_cmdLineArguments.logLevelFilters, "--log-level-filters", NULL,
-        "Log level filters, format: filterX1[,filterX2[,...]][-levelX][,filterY1[;filterY2,...][-levelY]][;...]");
-    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
@@ -1099,8 +1097,8 @@ void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
         m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
 
-    if (m_cmdLineArguments.msgLogLevel.isEmpty())
-        m_cmdLineArguments.msgLogLevel = settings->roSettings()->value(
+    if (m_cmdLineArguments.httpLogLevel.isEmpty())
+        m_cmdLineArguments.httpLogLevel = settings->roSettings()->value(
             nx_ms_conf::HTTP_MSG_LOG_LEVEL,
             nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
 
@@ -2293,34 +2291,30 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
-    logSettings.levelFilters = nx::utils::log::levelFiltersFromString(
-        cmdLineArguments().logLevelFilters);
-
-    logSettings.defaultLevel = nx::utils::log::Settings::kDefaultLevel;
-    logSettings.loadDefaultLevel(
+    logSettings.level.parse(
         cmdLineArguments().logLevel, settings->value("logLevel").toString());
 
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
-    logSettings.defaultLevel = nx::utils::log::Settings::kDefaultLevel;
-    logSettings.loadDefaultLevel(
-        cmdLineArguments().msgLogLevel, settings->value("http-log-level").toString());
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
 
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.defaultLevel = nx::utils::log::Settings::kDefaultLevel;
-    logSettings.loadDefaultLevel(
+    logSettings.level.reset();
+    logSettings.level.parse(
         cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
 
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.defaultLevel = nx::utils::log::Settings::kDefaultLevel;
-    logSettings.loadDefaultLevel(
+    logSettings.level.reset();
+    logSettings.level.parse(
         cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
 
     nx::utils::log::initialize(

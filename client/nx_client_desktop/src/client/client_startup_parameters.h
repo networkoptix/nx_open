@@ -51,7 +51,6 @@ struct QnStartupParameters
     QString delayedDrop;
     QString instantDrop;
     QString logLevel;
-    QString logLevelFilters;
     QString ec2TranLogLevel;
     QString lightMode;
     QnUuid videoWallGuid;
