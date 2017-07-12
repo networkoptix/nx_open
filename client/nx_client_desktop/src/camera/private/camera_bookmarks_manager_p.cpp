@@ -208,20 +208,20 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(
     const QnCameraBookmark &bookmark,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, nx::vms::event::ActionData(), callback);
+    addCameraBookmarkInternal(bookmark, nx::vms::event::AbstractActionPtr(), callback);
 }
 
-void QnCameraBookmarksManagerPrivate::addCameraBookmarkForAction(
+void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
     const QnCameraBookmark& bookmark,
     const nx::vms::event::AbstractActionPtr& action,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, action->toActionData(), callback);
+    addCameraBookmarkInternal(bookmark, action, callback);
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::ActionData& actionData,
+    const nx::vms::event::AbstractActionPtr& action,
     OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
@@ -240,9 +240,16 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     }
 
     setEnabled(true); // Forcefully enable on modifying operation
-    int handle = server->apiConnection()->addBookmarkAsync(
-        bookmark, actionData, this, SLOT(handleBookmarkOperation(int, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, bookmark.guid, callback);
+    const int handle = action
+        ? server->apiConnection()->acknowledgeEventAsync(
+            bookmark, action, this, SLOT(handleBookmarkOperation(int, int)))
+        : server->apiConnection()->addBookmarkAsync(
+            bookmark, this, SLOT(handleBookmarkOperation(int, int)));
+
+    const auto operationType = action
+        ? OperationInfo::OperationType::Acknowledge
+        : OperationInfo::OperationType::Add;
+    m_operations[handle] = OperationInfo(operationType, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
 }

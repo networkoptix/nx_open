@@ -42,7 +42,7 @@ public:
     /// @param callback         Callback with operation result.
     void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
-    void addCameraBookmarkForAction(
+    void acknowledgeEvent(
         const QnCameraBookmark& bookmark,
         const nx::vms::event::AbstractActionPtr& abstractAction,
         OperationCallbackType callback = OperationCallbackType());
@@ -129,7 +129,7 @@ private:
 
     void addCameraBookmarkInternal(
         const QnCameraBookmark& bookmark,
-        const nx::vms::event::ActionData& actionData = nx::vms::event::ActionData(),
+        const nx::vms::event::AbstractActionPtr& action,
         OperationCallbackType callback = OperationCallbackType());
 
 private:
@@ -143,6 +143,7 @@ private:
     struct OperationInfo {
         enum class OperationType {
             Add,
+            Acknowledge,
             Update,
             Delete
         };

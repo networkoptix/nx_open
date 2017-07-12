@@ -11,6 +11,9 @@
 
 #include <api/helpers/camera_id_helper.h>
 
+#include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 namespace {
 
 static const QString kStartTimeParam = lit("startTime");
@@ -193,11 +196,11 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark&
 
 QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::ActionData& data)
+    const nx::vms::event::AbstractActionPtr& action)
     :
     QnMultiserverRequestData(),
     bookmark(bookmark),
-    actionData(data)
+    action(action)
 {
 }
 
@@ -206,11 +209,15 @@ void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmark = bookmarkFromParams(params, resourcePool);
-    if (params.contains(kActionData))
-    {
-        const auto actionDataParameter = params.value(kActionData);
-        actionData = QJson::deserialized<nx::vms::event::ActionData>(actionDataParameter.toLatin1());
-    }
+    if (!params.contains(kActionData))
+        return;
+
+    const auto actionDataValue = params.value(kActionData);
+    ec2::ApiBusinessActionData actionData;
+    if (!QJson::deserialize(actionDataValue, &actionData))
+        return;
+
+    ec2::fromApiToResource(actionData, action);
 }
 
 QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
@@ -219,8 +226,12 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
 
     const auto bookmarkParams = bookmarksToParam(bookmark);
     result.append(bookmarkParams);
-    if (actionData.actionType != nx::vms::event::ActionType::undefinedAction)
-        result.insert(kActionData, QString::fromLatin1(QJson::serialized(actionData)));
+    if (action->actionType() == nx::vms::event::ActionType::undefinedAction)
+        return result;
+
+    ec2::ApiBusinessActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+    result.insert(kActionData, QString::fromLatin1(QJson::serialized(actionData)));
 
     return result;
 }

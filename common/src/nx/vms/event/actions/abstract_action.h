@@ -62,8 +62,6 @@ protected:
     explicit AbstractAction(const ActionType actionType, const EventParameters& runtimeParams);
 
 public:
-    ActionData toActionData() const;
-
     virtual ~AbstractAction();
 
     ActionType actionType() const;

@@ -114,6 +114,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
     (ec2BookmarksObject, "ec2/bookmarks")
     (ec2BookmarkAddObject, "ec2/bookmarks/add")
+    (ec2BookmarkAcknowledgeObject, "ec2/bookmarks/acknowledge")
     (ec2BookmarkUpdateObject, "ec2/bookmarks/update")
     (ec2BookmarkDeleteObject, "ec2/bookmarks/delete")
     (ec2BookmarkTagsObject, "ec2/bookmarks/tags")
@@ -276,6 +277,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnBackupStatusData>(this, response, handle);
             break;
         case ec2BookmarkAddObject:
+        case ec2BookmarkAcknowledgeObject:
         case ec2BookmarkUpdateObject:
         case ec2BookmarkDeleteObject:
             emitFinished(this, response.status, handle);
@@ -1122,15 +1124,30 @@ int QnMediaServerConnection::recordedTimePeriods(
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
 
-int QnMediaServerConnection::addBookmarkAsync(
+
+int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::ActionData& data,
+    const nx::vms::event::AbstractActionPtr& action,
     QObject* target,
     const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark, data);
+    QnUpdateBookmarkRequestData request(bookmark, action);
     request.format = Qn::SerializationFormat::UbjsonFormat;
-    return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
+
+    return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,
+        request.toParams(), nullptr, target, slot);
+}
+
+int QnMediaServerConnection::addBookmarkAsync(
+    const QnCameraBookmark& bookmark,
+    QObject* target,
+    const char* slot)
+{
+    QnUpdateBookmarkRequestData request(bookmark);
+    request.format = Qn::SerializationFormat::UbjsonFormat;
+
+    return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(),
+        nullptr, target, slot);
 }
 
 int QnMediaServerConnection::updateBookmarkAsync(

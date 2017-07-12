@@ -259,9 +259,10 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     if (!qnServerDb->addBookmark(bookmark))
         return false;
 
-    const auto& actionData = context.request().actionData;
-    if (actionData.actionType != nx::vms::event::ActionType::undefinedAction)
-        qnServerDb->saveActionToDB(actionData);
+    const auto& action = context.request().action;
+    if (action && action->actionType() != nx::vms::event::ActionType::undefinedAction)
+        qnServerDb->saveActionToDB(action);
+
     return true;
 }
 

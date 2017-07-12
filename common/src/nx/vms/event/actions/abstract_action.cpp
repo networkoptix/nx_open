@@ -187,20 +187,6 @@ AbstractAction::~AbstractAction()
 {
 }
 
-ActionData AbstractAction::toActionData() const
-{
-    nx::vms::event::ActionData result;
-
-    result.actionType = actionType();
-    result.actionParams = getParams();
-    result.eventParams = getRuntimeParams();
-    result.eventParams.toggleState = getToggleState();
-    result.businessRuleId = getRuleId();
-    result.aggregationCount = getAggregationCount();
-
-    return result;
-}
-
 ActionType AbstractAction::actionType() const
 {
     return m_actionType;
