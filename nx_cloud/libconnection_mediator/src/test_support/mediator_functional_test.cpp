@@ -105,9 +105,12 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
     m_httpPort = httpEndpoints.front().port;
 
-    network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
-        nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
-    network::SocketGlobals::mediatorConnector().enable(true);
+    if (m_testFlags & MediatorTestFlags::initiailizeConnectivity)
+    {
+        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
+        network::SocketGlobals::mediatorConnector().enable(true);
+    }
 
     return true;
 }

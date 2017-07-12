@@ -82,7 +82,13 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupMediatorUrl(QUrl mediatorUrl)
+void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
+}
+
+void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -177,15 +183,16 @@ void MediatorConnector::fetchEndpoint()
                 NX_DEBUG(this, lm("Fetched mediator tcp (%1) and udp (%2) urls")
                     .arg(tcpUrl).arg(udpUrl));
                 m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
-                useMediatorUrl(tcpUrl);
+                m_mediatorUrl = tcpUrl;
+                connectToMediatorAsync();
             }
         });
 }
 
-void MediatorConnector::useMediatorUrl(QUrl url)
+void MediatorConnector::connectToMediatorAsync()
 {
     m_stunClient->connect(
-        url,
+        *m_mediatorUrl,
         [this](SystemError::ErrorCode code)
         {
             auto setEndpoint =

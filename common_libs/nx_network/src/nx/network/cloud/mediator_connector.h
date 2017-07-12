@@ -28,7 +28,10 @@ public:
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
-    /** Shall be called to enable cloud functionality for application */
+    /**
+     * Has to be called to enable cloud functionality for application.
+     * E.g., initiates mediator address resolving.
+     */
     void enable(bool waitComplete = false);
 
     /** Provides client related functionality */
@@ -38,10 +41,14 @@ public:
     std::unique_ptr<MediatorServerTcpConnection> systemConnection();
 
     /**
+     * NOTE: Mediator url resolution will still happen by referring to specified address.
+     */
+    void mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl);
+    /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
      */
-    void mockupMediatorUrl(QUrl mediatorUrl);
+    void mockupMediatorUrl(const QUrl& mediatorUrl);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
@@ -67,7 +74,7 @@ private:
     virtual void stopWhileInAioThread() override;
 
     void fetchEndpoint();
-    void useMediatorUrl(QUrl url);
+    void connectToMediatorAsync();
 };
 
 } // namespace api

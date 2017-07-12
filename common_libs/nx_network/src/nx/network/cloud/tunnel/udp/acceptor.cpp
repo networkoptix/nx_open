@@ -1,6 +1,7 @@
 #include "acceptor.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/socket_global.h>
 
 #include "incoming_tunnel_connection.h"
 
@@ -45,9 +46,10 @@ void TunnelAcceptor::accept(AcceptHandler handler)
         [this, handler = std::move(handler)]() mutable
         {
             m_acceptHandler = std::move(handler);
+            NX_ASSERT(SocketGlobals::mediatorConnector().udpEndpoint());
             m_udpMediatorConnection = std::make_unique<
                 hpm::api::MediatorServerUdpConnection>(
-                    m_mediatorConnection->remoteAddress(),
+                    *SocketGlobals::mediatorConnector().udpEndpoint(),
                     m_mediatorConnection->credentialsProvider());
 
             m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());

@@ -35,8 +35,9 @@ public:
     enum MediatorTestFlags
     {
         noFlags = 0,
-        useTestCloudDataProvider = 1,
-        initiailizeSocketGlobals,
+        useTestCloudDataProvider = 0x01,
+        initiailizeSocketGlobals = 0x02,
+        initiailizeConnectivity = 0x04,
     };
 
     //!Calls \a start
