@@ -60,25 +60,29 @@ class PhysicalInstallationCtl(object):
         debian_dist_path = os.path.join(bin_dir, MEDIASERVER_DIST_FNAME)
         self._installation_hosts = [
             PhysicalInstallationHost.from_config(config, customization_company_name, debian_dist_path) for config in config_list]
-        self._next_idx_to_allocate = 0
+        self._available_hosts = self._installation_hosts[:]
 
     def clean_all_installations(self):
         for host in self._installation_hosts:
             host.reset_installations()
 
     def allocate_server(self, config):
-        idx = self._next_idx_to_allocate
-        host_list = self._installation_hosts[idx:] + self._installation_hosts[:idx]
-        self._next_idx_to_allocate = (idx + 1) % len(self._installation_hosts)
-        for host in host_list:
+        while self._available_hosts:
+            host = self._available_hosts[0]
             server = host.allocate_server(config)
-            if server: return server
+            if server:
+                # next time allocate on next one
+                self._available_hosts = self._available_hosts[1:] + self._available_hosts[:1]
+                return server
+            else:
+                del self._available_hosts[0]
         return None
 
     def release_all(self):
         log.info('Releasing all physical installations')
         for host in self._installation_hosts:
             host.release_all_servers()
+        self._available_hosts = self._installation_hosts[:]
 
 
 class PhysicalInstallationHost(object):
