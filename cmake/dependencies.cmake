@@ -86,7 +86,7 @@ function(get_dependencies)
         set(haveServer TRUE)
     endif()
 
-    if (LINUX AND box STREQUAL "none")
+    if ((LINUX AND box STREQUAL "none") OR (WINDOWS AND arch STREQUAL "x64"))
         nx_rdep_add_package(cassandra)
     endif()
 

@@ -13,5 +13,5 @@ nx_add_target(nx_cassandra LIBRARY ${library_type}
         nx_utils)
 
 target_compile_definitions(nx_cassandra
-    PRIVATE NX_NETWORK_API=${API_EXPORT_MACRO}
-    INTERFACE NX_NETWORK_API=${API_IMPORT_MACRO})
+    PRIVATE NX_CASSANDRA_API=${API_EXPORT_MACRO}
+    INTERFACE NX_CASSANDRA_API=${API_IMPORT_MACRO})

@@ -30,7 +30,7 @@ private:
     bool m_dbReady = false;
 
     void prepareDbStructure();
-    std::string whereStringForFind(const std::string& domainName);
+    std::string whereStringForFind(const std::string& domainName) const;
 };
 
 } // namespace model

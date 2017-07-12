@@ -9,7 +9,7 @@
 namespace nx {
 namespace cassandra {
 
-class Query
+class NX_CASSANDRA_API Query
 {
 public:
     Query(CassFuture* future);
@@ -38,7 +38,7 @@ private:
     friend class AsyncConnection;
 };
 
-class QueryResult
+class NX_CASSANDRA_API QueryResult
 {
 public:
     QueryResult(CassFuture* future);
@@ -96,7 +96,7 @@ private:
     }
 };
 
-class AsyncConnection
+class NX_CASSANDRA_API AsyncConnection
 {
 public:
     AsyncConnection(const char* host);

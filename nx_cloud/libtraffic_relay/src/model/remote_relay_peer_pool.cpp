@@ -154,7 +154,7 @@ bool RemoteRelayPeerPool::addPeer(
 }
 
 
-std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainName)
+std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainName) const
 {
     auto reversedDomainName = nx::utils::reverseWords(domainName, ".");
 
