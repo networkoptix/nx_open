@@ -260,10 +260,20 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
 
     if (role == Qt::DecorationRole)
     {
-        if (index.column() != kCamera)
-            return QVariant();
+        if (index.column() == kCamera)
+            return qnResIconCache->icon(QnResourceIconCache::Camera);
+        if (index.column() == kCreator)
+        {
+            if (bookmark.isCreatedInOlderVMS())
+                return QVariant();
 
-        return qnResIconCache->icon(QnResourceIconCache::Camera);
+            return bookmark.isCreatedBySystem()
+                ? qnResIconCache->icon(QnResourceIconCache::CurrentSystem)
+                : qnResIconCache->icon(QnResourceIconCache::User);
+        }
+
+        return QVariant();
+
     }
 
     switch(index.column())
