@@ -295,10 +295,10 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
     connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this,
         [this, usersModel](Qt::CheckState state)
         {
-            usersModel->beginResetModel();
+            QSet<QString> users;
             for (const auto& user: visibleUsers())
-                usersModel->setCheckState(state, user.login);
-            usersModel->endResetModel();
+                users.insert(user.login);
+            usersModel->setCheckState(state, users);
         });
 
     ui->usersTable->setModel(sortModel);
