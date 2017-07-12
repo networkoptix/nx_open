@@ -261,7 +261,8 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     if (!params.needConfirmation)
         return;
 
-    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
+    widget->setCloseButtonUnavailable();
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
         [this, businessAction]()
         {
             nx::client::desktop::ui::action::Parameters params;
