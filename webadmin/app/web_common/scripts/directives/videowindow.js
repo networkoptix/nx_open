@@ -367,6 +367,7 @@ angular.module('nxCommon')
                             scope.flashls = false;
                             scope.jsHls = false;
                             scope.loading = false; // no supported format - no loading
+                            recyclePlayer();
                             return;
                         }
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
