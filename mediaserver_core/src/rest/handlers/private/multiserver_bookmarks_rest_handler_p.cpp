@@ -29,6 +29,7 @@ namespace
         QString(),
         "tags",
         "add",
+        "acknowledge",
         "update",
         "delete",
     };

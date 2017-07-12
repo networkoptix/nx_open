@@ -11,6 +11,7 @@ enum class QnBookmarkOperation
     Get,
     GetTags,
     Add,
+    Acknowledge,
     Update,
     Delete,
 
