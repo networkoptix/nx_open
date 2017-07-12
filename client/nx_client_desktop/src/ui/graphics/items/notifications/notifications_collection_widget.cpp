@@ -263,6 +263,9 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
         return;
     }
 
+    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
+        return;
+
     const auto params = action->getParams();
     if (!params.requireConfirmation(action->getRuntimeParams().eventType))
         return;
@@ -504,9 +507,13 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     connect(item, &QnNotificationWidget::actionTriggered, this,
         &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    const bool isLockedItem = action->actionType() == vms::event::playSoundAction
-        || (action->actionType() == vms::event::showPopupAction
-            && action->getParams().requireConfirmation(action->getRuntimeParams().eventType));
+    const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
+    const bool isAcknowledgmentAction =
+        action->actionType() == vms::event::showPopupAction
+        && action->getParams().requireConfirmation(action->getRuntimeParams().eventType)
+        && context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
+
+    const bool isLockedItem = isPlaySoundAction || isAcknowledgmentAction;
     m_list->addItem(item, isLockedItem);
 }
 

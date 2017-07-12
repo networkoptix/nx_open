@@ -226,7 +226,7 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
 
     const auto bookmarkParams = bookmarksToParam(bookmark);
     result.append(bookmarkParams);
-    if (action->actionType() == nx::vms::event::ActionType::undefinedAction)
+    if (!action || action->actionType() == nx::vms::event::ActionType::undefinedAction)
         return result;
 
     ec2::ApiBusinessActionData actionData;
