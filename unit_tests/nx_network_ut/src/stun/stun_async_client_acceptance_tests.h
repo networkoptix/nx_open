@@ -57,15 +57,15 @@ TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest);
 
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, same_handler_cannot_be_added_twice)
 {
-    givenClientWithIndicationHandler();
-    thenSameHandlerCannotBeAdded();
+    this->givenClientWithIndicationHandler();
+    this->thenSameHandlerCannotBeAdded();
 }
 
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, add_remove_indication_handler)
 {
-    givenClientWithIndicationHandler();
-    whenRemovedHandler();
-    thenSameHandlerCanBeAddedAgain();
+    this->givenClientWithIndicationHandler();
+    this->whenRemovedHandler();
+    this->thenSameHandlerCanBeAddedAgain();
 }
 
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest, 
