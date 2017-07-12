@@ -13,6 +13,8 @@
 
 #include "jpeg_decoder.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace media {
 
@@ -21,7 +23,7 @@ void DecoderRegistrar::registerDecoders(
     const QSize& maxFfmpegResolution,
     bool isTranscodingEnabled)
 {
-    assert(allocator);
+    NX_ASSERT(allocator);
 
     VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
