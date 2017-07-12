@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -155,7 +156,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
     const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
     const auto currentUserId = context()->user()->getId();
-    const auto currentTimeMs = QDateTime::currentMSecsSinceEpoch();
+    const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     for (auto& bookmark: bookmarks)
     {
         bookmark.creatorId = currentUserId;
