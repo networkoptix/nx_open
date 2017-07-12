@@ -29,7 +29,7 @@ ConnectSessionManager::ConnectSessionManager(
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
     m_trafficRelay(trafficRelay),
-    m_remoteRelayPool(new model::RemoteRelayPeerPool)
+    m_remoteRelayPool(new model::RemoteRelayPeerPool("127.0.1.1"))
 {
 }
 
@@ -83,7 +83,7 @@ void ConnectSessionManager::beginListening(
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectSessionManager::saveServerConnection, this, 
+        std::bind(&ConnectSessionManager::saveServerConnection, this,
             request.peerName, _1);
 
     completionHandler(
@@ -100,7 +100,7 @@ void ConnectSessionManager::createClientSession(
         .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG2);
 
     api::CreateClientSessionResponse response;
-    response.sessionTimeout = 
+    response.sessionTimeout =
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
@@ -239,7 +239,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
             cl_logDEBUG1);
         return completionHandler(resultCode, nx_http::ConnectionEvents());
     }
-    
+
     NX_LOGX(lm("Session %1. Got listening peer %2 connection")
         .arg(connectSessionId).arg(listeningPeerName), cl_logDEBUG2);
 
@@ -247,7 +247,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        [this, connectSessionId, listeningPeerName, 
+        [this, connectSessionId, listeningPeerName,
             listeningPeerConnection = std::move(listeningPeerConnection)](
                 nx_http::HttpServerConnection* httpConnection) mutable
         {
@@ -302,7 +302,7 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
 {
     RelaySession relaySession;
 
-    // TODO: #ak Make lock shorter. Handle cancellation problem: 
+    // TODO: #ak Make lock shorter. Handle cancellation problem:
     // element from m_relaySessions is removed and destructor does not wait for this session completion.
     QnMutexLocker lock(&m_mutex);
 
@@ -357,7 +357,7 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
         settings, clientSessionPool, listeningPeerPool, trafficRelay);
 }
 
-ConnectSessionManagerFactory::FactoryFunc 
+ConnectSessionManagerFactory::FactoryFunc
     ConnectSessionManagerFactory::setFactoryFunc(
         ConnectSessionManagerFactory::FactoryFunc func)
 {

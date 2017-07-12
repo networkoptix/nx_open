@@ -10,8 +10,8 @@ namespace cloud {
 namespace relay {
 namespace model {
 
-RemoteRelayPeerPool::RemoteRelayPeerPool():
-    m_cassConnection(new nx::cassandra::AsyncConnection("127.0.0.1"))
+RemoteRelayPeerPool::RemoteRelayPeerPool(const char* cassandraHost):
+    m_cassConnection(new nx::cassandra::AsyncConnection(cassandraHost))
 {
     prepareDbStructure();
 }

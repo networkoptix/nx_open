@@ -17,7 +17,7 @@ namespace model {
 class RemoteRelayPeerPool
 {
 public:
-    RemoteRelayPeerPool();
+    RemoteRelayPeerPool(const char* cassandraHost);
 
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
     bool addPeer(const std::string& domainName, const std::string& peerName);

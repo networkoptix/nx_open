@@ -40,7 +40,7 @@ protected:
 
     void whenRelayPoolObjectHasBeenCreated()
     {
-        m_relayPool.reset(new TestRelayPool);
+        m_relayPool.reset(new TestRelayPool(options()->host.c_str()));
     }
 
     void assertSelectFromTablesResult(
