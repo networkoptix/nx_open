@@ -17,6 +17,9 @@ namespace QnBusiness {
 bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
     const QnUserResourcePtr& user);
 
+bool hasAccessToSource(const nx::vms::event::EventParameters& params,
+    const QnUserResourcePtr& user);
+
 } // namespace QnBusiness
 
 class QnCameraInputPolicy

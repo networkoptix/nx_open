@@ -36,8 +36,9 @@ public:
 
     void updateScale();
 
-    qreal scale() const;
-    qreal relativeScale() const;
+    qreal scale() const; //< Absolute scale
+    qreal sceneScale() const;
+    qreal relativeScale() const; //< scale() / sceneScale()
 
 signals:
     void scaleChanged();

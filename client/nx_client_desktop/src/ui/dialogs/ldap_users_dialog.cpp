@@ -96,21 +96,26 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     });
     m_timeoutTimer->start();
 
-    serverConnection->testLdapSettingsAsync(settings, this, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
+    serverConnection->testLdapSettingsAsync(settings,
+        this,
+        SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 
     setHelpTopic(this, Qn::UserSettings_LdapFetch_Help);
 }
 
 QnLdapUsersDialog::~QnLdapUsersDialog() {}
 
-void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
-    Q_UNUSED(handle);
+void QnLdapUsersDialog::at_testLdapSettingsFinished(int status,
+    const QnLdapUsers& users,
+    int /*handle*/,
+    const QString& errorString)
+{
     if (!m_loading)
         return;
 
-    if (status != 0 || !errorString.isEmpty()) {
-        QString result;
-        result = tr("Error while loading users.");
+    if (status != 0 || !errorString.isEmpty())
+    {
+        QString result = tr("Error while loading users.");
         if (!errorString.isEmpty())
             result += lit(" (%1)").arg(errorString);
 
@@ -121,94 +126,25 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     updateExistingUsers(users);
 
     QnLdapUsers filteredUsers = filterExistingUsers(users);
-    if (filteredUsers.isEmpty()) {
+    if (filteredUsers.isEmpty())
+    {
         stopTesting(tr("No new users found."));
         return;
     }
 
     m_loading = false;
 
+    setupUsersTable(filteredUsers);
+
     ui->stackedWidget->setCurrentWidget(ui->usersPage);
     ui->buttonBox->hideProgress();
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
-    ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
-
-    auto usersModel = new QnLdapUserListModel(this);
-    usersModel->setUsers(filteredUsers);
-
-    auto sortModel = new QSortFilterProxyModel(this);
-    auto header = new QnCheckBoxedHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
-    sortModel->setSourceModel(usersModel);
-
-    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, [this, usersModel](Qt::CheckState state) {
-        for (const auto &user: visibleUsers())
-            usersModel->setCheckState(state, user.login);
-    });
-
-    ui->usersTable->setModel(sortModel);
-    ui->usersTable->setHeader(header);
-
-    header->setVisible(true);
-    header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(QnLdapUserListModel::DnColumn, QHeaderView::Stretch);
-    header->setSectionsClickable(true);
-
-    ui->usersTable->sortByColumn(QnLdapUserListModel::FullNameColumn, Qt::AscendingOrder);
-
-    auto updateSelection = [this, header, sortModel] {
-        auto users = visibleSelectedUsers();
-        Qt::CheckState selectionState = Qt::Unchecked;
-
-        if (!users.isEmpty()) {
-
-            if (users.size() == sortModel->rowCount())
-                selectionState = Qt::Checked;
-            else
-                selectionState = Qt::PartiallyChecked;
-        }
-
-        header->setCheckState(selectionState);
-    };
-
-    connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, updateSelection] (const QModelIndex &index)
-    {
-        if (index.column() != QnLdapUserListModel::CheckBoxColumn)
-            return;
-
-        QString login = index.data(QnLdapUserListModel::LoginRole).toString();
-        if (login.isEmpty())
-            return;
-
-        /* Invert current state */
-        usersModel->setCheckState(index.data(Qt::CheckStateRole).toInt() == Qt::Checked ? Qt::Unchecked : Qt::Checked, login);
-        updateSelection();
-
-    });
-
     m_importButton->setVisible(true);
-    connect(m_importButton, &QPushButton::clicked, this, [this] {
-        importUsers(visibleSelectedUsers());
-        accept();
-    });
-
-    auto updateButton = [this, header] {
-        m_importButton->setEnabled(header->checkState() != Qt::Unchecked);
-    };
-
-    //TODO: #GDM model should notify about its check state changes
-    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
-    updateButton();
-
-    sortModel->setDynamicSortFilter(true);
-    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    sortModel->setFilterKeyColumn(-1);
-
-    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
-    connect(ui->filterLineEdit,  &QnSearchLineEdit::textChanged, this,
-        [sortModel](const QString &text)
+    connect(m_importButton, &QPushButton::clicked, this,
+        [this]
         {
-            sortModel->setFilterWildcard(text);
+            importUsers(visibleSelectedUsers());
+            accept();
         });
 }
 
@@ -260,9 +196,8 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
     }
 }
 
-
-void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
-
+void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
+{
     auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
@@ -278,7 +213,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     const QnUuid selectedUserRoleId = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 
-    for (const QnLdapUser &ldapUser: filteredUsers)
+    for (const QnLdapUser& ldapUser: filteredUsers)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
@@ -294,13 +229,15 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     }
 }
 
-QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const {
+QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const
+{
     QSet<QString> logins;
-    for (const auto &user: resourcePool()->getResources<QnUserResource>())
+    for (const auto &user : resourcePool()->getResources<QnUserResource>())
         logins.insert(user->getName().toLower());
 
     QnLdapUsers result;
-    for (const auto user: users) {
+    for (const auto user : users)
+    {
         if (logins.contains(user.login.toLower()))
             continue;
         result << user;
@@ -309,11 +246,13 @@ QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) con
     return result;
 }
 
-QnLdapUsers QnLdapUsersDialog::visibleUsers() const {
+QnLdapUsers QnLdapUsersDialog::visibleUsers() const
+{
     QnLdapUsers result;
     auto model = ui->usersTable->model();
 
-    for (int row = 0; row < model->rowCount(); ++row) {
+    for (int row = 0; row < model->rowCount(); ++row)
+    {
         QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
 
         auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();
@@ -323,11 +262,13 @@ QnLdapUsers QnLdapUsersDialog::visibleUsers() const {
     return result;
 }
 
-QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const {
+QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const
+{
     QnLdapUsers result;
     auto model = ui->usersTable->model();
 
-    for (int row = 0; row < model->rowCount(); ++row) {
+    for (int row = 0; row < model->rowCount(); ++row)
+    {
         QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
         bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
@@ -337,4 +278,94 @@ QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const {
             result << user;
     }
     return result;
+}
+
+void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
+{
+    auto scrollBar = new QnSnappedScrollBar(this);
+    ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
+    auto usersModel = new QnLdapUserListModel(this);
+    usersModel->setUsers(filteredUsers);
+
+    auto sortModel = new QSortFilterProxyModel(this);
+    auto header = new QnCheckBoxedHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
+    sortModel->setSourceModel(usersModel);
+
+    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this,
+        [this, usersModel](Qt::CheckState state)
+        {
+            QSet<QString> users;
+            for (const auto& user: visibleUsers())
+                users.insert(user.login);
+            usersModel->setCheckState(state, users);
+        });
+
+    ui->usersTable->setModel(sortModel);
+    ui->usersTable->setHeader(header);
+
+    header->setVisible(true);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnLdapUserListModel::DnColumn, QHeaderView::Stretch);
+    header->setSectionsClickable(true);
+
+    ui->usersTable->sortByColumn(QnLdapUserListModel::FullNameColumn, Qt::AscendingOrder);
+
+    auto updateSelection =
+        [this, header, sortModel]
+        {
+            auto users = visibleSelectedUsers();
+            Qt::CheckState selectionState = Qt::Unchecked;
+
+            if (!users.isEmpty())
+            {
+
+                if (users.size() == sortModel->rowCount())
+                    selectionState = Qt::Checked;
+                else
+                    selectionState = Qt::PartiallyChecked;
+            }
+
+            header->setCheckState(selectionState);
+        };
+
+    connect(ui->usersTable, &QTableView::clicked, this,
+        [usersModel, updateSelection](const QModelIndex &index)
+        {
+            if (index.column() != QnLdapUserListModel::CheckBoxColumn)
+                return;
+
+            QString login = index.data(QnLdapUserListModel::LoginRole).toString();
+            if (login.isEmpty())
+                return;
+
+            // Invert current state.
+            const auto inverted = index.data(Qt::CheckStateRole).toInt() == Qt::Checked
+                ? Qt::Unchecked
+                : Qt::Checked;
+            usersModel->setCheckState(inverted, login);
+            updateSelection();
+
+        });
+
+    auto updateButton =
+        [this, header]
+        {
+            m_importButton->setEnabled(header->checkState() != Qt::Unchecked);
+        };
+
+    //TODO: #GDM model should notify about its check state changes
+    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
+    updateButton();
+
+    sortModel->setDynamicSortFilter(true);
+    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    sortModel->setFilterKeyColumn(-1);
+
+    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
+        [sortModel](const QString &text)
+        {
+            sortModel->setFilterWildcard(text);
+        });
 }

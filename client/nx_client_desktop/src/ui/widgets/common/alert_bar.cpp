@@ -11,9 +11,9 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     m_label(new QLabel(this)),
     m_reservedSpace(false)
 {
-    setFixedHeight(style::Metrics::kHeaderSize); //< Height equal to table headers
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
-    setPaletteColor(this, QPalette::Window, Qt::red); //< Sensible default
+    setPaletteColor(this, QPalette::Window, Qt::red); //< Sensible default.
     m_label->setAutoFillBackground(true);
 
     m_label->setForegroundRole(QPalette::Text);
@@ -23,8 +23,8 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     m_label->setOpenExternalLinks(true);
 
     m_label->setContentsMargins(
-        style::Metrics::kDefaultTopLevelMargin, 0,
-        style::Metrics::kDefaultTopLevelMargin, 0);
+        style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding,
+        style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

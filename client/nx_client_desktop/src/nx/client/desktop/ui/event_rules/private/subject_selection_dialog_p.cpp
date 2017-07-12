@@ -42,11 +42,21 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     setPredefinedRoleIdsEnabled(true);
 }
 
+void SubjectSelectionDialog::RoleListModel::setRoleValidator(Qn::RoleValidator roleValidator)
+{
+    m_roleValidator = roleValidator;
+    m_validationStates.clear();
+    emitDataChanged();
+}
+
 void SubjectSelectionDialog::RoleListModel::setUserValidator(Qn::UserValidator userValidator)
 {
     m_userValidator = userValidator;
-    m_validationStates.clear();
-    emitDataChanged();
+    if (!m_roleValidator)
+    {
+        m_validationStates.clear();
+        emitDataChanged();
+    }
 }
 
 void SubjectSelectionDialog::RoleListModel::emitDataChanged()
@@ -87,6 +97,9 @@ QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, i
 
 QValidator::State SubjectSelectionDialog::RoleListModel::validateRole(const QnUuid& roleId) const
 {
+    if (m_roleValidator)
+        return m_roleValidator(roleId);
+
     return m_userValidator
         ? validateUsers(resourceAccessSubjectsCache()->usersInRole(roleId))
         : QValidator::Acceptable;

@@ -156,8 +156,8 @@ void QnCameraListDialog::updateWindowTitle() {
     const QString title = lit("%1 - %2").arg(titleServerPart).arg(titleCamerasPart);
     setWindowTitle(title);
 
+    // TODO: #common Semantically misplaced. Required to update columns after filtering.
     ui->camerasView->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    resize({ sizeHint().width(), height() }); //TODO: #vkutin foo-foo
 }
 
 void QnCameraListDialog::updateCriterion()

@@ -168,6 +168,7 @@ bool isSourceCameraRequired(EventType eventType)
         case cameraInputEvent:
         case cameraDisconnectEvent:
         case networkIssueEvent:
+        case softwareTriggerEvent:
             return true;
 
         default:

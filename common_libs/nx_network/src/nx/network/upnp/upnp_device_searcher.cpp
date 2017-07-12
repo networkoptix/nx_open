@@ -110,7 +110,7 @@ void DeviceSearcher::pleaseStop()
 void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& deviceType )
 {
     const auto lock = m_handlerGuard->lock();
-    assert(lock);
+    NX_ASSERT(lock);
 
     // check if handler is registred without deviceType
     const auto& allDev = m_handlers[ QString() ];
@@ -133,7 +133,7 @@ void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& dev
 void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& deviceType )
 {
     const auto lock = m_handlerGuard->lock();
-    assert(lock);
+    NX_ASSERT(lock);
 
     // try to unregister for specified deviceType
     auto it = m_handlers.find( deviceType );
@@ -307,7 +307,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
             continue;
 
         const auto lock = m_handlerGuard->lock();
-        assert(lock);
+        NX_ASSERT(lock);
         for( const auto& handler : m_handlers )
         {
             // undefined device type will trigger default discovery
