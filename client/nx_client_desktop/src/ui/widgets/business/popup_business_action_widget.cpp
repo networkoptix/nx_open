@@ -5,6 +5,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop::ui;
@@ -32,6 +33,12 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
+
+    if (fields.testFlag(Field::eventType))
+    {
+        const auto resourceRequired = nx::vms::event::isResourceRequired(model()->eventType());
+        ui->forceAcknoledgementCheckBox->setEnabled(resourceRequired);
+    }
 
     if (fields.testFlag(Field::actionParams))
         ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);

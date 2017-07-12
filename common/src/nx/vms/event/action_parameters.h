@@ -80,6 +80,12 @@ struct ActionParameters
      * \returns                        Whether all parameters have default values.
      */
     bool isDefault() const;
+
+    /**
+      * Checks if action requires confirmation according to specified target event type
+      * and needConfirmation field
+      */
+    bool requireConfirmation(EventType targetEventType) const;
 };
 
 #define ActionParameters_Fields (actionId)(needConfirmation)(actionResourceId)\

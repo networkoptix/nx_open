@@ -61,7 +61,7 @@ private:
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
 
     void handleShowPopupAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
+        const nx::vms::event::AbstractActionPtr& action,
         QnNotificationWidget* widget);
 
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);

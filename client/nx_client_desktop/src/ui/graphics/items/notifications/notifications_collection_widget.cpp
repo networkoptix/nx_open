@@ -254,30 +254,36 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     */
 
 void QnNotificationsCollectionWidget::handleShowPopupAction(
-    const vms::event::AbstractActionPtr& businessAction,
+    const vms::event::AbstractActionPtr& action,
     QnNotificationWidget* widget)
 {
-    const auto params = businessAction->getParams();
-    if (!params.needConfirmation)
+    if (action->actionType() != vms::event::ActionType::showPopupAction)
+    {
+        NX_ASSERT(false, "invalid action type.");
+        return;
+    }
+
+    const auto params = action->getParams();
+    if (!params.requireConfirmation(action->getRuntimeParams().eventType))
         return;
 
     widget->setCloseButtonUnavailable();
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
     widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
-        [this, businessAction]()
+        [this, action]()
         {
-            auto& actionParams = businessAction->getParams();
+            auto& actionParams = action->getParams();
             actionParams.recordBeforeMs = 0;
 
             static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
             actionParams.durationMs = kDurationMs.count();
 
             nx::client::desktop::ui::action::Parameters params;
-            params.setArgument(Qn::ActionDataRole, businessAction);
+            params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(action::AcknowledgeEventAction, params);
         });
 
-    m_customPopupItems.insert(businessAction->getParams().actionId, widget);
+    m_customPopupItems.insert(action->getParams().actionId, widget);
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
@@ -500,7 +506,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
     const bool isLockedItem = action->actionType() == vms::event::playSoundAction
         || (action->actionType() == vms::event::showPopupAction
-            && action->getParams().needConfirmation);
+            && action->getParams().requireConfirmation(action->getRuntimeParams().eventType));
     m_list->addItem(item, isLockedItem);
 }
 

@@ -2338,8 +2338,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
     std::function<void()> clientSideHandler;
 
-    if (rule->actionType() == nx::vms::event::bookmarkAction
-        && !rule->actionParams().needConfirmation)
+    if (rule->actionType() == nx::vms::event::bookmarkAction)
     {
         clientSideHandler =
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
