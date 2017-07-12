@@ -73,7 +73,7 @@ private:
     CassRow* nextRow() const;
 
     template<typename GetIndexFunc>
-    bool get(GetIndexFunc getIndexFunc, std::string* value) const
+    bool getImpl(GetIndexFunc getIndexFunc, std::string* value) const
     {
         if (!m_iterator)
             return false;

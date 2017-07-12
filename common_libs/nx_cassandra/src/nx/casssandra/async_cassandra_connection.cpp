@@ -299,7 +299,7 @@ bool QueryResult::next()
 
 bool QueryResult::get(const std::string& key, std::string* value) const
 {
-    return get(
+    return getImpl(
         [&key](const CassRow* row)
         {
             return cass_row_get_column_by_name_n(row, key.data(), key.size());
@@ -366,7 +366,7 @@ bool QueryResult::get(const std::string& key, int64_t* value) const
 
 bool QueryResult::get(int index, std::string* value) const
 {
-    return get(
+    return getImpl(
         [index](const CassRow* row)
         {
             return cass_row_get_column(row, index);
