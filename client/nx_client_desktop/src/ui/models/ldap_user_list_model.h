@@ -37,7 +37,10 @@ public:
     void setCheckState(Qt::CheckState state, const QString &login = QString());
 
     QnLdapUsers users() const;
-    void setUsers(const QnLdapUsers &users);    
+    void setUsers(const QnLdapUsers &users);
+
+    using QAbstractItemModel::beginResetModel;
+    using QAbstractItemModel::endResetModel;
 private:
     int userIndex(const QString &login) const;
 
