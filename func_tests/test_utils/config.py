@@ -94,7 +94,8 @@ class TestsConfig(object):
             config = cls()
         else:
             return None
-        config._update_with_tests_params(test_params)
+        if test_params:
+            config._update_with_tests_params(test_params)
         return config
 
     def __init__(self, physical_installation_host_list=None, tests=None):

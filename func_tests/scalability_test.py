@@ -112,9 +112,8 @@ def wait_merge_done(servers, method, api_object, api_method, start_time, merge_t
                                                    utils.datetime_utc_now() - api_call_start_time))
             return
         if utils.datetime_utc_now() - start_time >= merge_timeout:
-            pytest.fail("'%s' was not synchronized during %s: '%r' and '%r'" % (
-                api_method, merge_timeout - (api_call_start_time - start_time),
-                servers[0], first_unsynced_server))
+            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
         time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
 
 
