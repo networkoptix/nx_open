@@ -184,7 +184,7 @@ angular.module('nxCommon')
 
                 //TODO: remove ID, generate it dynamically
 
-                function recyclePlayer(player){
+                function recyclePlayer(player=null){
                     if(scope.player != player || !player) {
                         scope.vgPlayerReady({$API: null});
                         scope.player = player;
@@ -370,24 +370,14 @@ angular.module('nxCommon')
                             recyclePlayer();
                             return;
                         }
-                        if(!recyclePlayer(format)){ // Remove or recycle old player.
-                            // Some problem happened. We must reload video here
-                            if(scope.vgApi){
-                                scope.vgApi.kill();
-                            }
-                            if(videoPlayers){
-                                videoPlayers.pop();
-                            }
-                            $timeout(initNewPlayer);
+                        recyclePlayer(format);
+                        if(scope.vgApi){
+                            scope.vgApi.kill();
                         }
-                        else{
-                            scope.vgApi.load(getFormatSrc(format == 'webm' ? 'webm' : 'hls'));
-
-                            if(scope.playing){
-                                scope.vgApi.play();
-                            }
-
+                        if(videoPlayers){
+                            videoPlayers.pop();
                         }
+                        $timeout(initNewPlayer);
 
                         if(scope.rotation != 0 && scope.rotation != 180){
                             updateWidth();
