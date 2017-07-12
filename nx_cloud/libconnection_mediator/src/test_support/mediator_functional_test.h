@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_FUNCTIONAL_TEST_H
-#define NX_MEDIATOR_FUNCTIONAL_TEST_H
+#pragma once
 
 #include <vector>
 
@@ -19,10 +13,8 @@
 #include "../cloud_data_provider.h"
 #include "../data/listening_peer.h"
 #include "../mediator_process_public.h"
-
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
-
 
 namespace nx {
 namespace hpm {
@@ -84,12 +76,9 @@ private:
     QString m_tmpDir;
     int m_stunPort;
     int m_httpPort;
-    //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
 };
 
-}   // namespace hpm
-}   // namespace nx
-
-#endif  //NX_MEDIATOR_FUNCTIONAL_TEST_H
+} // namespace hpm
+} // namespace nx

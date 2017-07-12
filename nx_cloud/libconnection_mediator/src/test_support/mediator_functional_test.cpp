@@ -245,5 +245,5 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         QJson::deserialized<data::ListeningPeers>(responseBody));
 }
 
-}   // namespace hpm
-}   // namespace nx
+} // namespace hpm
+} // namespace nx
