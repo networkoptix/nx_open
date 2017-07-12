@@ -365,6 +365,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
         return;
 
+    if (!QnBusiness::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+        return;
+
     switch (action->actionType())
     {
         case vms::event::showPopupAction:

@@ -4,6 +4,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
+#include <QtGui/QTextDocument>
 
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
@@ -189,8 +190,9 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
         }
         else
         {
+            const auto rich = Qt::mightBeRichText(text) ? text : Qt::convertFromPlainText(text);
             textHtml = elideHtml(
-                htmlFormattedParagraph(text, kDescriptionPixelFontSize),
+                htmlFormattedParagraph(rich, kDescriptionPixelFontSize),
                 kDescriptionMaxLength);
         }
 

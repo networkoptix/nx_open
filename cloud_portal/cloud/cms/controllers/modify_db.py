@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from notifications.tasks import send_email
+from notifications.engines.email_engine import send 
 
 from .filldata import fill_content
 from api.models import Account
@@ -26,10 +26,10 @@ def accept_latest_draft(user):
 	unaccepted_version.save()
 
 
-def notify_version_ready():
-	super_users = Account.objects.filter(is_superuser)
+def notify_version_ready(version_id, product_name):
+	super_users = Account.objects.filter(is_superuser=1)
 	for user in super_users:
-		send_email(user.email, "version_ready_to_publish","",settings.CUSTOMIZATION)
+		send(user.email, "review_version", {'id':version_id, 'product': product_name}, settings.CUSTOMIZATION)
 
 
 def save_unrevisioned_records(customization, language, data_structures, request_data, user):
@@ -99,5 +99,17 @@ def send_version_for_review(customization, language, data_structures, product, r
 
 	alter_records_version(Context.objects.filter(product=product), customization, None, version)
 	#TODO add notification need to make template for this
-	#notify_version_ready()
+	notify_version_ready(version.id, product.name)
 
+def get_records_for_version(version):
+	data_records = version.datarecord_set.all().order_by('data_structure__context__name',
+														 'language__code')
+	contexts = {}
+
+	for record in data_records:
+		context_name = record.data_structure.context.name
+		if  context_name in contexts:
+			contexts[context_name].append(record)
+		else:
+			contexts[context_name] = [record]
+	return contexts

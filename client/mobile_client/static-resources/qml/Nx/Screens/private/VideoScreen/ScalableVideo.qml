@@ -52,10 +52,10 @@ ZoomableFlickable
         width: contentWidth
         height: contentHeight
         sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
-        videoRotation: resourceHelper ? resourceHelper.customRotation : 0
+        videoRotation: !liteMode && resourceHelper ? resourceHelper.customRotation : 0
         customAspectRatio:
         {
-            var aspectRatio = resourceHelper ? resourceHelper.customAspectRatio : 0.0
+            var aspectRatio = !liteMode && resourceHelper ? resourceHelper.customAspectRatio : 0.0
             if (aspectRatio === 0.0)
             {
                 if (mediaPlayer)

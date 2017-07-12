@@ -5,6 +5,8 @@ from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 
+from cloud import settings
+
 
 class AccountBackend(object):
     @staticmethod
@@ -62,6 +64,7 @@ class AccountManager(db.models.Manager):
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
+                          customization=settings.CUSTOMIZATION,
                           **extra_fields)
         user.save(using=self._db)
         return user
