@@ -258,7 +258,7 @@ QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter
         case Qn::BookmarkStartTime:
             return kOrderByTemplate.arg(lit("startTimeMs"), order);
         case Qn::BookmarkCreationTime:
-            return kOrderByTemplate.arg(lit("created"), order);
+            return kOrderByTemplate.arg(lit("creationTimeStampMs"), order);
         case Qn::BookmarkDuration:
             return kOrderByTemplate.arg(lit("durationMs"), order);
         case Qn::BookmarkCameraName:
@@ -1052,13 +1052,16 @@ bool QnServerDb::getBookmarks(
         book.description as description,
         book.timeout as timeout,
         book.camera_guid as cameraId,
+        book.creator_guid as creatorId,
+        book.created as creationTimeStampMs,
         group_concat(tag.name) as tags
         FROM bookmarks book
         LEFT JOIN bookmark_tags tag
         ON book.guid = tag.bookmark_guid
         %1 %2 %3
     )").arg(filterText,
-        "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout, cameraId",
+        "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout,"\
+        "creatorId, creationTimeStampMs, cameraId",
         createBookmarksFilterSortPart(filter));
 
     {

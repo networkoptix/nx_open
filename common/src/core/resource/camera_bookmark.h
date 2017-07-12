@@ -118,7 +118,8 @@ struct QnCameraBookmark
     static QnUuid systemUserId();
 };
 #define QnCameraBookmark_Fields \
-    (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
+    (guid)(creatorId)(creationTimeStampMs)(name)(description)(timeout)\
+    (startTimeMs)(durationMs)(tags)(cameraId)
 
 /**
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
