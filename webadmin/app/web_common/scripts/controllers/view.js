@@ -430,18 +430,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
-            var viewportHeight = windowHeight - headerHeight - topAlertHeight;
-
-            /*
-                If the view port height isnt its full height timeout unil it is
-                This is mainly used for mobile with the uses expands the nav bar
-                if the viewport passes that threshhold it will take up the entire height.
-            */
-            if(viewportHeight  < windowHeight - headerHeight){
-                $timeout(updateHeights,100);
-                return;
-            }
-            viewportHeight = viewportHeight  + 'px';
+            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
@@ -454,8 +443,16 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
+        //350ms delay is to give the navbar enough time to collapse
+        function navClicked(){
+            $timeout(updateHeights,350);
+        }
+
         //wait for the page to load then update
         $timeout(updateHeights);
+
+        var $navButton = $('.navbar-header>button')[0];
+        $navButton.addEventListener('click', navClicked);
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",$timeout(updateHeights,200));
 
