@@ -34,13 +34,13 @@ protected:
         nx_http::StatusCode::Value statusCode) override;
 
 private:
-    struct Mediator
+    struct MediatorHostDescriptor
     {
         QUrl tcpUrl;
         QUrl udpUrl;
     };
 
-    boost::optional<Mediator> m_mediator;
+    boost::optional<MediatorHostDescriptor> m_mediatorHostDescriptor;
 };
 
 } // namespace cloud

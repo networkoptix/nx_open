@@ -52,12 +52,12 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
-void MediatorConnector::enable( bool waitComplete )
+void MediatorConnector::enable(bool waitComplete)
 {
     bool needToFetch = false;
     {
-        QnMutexLocker lk( &m_mutex );
-        if( !m_promise )
+        QnMutexLocker lock(&m_mutex);
+        if (!m_promise)
         {
             needToFetch = true;
             m_promise = nx::utils::promise< bool >();
@@ -65,10 +65,10 @@ void MediatorConnector::enable( bool waitComplete )
         }
     }
 
-    if( needToFetch )
+    if (needToFetch)
         fetchEndpoint();
 
-    if( waitComplete )
+    if (waitComplete)
         m_future->wait();
 }
 
@@ -82,17 +82,17 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning )
+void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning)
 {
     {
-        QnMutexLocker lk( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_promise && (mediatorUrl == m_mediatorUrl))
             return;
 
-        NX_ASSERT( !m_promise, Q_FUNC_INFO,
-                    "Address resolving is already in progress!" );
+        NX_ASSERT(!m_promise, Q_FUNC_INFO,
+            "Address resolving is already in progress!");
 
-        m_promise = nx::utils::promise< bool >();
+        m_promise = nx::utils::promise<bool>();
         m_future = m_promise->get_future();
     }
 
@@ -104,40 +104,40 @@ void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning )
     m_mediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(nx::network::url::getEndpoint(mediatorUrl));
-    m_promise->set_value( true );
+    m_promise->set_value(true);
 }
 
-void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
+void MediatorConnector::setSystemCredentials(boost::optional<SystemCredentials> value)
 {
     bool needToReconnect = false;
     {
-        QnMutexLocker lk( &m_mutex );
-        if( m_credentials == value )
+        QnMutexLocker lock(&m_mutex);
+        if (m_credentials == value)
             return;
 
-        needToReconnect = static_cast<bool>( m_credentials );
+        needToReconnect = static_cast<bool>(m_credentials);
         m_credentials = std::move(value);
     }
 
     if (needToReconnect)
-        m_stunClient->closeConnection( SystemError::connectionReset );
+        m_stunClient->closeConnection(SystemError::connectionReset);
 }
 
 boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     return m_credentials;
 }
 
 boost::optional<SocketAddress> MediatorConnector::udpEndpoint() const
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_mediatorUdpEndpoint;
 }
 
 bool MediatorConnector::isConnected() const
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return static_cast<bool>(m_mediatorUrl);
 }
 
@@ -147,35 +147,42 @@ void MediatorConnector::setStunClientSettings(
     s_stunClientSettings = std::move(stunClientSettings);
 }
 
-static bool isReady(nx::utils::future<bool> const& f)
+static bool isReady(const nx::utils::future<bool>& f)
 {
     return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
+void MediatorConnector::stopWhileInAioThread()
+{
+    m_stunClient.reset();
+    m_mediatorUrlFetcher.reset();
+    m_fetchEndpointRetryTimer.reset();
 }
 
 void MediatorConnector::fetchEndpoint()
 {
     m_mediatorUrlFetcher->get(
-        [ this ](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
-    {
-        if( status != nx_http::StatusCode::ok )
+        [this](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
         {
-            NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
-                     .arg( status ), cl_logDEBUG1 );
+            if (status != nx_http::StatusCode::ok)
+            {
+                NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
+                    .arg(status), cl_logDEBUG1);
 
-            if (!isReady(*m_future))
-                m_promise->set_value( false );
+                if (!isReady(*m_future))
+                    m_promise->set_value(false);
 
-            // retry after some delay
-            m_fetchEndpointRetryTimer->scheduleNextTry([this]() { fetchEndpoint(); });
-        }
-        else
-        {
-            NX_DEBUG(this, lm("Fetched mediator tcp (%1) and udp (%2) urls")
-                .arg(tcpUrl).arg(udpUrl));
-            m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
-            useMediatorUrl(tcpUrl);
-        }
-    });
+                // Retry after some delay.
+                m_fetchEndpointRetryTimer->scheduleNextTry([this]() { fetchEndpoint(); });
+            }
+            else
+            {
+                NX_DEBUG(this, lm("Fetched mediator tcp (%1) and udp (%2) urls")
+                    .arg(tcpUrl).arg(udpUrl));
+                m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
+                useMediatorUrl(tcpUrl);
+            }
+        });
 }
 
 void MediatorConnector::useMediatorUrl(QUrl url)
@@ -186,12 +193,12 @@ void MediatorConnector::useMediatorUrl(QUrl url)
         {
             auto setEndpoint =
                 [this]()
-            {
-                QnMutexLocker lk(&m_mutex);
-                // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-                m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-                NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
-            };
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
+                    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
+                    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
+                };
 
             if (code == SystemError::noError)
                 setEndpoint();
@@ -201,13 +208,6 @@ void MediatorConnector::useMediatorUrl(QUrl url)
 
             m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
         });
-}
-
-void MediatorConnector::stopWhileInAioThread()
-{
-    m_stunClient.reset();
-    m_mediatorUrlFetcher.reset();
-    m_fetchEndpointRetryTimer.reset();
 }
 
 } // namespace api

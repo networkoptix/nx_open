@@ -29,7 +29,7 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     /** Shall be called to enable cloud functionality for application */
-    void enable( bool waitComplete = false );
+    void enable(bool waitComplete = false);
 
     /** Provides client related functionality */
     std::unique_ptr<MediatorClientTcpConnection> clientConnection();
@@ -38,9 +38,9 @@ public:
     std::unique_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
-    void mockupAddress( QUrl mediatorUrl, bool suppressWarning = false );
+    void mockupAddress(QUrl mediatorUrl, bool suppressWarning = false);
 
-    void setSystemCredentials( boost::optional<SystemCredentials> value );
+    void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
 
     boost::optional<SocketAddress> udpEndpoint() const;
@@ -49,14 +49,11 @@ public:
     static void setStunClientSettings(stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
-    void fetchEndpoint();
-    void useMediatorUrl(QUrl url);
-
     mutable QnMutex m_mutex;
-    boost::optional< SystemCredentials > m_credentials;
+    boost::optional<SystemCredentials> m_credentials;
 
-    boost::optional< nx::utils::promise< bool > > m_promise;
-    boost::optional< nx::utils::future< bool > > m_future;
+    boost::optional<nx::utils::promise<bool>> m_promise;
+    boost::optional<nx::utils::future<bool>> m_future;
 
     std::shared_ptr<stun::AsyncClientWithHttpTunneling> m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
@@ -65,6 +62,9 @@ private:
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 
     virtual void stopWhileInAioThread() override;
+
+    void fetchEndpoint();
+    void useMediatorUrl(QUrl url);
 };
 
 } // namespace api
