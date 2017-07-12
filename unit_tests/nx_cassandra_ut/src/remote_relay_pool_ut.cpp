@@ -27,7 +27,8 @@ class RemoteRelayPeerPool: public ::testing::Test
 protected:
     virtual void TearDown() override
     {
-        m_relayPool->getConnection()->executeUpdate("DROP KEYSPACE cdb;").wait();
+        if (m_relayPool)
+            m_relayPool->getConnection()->executeUpdate("DROP KEYSPACE cdb;").wait();
     }
 
     void givenDbWithNotExistentCdbKeyspace() {}
@@ -86,6 +87,10 @@ TEST_F(RemoteRelayPeerPool, CreateDbStructure_KeyspaceAlreadyExists)
     whenRelayPoolObjectHasBeenCreated();
 
     thenKeyspaceAndTableShouldBeCreated();
+}
+
+TEST_F(RemoteRelayPeerPool, addPeer)
+{
 }
 
 

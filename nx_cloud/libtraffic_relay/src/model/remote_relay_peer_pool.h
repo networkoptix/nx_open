@@ -8,6 +8,7 @@ namespace nx {
 
 namespace cassandra {
 class AsyncConnection;
+class Query;
 }
 
 namespace cloud {
@@ -20,7 +21,7 @@ public:
     RemoteRelayPeerPool(const char* cassandraHost);
 
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
-    bool addPeer(const std::string& domainName, const std::string& peerName);
+    cf::future<bool> addPeer(const std::string& relayName, const std::string& domainName);
 
 protected:
     cassandra::AsyncConnection* getConnection();
@@ -31,6 +32,10 @@ private:
 
     void prepareDbStructure();
     std::string whereStringForFind(const std::string& domainName) const;
+    bool bindInsertParameters(
+        cassandra::Query* query,
+        const std::string& relayName,
+        const std::string& domainName) const;
 };
 
 } // namespace model

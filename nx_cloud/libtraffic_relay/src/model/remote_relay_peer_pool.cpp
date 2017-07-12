@@ -129,7 +129,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
 
                 if (!result.second.next())
                 {
-                    NX_VERBOSE(this, "Select from cdb.relay_servers failed. Empty cursor.");
+                    NX_VERBOSE(this, "Select from cdb.relay_peers failed. Empty cursor.");
                     return std::string();
                 }
 
@@ -145,12 +145,87 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
             });
 }
 
-bool RemoteRelayPeerPool::addPeer(
-    const std::string& /*domainName*/,
-    const std::string& /*peerName*/)
+cf::future<bool> RemoteRelayPeerPool::addPeer(
+    const std::string& relayName,
+    const std::string& domainName)
 {
-//    if (!m_dbReady)
-        return false;
+    if (!m_dbReady)
+        return cf::make_ready_future(false);
+
+    return m_cassConnection->prepareQuery(
+        "INSERT INTO cdb.relay_peers \
+            relay_id, \
+            domain_suffix_1, \
+            domain_suffix_2, \
+            domain_suffix_3, \
+            domain_name_tail VALUES(?, ?, ?, ?, ?);")
+        .then(
+            [this, relayName, domainName](
+                cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
+            {
+                auto prepareResult = prepareFuture.get();
+                if (prepareResult.first != CASS_OK)
+                {
+                    NX_VERBOSE(this, "Prepare insert into cdb.relay_peers failed");
+                    return cf::make_ready_future(std::move((CassError)prepareResult.first));
+                }
+
+                if (!bindInsertParameters(&prepareResult.second, relayName, domainName))
+                {
+                    NX_VERBOSE(this, "Bind parameters for insert into cdb.relay_peers failed");
+                    return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
+                }
+
+                return m_cassConnection->executeUpdate(std::move(prepareResult.second));
+            })
+        .then(
+            [this](cf::future<CassError> executeFuture)
+            {
+                if (executeFuture.get() != CASS_OK)
+                {
+                    NX_VERBOSE(this, "Execute insert into cdb.relay_peers failed");
+                    return false;
+                }
+
+                NX_VERBOSE(this, "Execute insert into cdb.relay_peers succeded");
+                return true;
+            });
+}
+
+bool RemoteRelayPeerPool::bindInsertParameters(
+    cassandra::Query* query,
+    const std::string& relayName,
+    const std::string& domainName) const
+{
+    auto reversedDomainName = nx::utils::reverseWords(domainName, ".");
+    std::vector<std::string> domainParts;
+    boost::split(domainParts, reversedDomainName, boost::is_any_of("."));
+
+    NX_ASSERT(!domainParts.empty());
+
+    bool bindResult = true;
+    bindResult &= query->bind("relay_id", relayName);
+    bindResult &= query->bind("domain_suffix_1", domainParts[0]);
+
+    if (domainParts.size() > 1)
+        bindResult &= query->bind("domain_suffix_2", domainParts[1]);
+
+    if (domainParts.size() > 2)
+        bindResult &= query->bind("domain_suffix_3", domainParts[2]);
+
+    if (domainParts.size() > 3)
+    {
+        std::stringstream ss;
+        for (int i = 3; i < (int)domainParts.size(); ++i)
+        {
+            ss << domainParts[i];
+            if (i != (int)domainParts.size() - 1)
+                ss << ".";
+        }
+        bindResult &= query->bind("domain_name_tail", ss.str());
+    }
+
+    return bindResult;
 }
 
 
