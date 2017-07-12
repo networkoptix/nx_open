@@ -20,15 +20,19 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
 #include <core/resource/media_server_resource.h>
 
 #include <client_core/client_core_settings.h>
@@ -1140,6 +1144,9 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+    resourceAccessManager()->beginUpdate();
+    resourceAccessProvider()->beginUpdate();
+
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
     for (const auto& res: resourcesToRemove)
@@ -1154,6 +1161,9 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     licensePool()->reset();
     commonModule()->setReadOnly(false);
+
+    resourceAccessProvider()->endUpdate();
+    resourceAccessManager()->endUpdate();
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
