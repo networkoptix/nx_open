@@ -82,11 +82,11 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning)
+void MediatorConnector::mockupMediatorUrl(QUrl mediatorUrl)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_promise && (mediatorUrl == m_mediatorUrl))
+        if (m_promise && mediatorUrl == m_mediatorUrl)
             return;
 
         NX_ASSERT(!m_promise, Q_FUNC_INFO,
@@ -96,10 +96,7 @@ void MediatorConnector::mockupAddress(QUrl mediatorUrl, bool suppressWarning)
         m_future = m_promise->get_future();
     }
 
-    if (!suppressWarning)
-    {
-        NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
-    }
+    NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
 
     m_mediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);

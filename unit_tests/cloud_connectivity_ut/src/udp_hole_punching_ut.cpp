@@ -48,7 +48,7 @@ public:
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);

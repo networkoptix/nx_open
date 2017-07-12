@@ -37,8 +37,11 @@ public:
     /** Provides system related functionality */
     std::unique_ptr<MediatorServerTcpConnection> systemConnection();
 
-    /** Injects mediator address (tests only) */
-    void mockupAddress(QUrl mediatorUrl, bool suppressWarning = false);
+    /**
+     * Injects mediator url.
+     * As a result, no mediator url resolution will happen.
+     */
+    void mockupMediatorUrl(QUrl mediatorUrl);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;

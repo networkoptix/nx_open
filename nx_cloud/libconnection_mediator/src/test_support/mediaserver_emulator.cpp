@@ -104,7 +104,7 @@ MediaServerEmulator::MediaServerEmulator(
 
     bindToAioThread(getAioThread());
 
-    m_mediatorConnector->mockupAddress(
+    m_mediatorConnector->mockupMediatorUrl(
         nx::network::url::Builder().setScheme("stun").setEndpoint(mediatorEndpoint));
 
     m_mediatorConnector->setSystemCredentials(

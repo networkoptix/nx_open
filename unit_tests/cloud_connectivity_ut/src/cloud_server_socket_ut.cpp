@@ -609,7 +609,7 @@ protected:
                 server->serverId(),
                 system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);

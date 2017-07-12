@@ -30,7 +30,7 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }

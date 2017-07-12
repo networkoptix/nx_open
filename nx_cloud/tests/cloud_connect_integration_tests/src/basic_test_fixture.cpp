@@ -61,7 +61,7 @@ void BasicTestFixture::SetUp()
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
-    SocketGlobals::mediatorConnector().mockupAddress(
+    SocketGlobals::mediatorConnector().mockupMediatorUrl(
         nx::network::url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
 
     m_stunClient = std::make_shared<nx::stun::AsyncClient>();
