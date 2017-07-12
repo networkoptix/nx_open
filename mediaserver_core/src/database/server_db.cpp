@@ -257,10 +257,14 @@ QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter
             return kOrderByTemplate.arg(lit("book.name"), order);
         case Qn::BookmarkStartTime:
             return kOrderByTemplate.arg(lit("startTimeMs"), order);
+        case Qn::BookmarkCreationTime:
+            return kOrderByTemplate.arg(lit("created"), order);
         case Qn::BookmarkDuration:
             return kOrderByTemplate.arg(lit("durationMs"), order);
         case Qn::BookmarkCameraName:
             return kOrderByTemplate.arg(lit("cameraId"), order);
+        case Qn::BookmarkCreator:
+            return kOrderByTemplate.arg(lit("creatorId"), order);
         case Qn::BookmarkTags:
             return lit(""); // No sort by db
         default:
@@ -281,6 +285,8 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
         case Qn::BookmarkDuration:
             return filter.limit;
 
+        case Qn::BookmarkCreationTime:
+        case Qn::BookmarkCreator:
         case Qn::BookmarkCameraName:
         case Qn::BookmarkTags:
             // No limit for manually sorted sequences.
@@ -1208,8 +1214,10 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
         QSqlQuery insQuery(m_sdb);
         insQuery.prepare(insertOrReplace + R"(
             INTO bookmarks
-                (guid, camera_guid, start_time, duration, name, description, timeout)
-            VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout)
+                (guid, camera_guid, start_time, duration, name, description, timeout,
+                    creatorId, created)
+            VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
+                :creatorId, :creationTimeStampMs)
         )");
 
         QnSql::bind(bookmark, &insQuery);
