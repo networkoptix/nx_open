@@ -69,7 +69,7 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
+static const QSize kDefaultThumbnailSize(224, 0);
 
 /** We limit the maximal number of notification items to prevent crashes due
  * to reaching GDI resource limit. */
