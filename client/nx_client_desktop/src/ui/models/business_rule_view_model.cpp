@@ -904,12 +904,57 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case vms::event::cameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
                         resourcePool()->getResources<QnCameraMotionPolicy::resource_type>(filtered));
+
                 case vms::event::cameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
                         resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
+
                 case vms::event::softwareTriggerEvent:
-                    return m_eventParams.metadata.allUsers
-                        || !m_eventParams.metadata.instigators.empty();
+                {
+                    if (m_eventParams.metadata.allUsers)
+                        return true;
+
+                    // TODO: #vkutin #3.2 Create and use proper validation policy,
+                    // and avoid code duplication with QnSoftwareTriggerBusinessEventWidget
+
+                    // TODO: #vkutin #3.1 Check camera access permissions
+
+                    QnUserResourceList users;
+                    QList<QnUuid> roles;
+                    userRolesManager()->usersAndRoles(m_eventParams.metadata.instigators, users, roles);
+
+                    const auto isUserValid =
+                        [this](const QnUserResourcePtr& user)
+                        {
+                            return user->isEnabled() && resourceAccessManager()->hasGlobalPermission(
+                                user, Qn::GlobalUserInputPermission);
+                        };
+
+                    const auto isRoleValid =
+                        [this](const QnUuid& roleId)
+                        {
+                            const auto role = userRolesManager()->predefinedRole(roleId);
+                            switch (role)
+                            {
+                                case Qn::UserRole::CustomPermissions:
+                                    return false;
+                                case Qn::UserRole::CustomUserRole:
+                                {
+                                    const auto customRole = userRolesManager()->userRole(roleId);
+                                    return customRole.permissions.testFlag(Qn::GlobalUserInputPermission);
+                                }
+                                default:
+                                {
+                                    const auto permissions = userRolesManager()->userRolePermissions(role);
+                                    return permissions.testFlag(Qn::GlobalUserInputPermission);
+                                }
+                            }
+                        };
+
+                    return std::any_of(users.cbegin(), users.cend(), isUserValid)
+                        || std::any_of(roles.cbegin(), roles.cend(), isRoleValid);
+                }
+
                 default:
                     return true;
             }
