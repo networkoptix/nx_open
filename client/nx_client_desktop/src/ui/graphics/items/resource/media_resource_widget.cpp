@@ -2338,7 +2338,7 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 }
 
 /*
-* Software Triggers
+* Soft Triggers
 */
 
 QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
@@ -2405,7 +2405,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
     button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
+        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
         : name);
 
     const auto resultHandler =

@@ -94,7 +94,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case anyServerEvent:       return tr("Any Server Issue");
         case anyEvent:             return tr("Any Event");
 
-        case softwareTriggerEvent: return tr("Software Trigger");
+        case softwareTriggerEvent: return tr("Soft Trigger");
 
         case cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -188,7 +188,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         }
 
         case softwareTriggerEvent:
-            return tr("Software trigger %1 at %2")
+            return tr("Soft Trigger %1 at %2")
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
 
@@ -201,7 +201,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
 {
     if (params.eventType == softwareTriggerEvent)
     {
-        return tr("Software Trigger %1 has been activated multiple times")
+        return tr("Soft Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
     }
 
