@@ -265,6 +265,12 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
         [this, businessAction]()
         {
+            auto& actionParams = businessAction->getParams();
+            actionParams.recordBeforeMs = 0;
+
+            static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
+            actionParams.durationMs = kDurationMs.count();
+
             nx::client::desktop::ui::action::Parameters params;
             params.setArgument(Qn::ActionDataRole, businessAction);
             menu()->trigger(action::AcknowledgeEventAction, params);
