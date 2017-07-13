@@ -18,10 +18,8 @@ class MetricsSaver(object):
                 self._current_test_run, metric_name, metric_value_str)
 
     def _value2str(self, value):
-        if isinstance(value, str):
+        if isinstance(value, (float, int)):
             return value
-        if isinstance(value, int):
-            return str(value)
         if isinstance(value, datetime.timedelta):
-            return str(value.total_seconds())
+            return value.total_seconds()
         assert False, 'Unsupported metric value type: %s' % type(value)
