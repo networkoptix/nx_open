@@ -31,7 +31,7 @@ void AIOThread::pleaseStop()
     m_taskQueue->pollSet->interrupt();
 }
 
-void AIOThread::watchSocket(
+void AIOThread::startMonitoring(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
@@ -86,7 +86,7 @@ void AIOThread::changeSocketTimeout(
         m_taskQueue->pollSet->interrupt();
 }
 
-void AIOThread::removeFromWatch(
+void AIOThread::stopMonitoring(
     Pollable* const sock,
     aio::EventType eventType,
     bool waitForRunningHandlerCompletion,

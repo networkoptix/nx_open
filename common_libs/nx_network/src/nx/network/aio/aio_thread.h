@@ -45,7 +45,7 @@ public:
      * Start monitoring socket sock for event eventToWatch and trigger eventHandler when event happens.
      * NOTE: MUST be called with mutex locked.
      */
-    void watchSocket(
+    void startMonitoring(
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
@@ -65,14 +65,14 @@ public:
     /**
      * Stop monitorong sock for event eventType.
      * Garantees that no eventTriggered will be called after return of this method.
-     * If eventTriggered is running and removeFromWatch called not from eventTriggered, 
+     * If eventTriggered is running and stopMonitoring called not from eventTriggered, 
      *   method blocks till eventTriggered had returned.
-     * @param waitForRunningHandlerCompletion See comment to aio::AIOService::removeFromWatch.
+     * @param waitForRunningHandlerCompletion See comment to aio::AIOService::stopMonitoring.
      * NOTE: Calling this method with same parameters simultaneously from 
      *   multiple threads can cause undefined behavour.
      * NOTE: MUST be called with mutex locked.
      */
-    void removeFromWatch(
+    void stopMonitoring(
         Pollable* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion,

@@ -30,12 +30,12 @@ protected:
 
     void whenStartPollingSocket()
     {
-        m_aioThread.watchSocket(m_tcpSocket.get(), aio::EventType::etRead, this);
+        m_aioThread.startMonitoring(m_tcpSocket.get(), aio::EventType::etRead, this);
     }
 
     void whenStopPollingSocket()
     {
-        m_aioThread.removeFromWatch(m_tcpSocket.get(), aio::EventType::etRead, false);
+        m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::EventType::etRead, false);
     }
 
 private:
