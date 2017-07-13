@@ -124,6 +124,7 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
         QnUserResourceList users;
         QList<QnUuid> roles;
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
+        users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
         if (users.isEmpty() && roles.isEmpty())
         {

@@ -20,15 +20,19 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
 #include <core/resource/media_server_resource.h>
 
 #include <client_core/client_core_settings.h>
@@ -96,6 +100,7 @@ namespace {
 
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
+static constexpr int kReconnectDelayMs = 3000;
 
 bool isConnectionToCloud(const QUrl& url)
 {
@@ -536,10 +541,10 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
 
     switch (status)
     {
+        // Server database was cleaned up during restart, e.g. merge to other system.
         case Qn::UnauthorizedConnectionResult:
-            /* Server database was cleaned up during restart, e.g. merge to other system. */
-            m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
-            break;
+
+        // Server was updated.
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
@@ -550,23 +555,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
             break;
     }
 
-    /* Find next valid server for reconnect. */
-    QnMediaServerResourceList allServers = m_reconnectHelper->servers();
-    bool found = true;
-    do
-    {
-        m_reconnectHelper->next();
-        /* We have found at least one correct interface for the server. */
-        found = m_reconnectHelper->currentUrl().isValid();
-        if (!found) /* Do not try to connect to invalid servers. */
-            allServers.removeOne(m_reconnectHelper->currentServer());
-    } while (!found && !allServers.isEmpty());
-
-    /* Break cycle if we cannot find any valid server. */
-    if (found)
-        connectToServer(m_reconnectHelper->currentUrl());
-    else
-        disconnectFromServer(DisconnectFlag::Force);
+    reconnectStep();
 }
 
 void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr connection)
@@ -749,6 +738,31 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
         default:
             break;
     }
+}
+
+void QnWorkbenchConnectHandler::reconnectStep()
+{
+    if (m_reconnectHelper->servers().empty())
+    {
+        disconnectFromServer(DisconnectFlag::Force);
+        return;
+    }
+
+    m_reconnectHelper->next();
+    NX_EXPECT(m_reconnectDialog);
+    if (m_reconnectDialog)
+        m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
+
+    if (m_reconnectHelper->currentUrl().isValid())
+    {
+        connectToServer(m_reconnectHelper->currentUrl());
+    }
+    else
+    {
+        executeDelayedParented(
+            [this] { reconnectStep(); }, kReconnectDelayMs, m_reconnectHelper.data());
+    }
+    return;
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
@@ -1130,6 +1144,9 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+    resourceAccessManager()->beginUpdate();
+    resourceAccessProvider()->beginUpdate();
+
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
     for (const auto& res: resourcesToRemove)
@@ -1144,6 +1161,9 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     licensePool()->reset();
     commonModule()->setReadOnly(false);
+
+    resourceAccessProvider()->endUpdate();
+    resourceAccessManager()->endUpdate();
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
@@ -1188,8 +1208,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
             disconnectFromServer(DisconnectFlag::Force);
         });
     m_reconnectDialog->setServers(m_reconnectHelper->servers());
-    m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
     QnDialog::show(m_reconnectDialog);
-    connectToServer(m_reconnectHelper->currentUrl());
+
+    reconnectStep();
     return true;
 }

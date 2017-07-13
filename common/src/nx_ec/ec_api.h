@@ -522,8 +522,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        virtual void monitorServerDiscovery() = 0;
-
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
@@ -547,13 +545,6 @@ namespace ec2
         void timeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
-        //!Emitted when peer \a peerId local time has changed
-        /*!
-            \param peerId
-            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
-            \param peerLocalTime Peer local time (UTC, millis from epoch)
-        */
-        void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
     };
 
     typedef std::shared_ptr<AbstractTimeNotificationManager> AbstractTimeNotificationManagerPtr;
@@ -587,7 +578,6 @@ namespace ec2
         }
 
         //!Returns list of peers whose local system time is known
-        virtual QnPeerTimeInfoList getPeerTimeInfoList() const = 0;
         virtual void forceTimeResync() = 0;
 
     protected:

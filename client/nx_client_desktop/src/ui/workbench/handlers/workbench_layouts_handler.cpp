@@ -407,8 +407,13 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
 {
     if (items.size() > 1)
     {
-        const bool confirm = ui::resources::removeItemsFromLayout(mainWindow(),
-            action::ParameterTypes::resources(items));
+        const auto layout = items.first().layout();
+        const bool isLayoutTour = !layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
+        const auto resources = action::ParameterTypes::resources(items);
+
+        const bool confirm = isLayoutTour
+            ? ui::resources::removeItemsFromLayoutTour(mainWindow(), resources)
+            : ui::resources::removeItemsFromLayout(mainWindow(), resources);
 
         if (!confirm)
             return;

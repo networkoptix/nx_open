@@ -739,7 +739,7 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
         .condition(new ExportCondition(false));
 
-    factory(ExportTimelapseAction)
+    factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)

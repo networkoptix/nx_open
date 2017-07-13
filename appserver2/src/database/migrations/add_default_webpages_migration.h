@@ -6,7 +6,7 @@ namespace ec2 {
 namespace database {
 
 namespace api {
-    struct Context;
+    class QueryContext;
 }
 
 namespace migrations {
@@ -14,7 +14,7 @@ namespace migrations {
 /**
  * Web page with support link must be added by default (if exists in current customization)
  */
-bool addDefaultWebpages(ec2::database::api::Context* context);
+bool addDefaultWebpages(ec2::database::api::QueryContext* context);
 
 } // namespace migrations
 } // namespace database

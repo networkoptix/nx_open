@@ -86,7 +86,7 @@ bool QnIOModuleMonitor::open()
     QUrl requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;
-    query.addQueryItem(lit("physicalId"), m_camera->getUniqueId());
+    query.addQueryItem(QString::fromLatin1(Qn::PHYSICAL_ID_URL_QUERY_ITEM), m_camera->getUniqueId());
     requestUrl.setQuery(query);
 
     QnRoute route = commonModule()->router()->routeTo(server->getId());

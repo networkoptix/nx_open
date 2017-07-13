@@ -84,457 +84,6 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>寫入書籤</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>緊急錄影</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>寫入至日誌</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>顯示通知</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>重複播放聲音</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>播放聲音</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>說</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>儲存裝置故障</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>網路問題</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>伺服器錯誤</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>伺服器衝突</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>伺服器啟動</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>授權問題</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>任何伺服器問題</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>任何事件</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>未定義事件發生在 %1</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1 輸入</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1 位移偵測</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>%1 儲存裝置故障</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 網路問題</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>事件：%1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>來源：%1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>原因：%1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>衝突伺服器 #%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>時間：%1 在 %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP 封包遺失偵測.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O 錯誤於 %1。</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD %1 速度不足以錄影。</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>衝突伺服器: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>開始</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>停止</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>當 %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>在 %1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>發生未知事件</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>已失去與伺服器的連線.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>已有 %n 秒無接收資料.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>通用事件</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>敘述: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(主串流)無預期中斷.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(次串流)無預期中斷.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>觸發裝置輸出</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>觸發攝影機輸出</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>觸發裝置錄影</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>觸發攝影機錄影</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>任何裝置問題</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>任何攝影機問題</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>裝置 %1 已斷線</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>攝影機 %1 已斷線</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1的裝置IP衝突</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1的攝影機IP衝突</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>與裝置的連線無預期中斷.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>移動PTZ至預設點</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>顯示疊加文字</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>影像彈跳</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>影像備份完成</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>通用事件 %1</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>輸入埠 %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>影像備份已成功完成</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 模組 %1 已離線</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>衝突位址: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>影像備份失敗: 備份裝置無足夠空間</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>影像備份失敗: 目標裝置故障</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>影像備份失敗: 來源檔案開啟/讀取錯誤</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>影像備份失敗: 目標檔案開啟/寫入錯誤</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>影像備份失敗: 檔案目錄錯誤</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>檔案備份已被使用者取消. 資料已備份至 %1</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>發送一則HTTP命令</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>設備未回應網路請求.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>伺服器無預警停止.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>沒有足夠的授權. 以下設備錄影已被停用:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>沒有足夠的授權. 以下攝影機錄影已被停用:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>沒有足夠的授權. 以下 I/O 模組已被停用:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>攝影機位移偵測</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>設備上的 DI</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>攝影機上的 DI</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>設備斷線</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>攝影機斷線</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>設備 IP 衝突</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>攝影機 IP 衝突</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>錄影備份結束, 但尚未完全完成因為設定的備份時間已經結束. 資料將備份到 %1</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>傳送郵件</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -862,7 +411,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>開始</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -1470,6 +1019,461 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>擁有整個系統的權限且可管理系統. 可新增使用者.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>寫入書籤</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>緊急錄影</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation>傳送郵件</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>寫入至日誌</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>顯示通知</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>重複播放聲音</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>播放聲音</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>說</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>移動PTZ至預設點</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>顯示疊加文字</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>影像彈跳</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>發送一則HTTP命令</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>設備輸出</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>攝影機輸出</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>觸發裝置錄影</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>觸發攝影機錄影</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>通用事件</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>攝影機位移偵測</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>儲存裝置故障</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>網路問題</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>伺服器錯誤</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>伺服器衝突</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>伺服器啟動</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>授權問題</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>影像備份完成</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>任何伺服器問題</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>任何事件</translation>
+    </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>設備上的 DI</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>攝影機上的 DI</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>設備斷線</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>攝影機斷線</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>設備 IP 衝突</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>攝影機 IP 衝突</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>任何裝置問題</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>任何攝影機問題</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>未定義事件發生在 %1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>裝置 %1 已斷線</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>攝影機 %1 已斷線</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>I/O 模組 %1 已離線</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>%1 輸入</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>%1 位移偵測</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>%1 儲存裝置故障</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>%1 網路問題</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1的裝置IP衝突</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1的攝影機IP衝突</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>通用事件 %1</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>發生未知事件</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>事件：%1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>來源：%1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>敘述: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>輸入埠 %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>原因：%1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>衝突位址: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>衝突伺服器 #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>衝突伺服器: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>時間：%1 在 %2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>已有 %n 秒無接收資料.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>與裝置的連線無預期中斷.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>與攝影機的連線(主串流)無預期中斷.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>與攝影機的連線(次串流)無預期中斷.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP 封包遺失偵測.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>設備未回應網路請求.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>已失去與伺服器的連線.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>伺服器無預警停止.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O 錯誤於 %1。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>HDD/SSD %1 速度不足以錄影。</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>影像備份失敗: 備份裝置無足夠空間</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>影像備份失敗: 目標裝置故障</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>影像備份失敗: 來源檔案開啟/讀取錯誤</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>影像備份失敗: 目標檔案開啟/寫入錯誤</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>影像備份失敗: 檔案目錄錯誤</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>錄影備份結束, 但尚未完全完成因為設定的備份時間已經結束. 資料將備份到 %1</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>影像備份已成功完成</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>檔案備份已被使用者取消. 資料已備份至 %1</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>沒有足夠的授權. 以下設備錄影已被停用:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>沒有足夠的授權. 以下攝影機錄影已被停用:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>沒有足夠的授權. 以下 I/O 模組已被停用:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>開始</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>停止</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>當 %1</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>在 %1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>角色</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n 角色</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>全部使用者</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>至少選擇一個使用者</translation>
     </message>
   </context>
   <context>

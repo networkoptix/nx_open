@@ -29,11 +29,20 @@ namespace utils {
 
 boost::optional<QString> createRandomDir()
 {
-    assert(!config.tmpDir.isEmpty());
+#ifdef _DEBUG
+    // C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT.
+    assert(!config.tmpDir.isEmpty()); //< Safe under define.
+#endif
+
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     QString dirName = QString::fromStdString(boost::uuids::to_string(uuid));;
     QString fullPath(QDir(config.tmpDir).absoluteFilePath(dirName));
-    assert(!QDir().exists(fullPath));
+
+#ifdef _DEBUG
+    // C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT.
+    assert(!QDir().exists(fullPath)); //< Safe under define.
+#endif
+
     if (QDir().exists(fullPath))
         return boost::none;
     if (!QDir().mkpath(fullPath))

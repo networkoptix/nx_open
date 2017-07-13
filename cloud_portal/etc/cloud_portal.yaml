@@ -1,13 +1,13 @@
-customization: '$CUSTOMIZATION'
+customization: 'default'
 
 host: '$CLOUD_PORTAL_HOST'
 
 cloud_database:
-    host: '$DB_HOST'
-    port: '$DB_PORT'
-    username: '$DB_USER'
-    password: '$DB_PASSWORD'
-    database: '$DB_NAME'
+    host: 'localhost'
+    port: '3306'
+    username: 'root'
+    password: ''
+    database: 'cloudportal'
 
 cloud_db:
     url: 'http://$CLOUD_DB_HOST/cdb'
@@ -51,3 +51,4 @@ languages:
     - pt_PT
 
 queue_name: '$INSTANCE_NAME'
+max_retries: 10

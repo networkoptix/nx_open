@@ -54,6 +54,6 @@ static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
 static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
 
 /** Url query item used in api/iomonitor and deprecated api/image. */
-static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "physicalId";
+static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";
 
 } // namespace Qn

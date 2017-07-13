@@ -80,7 +80,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -280,6 +280,17 @@
     <name>LoginButton</name>
     <message>
         <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+        <source>Tap on the image to position your camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CANCEL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -404,7 +404,7 @@ TEST( HttpStreamReader, MultipleRequests )
     std::vector<TestRequestData> messagesToParse;
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -422,7 +422,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n"
@@ -432,7 +432,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -445,7 +445,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n"
@@ -455,7 +455,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -467,7 +467,7 @@ TEST( HttpStreamReader, MultipleRequests )
 
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -481,7 +481,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -510,7 +510,7 @@ TEST( HttpStreamReader, MultipleRequests )
 
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2a378\"\r\n"
@@ -546,7 +546,7 @@ TEST( HttpStreamReader, MultipleRequests )
 
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2b700\"\r\n"
@@ -580,7 +580,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2ca88\"\r\n"
@@ -614,7 +614,7 @@ TEST( HttpStreamReader, MultipleRequests )
         ) );
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -628,7 +628,7 @@ TEST( HttpStreamReader, MultipleRequests )
 
 
     messagesToParse.push_back( TestRequestData(
-        nx_http::Method::Post,
+        nx_http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"

@@ -57,7 +57,6 @@
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
-#include <nx_ec/ec2_lib.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -472,6 +471,12 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             qApp->applicationFilePath(),
             lit("ec2_tran") + logFileNameSuffix,
             ec2logger);
+    }
+
+    {
+        // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
+        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        logger->setDefaultLevel(nx::utils::log::Level::info);
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);

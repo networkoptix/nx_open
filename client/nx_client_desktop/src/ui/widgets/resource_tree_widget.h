@@ -116,6 +116,12 @@ public:
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
+    /**
+     * Allow some nodes to be auto-expanded. By default all nodes are auto-expanded.
+     */
+    using AutoExpandPolicy = std::function<bool(const QModelIndex&)>;
+    void setAutoExpandPolicy(AutoExpandPolicy policy);
+
     QAbstractItemView* treeView() const;
     QnResourceItemDelegate* itemDelegate() const;
 
@@ -160,6 +166,8 @@ private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
     QnResourceItemDelegate *m_itemDelegate;
+
+    AutoExpandPolicy m_autoExpandPolicy;
 
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 

@@ -40,7 +40,7 @@ def set_permissions(path):
     else:
         os.chmod(path, 0644)
 
-	
+
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
@@ -71,12 +71,12 @@ def prepare(binary, sbindir, tlibdir):
     handler_bin_dir = join(tbindir, '${protocol_handler_app_name}/Contents/MacOS')
     handler_binary = join(handler_bin_dir, 'applet')
     handler_script = join(handler_bin_dir, 'run')
-    
+
     os.chmod(handler_binary, 0755)
     os.chmod(handler_script, 0755)
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
-    for subfolder in 'platforms', 'imageformats', 'audio':
+    for subfolder in 'platforms', 'imageformats', 'audio', 'mediaservice':
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):

@@ -944,9 +944,9 @@ enum IDType
     ExportLayoutAction,
 
     /**
-     * Exports timelapse.
+     * Exports rapid review.
      */
-    ExportTimelapseAction,
+    ExportRapidReviewAction,
 
     /**
      * Bookmark selected range.

@@ -116,7 +116,7 @@ public:
             login,
             password,
             nx::network::AppInfo::realm().toUtf8(),
-            nx_http::Method::Get,
+            nx_http::Method::get,
             QnAuthHelper::instance()->generateNonce());
 
         auto msgBody = QJson::serialized(cookieLogin);

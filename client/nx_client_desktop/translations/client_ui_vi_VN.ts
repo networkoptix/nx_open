@@ -295,7 +295,7 @@
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>cài đặt máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -371,7 +371,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
     <message>
       <location/>
@@ -386,7 +386,7 @@
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>thẻ</translation>
     </message>
     <message>
       <location/>
@@ -475,7 +475,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>ghi sự kiện ...</translation>
     </message>
   </context>
   <context>
@@ -849,7 +849,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>ghi âm</translation>
     </message>
     <message>
       <location/>
@@ -864,7 +864,7 @@
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>buổi diễn FPS</translation>
     </message>
     <message>
       <location/>
@@ -884,7 +884,7 @@
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Displacement + chất lượng thấp</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>kích thước</translation>
     </message>
     <message>
       <location/>
@@ -1693,7 +1693,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>ghi âm</translation>
     </message>
     <message>
       <location/>
@@ -1968,7 +1968,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Broadcast</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>cho phép</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2271,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>nguồn</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>màn</translation>
     </message>
   </context>
   <context>
@@ -2353,7 +2353,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
     <message>
       <location/>
@@ -2500,7 +2500,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
     <message>
       <location/>
@@ -2555,7 +2555,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>thiết lập lại</translation>
     </message>
     <message>
       <location/>
@@ -2644,7 +2644,7 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
     <message>
       <location/>
@@ -2794,11 +2794,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2801,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2857,12 +2862,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>tên</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>người sử dụng</translation>
     </message>
     <message>
       <location/>

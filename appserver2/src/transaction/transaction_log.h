@@ -7,6 +7,8 @@
 
 #include "transaction_descriptor.h"
 
+#include <database/api/db_resource_api.h>
+
 namespace ec2
 {
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
@@ -15,6 +17,12 @@ namespace ec2
     enum class TransactionLockType;
 
     class QnUbjsonTransactionSerializer;
+
+    enum class TransactionLockType
+    {
+        Regular, //< do commit as soon as commit() function called
+        Lazy //< delay commit unless regular commit() called
+    };
 
     class QnTransactionLog
     {
@@ -106,7 +114,7 @@ namespace ec2
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
             const QByteArray &data);
-        void resetPreparedStatements();
+
     private:
         friend class detail::QnDbManager;
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
@@ -144,8 +152,8 @@ namespace ec2
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
         QnUbjsonTransactionSerializer* m_tranSerializer;
-        std::unique_ptr<QSqlQuery> m_insTranQuery;
-        std::unique_ptr<QSqlQuery> m_updateSequenceQuery;
+        ec2::database::api::QueryCache m_insertTransactionQuery;
+        ec2::database::api::QueryCache m_updateSequenceQuery;
     };
 };
 

@@ -4,7 +4,6 @@
 #include "core/resource/security_cam_resource.h"
 
 #include "common/common_module.h"
-#include "api/app_server_connection.h"
 
 QnSimpleNetworkProxyFactory::QnSimpleNetworkProxyFactory(QnCommonModule* commonModule):
     base_type(commonModule)

@@ -78,9 +78,14 @@ qreal QnViewportBoundWidget::scale() const
     return m_scale->xScale();
 }
 
+qreal QnViewportBoundWidget::sceneScale() const
+{
+    return m_scaleWatcher->scale();
+}
+
 qreal QnViewportBoundWidget::relativeScale() const
 {
-    return scale() / m_scaleWatcher->scale();
+    return scale() / sceneScale();
 }
 
 // -------------------------------------------------------------------------- //

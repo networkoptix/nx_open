@@ -35,9 +35,11 @@ public:
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QString &login = QString());
+    void setCheckState(Qt::CheckState state, const QSet<QString>& logins);
 
     QnLdapUsers users() const;
-    void setUsers(const QnLdapUsers &users);    
+    void setUsers(const QnLdapUsers &users);
+
 private:
     int userIndex(const QString &login) const;
 

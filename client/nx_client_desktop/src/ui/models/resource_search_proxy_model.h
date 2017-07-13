@@ -50,6 +50,15 @@ public:
     QnResourceSearchQuery query() const;
     void setQuery(const QnResourceSearchQuery& query);
 
+    enum class DefaultBehavior
+    {
+        showAll,
+        showNone
+    };
+
+    DefaultBehavior defaultBehavor() const;
+    void setDefaultBehavior(DefaultBehavior value);
+
 protected:
 
     // --------------------------------------------------------------
@@ -83,11 +92,12 @@ public slots:
     void invalidateFilterLater();
 
 protected:
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
     bool m_invalidating = false;
     QnResourceSearchQuery m_query;
+    DefaultBehavior m_defaultBehavior = DefaultBehavior::showAll;
 };
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel*)

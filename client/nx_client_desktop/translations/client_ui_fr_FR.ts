@@ -353,12 +353,12 @@
     <message>
       <location/>
       <source>By:</source>
-      <translation type="unfinished">By:</translation>
+      <translation>Par:</translation>
     </message>
     <message>
       <location/>
       <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
+      <translation>Demander confirmation avant de créer le signet</translation>
     </message>
   </context>
   <context>
@@ -452,7 +452,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>À</translation>
     </message>
   </context>
   <context>
@@ -599,7 +599,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
@@ -732,7 +732,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Autoriser le système à optimiser les paramètres caméra&quot; est désactivé dans l'administration système.</translation>
     </message>
     <message>
       <location/>
@@ -745,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID d'entrée</translation>
     </message>
   </context>
   <context>
@@ -1721,7 +1721,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Jouer aux utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -2251,7 +2251,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Un ordinateur puissant est recommandé pour une &quot;meilleur&quot; qualité et résolution.</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2271,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Source</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Écran</translation>
     </message>
   </context>
   <context>
@@ -2317,7 +2317,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Parler aux utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2560,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2657,7 +2657,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Disponible à</translation>
     </message>
     <message>
       <location/>
@@ -2667,7 +2667,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Icône</translation>
     </message>
   </context>
   <context>
@@ -2675,12 +2675,12 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
       <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
+      <translation>&lt;Légende&gt;</translation>
     </message>
     <message>
       <location/>
       <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
+      <translation>&lt;description&gt;</translation>
     </message>
   </context>
   <context>
@@ -2794,18 +2794,23 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Rôles</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Afficher tous les Utilisateurs</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2841,7 +2846,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Synchroniser le temps avec Internet</translation>
     </message>
   </context>
   <context>
@@ -2881,8 +2886,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Il n’y a pas de rôle d'usager personnalisé.
+Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     </message>
     <message>
       <location/>
