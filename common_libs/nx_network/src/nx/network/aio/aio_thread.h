@@ -63,10 +63,10 @@ public:
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() );
     /**
-     * Stop monitorong sock for event eventType.
-     * Garantees that no eventTriggered will be called after return of this method.
-     * If eventTriggered is running and stopMonitoring called not from eventTriggered, 
-     *   method blocks till eventTriggered had returned.
+     * Stop monitoring sock for event eventType.
+     * Guarantees that no AIOEventHandler::eventTriggered will be called after return of this method.
+     * If AIOEventHandler::eventTriggered is running and stopMonitoring called not from AIOEventHandler::eventTriggered,
+     *   method blocks untill AIOEventHandler::eventTriggered had returned.
      * @param waitForRunningHandlerCompletion See comment to aio::AIOService::stopMonitoring.
      * NOTE: Calling this method with same parameters simultaneously from 
      *   multiple threads can cause undefined behavour.

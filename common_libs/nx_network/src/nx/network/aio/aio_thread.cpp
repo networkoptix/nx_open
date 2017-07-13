@@ -1,5 +1,8 @@
 #include "aio_thread.h"
 
+#include <chrono>
+#include <thread>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -118,7 +121,7 @@ void AIOThread::stopMonitoring(
         userData = nullptr;
         return;
     }
-        
+
     if (waitForRunningHandlerCompletion)
     {
         std::atomic<int> taskCompletedCondition(0);
@@ -168,7 +171,7 @@ void AIOThread::stopMonitoring(
     }
 }
 
-void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor )
+void AIOThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
 {
     QnMutexLocker lk(&m_taskQueue->mutex);
 
@@ -181,7 +184,7 @@ void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> func
         m_taskQueue->pollSet->interrupt();
 }
 
-void AIOThread::dispatch( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor )
+void AIOThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
 {
     if (currentThreadSystemId() == systemThreadId())  //< If called from this aio thread.
     {
@@ -192,7 +195,7 @@ void AIOThread::dispatch( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> 
     post(sock, std::move(functor));
 }
 
-void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHandlerCompletion )
+void AIOThread::cancelPostedCalls(Pollable* const sock, bool waitForRunningHandlerCompletion)
 {
     QnMutexLocker lk(&m_taskQueue->mutex);
 
@@ -207,7 +210,7 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
         // Removing postedCallsToRemove with mutex unlocked since there can be indirect calls to this.
         return;
     }
-        
+
     if (waitForRunningHandlerCompletion)
     {
         // Posting cancellation task
@@ -225,11 +228,11 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
         //waiting for posted calls processing to finish
         while (m_taskQueue->processingPostedCalls == 1)
             msleep(0);    //yield. TODO #ak Better replace it with conditional_variable
-                            //TODO #ak must wait for target call only, not for any call!
+                          //TODO #ak must wait for target call only, not for any call!
 
-                            //here we can be sure that posted call for socket will never be triggered.
-                            //  Although, it may still be in the queue.
-                            //  But, socket can be safely removed, since we use socketSequence
+                          //here we can be sure that posted call for socket will never be triggered.
+                          //  Although, it may still be in the queue.
+                          //  But, socket can be safely removed, since we use socketSequence
 
         lk.relock();
     }
@@ -249,7 +252,7 @@ size_t AIOThread::socketsHandled() const
 
 void AIOThread::run()
 {
-    static const int ERROR_RESET_TIMEOUT = 1000;
+    static const std::chrono::seconds kErrorResetTimeout(1);
 
     initSystemThreadId();
     NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG1);
@@ -295,14 +298,14 @@ void AIOThread::run()
             if (errorCode == SystemError::interrupted)
                 continue;
             NX_LOG(QString::fromLatin1("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            msleep(ERROR_RESET_TIMEOUT);
+            std::this_thread::sleep_for(kErrorResetTimeout);
             continue;
         }
         curClock = m_taskQueue->getSystemTimerVal();
         if (triggeredSocketCount == 0)
         {
             if (nextPeriodicEventClock == 0 ||      //no periodic event
-                nextPeriodicEventClock > curClock) //not a time for periodic event
+                nextPeriodicEventClock > curClock)  //not a time for periodic event
             {
                 continue;   //poll has been interrupted
             }
