@@ -261,6 +261,9 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     if (!qnServerDb->addBookmark(bookmark))
         return false;
 
+    if (context.request().businessRuleId.isNull())
+        return true;
+
     nx::vms::event::EventParameters runtimeParams;
     runtimeParams.eventResourceId = bookmark.cameraId;
     runtimeParams.eventTimestampUsec = bookmark.startTimeMs;
@@ -268,6 +271,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     const auto action = nx::vms::event::CommonAction::create(
         nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
 
+    action->setRuleId(context.request().businessRuleId);
     action->getParams().additionalResources.push_back(authorityUser);
 
     qnServerDb->saveActionToDB(action);
