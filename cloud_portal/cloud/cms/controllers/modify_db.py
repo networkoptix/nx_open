@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from notifications.engines.email_engine import send 
+from notifications.engines.email_engine import send
+
+from PIL import Image
+import base64
 
 from .filldata import fill_content
 from api.models import Account
@@ -101,6 +104,7 @@ def send_version_for_review(customization, language, data_structures, product, r
 	#TODO add notification need to make template for this
 	notify_version_ready(version.id, product.name)
 
+
 def get_records_for_version(version):
 	data_records = version.datarecord_set.all().order_by('data_structure__context__name',
 														 'language__code')
@@ -113,3 +117,16 @@ def get_records_for_version(version):
 		else:
 			contexts[context_name] = [record]
 	return contexts
+
+
+def handle_image_upload(image):
+	#print image.read()
+	'''fs = FileSystemStorage()
+	filename = fs.save(image.name, image)
+	uploaded_file_url = fs.url(filename)
+	newImage = Image.open(os.path.join(settings.MEDIA_ROOT, filename))'''
+	
+	encoded_string = base64.b64encode(image.read())
+	newImage = Image.open(image)
+	width, height = newImage.size
+	return encoded_string
