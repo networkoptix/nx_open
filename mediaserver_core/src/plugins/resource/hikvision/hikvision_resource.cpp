@@ -1,8 +1,8 @@
 #ifdef ENABLE_ONVIF
 
-#include "hikvision_onvif_resource.h"
+#include "hikvision_resource.h"
 #include "hikvision_audio_transmitter.h"
-#include "hikvision_parsing_utils.h"
+#include "hikvision_utils.h"
 #include "hikvision_hevc_stream_reader.h"
 
 #include <QtXml/QDomElement>

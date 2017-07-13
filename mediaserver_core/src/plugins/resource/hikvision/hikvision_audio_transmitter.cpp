@@ -1,7 +1,7 @@
 #include <QtXml/QDomElement>
 
 #include "hikvision_audio_transmitter.h"
-#include "hikvision_parsing_utils.h"
+#include "hikvision_utils.h"
 
 #include <nx/utils/std/cpp14.h>
 

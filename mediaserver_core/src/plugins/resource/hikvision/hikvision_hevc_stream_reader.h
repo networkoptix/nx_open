@@ -5,7 +5,7 @@
 #include <nx/network/http/http_client.h>
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
-#include <plugins/resource/hikvision/hikvision_parsing_utils.h>
+#include <plugins/resource/hikvision/hikvision_utils.h>
 
 namespace nx {
 namespace mediaserver_core {

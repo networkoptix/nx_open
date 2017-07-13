@@ -1,6 +1,6 @@
 #include <QtXml/QDomElement>
 
-#include "hikvision_parsing_utils.h"
+#include "hikvision_utils.h"
 
 namespace nx {
 namespace mediaserver_core {

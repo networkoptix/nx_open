@@ -761,8 +761,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp
             QString("clearInputsTimeoutSec"), 0) * 1000 * 1000;
     }
 
-    qWarning() << "QnPlOnvifResource::initInternal() m_clearInputsTimeoutUSec =" << m_clearInputsTimeoutUSec;
-
     QnIOPortDataList allPorts = getRelayOutputList();
 
     if (onvifCapabilities.Capabilities &&

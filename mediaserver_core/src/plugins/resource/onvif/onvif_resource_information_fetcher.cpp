@@ -17,7 +17,7 @@
 #include <plugins/resource/pelco/optera/optera_resource.h>
 #include <plugins/resource/flir/flir_onvif_resource.h>
 #include <plugins/resource/vista/vista_resource.h>
-#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
+#include <plugins/resource/hikvision/hikvision_resource.h>
 #include <plugins/resource/flir/flir_onvif_resource.h>
 #include <plugins/resource/vivotek/vivotek_resource.h>
 #include <core/resource/resource_data.h>

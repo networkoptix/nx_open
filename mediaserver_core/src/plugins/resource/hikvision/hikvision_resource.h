@@ -4,7 +4,7 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <plugins/resource/hikvision/hikvision_parsing_utils.h>
+#include <plugins/resource/hikvision/hikvision_utils.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/network/http/http_client.h>
 

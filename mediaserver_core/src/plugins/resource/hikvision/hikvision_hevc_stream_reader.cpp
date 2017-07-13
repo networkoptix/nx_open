@@ -5,7 +5,7 @@
 #include <QtXml/QDomDocument>
 
 #include <nx/network/http/http_client.h>
-#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
+#include <plugins/resource/hikvision/hikvision_resource.h>
 
 namespace nx {
 namespace mediaserver_core {
