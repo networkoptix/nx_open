@@ -6,7 +6,7 @@ endif()
 
 add_definitions(-DUNICODE -D_CONSOLE -D_UNICODE)
 include_directories("${CONFIG_DIRECTORY}")
-add_executable(launcher src/main.cpp src/progress.cpp)
+add_executable(launcher src/main.cpp src/progress.cpp src/launcher.rc)
 set_target_properties(launcher PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 target_link_libraries(launcher msi comctl32)
 
