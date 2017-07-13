@@ -56,7 +56,7 @@ private:
     static void showValidateConnectionErrorMessage(
         QWidget* parentWidget,
         Qn::ConnectionResult result,
-        const QString& serverVersion);
+        const QnConnectionInfo& connectionInfo);
 
     static QString ldapServerTimeoutMessage();
 
