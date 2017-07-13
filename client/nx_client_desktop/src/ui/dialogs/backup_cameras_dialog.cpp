@@ -166,8 +166,8 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
     setDelegate(new BackupCamerasDialogDelegate(this));
 
     const auto alertBar = new QnPromoBar(this);
-    alertBar->setText(tr("Archive from selected cameras will be backed up only if backup "
-        "is set up on server where they currently are."));
+    alertBar->setText(tr("If the backup is not set up on the current server of the cameras, "
+        "their archive will not be backed up."));
 
     const auto layout = qobject_cast<QBoxLayout*>(this->layout());
     NX_ASSERT(layout);
