@@ -111,5 +111,5 @@ private:
     const char* toString(State state) const;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

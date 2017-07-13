@@ -127,4 +127,4 @@ TEST_F( ConnectTest, BindConnect )
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

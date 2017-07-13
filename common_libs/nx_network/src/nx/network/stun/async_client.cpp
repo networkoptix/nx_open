@@ -501,5 +501,5 @@ const char* AsyncClient::toString(State state) const
     return "unknown";
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx
