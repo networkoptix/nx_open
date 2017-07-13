@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
-from rest_framework import serializers
 from jsonfield import JSONField
 
 
@@ -51,13 +50,6 @@ class DataStructure(models.Model):
     @staticmethod
     def get_type(name):
         return next((type[0] for type in DATA_TYPES if type[1] == name), 0)
-
-class DataStructureSerializer(serializers.ModelSerializer):
-    meta_settings = serializers.JSONField()
-    class Meta:
-        model = DataStructure
-        fields = "__all__"
-
 
 # CMS settings. Release engineer can change that
 

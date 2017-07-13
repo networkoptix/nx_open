@@ -41,9 +41,9 @@
 <button onClick="openPreview()">Open Preview</button>
 {% endif %}
 
-{% if image %}
+<!--{% if image %}
 <div> <img src="data:image/png;base64,{{image}}"> </div>
-{% endif %}
+{% endif %}-->
 <script>
     function openPreview(){
         window.open("{{ preview_link }}");
