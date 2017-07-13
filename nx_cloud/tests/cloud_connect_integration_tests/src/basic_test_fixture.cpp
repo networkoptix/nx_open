@@ -33,8 +33,8 @@ boost::optional<hpm::api::SystemCredentials>
 BasicTestFixture::BasicTestFixture():
     m_staticMsgBody("Hello, hren!"),
     m_mediator(
-        nx::hpm::MediatorFunctionalTest::useTestCloudDataProvider |
-        nx::hpm::MediatorFunctionalTest::initiailizeSocketGlobals),
+        nx::hpm::MediatorFunctionalTest::allFlags &
+            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
     m_unfinishedRequestsLeft(0)
 {
 }
