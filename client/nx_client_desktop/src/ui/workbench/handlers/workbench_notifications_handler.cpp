@@ -153,6 +153,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(true, mainWindow()));
 
+    bookmark.description = QString(); //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;
@@ -468,6 +469,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
         {
             switch (action->getToggleState())
             {
+                case vms::event::EventState::undefined:
                 case vms::event::EventState::active:
                     addNotification(action);
                     break;

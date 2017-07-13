@@ -83,6 +83,11 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(bookmark.tags));
 
     updateTagsList();
+
+    if (ui->nameInputField->text().isEmpty())
+        ui->nameInputField->setFocus();
+    else
+        ui->descriptionTextEdit->setFocus();
 }
 
 void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const

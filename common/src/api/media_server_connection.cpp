@@ -115,7 +115,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ec2BookmarkUpdateObject, "ec2/bookmarks/update")
     (ec2BookmarkDeleteObject, "ec2/bookmarks/delete")
     (ec2BookmarkTagsObject, "ec2/bookmarks/tags")
-    (ec2BroadcastAction, "ec2/broadcastAction")
     (MergeLdapUsersObject, "mergeLdapUsers")
 );
 
@@ -1116,8 +1115,6 @@ int QnMediaServerConnection::acknowledgeEventAsync(
     const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark, action);
-    request.format = Qn::SerializationFormat::UbjsonFormat;
-
     return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,
         request.toParams(), nullptr, target, slot);
 }

@@ -26,6 +26,7 @@ bool allowsAggregation(ActionType actionType);
 
 bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
 
+QList<ActionType> userAvailableActions();
 QList<ActionType> allActions();
 
 class ActionData
