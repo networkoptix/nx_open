@@ -173,7 +173,7 @@ struct ActionParameters31Beta
     bool playToClient = true;
     QString contentType;
 };
-#define BusinessActionParameters31Beta_Fields (needConfirmation)(actionResourceId)\
+#define ActionParameters31Beta_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
