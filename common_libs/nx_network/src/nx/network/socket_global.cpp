@@ -160,7 +160,7 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
         SocketFactory::enforceSsl();
 
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        mediatorConnector().mockupAddress(*value);
+        mediatorConnector().mockupMediatorUrl(*value);
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)

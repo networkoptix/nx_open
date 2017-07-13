@@ -175,6 +175,14 @@ public:
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
     const nx_http::Request& request() const;
 
     /**

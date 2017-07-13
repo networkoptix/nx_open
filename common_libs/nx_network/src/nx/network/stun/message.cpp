@@ -177,5 +177,5 @@ void Message::clear()
     attributes.clear();
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

@@ -15,10 +15,10 @@ namespace hpm {
 
 namespace conf { class Settings; }
 
-class BusinessLogicComposite
+class Controller
 {
 public:
-    BusinessLogicComposite(
+    Controller(
         const conf::Settings& settings,
         nx::stun::MessageDispatcher* stunMessageDispatcher);
 

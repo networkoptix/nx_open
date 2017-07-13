@@ -218,15 +218,12 @@ void AddressResolver::resolveAsync(
     if (ipVersion == AF_INET)
     {
         const auto hostStr = hostName.toString().toStdString();
-        // TODO: #ak Use InetPton here on mswin2.
-        const auto ipv4Address = inet_addr(hostStr.c_str());
-        if (ipv4Address != INADDR_NONE)
+        struct in_addr resolvedAddress;
+        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+        if (inet_pton(AF_INET, hostStr.c_str(), &resolvedAddress) > 0)
         {
             // Resolved.
-            DEBUG_LOG("Hostname %1 is IP v4 address");
-            struct in_addr resolvedAddress;
-            memset(&resolvedAddress, 0, sizeof(resolvedAddress));
-            resolvedAddress.s_addr = ipv4Address;
+            DEBUG_LOG(lm("Hostname %1 is IP v4 address").arg(hostStr));
             AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
             return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
         }
@@ -445,7 +442,7 @@ AddressResolver::RequestInfo::RequestInfo(
 
 bool AddressResolver::isMediatorAvailable() const
 {
-    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
+    return SocketGlobals::mediatorConnector().isConnected();
 }
 
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)

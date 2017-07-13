@@ -30,14 +30,18 @@ public:
     void pleaseStop();
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doGet(const QUrl& url);
+    /**
+     * @return true if response has been received.
+     */
+    bool doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doPost(
         const QUrl& url,
@@ -45,8 +49,7 @@ public:
         nx_http::StringType messageBody);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doPut(
         const QUrl& url,
@@ -54,8 +57,7 @@ public:
         nx_http::StringType messageBody);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doDelete(const QUrl& url);
 

@@ -79,4 +79,4 @@ TEST_F(MediatorFunctionalTest, udp_transport)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

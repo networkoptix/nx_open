@@ -493,7 +493,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
 
     // TODO: #mu ON/OFF switch in settings?
