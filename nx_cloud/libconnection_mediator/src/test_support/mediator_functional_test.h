@@ -36,12 +36,13 @@ public:
     {
         noFlags = 0,
         useTestCloudDataProvider = 0x01,
-        initiailizeSocketGlobals = 0x02,
-        initiailizeConnectivity = 0x04,
+        initializeSocketGlobals = 0x02,
+        initializeConnectivity = 0x04,
+        allFlags = useTestCloudDataProvider | initializeSocketGlobals | initializeConnectivity,
     };
 
     //!Calls \a start
-    MediatorFunctionalTest(int flags = useTestCloudDataProvider | initiailizeSocketGlobals);
+    MediatorFunctionalTest(int flags = allFlags);
     ~MediatorFunctionalTest();
 
     virtual bool waitUntilStarted() override;

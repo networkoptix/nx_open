@@ -56,7 +56,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     m_stunPort(0),
     m_httpPort(0)
 {
-    if (m_testFlags & initiailizeSocketGlobals)
+    if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
@@ -105,7 +105,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
     m_httpPort = httpEndpoints.front().port;
 
-    if (m_testFlags & MediatorTestFlags::initiailizeConnectivity)
+    if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
         network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
