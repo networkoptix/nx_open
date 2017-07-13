@@ -88,12 +88,12 @@ struct ActionParameters
     bool requireConfirmation(EventType targetEventType) const;
 };
 
-#define ActionParameters_Fields (actionId)(needConfirmation)(actionResourceId)\
+#define ActionParameters_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
-    (playToClient)(contentType)
+    (playToClient)(contentType)(actionId)
 
-/* Backward compatibility is not really important here as this class is not stored in the DB. */
+/* Backward compatibility is not really important here as this class is stored in the DB as json. */
 QN_FUSION_DECLARE_FUNCTIONS(ActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 } // namespace event

@@ -279,6 +279,7 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
 
         case vms::event::showPopupAction:
             action->getParams().actionId = QnUuid::createUuid();
+            /*fallthrough*/
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::showTextOverlayAction:
             return broadcastAction(action);

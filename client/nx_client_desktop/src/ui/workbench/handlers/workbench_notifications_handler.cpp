@@ -139,8 +139,15 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
 
     const auto creationCallback =
-        [this, businessAction, repliesRemaining, anySuccessReply](bool success)
+        [this, businessAction, repliesRemaining, anySuccessReply,
+            parentThreadId = QThread::currentThreadId()](bool success)
         {
+            if (QThread::currentThreadId() != parentThreadId)
+            {
+                NX_ASSERT(false, "Invalid thread!");
+                return;
+            }
+
             if (success)
                 *anySuccessReply = true;
 
@@ -150,7 +157,9 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
             const auto action = CommonAction::createBroadcastAction(
                 ActionType::hidePopupAction, businessAction->getParams());
-            commonModule()->currentServer()->apiConnection()->broadcastAction(action);
+            const auto server = commonModule()->currentServer();
+            if (server)
+                server->apiConnection()->broadcastAction(action);
             emit notificationRemoved(businessAction);
         };
 

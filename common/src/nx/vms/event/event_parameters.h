@@ -39,8 +39,6 @@ struct EventParameters
 
     EventType eventType;
 
-    EventState toggleState; //< Is used only in QnServerDb::saveActionToDB function
-
     /** When did the event occur - in usecs. */
     qint64 eventTimestampUsec;
 
@@ -93,7 +91,7 @@ struct EventParameters
 };
 
 #define EventParameters_Fields \
-    (eventType)(toggleState)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
+    (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

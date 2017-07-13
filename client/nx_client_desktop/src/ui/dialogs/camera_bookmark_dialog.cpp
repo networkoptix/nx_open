@@ -20,7 +20,6 @@ QnCameraBookmarkList extractBookmarksFromAction(
 {
     QnCameraBookmarkList bookmarks;
 
-    // TODO: fill bookmark length BEFORE REVIEW
     const auto addBookmarkByResourceId =
         [action, commonModule, resourcePool, &bookmarks](const QnUuid& resourceId)
         {
