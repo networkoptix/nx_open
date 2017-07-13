@@ -1,13 +1,14 @@
 #ifdef ENABLE_ONVIF
 
+#include "hikvision_onvif_resource.h"
+#include "hikvision_audio_transmitter.h"
+#include "hikvision_parsing_utils.h"
+#include "hikvision_hevc_stream_reader.h"
+
 #include <QtXml/QDomElement>
 
 #include <boost/optional.hpp>
 #include <utils/camera/camera_diagnostics.h>
-
-#include "hikvision_onvif_resource.h"
-#include "hikvision_audio_transmitter.h"
-#include "hikvision_parsing_utils.h"
 
 namespace {
 
@@ -20,20 +21,30 @@ bool isResponseOK(const nx_http::HttpClient* client)
     return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
 }
 
+const std::array<Qn::ConnectionRole, 2> kRoles = {
+    Qn::ConnectionRole::CR_LiveVideo,
+    Qn::ConnectionRole::CR_SecondaryLiveVideo};
+
 } // namespace
 
-QnHikvisionOnvifResource::QnHikvisionOnvifResource():
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
+using namespace nx::mediaserver_core::plugins::hikvision;
+
+HikvisionResource::HikvisionResource():
     QnPlOnvifResource(),
     m_audioTransmitter(new HikvisionAudioTransmitter(this))
 {
 }
 
-QnHikvisionOnvifResource::~QnHikvisionOnvifResource()
+HikvisionResource::~HikvisionResource()
 {
     m_audioTransmitter.reset();
 }
 
-CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
+CameraDiagnostics::Result HikvisionResource::initInternal()
 {
     auto result = QnPlOnvifResource::initInternal();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
@@ -45,7 +56,41 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-std::unique_ptr<nx_http::HttpClient> QnHikvisionOnvifResource::getHttpClient()
+QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
+{
+    if (m_hevcSupported)
+        return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
+    
+    return base_type::createLiveDataProvider();
+}
+
+CameraDiagnostics::Result HikvisionResource::initializeMedia(
+    const CapabilitiesResp& onvifCapabilities)
+{
+    bool hasHevcSupport = false;
+    for (const auto& role : kRoles)
+    {
+        hikvision::ChannelCapabilities channelCapabilities;
+        if (!fetchChannelCapabilities(role, &channelCapabilities))
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                lit("Fetch channel capabilities"),
+                lit("Request failed"));
+        }
+
+        m_channelCapabilitiesByRole[role] = channelCapabilities;
+        m_hevcSupported = hikvision::codecSupported(
+            AV_CODEC_ID_HEVC,
+            channelCapabilities);
+    }
+
+    if (!m_hevcSupported)
+        return base_type::initializeMedia(onvifCapabilities);
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
 {
     std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
     httpClient->setResponseReadTimeoutMs(kRequestTimeout.count());
@@ -57,7 +102,22 @@ std::unique_ptr<nx_http::HttpClient> QnHikvisionOnvifResource::getHttpClient()
     return std::move(httpClient);
 }
 
-CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
+bool HikvisionResource::fetchChannelCapabilities(
+    Qn::ConnectionRole role,
+    ChannelCapabilities* outCapabilities)
+{
+    auto url = QUrl(getUrl());
+    url.setPath(kCapabilitiesRequestPathTemplate.arg(
+        buildChannelNumber(role, getChannel())));
+
+    nx::Buffer response;
+    if (!doGetRequest(url, getAuth(), &response))
+        return false;
+
+    return parseChannelCapabilitiesResponse(response, outCapabilities);
+}
+
+CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
 {
     auto httpClient = getHttpClient();
 
@@ -80,12 +140,12 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
     if (data.isEmpty())
         return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
 
-    auto channels = nx::plugins::hikvision::parseAvailableChannelsResponse(data);
+    auto channels = parseAvailableChannelsResponse(data);
 
     if (channels.empty())
         return CameraDiagnostics::NoErrorResult(); //< no 2-way-audio cap
 
-    boost::optional<nx::plugins::hikvision::ChannelStatusResponse> channel(boost::none);
+    boost::optional<ChannelStatusResponse> channel(boost::none);
     for (const auto& ch: channels)
     {
         if (!ch.id.isEmpty() && !ch.audioCompression.isEmpty())
@@ -98,7 +158,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
     if (!channel)
         return CameraDiagnostics::NoErrorResult();
 
-    QnAudioFormat outputFormat = nx::plugins::hikvision::toAudioFormat(
+    QnAudioFormat outputFormat = toAudioFormat(
         channel->audioCompression,
         channel->sampleRateKHz);
 
@@ -121,12 +181,26 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
     return CameraDiagnostics::NoErrorResult();
 }
 
-QnAudioTransmitterPtr QnHikvisionOnvifResource::getAudioTransmitter()
+QnAudioTransmitterPtr HikvisionResource::getAudioTransmitter()
 {
     if (!isInitialized())
         return nullptr;
 
     return m_audioTransmitter;
 }
+
+boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
+    Qn::ConnectionRole role)
+{
+    auto itr = m_channelCapabilitiesByRole.find(role);
+    if (itr == m_channelCapabilitiesByRole.end())
+        return boost::none;
+
+    return itr->second;
+}
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx
 
 #endif  //ENABLE_ONVIF

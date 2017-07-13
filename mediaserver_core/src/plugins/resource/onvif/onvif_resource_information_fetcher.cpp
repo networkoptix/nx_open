@@ -29,6 +29,7 @@
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
+using namespace nx::mediaserver_core::plugins;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -429,11 +430,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
     else if (manufacture.toLower().contains(QLatin1String("hikvision")))
-        resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
+        resource = QnPlOnvifResourcePtr(new HikvisionResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("vivotek")))
-        resource = QnPlOnvifResourcePtr(new nx::mediaserver_core::plugins::VivotekResource());
+        resource = QnPlOnvifResourcePtr(new VivotekResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

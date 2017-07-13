@@ -213,3 +213,16 @@ typedef QnSharedResourcePointerList<nx::plugins::flir::OnvifResource> QnFlirOnvi
 
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
+
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
+class HikvisionResource;
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx
+
+typedef 
+QnSharedResourcePointer<nx::mediaserver_core::plugins::HikvisionResource> QnHikvisionResourcePtr;

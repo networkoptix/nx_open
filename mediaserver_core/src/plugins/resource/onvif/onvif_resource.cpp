@@ -577,24 +577,18 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    result = initializeAdvancedParameters(capabilitiesResponse);
-    if (!result)
-        return result;
+    initializeAdvancedParameters(capabilitiesResponse);
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    result = initializeIo(capabilitiesResponse);
-    if (!result)
-        return result;
+    initializeIo(capabilitiesResponse);
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    result = initializePtz(capabilitiesResponse);
-    if (!result)
-        return result;
-
+    initializePtz(capabilitiesResponse);
+    
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 

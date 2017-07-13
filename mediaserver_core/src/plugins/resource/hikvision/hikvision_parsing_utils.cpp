@@ -3,6 +3,7 @@
 #include "hikvision_parsing_utils.h"
 
 namespace nx {
+namespace mediaserver_core {
 namespace plugins {
 namespace hikvision {
 
@@ -126,8 +127,6 @@ boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx_http::StringTyp
     OpenChannelResponse response;
 
     QDomDocument doc;
-    bool status;
-
     doc.setContent(message);
 
     auto element = doc.documentElement();
@@ -190,6 +189,257 @@ boost::optional<CommonResponse> parseCommonResponse(nx_http::StringType message)
     return response;
 }
 
+bool parseChannelCapabilitiesResponse(
+    const nx::Buffer& response,
+    ChannelCapabilities* outCapabilities)
+{
+    NX_ASSERT(outCapabilities, lit("Output capabilities should be provided."));
+    if (!outCapabilities)
+        return false;
+
+    QDomDocument doc;
+    doc.setContent(response);
+
+    auto element = doc.documentElement();
+    if (element.isNull() || element.tagName() != kChannelRootElementTag)
+        return false;
+
+    return parseVideoElement(
+        element.firstChildElement(kVideoElementTag),
+        outCapabilities);
+}
+
+bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* outCapabilities)
+{
+    if (videoElement.isNull())
+        return false;
+
+    bool success = false;
+    std::vector<int> resolutionWidths;
+    std::vector<int> resolutionHeights;
+
+    for (const auto& videoChannelProperty : kVideoChannelProperties)
+    {
+        auto propertyElement = videoElement.firstChildElement(videoChannelProperty);
+        if (propertyElement.isNull())
+            return false;
+
+        auto options = propertyElement.attribute(kOptionsAttribute);
+
+        if (options.isEmpty())
+            return false;
+
+        auto tag = propertyElement.tagName();
+
+        if (tag == kVideoCodecTypeTag)
+            success = parseCodecList(options, &outCapabilities->codecs);
+        else if (tag == kVideoResolutionWidthTag)
+            success = parseIntegerList(options, &resolutionWidths);
+        else if (tag == kVideoResolutionHeightTag)
+            success = parseIntegerList(options, &resolutionHeights);
+        else if (tag == kFixedQualityTag)
+            success = parseIntegerList(options, &outCapabilities->quality);
+        else if (tag == kMaxFrameRateTag)
+            success = parseIntegerList(options, &outCapabilities->fps);
+
+        if (!success)
+            return false;
+    }
+
+    success = makeResolutionList(
+        resolutionWidths,
+        resolutionHeights,
+        &outCapabilities->resolutions);
+
+    return success;
+}
+
+bool parseCodecList(const QString& raw, std::set<AVCodecID>* outCodecs)
+{
+    NX_ASSERT(outCodecs, lit("Output codec set should be provided"));
+    if (!outCodecs)
+        return false;
+
+    auto split = raw.split(L',');
+    for (const auto& codecString : split)
+    {
+        auto itr = kCodecMap.find(codecString.trimmed());
+        if (itr == kCodecMap.end())
+            continue;
+
+        outCodecs->insert(itr->second);
+    }
+
+    return true;
+}
+
+bool parseIntegerList(const QString& raw, std::vector<int>* outIntegerList)
+{
+    NX_ASSERT(outIntegerList, lit("Output vector should be provided."));
+    if (!outIntegerList)
+        return false;
+
+    bool success = false;
+    auto split = raw.split(L',');
+
+    for (const auto& integerString : split)
+    {
+        int number = integerString.trimmed().toInt(&success);
+        if (!success)
+            return false;
+
+        outIntegerList->push_back(number);
+    }
+
+    return true;
+}
+
+bool makeResolutionList(
+    const std::vector<int>& widths,
+    const std::vector<int>& heights,
+    std::vector<QSize>* outResolutions)
+{
+    NX_ASSERT(outResolutions, lit("Output vector should be provided."));
+    if (!outResolutions)
+        return false;
+
+    if (widths.size() != heights.size())
+        return false;
+
+    for (auto i = 0; i < widths.size(); ++i)
+        outResolutions->emplace_back(widths[i], heights[i]);
+
+    std::sort(
+        outResolutions->begin(),
+        outResolutions->end(),
+        [](const QSize& f, const QSize& s) -> bool
+        {
+            auto fArea = f.width() * f.height();
+            auto sArea = s.width() * s.height();
+
+            if (fArea != sArea)
+                return fArea < sArea;
+
+            return f.width() < s.width();
+        });
+
+    return true;
+}
+
+bool parseChannelPropertiesResponse(nx::Buffer& response, ChannelProperties* outChannelProperties)
+{
+    NX_ASSERT(outChannelProperties, lit("Output channel properties should be provided."));
+    if (!outChannelProperties)
+        return false;
+
+    QDomDocument doc;
+    doc.setContent(response);
+
+    auto element = doc.documentElement();
+    if (element.isNull() || element.tagName() != kChannelRootElementTag)
+        return false;
+
+    return parseTransportElement(
+        element.firstChildElement(kTransportElementTag),
+        outChannelProperties);
+}
+
+bool parseTransportElement(
+    const QDomElement& transportElement,
+    ChannelProperties* outChannelProperties)
+{
+    if (transportElement.isNull())
+        return false;
+
+    auto rtspPortNumberElement = transportElement.firstChildElement(kRtspPortNumberTag);
+    if (rtspPortNumberElement.isNull())
+        return false;
+
+    bool success = false;
+    outChannelProperties->rtspPortNumber = rtspPortNumberElement.text().toInt(&success);
+
+    return success;
+}
+
+bool doGetRequest(const QUrl& url, const QAuthenticator& auth, nx::Buffer* outBuffer)
+{
+    NX_ASSERT(outBuffer, lit("Output buffer should be provided."));
+    if (!outBuffer)
+        return false;
+
+    nx_http::HttpClient httpClient;
+    if (!tuneHttpClient(&httpClient, auth))
+        return false;
+
+    if (!httpClient.doGet(url))
+        return false;
+
+    while (!httpClient.eof())
+        outBuffer->append(httpClient.fetchMessageBodyBuffer());
+
+    bool success = nx_http::StatusCode::isSuccessCode(
+        httpClient.response()->statusLine.statusCode);
+
+    if (!success)
+        return false;
+
+    return true;
+}
+
+bool doPutRequest(const QUrl& url, const QAuthenticator& auth, const nx::Buffer& buffer)
+{
+    nx_http::HttpClient httpClient;
+    if (!tuneHttpClient(&httpClient, auth))
+        return false;
+
+    if (!httpClient.doPut(url, kContentType.toUtf8(), buffer))
+        return false;
+
+    nx::Buffer responseBuffer;
+    while (!httpClient.eof())
+        responseBuffer.append(httpClient.fetchMessageBodyBuffer());
+
+    return responseIsOk(
+        parseCommonResponse(responseBuffer));
+}
+
+bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth)
+{
+    NX_ASSERT(outHttpClient, lit("Output http client should be provided."));
+    if (!outHttpClient)
+        return false;
+
+    outHttpClient->setSendTimeoutMs(kHttpTimeout.count());
+    outHttpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
+    outHttpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
+    outHttpClient->setUserName(auth.user());
+    outHttpClient->setUserPassword(auth.password());
+
+    return true;
+}
+
+QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber)
+{
+    auto hikvisionChannelNumber = QString::number(channelNumber + 1);
+    auto streamNumber = role == Qn::ConnectionRole::CR_LiveVideo
+        ? kPrimaryStreamNumber
+        : kSecondaryStreamNumber;
+
+    return hikvisionChannelNumber + streamNumber;
+}
+
+bool codecSupported(AVCodecID codecId, const ChannelCapabilities& channelCapabilities)
+{
+    return channelCapabilities.codecs.find(codecId) != channelCapabilities.codecs.end();
+}
+
+bool responseIsOk(const boost::optional<CommonResponse>& response)
+{
+    return response 
+        && response->statusCode == kStatusCodeOk;
+}
+
 } // namespace hikvision
 } // namespace plugins
+} // namespace mediaserver_core
 } // namespace nx
