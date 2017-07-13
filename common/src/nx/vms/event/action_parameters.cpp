@@ -1,6 +1,7 @@
 #include "action_parameters.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 namespace {
 const int kDefaultFixedDurationMs = 5000;
@@ -37,6 +38,11 @@ bool ActionParameters::isDefault() const
 {
     static ActionParameters empty;
     return (*this) == empty;
+}
+
+bool ActionParameters::requireConfirmation(EventType targetEventType) const
+{
+    return needConfirmation && isSourceCameraRequired(targetEventType);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

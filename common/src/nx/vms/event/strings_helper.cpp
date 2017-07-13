@@ -49,6 +49,7 @@ QString StringsHelper::actionName(ActionType value) const
         case showTextOverlayAction:   return tr("Show text overlay");
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
+        case acknowledgeAction:       return tr("Acknowledge");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(

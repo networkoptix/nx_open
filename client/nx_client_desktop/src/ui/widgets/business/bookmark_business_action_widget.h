@@ -26,8 +26,5 @@ private slots:
     void paramsChanged();
 
 private:
-    void updateUserSelectionControls();
-
-private:
     QScopedPointer<Ui::BookmarkBusinessActionWidget> ui;
 };

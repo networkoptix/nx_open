@@ -91,6 +91,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,
     (Qn::BookmarkName,          "name")
     (Qn::BookmarkStartTime,     "startTime")
     (Qn::BookmarkDuration,      "duration")
+    (Qn::BookmarkCreationTime,  "created")
+    (Qn::BookmarkCreator,       "creator")
     (Qn::BookmarkTags,          "tags")
     (Qn::BookmarkCameraName,    "cameraName")
 )

@@ -13,11 +13,14 @@ struct ActionParameters
     ActionParameters();
 
     /**
+      * Identifier of action which is used in show/hide popup action.
+      */
+    QnUuid actionId;
+
+    /**
       * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
       */
     bool needConfirmation = false;
-
-    ActionType targetActionType = undefinedAction;
 
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
@@ -50,6 +53,7 @@ struct ActionParameters
     int durationMs;
 
     // Generic additional resources List: Show On Alarm Layout - users
+    // With acknowledgeAction contains user that confirms popup.
     std::vector<QnUuid> additionalResources;
 
     // When set, signalizes that all users must be targeted by the action.
@@ -77,14 +81,20 @@ struct ActionParameters
      * \returns                        Whether all parameters have default values.
      */
     bool isDefault() const;
+
+    /**
+      * Checks if action requires confirmation according to specified target event type
+      * and needConfirmation field
+      */
+    bool requireConfirmation(EventType targetEventType) const;
 };
 
-#define ActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+#define ActionParameters_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
-    (playToClient)(contentType)
+    (playToClient)(contentType)(actionId)
 
-/* Backward compatibility is not really important here as this class is not stored in the DB. */
+/* Backward compatibility is not really important here as this class is stored in the DB as json. */
 QN_FUSION_DECLARE_FUNCTIONS(ActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 } // namespace event

@@ -6,6 +6,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
+#include <nx/vms/event/event_fwd.h>
 
 struct QnGetBookmarksRequestData: public QnMultiserverRequestData
 {
@@ -38,6 +39,9 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
 {
     QnUpdateBookmarkRequestData();
     QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark);
+    QnUpdateBookmarkRequestData(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::AbstractActionPtr& action);
 
     virtual void loadFromParams(QnResourcePool* resourcePool,
         const QnRequestParamList& params) override;
@@ -45,6 +49,8 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
     virtual bool isValid() const override;
 
     QnCameraBookmark bookmark;
+    QnUuid businessRuleId;
+    nx::vms::event::EventType eventType;
 };
 
 struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData
