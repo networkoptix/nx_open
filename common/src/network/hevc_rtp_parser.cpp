@@ -453,7 +453,7 @@ bool HevcParser::handlePaciPacket(
     const uint8_t* payload,
     int payloadLength)
 {
-    NX_LOGX("HEVC RTP packet handling is not implemented yet.", cl_logWARNING);
+    NX_LOGX("HEVC PACI RTP packet handling is not implemented yet.", cl_logWARNING);
     return false;
 }
 

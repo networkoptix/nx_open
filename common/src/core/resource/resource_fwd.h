@@ -224,5 +224,5 @@ class HikvisionResource;
 } // namespace mediaserver_core
 } // namespace nx
 
-typedef 
+typedef
 QnSharedResourcePointer<nx::mediaserver_core::plugins::HikvisionResource> QnHikvisionResourcePtr;

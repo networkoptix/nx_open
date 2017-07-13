@@ -12,7 +12,7 @@ namespace plugins {
 
 class VivotekResource: public QnPlOnvifResource
 {
-    using base_type = QnPlOnvifResource; 
+    using base_type = QnPlOnvifResource;
 
     struct StreamCodecCapabilities
     {

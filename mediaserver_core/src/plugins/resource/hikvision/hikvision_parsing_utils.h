@@ -68,7 +68,7 @@ struct ChannelCapabilities
     std::vector<int> quality;
 };
 
-// Intentionally use struct here just in case we need 
+// Intentionally use struct here just in case we need
 // some additional channel properties in the future.
 struct ChannelProperties
 {

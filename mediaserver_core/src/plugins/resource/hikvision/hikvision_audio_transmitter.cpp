@@ -172,9 +172,7 @@ bool HikvisionAudioTransmitter::closeChannel()
 
     auto response = hikvision::parseCommonResponse(messageBody);
 
-    if (!response 
-        || response->statusCode != hikvision::kStatusCodeOk 
-        || response->subStatusCode.toLower() != hikvision::kSubStatusCodeOk)
+    if (!response || !hikvision::responseIsOk(response.get()))
     {
         return false;
     }

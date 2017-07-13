@@ -38,7 +38,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
 
     fetchHevcSupport();
     auto hevcIsSupported = hasHevcSupport();
-    
+
     if (!hevcIsSupported || !hevcIsSupported.get())
         return CameraDiagnostics::NoErrorResult();
 
@@ -100,8 +100,8 @@ bool VivotekResource::streamSupportsHevc(Qn::ConnectionRole role) const
     if (m_streamCodecCapabilities.size() < role + 1)
         return false;
 
-    // Little hack here. Vivotek API can not report 
-    // presence of hevc support per stream. We consider the stream as HEVC one 
+    // Little hack here. Vivotek API can not report
+    // presence of hevc support per stream. We consider the stream as HEVC one
     // if it supports H264 and the device supports HEVC in general.
     return hasHevcSupport() && m_streamCodecCapabilities[streamIndex].h264;
 }
@@ -128,7 +128,7 @@ bool VivotekResource::parseStreamCodecCapabilities(
 {
     bool success = false;
     auto split = codecCapabilitiesString.split(L',');
-    
+
     for (const auto& streamCapabilities: split)
     {
         auto capsEncoded = streamCapabilities.trimmed().toUInt(&success);
@@ -202,7 +202,7 @@ boost::optional<QString> VivotekResource::getVivotekParameter(const QString& par
     auto query = QUrlQuery(param);
     url.setPath(kGetParameterPath);
     url.setQuery(query);
-    
+
     QString parameterName;
     QString parameterValue;
 
