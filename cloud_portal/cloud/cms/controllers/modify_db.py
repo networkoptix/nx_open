@@ -35,7 +35,7 @@ def notify_version_ready(version_id, product_name):
 		send(user.email, "review_version", {'id':version_id, 'product': product_name}, settings.CUSTOMIZATION)
 
 
-def save_unrevisioned_records(customization, language, data_structures, request_data, user):
+def save_unrevisioned_records(customization, language, data_structures, request_data, request_files, user):
 	for data_structure in data_structures:
 		data_structure_name = data_structure.name
 		
@@ -129,4 +129,4 @@ def handle_image_upload(image):
 	encoded_string = base64.b64encode(image.read())
 	newImage = Image.open(image)
 	width, height = newImage.size
-	return encoded_string
+	return encoded_string, {'width': width, 'height': height}

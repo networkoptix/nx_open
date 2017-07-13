@@ -61,25 +61,27 @@ def handle_get_view(request, context_id, language_code):
 def handle_post_context_edit_view(request, context_id, language_id):
 	context, language, form, customization, user = get_post_parameters(request, context_id, language_id)
 	request_data = request.data
+	request_files = request.FILES
 	preview_link = ""
+	encoded_image = None
 	
 	if 'languageChanged' in request_data:	
 		if 'currentLanguage' in request_data and request_data['currentLanguage']:
 			last_language = Language.objects.get(id=request_data['currentLanguage'])
-			save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, user)
+			save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, request_files, user)
 		messages.success(request._request, "Changes have been saved.")
 
 	elif 'Preview' in request_data:
-		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, request_files, user)
 		preview_link = generate_preview(context)
 		messages.success(request._request, "Changes have been saved. Preview has been created.")
 
 	elif 'SaveDraft' in request_data:
-		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, request_files, user)
 		messages.success(request._request, "Changes have been saved.")
 
 	elif 'SendReview' in request_data:
-		send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, user)
+		send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, request_files, user)
 		messages.success(request._request, "Changes have been saved. A new version has been created.")
 		return None, None, None, None
 
@@ -102,10 +104,8 @@ def context_edit_view(request, context=None, language=None):
 													   'title': 'Content Editor'})
 
 	else:
-		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
+		context, encoded_image, form, language, preview_link = handle_post_context_edit_view(request, context, language)
 		
-		image = request.FILES['image'] if 'image' in request.FILES else ""
-		encoded_image = handle_image_upload(image)
 
 		if 'SendReview' in request.data:
 			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
