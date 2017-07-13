@@ -929,10 +929,12 @@ void QnServerDb::getAndSerializeActions(
     while (actionsQuery.next())
     {
         int flags = 0;
-        vms::event::EventType eventType =
-            (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        if (eventType == vms::event::cameraMotionEvent ||
-            eventType == vms::event::cameraInputEvent)
+        const auto eventType = (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
+        const auto actionType = (vms::event::ActionType) actionsQuery.value(actionTypeIdx).toInt();
+        if (eventType == vms::event::cameraMotionEvent
+            || eventType == vms::event::cameraInputEvent
+            || actionType == vms::event::ActionType::bookmarkAction
+            || actionType == vms::event::ActionType::acknowledgeAction)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
