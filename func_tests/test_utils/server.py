@@ -214,7 +214,7 @@ class Server(object):
                 log.debug('Server is still offline...')
                 time.sleep(0.5)
         else:
-            raise RuntimeError('Server has not went online in %d seconds' % wait_time_sec)
+            raise RuntimeError('Server %s has not went online in %d seconds' % (self, wait_time_sec))
 
     def _is_server_online(self):
         try:
