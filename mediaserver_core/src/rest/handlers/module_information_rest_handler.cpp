@@ -122,7 +122,7 @@ void QnModuleInformationRestHandler::closeAllSockets()
     std::set<QSharedPointer<AbstractStreamSocket>> savedSockets;
     {
         QnMutexLocker lock(&m_mutex);
-        std::swap(savedSockets, m_savedSockets);
+        savedSockets = m_savedSockets;
     }
 
     NX_DEBUG(this, lm("Close all %1 sockets").arg(savedSockets.size()));
