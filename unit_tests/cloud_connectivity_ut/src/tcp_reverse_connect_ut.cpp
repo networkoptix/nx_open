@@ -38,7 +38,8 @@ protected:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server)
     {
-        auto serverSocket = std::make_unique<CloudServerSocket>(server->mediatorConnection());
+        auto serverSocket = std::make_unique<CloudServerSocket>(
+            &server->mediatorConnector());
         serverSocket->setSupportedConnectionMethods(hpm::api::ConnectionMethod::reverseConnect);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));

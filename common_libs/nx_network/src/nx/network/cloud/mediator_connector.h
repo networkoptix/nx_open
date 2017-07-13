@@ -18,7 +18,21 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+class NX_NETWORK_API AbstractMediatorConnector
+{
+public:
+    virtual ~AbstractMediatorConnector() = default;
+
+    /** Provides client related functionality. */
+    virtual std::unique_ptr<MediatorClientTcpConnection> clientConnection() = 0;
+    /** Provides server-related functionality. */
+    virtual std::unique_ptr<MediatorServerTcpConnection> systemConnection() = 0;
+    virtual boost::optional<SocketAddress> udpEndpoint() const = 0;
+    virtual bool isConnected() const = 0;
+};
+
 class NX_NETWORK_API MediatorConnector:
+    public AbstractMediatorConnector,
     public AbstractCloudSystemCredentialsProvider,
     public network::aio::BasicPollable
 {
@@ -35,10 +49,10 @@ public:
     void enable(bool waitComplete = false);
 
     /** Provides client related functionality */
-    std::unique_ptr<MediatorClientTcpConnection> clientConnection();
+    virtual std::unique_ptr<MediatorClientTcpConnection> clientConnection() override;
 
     /** Provides system related functionality */
-    std::unique_ptr<MediatorServerTcpConnection> systemConnection();
+    virtual std::unique_ptr<MediatorServerTcpConnection> systemConnection() override;
 
     /**
      * NOTE: Mediator url resolution will still happen by referring to specified address.
@@ -53,8 +67,8 @@ public:
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
 
-    boost::optional<SocketAddress> udpEndpoint() const;
-    bool isConnected() const;
+    virtual boost::optional<SocketAddress> udpEndpoint() const override;
+    virtual bool isConnected() const override;
 
     static void setStunClientSettings(stun::AbstractAsyncClient::Settings stunClientSettings);
 

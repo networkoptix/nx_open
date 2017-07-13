@@ -258,6 +258,11 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
     return promise.get_future().get();
 }
 
+hpm::api::MediatorConnector& MediaServerEmulator::mediatorConnector()
+{
+    return *m_mediatorConnector;
+}
+
 std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::mediatorConnection()
 {
     return m_mediatorConnector->systemConnection();

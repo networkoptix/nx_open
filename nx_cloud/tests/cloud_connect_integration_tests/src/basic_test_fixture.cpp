@@ -217,7 +217,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
 void BasicTestFixture::startHttpServer()
 {
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-        SocketGlobals::mediatorConnector().systemConnection());
+        &SocketGlobals::mediatorConnector());
 
     m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");

@@ -11,9 +11,11 @@ namespace cloud {
 namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
+    const SocketAddress& mediatorUdpEndpoint,
     std::list<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
+    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
     m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
@@ -46,10 +48,9 @@ void TunnelAcceptor::accept(AcceptHandler handler)
         [this, handler = std::move(handler)]() mutable
         {
             m_acceptHandler = std::move(handler);
-            NX_ASSERT(SocketGlobals::mediatorConnector().udpEndpoint());
             m_udpMediatorConnection = std::make_unique<
                 hpm::api::MediatorServerUdpConnection>(
-                    *SocketGlobals::mediatorConnector().udpEndpoint(),
+                    m_mediatorUdpEndpoint,
                     m_mediatorConnection->credentialsProvider());
 
             m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());
