@@ -23,18 +23,16 @@
         <div class="form-row">
             {{ field.label_tag }}
             {{ field }}
+            
             {% if field.help_text %}
             <p class="help">{{ field.help_text }}</p>
             {% endif %}
             
-            {% for image in images %}
-                {% if image.name == field.label %}
-                <div>
-                    <p>Image preview</p>
-                    <img style="width: 400px" src="data:image/png;base64,{{image.url}}">
-                </div>
-                {% endif %}
-            {% endfor %}
+            <div>
+                <p>Image preview</p>
+                <img style="width: 400px" src="data:image/png;base64,{{field.value}}"
+                     onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+            </div>
         </div>
     {% endfor %}
 

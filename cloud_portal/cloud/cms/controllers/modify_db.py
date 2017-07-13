@@ -155,12 +155,4 @@ def handle_image_upload(image):
 	newImage = Image.open(image)
 	width, height = newImage.size
 	return encoded_string, {'width': width, 'height': height}, False
-
-
-def get_preview_images(context):
-	images = []
-	data_structures_with_image = context.datastructure_set.filter(type=DataStructure.get_type("Image"))
-	for data_structure in data_structures_with_image:
-		images.append({'name': data_structure.name, 'url':data_structure.datarecord_set.latest('created_date')})
-
-	return images
+	
