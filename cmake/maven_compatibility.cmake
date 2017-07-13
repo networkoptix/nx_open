@@ -9,3 +9,4 @@ set(sigar.version ${sigar_version})
 
 set(qt.dir ${QT_DIR})
 set(root.dir ${CMAKE_SOURCE_DIR})
+set(customization.dir ${customization_dir})
