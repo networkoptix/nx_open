@@ -46,9 +46,6 @@
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
 
-#include <nx_ec/data/api_business_rule_data.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
 
@@ -486,19 +483,6 @@ int QnMediaServerConnection::getParamsAsync(
 
     return sendAsyncGetRequestLogged(GetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
-}
-
-int QnMediaServerConnection::broadcastAction(const nx::vms::event::AbstractActionPtr& action)
-{
-    ec2::ApiBusinessActionData data;
-    ec2::fromResourceToApi(action, data);
-
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "application/json");
-
-    return sendAsyncPostRequestLogged(ec2BroadcastAction,
-        std::move(headers), QnRequestParamList(), QJson::serialized(data),
-        nullptr, nullptr, nullptr);
 }
 
 int QnMediaServerConnection::setParamsAsync(
@@ -1127,11 +1111,11 @@ int QnMediaServerConnection::recordedTimePeriods(
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action,
+    const QnUuid& businessRuleId,
     QObject* target,
     const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark, action);
+    QnUpdateBookmarkRequestData request(bookmark, businessRuleId);
     request.format = Qn::SerializationFormat::UbjsonFormat;
 
     return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,

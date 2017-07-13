@@ -7,7 +7,6 @@
 #include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <nx/utils/singleton.h>
-#include <nx/vms/event/event_fwd.h>
 
 /** Singleton, used to create, update, delete, fetch and cache bookmarks. */
 class QnCameraBookmarksManager : public QObject, public Singleton<QnCameraBookmarksManager>
@@ -37,11 +36,11 @@ public:
     /// @brief                  Add the bookmark to the camera and stores record in event log
     ///                         for the specified event.
     /// @param bookmark         Target bookmark.
-    /// @param action           Action data for record in event log
+    /// @param businessRuleId   Business rule identifier for which bookmark is created
     /// @param callback         Callback with operation result.
     void addAcknowledge(
         const QnCameraBookmark &bookmark,
-        const nx::vms::event::AbstractActionPtr& action,
+        const QnUuid& businessRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.

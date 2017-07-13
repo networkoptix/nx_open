@@ -26,7 +26,7 @@ public:
     /** Check if entered data is valid. */
     bool isValid() const;
 
-    void setDescriptionMandatory();
+    void setDescriptionMandatory(bool mandatory);
 
 signals:
     bool validChanged();

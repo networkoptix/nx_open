@@ -44,7 +44,7 @@ public:
 
     void acknowledgeEvent(
         const QnCameraBookmark& bookmark,
-        const nx::vms::event::AbstractActionPtr& abstractAction,
+        const QnUuid& businessRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
@@ -129,7 +129,7 @@ private:
 
     void addCameraBookmarkInternal(
         const QnCameraBookmark& bookmark,
-        const nx::vms::event::AbstractActionPtr& action,
+        const QnUuid& businessRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
 private:

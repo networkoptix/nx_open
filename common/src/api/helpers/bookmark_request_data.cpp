@@ -10,10 +10,6 @@
 #include <nx/utils/string.h>
 
 #include <api/helpers/camera_id_helper.h>
-
-#include <nx_ec/data/api_business_rule_data.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
 namespace {
 
 static const QString kStartTimeParam = lit("startTime");
@@ -33,7 +29,7 @@ static const QString kDescriptionParam = lit("description");
 static const QString kTimeoutParam = lit("timeout");
 static const QString kDurationParam = lit("duration");
 static const QString kTagParam = lit("tag");
-static const QString kActionData = lit("actionData");
+static const QString kBusinessRuleIdParam = lit("actionData");
 
 static const qint64 kUsPerMs = 1000;
 
@@ -196,11 +192,11 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark&
 
 QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action)
+    const QnUuid& businessRuleId)
     :
     QnMultiserverRequestData(),
     bookmark(bookmark),
-    action(action)
+    businessRuleId(businessRuleId)
 {
 }
 
@@ -209,30 +205,19 @@ void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmark = bookmarkFromParams(params, resourcePool);
-    if (!params.contains(kActionData))
+    if (!params.contains(kBusinessRuleIdParam))
         return;
 
-    const auto actionDataValue = params.value(kActionData);
-    ec2::ApiBusinessActionData actionData;
-    if (!QJson::deserialize(actionDataValue, &actionData))
-        return;
-
-    ec2::fromApiToResource(actionData, action);
+    const auto stringRuleId = params.value(kBusinessRuleIdParam);
+    businessRuleId = QnLexical::deserialized<QnUuid>(stringRuleId);
 }
 
 QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    const auto bookmarkParams = bookmarksToParam(bookmark);
-    result.append(bookmarkParams);
-    if (!action || action->actionType() == nx::vms::event::ActionType::undefinedAction)
-        return result;
-
-    ec2::ApiBusinessActionData actionData;
-    ec2::fromResourceToApi(action, actionData);
-    result.insert(kActionData, QString::fromLatin1(QJson::serialized(actionData)));
-
+    result.append(bookmarksToParam(bookmark));
+    result.insert(kBusinessRuleIdParam, QnLexical::serialized(businessRuleId));
     return result;
 }
 

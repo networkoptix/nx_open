@@ -53,6 +53,7 @@ struct ActionParameters
     int durationMs;
 
     // Generic additional resources List: Show On Alarm Layout - users
+    // With acknowledgeAction contains user that confirms popup.
     std::vector<QnUuid> additionalResources;
 
     // When set, signalizes that all users must be targeted by the action.

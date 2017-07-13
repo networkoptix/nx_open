@@ -281,9 +281,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
             static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
             actionParams.durationMs = kDurationMs.count();
 
-            nx::client::desktop::ui::action::Parameters params;
-            params.setArgument(Qn::ActionDataRole, action);
-            menu()->trigger(action::AcknowledgeEventAction, params);
+            menu()->trigger(action::AcknowledgeEventAction, {Qn::ActionDataRole, action});
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);
@@ -834,8 +832,7 @@ void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const 
 
 void QnNotificationsCollectionWidget::cleanUpItem(QnNotificationWidget* item)
 {
-    if (m_list->containsItem(item))
-        m_list->removeItem(item);
+    m_list->removeItem(item);
 
     for (QnSystemHealth::MessageType messageType : m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);

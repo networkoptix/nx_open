@@ -116,8 +116,11 @@ void QnBookmarkWidget::updateTagsList() {
     update();
 }
 
-void QnBookmarkWidget::setDescriptionMandatory()
+void QnBookmarkWidget::setDescriptionMandatory(bool mandatory)
 {
-    const auto validator = Qn::defaultNonEmptyValidator(tr("Description cannot be empty"));
+    const auto validator = mandatory
+        ? Qn::defaultNonEmptyValidator(tr("Description cannot be empty"))
+        : Qn::TextValidateFunction();
+
     ui->descriptionTextEdit->setValidator(validator);
 }

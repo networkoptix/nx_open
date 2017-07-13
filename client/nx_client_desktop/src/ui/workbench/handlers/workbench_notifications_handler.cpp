@@ -36,6 +36,7 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <camera/camera_bookmarks_manager.h>
+#include <nx_ec/ec_api.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -45,37 +46,20 @@ namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
 
-QnCameraBookmarkList extractBookmarksFromAction(
+QnCameraBookmark extractBookmarkFromAction(
     const nx::vms::event::AbstractActionPtr& action,
     QnCommonModule* commonModule)
 {
-    QnCameraBookmarkList bookmarks;
     const auto resourcePool = commonModule->resourcePool();
-    const auto addBookmarkByResourceId =
-        [action, commonModule, resourcePool, &bookmarks](const QnUuid& resourceId)
-        {
-            const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(resourceId);
-            if (!camera)
-            {
-                NX_EXPECT(false, "Invalid camera resource");
-                return;
-            }
+    const auto cameraResourceId = action->getRuntimeParams().eventResourceId;
+    const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(cameraResourceId);
+    if (!camera)
+    {
+        NX_EXPECT(false, "Invalid camera resource");
+        return QnCameraBookmark();
+    }
 
-            const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule);
-            if (bookmark.isValid())
-                bookmarks.append(bookmark);
-            else
-                NX_EXPECT(false, "Invalid bookmark");
-        };
-
-    // Extracts bookmarks from action-specified resources.
-    for (const auto& resourceId: action->getResources())
-        addBookmarkByResourceId(resourceId);
-
-    // Extracts bookmark for single-camera event (show popup, for example).
-    addBookmarkByResourceId(action->getRuntimeParams().eventResourceId);
-
-    return bookmarks;
+    return helpers::bookmarkFromAction(action, camera, commonModule);
 }
 
 } // namespace
@@ -162,25 +146,19 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto businessAction =
         actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
-    auto bookmarks = extractBookmarksFromAction(businessAction, commonModule());
-    if (bookmarks.isEmpty())
-    {
-        NX_ASSERT(false, "No bookmarks for action");
+    auto bookmark = extractBookmarkFromAction(businessAction, commonModule());
+    if (!bookmark.isValid())
         return;
-    }
 
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(true, mainWindow()));
 
+    bookmarksDialog->loadData(bookmark);
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;
 
-    const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
-    const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
-
     const auto creationCallback =
-        [this, businessAction, repliesRemaining, anySuccessReply,
-            parentThreadId = QThread::currentThreadId()](bool success)
+        [this, businessAction, parentThreadId = QThread::currentThreadId()](bool success)
         {
             if (QThread::currentThreadId() != parentThreadId)
             {
@@ -188,37 +166,32 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
                 return;
             }
 
-            if (success)
-                *anySuccessReply = true;
-
-            auto& counter = *repliesRemaining;
-            if (--counter || !*anySuccessReply)
+            if (!success)
                 return;
 
             const auto action = CommonAction::createBroadcastAction(
-                ActionType::hidePopupAction, businessAction->getParams());
-            const auto server = commonModule()->currentServer();
-            if (server)
-                server->apiConnection()->broadcastAction(action);
+                ActionType::showPopupAction, businessAction->getParams());
+            action->setToggleState(nx::vms::event::EventState::inactive);
+
+            if (const auto connection = commonModule()->ec2Connection())
+            {
+                static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
+
+                const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
+                manager->broadcastBusinessAction(action, this, fakeHandler);
+            }
             emit notificationRemoved(businessAction);
         };
 
-    QnCameraBookmark baseBookmark;
-    bookmarksDialog->submitData(baseBookmark);
+    bookmarksDialog->submitData(bookmark);
 
-    const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
     const auto currentUserId = context()->user()->getId();
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    bookmark.creatorId = currentUserId;
+    bookmark.creationTimeStampMs = currentTimeMs;
 
-    for (auto& bookmark: bookmarks)
-    {
-        bookmark.name = baseBookmark.name;
-        bookmark.description = baseBookmark.description;
-        bookmark.tags = baseBookmark.tags;
-        bookmark.creatorId = currentUserId;
-        bookmark.creationTimeStampMs = currentTimeMs;
-        qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
-    }
+    qnCameraBookmarksManager->addAcknowledge(
+        bookmark, businessAction->getRuleId(), creationCallback);
 }
 
 void QnWorkbenchNotificationsHandler::clear()
@@ -478,16 +451,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     switch (action->actionType())
     {
-        case vms::event::hidePopupAction:
-            emit notificationRemoved(action);
-            break;
-        case vms::event::showPopupAction:
         case vms::event::showOnAlarmLayoutAction:
-        {
             addNotification(action);
             break;
-        }
-
         case vms::event::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
@@ -498,6 +464,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
+        case vms::event::showPopupAction: //< Fallthrough
         case vms::event::playSoundAction:
         {
             switch (action->getToggleState())

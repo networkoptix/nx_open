@@ -222,7 +222,7 @@ enum ActionType
         */
     execHttpRequestAction = 15,
 
-    hidePopupAction = 16
+    acknowledgeAction = 16
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

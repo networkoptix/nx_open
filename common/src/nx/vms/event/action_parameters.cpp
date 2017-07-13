@@ -42,7 +42,7 @@ bool ActionParameters::isDefault() const
 
 bool ActionParameters::requireConfirmation(EventType targetEventType) const
 {
-    return needConfirmation && isResourceRequired(targetEventType);
+    return needConfirmation && isSourceCameraRequired(targetEventType);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

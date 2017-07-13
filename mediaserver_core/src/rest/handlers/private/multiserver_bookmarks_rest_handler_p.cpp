@@ -19,6 +19,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/vms/event/actions/common_action.h>
 
 #include <utils/common/synctime.h>
 
@@ -260,12 +261,16 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     if (!qnServerDb->addBookmark(bookmark))
         return false;
 
-    const auto& action = context.request().action;
-    if (action && action->actionType() == nx::vms::event::ActionType::bookmarkAction)
-    {
-        action->setReceivedFromRemoteHost(false);
-        qnServerDb->saveActionToDB(action);
-    }
+    nx::vms::event::EventParameters runtimeParams;
+    runtimeParams.eventResourceId = bookmark.cameraId;
+    runtimeParams.eventTimestampUsec = bookmark.startTimeMs;
+
+    const auto action = nx::vms::event::CommonAction::create(
+        nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
+
+    action->getParams().additionalResources.push_back(authorityUser);
+
+    qnServerDb->saveActionToDB(action);
 
     return true;
 }

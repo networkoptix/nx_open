@@ -20,8 +20,7 @@ QnCameraBookmarkDialog::QnCameraBookmarkDialog(bool mandatoryDescription, QWidge
         this, &QnCameraBookmarkDialog::updateOkButtonAvailability);
     updateOkButtonAvailability();
 
-    if (mandatoryDescription)
-        ui->bookmarkWidget->setDescriptionMandatory();
+    ui->bookmarkWidget->setDescriptionMandatory(mandatoryDescription);
 }
 
 QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
