@@ -115,7 +115,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
     auto progressDialog = new QnProgressDialog(mainWindow());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->setCancelButton(nullptr);
-    progressDialog->setWindowTitle(tr("Connecting to the current system..."));
+    progressDialog->setWindowTitle(tr("Connecting to the current System..."));
     progressDialog->show();
 
     connect(m_connectTool, &QnConnectToCurrentSystemTool::finished,
