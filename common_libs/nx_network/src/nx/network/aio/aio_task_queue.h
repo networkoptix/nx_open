@@ -207,6 +207,10 @@ public:
     qint64 getSystemTimerVal() const;
 
     void addTask(SocketAddRemoveTask task);
+    bool taskExists(
+        Pollable* const sock,
+        aio::EventType eventType,
+        TaskType taskType) const;
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
     
     void processPollSetModificationQueue(TaskType taskFilter);

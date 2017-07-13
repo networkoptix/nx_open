@@ -40,6 +40,10 @@ void AIOThread::watchSocket(
 {
     QnMutexLocker lk(&m_taskQueue->mutex);
 
+    // TODO: #ak Make following check complexity constant-time.
+    if (m_taskQueue->taskExists(sock, eventToWatch, detail::TaskType::tAdding))
+        return;
+
     // Checking queue for reverse task for sock.
     if (m_taskQueue->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeoutMs.count()))
         return;    //< Ignoring task.
@@ -95,7 +99,9 @@ void AIOThread::removeFromWatch(
         return;    //< Ignoring task.
 
     void*& userData = sock->impl()->eventTypeToUserData[eventType];
-    NX_ASSERT(userData != NULL);   //< Socket is not polled. NX_ASSERT?
+    if (userData == nullptr)
+        return; //< Socket is not polled.
+
     std::shared_ptr<detail::AioEventHandlingData> handlingData = static_cast<detail::AioEventHandlingDataHolder*>(userData)->data;
     if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
         return;   // Socket already marked for removal.
