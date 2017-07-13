@@ -16,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -28,6 +29,7 @@
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/strings_helper.h>
@@ -42,6 +44,39 @@ using namespace nx::client::desktop::ui;
 namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
+
+QnCameraBookmarkList extractBookmarksFromAction(
+    const nx::vms::event::AbstractActionPtr& action,
+    QnCommonModule* commonModule)
+{
+    QnCameraBookmarkList bookmarks;
+    const auto resourcePool = commonModule->resourcePool();
+    const auto addBookmarkByResourceId =
+        [action, commonModule, resourcePool, &bookmarks](const QnUuid& resourceId)
+        {
+            const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(resourceId);
+            if (!camera)
+            {
+                NX_EXPECT(false, "Invalid camera resource");
+                return;
+            }
+
+            const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule);
+            if (bookmark.isValid())
+                bookmarks.append(bookmark);
+            else
+                NX_EXPECT(false, "Invalid bookmark");
+        };
+
+    // Extracts bookmarks from action-specified resources.
+    for (const auto& resourceId: action->getResources())
+        addBookmarkByResourceId(resourceId);
+
+    // Extracts bookmark for single-camera event (show popup, for example).
+    addBookmarkByResourceId(action->getRuntimeParams().eventResourceId);
+
+    return bookmarks;
+}
 
 } // namespace
 
@@ -127,13 +162,18 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto businessAction =
         actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
+    auto bookmarks = extractBookmarksFromAction(businessAction, commonModule());
+    if (bookmarks.isEmpty())
+    {
+        NX_ASSERT(false, "No bookmarks for action");
+        return;
+    }
+
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(businessAction, mainWindow()));
+        new QnCameraBookmarkDialog(true, mainWindow()));
 
     if (bookmarksDialog->exec() != QDialog::Accepted)
         return;
-
-    auto bookmarks = bookmarksDialog->bookmarks();
 
     const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
     const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
@@ -163,11 +203,18 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             emit notificationRemoved(businessAction);
         };
 
+    QnCameraBookmark baseBookmark;
+    bookmarksDialog->submitData(baseBookmark);
+
     const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
     const auto currentUserId = context()->user()->getId();
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+
     for (auto& bookmark: bookmarks)
     {
+        bookmark.name = baseBookmark.name;
+        bookmark.description = baseBookmark.description;
+        bookmark.tags = baseBookmark.tags;
         bookmark.creatorId = currentUserId;
         bookmark.creationTimeStampMs = currentTimeMs;
         qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);

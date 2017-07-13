@@ -166,7 +166,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.durationMs = period.durationMs;
     bookmark.cameraId = camera->getId();
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
@@ -203,7 +203,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
         return;
     }
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
