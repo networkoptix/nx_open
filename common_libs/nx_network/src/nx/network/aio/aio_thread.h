@@ -15,11 +15,7 @@ class Pollable;
 
 namespace aio {
 
-namespace detail {
-
-class AioTaskQueue;
-
-} // namespace detail
+namespace detail { class AioTaskQueue; }
 
 class NX_NETWORK_API AbstractAioThread
 {
@@ -47,7 +43,7 @@ public:
     virtual void pleaseStop();
     /**
      * Start monitoring socket sock for event eventToWatch and trigger eventHandler when event happens.
-     * @note MUST be called with mutex locked.
+     * NOTE: MUST be called with mutex locked.
      */
     void watchSocket(
         Pollable* const sock,
@@ -58,7 +54,7 @@ public:
     /**
      * Change timeout of existing polling sock for eventToWatch to timeoutMS. 
      *   eventHandler is changed also.
-     * @note If sock is not polled, undefined behaviour can occur
+     * NOTE: If sock is not polled, undefined behaviour can occur.
      */
     void changeSocketTimeout(
         Pollable* const sock,
@@ -72,9 +68,9 @@ public:
      * If eventTriggered is running and removeFromWatch called not from eventTriggered, 
      *   method blocks till eventTriggered had returned.
      * @param waitForRunningHandlerCompletion See comment to aio::AIOService::removeFromWatch.
-     * @note Calling this method with same parameters simultaneously from 
+     * NOTE: Calling this method with same parameters simultaneously from 
      *   multiple threads can cause undefined behavour.
-     * @note MUST be called with mutex locked.
+     * NOTE: MUST be called with mutex locked.
      */
     void removeFromWatch(
         Pollable* const sock,
@@ -103,7 +99,7 @@ protected:
     virtual void run();
 
 private:
-    detail::AioTaskQueue* m_impl;
+    std::unique_ptr<detail::AioTaskQueue> m_taskQueue;
 };
 
 } // namespace aio
