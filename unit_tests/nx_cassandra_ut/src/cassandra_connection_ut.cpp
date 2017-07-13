@@ -18,6 +18,8 @@ protected:
         float floatVal= 0.242;
         int32_t intVal = 11;
         int64_t int64Val = 32;
+        InetAddr inetVal{"17.3.90.11"};
+        Uuid uuidVal{"DC93190E-A24F-4057-93E1-E31EEA0129A6"};
     };
 
     friend bool operator == (const BasicStruct& lhs, const BasicStruct& rhs)
@@ -26,7 +28,9 @@ protected:
             && lhs.doubleVal == rhs.doubleVal
             && lhs.floatVal == rhs.floatVal
             && lhs.intVal == rhs.intVal
-            && lhs.int64Val == rhs.int64Val;
+            && lhs.int64Val == rhs.int64Val
+            && strcmp(lhs.inetVal.addrString.c_str(), rhs.inetVal.addrString.c_str()) == 0
+            && stricmp(lhs.uuidVal.uuidString.c_str(), rhs.uuidVal.uuidString.c_str()) == 0;
     }
 
     Connection(): m_connection(options()->host.c_str()) {}
@@ -98,7 +102,10 @@ protected:
                             float_val   float, \
                             int_val     int, \
                             int64_val   bigint, \
-                            PRIMARY KEY (string_val, bool_val, double_val, float_val, int_val) \
+                            inet_val    inet, \
+                            uuid_val    uuid, \
+                            PRIMARY KEY (string_val, bool_val, double_val, \
+                                float_val, int_val, int64_val, inet_val, uuid_val ) \
                         );");
                 });
     }
@@ -107,8 +114,9 @@ protected:
     {
         return m_connection.prepareQuery(
             "INSERT INTO test_space.test_table ( \
-                string_val, bool_val, double_val, float_val, int_val, int64_val ) \
-                VALUES (?, ?, ?, ?, ?, ?);")
+                string_val, bool_val, double_val, float_val, \
+                int_val, int64_val, inet_val, uuid_val ) \
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
             .then(
                 [this, key](cf::future<std::pair<CassError, Query>> prepareFuture)
                 {
@@ -121,6 +129,8 @@ protected:
                     bindValAndAssert(&prepareResult.second, "float_val", m_basicStruct.floatVal);
                     bindValAndAssert(&prepareResult.second, "int_val", m_basicStruct.intVal);
                     bindValAndAssert(&prepareResult.second, "int64_val", m_basicStruct.int64Val);
+                    bindValAndAssert(&prepareResult.second, "inet_val", m_basicStruct.inetVal);
+                    bindValAndAssert(&prepareResult.second, "uuid_val", m_basicStruct.uuidVal);
 
                     return m_connection.executeUpdate(std::move(prepareResult.second));
                 });
@@ -137,6 +147,8 @@ protected:
         getValAndAssert(queryResult, "float_val", &basicStruct->floatVal);
         getValAndAssert(queryResult, "int_val", &basicStruct->intVal);
         getValAndAssert(queryResult, "int64_val", &basicStruct->int64Val);
+        getValAndAssert(queryResult, "inet_val", &basicStruct->inetVal);
+        getValAndAssert(queryResult, "uuid_val", &basicStruct->uuidVal);
     }
 
     static void getRowValuesAndCheckIfValidByIndex(
@@ -150,6 +162,8 @@ protected:
         getValAndAssert(queryResult, 3, &basicStruct->floatVal);
         getValAndAssert(queryResult, 4, &basicStruct->intVal);
         getValAndAssert(queryResult, 5, &basicStruct->int64Val);
+        getValAndAssert(queryResult, 6, &basicStruct->inetVal);
+        getValAndAssert(queryResult, 7, &basicStruct->uuidVal);
     }
 
     template<typename GetRowFunc>

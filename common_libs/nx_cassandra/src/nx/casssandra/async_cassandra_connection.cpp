@@ -246,6 +246,38 @@ bool Query::bind(const std::string& key, int64_t value)
     NX_CASS_BIND_BASIC_VALUE(int64);
 }
 
+bool Query::bind(const std::string& key, const InetAddr& value)
+{
+    if (!m_statement)
+        return false;
+
+    CassInet inetValue;
+    cass_inet_from_string(value.addrString.c_str(), &inetValue);
+
+    auto result = cass_statement_bind_inet_by_name_n(
+        m_statement,
+        key.data(), key.size(),
+        inetValue);
+
+    return result == CASS_OK;
+}
+
+bool Query::bind(const std::string& key, const Uuid& value)
+{
+    if (!m_statement)
+        return false;
+
+    CassUuid uuidValue;
+    cass_uuid_from_string(value.uuidString.c_str(), &uuidValue);
+
+    auto result = cass_statement_bind_uuid_by_name_n(
+        m_statement,
+        key.data(), key.size(),
+        uuidValue);
+
+    return result == CASS_OK;
+}
+
 #undef NX_CASS_BIND_BASIC_VALUE
 
 /** ---------------------------------- QueryResult ----------------------------------------------*/
@@ -299,7 +331,7 @@ bool QueryResult::next()
 
 bool QueryResult::get(const std::string& key, std::string* value) const
 {
-    return getImpl(
+    return getStringImpl(
         [&key](const CassRow* row)
         {
             return cass_row_get_column_by_name_n(row, key.data(), key.size());
@@ -366,7 +398,7 @@ bool QueryResult::get(const std::string& key, int64_t* value) const
 
 bool QueryResult::get(int index, std::string* value) const
 {
-    return getImpl(
+    return getStringImpl(
         [index](const CassRow* row)
         {
             return cass_row_get_column(row, index);
@@ -398,6 +430,47 @@ bool QueryResult::get(int index, int64_t* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(int64);
 }
+
+bool QueryResult::get(const std::string& key, InetAddr* value) const
+{
+    return getInetImpl(
+        [&key](const CassRow* row)
+        {
+            return cass_row_get_column_by_name_n(row, key.data(), key.size());
+        },
+        value);
+}
+
+bool QueryResult::get(int index, InetAddr* value) const
+{
+    return getInetImpl(
+        [index](const CassRow* row)
+        {
+            return cass_row_get_column(row, index);
+        },
+        value);
+}
+
+bool QueryResult::get(const std::string& key, Uuid* value) const
+{
+    return getUuidImpl(
+        [&key](const CassRow* row)
+        {
+            return cass_row_get_column_by_name_n(row, key.data(), key.size());
+        },
+        value);
+}
+
+bool QueryResult::get(int index, Uuid* value) const
+{
+    return getUuidImpl(
+        [index](const CassRow* row)
+        {
+            return cass_row_get_column(row, index);
+        },
+        value);
+}
+
 
 #undef NX_CASS_GET_BASIC_VALUE_BY_NAME
 #undef NX_CASS_GET_BASIC_VALUE_BY_INDEX

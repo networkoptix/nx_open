@@ -9,6 +9,20 @@
 namespace nx {
 namespace cassandra {
 
+struct InetAddr
+{
+    std::string addrString;
+    InetAddr(const std::string& addrString): addrString(addrString) {}
+    InetAddr() = default;
+};
+
+struct Uuid
+{
+    std::string uuidString;
+    Uuid(const std::string& uuidString) : uuidString(uuidString) {}
+    Uuid() = default;
+};
+
 class NX_CASSANDRA_API Query
 {
 public:
@@ -30,6 +44,8 @@ public:
     bool bind(const std::string& key, float value);
     bool bind(const std::string& key, int32_t value);
     bool bind(const std::string& key, int64_t value);
+    bool bind(const std::string& key, const InetAddr& value);
+    bool bind(const std::string& key, const Uuid& value);
 
 private:
     const CassPrepared* m_prepared = nullptr;
@@ -58,6 +74,8 @@ public:
     bool get(const std::string& key, float* value) const;
     bool get(const std::string& key, int32_t* value) const;
     bool get(const std::string& key, int64_t* value) const;
+    bool get(const std::string& key, InetAddr* value) const;
+    bool get(const std::string& key, Uuid* value) const;
 
     bool get(int index, std::string* value) const;
     bool get(int index, bool* value) const;
@@ -65,6 +83,8 @@ public:
     bool get(int index, float* value) const;
     bool get(int index, int32_t* value) const;
     bool get(int index, int64_t* value) const;
+    bool get(int index, InetAddr* value) const;
+    bool get(int index, Uuid* value) const;
 
 private:
     const CassResult* m_result = nullptr;
@@ -73,7 +93,7 @@ private:
     CassRow* nextRow() const;
 
     template<typename GetIndexFunc>
-    bool getImpl(GetIndexFunc getIndexFunc, std::string* value) const
+    bool getStringImpl(GetIndexFunc getIndexFunc, std::string* value) const
     {
         if (!m_iterator)
             return false;
@@ -90,6 +110,50 @@ private:
         {
             value->resize(valSize);
             memcpy((void*)value->data(), val, valSize);
+        }
+
+        return result == CASS_OK;
+    }
+
+    template<typename GetIndexFunc>
+    bool getInetImpl(GetIndexFunc getIndexFunc, InetAddr* value) const
+    {
+        if (!m_iterator)
+            return false;
+
+        const CassRow* row = cass_iterator_get_row(m_iterator);
+        if (!row)
+            return false;
+
+        CassInet val;
+        auto result = cass_value_get_inet(getIndexFunc(row), &val);
+
+        if (result == CASS_OK)
+        {
+            value->addrString.resize(CASS_INET_STRING_LENGTH);
+            cass_inet_string(val, (char*)value->addrString.data());
+        }
+
+        return result == CASS_OK;
+    }
+
+    template<typename GetIndexFunc>
+    bool getUuidImpl(GetIndexFunc getIndexFunc, Uuid* value) const
+    {
+        if (!m_iterator)
+            return false;
+
+        const CassRow* row = cass_iterator_get_row(m_iterator);
+        if (!row)
+            return false;
+
+        CassUuid val;
+        auto result = cass_value_get_uuid(getIndexFunc(row), &val);
+
+        if (result == CASS_OK)
+        {
+            value->uuidString.resize(CASS_UUID_STRING_LENGTH);
+            cass_uuid_string(val, (char*)value->uuidString.data());
         }
 
         return result == CASS_OK;

@@ -1,4 +1,6 @@
 #include <memory>
+#include <vector>
+#include <utility>
 #include <gtest/gtest.h>
 #include <model/remote_relay_peer_pool.h>
 #include <nx/casssandra/async_cassandra_connection.h>
@@ -31,6 +33,20 @@ protected:
             m_relayPool->getConnection()->executeUpdate("DROP KEYSPACE cdb;").wait();
     }
 
+    virtual void SetUp() override
+    {
+        m_relayToDomainTestData.push_back(
+            std::make_pair("87C86E7B-3EAE-42F7-97FB-528FC1C0A25F", "someServer.nx.com"));
+        m_relayToDomainTestData.push_back(
+            std::make_pair("BFF1EA22-56F3-4433-92A3-B412B733282F", "someServer.nx.network.com"));
+        m_relayToDomainTestData.push_back(
+            std::make_pair("1160E08E-0893-4CDF-8551-F86919FEF853", "someServer2.nx.network.ru"));
+        m_relayToDomainTestData.push_back(
+            std::make_pair("3CB0A381-A6A1-4905-A1E9-E1CF743A7042", "someServer3.com"));
+        m_relayToDomainTestData.push_back(
+            std::make_pair("68094200-0598-46B9-AE5D-9F08DF45C062", "someServer4.nx.network.org"));
+    }
+
     void givenDbWithNotExistentCdbKeyspace() {}
 
     void givenDbWithExistentCdbKeyspace()
@@ -46,7 +62,8 @@ protected:
 
     void whenFivePeersHaveBeenAdded()
     {
-        ASSERT_TRUE(m_relayPool->addPeer("relay1", "someServer.nx.com").get());
+        for (const auto& relayToDomain: m_relayToDomainTestData)
+            ASSERT_TRUE(m_relayPool->addPeer(relayToDomain.second).get());
     }
 
     void assertSelectFromTablesResult(
@@ -73,12 +90,25 @@ protected:
                 }).wait();
     }
 
-    void thenAllOfThemCanBeQueried()
+    void thenAllRecordsExistAndSplitCorreclty()
     {
+        auto selectResult = m_relayPool->getConnection()->executeSelect(
+            "SELECT * from cdb.relay_peers;").get();
+
+        ASSERT_EQ(CASS_OK, selectResult.first);
+
+        int rowCount = 0;
+        while (selectResult.second.next())
+        {
+            ++rowCount;
+        }
+
+        ASSERT_EQ((int)m_relayToDomainTestData.size(), rowCount);
     }
 
 private:
     std::unique_ptr<TestRelayPool> m_relayPool;
+    std::vector<std::pair<std::string, std::string>> m_relayToDomainTestData;
 };
 
 TEST_F(RemoteRelayPeerPool, CreateDbStructure_NeededStructureDoesNotExist)
@@ -104,7 +134,7 @@ TEST_F(RemoteRelayPeerPool, addPeer)
     whenRelayPoolObjectHasBeenCreated();
 
     whenFivePeersHaveBeenAdded();
-    thenAllOfThemCanBeQueried();
+    thenAllRecordsExistAndSplitCorreclty();
 }
 
 
