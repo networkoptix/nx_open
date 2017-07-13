@@ -62,7 +62,7 @@ public:
     void watchSocket(
         Pollable* const sock,
         aio::EventType eventToWatch,
-        AIOEventHandler<Pollable>* const eventHandler,
+        AIOEventHandler* const eventHandler,
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
@@ -89,13 +89,13 @@ public:
     void registerTimer(
         Pollable* const sock,
         std::chrono::milliseconds timeoutMillis,
-        AIOEventHandler<Pollable>* const eventHandler );
+        AIOEventHandler* const eventHandler );
     
     void registerTimerNonSafe(
         QnMutexLockerBase* const locker,
         Pollable* const sock,
         std::chrono::milliseconds timeoutMillis,
-        AIOEventHandler<Pollable>* const eventHandler);
+        AIOEventHandler* const eventHandler);
 
     /**
      * @returns true, if socket is still listened for state changes.
@@ -138,7 +138,7 @@ public:
         QnMutexLockerBase* const lock,
         Pollable* const sock,
         aio::EventType eventToWatch,
-        AIOEventHandler<Pollable>* const eventHandler,
+        AIOEventHandler* const eventHandler,
         boost::optional<std::chrono::milliseconds> timeoutMillis
             = boost::optional<std::chrono::milliseconds>(),
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler
