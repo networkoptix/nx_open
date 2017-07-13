@@ -33,6 +33,19 @@ void AioTaskQueue::addTask(SocketAddRemoveTask task)
     m_pollSetModificationQueue.push_back(std::move(task));
 }
 
+bool AioTaskQueue::taskExists(
+    Pollable* const socket,
+    aio::EventType eventType,
+    TaskType taskType) const
+{
+    for (const auto& task: m_pollSetModificationQueue)
+    {
+        if (task.socket == socket && task.eventType == eventType && task.type == taskType)
+            return true;
+    }
+    return false;
+}
+
 void AioTaskQueue::postAsyncCall(
     Pollable* const pollable,
     nx::utils::MoveOnlyFunc<void()> func)
