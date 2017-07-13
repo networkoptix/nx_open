@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -13,7 +14,10 @@ from cloud import settings
 from .controllers.modify_db import *
 from .forms import *
 
+from PIL import Image
+
 from django.contrib.admin import AdminSite
+
 class MyAdminSite(AdminSite):
             pass
 mysite = MyAdminSite()
@@ -104,6 +108,12 @@ def context_edit_view(request, context=None, language=None):
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
 		
 		image = request.FILES['image'] if 'image' in request.FILES else ""
+		fs = FileSystemStorage()
+		filename = fs.save(image.name, image)
+		uploaded_file_url = fs.url(filename)
+		newImage = Image.open(uploaded_file_url)
+		width, height = newImage.size
+		print image.name, image.content_type, width, height
 
 		if 'SendReview' in request.data:
 			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
@@ -116,7 +126,7 @@ def context_edit_view(request, context=None, language=None):
 													   'has_permission': mysite.has_permission(request),
 													   'site_url': mysite.site_url,
 													   'title': 'Content Editor',
-													   'image':image})
+													   'image':uploaded_file_url})
 
 
 @api_view(["POST"])
