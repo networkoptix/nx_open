@@ -190,8 +190,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     bookmark.creatorId = currentUserId;
     bookmark.creationTimeStampMs = currentTimeMs;
 
-    qnCameraBookmarksManager->addAcknowledge(
-        bookmark, businessAction->getRuleId(), creationCallback);
+    qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction, creationCallback);
 }
 
 void QnWorkbenchNotificationsHandler::clear()

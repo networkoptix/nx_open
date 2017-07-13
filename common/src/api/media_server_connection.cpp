@@ -1111,11 +1111,11 @@ int QnMediaServerConnection::recordedTimePeriods(
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,
-    const QnUuid& businessRuleId,
+    const nx::vms::event::AbstractActionPtr& action,
     QObject* target,
     const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark, businessRuleId);
+    QnUpdateBookmarkRequestData request(bookmark, action);
     request.format = Qn::SerializationFormat::UbjsonFormat;
 
     return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,

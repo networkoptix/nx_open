@@ -208,20 +208,20 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(
     const QnCameraBookmark &bookmark,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, QnUuid(), callback);
+    addCameraBookmarkInternal(bookmark, nx::vms::event::AbstractActionPtr(), callback);
 }
 
 void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
     const QnCameraBookmark& bookmark,
-    const QnUuid& businessRuleId,
+    const nx::vms::event::AbstractActionPtr& action,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, businessRuleId, callback);
+    addCameraBookmarkInternal(bookmark, action, callback);
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     const QnCameraBookmark& bookmark,
-    const QnUuid& businessRuleId,
+    const nx::vms::event::AbstractActionPtr& action,
     OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
@@ -240,15 +240,15 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     }
 
     setEnabled(true); // Forcefully enable on modifying operation
-    const int handle = businessRuleId.isNull()
-        ? server->apiConnection()->addBookmarkAsync(
-            bookmark, this, SLOT(handleBookmarkOperation(int, int)))
-        : server->apiConnection()->acknowledgeEventAsync(
-            bookmark, businessRuleId, this, SLOT(handleBookmarkOperation(int, int)));
+    const int handle = action
+        ? server->apiConnection()->acknowledgeEventAsync(
+            bookmark, action, this, SLOT(handleBookmarkOperation(int, int)))
+        : server->apiConnection()->addBookmarkAsync(
+            bookmark, this, SLOT(handleBookmarkOperation(int, int)));
 
-    const auto operationType = businessRuleId.isNull()
-        ? OperationInfo::OperationType::Add
-        : OperationInfo::OperationType::Acknowledge;
+    const auto operationType = action
+        ? OperationInfo::OperationType::Acknowledge
+        : OperationInfo::OperationType::Add;
     m_operations[handle] = OperationInfo(operationType, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);

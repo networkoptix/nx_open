@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 #include <nx/utils/string.h>
+#include <nx/vms/event/actions/abstract_action.h>
 
 #include <api/helpers/camera_id_helper.h>
 namespace {
@@ -29,7 +30,8 @@ static const QString kDescriptionParam = lit("description");
 static const QString kTimeoutParam = lit("timeout");
 static const QString kDurationParam = lit("duration");
 static const QString kTagParam = lit("tag");
-static const QString kBusinessRuleIdParam = lit("actionData");
+static const QString kBusinessRuleIdParam = lit("rule_id");
+static const QString kEventTypeParam = lit("event_type");
 
 static const qint64 kUsPerMs = 1000;
 
@@ -192,11 +194,16 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark&
 
 QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(
     const QnCameraBookmark& bookmark,
-    const QnUuid& businessRuleId)
+    const nx::vms::event::AbstractActionPtr& action)
     :
     QnMultiserverRequestData(),
     bookmark(bookmark),
-    businessRuleId(businessRuleId)
+    businessRuleId(action
+        ? action->getRuleId()
+        : QnUuid()),
+    eventType(action
+        ? action->getRuntimeParams().eventType
+        : nx::vms::event::EventType::undefinedEvent)
 {
 }
 
@@ -205,11 +212,17 @@ void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmark = bookmarkFromParams(params, resourcePool);
-    if (!params.contains(kBusinessRuleIdParam))
-        return;
+    if (params.contains(kBusinessRuleIdParam))
+    {
+        const auto stringRuleId = params.value(kBusinessRuleIdParam);
+        businessRuleId = QnLexical::deserialized<QnUuid>(stringRuleId);
+    }
 
-    const auto stringRuleId = params.value(kBusinessRuleIdParam);
-    businessRuleId = QnLexical::deserialized<QnUuid>(stringRuleId);
+    if (params.contains(kEventTypeParam))
+    {
+        const auto stringEventType = params.value(kEventTypeParam);
+        eventType = QnLexical::deserialized<nx::vms::event::EventType>(stringEventType);
+    }
 }
 
 QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
@@ -218,6 +231,7 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
 
     result.append(bookmarksToParam(bookmark));
     result.insert(kBusinessRuleIdParam, QnLexical::serialized(businessRuleId));
+    result.insert(kEventTypeParam, QnLexical::serialized(eventType));
     return result;
 }
 

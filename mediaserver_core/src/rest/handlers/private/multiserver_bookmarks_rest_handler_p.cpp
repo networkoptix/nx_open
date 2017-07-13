@@ -266,7 +266,8 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     nx::vms::event::EventParameters runtimeParams;
     runtimeParams.eventResourceId = bookmark.cameraId;
-    runtimeParams.eventTimestampUsec = bookmark.startTimeMs;
+    runtimeParams.eventTimestampUsec = bookmark.startTimeMs * 1000;
+    runtimeParams.eventType = context.request().eventType;
 
     const auto action = nx::vms::event::CommonAction::create(
         nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
