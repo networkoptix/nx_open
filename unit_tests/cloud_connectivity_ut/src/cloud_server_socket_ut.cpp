@@ -295,6 +295,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto server = std::make_unique<CloudServerSocket>(
         &mediatorConnector,
         nx::network::RetryPolicy());
+    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
     server->moveToListeningState();
@@ -319,6 +320,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     ASSERT_EQ(1U, list.size());
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
     nx::utils::promise<SystemError::ErrorCode> result;
@@ -327,8 +329,6 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         [&](SystemError::ErrorCode c){ result.set_value(c); });
 
     ASSERT_EQ(SystemError::noError, result.get_future().get());
-    client->pleaseStopSync();
-    server->pleaseStopSync();
 }
 
 //-------------------------------------------------------------------------------------------------
