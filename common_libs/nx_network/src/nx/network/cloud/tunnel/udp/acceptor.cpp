@@ -15,9 +15,9 @@ TunnelAcceptor::TunnelAcceptor(
     std::list<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
-    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
+    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
     m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions),
     m_holePunchingEnabled(true)
