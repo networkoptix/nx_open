@@ -31,9 +31,10 @@ protected:
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
 private:
-    bool fetchChannelCapabilities(
+    CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,
         hikvision::ChannelCapabilities* outCapabilities);
+
     CameraDiagnostics::Result initialize2WayAudio();
     std::unique_ptr<nx_http::HttpClient> getHttpClient();
 

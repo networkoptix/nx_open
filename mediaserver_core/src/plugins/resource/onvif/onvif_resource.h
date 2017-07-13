@@ -349,6 +349,8 @@ private:
     bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
+    bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc

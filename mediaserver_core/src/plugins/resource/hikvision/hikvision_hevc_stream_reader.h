@@ -49,7 +49,8 @@ private:
         int inputScaleSize,
         int inputQualityIndex) const;
 
-    bool fetchChannelProperties(hikvision::ChannelProperties* outChannelProperties) const;
+    CameraDiagnostics::Result fetchChannelProperties(
+        hikvision::ChannelProperties* outChannelProperties) const;
 
     CameraDiagnostics::Result configureChannel(
         QSize resolution,

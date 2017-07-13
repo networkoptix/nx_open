@@ -155,8 +155,6 @@ boost::optional<CommonResponse> parseCommonResponse(nx_http::StringType message)
 {
     CommonResponse response;
     QDomDocument doc;
-    bool status;
-
     doc.setContent(message);
 
     auto element = doc.documentElement();
@@ -361,8 +359,15 @@ bool parseTransportElement(
     return success;
 }
 
-bool doGetRequest(const QUrl& url, const QAuthenticator& auth, nx::Buffer* outBuffer)
+bool doGetRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    nx::Buffer* outBuffer,
+    nx_http::StatusCode::Value* outStatusCode)
 {
+    if (outStatusCode)
+        *outStatusCode = nx_http::StatusCode::Value::undefined;
+
     NX_ASSERT(outBuffer, lit("Output buffer should be provided."));
     if (!outBuffer)
         return false;
@@ -377,17 +382,24 @@ bool doGetRequest(const QUrl& url, const QAuthenticator& auth, nx::Buffer* outBu
     while (!httpClient.eof())
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
-    bool success = nx_http::StatusCode::isSuccessCode(
-        httpClient.response()->statusLine.statusCode);
+    nx_http::StatusCode::Value statusCode = (nx_http::StatusCode::Value)httpClient.response()
+        ->statusLine.statusCode;
 
-    if (!success)
-        return false;
+    if (outStatusCode)
+        *outStatusCode = statusCode;
 
-    return true;
+    return nx_http::StatusCode::isSuccessCode(statusCode);
 }
 
-bool doPutRequest(const QUrl& url, const QAuthenticator& auth, const nx::Buffer& buffer)
+bool doPutRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    const nx::Buffer& buffer,
+    nx_http::StatusCode::Value* outStatusCode)
 {
+    if (outStatusCode)
+        *outStatusCode = nx_http::StatusCode::undefined;
+
     nx_http::HttpClient httpClient;
     if (!tuneHttpClient(&httpClient, auth))
         return false;
@@ -399,8 +411,14 @@ bool doPutRequest(const QUrl& url, const QAuthenticator& auth, const nx::Buffer&
     while (!httpClient.eof())
         responseBuffer.append(httpClient.fetchMessageBodyBuffer());
 
-    return responseIsOk(
-        parseCommonResponse(responseBuffer));
+    nx_http::StatusCode::Value statusCode = (nx_http::StatusCode::Value)httpClient.response()
+        ->statusLine.statusCode;
+
+    if (outStatusCode)
+        *outStatusCode = statusCode;
+
+    return responseIsOk(parseCommonResponse(responseBuffer))
+        && nx_http::StatusCode::isSuccessCode(statusCode);
 }
 
 bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth)

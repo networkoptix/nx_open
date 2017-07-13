@@ -135,9 +135,17 @@ bool parseTransportElement(
     const QDomElement& transportElement,
     ChannelProperties* outChannelProperties);
 
-bool doGetRequest(const QUrl& url, const QAuthenticator& auth, nx::Buffer* outBuffer);
+bool doGetRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    nx::Buffer* outBuffer,
+    nx_http::StatusCode::Value* outStatusCode = nullptr);
 
-bool doPutRequest(const QUrl& url, const QAuthenticator& auth, const nx::Buffer& buffer);
+bool doPutRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    const nx::Buffer& buffer,
+    nx_http::StatusCode::Value* outStatusCode = nullptr);
 
 bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth);
 

@@ -565,13 +565,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     DeviceSoapWrapper* soapWrapper = nullptr;
 
     auto result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
-    if(!result)
+    if(!checkResultAndSetStatus(result))
         return result;
 
     std::unique_ptr<DeviceSoapWrapper> guard(soapWrapper);
 
     result = initializeMedia(capabilitiesResponse);
-    if (!result)
+    if (!checkResultAndSetStatus(result))
         return result;
 
     if (m_appStopping)
@@ -593,7 +593,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     result = customInitialization(capabilitiesResponse);
-    if (!result)
+    if (!checkResultAndSetStatus(result))
         return result;
 
     saveParams();
@@ -2006,6 +2006,15 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
     else {
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getProfiles"), soapWrapper.getLastError());
     }
+}
+
+bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result& result)
+{
+    bool notAuthorized = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised;
+    if (notAuthorized && getStatus() != Qn::Unauthorized)
+        setStatus(Qn::Unauthorized);
+        
+    return !!result;
 }
 
 bool QnPlOnvifResource::trustMaxFPS()

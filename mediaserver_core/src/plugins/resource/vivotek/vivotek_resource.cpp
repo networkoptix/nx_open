@@ -5,6 +5,10 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -34,6 +38,12 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
 {
     auto result = base_type::initializeMedia(onvifCapabilities);
     if (!result)
+        return result;
+
+    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+
+    if (hevcIsDisabled)
         return result;
 
     fetchHevcSupport();

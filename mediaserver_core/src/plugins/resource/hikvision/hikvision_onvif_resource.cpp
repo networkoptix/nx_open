@@ -9,6 +9,9 @@
 
 #include <boost/optional.hpp>
 #include <utils/camera/camera_diagnostics.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
 
 namespace {
 
@@ -67,21 +70,24 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    bool hasHevcSupport = false;
-    for (const auto& role : kRoles)
-    {
-        hikvision::ChannelCapabilities channelCapabilities;
-        if (!fetchChannelCapabilities(role, &channelCapabilities))
-        {
-            return CameraDiagnostics::RequestFailedResult(
-                lit("Fetch channel capabilities"),
-                lit("Request failed"));
-        }
+    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
-        m_channelCapabilitiesByRole[role] = channelCapabilities;
-        m_hevcSupported = hikvision::codecSupported(
-            AV_CODEC_ID_HEVC,
-            channelCapabilities);
+    if (!hevcIsDisabled)
+    {
+        bool hasHevcSupport = false;
+        for (const auto& role : kRoles)
+        {
+            hikvision::ChannelCapabilities channelCapabilities;
+            auto result = fetchChannelCapabilities(role, &channelCapabilities);
+            if (!result)
+                return result;
+
+            m_channelCapabilitiesByRole[role] = channelCapabilities;
+            m_hevcSupported = hikvision::codecSupported(
+                AV_CODEC_ID_HEVC,
+                channelCapabilities);
+        }
     }
 
     if (!m_hevcSupported)
@@ -102,7 +108,7 @@ std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
     return std::move(httpClient);
 }
 
-bool HikvisionResource::fetchChannelCapabilities(
+CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     Qn::ConnectionRole role,
     ChannelCapabilities* outCapabilities)
 {
@@ -111,10 +117,25 @@ bool HikvisionResource::fetchChannelCapabilities(
         buildChannelNumber(role, getChannel())));
 
     nx::Buffer response;
-    if (!doGetRequest(url, getAuth(), &response))
-        return false;
+    nx_http::StatusCode::Value statusCode;
+    if (!doGetRequest(url, getAuth(), &response, &statusCode))
+    {
+        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
-    return parseChannelCapabilitiesResponse(response, outCapabilities);
+        return CameraDiagnostics::RequestFailedResult(
+            lit("Fetch channel capabilities"),
+            lit("Request failed"));
+    }
+
+    if (!parseChannelCapabilitiesResponse(response, outCapabilities))
+    {
+        return CameraDiagnostics::CameraResponseParseErrorResult(
+            url.toString(),
+            lit("Fetch camera capabilities"));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
