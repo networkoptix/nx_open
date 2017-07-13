@@ -36,6 +36,7 @@ LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
+CLIENT_MEDIASERVICE_PATH=$CLIENT_BIN_PATH/mediaservice
 CLIENT_AUDIO_PATH=$CLIENT_BIN_PATH/audio
 CLIENT_XCBGLINTEGRATIONS_PATH=$CLIENT_BIN_PATH/xcbglintegrations
 CLIENT_PLATFORMINPUTCONTEXTS_PATH=$CLIENT_BIN_PATH/platforminputcontexts
@@ -52,6 +53,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/imageformats
+mkdir -p $BINSTAGE/mediaservice
 mkdir -p $BINSTAGE/audio
 mkdir -p $BINSTAGE/platforminputcontexts
 mkdir -p $HELPSTAGE
@@ -85,10 +87,11 @@ cp -r "$CLIENT_BIN_PATH/fonts" "$BINSTAGE"
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
 
-# Copy libraries, imageformats
+# Copy libraries, imageformats, mediaservice
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
+cp -r $CLIENT_MEDIASERVICE_PATH/*.* $BINSTAGE/mediaservice
 cp -r $CLIENT_XCBGLINTEGRATIONS_PATH $BINSTAGE
 cp -r $CLIENT_QML_PATH $BINSTAGE
 if [ '${arch}' != 'arm' ]; then cp -r $CLIENT_AUDIO_PATH/*.* $BINSTAGE/audio; fi
@@ -111,7 +114,7 @@ do
 done
 
 if [ '${arch}' != 'arm' ]
-then 
+then
     cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
     cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
     cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
@@ -131,7 +134,7 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
-for f in $(ls debian); do 
+for f in $(ls debian); do
     if [ $f != 'control.template' ]; then install -m 755 debian/$f $STAGE/DEBIAN; fi
 done
 

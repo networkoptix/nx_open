@@ -13,6 +13,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -40,6 +41,7 @@
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -164,11 +166,14 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.durationMs = period.durationMs;
     bookmark.cameraId = camera->getId();
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
+
+    bookmark.creatorId = context()->user()->getId();
+    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
     dialog->submitData(bookmark);
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
@@ -198,7 +203,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
         return;
     }
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())

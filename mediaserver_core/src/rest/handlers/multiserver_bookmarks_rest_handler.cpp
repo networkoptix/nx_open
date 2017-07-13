@@ -69,6 +69,7 @@ static int performAddOrUpdate(
     QnBookmarkOperation op,
     int ownerPort,
     const QnRequestParamList& params,
+    const QnUuid& authoredUserId,
     QByteArray* outBody,
     QByteArray* outContentType)
 {
@@ -83,8 +84,8 @@ static int performAddOrUpdate(
     }
 
     QnUpdateBookmarkRequestContext context(request, ownerPort);
-    bool ok = (op == QnBookmarkOperation::Add)
-        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(commonModule, context)
+    bool ok = (op == QnBookmarkOperation::Add || op == QnBookmarkOperation::Acknowledge)
+        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(commonModule, context, authoredUserId)
         : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(commonModule, context);
     if (!ok)
     {
@@ -207,7 +208,12 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     {
         case QnBookmarkOperation::Add:
         case QnBookmarkOperation::Update:
-            return performAddOrUpdate(commonModule, op, ownerPort, params, &result, &contentType);
+        case QnBookmarkOperation::Acknowledge:
+        {
+            const auto authoredUserId = processor->accessRights().userId;
+            return performAddOrUpdate(commonModule, op, ownerPort, params, authoredUserId,
+                &result, &contentType);
+        }
 
         case QnBookmarkOperation::Delete:
             return performDelete(commonModule, ownerPort, params, &result, &contentType);

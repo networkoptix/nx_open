@@ -364,7 +364,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
             : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
     }
 
-    return tr("Send Email to %1").arg(receivers.join(QLatin1String("; ")));
+    return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 }
 
 QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)

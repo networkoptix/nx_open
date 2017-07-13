@@ -61,7 +61,7 @@ private:
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
 
     void handleShowPopupAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
+        const nx::vms::event::AbstractActionPtr& action,
         QnNotificationWidget* widget);
 
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
@@ -92,6 +92,7 @@ private:
     QIcon iconForAction(const nx::vms::event::AbstractActionPtr& action) const;
 
     void cleanUpItem(QnNotificationWidget* item);
+
 private:
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
@@ -101,6 +102,7 @@ private:
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByEventRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

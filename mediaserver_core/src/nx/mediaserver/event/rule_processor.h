@@ -172,8 +172,6 @@ private:
     void doProxyAction(const vms::event::AbstractActionPtr& action, const QnResourcePtr& res);
     void doExecuteAction(const vms::event::AbstractActionPtr& action, const QnResourcePtr& res);
 
-    bool handleBookmarkAction(const vms::event::AbstractActionPtr& action);
-
     bool updateProlongedActionStartTime(const vms::event::AbstractActionPtr& action);
     bool popProlongedActionStartTime(
         const vms::event::AbstractActionPtr& action,

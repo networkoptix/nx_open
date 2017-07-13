@@ -156,7 +156,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    QnBusinessTypesComparator lexComparator;
+    QnBusinessTypesComparator lexComparator(true);
     for (vms::event::EventType eventType : lexComparator.lexSortedEvents())
     {
         QStandardItem *item = new QStandardItem(m_helper->eventName(eventType));
