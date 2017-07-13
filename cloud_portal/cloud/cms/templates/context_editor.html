@@ -14,6 +14,7 @@
     <div> Link to Page: <a href="{{context.url}}">{{ context.url }}</a></div>
     {% endif %}
 </fieldset>
+
 <form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
     <input type="hidden" name="currentLanguage" value="{{ language.id }}">
     <input type="hidden" id="languageChanged">
@@ -25,6 +26,15 @@
             {% if field.help_text %}
             <p class="help">{{ field.help_text }}</p>
             {% endif %}
+            
+            {% for image in images %}
+                {% if image.name == field.label %}
+                <div>
+                    <p>Image preview</p>
+                    <img style="width: 400px" src="data:image/png;base64,{{image.url}}">
+                </div>
+                {% endif %}
+            {% endfor %}
         </div>
     {% endfor %}
 

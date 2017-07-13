@@ -117,8 +117,11 @@ def handle_post_context_edit_view(request, context_id, language_id):
 def context_edit_view(request, context=None, language=None):
 	if request.method == "GET":
 		context, form, language = handle_get_view(request, context, language)
+		images = get_preview_images(context)
+		
 		return render(request, 'context_editor.html', {'context': context,
 													   'form': form,
+													   'images': images,
 													   'language': language,
 													   'user': request.user,
 													   'has_permission': mysite.has_permission(request),
@@ -127,13 +130,14 @@ def context_edit_view(request, context=None, language=None):
 
 	else:
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
-		
+		images = get_preview_images(context)
 
 		if 'SendReview' in request.data:
 			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
 		return render(request, 'context_editor.html', {'context': context,
 													   'form': form,
+													   'images': images,
 													   'language': language,
 													   'preview_link': preview_link,
 													   'user': request.user,
