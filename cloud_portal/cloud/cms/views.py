@@ -19,8 +19,8 @@ class MyAdminSite(AdminSite):
 mysite = MyAdminSite()
 
 def get_post_parameters(request, context_id, language_id):
-	context, language = get_context_and_language(request.data, context_id, language_id)
-	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
+	customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+	context, language = get_context_and_language(request.data, context_id, language_id)	
 	user = Account.objects.get(email=request.user)
 
 	if not language and 'language' in request.session:
@@ -36,6 +36,7 @@ def get_post_parameters(request, context_id, language_id):
 
 def handle_get_view(request, context_id, language_code):
 	context, language, = None, None
+	customization = Customization.objects.get(name=settings.CUSTOMIZATION)
 	if context_id:
 		context = Context.objects.get(id=context_id)
 	
@@ -46,13 +47,13 @@ def handle_get_view(request, context_id, language_code):
 		language = Language.objects.get(code=request.session['language'])
 
 	else:
-		language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+		language = customization.default_language
 
 	language_id = language.id
 
 	form = CustomContextForm(initial={'language': language_id})
 	if context:
-		form.add_fields(context, language)
+		form.add_fields(context, customization, language)
 
 	return context, form, language
 	
@@ -82,7 +83,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 		messages.success(request._request, "Changes have been saved. A new version has been created.")
 		return None, None, None, None
 
-	form.add_fields(context, language)
+	form.add_fields(context, customization, language)
 
 	return context, form, language, preview_link
 
@@ -125,7 +126,8 @@ def review_version_request(request, context=None, language=None):
 		preview_link = generate_preview()
 		return redirect(preview_link)
 	elif "Publish" in request.data:
-		publish_latest_version(request.user)
+		customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+		publish_latest_version(customization, request.user)
 		version = ContentVersion.objects.latest('created_date')
 		contexts = get_records_for_version(version)
 		messages.success(request._request, "Version " + str(version.id) +" has been published")

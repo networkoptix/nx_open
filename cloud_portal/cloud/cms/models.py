@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
 
+from django.template.defaultfilters import truncatechars
+
 
 # CMS structure (data structure). Only developers can change that
 
@@ -102,6 +104,11 @@ class DataRecord(models.Model):
 
     def __str__(self):
         return self.value
+
+    #added for images base64 encoding makes the field really long
+    @property
+    def short_description(self):
+        return truncatechars(self.value, 100)
 
 
 class Blank(models.Model):

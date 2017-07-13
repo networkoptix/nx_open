@@ -19,15 +19,15 @@ def get_context_and_language(request_data, context_id, language_id):
 	return context, language
 
 
-def accept_latest_draft(user):
-	unaccepted_version = ContentVersion.objects.filter(accepted_date=None).latest('created_date')
+def accept_latest_draft(customization, user):
+	unaccepted_version = ContentVersion.objects.filter(accepted_date=None, customization=customization).latest('created_date')
 	unaccepted_version.accepted_by = user
 	unaccepted_version.accepted_date = datetime.now()
 	unaccepted_version.save()
 
 
-def notify_version_ready(version_id, product_name):
-	super_users = Account.objects.filter(is_superuser=1)
+def notify_version_ready(customization, version_id, product_name):
+	super_users = Account.objects.filter(customization=customization, is_superuser=1)
 	for user in super_users:
 		send(user.email, "review_version", {'id':version_id, 'product': product_name}, settings.CUSTOMIZATION)
 
@@ -79,8 +79,8 @@ def generate_preview(context=None):
 	return '/' + context.url + "?preview" if context else "/?preview"
 
 
-def publish_latest_version(user):
-	accept_latest_draft(user)
+def publish_latest_version(customization, user):
+	accept_latest_draft(customization, user)
 	fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
 
 
@@ -99,7 +99,7 @@ def send_version_for_review(customization, language, data_structures, product, r
 
 	alter_records_version(Context.objects.filter(product=product), customization, None, version)
 	#TODO add notification need to make template for this
-	notify_version_ready(version.id, product.name)
+	notify_version_ready(customization, version.id, product.name)
 
 def get_records_for_version(version):
 	data_records = version.datarecord_set.all().order_by('data_structure__context__name',
