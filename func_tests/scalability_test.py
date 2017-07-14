@@ -190,19 +190,16 @@ def create_test_data_on_server((config, server, index)):
 
 
 def create_test_data(config, servers):
-    start_time = utils.datetime_utc_now()
     server_tupples = [(config, server, i)
                       for i, server in enumerate(servers)]
     pool = ThreadPool(len(servers))
     pool.map(create_test_data_on_server, server_tupples)
     pool.close()
     pool.join()
-    return utils.datetime_utc_now() - start_time
 
 
 def test_scalability(metrics_saver, config, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
-    populate_duration = create_test_data(config, servers)
-    metrics_saver.save('populate_duration', populate_duration)
+    create_test_data(config, servers)
     merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
     metrics_saver.save('merge_duration', merge_duration)
