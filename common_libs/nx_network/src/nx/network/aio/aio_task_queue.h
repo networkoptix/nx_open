@@ -207,13 +207,17 @@ public:
     qint64 getSystemTimerVal() const;
 
     void addTask(SocketAddRemoveTask task);
+    bool taskExists(
+        Pollable* const sock,
+        aio::EventType eventType,
+        TaskType taskType) const;
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
     
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
     /**
-     * This method introduced for optimization: if we fast call watchSocket then removeSocket 
+     * This method introduced for optimization: if we fast call startMonitoring then removeSocket 
      * (socket has not been added to pollset yet), then removeSocket can just cancel 
      * "add socket to pollset" task. And vice versa.
      * @return true if reverse task has been cancelled and socket 
