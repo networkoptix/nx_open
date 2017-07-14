@@ -557,7 +557,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
-        .text(ContextMenu::tr("Bookmark Search..."))
+        .text(ContextMenu::tr("Bookmark Log..."))
         .shortcut(lit("Ctrl+B"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
