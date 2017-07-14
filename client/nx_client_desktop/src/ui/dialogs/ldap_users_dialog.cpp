@@ -173,7 +173,9 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
             return user->isLdap();
         });
 
-    for (const QnLdapUser &ldapUser : users)
+    QnUserResourceList modifiedUsers;
+
+    for (const auto& ldapUser: users)
     {
         auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(),
             [ldapUser](const QnUserResourcePtr &user)
@@ -188,12 +190,11 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
         if (existingUser->getEmail() == ldapUser.email)
             continue;
 
-        qnResourcesChangesManager->saveUser(existingUser,
-            [ldapUser](const QnUserResourcePtr &user)
-            {
-                user->setEmail(ldapUser.email);
-            });
+        existingUser->setEmail(ldapUser.email);
+        modifiedUsers.push_back(existingUser);
     }
+
+    qnResourcesChangesManager->saveUsers(modifiedUsers);
 }
 
 void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
@@ -213,7 +214,8 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
     const QnUuid selectedUserRoleId = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 
-    for (const QnLdapUser& ldapUser: filteredUsers)
+    QnUserResourceList addedUsers;
+    for (const auto& ldapUser: filteredUsers)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
@@ -224,9 +226,9 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
             user->setUserRoleId(selectedUserRoleId);
         else
             user->setRawPermissions(permissions);
-
-        qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
+        addedUsers.push_back(user);
     }
+    qnResourcesChangesManager->saveUsers(addedUsers);
 }
 
 QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const

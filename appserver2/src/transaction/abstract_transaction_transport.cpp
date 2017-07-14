@@ -20,6 +20,7 @@ static bool skipTransactionForMobileClient(ApiCommand::Value command)
         case ApiCommand::saveCamera:
         case ApiCommand::saveMediaServer:
         case ApiCommand::saveUser:
+        case ApiCommand::saveUsers:
         case ApiCommand::saveLayout:
         case ApiCommand::setResourceStatus:
         case ApiCommand::setResourceParam:

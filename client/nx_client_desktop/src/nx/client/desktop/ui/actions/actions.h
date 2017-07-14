@@ -968,6 +968,8 @@ enum IDType
      */
     RemoveBookmarksAction,
 
+    AcknowledgeEventAction,
+
     /**
      * Opens new layout for Quick Search.
      *

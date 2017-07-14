@@ -49,7 +49,7 @@ public:
         m_sortCol(DateTimeColumn),
         m_sortOrder(Qt::DescendingOrder),
         m_size(0),
-        m_lexComparator(new QnBusinessTypesComparator())
+        m_lexComparator(new QnBusinessTypesComparator(false))
     {
     }
 

@@ -39,7 +39,7 @@ QString StringsHelper::actionName(ActionType value) const
         case undefinedAction:         return QString();
         case bookmarkAction:          return tr("Bookmark");
         case panicRecordingAction:    return tr("Panic recording");
-        case sendMailAction:          return tr("Send Email");
+        case sendMailAction:          return tr("Send email");
         case diagnosticsAction:       return tr("Write to log");
         case showPopupAction:         return tr("Show notification");
         case playSoundAction:         return tr("Repeat sound");
@@ -49,6 +49,7 @@ QString StringsHelper::actionName(ActionType value) const
         case showTextOverlayAction:   return tr("Show text overlay");
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
+        case acknowledgeAction:       return tr("Acknowledge");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(

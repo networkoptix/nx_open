@@ -78,8 +78,12 @@ angular.module('cloudApp')
 
                             if(!settings.ignoreUnauthorized &&
                                     data.data &&
-                                    (data.data.resultCode == 'notAuthorized' ||
-                                        data.data.resultCode =='forbidden' && settings.logoutForbidden)){
+                                    (data.data.detail ||
+                                        // detail appears only when django rest framewrok declines request with
+                                        // {"detail":"Authentication credentials were not provided."}
+                                        // we need to handle this like user was not authorised
+                                    data.data.resultCode == 'notAuthorized' ||
+                                    data.data.resultCode =='forbidden' && settings.logoutForbidden)){
                                 account.logout();
                                 deferred.reject(data);
                                 return;
