@@ -326,6 +326,7 @@ void QnLoginDialog::accept()
                     const bool storePassword =
                         (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
                     params.setArgument(Qn::UrlRole, url);
+                    params.setArgument(Qn::StoreSessionRole, true);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
