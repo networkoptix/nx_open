@@ -10,5 +10,8 @@
   },
   "system_shared":{
     "emailSubject":"Вам открыт доступ к системе {{message.system_name}}"
+  },
+  "review_version":{
+    "emailSubject":"Version {{message.id}} is ready to be reviewed"
   }
 }

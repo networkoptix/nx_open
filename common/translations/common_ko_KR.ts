@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that bookmark was created by system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -484,22 +492,6 @@
         <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>라이센스 키를 활성화 하는 문제가 있었습니다. 데이터베이스 오류가 발생 했습니다.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>라이센스 키를 활성화 하는 문제가 있었습니다. 잘못 된 데이터를 받았습니다. 문제를 보고 지원 팀에 문의 하십시오.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -512,21 +504,12 @@
         <numerusform>%n 더 많은 %1 사용 됩니다.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>이 라이센스 키가 %2에 하드웨어 ID %1에 이전 활성화 되었습니다. 유효한 라이센스 키를 얻기 위해 지원 팀에 문의 하십시오.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>유효하지 않은 서명</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>서버와 연관된 HW ID 가 일치 하지 않습니다</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -551,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>알수없는 오류</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
@@ -1032,10 +1019,6 @@
       <translation>긴급 저장</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>이메일 전송</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>로그 기록</translation>
     </message>
@@ -1132,10 +1115,6 @@
     <message>
       <source>Any Event</source>
       <translation>모든 이벤트</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1248,16 +1227,8 @@
       <translation>%1에서 일반 이벤트</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>알지 못하는 이벤트 발생</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1474,6 +1445,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>최소 하나의 사용자를 선택하세요</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

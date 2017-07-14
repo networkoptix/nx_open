@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>Nachlaufzeit:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -452,7 +442,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Bei</translation>
     </message>
   </context>
   <context>
@@ -599,7 +589,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
@@ -732,7 +722,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>Die Systemeinstellung &quot;Optimierung der Kameraeinstellungen erlauben&quot; ist deaktiviert.</translation>
     </message>
     <message>
       <location/>
@@ -745,7 +735,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>Input-ID</translation>
     </message>
   </context>
   <context>
@@ -904,8 +894,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>Falsche Email oder Passwort</translation>
+      <source>Incorrect email or password</source>
+      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1040,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>Rapid-Review exportieren</translation>
     </message>
@@ -1068,13 +1058,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>Rapid-Review Geschwindigkeit</translation>
+      <source>Frames Interval</source>
+      <translation>Frameintervall</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>Frameintervall</translation>
+      <source>Rapid Review speed</source>
+      <translation>Rapid-Review Geschwindigkeit</translation>
     </message>
   </context>
   <context>
@@ -1721,7 +1711,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Soundausgabe</translation>
     </message>
   </context>
   <context>
@@ -1735,6 +1725,11 @@
       <location/>
       <source>for</source>
       <translation>für</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation>Zwangsbestätigung</translation>
     </message>
   </context>
   <context>
@@ -1908,8 +1903,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>Email oder Passwort ungültig</translation>
+      <source>Incorrect email or password</source>
+      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
     </message>
   </context>
   <context>
@@ -2251,7 +2246,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Ein leistungsfähiger Computer wird für die &quot;Beste&quot; Qualität und Auflösung empfohlen.</translation>
     </message>
     <message>
       <location/>
@@ -2317,7 +2312,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Sprachausgabe</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2555,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>Textlabel</translation>
     </message>
   </context>
   <context>
@@ -2657,7 +2652,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Zugänglich für</translation>
     </message>
     <message>
       <location/>
@@ -2667,20 +2662,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
+      <translation>Symbol</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2777,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Rollen</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Alle Benutzer anzeigen</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Benutzer auswählen</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Nichts entspricht Ihrer Suche.</translation>
     </message>
   </context>
   <context>
@@ -2846,7 +2828,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Synchronisiere die Uhrzeit aus dem Internet</translation>
     </message>
   </context>
   <context>
@@ -2886,8 +2868,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Noch gibt es keine benutzerdefinierte Rollen. 
+Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     </message>
     <message>
       <location/>

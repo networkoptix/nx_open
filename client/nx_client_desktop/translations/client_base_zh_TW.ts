@@ -952,12 +952,12 @@ to view more bookmarks</source>
       <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
-    </message>
-    <message>
       <source>Number of deactivations exceeded limit for this license.</source>
       <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+    </message>
+    <message>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1508,6 +1508,10 @@ to view more bookmarks</source>
       <source>Select Cameras to Backup...</source>
       <translation>選擇要備份的攝影機...</translation>
     </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
@@ -1589,6 +1593,10 @@ to view more bookmarks</source>
     <message>
       <source>Name cannot be empty.</source>
       <translation>名稱不能為空白.</translation>
+    </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -2944,8 +2952,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</source>
+      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</translation>
     </message>
   </context>
   <context>
@@ -3729,10 +3737,6 @@ to %1</source>
       <translation>您嘗試啟動的授權與您的軟體不相容.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation>請連絡客戶支援以取得有效的授權.</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation>您已經啟動此授權</translation>
     </message>
@@ -3765,24 +3769,12 @@ to %1</source>
       <translation>收到的資料有誤. 請連絡客戶支援以回報此問題.</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation>無效的授權</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>啟動授權失敗</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation>請連絡客戶支援以取得有效的授權.</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>網路問題.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation>請連絡客戶支援手動啟動授權.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3807,14 +3799,6 @@ to %1</source>
     <message>
       <source>Please make sure it is entered correctly.</source>
       <translation>請確認輸入正確.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation>這授權已啟動且綁定在硬體 ID %1 上</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation>這授權已啟動且綁定在硬體 ID %1 上於 %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
@@ -3894,6 +3878,30 @@ to %1</source>
         <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>無效的授權</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -3922,12 +3930,12 @@ to %1</source>
       <translation>複製硬體 ID 至剪貼簿</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>請將授權及硬體 ID 透過 Email 提供到 %1 以取得離線授權檔.</translation>
-    </message>
-    <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>請將授權及硬體 ID 提供到 %1 以取得離線授權檔.</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
@@ -4186,13 +4194,13 @@ to %1</source>
       <translation>低解析度</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
     </message>
   </context>
   <context>
@@ -4338,16 +4346,16 @@ to %1</source>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation>b/s</translation>
+      <source>B/s</source>
+      <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation>Kb/s</translation>
+      <source>KB/s</source>
+      <translation type="unfinished">KB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation>Mb/s</translation>
+      <source>MB/s</source>
+      <translation type="unfinished">MB/s</translation>
     </message>
   </context>
   <context>
@@ -4424,18 +4432,8 @@ to %1</source>
       <translation>警報: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation type="unfinished">Bookmark it</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks created</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -4492,8 +4490,8 @@ to %1</source>
       <translation>使用者輸入</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4934,7 +4932,7 @@ to %1</source>
     </message>
     <message>
       <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <translation>佈局輪巡</translation>
     </message>
   </context>
   <context>
@@ -5025,6 +5023,14 @@ to %1</source>
     <message>
       <source>Camera</source>
       <translation>攝影機</translation>
+    </message>
+    <message>
+      <source>Created</source>
+      <translation type="unfinished">Created</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation type="unfinished">Creator</translation>
     </message>
   </context>
   <context>
@@ -5124,10 +5130,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Send Email to %1</source>
-      <translation>傳送電子郵件給 %1</translation>
-    </message>
-    <message>
       <source>User %1 has invalid email address</source>
       <translation type="unfinished">User %1 has invalid email address</translation>
     </message>
@@ -5146,6 +5148,10 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Send email to %1</source>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
@@ -5683,6 +5689,41 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation type="unfinished">Role %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation type="unfinished">Selected roles have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation type="unfinished">User %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation type="unfinished">Selected users have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -6113,42 +6154,42 @@ to %1</source>
       <translation>了解更多</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation>有些使用者沒有設置他們的電子郵件地址</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation>傳送郵件時發生錯誤</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation>有些使用者沒有設置他們的電子郵件地址</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation>系統運行在安全模式下.</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
-      <translation>您無法透過電子郵件收到系統通知.</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by Email.</source>
-      <translation>他們無法透過電子郵件收到系統通知.</translation>
-    </message>
-    <message>
-      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>連線</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses</source>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses.</source>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
   </context>
   <context>
@@ -6663,8 +6704,8 @@ to %1</source>
       <translation>密碼不匹配.</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
-      <translation>使用此 Email 的雲端使用者已存在.</translation>
+      <source>Cloud user with specified email already exists.</source>
+      <translation type="unfinished">Cloud user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7006,10 +7047,6 @@ to %1</source>
       <translation>管理者密碼</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation>連線至目前的系統...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>很快地系統會被合併起來</translation>
     </message>
@@ -7040,6 +7077,10 @@ to %1</source>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>雲端系統不能合併</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation type="unfinished">Connecting to the current System...</translation>
     </message>
   </context>
   <context>
@@ -7386,16 +7427,16 @@ to %1</source>
       <translation type="unfinished">- Choose one -</translation>
     </message>
     <message>
-      <source>I&apos;m upgrading my machine</source>
-      <translation type="unfinished">I&apos;m upgrading my machine</translation>
-    </message>
-    <message>
       <source>I accidentally assigned the license to a wrong machine</source>
       <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
       <translation type="unfinished">Other Reason</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
   </context>
   <context>
@@ -7831,7 +7872,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <translation>佈局輪巡</translation>
     </message>
     <message>
       <source>Layout Tour %1</source>

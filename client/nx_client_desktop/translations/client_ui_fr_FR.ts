@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>Post-Enregistrement:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation>Par:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation>Demander confirmation avant de créer le signet</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -904,8 +894,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>Courriel ou mot de passe incorrect</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1040,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>Exporter Analyse Rapide</translation>
     </message>
@@ -1068,13 +1058,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>Vitesse Analyse Rapide</translation>
+      <source>Frames Interval</source>
+      <translation>Intervalle d'image</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>Intervalle d'image</translation>
+      <source>Rapid Review speed</source>
+      <translation>Vitesse Analyse Rapide</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1726,11 @@
       <source>for</source>
       <translation>pour</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1903,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>Courriel ou mot de passe incorrect</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2671,19 +2666,6 @@
     </message>
   </context>
   <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation>&lt;Légende&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation>&lt;description&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2805,12 +2787,12 @@
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Sélectionner Utilisateurs</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Rien ne correspond à votre recherche.</translation>
     </message>
   </context>
   <context>
