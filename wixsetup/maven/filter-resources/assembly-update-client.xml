@@ -15,6 +15,7 @@
                 <include>imageformats/qjpeg.dll</include>
                 <include>imageformats/qtiff.dll</include>
                 <include>platforms/qwindows.dll</include>
+                <include>mediaservice/*.dll</include>
                 <include>vox/**</include>
                 <include>av*.dll</include>
                 <include>${applauncher.binary.name}</include>
@@ -33,6 +34,7 @@
             </includes>
             <excludes>
                 <exclude>libvorbisfile.dll</exclude>
+                <exclude>mediaservice/*d.dll</exclude>
             </excludes>
         </fileSet>
         <fileSet>

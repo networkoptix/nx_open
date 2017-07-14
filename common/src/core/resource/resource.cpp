@@ -32,6 +32,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
 
+#include <nx/utils/log/assert.h>
+
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
 
@@ -626,6 +628,10 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     if (hasFlags(Qn::removed))
+        return;
+
+    NX_ASSERT(commonModule());
+    if (!commonModule())
         return;
 
     QnUuid id = getId();

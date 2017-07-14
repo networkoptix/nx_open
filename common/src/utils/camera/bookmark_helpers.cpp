@@ -2,8 +2,10 @@
 #include "bookmark_helpers.h"
 
 #include <utils/math/math.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -19,6 +21,25 @@ bool isChangedEnough(qint64 first, qint64 second, qint64 minDiff)
 
 } // namespace
 
+QString helpers::getBookmarkCreatorName(
+    const QnCameraBookmark& bookmark,
+    QnResourcePool* resourcePool)
+{
+    static const auto kSystemEventText =
+        QObject::tr("System Event", "Shows that bookmark was created by system event");
+
+    if (bookmark.isCreatedInOlderVMS())
+        return QString();
+
+    if (bookmark.isCreatedBySystem())
+        return kSystemEventText;
+
+    const auto userResource = resourcePool->getResourceById<QnUserResource>(
+        bookmark.creatorId);
+    return userResource ? userResource->getName() : QString();
+
+}
+
 QnCameraBookmark helpers::bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
     const QnSecurityCamResourcePtr& camera,
@@ -31,13 +52,6 @@ QnCameraBookmark helpers::bookmarkFromAction(
     }
 
     const auto actionParams = action->getParams();
-    if (action->actionType() != vms::event::bookmarkAction
-        && actionParams.targetActionType != vms::event::bookmarkAction)
-    {
-        NX_EXPECT(false, "Invalid action");
-        return QnCameraBookmark();
-    }
-
     const qint64 recordBeforeMs = actionParams.recordBeforeMs;
     const qint64 recordAfterMs = actionParams.recordAfter;
     const qint64 fixedDurationMs = actionParams.durationMs;
@@ -47,12 +61,8 @@ QnCameraBookmark helpers::bookmarkFromAction(
     const qint64 endTimeMs = startTimeMs;
 
     QnCameraBookmark bookmark;
-    const auto stringKey = lit("%1%2%3").arg(
-        action->getRuleId().toString(),
-        camera->getId().toString(),
-        QString::number(runtimeParams.eventTimestampUsec));
 
-    bookmark.guid = guidFromArbitraryData(stringKey);
+    bookmark.guid = QnUuid::createUuid();
     bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;

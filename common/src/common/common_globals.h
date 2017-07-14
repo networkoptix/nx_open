@@ -510,11 +510,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
     {
-        BookmarkName
-        , BookmarkStartTime
-        , BookmarkDuration
-        , BookmarkTags          // Sorted manually!
-        , BookmarkCameraName    // Sorted manually!
+        BookmarkName,
+        BookmarkStartTime,
+        BookmarkDuration,
+        BookmarkCreationTime,   //< Sorted manually!
+                                // TODO: #ynikitenkov add migration from older version to prevent
+                                // empty/zero creation time. It would allow as to sort bookmarks
+                                // by database, not manually, which is faster.
+        BookmarkCreator,        //< Sorted manually!
+        BookmarkTags,           //< Sorted manually!
+        BookmarkCameraName      //< Sorted manually!
     };
 
     /**

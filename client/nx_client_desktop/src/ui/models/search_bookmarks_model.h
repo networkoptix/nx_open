@@ -12,12 +12,14 @@ class QnSearchBookmarksModel : public QAbstractItemModel
 public:
     enum Column
     {
-          kName
-        , kCamera
-        , kStartTime
-        , kLength
-        , kTags
-        , kColumnsCount
+        kName,
+        kCamera,
+        kStartTime,
+        kLength,
+        kCreationTime,
+        kCreator,
+        kTags,
+        kColumnsCount
     };
 
 public:
@@ -59,6 +61,5 @@ public:
 
 private:
     class Impl;
-
     Impl * const m_impl;
 };

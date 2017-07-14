@@ -11,7 +11,7 @@ namespace cloud {
 
 TunnelAcceptorFactory::TunnelAcceptorFactory():
     base_type(std::bind(&TunnelAcceptorFactory::defaultFactoryFunction, this,
-        std::placeholders::_1)),
+        std::placeholders::_1, std::placeholders::_2)),
     m_enabledConnectionMethods(hpm::api::ConnectionMethod::all)
 {
 }
@@ -40,6 +40,7 @@ TunnelAcceptorFactory& TunnelAcceptorFactory::instance()
 
 std::vector<std::unique_ptr<AbstractTunnelAcceptor>>
     TunnelAcceptorFactory::defaultFactoryFunction(
+        const SocketAddress& mediatorUdpEndpoint,
         const hpm::api::ConnectionRequestedEvent& event)
 {
     using namespace hpm::api::ConnectionMethod;
@@ -49,6 +50,7 @@ std::vector<std::unique_ptr<AbstractTunnelAcceptor>>
     if ((event.connectionMethods & udpHolePunching) && !event.udpEndpointList.empty())
     {
         auto acceptor = std::make_unique<udp::TunnelAcceptor>(
+            mediatorUdpEndpoint,
             std::move(event.udpEndpointList),
             event.params);
         // TODO: #ak Following call is a result of some architectual problem 

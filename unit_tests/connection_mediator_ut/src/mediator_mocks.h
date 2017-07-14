@@ -56,6 +56,6 @@ public:
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx
 
 #endif // MEDIATOR_MOCKS

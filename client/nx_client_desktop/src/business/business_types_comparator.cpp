@@ -4,8 +4,9 @@
 
 using namespace nx;
 
-QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
-    base_type(parent)
+QnBusinessTypesComparator::QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject* parent):
+    base_type(parent),
+    m_onlyUserAvailableActions(onlyUserAvailableActions)
 {
     initLexOrdering();
 }
@@ -39,7 +40,8 @@ void QnBusinessTypesComparator::initLexOrdering()
     // action types to lex order
     maxType = 0;
     QMap<QString, int> actionTypes;
-    for (auto actionType: vms::event::allActions()) {
+    for (auto actionType: getAllActions())
+    {
         actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
             maxType = actionType;
@@ -70,9 +72,16 @@ QList<vms::event::EventType> QnBusinessTypesComparator::lexSortedEvents() const
     return events;
 }
 
+QList<nx::vms::event::ActionType> QnBusinessTypesComparator::getAllActions() const
+{
+    return m_onlyUserAvailableActions
+        ? vms::event::userAvailableActions()
+        : vms::event::allActions();
+}
+
 QList<vms::event::ActionType> QnBusinessTypesComparator::lexSortedActions() const
 {
-    auto actions = vms::event::allActions();
+    auto actions = getAllActions();
     std::sort(actions.begin(), actions.end(),
         [this](vms::event::ActionType l, vms::event::ActionType r)
         {

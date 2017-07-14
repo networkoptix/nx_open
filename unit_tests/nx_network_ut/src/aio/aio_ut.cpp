@@ -19,7 +19,7 @@ namespace network {
 namespace aio {
 
 class DummyEventHandler:
-    public AIOEventHandler<Pollable>
+    public AIOEventHandler
 {
 public:
     DummyEventHandler(std::function<void(Pollable*, aio::EventType)> func)
