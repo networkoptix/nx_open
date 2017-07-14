@@ -33,7 +33,7 @@
 				<tr>
 					<td>{{ record.language.code }}</td>
 					<td>{{ record.data_structure.name }}</td>
-					<td>{{ record }}</td>
+					<td>{{ record |truncatechars:100 }}</td>
 					<td>
 						{% if record.language %}
 						<a class="button"

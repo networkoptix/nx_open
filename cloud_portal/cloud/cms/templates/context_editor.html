@@ -29,7 +29,12 @@
             {% endif %}
             
             <div>
-                <p>Image preview</p>
+                <br>
+                <div>
+                    <label for="Remove_{{field.label}}">Remove Image</label>
+                    <input id="Remove_{{field.label}}" type="checkbox" name="Remove_{{field.label}}">
+                </div>
+                <h4>Preview for {{field.label}}</h4>
                 <img style="width: 400px" src="data:image/png;base64,{{field.value}}"
                      onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
             </div>

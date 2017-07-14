@@ -37,7 +37,8 @@ class CustomContextForm(forms.ModelForm):
 			if data_structure.type == DataStructure.get_type("Image"):
 				self.fields[ds_name] = forms.ImageField(label=ds_name,
 														help_text=ds_description,
-														initial=record_value)
+														initial=record_value,
+														required=False)
 				continue
 
 			self.fields[ds_name] = forms.CharField(required=False,

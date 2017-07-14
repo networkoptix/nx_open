@@ -48,30 +48,36 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 																	  language=language)\
 															  .exclude(version=None)
 		
-		new_record_value = None
+		new_record_value = ""
 		#If the DataStructure is supposed to be an image convert to base64 and error check
-		if data_structure_name in request_files:
-			new_record_value, dimensions, invalid_file_type = handle_image_upload(request_files[data_structure_name])
+		if data_structure.get_type('Image') == data_structure.type:
+			#If a file has been uploaded try to save it
+			if data_structure_name in request_files:
+				new_record_value, dimensions, invalid_file_type = handle_image_upload(request_files[data_structure_name])
 
-			if invalid_file_type:
-				upload_errors.append((data_structure_name, 'Invalid file type. Can only upload ".png"'))
-				continue
+				if invalid_file_type:
+					upload_errors.append((data_structure_name, 'Invalid file type. Can only upload ".png"'))
+					continue
 
-			#Gets the meta_settings form the DataStructure to check if the sizes are valid
-			data_structure_meta_string = data_structure.meta_settings
-			#ast.literal_eval used to convert string to dict
-			data_structure_meta = ast.literal_eval(data_structure_meta_string)
+				#Gets the meta_settings form the DataStructure to check if the sizes are valid
+				data_structure_meta_string = data_structure.meta_settings
+				#ast.literal_eval used to convert string to dict
+				data_structure_meta = ast.literal_eval(data_structure_meta_string)
 
-			if data_structure_meta['height'] < dimensions['height'] or\
-			   data_structure_meta['width'] < dimensions['width']:
-			   	
-			   	size_error_msg = 'Size is too big. Height must be less than {}. Width must be less than {}.'\
-			   						.format(data_structure_meta['height'], data_structure_meta['width'])
-				
-				upload_errors.append((data_structure_name, size_error_msg))
+				size_errors = check_image_dimensions(data_structure_name, data_structure_meta, dimensions)
+
+				if size_errors:
+					upload_errors.extend(size_errors)
+					continue
+			#If file was not uploaded remove it if user chooses to delete it
+			elif "Remove_" + data_structure_name in request_data:
+				new_record_value = ""
+			#If neither case do nothing for this record
+			else:
 				continue
 		else:
 			new_record_value = request_data[data_structure_name]
+
 
 		if latest_unapproved_record.exists():
 			if new_record_value == latest_unapproved_record.latest('created_date').value:
@@ -116,7 +122,7 @@ def publish_latest_version(customization, user):
 	fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
 
 
-def send_version_for_review(customization, language, data_structures, product, request_data, user):
+def send_version_for_review(customization, language, data_structures, product, request_data, request_files, user):
 	old_versions = ContentVersion.objects.filter(accepted_date=None)
 
 	if old_versions.exists():
@@ -124,13 +130,12 @@ def send_version_for_review(customization, language, data_structures, product, r
 		alter_records_version(Context.objects.filter(product=product), customization, old_version, None)
 		old_version.delete()
 
-	save_unrevisioned_records(customization, language, data_structures, request_data, user)
+	save_unrevisioned_records(customization, language, data_structures, request_data, request_files, user)
 
 	version = ContentVersion(customization=customization, name="N/A", created_by=user)
 	version.save()
 
 	alter_records_version(Context.objects.filter(product=product), customization, None, version)
-	#TODO add notification need to make template for this
 	notify_version_ready(customization, version.id, product.name)
 
 
@@ -159,3 +164,30 @@ def handle_image_upload(image):
 	width, height = newImage.size
 	return encoded_string, {'width': width, 'height': height}, False
 	
+
+def check_image_dimensions(data_structure_name, meta_dimensions, image_dimensions):
+	size_error_msgs = []
+	if not meta_dimensions:
+		return size_error_msgs
+
+	if 'height' in meta_dimensions and meta_dimensions['height'] != image_dimensions['height']:			   	
+	   	error_msg = "Image height must be equal to {}. Uploaded image's height is {}."\
+	   						.format(meta_dimensions['height'], image_dimensions['height'])
+		size_error_msgs.append((data_structure_name, error_msg))
+
+	if 'width' in meta_dimensions and meta_dimensions['width'] != image_dimensions['width']:
+		error_msg = "Image width must be equal to {}. Uploaded image's width is {}."\
+	   						.format(meta_dimensions['width'], image_dimensions['width'])
+	   	size_error_msgs.append((data_structure_name, error_msg))
+
+	if 'height_lt' in meta_dimensions and meta_dimensions['height_lt'] < image_dimensions['height']:
+		error_msg = "Image height must be equal to or less than {}. Uploaded image's height is {}."\
+	   						.format(meta_dimensions['height_lt'], image_dimensions['height'])
+		size_error_msgs.append((data_structure_name, error_msg))
+
+	if 'width_lt' in meta_dimensions and meta_dimensions['width_lt'] < image_dimensions['width']:
+		error_msg = "Image width must be equal to or less than {}. Uploaded image's width is {}."\
+	   						.format(meta_dimensions['width_lt'], image_dimensions['width'])
+	   	size_error_msgs.append((data_structure_name, error_msg))
+
+	return size_error_msgs
