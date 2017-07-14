@@ -34,7 +34,6 @@ DATA_TYPES = (
     (3, 'Long Text')
 )
 
-
 class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
@@ -43,7 +42,7 @@ class DataStructure(models.Model):
     type = models.IntegerField(choices=DATA_TYPES, default=0)
     default = models.CharField(max_length=1024, default='')
     translatable = models.BooleanField(default=True)
-    # meta_settings = JSONField()
+    meta_settings = JSONField(default=dict())
 
     def __str__(self):
         return self.name
@@ -51,7 +50,6 @@ class DataStructure(models.Model):
     @staticmethod
     def get_type(name):
         return next((type[0] for type in DATA_TYPES if type[1] == name), 0)
-
 
 # CMS settings. Release engineer can change that
 

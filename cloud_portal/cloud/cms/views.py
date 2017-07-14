@@ -14,6 +14,7 @@ from .controllers.modify_db import *
 from .forms import *
 
 from django.contrib.admin import AdminSite
+
 class MyAdminSite(AdminSite):
             pass
 mysite = MyAdminSite()
@@ -57,29 +58,53 @@ def handle_get_view(request, context_id, language_code):
 	return context, form, language
 	
 
+def add_upload_error_messages(request, errors):
+	for error in errors:
+		messages.error(request, "Upload error for {}. {}".format(error[0], error[1]))
+
+
 def handle_post_context_edit_view(request, context_id, language_id):
 	context, language, form, customization, user = get_post_parameters(request, context_id, language_id)
 	request_data = request.data
+	request_files = request.FILES
 	preview_link = ""
+	upload_errors = []
 	
 	if 'languageChanged' in request_data:	
 		if 'currentLanguage' in request_data and request_data['currentLanguage']:
 			last_language = Language.objects.get(id=request_data['currentLanguage'])
-			save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, user)
+			upload_errors = save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, request_files, user)
+		
+		if upload_errors:
+			add_upload_error_messages(request._request, upload_errors)
+		
 		messages.success(request._request, "Changes have been saved.")
 
 	elif 'Preview' in request_data:
-		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		upload_errors = save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, request_files, user)
 		preview_link = generate_preview(context)
+		
+		if upload_errors:
+			add_upload_error_messages(request._request, upload_errors)
+		
 		messages.success(request._request, "Changes have been saved. Preview has been created.")
 
 	elif 'SaveDraft' in request_data:
-		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		upload_errors = save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, request_files, user)
+		
+		if upload_errors:
+			add_upload_error_messages(request._request, upload_errors)
+		
 		messages.success(request._request, "Changes have been saved.")
 
 	elif 'SendReview' in request_data:
-		send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, user)
+		upload_errors = send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, request_files, user)
+		
+		if upload_errors:
+			add_upload_error_messages(request._request, upload_errors)
+		
 		messages.success(request._request, "Changes have been saved. A new version has been created.")
+		
 		return None, None, None, None
 
 	form.add_fields(context, language)
@@ -92,6 +117,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 def context_edit_view(request, context=None, language=None):
 	if request.method == "GET":
 		context, form, language = handle_get_view(request, context, language)
+		
 		return render(request, 'context_editor.html', {'context': context,
 													   'form': form,
 													   'language': language,
@@ -102,8 +128,6 @@ def context_edit_view(request, context=None, language=None):
 
 	else:
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
-		
-		image = request.FILES['image'] if 'image' in request.FILES else ""
 
 		if 'SendReview' in request.data:
 			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
@@ -115,8 +139,7 @@ def context_edit_view(request, context=None, language=None):
 													   'user': request.user,
 													   'has_permission': mysite.has_permission(request),
 													   'site_url': mysite.site_url,
-													   'title': 'Content Editor',
-													   'image':image})
+													   'title': 'Content Editor'})
 
 
 @api_view(["POST"])

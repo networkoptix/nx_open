@@ -3,7 +3,6 @@ from .models import *
 
 class CustomContextForm(forms.ModelForm):
 	language = forms.ModelChoiceField(widget=forms.Select, label="Language", queryset=Language.objects.all())
-	image = forms.ImageField()
 
 	class Meta():
 		fields = "__all__"
@@ -34,6 +33,12 @@ class CustomContextForm(forms.ModelForm):
 			widget_type = forms.TextInput(attrs={'size': 80})
 			if data_structure.type == DataStructure.get_type("Long Text") or data_structure.type == DataStructure.get_type("HTML"):
 				widget_type = forms.Textarea
+
+			if data_structure.type == DataStructure.get_type("Image"):
+				self.fields[ds_name] = forms.ImageField(label=ds_name,
+														help_text=ds_description,
+														initial=record_value)
+				continue
 
 			self.fields[ds_name] = forms.CharField(required=False,
 												   label=ds_name,
