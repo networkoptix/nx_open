@@ -56,7 +56,7 @@ public:
     {
         m_endpoints.reserve(addrToListenList.size());
 
-        // Binding to address(-es) to listen.
+        // Binding to address(es) to listen.
         for (const SocketAddress& addr: addrToListenList)
         {
             std::unique_ptr<SocketServerType> socketServer = m_socketServerFactory();
@@ -89,7 +89,7 @@ public:
     }
 
     /**
-     * @return true, if all binded addresses are successfully listened.
+     * @return true if all bound addresses are successfully listened.
      */
     bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
