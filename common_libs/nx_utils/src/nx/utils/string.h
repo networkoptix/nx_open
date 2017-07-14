@@ -195,5 +195,99 @@ NX_UTILS_API QByteArray unquoteStr(const QByteArray& v);
 
 NX_UTILS_API QString unquoteStr(const QString& v);
 
+static const size_t BufferNpos = size_t(-1);
+
+/**
+ * Searches first occurence of any element of \0-terminated string toSearch in count elements of str,
+ *   starting with element offset.
+ * @param toSearch \0-terminated string.
+ * @param count number of characters of str to check, 
+ *   NOT a length of searchable characters string (toSearch).
+ * NOTE: following algorithms differ from stl analogue in following: 
+ *   they limit number of characters checked during search.
+ */
+template<class Str>
+size_t find_first_of(
+    const Str& str,
+    const typename Str::value_type* toSearch,
+    size_t offset = 0,
+    size_t count = BufferNpos)
+{
+    const size_t toSearchDataSize = strlen(toSearch);
+    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
+    for (const typename Str::value_type*
+        curPos = str.data() + offset;
+        curPos < strEnd;
+        ++curPos)
+    {
+        if (memchr(toSearch, *curPos, toSearchDataSize))
+            return curPos - str.data();
+    }
+
+    return BufferNpos;
+}
+
+template<class Str>
+size_t find_first_not_of(
+    const Str& str,
+    const typename Str::value_type* toSearch,
+    size_t offset = 0,
+    size_t count = BufferNpos)
+{
+    const size_t toSearchDataSize = strlen(toSearch);
+    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
+    for (const typename Str::value_type*
+        curPos = str.data() + offset;
+        curPos < strEnd;
+        ++curPos)
+    {
+        if (memchr(toSearch, *curPos, toSearchDataSize) == NULL)
+            return curPos - str.data();
+    }
+
+    return BufferNpos;
+}
+
+template<class Str>
+size_t find_last_not_of(
+    const Str& str,
+    const typename Str::value_type* toSearch,
+    size_t offset = 0,
+    size_t count = BufferNpos)
+{
+    const size_t toSearchDataSize = strlen(toSearch);
+    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
+    for (const typename Str::value_type*
+        curPos = strEnd - 1;
+        curPos >= str.data();
+        --curPos)
+    {
+        if (memchr(toSearch, *curPos, toSearchDataSize) == NULL)
+            return curPos - str.data();
+    }
+
+    return BufferNpos;
+}
+
+template<class Str, class StrValueType>
+size_t find_last_of(
+    const Str& str,
+    const StrValueType toSearch,
+    size_t offset = 0,
+    size_t count = BufferNpos)
+{
+    const StrValueType* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
+    for (const StrValueType*
+        curPos = strEnd - 1;
+        curPos >= str.data();
+        --curPos)
+    {
+        if (toSearch == *curPos)
+            return curPos - str.data();
+    }
+
+    return BufferNpos;
+}
+
 } // namespace utils
 } // namespace nx

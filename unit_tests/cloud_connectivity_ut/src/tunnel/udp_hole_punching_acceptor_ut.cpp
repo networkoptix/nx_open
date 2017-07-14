@@ -77,7 +77,10 @@ protected:
 
         nx::hpm::api::ConnectionParameters connectionParameters;
         connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
-        tunnelAcceptor.reset(new TunnelAcceptor({get2ndPeerAddress()}, connectionParameters));
+        tunnelAcceptor.reset(new TunnelAcceptor(
+            mediatorConnection->remoteAddress(),
+            {get2ndPeerAddress()}, 
+            connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection.get());
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);

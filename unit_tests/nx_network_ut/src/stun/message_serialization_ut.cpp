@@ -309,5 +309,5 @@ TEST( StunMessageSerialization, Authentification )
 
 // TODO: add some more test when we support some
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

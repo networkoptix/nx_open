@@ -84,63 +84,8 @@ void removeHeader(HttpHeaders* const headers, const StringType& headerName)
         itr = headers->erase(itr);
 }
 
-////////////////////////////////////////////////////////////
-//// parse utils
-////////////////////////////////////////////////////////////
-
-/*
-//split string str (starting at \a offset, checking \a count elements) into substrings using any element of \a separatorStr as separator
-template<class T, class Func>
-void split(
-const T& str,
-const typename T::value_type* separatorStr,
-const Func& func,
-typename T::size_type offset = 0,
-typename T::size_type count = T::npos )
-{
-if( count == T::npos )
-count = str.size();
-typename T::size_type currentTokenStart = offset;
-for( typename T::size_type i = offset; i < count; ++i )
-{
-if( strchr( separatorStr, str[i] ) == NULL )
-continue;
-if( i > currentTokenStart ) //skipping empty tokens
-func( str, currentTokenStart, i-currentTokenStart );
-currentTokenStart = i+1;
-}
-if( currentTokenStart < count )
-func( str, currentTokenStart, count-currentTokenStart );
-}
-
-template<class Handler, class Str>
-struct SplitHandlerStruct
-{
-Handler* obj;
-void (Handler::*func)( const Str&, size_t, size_t );
-
-SplitHandlerStruct( Handler* _obj, void (Handler::*_func)( const Str&, size_t, size_t ) )
-:
-obj( _obj ),
-func( _func )
-{
-}
-
-void operator()( const Str& str, size_t offset, size_t count )
-{
-obj->func( str, offset, count );
-}
-};
-
-template<class Handler, class Str>
-typename SplitHandlerStruct<Handler, Str> split_handler(
-Handler* obj,
-void (Handler::*func)( const Str&, size_t, size_t ) )
-{
-return typename SplitHandlerStruct<Handler, Str>( obj, func );
-}
-*/
-
+//-------------------------------------------------------------------------------------------------
+// parse utils
 
 static size_t estimateSerializedDataSize(const HttpHeaders& headers)
 {
@@ -189,28 +134,28 @@ bool parseHeader(
     const ConstBufferRefType& data)
 {
     //skipping whitespace at start
-    const size_t headerNameStart = find_first_not_of(data, " ");
-    if (headerNameStart == BufferNpos)
+    const size_t headerNameStart = nx::utils::find_first_not_of(data, " ");
+    if (headerNameStart == nx::utils::BufferNpos)
         return false;
-    const size_t headerNameEnd = find_first_of(data, " :", headerNameStart);
-    if (headerNameEnd == BufferNpos)
+    const size_t headerNameEnd = nx::utils::find_first_of(data, " :", headerNameStart);
+    if (headerNameEnd == nx::utils::BufferNpos)
         return false;
 
     const size_t headerSepPos = data[headerNameEnd] == ':'
         ? headerNameEnd
-        : find_first_of(data, ":", headerNameEnd);
-    if (headerSepPos == BufferNpos)
+        : nx::utils::find_first_of(data, ":", headerNameEnd);
+    if (headerSepPos == nx::utils::BufferNpos)
         return false;
-    const size_t headerValueStart = find_first_not_of(data, ": ", headerSepPos);
-    if (headerValueStart == BufferNpos)
+    const size_t headerValueStart = nx::utils::find_first_not_of(data, ": ", headerSepPos);
+    if (headerValueStart == nx::utils::BufferNpos)
     {
         *headerName = data.mid(headerNameStart, headerNameEnd - headerNameStart);
         return true;
     }
 
     //skipping separators after headerValue
-    const size_t headerValueEnd = find_last_not_of(data, " \n\r", headerValueStart);
-    if (headerValueEnd == BufferNpos)
+    const size_t headerValueEnd = nx::utils::find_last_not_of(data, " \n\r", headerValueStart);
+    if (headerValueEnd == nx::utils::BufferNpos)
         return false;
 
     *headerName = data.mid(headerNameStart, headerNameEnd - headerNameStart);
@@ -226,8 +171,11 @@ HttpHeader parseHeader(const ConstBufferRefType& data)
     return HttpHeader(headerNameRef, headerValueRef);
 }
 
-namespace StatusCode
-{
+//-------------------------------------------------------------------------------------------------
+// StatusCode.
+
+namespace StatusCode {
+
 StringType toString(int val)
 {
     return toString(Value(val));
@@ -284,7 +232,6 @@ StringType toString(Value val)
     }
 }
 
-
 bool isSuccessCode(Value statusCode)
 {
     return isSuccessCode(static_cast<int>(statusCode));
@@ -311,7 +258,8 @@ bool isMessageBodyAllowed(int statusCode)
             return true;
     }
 }
-}
+
+} // namespace StatusCode
 
 const StringType Method::get("GET");
 const StringType Method::head("HEAD");
@@ -325,16 +273,9 @@ bool Method::isMessageBodyAllowed(ValueType method)
     return method != get && method != head && method != delete_;
 }
 
-//namespace Version
-//{
-//    const StringType http_1_0( "HTTP/1.0" );
-//    const StringType http_1_1( "HTTP/1.1" );
-//}
+//-------------------------------------------------------------------------------------------------
+// class MimeProtoVersion.
 
-
-////////////////////////////////////////////////////////////
-//// class MimeProtoVersion
-////////////////////////////////////////////////////////////
 static size_t estimateSerializedDataSize(const MimeProtoVersion& val)
 {
     return val.protocol.size() + 1 + val.version.size();
@@ -361,9 +302,9 @@ void MimeProtoVersion::serialize(BufferType* const dstBuffer) const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class RequestLine
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class RequestLine.
+
 static size_t estimateSerializedDataSize(const RequestLine& rl)
 {
     return rl.method.size() + 1 + rl.url.toString().size() + 1 + estimateSerializedDataSize(rl.version) + 2;
@@ -443,17 +384,21 @@ StringType RequestLine::toString() const
     return buf;
 }
 
-////////////////////////////////////////////////////////////
-//// class StatusLine
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class StatusLine.
+
 static const int MAX_DIGITS_IN_STATUS_CODE = 5;
 static size_t estimateSerializedDataSize(const StatusLine& sl)
 {
-    return estimateSerializedDataSize(sl.version) + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
+    return estimateSerializedDataSize(sl.version)
+        + 1
+        + MAX_DIGITS_IN_STATUS_CODE
+        + 1
+        + sl.reasonPhrase.size()
+        + 2;
 }
 
-StatusLine::StatusLine()
-    :
+StatusLine::StatusLine():
     statusCode(StatusCode::undefined)
 {
 }
@@ -461,27 +406,31 @@ StatusLine::StatusLine()
 bool StatusLine::parse(const ConstBufferRefType& data)
 {
     const size_t versionStart = 0;
-    const size_t versionEnd = find_first_of(data, " ", versionStart);
-    if (versionEnd == BufferNpos)
+    const size_t versionEnd = nx::utils::find_first_of(data, " ", versionStart);
+    if (versionEnd == nx::utils::BufferNpos)
         return false;
     if (!version.parse(data.mid(versionStart, versionEnd - versionStart)))
         return false;
 
-    const size_t statusCodeStart = find_first_not_of(data, " ", versionEnd);
-    if (statusCodeStart == BufferNpos)
+    const size_t statusCodeStart = nx::utils::find_first_not_of(data, " ", versionEnd);
+    if (statusCodeStart == nx::utils::BufferNpos)
         return false;
-    const size_t statusCodeEnd = find_first_of(data, " ", statusCodeStart);
-    if (statusCodeEnd == BufferNpos)
+    const size_t statusCodeEnd = nx::utils::find_first_of(data, " ", statusCodeStart);
+    if (statusCodeEnd == nx::utils::BufferNpos)
         return false;
-    statusCode = ((BufferType)data.mid(statusCodeStart, statusCodeEnd - statusCodeStart)).toUInt();
+    statusCode = ((BufferType)data.mid(
+        statusCodeStart,
+        statusCodeEnd - statusCodeStart)).toUInt();
 
-    const size_t reasonPhraseStart = find_first_not_of(data, " ", statusCodeEnd);
-    if (reasonPhraseStart == BufferNpos)
+    const size_t reasonPhraseStart = nx::utils::find_first_not_of(data, " ", statusCodeEnd);
+    if (reasonPhraseStart == nx::utils::BufferNpos)
         return false;
-    const size_t reasonPhraseEnd = find_first_of(data, "\r\n", reasonPhraseStart);
+    const size_t reasonPhraseEnd = nx::utils::find_first_of(data, "\r\n", reasonPhraseStart);
     reasonPhrase = data.mid(
         reasonPhraseStart,
-        reasonPhraseEnd == BufferNpos ? BufferNpos : reasonPhraseEnd - reasonPhraseStart);
+        reasonPhraseEnd == nx::utils::BufferNpos
+            ? nx::utils::BufferNpos
+            : reasonPhraseEnd - reasonPhraseStart);
 
     return true;
 }
@@ -509,9 +458,9 @@ StringType StatusLine::toString() const
     return buf;
 }
 
-////////////////////////////////////////////////////////////
-//// class Request
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class Request.
+
 template<class MessageType, class MessageLineType>
 bool parseRequestOrResponse(
     const ConstBufferRefType& data,
@@ -537,8 +486,14 @@ bool parseRequestOrResponse(
         }
 
         //breaking into lines
-        const size_t lineSepPos = find_first_of(data, "\r\n", curPos, data.size() - curPos);
-        const ConstBufferRefType currentLine = data.mid(curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos - curPos);
+        const size_t lineSepPos = nx::utils::find_first_of(
+            data,
+            "\r\n",
+            curPos,
+            data.size() - curPos);
+        const ConstBufferRefType currentLine = data.mid(
+            curPos,
+            lineSepPos == nx::utils::BufferNpos ? lineSepPos : lineSepPos - curPos);
         switch (state)
         {
             case readingMessageLine:
@@ -573,7 +528,7 @@ bool parseRequestOrResponse(
                 break;
         }
 
-        if (lineSepPos == BufferNpos)
+        if (lineSepPos == nx::utils::BufferNpos)
             break;  //no more data to parse
         curPos = lineSepPos;
         ++curPos;   //skipping separator
@@ -592,11 +547,12 @@ bool Request::parse(const ConstBufferRefType& data)
 void Request::serialize(BufferType* const dstBuffer) const
 {
     //estimating required buffer size
-    dstBuffer->reserve(dstBuffer->size()
-        + estimateSerializedDataSize(requestLine)
-        + estimateSerializedDataSize(headers)
-        + 2
-        + messageBody.size());
+    dstBuffer->reserve(
+        dstBuffer->size() +
+        estimateSerializedDataSize(requestLine) +
+        estimateSerializedDataSize(headers) +
+        2 +
+        messageBody.size());
 
     //serializing
     requestLine.serialize(dstBuffer);
@@ -637,9 +593,9 @@ BufferType Request::getCookieValue(const BufferType& name) const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class Response
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class Response.
+
 bool Response::parse(const ConstBufferRefType& data)
 {
     return parseRequestOrResponse(data, this, &Response::statusLine);
@@ -648,7 +604,12 @@ bool Response::parse(const ConstBufferRefType& data)
 void Response::serialize(BufferType* const dstBuffer) const
 {
     //estimating required buffer size
-    dstBuffer->reserve(dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size());
+    dstBuffer->reserve(
+        dstBuffer->size() +
+        estimateSerializedDataSize(statusLine) +
+        estimateSerializedDataSize(headers) +
+        2 +
+        messageBody.size());
 
     //serializing
     statusLine.serialize(dstBuffer);
@@ -657,10 +618,19 @@ void Response::serialize(BufferType* const dstBuffer) const
     dstBuffer->append(messageBody);
 }
 
-void Response::serializeMultipartResponse(BufferType* const dstBuffer, const ConstBufferRefType& boundary) const
+void Response::serializeMultipartResponse(
+    BufferType* const dstBuffer,
+    const ConstBufferRefType& boundary) const
 {
     //estimating required buffer size
-    dstBuffer->reserve(dstBuffer->size() + boundary.size() + 2 + estimateSerializedDataSize(headers) + 2 + messageBody.size() + 2);
+    dstBuffer->reserve(
+        dstBuffer->size() +
+        boundary.size() +
+        2 +
+        estimateSerializedDataSize(headers) +
+        2 +
+        messageBody.size() +
+        2);
 
     //serializing
     dstBuffer->append(boundary);
@@ -687,8 +657,8 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
 }
 
 
-namespace MessageType
-{
+namespace MessageType {
+
 QLatin1String toString(Value val)
 {
     switch (val)
@@ -710,7 +680,8 @@ QLatin1String toString(Value val)
         }
     }
 }
-}
+
+} // namespace MessageType
 
 static bool isMessageBodyForbiddenByHeaders(const HttpHeaders& headers)
 {
@@ -736,11 +707,10 @@ bool isMessageBodyPresent(const Response& response)
 }
 
 
-////////////////////////////////////////////////////////////
-//// class Message
-////////////////////////////////////////////////////////////
-Message::Message(MessageType::Value _type)
-    :
+//-------------------------------------------------------------------------------------------------
+// class Message.
+
+Message::Message(MessageType::Value _type):
     type(_type)
 {
     if (type == MessageType::request)
@@ -749,8 +719,7 @@ Message::Message(MessageType::Value _type)
         response = new Response();
 }
 
-Message::Message(const Message& right)
-    :
+Message::Message(const Message& right):
     type(right.type)
 {
     if (type == MessageType::request)
@@ -761,8 +730,7 @@ Message::Message(const Message& right)
         request = NULL;
 }
 
-Message::Message(Message&& right)
-    :
+Message::Message(Message&& right):
     type(right.type),
     request(right.request)
 {
@@ -844,8 +812,8 @@ const StringType kContentType = "Content-Type";
 const StringType kUserAgent = "User-Agent";
 
 
-namespace AuthScheme
-{
+namespace AuthScheme {
+
 const char* toString( Value val )
 {
     switch( val )
@@ -876,11 +844,12 @@ Value fromString( const ConstBufferRefType& str )
         return digest;
     return none;
 }
-}
 
-///////////////////////////////////////////////////////////////////
-//  Authorization
-///////////////////////////////////////////////////////////////////
+} // namespace AuthSchemeS
+
+//-------------------------------------------------------------------------------------------------
+// Authorization.
+
 bool BasicCredentials::parse(const BufferType& str)
 {
     const auto decodedBuf = BufferType::fromBase64(str);
@@ -917,21 +886,18 @@ void DigestCredentials::serialize(BufferType* const dstBuffer) const
 }
 
 
-//////////////////////////////////////////////
-//   Authorization
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// Authorization.
 
 const StringType Authorization::NAME("Authorization");
 
-Authorization::Authorization()
-    :
+Authorization::Authorization():
     authScheme(AuthScheme::none)
 {
     basic = NULL;
 }
 
-Authorization::Authorization(const AuthScheme::Value& authSchemeVal)
-    :
+Authorization::Authorization(const AuthScheme::Value& authSchemeVal):
     authScheme(authSchemeVal)
 {
     switch (authScheme)
@@ -950,8 +916,7 @@ Authorization::Authorization(const AuthScheme::Value& authSchemeVal)
     }
 }
 
-Authorization::Authorization(Authorization&& right)
-    :
+Authorization::Authorization(Authorization&& right):
     authScheme(right.authScheme),
     basic(right.basic)
 {
@@ -959,8 +924,7 @@ Authorization::Authorization(Authorization&& right)
     right.basic = nullptr;
 }
 
-Authorization::Authorization(const Authorization& right)
-    :
+Authorization::Authorization(const Authorization& right):
     authScheme(right.authScheme)
 {
     switch (authScheme)
@@ -1067,7 +1031,9 @@ StringType Authorization::userid() const
     }
 }
 
-BasicAuthorization::BasicAuthorization(const StringType& userName, const StringType& userPassword)
+BasicAuthorization::BasicAuthorization(
+    const StringType& userName,
+    const StringType& userPassword)
     :
     Authorization(AuthScheme::basic)
 {
@@ -1076,20 +1042,17 @@ BasicAuthorization::BasicAuthorization(const StringType& userName, const StringT
 }
 
 
-DigestAuthorization::DigestAuthorization()
-    :
+DigestAuthorization::DigestAuthorization():
     Authorization(AuthScheme::digest)
 {
 }
 
-DigestAuthorization::DigestAuthorization(DigestAuthorization&& right)
-    :
+DigestAuthorization::DigestAuthorization(DigestAuthorization&& right):
     Authorization(std::move(right))
 {
 }
 
-DigestAuthorization::DigestAuthorization(const DigestAuthorization& right)
-    :
+DigestAuthorization::DigestAuthorization(const DigestAuthorization& right):
     Authorization(right)
 {
 }
@@ -1103,14 +1066,12 @@ void DigestAuthorization::addParam(const BufferType& name, const BufferType& val
 }
 
 
-//////////////////////////////////////////////
-//   WWWAuthenticate
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// WWWAuthenticate.
 
 const StringType WWWAuthenticate::NAME("WWW-Authenticate");
 
-WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme)
-    :
+WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme):
     authScheme(authScheme)
 {
 }
@@ -1145,10 +1106,8 @@ BufferType WWWAuthenticate::serialized() const
     return dest;
 }
 
-
-//////////////////////////////////////////////
-//   Accept-Encoding
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// Accept-Encoding.
 
 //const nx_http::StringType IDENTITY_CODING( "identity" );
 //const nx_http::StringType ANY_CODING( "*" );
@@ -1185,7 +1144,9 @@ void AcceptEncodingHeader::parse(const nx_http::StringType& str)
     }
 }
 
-bool AcceptEncodingHeader::encodingIsAllowed(const nx_http::StringType& encodingName, double* q) const
+bool AcceptEncodingHeader::encodingIsAllowed(
+    const nx_http::StringType& encodingName,
+    double* q) const
 {
     auto codingIter = m_codings.find(encodingName);
     if (codingIter == m_codings.end())
@@ -1207,9 +1168,8 @@ bool AcceptEncodingHeader::encodingIsAllowed(const nx_http::StringType& encoding
 }
 
 
-//////////////////////////////////////////////
-//   Range
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// Range.
 
 Range::Range()
 {
@@ -1234,7 +1194,11 @@ bool Range::parse(const nx_http::StringType& strValue)
         {
             rangeSpec.start = StringType::fromRawData(simpleRangeStr.constData(), sepPos).toULongLong();
             if (sepPos < simpleRangeStr.size() - 1)  //range end is not empty
-                rangeSpec.end = StringType::fromRawData(simpleRangeStr.constData() + sepPos + 1, simpleRangeStr.size() - sepPos - 1).toULongLong();
+            {
+                rangeSpec.end = StringType::fromRawData(
+                    simpleRangeStr.constData() + sepPos + 1,
+                    simpleRangeStr.size() - sepPos - 1).toULongLong();
+            }
         }
         if (rangeSpec.end && rangeSpec.end < rangeSpec.start)
             return false;
@@ -1268,10 +1232,14 @@ bool Range::full(size_t contentSize) const
     //map<start, end>
     std::map<quint64, quint64> rangesSorted;
     for (const RangeSpec& rangeSpec : rangeSpecList)
-        rangesSorted.emplace(rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize);
+    {
+        rangesSorted.emplace(
+            rangeSpec.start,
+            rangeSpec.end ? rangeSpec.end.get() : contentSize);
+    }
 
     quint64 curPos = 0;
-    for (const std::pair<quint64, quint64>& range : rangesSorted)
+    for (const std::pair<quint64, quint64>& range: rangesSorted)
     {
         if (range.first > curPos)
             return false;
@@ -1290,7 +1258,11 @@ quint64 Range::totalRangeLength(size_t contentSize) const
     //map<start, end>
     std::map<quint64, quint64> rangesSorted;
     for (const RangeSpec& rangeSpec : rangeSpecList)
-        rangesSorted.emplace(rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize);
+    {
+        rangesSorted.emplace(
+            rangeSpec.start,
+            rangeSpec.end ? rangeSpec.end.get() : contentSize);
+    }
 
     quint64 curPos = 0;
     quint64 totalLength = 0;
@@ -1311,11 +1283,10 @@ quint64 Range::totalRangeLength(size_t contentSize) const
 }
 
 
-//////////////////////////////////////////////
-//   Content-Range
-//////////////////////////////////////////////
-ContentRange::ContentRange()
-    :
+//-------------------------------------------------------------------------------------------------
+// Content-Range.
+
+ContentRange::ContentRange():
     unitName("bytes")
 {
 }
@@ -1355,9 +1326,8 @@ StringType ContentRange::toString() const
 }
 
 
-//////////////////////////////////////////////
-//   Via
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// Via.
 
 bool Via::parse(const nx_http::StringType& strValue)
 {
@@ -1365,26 +1335,26 @@ bool Via::parse(const nx_http::StringType& strValue)
         return true;
 
     //introducing loop counter to guarantee method finiteness in case of bug in code
-    for (size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
-        curEntryStart != nx_http::BufferNpos && (i < 1000);
-        curEntryStart = (curEntryEnd == nx_http::BufferNpos ? curEntryEnd : curEntryEnd + 1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd + 1), ++i)
+    for (size_t curEntryEnd = nx::utils::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
+        curEntryStart != nx::utils::BufferNpos && (i < 1000);
+        curEntryStart = (curEntryEnd == nx::utils::BufferNpos ? curEntryEnd : curEntryEnd + 1), curEntryEnd = nx::utils::find_first_of(strValue, ",", curEntryEnd + 1), ++i)
     {
         ProxyEntry entry;
 
         //skipping spaces at the start of entry
-        while ((curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) &&
+        while ((curEntryStart < (curEntryEnd == nx::utils::BufferNpos ? strValue.size() : curEntryEnd)) &&
             (strValue.at(curEntryStart) == ' '))
         {
             ++curEntryStart;
         }
 
         //curEntryStart points first char after comma
-        size_t receivedProtoEnd = nx_http::find_first_of(strValue, " ", curEntryStart);
-        if (receivedProtoEnd == nx_http::BufferNpos)
+        size_t receivedProtoEnd = nx::utils::find_first_of(strValue, " ", curEntryStart);
+        if (receivedProtoEnd == nx::utils::BufferNpos)
             return false;
         ConstBufferRefType protoNameVersion(strValue, curEntryStart, receivedProtoEnd - curEntryStart);
-        size_t nameVersionSep = nx_http::find_first_of(protoNameVersion, "/");
-        if (nameVersionSep == nx_http::BufferNpos)
+        size_t nameVersionSep = nx::utils::find_first_of(protoNameVersion, "/");
+        if (nameVersionSep == nx::utils::BufferNpos)
         {
             //only version present
             entry.protoVersion = protoNameVersion;
@@ -1395,21 +1365,21 @@ bool Via::parse(const nx_http::StringType& strValue)
             entry.protoVersion = protoNameVersion.mid(nameVersionSep + 1);
         }
 
-        size_t receivedByStart = nx_http::find_first_not_of(strValue, " ", receivedProtoEnd + 1);
-        if (receivedByStart == nx_http::BufferNpos || receivedByStart > curEntryEnd)
+        size_t receivedByStart = nx::utils::find_first_not_of(strValue, " ", receivedProtoEnd + 1);
+        if (receivedByStart == nx::utils::BufferNpos || receivedByStart > curEntryEnd)
             return false;   //no receivedBy field
 
-        size_t receivedByEnd = nx_http::find_first_of(strValue, " ", receivedByStart);
-        if (receivedByEnd == nx_http::BufferNpos || (receivedByEnd > curEntryEnd))
+        size_t receivedByEnd = nx::utils::find_first_of(strValue, " ", receivedByStart);
+        if (receivedByEnd == nx::utils::BufferNpos || (receivedByEnd > curEntryEnd))
         {
             receivedByEnd = curEntryEnd;
         }
         else
         {
             //comment present
-            size_t commentStart = nx_http::find_first_not_of(strValue, " ", receivedByEnd + 1);
-            if (commentStart != nx_http::BufferNpos && commentStart < curEntryEnd)
-                entry.comment = strValue.mid(commentStart, curEntryEnd == nx_http::BufferNpos ? -1 : (curEntryEnd - commentStart)); //space are allowed in comment
+            size_t commentStart = nx::utils::find_first_not_of(strValue, " ", receivedByEnd + 1);
+            if (commentStart != nx::utils::BufferNpos && commentStart < curEntryEnd)
+                entry.comment = strValue.mid(commentStart, curEntryEnd == nx::utils::BufferNpos ? -1 : (curEntryEnd - commentStart)); //space are allowed in comment
         }
         entry.receivedBy = strValue.mid(receivedByStart, receivedByEnd - receivedByStart);
 
@@ -1448,12 +1418,10 @@ StringType Via::toString() const
 }
 
 
-//////////////////////////////////////////////
-//   Keep-Alive
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// Keep-Alive.
 
-KeepAlive::KeepAlive()
-    :
+KeepAlive::KeepAlive():
     timeout(0)
 {
 }
@@ -1628,7 +1596,7 @@ void Server::readProductName(Server::Product* product, QnByteArrayConstRef* inpu
     while (!inputStr->isEmpty() && inputStr->front() == ' ')
         inputStr->pop_front();
 
-    auto len = find_first_of(*inputStr, "/ (");
+    auto len = nx::utils::find_first_of(*inputStr, "/ (");
     product->name = inputStr->mid(0, len);
     inputStr->pop_front(len);
 }
@@ -1642,7 +1610,7 @@ void Server::readProductVersion(Server::Product* product, QnByteArrayConstRef* i
     if (inputStr->isEmpty())
         return; //< No version here.
 
-    const auto len = find_first_of(*inputStr, " (");
+    const auto len = nx::utils::find_first_of(*inputStr, " (");
     if (len == 0)
         return; //< No version here.
 
@@ -1659,7 +1627,7 @@ void Server::readProductComment(Server::Product* product, QnByteArrayConstRef* i
         return; //< No comment here.
     inputStr->pop_front();
 
-    const auto commentEnd = find_first_of(*inputStr, ")");
+    const auto commentEnd = nx::utils::find_first_of(*inputStr, ")");
     product->comment = inputStr->mid(0, commentEnd);
     inputStr->pop_front(commentEnd);
     if (!inputStr->isEmpty())
@@ -1670,8 +1638,7 @@ void Server::readProductComment(Server::Product* product, QnByteArrayConstRef* i
 
   //-------------------------------------------------------------------------------------------------
 
-ChunkHeader::ChunkHeader()
-    :
+ChunkHeader::ChunkHeader():
     chunkSize(0)
 {
 }
@@ -1710,7 +1677,9 @@ int ChunkHeader::parse(const ConstBufferRefType& buf)
                 {
                     if (curPos == extNameStart)
                         return -1;  //empty extension
-                    extensions.push_back(std::make_pair(BufferType(extNameStart, curPos - extNameStart), BufferType()));
+                    extensions.push_back(std::make_pair(
+                        BufferType(extNameStart, curPos - extNameStart),
+                        BufferType()));
                 }
                 else if (state == readingExtVal)
                 {
@@ -1723,7 +1692,9 @@ int ChunkHeader::parse(const ConstBufferRefType& buf)
                     if (extValSize > 0 && *(extValStart + extValSize - 1) == '"')
                         --extValSize;
 
-                    extensions.push_back(std::make_pair(BufferType(extNameStart, extSepPos - extNameStart), BufferType(extValStart, extValSize)));
+                    extensions.push_back(std::make_pair(
+                        BufferType(extNameStart, extSepPos - extNameStart),
+                        BufferType(extValStart, extValSize)));
                 }
 
                 state = readingExtName;
@@ -1749,7 +1720,9 @@ int ChunkHeader::parse(const ConstBufferRefType& buf)
                 {
                     if (curPos == extNameStart)
                         return -1;  //empty extension
-                    extensions.push_back(std::make_pair(BufferType(extNameStart, curPos - extNameStart), BufferType()));
+                    extensions.push_back(std::make_pair(
+                        BufferType(extNameStart, curPos - extNameStart),
+                        BufferType()));
                 }
                 else if (state == readingExtVal)
                 {
@@ -1762,7 +1735,9 @@ int ChunkHeader::parse(const ConstBufferRefType& buf)
                     if (extValSize > 0 && *(extValStart + extValSize - 1) == '"')
                         --extValSize;
 
-                    extensions.push_back(std::make_pair(BufferType(extNameStart, extSepPos - extNameStart), BufferType(extValStart, extValSize)));
+                    extensions.push_back(std::make_pair(
+                        BufferType(extNameStart, extSepPos - extNameStart),
+                        BufferType(extValStart, extValSize)));
                 }
 
                 if ((dataEnd - curPos < 2) || *(curPos + 1) != '\n')
@@ -1809,7 +1784,10 @@ StringType userAgentString()
 }
 
 static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
-    nx::utils::AppInfo::productNameLong(), nx::utils::AppInfo::applicationVersion(), nx::utils::AppInfo::organizationName(), COMPATIBILITY_SERVER_STRING
+    nx::utils::AppInfo::productNameLong(),
+    nx::utils::AppInfo::applicationVersion(),
+    nx::utils::AppInfo::organizationName(),
+    COMPATIBILITY_SERVER_STRING
 ).toUtf8();
 
 StringType serverString()

@@ -9,6 +9,7 @@
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/utils/basic_factory.h>
 
+#include "mediator_connector.h"
 #include "mediator_server_connections.h"
 #include "tunnel/incoming_tunnel_pool.h"
 #include "tunnel/tunnel_acceptor_factory.h"
@@ -34,7 +35,7 @@ public:
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
     CloudServerSocket(
-        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        hpm::api::AbstractMediatorConnector* mediatorConnector,
         nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
             = nx::network::RetryPolicy());
 
@@ -108,6 +109,7 @@ protected:
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
     void onMediatorConnectionRestored();
 
+    hpm::api::AbstractMediatorConnector* m_mediatorConnector;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     int m_acceptQueueLen;

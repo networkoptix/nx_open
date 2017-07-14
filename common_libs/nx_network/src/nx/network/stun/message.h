@@ -177,5 +177,5 @@ public:
     boost::optional<QString> hasError(SystemError::ErrorCode code) const;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

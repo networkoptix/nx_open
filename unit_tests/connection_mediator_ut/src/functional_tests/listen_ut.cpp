@@ -110,4 +110,4 @@ TEST_F(ListeningPeer, peer_disconnect)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

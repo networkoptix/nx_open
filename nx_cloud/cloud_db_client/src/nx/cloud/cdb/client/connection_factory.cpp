@@ -17,8 +17,7 @@ namespace client {
 
 constexpr static auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
-ConnectionFactory::ConnectionFactory():
-    m_endPointFetcher(std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
+ConnectionFactory::ConnectionFactory()
 {
 }
 

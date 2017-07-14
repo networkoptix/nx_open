@@ -35,6 +35,12 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+enum class MediatorApiProtocol
+{
+    stun,
+    http
+};
+
 class BasicTestFixture:
     public ::testing::Test
 {
@@ -59,6 +65,7 @@ protected:
     const hpm::api::SystemCredentials& cloudSystemCredentials() const;
 
     void setRemotePeerName(const nx::String& peerName);
+    void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
 private:
     struct HttpRequestResult
@@ -72,18 +79,20 @@ private:
     nx::hpm::MediatorFunctionalTest m_mediator;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     nx::cloud::relay::test::Launcher m_trafficRelay;
-    PredefinedCredentialsProvider m_credentialsProvider;
-    std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
     std::unique_ptr<TestHttpServer> m_httpServer;
+    TestHttpServer m_cloudModulesXmlProvider;
     QUrl m_staticUrl;
     std::list<std::unique_ptr<nx_http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
     boost::optional<nx::String> m_remotePeerName;
+    MediatorApiProtocol m_mediatorApiProtocol = MediatorApiProtocol::http;
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
     QUrl m_relayUrl;
 
+    void initializeCloudModulesXmlWithDirectStunPort();
+    void initializeCloudModulesXmlWithStunOverHttp();
     void startHttpServer();
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter);
