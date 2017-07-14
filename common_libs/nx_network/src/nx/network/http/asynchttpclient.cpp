@@ -332,6 +332,37 @@ void AsyncHttpClient::doOptions(
         url);
 }
 
+void AsyncHttpClient::doUpgrade(
+    const QUrl& url,
+    const StringType& protocolToUpgradeTo)
+{
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    m_additionalHeaders.emplace("Connection", "Upgrade");
+    m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
+    composeRequest(nx_http::Method::options);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncHttpClient::doUpgrade(
+    const QUrl& url,
+    const StringType& protocolToUpgradeTo,
+    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+{
+    typedef void(AsyncHttpClient::*FuncToCallType)(
+        const QUrl& /*url*/,
+        const StringType& /*protocolToUpgradeTo*/);
+
+    doHttpOperation<const QUrl&, const StringType&>(
+        std::move(completionHandler),
+        static_cast<FuncToCallType>(&AsyncHttpClient::doUpgrade),
+        url,
+        protocolToUpgradeTo);
+}
+
 const nx_http::Request& AsyncHttpClient::request() const
 {
     return m_request;

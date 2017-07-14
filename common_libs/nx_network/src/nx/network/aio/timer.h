@@ -23,7 +23,7 @@ namespace aio {
  */
 class NX_NETWORK_API Timer:
     public BasicPollable,
-    private AIOEventHandler<Pollable>
+    private AIOEventHandler
 {
 public:
     Timer(aio::AbstractAioThread* aioThread = nullptr);

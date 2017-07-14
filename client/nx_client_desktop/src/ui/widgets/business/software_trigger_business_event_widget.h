@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+
+#include <core/resource/resource_fwd.h>
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
@@ -29,6 +31,10 @@ private:
     void at_usersButton_clicked();
     void updateUsersButton();
     void paramsChanged();
+
+    bool isRoleValid(const QnUuid& id) const;
+    bool isUserValid(const QnUserResourcePtr& user) const;
+    QString calculateAlert(bool allUsers, const QSet<QnUuid>& checkedSubjects) const;
 
 private:
     QScopedPointer<Ui::SoftwareTriggerBusinessEventWidget> ui;

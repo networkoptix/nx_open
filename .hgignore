@@ -33,7 +33,9 @@ donotrebuild
 vms*.pro
 .idea
 .branch.properties
+.ec_protocol.properties
 .cloudHost.properties
+.customization.properties
 x86/*
 x64/*
 target/*

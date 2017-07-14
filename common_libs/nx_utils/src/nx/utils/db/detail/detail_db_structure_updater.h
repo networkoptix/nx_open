@@ -20,11 +20,15 @@ class QueryContext;
 
 namespace detail {
 
+/**
+ * Updates specified DB scheme. 
+ * Multiple objects can be used to update mutiple schemes 
+ * (e.g., db_version_data table and application scheme).
+ */
 class NX_UTILS_API DbStructureUpdater
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)>
-        DbUpdateFunc;
+    using UpdateFunc = MoveOnlyFunc<DBResult(QueryContext*)>;
 
     DbStructureUpdater(
         const std::string& schemaName,
@@ -37,7 +41,7 @@ public:
     void addUpdateScript(QByteArray updateScript);
 
     void addUpdateScript(std::map<RdbmsDriverType, QByteArray> scriptByDbType);
-    void addUpdateFunc(DbUpdateFunc dbUpdateFunc);
+    void addUpdateFunc(UpdateFunc dbUpdateFunc);
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
@@ -57,7 +61,7 @@ private:
         /** Can be empty. */
         std::map<RdbmsDriverType, QByteArray> dbTypeToSqlScript;
         /** Can be empty. */
-        DbUpdateFunc func;
+        UpdateFunc func;
 
         DbUpdate(QByteArray _sqlScript)
         {
@@ -69,7 +73,7 @@ private:
         {
         }
 
-        DbUpdate(DbUpdateFunc _func):
+        DbUpdate(UpdateFunc _func):
             func(std::move(_func))
         {
         }

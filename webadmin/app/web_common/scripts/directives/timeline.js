@@ -417,6 +417,7 @@ angular.module('nxCommon')
 
                 scope.$watch('positionProvider',function(){
                     timelineActions.setPositionProvider(scope.positionProvider);
+                    $timeout(updateTimelineWidth);
                 });
 
                 // !!! Subscribe for different events which affect timeline
@@ -444,7 +445,8 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                $timeout(updateTimelineWidth); // Adjust width
+                //We need a delay for the timeline to fully load then we can calculate the width of the timeline
+                $timeout(updateTimelineWidth); // Adjust width.
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing

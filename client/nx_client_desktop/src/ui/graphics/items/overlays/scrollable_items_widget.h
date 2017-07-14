@@ -64,6 +64,10 @@ public:
     int lineHeight() const;
     void setLineHeight(int value);
 
+signals:
+    void contentHeightChanged();
+    void contentWidthChanged();
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which,
         const QSizeF& constraint = QSizeF()) const override;

@@ -4,6 +4,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 class QnResourceTitleItem;
+class QnViewportBoundWidget;
 class QnHtmlTextItem;
 struct QnResourceHudColors;
 
@@ -22,7 +23,7 @@ public:
     QnResourceTitleItem* title() const;
 
     /** Everything under title bar. */
-    QGraphicsWidget* content() const;
+    QnViewportBoundWidget* content() const;
 
     /** Resource details text item. */
     QnHtmlTextItem* details() const;

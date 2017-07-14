@@ -15,6 +15,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -62,12 +63,15 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
+    auto scrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
+    scrollBar->setUseItemViewPaddingWhenVisible(false);
+    scrollBar->setUseMaximumSpace(true);
+    ui->camerasTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     m_header = new QnCheckBoxedHeaderView(CheckBoxColumn, this);
     ui->camerasTable->setHorizontalHeader(m_header);
     m_header->setVisible(true);
-    m_header->setSectionResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
-    m_header->setSectionResizeMode(ManufColumn, QHeaderView::ResizeToContents);
-    m_header->setSectionResizeMode(NameColumn, QHeaderView::ResizeToContents);
+    m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_header->setSectionResizeMode(UrlColumn, QHeaderView::Stretch);
     m_header->setSectionsClickable(true);
 

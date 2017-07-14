@@ -66,7 +66,7 @@ private:
     private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
-    void at_exportTimelapseAction_triggered();
+    void at_exportRapidReviewAction_triggered();
 
     void at_layout_exportFinished(bool success, const QString &filename);
     void at_camera_exportFinished(bool success, const QString &fileName);

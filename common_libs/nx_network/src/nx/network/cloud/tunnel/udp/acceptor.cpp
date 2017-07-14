@@ -1,6 +1,7 @@
 #include "acceptor.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/socket_global.h>
 
 #include "incoming_tunnel_connection.h"
 
@@ -10,11 +11,13 @@ namespace cloud {
 namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
+    const SocketAddress& mediatorUdpEndpoint,
     std::list<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
+    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
     m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions),
     m_holePunchingEnabled(true)
@@ -47,7 +50,7 @@ void TunnelAcceptor::accept(AcceptHandler handler)
             m_acceptHandler = std::move(handler);
             m_udpMediatorConnection = std::make_unique<
                 hpm::api::MediatorServerUdpConnection>(
-                    m_mediatorConnection->remoteAddress(),
+                    m_mediatorUdpEndpoint,
                     m_mediatorConnection->credentialsProvider());
 
             m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());

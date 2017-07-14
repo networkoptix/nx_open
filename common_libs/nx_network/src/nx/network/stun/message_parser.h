@@ -170,7 +170,7 @@ private:
     std::deque<char> m_tempBuffer;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx
 
 #endif  //STUN_MESSAGE_PARSER_H

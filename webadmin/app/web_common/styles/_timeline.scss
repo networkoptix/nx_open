@@ -35,7 +35,7 @@ canvas{
 }
 
 .timeline-wrapper{
-  height: 100%;
+  height: 100px;
 }
 
 
@@ -101,7 +101,7 @@ ng-include{
 
 .timeline{
   position:relative;
-  height:100px;
+  height:100%;
   -webkit-touch-callout: none;
   user-select: none;
   background-color: $additional_light2;
@@ -159,15 +159,13 @@ ng-include{
   color:$light10;
 }
 
-.no-timeline{
-  height: 40px !important;
-}
-
 .no-timeline .volume .glyphicon-volume-up{
   margin: 10px auto !important;
 }
 
-.no-timeline .live-button,
+.no-timeline .live-button{
+  line-height: 40px !important;
+}
 .mobile-controls .live-button{
   line-height: 60px !important;
 }

@@ -44,7 +44,7 @@ bool AIOService::isInitialized() const
 void AIOService::watchSocket(
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -75,7 +75,7 @@ void AIOService::removeFromWatch(
 void AIOService::registerTimer(
     Pollable* const sock,
     std::chrono::milliseconds timeoutMillis,
-    AIOEventHandler<Pollable>* const eventHandler)
+    AIOEventHandler* const eventHandler)
 {
     QnMutexLocker locker(&m_mutex);
     registerTimerNonSafe(&locker, sock, timeoutMillis, eventHandler);
@@ -85,7 +85,7 @@ void AIOService::registerTimerNonSafe(
     QnMutexLockerBase* const locker,
     Pollable* const sock,
     std::chrono::milliseconds timeoutMillis,
-    AIOEventHandler<Pollable>* const eventHandler)
+    AIOEventHandler* const eventHandler)
 {
     watchSocketNonSafe(
         locker,
@@ -180,7 +180,7 @@ void AIOService::watchSocketNonSafe(
     QnMutexLockerBase* const lock,
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     boost::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
@@ -196,7 +196,7 @@ void AIOService::watchSocketNonSafe(
                     lock,
                     sock,
                     std::bind(
-                        &AIOEventHandler<Pollable>::eventTriggered,
+                        &AIOEventHandler::eventTriggered,
                         eventHandler,
                         sock,
                         aio::etError));
@@ -212,7 +212,7 @@ void AIOService::watchSocketNonSafe(
                     lock,
                     sock,
                     std::bind(
-                        &AIOEventHandler<Pollable>::eventTriggered,
+                        &AIOEventHandler::eventTriggered,
                         eventHandler,
                         sock,
                         aio::etError));
@@ -263,8 +263,8 @@ void AIOService::watchSocketNonSafe(
 
     const auto threadToUse = getSocketAioThread(lock, sock);
     if (!m_systemSocketAIO.sockets.emplace(
-        sockCtx,
-        std::make_pair(threadToUse, timeoutMillis.get())).second)
+            sockCtx,
+            std::make_pair(threadToUse, timeoutMillis.get())).second)
     {
         NX_ASSERT(false);
     }

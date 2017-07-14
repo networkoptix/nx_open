@@ -41,7 +41,7 @@ void AIOThread::pleaseStop()
 void AIOThread::watchSocket(
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     std::chrono::milliseconds timeoutMs,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
@@ -74,7 +74,7 @@ void AIOThread::watchSocket(
 void AIOThread::changeSocketTimeout(
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     std::chrono::milliseconds timeoutMs,
     std::function<void()> socketAddedToPollHandler)
 {

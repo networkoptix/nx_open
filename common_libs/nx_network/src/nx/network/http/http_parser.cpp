@@ -25,7 +25,7 @@ nx::network::server::ParserState MessageParser::parse(
         return nx::network::server::ParserState::done;
     }
 
-    if (!m_httpStreamReader.parseBytes(buffer, nx_http::BufferNpos, bytesProcessed))
+    if (!m_httpStreamReader.parseBytes(buffer, nx::utils::BufferNpos, bytesProcessed))
         return nx::network::server::ParserState::failed;
 
     switch (m_httpStreamReader.state())
@@ -95,7 +95,7 @@ nx::network::server::ParserState MessageParser::parse(
         return nx::network::server::ParserState::done;
     }
 
-    if (!m_httpStreamReader.parseBytes(buffer, nx_http::BufferNpos, bytesProcessed))
+    if (!m_httpStreamReader.parseBytes(buffer, nx::utils::BufferNpos, bytesProcessed))
         return nx::network::server::ParserState::failed;
 
     switch (m_httpStreamReader.state())

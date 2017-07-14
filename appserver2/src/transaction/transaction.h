@@ -713,6 +713,17 @@ APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(510, saveUsers,  ApiUserDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       UserNotificationManagerHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(600, getLayouts, ApiLayoutDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \

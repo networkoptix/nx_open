@@ -124,7 +124,8 @@ Qt::CheckState QnLdapUserListModel::checkState() const {
     return Qt::PartiallyChecked;
 }
 
-void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString &login) {
+void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString& login)
+{
     if (state == Qt::PartiallyChecked)
         return;
 
@@ -145,21 +146,51 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString &log
             m_checkedUserLogins.remove(login);
     }
 
-
     if (login.isEmpty())
     {
-        emit dataChanged(index(0, CheckBoxColumn), index(m_userList.size() - 1, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
+        emit dataChanged(
+            index(0, CheckBoxColumn),
+            index(m_userList.size() - 1, CheckBoxColumn),
+            {Qt::CheckStateRole});
     }
     else
     {
         auto row = userIndex(login);
-        if (row >= 0)
-            emit dataChanged(index(row, CheckBoxColumn), index(row, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
-    }
+        if (row < 0)
+            return;
 
+        const auto idx = index(row, CheckBoxColumn);
+        emit dataChanged(idx, idx, {Qt::CheckStateRole});
+    }
 }
 
-QnLdapUsers QnLdapUserListModel::users() const {
+void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QSet<QString>& logins)
+{
+    if (logins.empty())
+        return;
+
+    switch (state)
+    {
+        case Qt::Checked:
+            m_checkedUserLogins.unite(logins);
+            break;
+        case Qt::Unchecked:
+            m_checkedUserLogins.subtract(logins);
+            break;
+        case Qt::PartiallyChecked:
+            return;
+        default:
+            break;
+    }
+
+    emit dataChanged(
+        index(0, CheckBoxColumn),
+        index(m_userList.size() - 1, CheckBoxColumn),
+        {Qt::CheckStateRole});
+}
+
+QnLdapUsers QnLdapUserListModel::users() const
+{
     return m_userList;
 }
 

@@ -473,6 +473,12 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             ec2logger);
     }
 
+    {
+        // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
+        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        logger->setDefaultLevel(nx::utils::log::Level::info);
+    }
+
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 }
 
@@ -487,7 +493,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
 
     // TODO: #mu ON/OFF switch in settings?

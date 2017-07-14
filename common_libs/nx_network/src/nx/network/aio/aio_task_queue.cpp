@@ -183,7 +183,7 @@ void AioTaskQueue::addSockToPollset(
     Pollable* socket,
     aio::EventType eventType,
     int timeout,
-    AIOEventHandler<Pollable>* eventHandler)
+    AIOEventHandler* eventHandler)
 {
     std::unique_ptr<AioEventHandlingDataHolder> handlingData(new AioEventHandlingDataHolder(eventHandler));
     bool failedToAddToPollset = false;
@@ -242,7 +242,7 @@ bool AioTaskQueue::removeReverseTask(
     Pollable* const sock,
     aio::EventType eventType,
     TaskType taskType,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     unsigned int newTimeoutMS)
 {
     Q_UNUSED(eventHandler)

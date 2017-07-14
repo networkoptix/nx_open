@@ -60,7 +60,15 @@ function(nx_add_target name type)
     endif()
 
     if("${type}" STREQUAL "EXECUTABLE")
-        add_executable(${name} ${sources})
+        set(rc_file)
+        if(WINDOWS)
+            set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/hdwitness.rc")
+            configure_file(
+                "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/hdwitness.rc"
+                "${rc_file}")
+        endif()
+
+        add_executable(${name} ${sources} "${rc_file}")
         set_target_properties(${name} PROPERTIES SKIP_BUILD_RPATH OFF)
 
         if(WINDOWS)
