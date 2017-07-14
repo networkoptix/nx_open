@@ -999,22 +999,22 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
                 case vms::event::playSoundAction:
                 case vms::event::playSoundOnceAction:
-		            return !m_actionParams.url.isEmpty()
-		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
-		                    || m_actionParams.playToClient
-		                );
+                    return !m_actionParams.url.isEmpty()
+                        && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            || m_actionParams.playToClient
+                        );
 
                 case vms::event::showPopupAction:
                     return m_actionParams.allUsers || !filterSubjectIds(
                         m_actionParams.additionalResources).empty();
 
                 case vms::event::sayTextAction:
-		            return !m_actionParams.sayText.isEmpty()
-		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
-		                    || m_actionParams.playToClient
-		                );
+                    return !m_actionParams.sayText.isEmpty()
+                        && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            || m_actionParams.playToClient
+                        );
 
                 case vms::event::executePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
