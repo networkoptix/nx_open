@@ -14,6 +14,7 @@
     <div> Link to Page: <a href="{{context.url}}">{{ context.url }}</a></div>
     {% endif %}
 </fieldset>
+
 <form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
     <input type="hidden" name="currentLanguage" value="{{ language.id }}">
     <input type="hidden" id="languageChanged">
@@ -22,9 +23,16 @@
         <div class="form-row">
             {{ field.label_tag }}
             {{ field }}
+            
             {% if field.help_text %}
             <p class="help">{{ field.help_text }}</p>
             {% endif %}
+            
+            <div>
+                <p>Image preview</p>
+                <img style="width: 400px" src="data:image/png;base64,{{field.value}}"
+                     onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+            </div>
         </div>
     {% endfor %}
 
@@ -41,9 +49,9 @@
 <button onClick="openPreview()">Open Preview</button>
 {% endif %}
 
-{% if image %}
-<div> {{image}}</div>
-{% endif %}
+<!--{% if image %}
+<div> <img src="data:image/png;base64,{{image}}"> </div>
+{% endif %}-->
 <script>
     function openPreview(){
         window.open("{{ preview_link }}");

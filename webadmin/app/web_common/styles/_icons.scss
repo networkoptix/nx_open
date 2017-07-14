@@ -194,3 +194,17 @@
   height: 96px !important;
   background-position: 0px -316px;
 }
+
+.live-button.active .live-glyph{
+  @include icon;
+  width: 12px !important;
+  height: 12px !important;
+  background-position: -97px -59px;
+}
+
+.live-button .live-glyph{
+  @include icon;
+  width: 12px !important;
+  height: 12px !important;
+  background-position: -85px -59px;
+}
