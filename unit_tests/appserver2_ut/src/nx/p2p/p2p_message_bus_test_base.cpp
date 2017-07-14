@@ -128,7 +128,7 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, int baseTcpPort)
 {
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
@@ -148,18 +148,24 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
     const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
     result->addArg(guidArg.toStdString().c_str());
 
+    if (baseTcpPort)
+    {
+        const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
+        result->addArg(guidArg.toStdString().c_str());
+    }
+
     ++m_instanceCounter;
 
     result->start();
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex)
+void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, int baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver(i == keekDbAtServerIndex));
+        m_servers.push_back(createAppserver(i == keekDbAtServerIndex, baseTcpPort));
 
     for (const auto& server: m_servers)
     {
