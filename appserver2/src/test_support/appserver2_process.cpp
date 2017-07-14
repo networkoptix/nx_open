@@ -37,7 +37,6 @@
 #include <api/model/configure_system_data.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
-#include <nx/util/appserver2_util.h>
 #include <api/model/ping_reply.h>
 #include <core/resource/media_server_resource.h>
 #include <transaction/transaction_message_bus.h>
