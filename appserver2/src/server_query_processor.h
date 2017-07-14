@@ -231,6 +231,19 @@ public:
     }
 
     /**
+    * Execute transaction.
+    * Transaction executed locally and broadcast through the whole cluster.
+    * @param handler Called upon request completion. Functor(ErrorCode).
+    */
+    template<class HandlerType>
+    void processUpdateAsync(QnTransaction<ApiUserDataList>& tran, HandlerType handler)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveUsers);
+        return processMultiUpdateAsync<ApiUserDataList, ApiUserData>(
+            tran, handler, ApiCommand::saveUser);
+    }
+
+    /**
      * Execute transaction.
      * Transaction executed locally and broadcast through the whole cluster.
      * @param handler Called upon request completion. Functor(ErrorCode).

@@ -17,7 +17,8 @@ class QnCameraBookmarkDialog : public QnSessionAwareButtonBoxDialog
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnCameraBookmarkDialog(QWidget *parent = 0);
+    explicit QnCameraBookmarkDialog(bool mandatoryDescription, QWidget *parent = 0);
+
     ~QnCameraBookmarkDialog();
 
     const QnCameraBookmarkTagList &tags() const;
@@ -27,6 +28,13 @@ public:
     void submitData(QnCameraBookmark &bookmark) const;
 
     virtual void accept() override;
+
+protected:
+    virtual void initializeButtonBox() override;
+
+private:
+    void updateOkButtonAvailability();
+
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
 };

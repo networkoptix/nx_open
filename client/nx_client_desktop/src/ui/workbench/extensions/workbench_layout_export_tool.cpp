@@ -366,7 +366,6 @@ void QnLayoutExportTool::finishExport(bool success)
                 emit finished(false, m_targetFilename);
                 return;
             }
-            layout->setStatus(Qn::Online);
             resourcePool()->addResource(layout);
             break;
         }

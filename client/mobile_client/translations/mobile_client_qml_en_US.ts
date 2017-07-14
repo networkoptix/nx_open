@@ -80,7 +80,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

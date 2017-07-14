@@ -245,7 +245,7 @@ QString Deactivator::errorDescription(ErrorCode error)
         case ErrorCode::deactivationIsPending:
             return tr("License is in pending deactivation state, but has not been deactivated yet.");
         case ErrorCode::invalidHardwareId:
-            return tr("Hardware ID of Media Server with"
+            return tr("Hardware ID of Server with"
                     " this license does not match Hardware ID on which license was activated.");
         case ErrorCode::limitExceeded:
             return tr("Number of deactivations exceeded limit for this license.");

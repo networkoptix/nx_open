@@ -461,7 +461,7 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified Email already exists."));
+                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
             }
 
             result = Qn::defaultEmailValidator()(text);

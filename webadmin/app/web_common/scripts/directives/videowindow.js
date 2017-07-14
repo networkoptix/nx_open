@@ -184,7 +184,7 @@ angular.module('nxCommon')
 
                 //TODO: remove ID, generate it dynamically
 
-                function recyclePlayer(player=null){
+                function recyclePlayer(player){
                     if(scope.player != player || !player) {
                         scope.vgPlayerReady({$API: null});
                         scope.player = player;
@@ -367,9 +367,10 @@ angular.module('nxCommon')
                             scope.flashls = false;
                             scope.jsHls = false;
                             scope.loading = false; // no supported format - no loading
-                            recyclePlayer();
+                            recyclePlayer(null); //There is no player so it should be set to null
                             return;
                         }
+
                         recyclePlayer(format);
                         if(scope.vgApi){
                             scope.vgApi.kill();
@@ -388,14 +389,16 @@ angular.module('nxCommon')
                 scope.$watch("vgSrc",srcChanged, true);
 
                 scope.$on('$destroy',function(){
-                    recyclePlayer();
+                    recyclePlayer(null);
                     scope.vgApi.kill();
-                    if(videoPlayers.length == 1){
-                        videoPlayers.pop();
-                    }
-                    else{
+
+                    if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
+                    }
+
+                    if(videoPlayers.length > 0){
+                        videoPlayers.pop();
                     }
                 });
 

@@ -52,7 +52,7 @@ public:
     void watchSocket(
         Pollable* const sock,
         aio::EventType eventToWatch,
-        AIOEventHandler<Pollable>* const eventHandler,
+        AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>() );
     /**
@@ -63,7 +63,7 @@ public:
     void changeSocketTimeout(
         Pollable* const sock,
         aio::EventType eventToWatch,
-        AIOEventHandler<Pollable>* const eventHandler,
+        AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() );
     /**

@@ -200,7 +200,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(
-                nx::network::SocketGlobals::mediatorConnector().systemConnection(),
+                &nx::network::SocketGlobals::mediatorConnector(),
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));

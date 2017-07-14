@@ -220,7 +220,9 @@ enum ActionType
         * - url                                        - full HTTP url to execute. username/password are stored as part of the URL
         * - text                                       - HTTP message body for POST method
         */
-    execHttpRequestAction = 15
+    execHttpRequestAction = 15,
+
+    acknowledgeAction = 16
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

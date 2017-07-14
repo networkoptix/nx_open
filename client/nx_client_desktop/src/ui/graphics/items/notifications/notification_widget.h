@@ -64,6 +64,8 @@ public:
         const QString& text,
         const ButtonHandler& handler);
 
+    void setCloseButtonUnavailable();
+
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
 
@@ -134,6 +136,7 @@ private:
     QGraphicsLinearLayout* m_primaryLayout;
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
+    bool m_closeButtonAvailable = true;
     QnNotificationLevel::Value m_notificationLevel;
     QPointer<QnImageProvider> m_imageProvider;
     QColor m_color;
