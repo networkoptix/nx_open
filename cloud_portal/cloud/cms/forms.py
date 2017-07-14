@@ -12,7 +12,7 @@ class CustomContextForm(forms.ModelForm):
 		super(CustomContextForm, self)
 		self.fields.pop('language')
 
-	def add_fields(self, context, language):
+	def add_fields(self, context, customization, language):
 		data_structures = context.datastructure_set.all()
 		
 		if len(data_structures) < 1:
@@ -26,7 +26,7 @@ class CustomContextForm(forms.ModelForm):
 			
 			ds_description = data_structure.description
 
-			latest_record = data_structure.datarecord_set.filter(language=language)
+			latest_record = data_structure.datarecord_set.filter(customization=customization, language=language)
 
 			record_value = latest_record.latest('created_date').value if latest_record.exists() else data_structure.default
 
