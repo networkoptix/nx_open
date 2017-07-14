@@ -3,14 +3,16 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
+#include <chrono>
+
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
-constexpr const size_t kMaxTimeStrLength = sizeof(quint32); 
-constexpr const int kSocketRecvTimeout = 7000;
-constexpr const int kMillisPerSec = 1000;
+constexpr size_t kMaxTimeStrLength = sizeof(quint32); 
+constexpr std::chrono::seconds kSocketRecvTimeout = std::chrono::seconds(7);
+constexpr int kMillisPerSec = 1000;
 
 namespace nx {
 namespace network {
@@ -22,8 +24,8 @@ qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr)
         return -1;
     memcpy(&utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds));
     utcTimeSeconds = ntohl(utcTimeSeconds);
-    utcTimeSeconds -= kSecondsFrom19000101To19700101;
-    return ((qint64)utcTimeSeconds) * kMillisPerSec;
+    utcTimeSeconds -= kSecondsFrom1900_01_01To1970_01_01;
+    return ((qint64) utcTimeSeconds) * kMillisPerSec;
 }
 
 //-------------------------------------------------------------------------------------------------

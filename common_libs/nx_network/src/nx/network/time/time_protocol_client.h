@@ -11,7 +11,7 @@
 namespace nx {
 namespace network {
 
-constexpr const unsigned int kSecondsFrom19000101To19700101 = 2208988800UL;
+constexpr const unsigned int kSecondsFrom1900_01_01To1970_01_01 = 2208988800UL;
 constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protocol
 
 /**
