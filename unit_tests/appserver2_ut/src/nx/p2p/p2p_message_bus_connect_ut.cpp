@@ -16,6 +16,7 @@
 #include <nx/p2p/p2p_serialization.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx/utils/argument_parser.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace p2p {
@@ -214,7 +215,7 @@ protected:
         for (const auto& server: m_servers)
         {
             createData(
-                server, 
+                server,
                 cameraCount,
                 getIntParam(args, kPropertyCountParamName, kDefaultPropertiesPerCamera),
                 getIntParam(args, kUserCountParamName, kDefaultUsersCount));
@@ -261,6 +262,17 @@ protected:
 
         NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
         printReport();
+
+        for (auto& server: m_servers)
+        {
+            auto commonModule = server->moduleInstance()->commonModule();
+            auto serverRes = commonModule->resourcePool()->
+                getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
+            auto flags = serverRes->getServerFlags();
+            flags |= Qn::SF_P2pSyncDone;
+            serverRes->setServerFlags(flags);
+            commonModule->bindModuleinformation(serverRes);
+        }
 
         while (args.get(kStandaloneModeParamName))
             std::this_thread::sleep_for(std::chrono::seconds(1));
