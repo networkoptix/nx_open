@@ -17,6 +17,12 @@ function(nx_strip_target target)
             endif()
         endif()
 
+        set(strip_flags --strip-debug)
+
+        if(NOT STRIP_ONLY_DEBUG_INFO)
+            list(APPEND strip_flags --strip-unneeded)
+        endif()
+
         if(STRIP_COPY_DEBUG_INFO)
             if(NOT CMAKE_OBJCOPY)
                 message(FATAL_ERROR "objcopy is not found.")
@@ -32,12 +38,6 @@ function(nx_strip_target target)
         else()
             set(copy_debug_info_command)
             set(add_debuglink_command)
-        endif()
-
-        set(strip_flags --strip-unneeded)
-
-        if(STRIP_ONLY_DEBUG_INFO)
-            list(APPEND strip_flags --strip-debug)
         endif()
 
         add_custom_command(TARGET ${target} POST_BUILD
