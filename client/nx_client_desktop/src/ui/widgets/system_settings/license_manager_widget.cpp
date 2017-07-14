@@ -472,7 +472,7 @@ void QnLicenseManagerWidget::showIncompatibleLicenceMessageLater()
     showMessageLater(QnMessageBoxIcon::Warning,
         tr("Incompatible license"),
         tr("License you are trying to activate is incompatible with your software.")
-            + L'\n' + tr("Please contact Customer Support to get a valid license key."),
+            + L'\n' + tr("Please contact Customer Support to get a valid License Key."),
         CopyToClipboardButton::Hide);
 }
 
@@ -1021,7 +1021,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     else if (messageId == lit("InvalidKey"))
     {
         showMessageLater(QnMessageBoxIcon::Warning,
-            tr("Invalid license key"),
+            tr("Invalid License Key"),
             tr("Please make sure it is entered correctly.")
             + L'\n' + getProblemPersistMessage(),
             CopyToClipboardButton::Hide);
@@ -1048,7 +1048,7 @@ void QnLicenseManagerWidget::showFailedToActivateLicenseLater(const QString& ext
 
 QString QnLicenseManagerWidget::getContactSupportMessage()
 {
-    return tr("Please contact Customer Support to obtain a valid license key.");
+    return tr("Please contact Customer Support to obtain a valid License Key.");
 }
 
 QString QnLicenseManagerWidget::networkErrorText()
@@ -1058,7 +1058,7 @@ QString QnLicenseManagerWidget::networkErrorText()
 
 QString QnLicenseManagerWidget::networkErrorExtras()
 {
-    return tr("Please contact Customer Support to activate license key manually.");
+    return tr("Please contact Customer Support to activate License Key manually.");
 }
 
 QString QnLicenseManagerWidget::getProblemPersistMessage()
@@ -1070,10 +1070,9 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& hwid,
     const QString& time)
 {
-    //TODO: #GDM #tr almost the same as in QnLicenseUsageHelper::activationMessage
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to hardware ID %1").arg(hwid)
-        : tr("This license is already activated and linked to hardware ID %1 on %2")
+        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

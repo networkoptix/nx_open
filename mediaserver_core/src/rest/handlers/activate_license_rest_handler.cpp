@@ -27,21 +27,65 @@ static const int TCP_TIMEOUT = 1000 * 5;
 #include "nx1/info.h"
 #endif
 
-namespace
+namespace {
+
+const QString kLicenseKey = lit("license_key");
+const QString kBox = lit("box");
+const QString kBrand = lit("brand");
+const QString kVersion = lit("version");
+const QString kMac = lit("mac");
+const QString kSerial = lit("serial");
+const QString kLang = lit("lang");
+const QString kOldHwidArray = lit("oldhwid[]");
+const QString kHwid = lit("hwid");
+const QString kHwidArray = lit("hwid[]");
+const QString kMode = lit("mode");
+const QString kInfo = lit("info");
+const QString kKey = lit("key");
+
+// TODO: some strings can be reused when server will become translatable
+QString activationMessage(const QJsonObject& errorMessage)
 {
-    const QString kLicenseKey = lit("license_key");
-    const QString kBox = lit("box");
-    const QString kBrand = lit("brand");
-    const QString kVersion = lit("version");
-    const QString kMac = lit("mac");
-    const QString kSerial = lit("serial");
-    const QString kLang = lit("lang");
-    const QString kOldHwidArray = lit("oldhwid[]");
-    const QString kHwid = lit("hwid");
-    const QString kHwidArray = lit("hwid[]");
-    const QString kMode = lit("mode");
-    const QString kInfo = lit("info");
-    const QString kKey = lit("key");
+    QString messageId = errorMessage.value(lit("messageId")).toString();
+
+    // TODO: Feature #3629 case J
+    if (messageId == lit("DatabaseError"))
+        return lit("There was a problem activating your License Key. A database error occurred.");
+
+    if (messageId == lit("InvalidData"))
+    {
+        return lit("There was a problem activating your License Key. Invalid data received. "
+            "Please contact support team to report the issue.");
+    }
+
+    if (messageId == lit("InvalidKey"))
+    {
+        return lit("License Key you have entered is invalid. Please check that License Key is "
+            "entered correctly. If problem continues, please contact the support team to confirm "
+            "if License Key is valid or to obtain a valid License Key.");
+    }
+
+    if (messageId == lit("InvalidBrand"))
+    {
+        return lit("You are trying to activate an incompatible license with your software. Please "
+            "contact the support team to obtain a valid License Key.");
+    }
+
+    if (messageId == lit("AlreadyActivated"))
+    {
+        QString message = lit("This License Key has been previously activated to Hardware ID %1 on %2. "
+            "Please contact the support team to obtain a valid License Key.");
+
+        QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+        QString hwid = arguments.value(lit("hwid")).toString();
+        QString time = arguments.value(lit("time")).toString();
+
+        return message.arg(hwid).arg(time);
+    }
+
+    return errorMessage.value(lit("message")).toString();
+}
+
 }
 
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
@@ -136,7 +180,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         QJsonObject errorMessage;
         if (QJson::deserialize(response, &errorMessage))
         {
-            QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
+            QString message = activationMessage(errorMessage);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
             return CODE_OK;
         }

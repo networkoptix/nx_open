@@ -350,16 +350,6 @@
         <source>Post-recording:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>By:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ask confirmation before creating bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -1734,6 +1724,11 @@
     <message>
         <location/>
         <source>for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force Acknowledgment</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

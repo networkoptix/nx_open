@@ -1601,6 +1601,10 @@ to view more bookmarks</source>
         <source>Name cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Description cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
@@ -2970,7 +2974,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
+        <source>44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3763,10 +3767,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact Customer Support to get a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You already activated this license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3799,23 +3799,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid license key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact Customer Support to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please contact Customer Support to activate license key manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3842,14 +3830,6 @@ to %1</source>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware ID %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -3936,6 +3916,30 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Invalid License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to obtain a valid License Key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to activate License Key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to Hardware ID %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to get a valid License Key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4385,15 +4389,15 @@ to %1</source>
 <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-        <source>b/s</source>
+        <source>B/s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Kb/s</source>
+        <source>KB/s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mb/s</source>
+        <source>MB/s</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4472,19 +4476,8 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmark it</source>
+        <source>Acknowledge</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bookmark created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n bookmarks created</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -5079,6 +5072,14 @@ to %1</source>
     </message>
     <message>
         <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creator</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
