@@ -19,6 +19,19 @@ class ContextAdmin(admin.ModelAdmin):
         return format_html('<a class="button" href="{}">edit content</a>',
                             reverse('context_editor', args=[obj.id]))
 
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return None
+        return list(self.readonly_fields) + \
+               [field.name for field in obj._meta.fields] + \
+               [field.name for field in obj._meta.many_to_many]
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
 
@@ -55,6 +68,19 @@ class ContentVersionAdmin(admin.ModelAdmin):
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',
                             reverse('review_version', args=[obj.id]))
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return None
+        return list(self.readonly_fields) + \
+               [field.name for field in obj._meta.fields] + \
+               [field.name for field in obj._meta.many_to_many]
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
     content_version_actions.short_description = "Admin Options"
     content_version_actions.allow_tags = True
