@@ -177,9 +177,9 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
 {
     if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus.get()))
     {
-        httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus*>(
             "HTTP", "ec2/events", bus);
-        httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus*>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
     else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus.get()))
