@@ -15,7 +15,7 @@
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
-#include <mediaserver_api.h>
+#include <mediaserver_endpoint_tester.h>
 
 #include "mediator_mocks.h"
 

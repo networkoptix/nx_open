@@ -3,7 +3,7 @@
 
 #include <gmock/gmock.h>
 
-#include <mediaserver_api.h>
+#include <mediaserver_endpoint_tester.h>
 
 #include "custom_printers.h"
 

@@ -3,7 +3,7 @@
 #include "cloud_data_provider.h"
 #include "listening_peer_pool.h"
 #include "peer_registrator.h"
-#include "mediaserver_api.h"
+#include "mediaserver_endpoint_tester.h"
 #include "server/hole_punching_processor.h"
 #include "statistics/stats_manager.h"
 

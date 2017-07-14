@@ -1,4 +1,4 @@
-#include "mediaserver_api.h"
+#include "mediaserver_endpoint_tester.h"
 
 #include <QJsonDocument>
 
@@ -9,6 +9,25 @@
 
 namespace nx {
 namespace hpm {
+
+struct PingCollector
+{
+    QnMutex mutex;
+    size_t expected;
+    std::list< SocketAddress > endpoints;
+    ConnectionWeakRef connection;
+
+    PingCollector(
+        size_t expected,
+        ConnectionWeakRef connection)
+        :
+        expected(expected),
+        connection(std::move(connection))
+    {
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
     AbstractCloudDataProvider* cloudData,
@@ -26,23 +45,6 @@ MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
 
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register ping processor");
 }
-
-struct PingCollector
-{
-    QnMutex mutex;
-    size_t expected;
-    std::list< SocketAddress > endpoints;
-    ConnectionWeakRef connection;
-
-    PingCollector(
-        size_t expected_,
-        ConnectionWeakRef connection_)
-        :
-        expected(expected_),
-        connection(std::move(connection_))
-    {
-    }
-};
 
 void MediaserverEndpointTesterBase::ping(
     const ConnectionStrongRef& connection,
@@ -87,7 +89,7 @@ void MediaserverEndpointTesterBase::ping(
             collector->endpoints.push_back(std::move(address));
 
         if (--collector->expected)
-            return; // wait for others...
+            return; //< Waiting for others to complete.
 
         if (auto connection = collector->connection.lock())
         {
