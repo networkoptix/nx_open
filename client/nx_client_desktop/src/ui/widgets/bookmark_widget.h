@@ -26,8 +26,11 @@ public:
     /** Check if entered data is valid. */
     bool isValid() const;
 
+    void setDescriptionMandatory(bool mandatory);
+
 signals:
     bool validChanged();
+
 private:
     void updateTagsList();
 

@@ -10,11 +10,12 @@ namespace db {
  * Updates are executed in order they have been added to DbStructureUpdater instance.
  * @note Database is not created, it MUST already exist.
  * @note This class methods are not thread-safe.
+ * @note Always updates internal auxiliary schema first.
  */
 class NX_UTILS_API DbStructureUpdater
 {
 public:
-    using DbUpdateFunc = MoveOnlyFunc<DBResult(QueryContext*)>;
+    using UpdateFunc = MoveOnlyFunc<DBResult(QueryContext*)>;
 
     DbStructureUpdater(
         const std::string& schemaName,
@@ -25,8 +26,8 @@ public:
 
     /**
      * Used to aggregate update scripts.
-     * if not set, initial version is considered to be zero.
-     * Subsequent call to addUpdate* method will add script with initial version.
+     * If not set, initial version is considered to be zero.
+     * Subsequent call to addUpdate* method will use version, set by this method.
      * WARNING: DB of version less than initial will fail to be upgraded!
      */
     void setInitialVersion(unsigned int version);
@@ -37,7 +38,7 @@ public:
      * Script for RdbmsDriverType::unknown is used as a fallback.
      */
     void addUpdateScript(std::map<RdbmsDriverType, QByteArray> scriptByDbType);
-    void addUpdateFunc(DbUpdateFunc dbUpdateFunc);
+    void addUpdateFunc(UpdateFunc dbUpdateFunc);
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
@@ -48,8 +49,8 @@ public:
     unsigned int maxKnownVersion() const;
 
     /**
-     * By default, update is done to the maximum known version. I.e., every script/function is
-     * applied.
+     * By default, update is done to the maximum known version. 
+     * I.e., every script/function is applied.
      */
     void setVersionToUpdateTo(unsigned int version);
 
@@ -62,11 +63,11 @@ private:
 
     void updateStructInternal(QueryContext* queryContext);
     void updateDbToMultipleSchema(QueryContext* queryContext);
-    bool isDbVersionTableExists(QueryContext* queryContext);
+    bool dbVersionTableExists(QueryContext* queryContext);
     void createInitialSchema(QueryContext* queryContext);
-    bool isDbVersionTableSupportsMultipleSchemas(QueryContext* queryContext);
+    bool dbVersionTableSupportsMultipleSchemas(QueryContext* queryContext);
     void updateDbVersionTable(QueryContext* queryContext);
-    void setDbSchemaNameTo(
+    void setDbSchemaName(
         QueryContext* queryContext,
         const std::string& schemaName);
 };

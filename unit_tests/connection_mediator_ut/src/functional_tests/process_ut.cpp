@@ -89,4 +89,4 @@ TEST_F(FtMediatorProcess, correct_manager_destruction_order)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

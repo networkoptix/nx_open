@@ -165,7 +165,7 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator()),
+    m_lexComparator(new QnBusinessTypesComparator(true)),
     m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
 {
 }

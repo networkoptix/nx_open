@@ -10,6 +10,8 @@
 #include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/actions/abstract_action.h>
 
 class QnCameraBookmarksManagerPrivate:
     public Connective<QObject>,
@@ -40,6 +42,11 @@ public:
     /// @param callback         Callback with operation result.
     void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
+    void acknowledgeEvent(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::AbstractActionPtr& action,
+        OperationCallbackType callback = OperationCallbackType());
+
     /// @brief                  Update the existing bookmark on the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
@@ -67,6 +74,7 @@ public:
     /// @param query            Target query.
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+
 private slots:
 
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int requestId);
@@ -119,6 +127,11 @@ private:
     /// @brief                  Find and discard camera from all cached queries. Invalid queries will be discarded as well.
     void removeCameraFromQueries(const QnResourcePtr& resource);
 
+    void addCameraBookmarkInternal(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::AbstractActionPtr& action,
+        OperationCallbackType callback = OperationCallbackType());
+
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
@@ -130,6 +143,7 @@ private:
     struct OperationInfo {
         enum class OperationType {
             Add,
+            Acknowledge,
             Update,
             Delete
         };

@@ -21,13 +21,13 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::SmtpIsNotSet:
             return tr("Email server is not set");
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Some users have not set their Email addresses");
+            return tr("Some users have not set their email addresses");
         case QnSystemHealth::NoPrimaryTimeServer:
             return tr("Select server for others to synchronize time with");
         case QnSystemHealth::SystemIsReadOnly:
             return tr("System is in safe mode");
         case QnSystemHealth::EmailSendError:
-            return tr("Error while sending Email");
+            return tr("Error while sending email");
         case QnSystemHealth::StoragesAreFull:
             return tr("Storage is full");
         case QnSystemHealth::StoragesNotConfigured:
@@ -63,9 +63,9 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
 
             const QString kCloudNameText = lit("<b>%1</b>").arg(nx::network::AppInfo::cloudName());
             const QString kMessage = isLoggedIntoCloud
-                ? tr("Connect your system to %1 &mdash; make it accessible from anywhere!",
+                ? tr("Connect your System to %1 &mdash; make it accessible from anywhere!",
                     "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText)
-                : tr("Check out %1 &mdash; connect to your system from anywhere!",
+                : tr("Check out %1 &mdash; connect to your System from anywhere!",
                     "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText);
 
             using nx::vms::utils::SystemUri;
@@ -102,13 +102,13 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString();
 
         case QnSystemHealth::EmailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by Email.");
+            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");
             break;
         case QnSystemHealth::SmtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by Email.");
+            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by email.");
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive System notifications by Email.");
+            messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
             break;
         case QnSystemHealth::NoPrimaryTimeServer:
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");

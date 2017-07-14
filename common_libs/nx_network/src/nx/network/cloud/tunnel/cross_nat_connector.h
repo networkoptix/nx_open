@@ -34,7 +34,7 @@ public:
      */
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
-        boost::optional<SocketAddress> mediatorAddress = boost::none);
+        boost::optional<SocketAddress> mediatorUdpEndpoint = boost::none);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -58,7 +58,7 @@ private:
     const AddressEntry m_targetPeerAddress;
     const nx::String m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
-    SocketAddress m_mediatorAddress;
+    SocketAddress m_mediatorUdpEndpoint;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
     boost::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;

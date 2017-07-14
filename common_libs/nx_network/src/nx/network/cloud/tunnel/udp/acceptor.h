@@ -21,6 +21,7 @@ class NX_NETWORK_API TunnelAcceptor:
 {
 public:
     TunnelAcceptor(
+        const SocketAddress& mediatorUdpEndpoint,
         std::list<SocketAddress> peerAddresses,
         nx::hpm::api::ConnectionParameters connectionParametes);
 
@@ -44,6 +45,7 @@ private:
 
     const std::list<SocketAddress> m_peerAddresses;
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
+    SocketAddress m_mediatorUdpEndpoint;
     std::chrono::milliseconds m_udpRetransmissionTimeout;
     int m_udpMaxRetransmissions;
     bool m_holePunchingEnabled;

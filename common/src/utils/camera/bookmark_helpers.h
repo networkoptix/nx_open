@@ -9,6 +9,10 @@ class QnCommonModule;
 
 namespace helpers {
 
+QString getBookmarkCreatorName(
+    const QnCameraBookmark& bookmark,
+    QnResourcePool* resourcePool);
+
 QnCameraBookmark bookmarkFromAction(
     const nx::vms::event::AbstractActionPtr& action,
     const QnSecurityCamResourcePtr& camera,

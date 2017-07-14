@@ -49,6 +49,18 @@ void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmar
     emit bookmarkAdded(bookmark);
 }
 
+void QnCameraBookmarksManager::addAcknowledge(
+    const QnCameraBookmark &bookmark,
+    const nx::vms::event::AbstractActionPtr& action,
+    OperationCallbackType callback)
+{
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    Q_D(QnCameraBookmarksManager);
+    d->acknowledgeEvent(bookmark, action, callback);
+
+    emit bookmarkAdded(bookmark);
+}
+
 void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
