@@ -146,22 +146,23 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
     m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
+    m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on respool.
 
     m_moduleDiscoveryManager = new nx::vms::discovery::Manager(this, clientMode, m_resourcePool);
     // TODO: bind m_moduleDiscoveryManager to resPool server changes
     m_router = new QnRouter(this, m_moduleDiscoveryManager);
 
     m_userRolesManager = new QnUserRolesManager(this);         /*< Depends on nothing. */
-    m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
+
+    // Depends on respool and roles.
+    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
+
+    // Depends on respool, roles and global permissions.
+    m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this);
 
     // Depends on respool, roles and shared resources.
     m_resourceAccessProvider = new QnResourceAccessProvider(resourceAccessMode, this);
-
-    // Depends on respool.
-    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
-    m_runtimeInfoManager = new QnRuntimeInfoManager(this);
-
 
     // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
     m_resourceAccessProvider->addBaseProvider(
@@ -175,7 +176,6 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     // Depends on access provider.
     m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);
-
 
     m_globalSettings = new QnGlobalSettings(this);
     m_cameraHistory = new QnCameraHistoryPool(this);
