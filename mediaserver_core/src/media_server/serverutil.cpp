@@ -50,7 +50,6 @@
 #include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
 #include <api/model/password_data.h>
-#include <nx/util/appserver2_util.h>
 
 namespace
 {
