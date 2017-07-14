@@ -67,11 +67,14 @@ def alter_records_version(contexts, customization, old_version, new_version):
 	languages = Language.objects.all()
 	for context in contexts:
 		for data_structure in context.datastructure_set.all():
-			records = data_structure.datarecord_set.filter(customization=customization,
+			record = data_structure.datarecord_set.filter(customization=customization,
 														   version=old_version)
-			for record in records:
-				record.version = new_version
-				record.save()
+
+			#Now only the latest records that can be published will have its version altered
+			if record.exists():
+				latest_record = record.latest('created_date')
+				latest_record.version = new_version
+				latest_record.save()
 
 
 def generate_preview(context=None):
