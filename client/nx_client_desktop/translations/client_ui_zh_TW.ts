@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>事後錄影:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -904,8 +894,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>不正確的電子郵件或密碼</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1040,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>匯出縮時預覽</translation>
     </message>
@@ -1068,13 +1058,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>縮時預覽倍數</translation>
+      <source>Frames Interval</source>
+      <translation>兩張影像間隔</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>兩張影像間隔</translation>
+      <source>Rapid Review speed</source>
+      <translation>縮時預覽倍數</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1726,11 @@
       <source>for</source>
       <translation>給</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1903,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>不正確的電子郵件或密碼</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2668,19 +2663,6 @@
       <location/>
       <source>Icon</source>
       <translation type="unfinished">Icon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
     </message>
   </context>
   <context>

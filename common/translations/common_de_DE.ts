@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that bookmark was created by system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -115,7 +123,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Ungültige Antwort von Server %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -139,7 +147,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Ein Ein-/Ausgabefehler hat sich ereignet. Betriebssystemmeldung: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -163,11 +171,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Geräteabfrage %1&quot;&quot; fehlgeschlagen mit Fehler &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Kameraabfrage %1&quot;&quot; fehlgeschlagen mit Fehler &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -207,7 +215,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I/O-Modulabfrage %1&quot;&quot; fehlgeschlagen mit Fehler &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -295,7 +303,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Die Kamera wurde aus dem Archiv wiederhergestellt. Löschen Sie die Kamera und fügen Sie sie erneut hinzu, um das Live-Video anzuzeigen.</translation>
     </message>
   </context>
   <context>
@@ -395,11 +403,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Kante</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -486,22 +494,6 @@
         <numerusform>%n %2 von %1 werden verwendet werden.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Supportteam, falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. Ihren Lizenzschlüssel zu prüfen.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren. Bitte kontaktieren Sie das Support-Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ein Datenbankfehler ist aufgetreten.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ungültige Daten wurden empfangen. Kontaktieren Sie bitte das Supportteam.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -516,21 +508,12 @@
         <numerusform>%n %1 werden verwendet.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>Dieser Lizenzschlüssel wurde zuvor auf Hardware-ID %1 am %2 aktiviert. Bitte wenden Sie sich an das Support-Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>Ungültige Signatur</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -555,6 +538,10 @@
     <message>
       <source>Unknown error</source>
       <translation>Unbekannter Fehler</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
@@ -1050,10 +1037,6 @@
       <translation>Panikaufnahme</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>Email senden</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>In Log schreiben</translation>
     </message>
@@ -1152,10 +1135,6 @@
       <source>Any Event</source>
       <translation>Allgemeines Ereignis</translation>
     </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
@@ -1240,7 +1219,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Serverfehler &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1254,39 +1233,31 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Serverkonflikt &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Server &quot;%1&quot; gestartet</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Server &quot;%1&quot; hat ein Lizenzproblem</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Server &quot;%1&quot; hat eine Archivsicherung fertiggestellt</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
       <translation>Ereignis auf %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>Unbekanntes Ereignis aufgetreten</translation>
     </message>
     <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Mehrere %1 Ereignisse sind aufgetreten</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1328,19 +1299,19 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n mal, zuerst: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n mal, zuerst: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1405,11 +1376,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD-Speicher &quot;%1&quot; ist voll. Festplatte enthält zu viele Daten, die nicht vom VMS verwaltet werden.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Festplatte &quot;%1&quot; ist fast voll.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1473,7 +1444,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Triggername</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1495,7 +1466,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Alle Administratoren</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1504,6 +1475,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>Mindestens einen Benutzer wählen</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

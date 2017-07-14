@@ -85,6 +85,7 @@ struct EventParameters
      */
     EventMetaData metadata;
 
+
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 };

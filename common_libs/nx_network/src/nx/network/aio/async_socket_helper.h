@@ -66,7 +66,7 @@ protected:
 template<class SocketType>
 class AsyncSocketImplHelper:
     public BaseAsyncSocketImplHelper<SocketType>,
-    public aio::AIOEventHandler<Pollable>
+    public aio::AIOEventHandler
 {
 public:
     AsyncSocketImplHelper(
@@ -828,7 +828,7 @@ private:
 
 template <class SocketType>
 class AsyncServerSocketHelper:
-    public aio::AIOEventHandler<Pollable>
+    public aio::AIOEventHandler
 {
 public:
     AsyncServerSocketHelper(SocketType* _sock):

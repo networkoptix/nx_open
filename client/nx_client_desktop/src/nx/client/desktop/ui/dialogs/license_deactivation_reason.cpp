@@ -166,7 +166,7 @@ QStringList LicenseDeactivationReason::reasons()
 {
     static const QStringList kReasons{
         tr("- Choose one -"),
-        tr("I'm upgrading my machine"),
+        tr("I am upgrading my machine"),
         tr("I accidentally assigned the license to a wrong machine"),
         tr("Other Reason")};
 

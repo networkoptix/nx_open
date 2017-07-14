@@ -929,35 +929,35 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Licence n’existe pas.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Licence désactivée.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Licence inactive.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Licence invalide.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Licence d'essaie.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
-    </message>
-    <message>
-      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>Licence en cours de désactivation, mais n'a pas encore été désactivée.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Nombre de désactivations a dépassé la limite pour cette licence.</translation>
+    </message>
+    <message>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1515,6 +1515,10 @@ pour afficher plus de signets</translation>
       <source>Select Cameras to Backup...</source>
       <translation>Sélectionner les caméras à sauvegarder...</translation>
     </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
@@ -1597,6 +1601,10 @@ pour afficher plus de signets</translation>
     <message>
       <source>Name cannot be empty.</source>
       <translation>Nom ne peut pas être vide.</translation>
+    </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -2813,7 +2821,7 @@ to %1</source>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
-      <translation type="unfinished">This user is disabled by system administrator.</translation>
+      <translation>Utilisateur désactivé par l'administrateur système.</translation>
     </message>
   </context>
   <context>
@@ -2971,8 +2979,8 @@ to %1</source>
       <translation>Impossible d'initialiser l'encodeur audio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation>Formats audio de 44,1Khz et 48Khz non pris en charge par le périphérique de capture audio. S.V.P, choisir un autre appareil audio ou &quot;aucun&quot; dans les paramètres d’enregistrement d’écran</translation>
+      <source>44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</source>
+      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</translation>
     </message>
   </context>
   <context>
@@ -3764,10 +3772,6 @@ to %1</source>
       <translation>Licence que vous tentez d’activer est incompatible avec votre logiciel.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation>S.V.P contacter le Support client pour obtenir une clé de licence valide.</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation>Vous avez déjà activé cette licence</translation>
     </message>
@@ -3800,24 +3804,12 @@ to %1</source>
       <translation>Données invalides reçues. Veuillez contacter le Support client pour signaler le problème.</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation>Clé de licence invalide</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>Échec d’activation de la licence</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation>S.V.P contacter le Support client pour obtenir une clé de licence valide.</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>Erreur Réseau</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation>S.V.P contacter le Support client pour activer la clé de licence manuellement.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3844,14 +3836,6 @@ to %1</source>
     <message>
       <source>Please make sure it is entered correctly.</source>
       <translation>S.V.P, assurez-vous qu'elle soit entrée correctement.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
@@ -3922,21 +3906,45 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n canal.</numerusform>
+        <numerusform>%n canaux.</numerusform>
       </translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Veuillez contacter le Support Client.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Désactiver %n autre</numerusform>
+        <numerusform>Désactiver %n autre</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Clé de licence invalide</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
     </message>
   </context>
   <context>
@@ -3966,12 +3974,12 @@ to %1</source>
       <translation>ID Matériel copié dans le presse-papiers</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
-    </message>
-    <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
@@ -4234,13 +4242,13 @@ to %1</source>
       <translation>Basse-Res</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation>appuyez et maintenez</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation>Impossible d’appeler le déclencheur %1 (%2)</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation>appuyez et maintenez</translation>
     </message>
   </context>
   <context>
@@ -4386,16 +4394,16 @@ to %1</source>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation>B/s</translation>
+      <source>B/s</source>
+      <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation>KB/s</translation>
+      <source>KB/s</source>
+      <translation type="unfinished">KB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation>MB/s</translation>
+      <source>MB/s</source>
+      <translation type="unfinished">MB/s</translation>
     </message>
   </context>
   <context>
@@ -4473,19 +4481,8 @@ to %1</source>
       <translation>Alarme: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation>Ajouter signet</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation>Signet créé</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation>
-        <numerusform>%n signets créés</numerusform>
-        <numerusform>%n signets créés</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -4542,8 +4539,8 @@ to %1</source>
       <translation>Entrée usager</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
-      <translation>PTZ, sortie périphérique, audio bidirectionnel, déclencheurs logiciels.</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
@@ -5082,6 +5079,14 @@ to %1</source>
       <source>Camera</source>
       <translation>Caméra</translation>
     </message>
+    <message>
+      <source>Created</source>
+      <translation type="unfinished">Created</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation type="unfinished">Creator</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchLineEdit</name>
@@ -5185,30 +5190,30 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Send Email to %1</source>
-      <translation>Envoyer courriel à %1</translation>
-    </message>
-    <message>
       <source>User %1 has invalid email address</source>
-      <translation type="unfinished">User %1 has invalid email address</translation>
+      <translation>Usager %1 a un courriel invalide</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%n de %1 usagers ont un courriel invalide</numerusform>
+        <numerusform>%n de %1 usagers ont un courriel invalide</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Adresse courriel invalide %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n de %1 des courriels supplémentaires sont invalides</numerusform>
+        <numerusform>%n de %1 des courriels supplémentaires sont invalides</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Send email to %1</source>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
@@ -5747,6 +5752,43 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation type="unfinished">Role %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation type="unfinished">Selected roles have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation type="unfinished">User %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation type="unfinished">Selected users have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -6178,42 +6220,42 @@ to %1</source>
       <translation>En savoir plus</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation>Certains usagers n’ont pas mis leurs courriel</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation>Erreur lors de l’envoi courriel</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation>Certains usagers n’ont pas mis leurs courriel.</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation>Système s’exécute en mode sans échec.</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
-      <translation>Vous ne pouvez pas recevoir les notifications système par courriel.</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by Email.</source>
-      <translation>Ils ne peuvent pas recevoir les notifications système par courriel.</translation>
-    </message>
-    <message>
-      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Connexion</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses</source>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses.</source>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
   </context>
   <context>
@@ -6734,8 +6776,8 @@ to %1</source>
       <translation>Le mot de passe ne correspond pas.</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
-      <translation>Usager nuage avec courriel spécifié existe déjà.</translation>
+      <source>Cloud user with specified email already exists.</source>
+      <translation type="unfinished">Cloud user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7079,10 +7121,6 @@ to %1</source>
       <translation>Mot de passe Administrateur</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation>Connexion sur le système actuel...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Les systèmes seront fusionnées sous peu</translation>
     </message>
@@ -7113,6 +7151,10 @@ to %1</source>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Systèmes nuage ne peuvent pas être fusionnées</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation type="unfinished">Connecting to the current System...</translation>
     </message>
   </context>
   <context>
@@ -7388,7 +7430,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the tour</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
+      <translation>Faites glisser la mise en page ou caméra ici pour l’ajouter au tour</translation>
     </message>
   </context>
   <context>
@@ -7462,19 +7504,19 @@ to %1</source>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
-    </message>
-    <message>
-      <source>I&apos;m upgrading my machine</source>
-      <translation type="unfinished">I&apos;m upgrading my machine</translation>
+      <translation>- Choisir un -</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Accidentellement assigné la licence à une mauvaise machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Autre raison</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
   </context>
   <context>
@@ -7679,17 +7721,17 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing layout tour?</source>
-      <translation type="unfinished">Overwrite existing layout tour?</translation>
+      <translation>Remplacer mise en page de tour existante?</translation>
     </message>
     <message>
       <source>There is another layout tour with the same name.</source>
-      <translation type="unfinished">There is another layout tour with the same name.</translation>
+      <translation>Il y a une autre mise en page de tour du même nom.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout tour?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout tour?</numerusform>
-        <numerusform>Remove %n items from layout tour?</numerusform>
+      <translation>
+        <numerusform>Supprimer %n objets de la mise en page de tour?</numerusform>
+        <numerusform>Supprimer %n objets de la mise en page de tour?</numerusform>
       </translation>
     </message>
   </context>

@@ -103,5 +103,5 @@ public:
     virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

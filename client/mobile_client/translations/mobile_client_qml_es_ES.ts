@@ -80,8 +80,8 @@
       <translation>Inicia sesión</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>Correo electrónico incorrecto o la contraseña</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>

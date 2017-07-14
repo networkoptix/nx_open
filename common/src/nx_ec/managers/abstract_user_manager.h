@@ -74,6 +74,26 @@ public:
     }
 
     /**
+    * @param handler Functor with params: (ErrorCode)
+    */
+    template<class TargetType, class HandlerType>
+    int save(const ApiUserDataList& users, TargetType* target, HandlerType handler)
+    {
+        return save(users, std::static_pointer_cast<impl::SimpleHandler>(
+            std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                target, handler)));
+    }
+
+    ErrorCode saveSync(const ApiUserDataList& users)
+    {
+        return impl::doSyncCall<impl::SimpleHandler>(
+            [=](const impl::SimpleHandlerPtr& handler)
+            {
+                return this->save(users, handler);
+            });
+    }
+
+    /**
      * @param handler Functor with params: (ErrorCode)
      */
     template<class TargetType, class HandlerType>
@@ -188,8 +208,9 @@ public:
 
 private:
     virtual int getUsers(impl::GetUsersHandlerPtr handler) = 0;
-    virtual int save(
-        const ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler) = 0;
+    virtual int save(const ApiUserData& user, const QString& newPassword,
+        impl::SimpleHandlerPtr handler) = 0;
+    virtual int save(const ApiUserDataList& users, impl::SimpleHandlerPtr handler) = 0;
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
 
     virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) = 0;

@@ -350,16 +350,6 @@
         <source>Post-recording:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>By:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ask confirmation before creating bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -904,7 +894,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1050,9 +1040,9 @@
     </message>
 </context>
 <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
         <source>Export Rapid Review</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1068,12 +1058,12 @@
     </message>
     <message>
         <location/>
-        <source>Rapid Review speed</source>
+        <source>Frames Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Frames Interval</source>
+        <source>Rapid Review speed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1736,6 +1726,11 @@
         <source>for</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Force Acknowledgment</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PopupSettingsWidget</name>
@@ -1908,7 +1903,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2667,19 +2662,6 @@
     <message>
         <location/>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-        <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-        <source>&lt;Some Caption&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Some description&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

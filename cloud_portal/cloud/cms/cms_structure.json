@@ -27,11 +27,11 @@
       "values":[
         ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
         ["%BLOCK1_TITLE%","Connect from Anywhere"],
-        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password"],
+        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password","","Long Text"],
         ["%BLOCK2_TITLE%","Simple User Management"],
-        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles"],
+        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles","","Long Text"],
         ["%BLOCK3_TITLE%","Multiple System Management"],
-        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management"]
+        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management","","Long Text"]
       ]
     },
     {

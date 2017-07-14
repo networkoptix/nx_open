@@ -39,7 +39,7 @@ QString StringsHelper::actionName(ActionType value) const
         case undefinedAction:         return QString();
         case bookmarkAction:          return tr("Bookmark");
         case panicRecordingAction:    return tr("Panic recording");
-        case sendMailAction:          return tr("Send Email");
+        case sendMailAction:          return tr("Send email");
         case diagnosticsAction:       return tr("Write to log");
         case showPopupAction:         return tr("Show notification");
         case playSoundAction:         return tr("Repeat sound");
@@ -49,6 +49,7 @@ QString StringsHelper::actionName(ActionType value) const
         case showTextOverlayAction:   return tr("Show text overlay");
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
+        case acknowledgeAction:       return tr("Acknowledge");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -94,7 +95,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case anyServerEvent:       return tr("Any Server Issue");
         case anyEvent:             return tr("Any Event");
 
-        case softwareTriggerEvent: return tr("Software Trigger");
+        case softwareTriggerEvent: return tr("Soft Trigger");
 
         case cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -188,7 +189,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         }
 
         case softwareTriggerEvent:
-            return tr("Software trigger %1 at %2")
+            return tr("Soft Trigger %1 at %2")
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
 
@@ -201,7 +202,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
 {
     if (params.eventType == softwareTriggerEvent)
     {
-        return tr("Software Trigger %1 has been activated multiple times")
+        return tr("Soft Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
     }
 
@@ -667,6 +668,7 @@ QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const
     else
         userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
 
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     return actionSubjects(users, roles, showName);
 }
 

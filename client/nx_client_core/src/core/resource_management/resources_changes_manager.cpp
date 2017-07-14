@@ -406,6 +406,28 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         });
 }
 
+void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
+{
+    if (users.empty())
+        return;
+
+    auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+
+    auto sessionGuid = commonModule()->runningInstanceGUID();
+
+    ec2::ApiUserDataList apiUsers;
+    for (const auto& user: users)
+    {
+        apiUsers.push_back({});
+        fromResourceToApi(user, apiUsers.back());
+    }
+
+    connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, this,
+        [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
+}
+
 void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& accessibleResources)
 {

@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>אחרי הקלטה:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation>על ידי:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation>בקש אישור לפני יצירת סימנייה</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -904,8 +894,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>שם משתמש או סיסמא שגויים</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1040,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>ייצוא סקירה מהירה</translation>
     </message>
@@ -1068,13 +1058,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>מהירות סקירה מהירה</translation>
+      <source>Frames Interval</source>
+      <translation>מרווח תמונות</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>מרווח תמונות</translation>
+      <source>Rapid Review speed</source>
+      <translation>מהירות סקירה מהירה</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1726,11 @@
       <source>for</source>
       <translation>ל</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1903,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>דוא"ל או סיסמה שגויים</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2671,19 +2666,6 @@
     </message>
   </context>
   <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation>&lt; כותרת &gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation>&lt; תיאור &gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2805,12 +2787,12 @@
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>בחר משתמשים</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>אין פריטים שתואמים לחיפוש.</translation>
     </message>
   </context>
   <context>

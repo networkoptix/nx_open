@@ -38,20 +38,20 @@ SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 
 CrossNatConnector::CrossNatConnector(
     const AddressEntry& targetPeerAddress,
-    boost::optional<SocketAddress> mediatorAddress)
+    boost::optional<SocketAddress> mediatorUdpEndpoint)
     :
     m_targetPeerAddress(targetPeerAddress),
     m_connectSessionId(QnUuid::createUuid().toByteArray()),
-    m_mediatorAddress(
-        mediatorAddress
-        ? mediatorAddress.get()
-        : *nx::network::SocketGlobals::mediatorConnector().mediatorAddress()),
+    m_mediatorUdpEndpoint(
+        mediatorUdpEndpoint
+        ? mediatorUdpEndpoint.get()
+        : *nx::network::SocketGlobals::mediatorConnector().udpEndpoint()),
     m_originatingHostAddressReplacement(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
     m_mediatorUdpClient = 
-        std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
+        std::make_unique<api::MediatorClientUdpConnection>(m_mediatorUdpEndpoint);
     m_mediatorUdpClient->bindToAioThread(getAioThread());
 
     m_timer = std::make_unique<aio::Timer>();
@@ -194,7 +194,7 @@ void CrossNatConnector::onConnectResponse(
     if (m_done)
         return;
 
-    m_mediatorAddress = stunTransportHeader.locationEndpoint;
+    m_mediatorUdpEndpoint = stunTransportHeader.locationEndpoint;
 
     m_timer->cancelSync();
 
@@ -314,7 +314,7 @@ void CrossNatConnector::holePunchingDone(
             stun::extension::methods::connectionResult));
     m_connectResultReport.serialize(&connectResultReportMessage);
     m_connectResultReportSender->sendMessage(
-        m_mediatorAddress,
+        m_mediatorUdpEndpoint,
         std::move(connectResultReportMessage),
         std::bind(&CrossNatConnector::connectSessionReportSent, this, _1));
 }

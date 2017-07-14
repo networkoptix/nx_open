@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QLayout>
 
+#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -12,6 +13,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
@@ -272,45 +274,22 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     QnUserResourceList users;
     QList<QnUuid> roles;
     module->userRolesManager()->usersAndRoles(ids, users, roles);
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
     auto additional = parseAdditional(additionalList);
 
-    QStringList receivers;
-    int invalid = 0;
-    int total = 0;
-    int explicitUsers = 0;
-    QnUserResourcePtr invalidUser;
-
-    for (const auto& user: users)
-    {
-        if (!user->isEnabled())
-            continue;
-
-        ++explicitUsers;
-
-        QString userMail = user->getEmail();
-        if (isValidUser(user))
-        {
-            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
-        }
-        else
-        {
-            ++invalid;
-            if (!invalidUser)
-                invalidUser = user;
-        }
-    }
-
-    if (explicitUsers == 0 && roles.empty() && additional.isEmpty())
+    if (users.empty() && roles.empty() && additional.isEmpty())
         return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (!detailed)
     {
         QStringList recipients;
-        if (explicitUsers)
-            recipients << tr("%n Users", "", explicitUsers);
-        if (!roles.empty())
-            recipients << tr("%n Roles", "", (int)roles.size());
+        if (!users.empty() || !roles.empty())
+        {
+            recipients << nx::vms::event::StringsHelper(qnClientCoreModule->commonModule())
+                .actionSubjects(users, roles, true);
+        }
+
         if (!additional.empty())
             recipients << tr("%n additional", "", additional.size());
 
@@ -318,7 +297,19 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
         return recipients.join(lit(", "));
     }
 
-    total = explicitUsers;
+    QStringList receivers;
+    QSet<QnUserResourcePtr> invalidUsers;
+
+    for (const auto& user : users)
+    {
+        QString userMail = user->getEmail();
+        if (isValidUser(user))
+            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
+        else
+            invalidUsers << user;
+    }
+
+    int total = users.size();
 
     for (const auto& roleId: roles)
     {
@@ -331,18 +322,15 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 
             ++total;
             if (!isValidUser(user))
-            {
-                ++invalid;
-                if (!invalidUser)
-                    invalidUser = user;
-            }
+                invalidUsers << user;
         }
     }
 
+    int invalid = invalidUsers.size();
     if (invalid > 0)
     {
         return invalid == 1
-            ? tr("User %1 has invalid email address").arg(invalidUser->getName())
+            ? tr("User %1 has invalid email address").arg((*invalidUsers.cbegin())->getName())
             : tr("%n of %1 users have invalid email address", "", invalid).arg(total);
     }
 
@@ -362,7 +350,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
             : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
     }
 
-    return tr("Send Email to %1").arg(receivers.join(QLatin1String("; ")));
+    return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 }
 
 QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)
@@ -407,6 +395,40 @@ bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
 
     const auto roleId = QnUserRolesManager::unifiedUserRoleId(user);
     return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
+}
+
+bool hasAccessToSource(const nx::vms::event::EventParameters& params,
+    const QnUserResourcePtr& user)
+{
+    if (!user || !user->commonModule())
+        return false;
+
+    const auto context = user->commonModule();
+
+    const auto eventType = params.eventType;
+
+    const auto resource = context->resourcePool()->getResourceById(params.eventResourceId);
+    const bool hasViewPermission = resource && context->resourceAccessManager()->hasPermission(
+        user,
+        resource,
+        Qn::ViewContentPermission);
+
+    if (nx::vms::event::isSourceCameraRequired(eventType))
+    {
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+        return camera && hasViewPermission;
+    }
+
+    if (nx::vms::event::isSourceServerRequired(eventType))
+    {
+        const auto server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+        /* Only admins should see notifications with servers. */
+        return server && hasViewPermission;
+    }
+
+    return true;
 }
 
 } // namespace QnBusiness

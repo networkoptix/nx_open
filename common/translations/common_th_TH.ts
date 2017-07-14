@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that bookmark was created by system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -484,22 +492,6 @@
         <numerusform>%n %2 จะถูกนำมาใช้จาก %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>คุณพยายามที่จะเปิดใช้งานใบอนุญาตเข้ากันไม่ได้กับซอฟต์แวร์ของคุณ กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ มีข้อผิดพลาดเกิดขึ้นในฐานข้อมูล.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง โปรดติดต่อทีมสนับสนุนเพื่อรายงานปัญหา.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation type="unfinished">
@@ -512,21 +504,12 @@
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation type="unfinished">This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>ลายเซ็นไม่ถูกต้อง</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>เซิร์ฟเวอร์กับฮาร์ดแวร์ที่ตรงกับ ไอดี ไม่พบ</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -551,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
@@ -1032,10 +1019,6 @@
       <translation>บันทึกความตื่นตระหนก</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>เขียนลงบันทึก</translation>
     </message>
@@ -1132,10 +1115,6 @@
     <message>
       <source>Any Event</source>
       <translation>ทุกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1248,16 +1227,8 @@
       <translation>เหตุการณ์ทั่วไปที่ %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1474,6 +1445,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

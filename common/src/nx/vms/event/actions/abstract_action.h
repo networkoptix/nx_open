@@ -18,6 +18,7 @@ namespace event {
 //TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
 bool requiresCameraResource(ActionType actionType);
 bool requiresUserResource(ActionType actionType);
+bool requiresAdditionalUserResource(ActionType actionType);
 
 bool hasToggleState(ActionType actionType);
 bool canBeInstant(ActionType actionType);
@@ -26,7 +27,33 @@ bool allowsAggregation(ActionType actionType);
 
 bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
 
+QList<ActionType> userAvailableActions();
 QList<ActionType> allActions();
+
+class ActionData
+{
+public:
+    // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
+    enum Flags {
+        VideoLinkExists = 1
+    };
+
+    ActionData(): actionType(undefinedAction), flags(0) {}
+    bool hasFlags(int value) const { return flags & value; }
+
+    ActionType actionType;
+    ActionParameters actionParams;
+    EventParameters eventParams;
+    QnUuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
+    int aggregationCount;
+
+    int flags;
+    QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
+};
+
+#define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
+
+QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record));
 
 /**
  * Base class for business actions
@@ -39,7 +66,6 @@ protected:
 public:
     virtual ~AbstractAction();
 
-    void setActionType(ActionType actionType);
     ActionType actionType() const;
 
     /**
@@ -96,30 +122,6 @@ protected:
     QnUuid m_ruleId; // event rule that generated this action
     int m_aggregationCount;
 };
-
-class ActionData
-{
-public:
-    // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
-    enum Flags {
-        VideoLinkExists = 1
-    };
-
-    ActionData(): actionType(undefinedAction), flags(0) {}
-    bool hasFlags(int value) const { return flags & value; }
-
-    ActionType actionType;
-    ActionParameters actionParams;
-    EventParameters eventParams;
-    QnUuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
-    int aggregationCount;
-
-    int flags;
-    QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
-};
-
-#define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
-QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record));
 
 } // namespace event
 } // namespace vms

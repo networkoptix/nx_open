@@ -67,7 +67,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (m_query.isEmpty())
+    if (m_query.text.isEmpty())
         return m_defaultBehavior == DefaultBehavior::showAll;
 
     QModelIndex root = (sourceParent.column() > Qn::NameColumn)

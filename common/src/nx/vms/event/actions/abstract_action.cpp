@@ -29,6 +29,7 @@ bool requiresCameraResource(ActionType actionType)
         case executePtzPresetAction:
         case showTextOverlayAction:
         case showOnAlarmLayoutAction:
+        case acknowledgeAction:
             return true;
 
         default:
@@ -56,7 +57,39 @@ bool requiresUserResource(ActionType actionType)
         case execHttpRequestAction:
             return false;
 
+        case acknowledgeAction:
         case sendMailAction:
+            return true;
+
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            return false;
+    }
+}
+
+// TODO: #vkutin #3.2 User resources and device resources of actions will be refactored.
+bool requiresAdditionalUserResource(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case undefinedAction:
+        case panicRecordingAction:
+        case cameraOutputAction:
+        case cameraRecordingAction:
+        case diagnosticsAction:
+        case playSoundAction:
+        case executePtzPresetAction:
+        case showTextOverlayAction:
+        case execHttpRequestAction:
+        case acknowledgeAction:
+        case sendMailAction:
+            return false;
+
+        case bookmarkAction:
+        case showPopupAction:
+        case playSoundOnceAction:
+        case sayTextAction:
+        case showOnAlarmLayoutAction:
             return true;
 
         default:
@@ -77,8 +110,8 @@ bool hasToggleState(ActionType actionType)
         case sayTextAction:
         case executePtzPresetAction:
         case showOnAlarmLayoutAction:
-            return false;
         case execHttpRequestAction:
+        case acknowledgeAction:
             return false;
 
         case cameraOutputAction:
@@ -153,9 +186,10 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
     return true;
 }
 
-QList<ActionType> allActions()
+QList<ActionType> userAvailableActions()
 {
-    static QList<ActionType> result {
+    static QList<ActionType> result
+    {
         cameraOutputAction,
         bookmarkAction,
         cameraRecordingAction,
@@ -169,7 +203,21 @@ QList<ActionType> allActions()
         executePtzPresetAction,
         showTextOverlayAction,
         showOnAlarmLayoutAction,
-        execHttpRequestAction };
+        execHttpRequestAction
+    };
+
+    return result;
+}
+
+QList<ActionType> allActions()
+{
+    static QList<ActionType> result =
+        []()
+        {
+            QList<ActionType> result = userAvailableActions();
+            result.append(acknowledgeAction);
+            return result;
+        }();
 
     return result;
 }
@@ -190,11 +238,6 @@ AbstractAction::~AbstractAction()
 ActionType AbstractAction::actionType() const
 {
     return m_actionType;
-}
-
-void AbstractAction::setActionType(ActionType actionType)
-{
-    m_actionType = actionType;
 }
 
 void AbstractAction::setResources(const QVector<QnUuid>& resources)

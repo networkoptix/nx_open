@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that bookmark was created by system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -484,22 +492,6 @@
         <numerusform>%n %2 将使用 %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>当前激活的授权码不可用，请联系技术支持获取有效授权码。</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>激活授权许可时，发生数据库错误.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>激活授权许可时发生错误, 收到无效数据, 请联系技术支持团队解决此问题.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -512,21 +504,12 @@
         <numerusform>%n 将使用更多的 %1。</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>授权已被激活，关联硬件ID %1(%2). 请联系技术支持团队获取有效授权。</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>无效签名</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>服务器未找到匹配硬件ID</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -551,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>未知错误</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
@@ -1032,10 +1019,6 @@
       <translation>危机录像</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>发送电子邮件</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>写入日志</translation>
     </message>
@@ -1132,10 +1115,6 @@
     <message>
       <source>Any Event</source>
       <translation>任何事件</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1248,16 +1227,8 @@
       <translation>通用事件在 %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>发生未知事件</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1474,6 +1445,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>选择至少一个用户</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

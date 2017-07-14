@@ -84,6 +84,14 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>System Event</source>
+        <comment>Shows that bookmark was created by system event</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
@@ -486,22 +494,6 @@
             <numerusform>%n %2 will be used out of %1.</numerusform>
         </translation>
     </message>
-    <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Activate %n more %1.</source>
         <translation type="unfinished">
@@ -516,20 +508,11 @@
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
-        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-        <comment>%1 is a hardware ID, %2 is an activation time</comment>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnLicenseValidator</name>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server with matching hardware ID not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -554,6 +537,10 @@
     </message>
     <message>
         <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server with matching Hardware ID not found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1050,10 +1037,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send Email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1150,10 +1133,6 @@
     </message>
     <message>
         <source>Any Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Software Trigger</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -1273,15 +1252,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Software trigger %1 at %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Software Trigger %1 has been activated multiple times</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1503,6 +1474,26 @@
     </message>
     <message>
         <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger %1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger %1 has been activated multiple times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acknowledge</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

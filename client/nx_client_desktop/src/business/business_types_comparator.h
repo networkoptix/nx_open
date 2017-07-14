@@ -11,7 +11,7 @@ class QnBusinessTypesComparator: public QObject, public QnConnectionContextAware
 {
     using base_type = QObject;
 public:
-    QnBusinessTypesComparator(QObject *parent = nullptr);
+    explicit QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject *parent = nullptr);
 
     bool lexicographicalLessThan(nx::vms::event::EventType left, nx::vms::event::EventType right) const;
     bool lexicographicalLessThan(nx::vms::event::ActionType left, nx::vms::event::ActionType right) const;
@@ -32,7 +32,10 @@ public:
 private:
     void initLexOrdering();
 
+    QList<nx::vms::event::ActionType> getAllActions() const;
+
 private:
     QVector<int> m_eventTypeToLexOrder;
     QVector<int> m_actionTypeToLexOrder;
+    bool m_onlyUserAvailableActions;
 };
