@@ -31,16 +31,16 @@ public:
     };
 };
 
-class MediaserverApiMock
-        : public MediaserverApiBase
+class MediaserverEndpointTesterMock
+        : public MediaserverEndpointTesterBase
 {
 public:
     MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
                                     std::function< void( SocketAddress, bool ) > ) );
 
-    MediaserverApiMock( AbstractCloudDataProvider* cloudData,
+    MediaserverEndpointTesterMock( AbstractCloudDataProvider* cloudData,
                         nx::stun::MessageDispatcher* dispatcher )
-        : MediaserverApiBase( cloudData, dispatcher ) {}
+        : MediaserverEndpointTesterBase( cloudData, dispatcher ) {}
 
     inline
     void expect_pingServer( const SocketAddress& address, const String& serverId,

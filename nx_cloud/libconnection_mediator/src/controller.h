@@ -30,7 +30,7 @@ public:
 private:
     stats::StatsManager m_statsManager;
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
-    MediaserverApi m_mediaserverApi;
+    MediaserverEndpointTester m_mediaserverApi;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     HolePunchingProcessor m_cloudConnectProcessor;

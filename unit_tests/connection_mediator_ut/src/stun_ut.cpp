@@ -51,7 +51,7 @@ protected:
     SocketAddress address;
     MessageDispatcher stunMessageDispatcher;
     CloudDataProviderMock cloudData;
-    MediaserverApiMock mediaserverApi;
+    MediaserverEndpointTesterMock mediaserverApi;
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;

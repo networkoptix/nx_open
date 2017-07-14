@@ -14,18 +14,18 @@ namespace hpm {
 /**
  * Mediaserver API communicating interface.
  */
-class MediaserverApiBase:
+class MediaserverEndpointTesterBase:
     protected RequestProcessor
 {
 public:
-    MediaserverApiBase(
+    MediaserverEndpointTesterBase(
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatche);
+        nx::stun::MessageDispatcher* dispatcher);
 
     void ping(const ConnectionStrongRef& connection, stun::Message message);
 
     /**
-     * Pings address and verifies if the is the mediaservers with expectedId.
+     * Ping address to verify there is a mediaserver with expected id listening.
      */
     virtual void pingServer(
         const SocketAddress& address,
@@ -34,13 +34,14 @@ public:
 };
 
 /**
- * Mediaserver API communicating interface over nx_http::AsyncHttpClient.
+ * Checks whether mediaserver with specified id is listening on the given host:port.
+ * Does so by invoking /api/ping request.
  */
-class MediaserverApi:
-    public MediaserverApiBase
+class MediaserverEndpointTester:
+    public MediaserverEndpointTesterBase
 {
 public:
-    MediaserverApi(
+    MediaserverEndpointTester(
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher);
 

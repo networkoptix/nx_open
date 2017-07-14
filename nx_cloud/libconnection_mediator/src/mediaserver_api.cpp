@@ -10,7 +10,7 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiBase::MediaserverApiBase(
+MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher)
     :
@@ -24,7 +24,6 @@ MediaserverApiBase::MediaserverApiBase(
                 ping(std::move(connection), std::move(message));
             });
 
-    // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register ping processor");
 }
 
@@ -45,7 +44,7 @@ struct PingCollector
     }
 };
 
-void MediaserverApiBase::ping(
+void MediaserverEndpointTesterBase::ping(
     const ConnectionStrongRef& connection,
     stun::Message message)
 {
@@ -114,11 +113,11 @@ void MediaserverApiBase::ping(
 
 //-------------------------------------------------------------------------------------------------
 
-MediaserverApi::MediaserverApi(
+MediaserverEndpointTester::MediaserverEndpointTester(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher)
     : 
-    MediaserverApiBase(cloudData, dispatcher)
+    MediaserverEndpointTesterBase(cloudData, dispatcher)
 {
 }
 
@@ -140,7 +139,7 @@ static QString scanResponseForErrors(const nx::Buffer& buffer, const String& exp
     return QString();
 }
 
-void MediaserverApi::pingServer(
+void MediaserverEndpointTester::pingServer(
     const SocketAddress& address,
     const String& expectedId,
     std::function<void(SocketAddress, bool)> onPinged)
