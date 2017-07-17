@@ -1255,10 +1255,10 @@ void MessageBus::proxyFillerTransaction(
 
 void MessageBus::updateOfflineDistance(
     const ApiPersistentIdData& to,
-    const ApiPersistentIdData& via,
     int sequence)
 {
     const qint32 offlineDistance = kMaxDistance - sequence;
+    const auto via = localPeer();
     const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
     if (offlineDistance < toDistance)
     {
@@ -1279,7 +1279,7 @@ void MessageBus::gotTransaction(
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
-    updateOfflineDistance(peerId, connection->remotePeer(), tran.persistentInfo.sequence);
+    updateOfflineDistance(peerId, tran.persistentInfo.sequence);
 
     if (!m_db)
         return;
@@ -1376,7 +1376,7 @@ void MessageBus::gotTransaction(
     {
         if (transactionDescriptor->isPersistent)
         {
-            updateOfflineDistance(peerId, connection->remotePeer(), tran.persistentInfo.sequence);
+            updateOfflineDistance(peerId, tran.persistentInfo.sequence);
             std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
             dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
 
