@@ -87,7 +87,7 @@
     <name>QObject</name>
     <message>
       <source>System Event</source>
-      <comment>Shows that bookmark was created by system event</comment>
+      <comment>Shows that the bookmark was created by a system event</comment>
       <translation type="unfinished">System Event</translation>
     </message>
   </context>
@@ -540,8 +540,8 @@
       <translation>Unbekannter Fehler</translation>
     </message>
     <message>
-      <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -659,16 +659,16 @@
       <translation>FREE-Lizenz</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>Hardware-ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Lizenziert für: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Wasserzeichen: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1478,23 +1478,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Softwaretrigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Softwaretrigger %1 bei %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Softwaretrigger %1 wurde mehrfach aktiviert</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Email senden</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Bestätigen</translation>
     </message>
   </context>
   <context>

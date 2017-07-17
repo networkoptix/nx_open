@@ -87,7 +87,7 @@
     <name>QObject</name>
     <message>
       <source>System Event</source>
-      <comment>Shows that bookmark was created by system event</comment>
+      <comment>Shows that the bookmark was created by a system event</comment>
       <translation type="unfinished">System Event</translation>
     </message>
   </context>
@@ -544,8 +544,8 @@
       <translation>Nieznany błąd</translation>
     </message>
     <message>
-      <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -669,16 +669,16 @@
       <translation type="unfinished">FREE License</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation type="unfinished">Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>

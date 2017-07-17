@@ -729,13 +729,28 @@
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -750,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation>ID тревожного в&amp;ыхода:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation>Длительность по умолчанию:</translation>
     </message>
@@ -762,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation>секунд</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -1400,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>Привязано к Аппаратному ID:</translation>
+      <source>Features</source>
+      <translation>Особенности</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation>Особенности</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1509,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation>Аппаратный ID</translation>
+      <source>Activation Key File</source>
+      <translation>Файл с ключом активации</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation>Файл с ключом активации</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1936,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation>Проверить</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation>Будет выполнено повторное подключение.</translation>
     </message>
     <message>
       <location/>

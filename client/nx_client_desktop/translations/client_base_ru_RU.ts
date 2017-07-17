@@ -279,10 +279,6 @@ to view more bookmarks</source>
       <translation>Аудит...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>Поиск по закладкам...</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>Войти в %1...</translation>
@@ -869,6 +865,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>Открепить панель оповещений</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -956,8 +956,8 @@ to view more bookmarks</source>
       <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
-      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -2017,10 +2017,6 @@ to view more bookmarks</source>
       <translation>Загрузка...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>Идентификатор камеры</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>Основной поток</translation>
     </message>
@@ -2031,10 +2027,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>У камеры нет вторичного потока</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>Идентификатор модуля ввода/вывода</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2059,6 +2051,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>У модуль ввода/вывода нет аудио потока</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -3006,8 +3006,8 @@ to %1</source>
       <translation>Невозможно инициализировать звуковое устройство %1.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3450,10 +3450,6 @@ to %1</source>
       <translation>Некорректное состояние</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation>ID</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation>По щелчку</translation>
     </message>
@@ -3475,6 +3471,10 @@ to %1</source>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
       <translation>Импульс</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
     </message>
   </context>
   <context>
@@ -3689,12 +3689,12 @@ to %1</source>
       <translation>Ключ</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation>Привязано к аппаратному ID</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation>Особенности:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3979,16 +3979,16 @@ to %1</source>
       <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
-    </message>
-    <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
       <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
     </message>
   </context>
   <context>
@@ -4014,16 +4014,16 @@ to %1</source>
       <translation>Не удалось открыть файл</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation>Аппаратный ID скопирован в буфер обмена</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный ID на %1.</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4318,10 +4318,6 @@ to %1</source>
       <translation>Объединить с %1</translation>
     </message>
     <message>
-      <source>Success!</source>
-      <translation>Успешно!</translation>
-    </message>
-    <message>
       <source>Testing...</source>
       <translation>Проверка...</translation>
     </message>
@@ -4342,16 +4338,8 @@ to %1</source>
       <translation>Не удалось объединить системы</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation>Система успешно сконфигурирована.</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>Неверный URL-адрес.</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation>Серверы удалённой системы должны появиться в вашей системе в ближайшее время.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4360,6 +4348,18 @@ to %1</source>
     <message>
       <source>This is the current System URL.</source>
       <translation>Этот URL используется в данный момент.</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4446,12 +4446,12 @@ to %1</source>
       <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
-    </message>
-    <message>
       <source>MB/s</source>
       <translation type="unfinished">MB/s</translation>
+    </message>
+    <message>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -5225,22 +5225,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Role</numerusform>
-        <numerusform>%n роли</numerusform>
-        <numerusform>%n ролей</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
@@ -7215,10 +7199,6 @@ to %1</source>
       <translation>Общее количество лицензий уменьшится</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation>Сервер подключен к системе</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation>Пароль не может быть пустым.</translation>
     </message>
@@ -7229,6 +7209,14 @@ to %1</source>
     <message>
       <source>Connecting to the current System...</source>
       <translation type="unfinished">Connecting to the current System...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>

@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+יש גרסה חדשה עבור {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+לחץ על הקישור כדי לבדוק את הטיוטה {{ message.id }} עבור {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+קישור לבדיקה: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+בדף זה אתה יכול
+1) ליצור תצוגה מקדימה כדי לראות את השינויים האחרונים.
+2) לפרסם גירסה זו אשר תעדכן כל התוכן.
+3) עריכת ההקשר על ידי לחיצה על כפתור העריכה. כדי לראות את השינויים האלה יהיה עליך ליצור גרסה חדשה.
