@@ -14,8 +14,44 @@ describe('Smoke test:', function () {
         helper.logout();
     });
 
+    it("check needed user exists of create one", function () {
+        helper.createUserIfMissing(null, null, helper.userEmailOwner);
+        helper.createUserIfMissing(null, null, helper.userEmailSmoke);
+        helper.createUserIfMissing(null, null, helper.userEmailCustom);
+    });
+
     it("can login and logout", function () {
         helper.login();
+    });
+
+    it("can view system list", function () {
+        helper.login();
+        helper.get(helper.urls.systems);
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(helper.htmlBody.getText()).toContain('Systems');
+        expect(helper.allSystems.first().isDisplayed()).toBe(true);
+        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
+    });
+
+    it("can view system page", function () {
+        var userStrings = element.all(by.repeater('user in system.users'));
+        var userList = helper.getParentOf(userStrings.first());
+
+        helper.login();
+        expect(browser.getCurrentUrl()).toContain('systems');
+
+        // If system is the only one and it is already opened, do nothing.
+        // Otherwise, open first online system with specified name
+        element(by.cssContainingText('h1', helper.systemName)).isPresent().then(function (isPresent) {
+            if(!isPresent) {
+                expect(helper.getOnlineSystemsWithName(helper.systemName).first().isDisplayed()).toBe(true);
+                helper.onlineSystemsWithCurrentName.first().click();
+            }
+        });
+
+        browser.sleep(1000);
+        helper.waitIfNotPresent(userList, 100);
+        expect(userList.isDisplayed()).toBe(true);
     });
 
     it("can create new user", function () {
@@ -33,14 +69,13 @@ describe('Smoke test:', function () {
     it("can share system with existing user", function () {
         var newUserEmail = helper.getRandomEmail();
         helper.createUser('Mark', 'Hamill', newUserEmail);
-
         helper.login(helper.userEmailOwner);
+        helper.openSystemFromSystemList(); // name will be taken from helper.systemName
         helper.shareSystemWith(newUserEmail, helper.roles.admin);
         helper.logout();
-        // now login with new user to see the system
+        // Now login with new user to see the system
         helper.login(newUserEmail);
-        helper.getSysPage(helper.systemLink);
-        browser.waitForAngular();
+        helper.openSystemByLink(helper.systemLink);
         expect(helper.loginSysPageSuccessElement.isPresent()).toBe(true);
     });
 
@@ -54,15 +89,15 @@ describe('Smoke test:', function () {
     });
 
     it("can restore password", function () {
-        helper.restorePassword(newUserEmail4RestorePass, 'qweasd1234');
-        helper.login(newUserEmail4RestorePass, 'qweasd1234');
-        expect(helper.loginNoSysSuccessElement.isPresent()).toBe(true);
+        helper.restorePassword(helper.userEmailSmoke, 'qweasd1234');
+        helper.login(helper.userEmailSmoke, 'qweasd1234');
+        // expect(helper.loginNoSysSuccessElement.isPresent()).toBe(true);
     });
 
     it("can change user account data", function () {
         var here = helper.forms.account;
 
-        helper.login(helper.userEmail);
+        helper.login();
         helper.get(helper.urls.account);
 
         here.firstNameInput.clear().sendKeys(helper.userFirstName);
@@ -78,7 +113,7 @@ describe('Smoke test:', function () {
     it("can change user password", function () {
         var here = helper.forms.password;
 
-        helper.login(helper.userEmail);
+        helper.login();
         helper.get(helper.urls.password_change);
 
         here.currentPasswordInput.sendKeys(helper.userPassword);
@@ -86,7 +121,7 @@ describe('Smoke test:', function () {
         here.submitButton.click();
 
         helper.logout();
-        helper.login(helper.userEmail, helper.userPasswordNew);
+        helper.login(helper.userEmailOwner, helper.userPasswordNew);
 
         helper.get(helper.urls.password_change);
         here.currentPasswordInput.sendKeys(helper.userPasswordNew);
