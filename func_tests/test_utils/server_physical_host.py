@@ -6,7 +6,6 @@ import uuid
 import jinja2
 from .utils import is_list_inst
 from .host import SshHostConfig, host_from_config
-from .vagrant_box_config import MEDIASERVER_DIST_FNAME
 from .server_ctl import MEDIASERVER_DIR, PhysicalHostServerCtl
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
 from .server import Server
@@ -55,11 +54,10 @@ class PhysicalInstallationHostConfig(object):
 
 class PhysicalInstallationCtl(object):
 
-    def __init__(self, bin_dir, customization_company_name, config_list):
+    def __init__(self, mediaserver_dist_path, customization_company_name, config_list):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
-        debian_dist_path = os.path.join(bin_dir, MEDIASERVER_DIST_FNAME)
         self._installation_hosts = [
-            PhysicalInstallationHost.from_config(config, customization_company_name, debian_dist_path) for config in config_list]
+            PhysicalInstallationHost.from_config(config, customization_company_name, mediaserver_dist_path) for config in config_list]
         self._available_hosts = self._installation_hosts[:]
 
     def clean_all_installations(self):
@@ -88,17 +86,17 @@ class PhysicalInstallationCtl(object):
 class PhysicalInstallationHost(object):
 
     @classmethod
-    def from_config(cls, config, customization_company_name, debian_dist_path):
+    def from_config(cls, config, customization_company_name, mediaserver_dist_path):
         return cls(config.name, host_from_config(config.location), config.root_dir, config.limit,
-                   customization_company_name, debian_dist_path)
+                   customization_company_name, mediaserver_dist_path)
 
-    def __init__(self, name, host, root_dir, limit, customization_company_name, debian_dist_path):
+    def __init__(self, name, host, root_dir, limit, customization_company_name, mediaserver_dist_path):
         self._name = name
         self._host = host  # Host (LocalHost or RemoteSshHost)
         self._root_dir = host.expand_path(root_dir)
         self._limit = limit
         self._customization_company_name = customization_company_name
-        self._debian_dist_path = debian_dist_path
+        self._mediaserver_dist_path = mediaserver_dist_path
         self._dist_unpacked = self._host.dir_exists(self._remote_dist_subdir)
         self._ensure_root_dir_exists()
         self._installations = list(self._read_installations())  # ServerInstallation list
@@ -176,9 +174,9 @@ class PhysicalInstallationHost(object):
         
     def _prepare_installation_dir(self, dir, server_port):
         if not self._dist_unpacked:
-            remote_dist_path = os.path.join(self._remote_dist_root, MEDIASERVER_DIST_FNAME)
+            remote_dist_path = os.path.join(self._remote_dist_root, os.path.basename(self._mediaserver_dist_path))
             self._host.mk_dir(self._remote_dist_root)
-            self._host.put_file(self._debian_dist_path, self._remote_dist_root)
+            self._host.put_file(self._mediaserver_dist_path, self._remote_dist_root)
             self._host.run_command(['dpkg', '--extract', remote_dist_path, self._unpacked_dist_dir])
             assert self._host.dir_exists(self._remote_dist_subdir), (
                 'Distributive provided was build with another customization.'

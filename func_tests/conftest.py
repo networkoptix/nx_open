@@ -28,7 +28,7 @@ DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
-
+DEFAULT_MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
@@ -61,6 +61,8 @@ def pytest_addoption(parser):
     parser.addoption('--bin-dir',
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
+    parser.addoption('--mediaserver-dist-path',
+                     help='path to mediaserver distributive (.deb), default is %s in bin-dir' % DEFAULT_MEDIASERVER_DIST_FNAME)
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
     parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH,
@@ -110,6 +112,11 @@ def run_options(request):
         vm_ssh_host_config = None
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
+    mediaserver_dist_path = request.config.getoption('--mediaserver-dist-path')
+    if mediaserver_dist_path:
+        mediaserver_dist_path = os.path.expandvars(os.path.expanduser(mediaserver_dist_path))
+    mediaserver_dist_path = os.path.join(bin_dir, mediaserver_dist_path or DEFAULT_MEDIASERVER_DIST_FNAME)
+    assert os.path.isfile(mediaserver_dist_path), 'Mediaserver distributive is missing at %r' % mediaserver_dist_path
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
         request.config.getoption('--test-parameters'),
@@ -119,6 +126,7 @@ def run_options(request):
         customization=request.config.getoption('--customization'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
+        mediaserver_dist_path=mediaserver_dist_path,
         media_sample_path=request.config.getoption('--media-sample-path'),
         media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
@@ -201,7 +209,7 @@ def cloud_host_host(init_logging, run_options):
 
 @pytest.fixture(scope='session')
 def box_factory(request, run_options, init_logging, customization_company_name):
-    config_factory = BoxConfigFactory(customization_company_name)
+    config_factory = BoxConfigFactory(run_options.mediaserver_dist_path, customization_company_name)
     factory = VagrantBoxFactory(
         request.config.cache,
         run_options,
@@ -221,7 +229,7 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
     if not run_options.tests_config:
         return None
     pic = PhysicalInstallationCtl(
-        run_options.bin_dir,
+        run_options.mediaserver_dist_path,
         customization_company_name,
         run_options.tests_config.physical_installation_host_list,
         )
