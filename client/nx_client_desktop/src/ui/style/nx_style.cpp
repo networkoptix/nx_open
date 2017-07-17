@@ -1925,9 +1925,13 @@ void QnNxStyle::drawControl(
                     optionCopy.state &= ~State_MouseOver;
                     optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
                         button->state.testFlag(State_On) ? QIcon::On : QIcon::Off, false);
-                    base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
-                    return;
+                    d->drawToolButton(painter, &optionCopy, widget);
                 }
+                else
+                {
+                    d->drawToolButton(painter, button, widget);
+                }
+                return;
             }
 
             break;

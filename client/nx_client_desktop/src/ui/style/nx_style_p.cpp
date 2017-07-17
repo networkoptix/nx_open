@@ -17,6 +17,11 @@ using namespace style;
 
 namespace {
 
+QWindow* qt_getWindow(const QWidget* widget)
+{
+    return widget ? widget->window()->windowHandle() : 0;
+}
+
 void paintLabelIcon(
     QRect* labelRect,
     QPainter* painter,
@@ -509,6 +514,141 @@ void QnNxStylePrivate::drawTextButton(
 
     QnScopedPainterPenRollback penRollback(painter, QPen(brush.color()));
     painter->drawText(textRect, kTextFlags, text);
+}
+
+void QnNxStylePrivate::drawArrow(const QStyle* style,
+    const QStyleOptionToolButton* toolbutton,
+    const QRect& rect,
+    QPainter* painter,
+    const QWidget* widget)
+{
+    QStyle::PrimitiveElement pe;
+    switch (toolbutton->arrowType)
+    {
+        case Qt::LeftArrow:
+            pe = QStyle::PE_IndicatorArrowLeft;
+            break;
+        case Qt::RightArrow:
+            pe = QStyle::PE_IndicatorArrowRight;
+            break;
+        case Qt::UpArrow:
+            pe = QStyle::PE_IndicatorArrowUp;
+            break;
+        case Qt::DownArrow:
+            pe = QStyle::PE_IndicatorArrowDown;
+            break;
+        default:
+            return;
+    }
+    QStyleOption arrowOpt = *toolbutton;
+    arrowOpt.rect = rect;
+    style->drawPrimitive(pe, &arrowOpt, painter, widget);
+}
+
+void QnNxStylePrivate::drawToolButton(QPainter* painter,
+    const QStyleOptionToolButton* option,
+    const QWidget* widget) const
+{
+    Q_Q(const QnNxStyle);
+
+    QRect rect = option->rect;
+    int shiftX = 0;
+    int shiftY = 0;
+    if (option->state & (QStyle::State_Sunken | QStyle::State_On))
+    {
+        shiftX = q->pixelMetric(QStyle::PM_ButtonShiftHorizontal, option, widget);
+        shiftY = q->pixelMetric(QStyle::PM_ButtonShiftVertical, option, widget);
+    }
+    // Arrow type always overrules and is always shown
+    bool hasArrow = option->features & QStyleOptionToolButton::Arrow;
+    if (((!hasArrow && option->icon.isNull()) && !option->text.isEmpty())
+        || option->toolButtonStyle == Qt::ToolButtonTextOnly)
+    {
+        int alignment = Qt::AlignCenter | Qt::TextShowMnemonic;
+        if (!q->styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+            alignment |= Qt::TextHideMnemonic;
+        rect.translate(shiftX, shiftY);
+        painter->setFont(option->font);
+        q->drawItemText(painter, rect, alignment, option->palette,
+            option->state & QStyle::State_Enabled, option->text,
+            QPalette::ButtonText);
+    }
+    else
+    {
+        QPixmap pm;
+        QSize pmSize = option->iconSize;
+        if (!option->icon.isNull())
+        {
+            QIcon::State state = option->state & QStyle::State_On ? QIcon::On : QIcon::Off;
+            QIcon::Mode mode;
+            if (!(option->state & QStyle::State_Enabled))
+                mode = QIcon::Disabled;
+            else if ((option->state & QStyle::State_MouseOver) && (option->state & QStyle::State_AutoRaise))
+                mode = QIcon::Active;
+            else
+                mode = QIcon::Normal;
+
+            pm = option->icon.pixmap(qt_getWindow(widget), option->iconSize, mode, state);
+            pmSize = pm.size() / pm.devicePixelRatio();
+        }
+
+        if (option->toolButtonStyle != Qt::ToolButtonIconOnly)
+        {
+            painter->setFont(option->font);
+            QRect pr = rect,
+                tr = rect;
+            int alignment = Qt::TextShowMnemonic;
+            if (!q->styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+                alignment |= Qt::TextHideMnemonic;
+
+            if (option->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
+            {
+                pr.setHeight(pmSize.height() + 6);
+                tr.adjust(0, pr.height() - 1, 0, -1);
+                pr.translate(shiftX, shiftY);
+                if (!hasArrow)
+                {
+                    q->drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
+                }
+                else
+                {
+                    drawArrow(q, option, pr, painter, widget);
+                }
+                alignment |= Qt::AlignCenter;
+            }
+            else
+            {
+                pr.setWidth(pmSize.width() + 8);
+                tr.adjust(pr.width(), 0, 0, 0);
+                pr.translate(shiftX, shiftY);
+                if (!hasArrow)
+                {
+                    q->drawItemPixmap(painter, QStyle::visualRect(option->direction, rect, pr), Qt::AlignCenter, pm);
+                }
+                else
+                {
+                    drawArrow(q, option, pr, painter, widget);
+                }
+                alignment |= Qt::AlignLeft | Qt::AlignVCenter;
+            }
+            tr.translate(shiftX, shiftY);
+            q->drawItemText(painter, QStyle::visualRect(option->direction, rect, tr), alignment, option->palette,
+                option->state & QStyle::State_Enabled, option->text,
+                QPalette::ButtonText);
+        }
+        else
+        {
+            rect.translate(shiftX, shiftY);
+            if (hasArrow)
+            {
+                drawArrow(q, option, rect, painter, widget);
+            }
+            else
+            {
+                q->drawItemPixmap(painter, rect, Qt::AlignCenter, pm);
+            }
+        }
+    }
 }
 
 /* Insert horizontal separator line into QInputDialog above its button box: */
