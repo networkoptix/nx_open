@@ -1,4 +1,4 @@
-#include "mediaserver_api.h"
+#include "mediaserver_endpoint_tester.h"
 
 #include <QJsonDocument>
 
@@ -10,7 +10,26 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiBase::MediaserverApiBase(
+struct PingCollector
+{
+    QnMutex mutex;
+    size_t expected;
+    std::list< SocketAddress > endpoints;
+    ConnectionWeakRef connection;
+
+    PingCollector(
+        size_t expected,
+        ConnectionWeakRef connection)
+        :
+        expected(expected),
+        connection(std::move(connection))
+    {
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher)
     :
@@ -24,28 +43,10 @@ MediaserverApiBase::MediaserverApiBase(
                 ping(std::move(connection), std::move(message));
             });
 
-    // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register ping processor");
 }
 
-struct PingCollector
-{
-    QnMutex mutex;
-    size_t expected;
-    std::list< SocketAddress > endpoints;
-    ConnectionWeakRef connection;
-
-    PingCollector(
-        size_t expected_,
-        ConnectionWeakRef connection_)
-        :
-        expected(expected_),
-        connection(std::move(connection_))
-    {
-    }
-};
-
-void MediaserverApiBase::ping(
+void MediaserverEndpointTesterBase::ping(
     const ConnectionStrongRef& connection,
     stun::Message message)
 {
@@ -88,7 +89,7 @@ void MediaserverApiBase::ping(
             collector->endpoints.push_back(std::move(address));
 
         if (--collector->expected)
-            return; // wait for others...
+            return; //< Waiting for others to complete.
 
         if (auto connection = collector->connection.lock())
         {
@@ -114,11 +115,11 @@ void MediaserverApiBase::ping(
 
 //-------------------------------------------------------------------------------------------------
 
-MediaserverApi::MediaserverApi(
+MediaserverEndpointTester::MediaserverEndpointTester(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher)
     : 
-    MediaserverApiBase(cloudData, dispatcher)
+    MediaserverEndpointTesterBase(cloudData, dispatcher)
 {
 }
 
@@ -140,7 +141,7 @@ static QString scanResponseForErrors(const nx::Buffer& buffer, const String& exp
     return QString();
 }
 
-void MediaserverApi::pingServer(
+void MediaserverEndpointTester::pingServer(
     const SocketAddress& address,
     const String& expectedId,
     std::function<void(SocketAddress, bool)> onPinged)

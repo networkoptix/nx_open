@@ -603,10 +603,10 @@ begin_label:
             // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
 
 
-            FrameTypeExtractor::FrameType frameType = FrameTypeExtractor::UnknownFrameType;
             bool isKeyFrame = false;
             if (videoData)
             {
+                isKeyFrame = m_currentData->flags  & AV_PKT_FLAG_KEY;
                 if (videoData->context)
                 {
                     if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
@@ -616,12 +616,14 @@ begin_label:
                     }
                 }
 
-                frameType = m_frameTypeExtractor->getFrameType((const quint8*)videoData->data(), static_cast<int>(videoData->dataSize()));
+                if (m_frameTypeExtractor)
+                {
+                    const auto frameType = m_frameTypeExtractor->getFrameType(
+                        (const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));
 
-                if (frameType != FrameTypeExtractor::UnknownFrameType)
-                    isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
-                else
-                    isKeyFrame = m_currentData->flags  & AV_PKT_FLAG_KEY;
+                    if (frameType != FrameTypeExtractor::UnknownFrameType)
+                        isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
+                }
             }
 
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))

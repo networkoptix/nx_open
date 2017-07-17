@@ -13,6 +13,7 @@
 #include <nx/utils/thread/stoppable.h>
 #include <common/static_common_module.h>
 #include <common/common_module.h>
+#include <network/http_connection_listener.h>
 
 //namespace nx {
 namespace ec2 {
@@ -71,6 +72,28 @@ public:
 private:
     Appserver2Process* m_impl;
 };
+
+class QnSimpleHttpConnectionListener: public QnHttpConnectionListener
+{
+public:
+    QnSimpleHttpConnectionListener(
+        QnCommonModule* commonModule,
+        const QHostAddress& address,
+        int port,
+        int maxConnections,
+        bool useSsl);
+
+    ~QnSimpleHttpConnectionListener();
+
+    bool needAuth(const nx_http::Request& request) const;
+    void disableAuthForPath(const QString& path);
+protected:
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        QSharedPointer<AbstractStreamSocket> clientSocket) override;
+private:
+    QSet<QString> m_disableAuthPrefixes;
+};
+
 
 }   // namespace ec2
 //}   // namespace nx

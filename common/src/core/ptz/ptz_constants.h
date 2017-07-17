@@ -46,6 +46,8 @@ public:
 
         AuxilaryPtzCapability = 0x01000000,
 
+        NativePresetsPtzCapability = 0x08000000,
+
         ContinuousPanTiltCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability,
 

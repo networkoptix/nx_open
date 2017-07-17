@@ -248,7 +248,7 @@ Handle ServerConnection::checkCloudHost(
         targetThread);
 }
 
-Handle ServerConnection::downloaderAddDownload(
+Handle ServerConnection::addFileDownload(
     const QString& fileName,
     int size,
     const QByteArray& md5,
@@ -256,60 +256,57 @@ Handle ServerConnection::downloaderAddDownload(
     GetCallback callback,
     QThread* targetThread)
 {
-    return executeGet(
-        lit("/api/downloader/addDownload"),
+    return executePost(
+        lit("/api/downloads/%1").arg(fileName),
         QnRequestParamList{
-            {lit("fileName"), fileName},
             {lit("size"), QString::number(size)},
             {lit("md5"), QString::fromUtf8(md5)},
             {lit("url"), url.toString()}},
+        QByteArray(),
+        QByteArray(),
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderRemoveDownload(
+Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
     GetCallback callback,
     QThread* targetThread)
 {
-    return executeGet(
-        lit("/api/downloader/removeDownload"),
-        QnRequestParamList{
-            {lit("fileName"), fileName},
-            {lit("deleteData"), QnLexical::serialized(deleteData)}},
+    return executeDelete(
+        lit("/api/downloads/%1").arg(fileName),
+        QnRequestParamList{{lit("deleteData"), QnLexical::serialized(deleteData)}},
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderChunkChecksums(
+Handle ServerConnection::fileChunkChecksums(
     const QString& fileName,
     GetCallback callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloader/chunkChecksums"),
-        QnRequestParamList{{lit("fileName"), fileName}},
+        lit("/api/downloads/%1/checksums").arg(fileName),
+        QnRequestParamList(),
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderDownloadChunk(
+Handle ServerConnection::downloadFileChunk(
     const QString& fileName,
     int index,
     Result<QByteArray>::type callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloader/downloadChunk"),
-        QnRequestParamList{
-            {lit("fileName"), fileName},
-            {lit("index"), QString::number(index)}},
+        lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(index),
+        QnRequestParamList(),
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderDownloadChunkFromInternet(
+Handle ServerConnection::downloadFileChunkFromInternet(
     const QString& fileName,
     const QUrl& url,
     int chunkIndex,
@@ -318,53 +315,49 @@ Handle ServerConnection::downloaderDownloadChunkFromInternet(
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloader/downloadChunkFromInternet"),
+        lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex),
         QnRequestParamList{
-            {lit("fileName"), fileName},
             {lit("url"), url.toString()},
-            {lit("chunkIndex"), QString::number(chunkIndex)},
             {lit("chunkSize"), QString::number(chunkSize)}},
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderUploadChunk(
+Handle ServerConnection::uploadFileChunk(
     const QString& fileName,
     int index,
     const QByteArray& data,
     GetCallback callback,
     QThread* targetThread)
 {
-    return executePost(
-        lit("/api/downloader/uploadChunk"),
-        QnRequestParamList{
-            {lit("fileName"), fileName},
-            {lit("index"), QString::number(index)}},
+    return executePut(
+        lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(index),
+        QnRequestParamList(),
         "application/octet-stream",
         data,
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderStatus(
+Handle ServerConnection::downloadsStatus(
     GetCallback callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloader/status"),
+        lit("/api/downloads/status"),
         QnRequestParamList(),
         callback,
         targetThread);
 }
 
-Handle ServerConnection::downloaderFileStatus(
+Handle ServerConnection::fileDownloadStatus(
     const QString& fileName,
     GetCallback callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloader/status"),
-        QnRequestParamList{{lit("fileName"), fileName}},
+        lit("/api/downloads/%1/status").arg(fileName),
+        QnRequestParamList(),
         callback,
         targetThread);
 }

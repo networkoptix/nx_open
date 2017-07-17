@@ -4,18 +4,6 @@ namespace
 {
     const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
     const std::chrono::milliseconds kTransmissionTimeout(3000);
-
-    AVCodecID toFfmpegCodec(const QString& codec)
-    {
-        if (codec == "AAC")
-            return AV_CODEC_ID_AAC;
-        else if (codec == "G726")
-            return AV_CODEC_ID_ADPCM_G726;
-        else if (codec == "MULAW")
-            return AV_CODEC_ID_PCM_MULAW;
-        else
-            return AV_CODEC_ID_NONE;
-    }
 } // namespace
 
 QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):

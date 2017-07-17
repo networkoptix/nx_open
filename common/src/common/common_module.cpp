@@ -308,8 +308,8 @@ void QnCommonModule::updateModuleInformationUnsafe()
     //NX_ASSERT(server);
     if (!server)
         return;
-
-    m_moduleInformation.port = server->getPort();
+    if (server->getPort())
+        m_moduleInformation.port = server->getPort();
     m_moduleInformation.name = server->getName();
     m_moduleInformation.serverFlags = server->getServerFlags();
 

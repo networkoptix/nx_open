@@ -5,12 +5,15 @@ load information related to [current] customization
 
 import os.path
 import ConfigParser
+import debian.debfile
 
 
-def read_customization_company_name(customization):
-    proj_root = os.path.join(os.path.dirname(__file__), '../..')
-    properties_path = os.path.join(proj_root, 'customization', customization, 'build.properties')
-    config = ConfigParser.SafeConfigParser()
-    with open(properties_path) as f:
-        config.readfp(f)
-    return config.get('basic', 'deb.customization.company.name')
+# customization company name is the directory name under '/opt/': '/opt/networkoptix' -> company name = 'networkoptix'
+def detect_customization_company_name(mediaserver_dist_fpath):
+    debfile = debian.debfile.DebFile(mediaserver_dist_fpath)
+    for tar_info in debfile.data.tgz().getmembers():
+        path = tar_info.path.split('/')
+        if len(path) < 3 or path[:2] != ['.', 'opt']:
+            continue
+        return path[2]
+    assert False, 'Unable to detect company name from mediaserver distributive %r contents' % mediaserver_dist_fpath
