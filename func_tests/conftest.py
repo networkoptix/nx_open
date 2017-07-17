@@ -12,7 +12,7 @@ from test_utils.utils import SimpleNamespace
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.artifact import ArtifactFactory
 from test_utils.metrics_saver import MetricsSaver
-from test_utils.customization import read_customization_company_name
+from test_utils.customization import detect_customization_company_name
 from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.vagrant_box import VagrantBoxFactory
@@ -190,7 +190,9 @@ def metrics_saver(junk_shop_repository):
 
 @pytest.fixture(scope='session')
 def customization_company_name(run_options):
-    return read_customization_company_name(run_options.customization)
+    company_name = detect_customization_company_name(run_options.mediaserver_dist_path)
+    log.info('Customization company name: %r', company_name)
+    return company_name
 
 
 @pytest.fixture(params=['http', 'https'])
