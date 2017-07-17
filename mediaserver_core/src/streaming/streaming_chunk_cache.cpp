@@ -12,10 +12,12 @@
 
 StreamingChunkCache::StreamingChunkCache(
     QnResourcePool* resourcePool,
+    StreamingChunkTranscoder* transcoder,
     std::chrono::seconds cacheSize)
     :
     m_cache(cacheSize.count()),
-    m_streamingChunkProvider(StreamingChunkProviderFactory::instance().create(resourcePool))
+    m_streamingChunkProvider(
+        StreamingChunkProviderFactory::instance().create(resourcePool, transcoder))
 {
 }
 

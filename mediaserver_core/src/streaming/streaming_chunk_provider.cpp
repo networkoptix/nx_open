@@ -13,9 +13,12 @@
 #include "streaming_chunk_transcoder.h"
 #include "video_camera_streaming_chunk.h"
 
-StreamingChunkProvider::StreamingChunkProvider(QnResourcePool* resourcePool):
+StreamingChunkProvider::StreamingChunkProvider(
+    QnResourcePool* resourcePool,
+    StreamingChunkTranscoder* transcoder)
+    :
     m_resourcePool(resourcePool),
-    m_transcoder(StreamingChunkTranscoder::instance())
+    m_transcoder(transcoder)
 {
 }
 
@@ -44,12 +47,13 @@ bool StreamingChunkProvider::get(
 //-------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AbstractStreamingChunkProvider> StreamingChunkProviderFactory::create(
-    QnResourcePool* resourcePool)
+    QnResourcePool* resourcePool,
+    StreamingChunkTranscoder* transcoder)
 {
     if (m_customFunc)
         return m_customFunc();
 
-    return std::make_unique<StreamingChunkProvider>(resourcePool);
+    return std::make_unique<StreamingChunkProvider>(resourcePool, transcoder);
 }
 
 StreamingChunkProviderFactory::Function StreamingChunkProviderFactory::setCustomFunc(

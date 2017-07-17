@@ -18,6 +18,7 @@
 #include "streaming_chunk_provider.h"
 
 class QnResourcePool;
+class StreamingChunkTranscoder;
 
 class StreamingChunkCache:
     public QObject
@@ -27,6 +28,7 @@ class StreamingChunkCache:
 public:
     StreamingChunkCache(
         QnResourcePool* resourcePool,
+        StreamingChunkTranscoder* transcoder,
         std::chrono::seconds cacheSize);
 
     std::unique_ptr<StreamingChunkInputStream> getChunkForReading(

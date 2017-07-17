@@ -41,7 +41,8 @@ public:
             StreamingChunkProviderFactory::instance().setCustomFunc(
                 std::bind(&StreamingChunkCache::createStreamingChunkProvider, this));
 
-        m_streamingChunkCache = std::make_unique<::StreamingChunkCache>(nullptr, kCacheSize);
+        m_streamingChunkCache = 
+            std::make_unique<::StreamingChunkCache>(nullptr, nullptr, kCacheSize);
     }
 
     ~StreamingChunkCache()

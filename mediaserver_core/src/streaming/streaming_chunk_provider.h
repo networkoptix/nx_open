@@ -39,7 +39,9 @@ class StreamingChunkProvider:
     public AbstractStreamingChunkProvider
 {
 public:
-    StreamingChunkProvider(QnResourcePool* resourcePool);
+    StreamingChunkProvider(
+        QnResourcePool* resourcePool,
+        StreamingChunkTranscoder* transcoder);
 
     virtual bool get(
         const StreamingChunkCacheKey& key,
@@ -60,7 +62,8 @@ public:
         nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamingChunkProvider>()>;
 
     std::unique_ptr<AbstractStreamingChunkProvider> create(
-        QnResourcePool* resourcePool);
+        QnResourcePool* resourcePool,
+        StreamingChunkTranscoder* transcoder);
 
     Function setCustomFunc(Function);
 

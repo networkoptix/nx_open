@@ -27,6 +27,7 @@
 #include <utils/common/delayed.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
+#include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
@@ -122,8 +123,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnStorageDbPool(commonModule()->moduleGUID()));
 
+    auto streamingChunkTranscoder = store(
+        new StreamingChunkTranscoder(
+            commonModule()->resourcePool(),
+            StreamingChunkTranscoder::fBeginOfRangeInclusive));
+
     m_streamingChunkCache = store(new StreamingChunkCache(
         commonModule()->resourcePool(),
+        streamingChunkTranscoder,
         std::chrono::seconds(
             m_settings->roSettings()->value(
                 nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
