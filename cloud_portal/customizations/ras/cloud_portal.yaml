@@ -46,7 +46,7 @@ languages:
     - tr
     - zh_CN
     - zh_TW
-    - he
+    - hu
 
 queue_name: '$INSTANCE_NAME'
 
