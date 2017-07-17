@@ -62,7 +62,9 @@
 	{% csrf_token %}
 	<div class="submit-row">
         <button class="button" type="submit" name="Preview">Preview</button>
+		{% if perms.cms.publish_version %}
         <button class="button" type="submit" name="Publish">Publish</button>
+		{% endif %}
 	</div>
 </form>
 {% endif %}

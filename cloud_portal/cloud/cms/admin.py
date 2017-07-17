@@ -76,6 +76,11 @@ class ContentVersionAdmin(CMSAdmin):
                     'accepted_date', 'accepted_by',
                     'content_version_actions')
 
+    class Meta:
+        permissions = (
+            ("publish_version", "Can publish content to production"),
+        )
+
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',
                             reverse('review_version', args=[obj.id]))
