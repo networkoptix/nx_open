@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/cpp14.h>
+
 #include <common/common_module.h>
 #include <streaming/streaming_chunk_cache.h>
 #include <streaming/streaming_chunk_provider.h>
