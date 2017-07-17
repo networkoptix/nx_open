@@ -34,6 +34,10 @@ function(detect_package_versions)
         set(_openal_version "1.17.2")
     endif()
 
+    if(IOS)
+        set(_openssl_version "1.0.1i")
+    endif()
+
     if(box MATCHES "bpi|bananapi")
         set(_openssl_version "1.0.0j")
         set(_quazip_version "0.7")
