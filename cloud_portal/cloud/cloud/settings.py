@@ -314,3 +314,5 @@ DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
 
 MAX_RETRIES = conf['max_retries']
+
+SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
