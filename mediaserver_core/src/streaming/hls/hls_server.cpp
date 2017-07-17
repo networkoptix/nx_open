@@ -837,7 +837,7 @@ namespace nx_hls
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;
-        m_chunkInputStream = StreamingChunkCache::instance()->getChunkForReading(
+        m_chunkInputStream = qnServerModule->streamingChunkCache()->getChunkForReading(
             currentChunkKey, &chunk);
         if (!m_chunkInputStream)
         {

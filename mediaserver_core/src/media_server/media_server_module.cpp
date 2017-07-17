@@ -122,7 +122,12 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnStorageDbPool(commonModule()->moduleGUID()));
 
-    m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
+    m_streamingChunkCache = store(new StreamingChunkCache(
+        commonModule()->resourcePool(),
+        std::chrono::seconds(
+            m_settings->roSettings()->value(
+                nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
+                nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt())));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 

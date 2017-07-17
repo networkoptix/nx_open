@@ -8,22 +8,28 @@
 
 #include <nx/utils/std/cpp14.h>
 
+#include "media_server/media_server_module.h"
 #include "media_server/settings.h"
 #include "streaming_chunk_transcoder.h"
 #include "video_camera_streaming_chunk.h"
 
-StreamingChunkProvider::StreamingChunkProvider():
+StreamingChunkProvider::StreamingChunkProvider(QnResourcePool* resourcePool):
+    m_resourcePool(resourcePool),
     m_transcoder(StreamingChunkTranscoder::instance())
 {
 }
 
-bool StreamingChunkProvider::get( const StreamingChunkCacheKey& key, int* const itemCost, StreamingChunkPtr* const chunk )
+bool StreamingChunkProvider::get(
+    const StreamingChunkCacheKey& key,
+    int* const itemCost,
+    StreamingChunkPtr* const chunk)
 {
     using namespace std::chrono;
 
     StreamingChunkPtr newChunk = std::make_shared<VideoCameraStreamingChunk>(
+        m_resourcePool,
         key,
-        MSSettings::roSettings()->value(
+        qnServerModule->settings()->roSettings()->value(
             nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt());
     if( !m_transcoder->transcodeAsync( key, newChunk ) )
@@ -37,12 +43,13 @@ bool StreamingChunkProvider::get( const StreamingChunkCacheKey& key, int* const 
 
 //-------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AbstractStreamingChunkProvider> StreamingChunkProviderFactory::create()
+std::unique_ptr<AbstractStreamingChunkProvider> StreamingChunkProviderFactory::create(
+    QnResourcePool* resourcePool)
 {
     if (m_customFunc)
         return m_customFunc();
 
-    return std::make_unique<StreamingChunkProvider>();
+    return std::make_unique<StreamingChunkProvider>(resourcePool);
 }
 
 StreamingChunkProviderFactory::Function StreamingChunkProviderFactory::setCustomFunc(

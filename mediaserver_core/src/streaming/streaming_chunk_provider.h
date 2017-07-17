@@ -10,6 +10,7 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 
+class QnResourcePool;
 class StreamingChunkTranscoder;
 
 class AbstractStreamingChunkProvider
@@ -38,7 +39,7 @@ class StreamingChunkProvider:
     public AbstractStreamingChunkProvider
 {
 public:
-    StreamingChunkProvider();
+    StreamingChunkProvider(QnResourcePool* resourcePool);
 
     virtual bool get(
         const StreamingChunkCacheKey& key,
@@ -46,6 +47,7 @@ public:
         StreamingChunkPtr* const chunk) override;
 
 private:
+    QnResourcePool* m_resourcePool;
     StreamingChunkTranscoder* m_transcoder;
 };
 
@@ -57,7 +59,8 @@ public:
     using Function = 
         nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamingChunkProvider>()>;
 
-    std::unique_ptr<AbstractStreamingChunkProvider> create();
+    std::unique_ptr<AbstractStreamingChunkProvider> create(
+        QnResourcePool* resourcePool);
 
     Function setCustomFunc(Function);
 

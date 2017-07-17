@@ -4,12 +4,15 @@
 #include <core/resource/security_cam_resource.h>
 
 VideoCameraStreamingChunk::VideoCameraStreamingChunk(
+    QnResourcePool* resourcePool,
     const StreamingChunkCacheKey& params,
     std::size_t maxInternalBufferSize)
     :
-    StreamingChunk(params, maxInternalBufferSize)
+    StreamingChunk(params, maxInternalBufferSize),
+    m_resourcePool(resourcePool)
 {
     const auto res = nx::camera_id_helper::findCameraByFlexibleId(
+        m_resourcePool,
         params.srcResourceUniqueID());
     if (res)
         m_videoCameraLocker = qnCameraPool->getVideoCameraLockerByResourceId(res->getId());

@@ -9,6 +9,7 @@
 #include <memory>
 
 #include <QtCore/QCache>
+#include <QtCore/QObject>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -16,16 +17,19 @@
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_provider.h"
 
-class StreamingChunkCache
+class QnResourcePool;
+
+class StreamingChunkCache:
+    public QObject
 {
 public:
-    StreamingChunkCache(std::chrono::seconds cacheSize);
+    StreamingChunkCache(
+        QnResourcePool* resourcePool,
+        std::chrono::seconds cacheSize);
 
     std::unique_ptr<StreamingChunkInputStream> getChunkForReading(
         const StreamingChunkCacheKey currentChunkKey,
         StreamingChunkPtr* chunk);
-
-    static StreamingChunkCache* instance();
 
 private:
     mutable QnMutex m_mutex;
