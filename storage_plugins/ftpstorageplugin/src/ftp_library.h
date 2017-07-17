@@ -11,7 +11,7 @@
 #include "impl/ftplib.h"
 
 /*! \mainpage
-    
+
     \section intro_sec Introduction
     This is the example project aimed to demonstrate NX Storage plugin API SDK possible implementation.
     \subsection tips_subsec Some tips
@@ -32,13 +32,13 @@
       fileInfo.url = /some/path/file1.mkv                   // right
       fileInfo.url = file1.mkv                              // wrong
       \endcode
-    - Some of the API functions are called frequently, for example open(), some - based on some (sometimes quite long) timeout, for example, removeDir(). 
+    - Some of the API functions are called frequently, for example open(), some - based on some (sometimes quite long) timeout, for example, removeDir().
       But MediaServer calls all of them in time, so every function should be implemented correctly.
     - For some storages types, for example FTP, it may be impossible to 'honestly' implement such fuctions as getTotalSpace() and getFreeSpace().
-      In this case these functions are allowed to return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in determing "best"​ storage algorithm. 
-      For example if some storage total space is far smaller than others this storage won't be selected for writing. 
+      In this case these functions are allowed to return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in determing "best"​ storage algorithm.
+      For example if some storage total space is far smaller than others this storage won't be selected for writing.
       Or if some storage is twice larger than another, it will be written on twice more data. Also total space value is displayed in client for every storage in list.
-      getFreeSpace() is used to rotate data on storages. If MediaServer sees that some storage free space becomes lower than predefined limit (5gb by default) 
+      getFreeSpace() is used to rotate data on storages. If MediaServer sees that some storage free space becomes lower than predefined limit (5gb by default)
       it will try to remove some old files and folders on this storage.
 
     \section build_how_to Build how-to
@@ -48,8 +48,8 @@
 
     \section usage Usage
     You should have NX Mediaserver installed. Put built plugin library in mediaserver/bin/plugins (linux) or mediaserver/plugins (windows) folder and restart mediaserver.
-    Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP). 
-    Enter valid ftp url and credentials and press Ok. For example, 
+    Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP).
+    Enter valid ftp url and credentials and press Ok. For example,
 	\code
 	Url:		ftp://10.2.3.87/path/to/storage
 	Login:		user1
@@ -57,7 +57,7 @@
 	\endcode
 */
 
-namespace nx_spl 
+namespace nx_spl
 {
     namespace aux
     {   // Generic reference counter Mix-In. Private inherit it.
@@ -126,15 +126,15 @@ namespace nx_spl
             const uint32_t  size,
             int*            ecode
         ) const override;
- 
+
         virtual int STORAGE_METHOD_CALL seek(
-            uint64_t    pos, 
+            uint64_t    pos,
             int*        ecode
         ) override;
 
-        virtual int      STORAGE_METHOD_CALL getMode() const override; 
+        virtual int      STORAGE_METHOD_CALL getMode() const override;
         virtual uint32_t STORAGE_METHOD_CALL size(int* ecode) const override;
-    
+
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
@@ -175,7 +175,7 @@ namespace nx_spl
         typedef FileListType::const_iterator    FileListIteratorType;
     public:
         FtpFileInfoIterator(
-            ftplib              &impl, 
+            ftplib              &impl,
             FileListType       &&fileList, // caller doesn't really need this list after Iterator is constructed
             const std::string   &baseDir
         );
@@ -229,42 +229,42 @@ namespace nx_spl
             int             flags,
             int*            ecode
         ) const override;
- 
-        virtual uint64_t STORAGE_METHOD_CALL getFreeSpace(int* ecode) const; 
-        virtual uint64_t STORAGE_METHOD_CALL getTotalSpace(int* ecode) const; 
+
+        virtual uint64_t STORAGE_METHOD_CALL getFreeSpace(int* ecode) const;
+        virtual uint64_t STORAGE_METHOD_CALL getTotalSpace(int* ecode) const;
         virtual int STORAGE_METHOD_CALL getCapabilities() const;
- 
+
         virtual void STORAGE_METHOD_CALL removeFile(
             const char* url,
             int*        ecode
         ) override;
- 
+
         virtual void STORAGE_METHOD_CALL removeDir(
             const char* url,
             int*        ecode
         ) override;
- 
+
         virtual void STORAGE_METHOD_CALL renameFile(
             const char*     oldUrl,
             const char*     newUrl,
             int*            ecode
         ) override;
- 
+
         virtual FileInfoIterator* STORAGE_METHOD_CALL getFileIterator(
             const char*     dirUrl,
             int*            ecode
         ) const override;
- 
+
         virtual int STORAGE_METHOD_CALL fileExists(
             const char*     url,
             int*            ecode
         ) const override;
- 
+
         virtual int STORAGE_METHOD_CALL dirExists(
             const char*     url,
             int*            ecode
         ) const override;
- 
+
         virtual uint64_t STORAGE_METHOD_CALL fileSize(
             const char*     url,
             int*            ecode
@@ -279,7 +279,7 @@ namespace nx_spl
     private:
         // destroy only via releaseRef()
         ~FtpStorage();
-        
+
     private:
         implPtrType         m_impl;
         std::string         m_implurl;
@@ -289,7 +289,7 @@ namespace nx_spl
         mutable int         m_available;
     }; // class Ftpstorage
 
-    class FtpStorageFactory 
+    class FtpStorageFactory
         : public StorageFactory,
           private aux::NonCopyable,
           private aux::PluginRefCounter<FtpStorageFactory>
@@ -304,7 +304,7 @@ namespace nx_spl
             const char* url,
             int*        ecode
         ) override;
- 
+
         virtual const char* STORAGE_METHOD_CALL storageType() const override;
         virtual const char* lastErrorMessage(int ecode) const override;
 
