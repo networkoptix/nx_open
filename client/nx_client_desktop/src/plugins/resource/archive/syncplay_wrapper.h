@@ -76,7 +76,7 @@ private:
     qint64 endTime() const;
 
     void erase(QnAbstractArchiveDelegate* value);
-    qint64 getDisplayedTimeInternal() const;
+    qint64 getDisplayedTimeInternal(bool useEofItems = false) const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);
     qint64 maxArchiveTime() const;

@@ -347,7 +347,10 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+protected:
+#ifdef ENABLE_DATA_PROVIDERS
+    QnAudioTransmitterPtr m_audioTransmitter;
+#endif
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

@@ -216,7 +216,8 @@ void AsyncHttpClient::doPost(
     m_requestUrl = url;
     m_contentLocationUrl = url;
     composeRequest(nx_http::Method::post);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
+    if (!contentType.isEmpty())
+        m_request.headers.insert(make_pair("Content-Type", contentType));
     if (includeContentLength)
         m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
     //TODO #ak support chunked encoding & compression

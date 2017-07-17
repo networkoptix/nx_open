@@ -57,8 +57,6 @@ public:
 
     QnAspectRatio aspectRatio() const;
 
-protected:
-
 private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;

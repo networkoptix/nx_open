@@ -130,7 +130,7 @@ public:
         QThread* targetThread = nullptr);
 
     /* DistributedFileDownloader API */
-    Handle downloaderAddDownload(
+    Handle addFileDownload(
         const QString& fileName,
         int size,
         const QByteArray& md5,
@@ -138,24 +138,24 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderRemoveDownload(
+    Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderChunkChecksums(
+    Handle fileChunkChecksums(
         const QString& fileName,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderDownloadChunk(
+    Handle downloadFileChunk(
         const QString& fileName,
         int index,
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderDownloadChunkFromInternet(
+    Handle downloadFileChunkFromInternet(
         const QString& fileName,
         const QUrl& url,
         int chunkIndex,
@@ -163,18 +163,18 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderUploadChunk(
+    Handle uploadFileChunk(
         const QString& fileName,
         int index,
         const QByteArray& data,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderStatus(
+    Handle downloadsStatus(
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle downloaderFileStatus(
+    Handle fileDownloadStatus(
         const QString& fileName,
         GetCallback callback,
         QThread* targetThread = nullptr);

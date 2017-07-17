@@ -30,6 +30,7 @@ public:
         registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
         registerKey<QnBitrateList>(Qn::HIGH_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
         registerKey<QnBitrateList>(Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
+        registerKey<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
 
         registerKey<QnBounds>(Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME);
         registerKey<QnBounds>(Qn::LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME);
@@ -66,7 +67,7 @@ protected:
             if(serializer) {
                 if(!serializer->deserialize(ctx, data.json, &data.value))
                     return false;
-                
+
                 data.type = serializer->type();
             }
         }
@@ -95,7 +96,7 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
         return false;
 
     /* Note: we're using type erasure here so that we don't have to include json
-     * headers from this header. Performance penalty is negligible as this 
+     * headers from this header. Performance penalty is negligible as this
      * function is only called during resource construction. */
 
     const Data &data = *pos;

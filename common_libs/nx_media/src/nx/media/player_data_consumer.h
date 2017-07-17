@@ -180,7 +180,7 @@ private:
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
     std::atomic<bool> m_audioEnabled;
-    std::atomic<bool> m_needResetAudio;
+    std::atomic<bool> m_needToResetAudio;
 };
 
 } // namespace media
