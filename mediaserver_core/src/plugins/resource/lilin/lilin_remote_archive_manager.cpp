@@ -229,8 +229,6 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
     return dateTime.toMSecsSinceEpoch();
 }
 
-
 } // namespace plugins
 } // namespace mediasever_core
 } // namespace nx
-
