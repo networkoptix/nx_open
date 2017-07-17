@@ -1,10 +1,7 @@
 from __future__ import absolute_import
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.response import Response
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -136,6 +133,9 @@ def context_edit_view(request, context=None, language=None):
                                                        'title': 'Content Editor'})
 
     else:
+        if not request.user.has_perm('cms.edit_content'):
+            raise PermissionDenied
+
         context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
 
         if 'SendReview' in request.data:
@@ -170,7 +170,7 @@ def review_version_request(request, context=None, language=None):
                                                        'has_permission': mysite.has_permission(request),
                                                        'site_url': mysite.site_url,
                                                        'title': 'Review A version'})
-    return Response("Invalid")
+    raise SuspiciousOperation('Invalid command')
 
 
 @api_view(["GET"])

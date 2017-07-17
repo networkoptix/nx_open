@@ -39,6 +39,13 @@ admin.site.register(Product, ProductAdmin)
 class ContextAdmin(CMSAdmin):
     list_display = ('product', 'name', 'description', 'url', 'translatable', 'context_actions')
 
+    class Meta:
+        verbose_name = 'Content page'
+        verbose_name_plural = 'Content pages'
+        permissions = (
+            ("edit_content", "Can edit content and send for review"),
+        )
+
     def context_actions(self, obj):
         return format_html('<a class="button" href="{}">edit content</a>',
                             reverse('context_editor', args=[obj.id]))
