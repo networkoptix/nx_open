@@ -1,6 +1,11 @@
 find_library(Qt5MultimediaQuick_p_LIBRARY
     NAMES Qt5MultimediaQuick_p QtMultimediaQuick_p
-    PATHS "${QT_DIR}/lib" NO_DEFAULT_PATH)
+    PATHS "${QT_DIR}/lib" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+
+if(NOT Qt5MultimediaQuick_p_LIBRARY)
+    message(FATAL_ERROR "Library Qt5MultimediaQuick_p not found.")
+endif()
+
 mark_as_advanced(Qt5MultimediaQuick_p_LIBRARY)
 
 nx_add_target(nx_client_core LIBRARY
