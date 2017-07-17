@@ -9,12 +9,6 @@
 
 #include <nx/utils/random.h>
 
-#include <api/helpers/camera_id_helper.h>
-#include <core/resource/security_cam_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-#include "media_server/settings.h"
-
 StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
     m_currentOffset( 0 ),
     m_chunk(chunk)
@@ -27,18 +21,15 @@ StreamingChunk::SequentialReadingContext::~SequentialReadingContext()
     m_chunk->m_readers.erase(this);
 }
 
-StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params ):
+StreamingChunk::StreamingChunk(
+    const StreamingChunkCacheKey& params,
+    std::size_t maxInternalBufferSize)
+    :
     m_params( params ),
     m_modificationState( State::init ),
-    m_maxInternalBufferSize(
-        MSSettings::roSettings()->value(
-            nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
-            nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
+    m_maxInternalBufferSize(maxInternalBufferSize),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
 {
-    const auto res = nx::camera_id_helper::findCameraByFlexibleId(params.srcResourceUniqueID());
-    if (res)
-        m_videoCameraLocker = qnCameraPool->getVideoCameraLockerByResourceId(res->getId());
 }
 
 StreamingChunk::~StreamingChunk()
@@ -71,6 +62,12 @@ nx::Buffer StreamingChunk::data() const
 {
     QnMutexLocker lk( &m_mutex );
     return m_data;
+}
+
+bool StreamingChunk::startsWithZeroOffset() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_dataOffsetAtTheFrontOfTheBuffer == 0;
 }
 
 bool StreamingChunk::tryRead(
@@ -190,8 +187,6 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_modificationState = State::closed;
         m_cond.wakeAll();
     }
-
-    m_videoCameraLocker.reset();
 
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.close();

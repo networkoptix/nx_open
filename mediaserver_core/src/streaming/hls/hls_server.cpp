@@ -88,7 +88,6 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
-            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
@@ -815,7 +814,7 @@ namespace nx_hls
             containerFormat,
             aliasIter != requestParams.end() ? aliasIter->second : QString(),
             startTimestamp,
-            chunkDuration,
+            std::chrono::microseconds(chunkDuration),
             streamQuality,
             requestParams );
 
@@ -825,25 +824,25 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        //retrieving streaming chunk
-        StreamingChunkPtr chunk;
-        if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
-        {
-            NX_LOG( lit("Could not get chunk %1 of resource %2 requested by %3").
-                arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
         //streaming chunk
-        if( m_currentChunk )
+        if (m_currentChunk)
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
-            StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 
+        //retrieving streaming chunk
+        StreamingChunkPtr chunk;
+        m_chunkInputStream = StreamingChunkCache::instance()->getChunkForReading(
+            currentChunkKey, &chunk);
+        if (!m_chunkInputStream)
+        {
+            NX_LOG(lm("Could not get chunk %1 of resource %2 requested by %3")
+                .arg(request.requestLine.url.query()).arg(uniqueResourceID.toString())
+                .arg(remoteHostAddress().toString()), cl_logDEBUG1);
+            return nx_http::StatusCode::notFound;
+        }
         m_currentChunk = chunk;
-        m_chunkInputStream.reset( new StreamingChunkInputStream( m_currentChunk.get() ) );
 
         //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
         const auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
