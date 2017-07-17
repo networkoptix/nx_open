@@ -147,6 +147,15 @@ bool doPutRequest(
     const nx::Buffer& buffer,
     nx_http::StatusCode::Value* outStatusCode = nullptr);
 
+bool doRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    const nx_http::Method::ValueType& method,
+    const nx::Buffer* bufferToSend = nullptr,
+    nx::Buffer* outResponseBuffer = nullptr,
+    nx_http::StatusCode::Value* outStatusCode = nullptr
+);
+
 bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth);
 
 QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber);

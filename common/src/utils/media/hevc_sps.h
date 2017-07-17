@@ -23,9 +23,9 @@ struct ProfileTierLevel
 
     struct Layer
     {
-        uint8_t profileSpace;
+        uint8_t profileSpace = 0;
         bool tierFlag = false;
-        uint8_t profileIdc;
+        uint8_t profileIdc = 0;
         std::array<bool, 32> profileCompatibilityFlags;
         bool progressiveSourceFlag = false;
         bool interlacedSourceFlag = false;
@@ -45,7 +45,7 @@ struct ProfileTierLevel
         uint8_t levelIdc = 0;
 
     public:
-        bool isSubLayer() { return nxIsSubLayer; }
+        bool isSubLayer() { return nxIsSubLayer; } const
         void setIsSubLayer(bool isSubLayer) { nxIsSubLayer = isSubLayer; }
 
     private:

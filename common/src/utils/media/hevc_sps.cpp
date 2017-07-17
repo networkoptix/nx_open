@@ -21,10 +21,8 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
     payload += NalUnitHeader::kTotalLength;
     payloadLength -= NalUnitHeader::kTotalLength;
 
-    auto decodedNalBuffer = std::unique_ptr<uint8_t[]>(
-        new uint8_t[payloadLength + kReservedNalSpace]);
-
-    auto rawDecodedNalBuffer = decodedNalBuffer.get();
+    std::vector<uint8_t> decodedNalBuffer(payloadLength + kReservedNalSpace);
+    auto rawDecodedNalBuffer = decodedNalBuffer.data();
 
     NALUnit::decodeNAL(
         payload,
@@ -33,10 +31,10 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         payloadLength + kReservedNalSpace);
 
     BitStreamReader reader;
-    reader.setBuffer(rawDecodedNalBuffer, rawDecodedNalBuffer + payloadLength);
 
     try
     {
+        reader.setBuffer(rawDecodedNalBuffer, rawDecodedNalBuffer + payloadLength);
         spsVideoParamterSetId = reader.getBits(4);
         spsMaxSubLayersMinus1 = reader.getBits(3);
         spsTemporalIdNestingFlag = reader.getBit();

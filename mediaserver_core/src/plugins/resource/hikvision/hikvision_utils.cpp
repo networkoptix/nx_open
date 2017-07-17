@@ -365,36 +365,40 @@ bool doGetRequest(
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)
 {
-    if (outStatusCode)
-        *outStatusCode = nx_http::StatusCode::Value::undefined;
-
-    NX_ASSERT(outBuffer, lit("Output buffer should be provided."));
+    NX_ASSERT(outBuffer, lit("Output buffer should be set."));
     if (!outBuffer)
         return false;
 
-    nx_http::HttpClient httpClient;
-    if (!tuneHttpClient(&httpClient, auth))
-        return false;
-
-    if (!httpClient.doGet(url))
-        return false;
-
-    while (!httpClient.eof())
-        outBuffer->append(httpClient.fetchMessageBodyBuffer());
-
-    nx_http::StatusCode::Value statusCode = (nx_http::StatusCode::Value)httpClient.response()
-        ->statusLine.statusCode;
-
-    if (outStatusCode)
-        *outStatusCode = statusCode;
-
-    return nx_http::StatusCode::isSuccessCode(statusCode);
+    return doRequest(
+        url,
+        auth,
+        nx_http::Method::GET,
+        /*bufferToSend*/ nullptr,
+        outBuffer,
+        outStatusCode);
 }
 
 bool doPutRequest(
     const QUrl& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
+    nx_http::StatusCode::Value* outStatusCode)
+{
+    return doRequest(
+        url,
+        auth,
+        nx_http::Method::PUT,
+        &buffer,
+        /*outResponseBuffer*/ nullptr,
+        outStatusCode);
+}
+
+bool doRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    const nx_http::Method::ValueType& method,
+    const nx::Buffer* bufferToSend,
+    nx::Buffer* outResponseBuffer,
     nx_http::StatusCode::Value* outStatusCode)
 {
     if (outStatusCode)
@@ -404,7 +408,13 @@ bool doPutRequest(
     if (!tuneHttpClient(&httpClient, auth))
         return false;
 
-    if (!httpClient.doPut(url, kContentType.toUtf8(), buffer))
+    bool result = false;
+    if (method == nx_http::Method::GET)
+        result = httpClient.doGet(url);
+    else if (method == nx_http::Method::PUT && bufferToSend)
+        result = httpClient.doPut(url, kContentType.toUtf8(), *bufferToSend);
+    
+    if (!result)
         return false;
 
     nx::Buffer responseBuffer;
@@ -417,8 +427,14 @@ bool doPutRequest(
     if (outStatusCode)
         *outStatusCode = statusCode;
 
-    return responseIsOk(parseCommonResponse(responseBuffer))
-        && nx_http::StatusCode::isSuccessCode(statusCode);
+    result = nx_http::StatusCode::isSuccessCode(statusCode);
+    if (method == nx_http::Method::PUT && result)
+        result = responseIsOk(parseCommonResponse(responseBuffer));
+
+    if (result && outResponseBuffer)
+        *outResponseBuffer = std::move(responseBuffer);
+
+    return result;
 }
 
 bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth)

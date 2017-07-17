@@ -55,7 +55,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         quality = chooseQuality(liveStreamParameters.quality, channelCapabilities);
     else
         quality = chooseQuality(liveStreamParameters.secondaryQuality, channelCapabilities);
-   
+
     result = configureChannel(resolution, codec, fps, quality);
     if (!result)
         return result;
@@ -138,7 +138,7 @@ int HikvisionHevcStreamReader::chooseFps(
     const ChannelCapabilities& channelCapabilities, float fps) const
 {
     int choosenFps = 0;
-    int minDifference = std::numeric_limits<int>::max();
+    auto minDifference = std::numeric_limits<double>::max();
 
     for (const auto& hikvisionFramerate: channelCapabilities.fps)
     {

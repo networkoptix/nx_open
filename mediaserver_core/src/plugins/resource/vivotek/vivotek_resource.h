@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QFlags>
+
 #include <boost/optional/optional.hpp>
 
 #include <plugins/resource/onvif/onvif_resource.h>
@@ -14,19 +16,21 @@ class VivotekResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
 
-    struct StreamCodecCapabilities
+public:
+    enum class StreamCodecCapability
     {
-        bool h264 = false;
-        bool mpeg4 = false;
-        bool mjpeg = false;
-        bool svc = false;
+        mpeg4 = 0b0001,
+        mjpeg = 0b0010,
+        h264 = 0b0100,
+        svc = 0b1000
     };
 
-public:
+    Q_DECLARE_FLAGS(StreamCodecCapabilities, StreamCodecCapability);
+
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
 
-    virtual void afterConfigureStream(Qn::ConnectionRole role) override;
+    virtual CameraDiagnostics::Result customStreamConfiguration(Qn::ConnectionRole role) override;
 
 private:
     bool fetchHevcSupport();
@@ -37,7 +41,7 @@ private:
 
     bool parseStreamCodecCapabilities(
         const QString& codecCapabilitiesString,
-        std::vector<StreamCodecCapabilities>& outCapabilities) const;
+        std::vector<StreamCodecCapabilities>* outCapabilities) const;
 
     void tuneHttpClient(nx_http::HttpClient& httpClient) const;
 
@@ -54,6 +58,8 @@ private:
     boost::optional<bool> m_hasHevcSupport;
     std::vector<StreamCodecCapabilities> m_streamCodecCapabilities;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(VivotekResource::StreamCodecCapabilities);
 
 } // namespace plugins
 } // namespace mediaserver_core

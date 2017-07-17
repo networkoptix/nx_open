@@ -75,7 +75,6 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
 
     if (!hevcIsDisabled)
     {
-        bool hasHevcSupport = false;
         for (const auto& role : kRoles)
         {
             hikvision::ChannelCapabilities channelCapabilities;

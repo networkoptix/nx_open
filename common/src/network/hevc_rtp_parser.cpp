@@ -42,17 +42,17 @@ bool HevcParser::processData(
 
     m_rtpBufferBase = rtpBufferBase;
 
-    bool skipData = false;
+    bool isFatalError = false;
     uint32_t rtpTimestamp = 0;
     int payloadLength = bytesRead;
     auto payload = rtpBufferBase + rtpBufferOffset;
 
-    if (!processRtpHeader(&payload, &payloadLength, &skipData, &rtpTimestamp))
+    if (!processRtpHeader(&payload, &payloadLength, &isFatalError, &rtpTimestamp))
     {
-        if (!skipData)
+        if (isFatalError)
             reset();
 
-        return skipData;
+        return !isFatalError;
     }
 
     if (!handlePayload(payload, payloadLength))
@@ -147,6 +147,8 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
             (char*)hevc::kShortNalUnitPrefix,
             sizeof(hevc::kShortNalUnitPrefix));
 
+        // Some cameras (e.g. DigitalWatchdog) 
+        // may send extra start code in parameter set SDP string.
         if (parameterSet.endsWith(startCode))
         {
             parameterSet.remove(
@@ -189,34 +191,37 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
 //-------------------------------------------------------------------------------------------------
 
 bool HevcParser::processRtpHeader(
-    uint8_t** payload,
-    int* payloadLength,
-    bool* outSkipData,
+    uint8_t** outPayload,
+    int* outPayloadLength,
+    bool* outIsFatalError,
     uint32_t* outRtpTimestamp)
 {
-    NX_ASSERT(payload && *payload, "Incorrect payload.");
-    if (!payload || !*payload)
+    NX_ASSERT(outPayload && *outPayload, "Incorrect payload.");
+    if (!outPayload || !*outPayload)
         return false;
 
-    NX_ASSERT(payloadLength, "Incorrect payload length.");
-    if (!payloadLength)
+    NX_ASSERT(outPayloadLength, "Incorrect payload length.");
+    if (!outPayloadLength)
         return false;
 
-    if (outSkipData)
-        *outSkipData = false;
+    auto& payload = *outPayload;
+    auto& payloadLength = *outPayloadLength;
 
-    if (*payloadLength < RtpHeader::RTP_HEADER_SIZE + 1)
+    if (outIsFatalError)
+        *outIsFatalError = true;
+
+    if (payloadLength < RtpHeader::RTP_HEADER_SIZE + 1)
         return false;
 
-    auto rtpHeaderSize = calculateFullRtpHeaderSize(*payload, *payloadLength);
+    auto rtpHeaderSize = calculateFullRtpHeaderSize(payload, payloadLength);
     if (rtpHeaderSize < RtpHeader::RTP_HEADER_SIZE)
         return false;
 
-    auto rtpHeader = (RtpHeader*)(*payload);
+    auto rtpHeader = (RtpHeader*)(payload);
     if (!isApropriatePayloadType(rtpHeader))
     {
-        if (outSkipData)
-            *outSkipData = true;
+        if (outIsFatalError)
+            *outIsFatalError = false;
         return false;
     }
 
@@ -228,12 +233,12 @@ bool HevcParser::processRtpHeader(
     }
 
     if (rtpHeader->padding)
-        *payloadLength -= *((*payload) + (*payloadLength) - 1);
+        payloadLength -= *(payload + payloadLength - 1);
 
-    *payload += rtpHeaderSize;
-    *payloadLength -= rtpHeaderSize;
+    payload += rtpHeaderSize;
+    payloadLength -= rtpHeaderSize;
 
-    if (*payloadLength < 1)
+    if (payloadLength < 1)
         return false;
 
     if (rtpHeader->marker)
@@ -379,7 +384,7 @@ bool HevcParser::handleAggregationPacket(
     int payloadLength)
 {
     DonType donType = DonType::Donl;
-    while (payloadLength)
+    while (payloadLength > 0)
     {
         skipDonIfNeeded(&payload, &payloadLength, donType);
         donType = DonType::Dond;
@@ -403,12 +408,9 @@ bool HevcParser::handleAggregationPacket(
 
         payload += nalSize;
         payloadLength -= nalSize;
-
-        if (payloadLength < 0)
-            return false;
     }
 
-    return true;
+    return payloadLength == 0;
 }
 
 bool HevcParser::handleFragmentationPacket(

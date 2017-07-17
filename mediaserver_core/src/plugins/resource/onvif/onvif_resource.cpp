@@ -4029,6 +4029,11 @@ void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole role)
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 double QnPlOnvifResource::getClosestAvailableFps(double desiredFps)
 {
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));

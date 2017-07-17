@@ -42,7 +42,7 @@ struct FuHeader
 {
     bool startFlag = 0;
     bool endFlag = 0;
-    NalUnitType unitType;
+    NalUnitType unitType = NalUnitType::Unspec63;
 
     const static int kTotalLength = 1;
 

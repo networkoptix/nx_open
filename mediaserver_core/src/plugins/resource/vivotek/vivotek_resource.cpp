@@ -15,11 +15,6 @@ namespace plugins {
 
 namespace {
 
-const uint8_t kMpeg4Mask = 0b1;
-const uint8_t kMjpegMask = 0b10;
-const uint8_t kH264Mask = 0b100;
-const uint8_t kSvcMask = 0b1000;
-
 const QString kGetParameterPath = lit("/cgi-bin/admin/getparam.cgi");
 const QString kSetParameterPath = lit("/cgi-bin/admin/setparam.cgi");
 const QString kInvalid = lit("ERR_INVALID");
@@ -50,7 +45,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     auto hevcIsSupported = hasHevcSupport();
 
     if (!hevcIsSupported || !hevcIsSupported.get())
-        return CameraDiagnostics::NoErrorResult();
+        return result;
 
     auto rawStreamCodecCapabilities = getVivotekParameter(kStreamCodecCapabilities);
     if (!rawStreamCodecCapabilities)
@@ -63,7 +58,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     m_streamCodecCapabilities.clear();
     bool streamCodecCapabilitiesParsed = parseStreamCodecCapabilities(
         rawStreamCodecCapabilities.get(),
-        m_streamCodecCapabilities);
+        &m_streamCodecCapabilities);
 
     if (!streamCodecCapabilitiesParsed)
     {
@@ -72,20 +67,31 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
             lit("Stream codec capabilities"));
     }
 
-    return CameraDiagnostics::NoErrorResult();
+    return result;
 }
 
-void VivotekResource::afterConfigureStream(Qn::ConnectionRole role)
+CameraDiagnostics::Result VivotekResource::customStreamConfiguration(Qn::ConnectionRole role)
 {
+    bool success = true;
     if (streamSupportsHevc(role))
-        setHevcForStream(role);
+        success = setHevcForStream(role);
 
-    base_type::afterConfigureStream(role);
+    if (!success)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("Set HEVC for stream %1")
+                .arg(role == Qn::ConnectionRole::CR_LiveVideo 
+                    ? lit("primary")
+                    : lit("secondary")),
+            lit("Request failed."));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool VivotekResource::fetchHevcSupport()
 {
-    if (m_hasHevcSupport)
+    if (m_hasHevcSupport.is_initialized())
         return true;
 
     auto value = getVivotekParameter(kGeneralCodecCapability);
@@ -113,7 +119,8 @@ bool VivotekResource::streamSupportsHevc(Qn::ConnectionRole role) const
     // Little hack here. Vivotek API can not report
     // presence of hevc support per stream. We consider the stream as HEVC one
     // if it supports H264 and the device supports HEVC in general.
-    return hasHevcSupport() && m_streamCodecCapabilities[streamIndex].h264;
+    return hasHevcSupport()
+        && m_streamCodecCapabilities[streamIndex].testFlag(StreamCodecCapability::h264);
 }
 
 bool VivotekResource::setHevcForStream(Qn::ConnectionRole role)
@@ -134,8 +141,9 @@ bool VivotekResource::setHevcForStream(Qn::ConnectionRole role)
 
 bool VivotekResource::parseStreamCodecCapabilities(
     const QString& codecCapabilitiesString,
-    std::vector<VivotekResource::StreamCodecCapabilities>& outCapabilities) const
+    std::vector<StreamCodecCapabilities>* outCapabilities) const
 {
+    NX_ASSERT(outCapabilities, lit("No output vector provided."));
     bool success = false;
     auto split = codecCapabilitiesString.split(L',');
 
@@ -145,13 +153,17 @@ bool VivotekResource::parseStreamCodecCapabilities(
         if (!success)
             return false;
 
-        StreamCodecCapabilities caps;
-        caps.h264 = capsEncoded | kH264Mask;
-        caps.mjpeg = capsEncoded | kMjpegMask;
-        caps.mpeg4 = capsEncoded | kMpeg4Mask;
-        caps.svc = capsEncoded | kSvcMask;
+        QFlags<StreamCodecCapability> caps;
+        if (capsEncoded & (uint8_t)StreamCodecCapability::h264)
+            caps |= StreamCodecCapability::h264;
+        if (capsEncoded & (uint8_t)StreamCodecCapability::mjpeg)
+            caps |= StreamCodecCapability::mjpeg;
+        if (capsEncoded & (uint8_t)StreamCodecCapability::mpeg4)
+            caps |= StreamCodecCapability::mpeg4;
+        if (capsEncoded & (uint8_t)StreamCodecCapability::svc)
+            caps |= StreamCodecCapability::svc;
 
-        outCapabilities.push_back(caps);
+        outCapabilities->push_back(caps);
     }
 
     return true;

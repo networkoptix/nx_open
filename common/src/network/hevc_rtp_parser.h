@@ -45,10 +45,14 @@ public:
     virtual void setSDPInfo(QByteArrayList lines) override;
 
 private:
+    
+    // Returns true if RTP header is correct. In this case value of outIsFatalError is undefined
+    // If this function has returned false and value of outIsFatalError is false we can just skip the data
+    // otherwise we must reset the parser.
     bool processRtpHeader(
-        uint8_t** payload,
-        int* payloadLength,
-        bool* outSkipData,
+        uint8_t** outPayload,
+        int* outPayloadLength,
+        bool* outIsFatalError,
         uint32_t* outRtpTimestamp);
 
     int calculateFullRtpHeaderSize(
