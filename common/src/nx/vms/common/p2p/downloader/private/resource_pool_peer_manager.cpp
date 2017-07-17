@@ -109,7 +109,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
             callback(success, handle, fileInfo);
         };
 
-    return connection->downloaderFileStatus(fileName, handleReply, thread());
+    return connection->fileDownloadStatus(fileName, handleReply, thread());
 }
 
 rest::Handle ResourcePoolPeerManager::requestChecksums(
@@ -131,7 +131,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
             callback(success, handle, checksums);
         };
 
-    return connection->downloaderChunkChecksums(fileName, handleReply, thread());
+    return connection->fileChunkChecksums(fileName, handleReply, thread());
 }
 
 rest::Handle ResourcePoolPeerManager::downloadChunk(
@@ -144,7 +144,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     if (!connection)
         return -1;
 
-    return connection->downloaderDownloadChunk(fileName, chunkIndex, callback, thread());
+    return connection->downloadFileChunk(fileName, chunkIndex, callback, thread());
 }
 
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
@@ -170,7 +170,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 callback(success, handle, result);
             };
 
-        return connection->downloaderDownloadChunkFromInternet(
+        return connection->downloadFileChunkFromInternet(
             fileName, url, chunkIndex, chunkSize, handleReply, thread());
     }
 

@@ -141,7 +141,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    m_encoderCtx->bit_rate = 64000 * m_encoderCtx->channels;
+    m_encoderCtx->bit_rate = m_bitrate > 0 ? m_bitrate : 64000 * m_encoderCtx->channels;
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {

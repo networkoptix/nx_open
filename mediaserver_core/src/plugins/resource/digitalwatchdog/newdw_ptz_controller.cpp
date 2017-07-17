@@ -21,7 +21,8 @@ QnNewDWPtzController::~QnNewDWPtzController()
 
 Ptz::Capabilities QnNewDWPtzController::getCapabilities() const
 {
-    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability | Ptz::PresetsPtzCapability;
+    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability
+        | Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
 }
 
 static QString zoomDirection(qreal speed)
