@@ -223,13 +223,6 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
             break;
         }
 
-        case vms::event::bookmarkAction:
-        {
-            if (handleBookmarkAction(action))
-                return;
-            break;
-        }
-
         default:
             break;
     }
@@ -285,10 +278,11 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
             return true;
 
         case vms::event::showPopupAction:
+            action->getParams().actionId = QnUuid::createUuid();
+            /*fallthrough*/
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::showTextOverlayAction:
             return broadcastAction(action);
-
         default:
             break;
     }
@@ -373,28 +367,6 @@ bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& act
 
     return true;
 }
-
-bool RuleProcessor::handleBookmarkAction(const vms::event::AbstractActionPtr& action)
-{
-    if (!action->getParams().needConfirmation)
-        return false;
-
-    if (action->actionType() != vms::event::bookmarkAction)
-    {
-        NX_EXPECT(false, "Invalid action");
-        return false;
-    }
-
-    if (!fixActionTimeFields(action))
-        return false;
-
-    action->getParams().targetActionType = action->actionType();
-    action->setActionType(vms::event::showPopupAction);
-
-    broadcastAction(action);
-    return true;
-}
-
 void RuleProcessor::addRule(const vms::event::RulePtr& value)
 {
     at_ruleAddedOrUpdated(value);

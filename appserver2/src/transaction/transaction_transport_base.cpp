@@ -903,8 +903,6 @@ void QnTransactionTransportBase::sendHttpKeepAlive()
 
 void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
 {
-    if (m_remotePeer.isClient())
-        return; //not sending keep-alive to a client
     if (!m_isKeepAliveEnabled)
         return;
 

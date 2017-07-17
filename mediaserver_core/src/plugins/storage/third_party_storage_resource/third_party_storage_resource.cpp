@@ -35,11 +35,6 @@ namespace aux
                return -1;
 
             int ecode;
-            m_io->size(&ecode);
-
-            if (ecode != nx_spl::error::NoError)
-                return -1;
-
             uint32_t bytesRead = m_io->read(data, maxlen, &ecode);
 
             if (ecode != nx_spl::error::NoError)
@@ -151,6 +146,11 @@ namespace aux
             return false;
         }
 
+        virtual bool eof() const override
+        {
+            return m_impl->atEnd();
+        }
+
     private:
         QString         m_filename;
         TPIODevicePtr   m_impl;
@@ -207,7 +207,7 @@ void QnThirdPartyStorageResource::openStorage(
     QnMutexLocker lock(&m_mutex);
 
     int ecode;
-    nx_spl::Storage* spRaw = sf->createStorage(commonModule(), storageUrl, &ecode);
+    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
 
     if (ecode != nx_spl::error::NoError)
     {

@@ -21,6 +21,9 @@
 
                 <Directory Id="Platforms" Name="platforms">
                 </Directory>
+                
+                <Directory Id="Mediaservice" Name="mediaservice">
+                </Directory>
 
                 <Directory Id="Audio" Name="audio">
                 </Directory>
@@ -185,6 +188,15 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="Mediaservice" Directory="Mediaservice">
+            <Component>
+                <File Id="dsengine.dll" Name="dsengine.dll" Source="$(var.QtPluginsDir)\mediaservice\dsengine.dll" DiskId="12" />
+            </Component>
+            <Component>
+                <File Id="qtmedia_audioengine.dll" Name="qtmedia_audioengine.dll" Source="$(var.QtPluginsDir)\mediaservice\qtmedia_audioengine.dll" DiskId="12" />
+            </Component>
+        </ComponentGroup>
+		
         <ComponentGroup Id="AudioPlugins" Directory="Audio">
             <Component>
                 <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
@@ -208,6 +220,7 @@
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ClientQuazip" />
             <ComponentGroupRef Id="ImageFormats" />
+            <ComponentGroupRef Id="Mediaservice" />			
             <ComponentGroupRef Id="Platforms" />
             <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />

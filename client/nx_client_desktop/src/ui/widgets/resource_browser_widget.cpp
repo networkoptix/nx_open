@@ -135,6 +135,25 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
+    ui->resourceTreeWidget->setAutoExpandPolicy(
+        [](const QModelIndex& index)
+        {
+            switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
+            {
+                case Qn::ResourceNode:
+                {
+                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    return resource && resource->hasFlags(Qn::server);
+                }
+                case Qn::ServersNode:
+                case Qn::UserResourcesNode:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
+    );
 
 #ifdef _TREE_SEARCH_32
     ui->resourceTreeWidget->setFilterVisible();
@@ -321,6 +340,7 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
+        result->setDefaultBehavior(QnResourceSearchProxyModel::DefaultBehavior::showNone);
 
         layout->setProperty(kSearchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
     }

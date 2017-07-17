@@ -118,10 +118,9 @@ private:
 QnPlAxisResource::QnPlAxisResource():
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
-    m_outputIoMonitor(Qn::PT_Output),
-    m_audioTransmitter(new QnAxisAudioTransmitter(this))
+    m_outputIoMonitor(Qn::PT_Output)
 {
-
+    m_audioTransmitter.reset(new QnAxisAudioTransmitter(this));
     setVendor(lit("Axis"));
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
@@ -1292,15 +1291,15 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
     NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
 
     //notification
-    size_t sepPos = nx_http::find_first_of( notification, ":" );
-    if (sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size())
+    size_t sepPos = nx::utils::find_first_of( notification, ":" );
+    if (sepPos == nx::utils::BufferNpos || sepPos+1 >= notification.size())
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
     const char eventType = notification[sepPos+1];
-    size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
-    if (portTypePos == nx_http::BufferNpos)
+    size_t portTypePos = nx::utils::find_first_not_of( notification, "0123456789" );
+    if (portTypePos == nx::utils::BufferNpos)
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
@@ -1443,14 +1442,6 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
                     res->updateIOSettings();
             });
     }
-}
-
-QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const

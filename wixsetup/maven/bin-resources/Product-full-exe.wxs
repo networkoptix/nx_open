@@ -26,6 +26,7 @@
                 SuppressOptionsUI="no"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
+                SuppressDowngradeFailure="yes"
                 LicenseUrl="License.html"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />

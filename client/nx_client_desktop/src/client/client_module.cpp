@@ -57,7 +57,6 @@
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
-#include <nx_ec/ec2_lib.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -121,7 +120,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")));
+    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -474,6 +473,12 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             ec2logger);
     }
 
+    {
+        // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
+        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        logger->setDefaultLevel(nx::utils::log::Level::info);
+    }
+
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 }
 
@@ -488,7 +493,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
 
     // TODO: #mu ON/OFF switch in settings?

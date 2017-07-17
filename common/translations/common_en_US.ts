@@ -1050,10 +1050,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send Email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1150,10 +1146,6 @@
     </message>
     <message>
         <source>Any Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Software Trigger</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -1273,15 +1265,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Software trigger %1 at %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Software Trigger %1 has been activated multiple times</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1503,6 +1487,22 @@
     </message>
     <message>
         <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger %1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soft Trigger %1 has been activated multiple times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send email</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

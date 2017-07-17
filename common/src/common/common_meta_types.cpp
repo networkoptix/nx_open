@@ -228,6 +228,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
+    qRegisterMetaType<ApiMultiserverServerDateTimeDataList>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
@@ -350,6 +351,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<nx::common::utils::Credentials>>();
     qRegisterMetaType<QnHttpConfigureRequestList>();
     qRegisterMetaType<QnBitrateList>();
+    qRegisterMetaType<TwoWayAudioParams>();
     qRegisterMetaType<QnBounds>();
     qRegisterMetaType<QnCameraAdvancedParameterOverload>();
 
@@ -374,6 +376,7 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
+    QnJsonSerializer::registerSerializer<TwoWayAudioParams>();
     QnJsonSerializer::registerSerializer<QnBounds>();
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 

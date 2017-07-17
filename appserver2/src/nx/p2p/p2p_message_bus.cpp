@@ -246,14 +246,6 @@ void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
         }
         sendTransactionImpl(connection, tran, TransportHeader());
     }
-
-    {
-        QnTransaction<ApiPeerSystemTimeDataList> tran;
-        tran.params = m_timeSyncManager->getKnownPeersSystemTime();
-        tran.command = ApiCommand::getKnownPeersSystemTime;
-        tran.peerID = commonModule()->moduleGUID();
-        sendTransactionImpl(connection, tran, TransportHeader());
-    }
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -807,6 +799,7 @@ void MessageBus::at_stateChanged(
                 emitPeerFoundLostSignals();
                 startReading(connection);
             }
+            emit newDirectConnectionEstablished(connection.data());
             break;
         case Connection::State::Unauthorized:
         case Connection::State::Error:
@@ -1366,21 +1359,15 @@ void MessageBus::gotTransaction(
     // process special cases
     switch (tran.command)
     {
+        //TODO: move it to the global setting param or emit this data via NotificationManager
         case ApiCommand::forcePrimaryTimeServer:
             m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             if (localPeer().isServer())
                 sendTransaction(tran, transportHeader); //< Proxy
             return;
-        case ApiCommand::broadcastPeerSystemTime:
-            m_timeSyncManager->peerSystemTimeReceived(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
-        case ApiCommand::getKnownPeersSystemTime:
-            m_timeSyncManager->knownPeersSystemTimeReceived(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
+        case ApiCommand::broadcastPeerSyncTime:
+            m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+            return; // do not proxy.
         default:
             break; //< Not a special case
     }
@@ -1619,7 +1606,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
     for (const auto& connection: m_connections)
     {
         QnTransportConnectionInfo info;
-        info.url = connection->remoteUrl();
+        info.url = connection->remoteAddr();
         info.state = toString(connection->state());
         info.isIncoming = connection->direction() == Connection::Direction::incoming;
         info.remotePeerId = connection->remotePeer().id;

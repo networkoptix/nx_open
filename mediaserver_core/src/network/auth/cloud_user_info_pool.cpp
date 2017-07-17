@@ -115,7 +115,7 @@ CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSu
     m_supplier->setPool(this);
 }
 
-bool CloudUserInfoPool::authenticate(
+Qn::AuthResult CloudUserInfoPool::authenticate(
     const nx_http::Method::ValueType& method,
     const nx_http::header::Authorization& authHeader) const
 {
@@ -129,12 +129,12 @@ bool CloudUserInfoPool::authenticate(
         NX_LOGX(lm("parseCloudNonce() failed. User: %1, nonce: %2")
             .arg(userName)
             .arg(nonce), cl_logERROR);
-        return false;
+        return Qn::Auth_WrongDigest;
     }
 
     const auto intermediateResponse = intermediateResponseByUserNonce(userName, cloudNonce);
     if (!intermediateResponse)
-        return false;
+        return Qn::Auth_WrongLogin;
 
     const auto ha2 = nx_http::calcHa2(method, authHeader.digest->params["uri"]);
     const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
@@ -144,9 +144,9 @@ bool CloudUserInfoPool::authenticate(
         ha2);
 
     if (authHeader.digest->params["response"] == calculatedResponse)
-        return true;
+        return Qn::Auth_OK;
 
-    return false;
+    return Qn::Auth_WrongPassword;
 }
 
 boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(

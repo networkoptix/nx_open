@@ -113,6 +113,11 @@ private:
     void setPhysicalState(PhysicalState value);
     void handleStateChanged(LogicalState logicalValue, PhysicalState physicalValue);
 
+    /**
+     * Check if there is at least one online server and try to reconnect. If not, try again later.
+     */
+    void reconnectStep();
+
 signals:
     void stateChanged(LogicalState logicalValue, PhysicalState physicalValue);
 

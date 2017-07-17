@@ -9,6 +9,8 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include <utils/common/html.h>
 
 namespace {
@@ -34,17 +36,14 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
     ui->emailLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->emailLabel->setForegroundRole(QPalette::Text);
 
-    using nx::vms::utils::SystemUri;
-    QnCloudUrlHelper urlHelper(
-        SystemUri::ReferralSource::DesktopClient,
-        SystemUri::ReferralContext::SettingsDialog);
-    ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
-        urlHelper.accountManagementUrl()));
-
     static const QMargins kSpacingByContentsMargin(
         0, style::Metrics::kDefaultLayoutSpacing.height(), 0, 0);
     ui->manageAccountLabel->setContentsMargins(ui->manageAccountLabel->contentsMargins()
         + kSpacingByContentsMargin);
+
+    updateManageAccountLink();
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+        &QnCloudUserPanelWidget::updateManageAccountLink);
 }
 
 QnCloudUserPanelWidget::~QnCloudUserPanelWidget()
@@ -101,4 +100,20 @@ AbstractAccessor* QnCloudUserPanelWidget::createIconWidthAccessor()
         };
 
     return newAccessor(getLabelWidth, setLabelWidth);
+}
+
+void QnCloudUserPanelWidget::updateManageAccountLink()
+{
+    if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Status::LoggedOut)
+    {
+        ui->manageAccountLabel->setText(tr("Account Settings"));
+        return;
+    }
+
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
+    ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
+        urlHelper.accountManagementUrl()));
 }

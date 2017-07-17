@@ -14,11 +14,10 @@ class NX_NETWORK_API AbstractAccurateTimeFetcher:
 {
 public:
     /**
-     * Functor arguments:
-     * - qint64 on success UTC millis from epoch. On failure -1.
-     * - SystemError::ErrorCode last system error code. SystemError::noError in case of success.
+     * @param utcMillis UTC time received. Undefined if sysErrorCode is not SystemError::noError.
      */
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(qint64, SystemError::ErrorCode)>;
+    using CompletionHandler = nx::utils::MoveOnlyFunc<
+        void(qint64 /*utcMillis*/, SystemError::ErrorCode /*sysErrorCode*/)>;
 
     virtual ~AbstractAccurateTimeFetcher() = default;
 

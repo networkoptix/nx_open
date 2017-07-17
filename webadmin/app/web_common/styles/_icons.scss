@@ -116,23 +116,21 @@
     background-position: -73px -61px;
   }
 }
-
-.camera-preview-offline{
-  @include icon;
-  width: 25px !important;
-  height: 25px !important;
-  position: relative;
-  left: 20px;
-  top: 5px;
-  background-position: -24px -191px;
-}
+.camera-preview-offline,
 .camera-preview-unauthorized{
   @include icon;
   width: 25px !important;
   height: 25px !important;
   position: relative;
-  left: 20px;
+  display: block;
+  margin:0 auto;
   top: 5px;
+}
+
+.camera-preview-offline{
+  background-position: -24px -191px;
+}
+.camera-preview-unauthorized{
   background-position: 1px -191px;
 }
 
@@ -195,4 +193,18 @@
   width: 96px !important;
   height: 96px !important;
   background-position: 0px -316px;
+}
+
+.live-button.active .live-glyph{
+  @include icon;
+  width: 12px !important;
+  height: 12px !important;
+  background-position: -97px -59px;
+}
+
+.live-button .live-glyph{
+  @include icon;
+  width: 12px !important;
+  height: 12px !important;
+  background-position: -85px -59px;
 }

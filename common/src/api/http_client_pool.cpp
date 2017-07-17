@@ -41,7 +41,7 @@ void ClientPool::setPoolSize(int value)
 int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
 {
     Request request;
-    request.method = Method::Get;
+    request.method = Method::get;
     request.url = url;
     request.headers = headers;
     return sendRequest(request);
@@ -54,7 +54,7 @@ int ClientPool::doPost(
     nx_http::HttpHeaders headers)
 {
     Request request;
-    request.method = Method::Post;
+    request.method = Method::post;
     request.url = url;
     request.headers = headers;
     request.contentType = contentType;
@@ -108,7 +108,7 @@ void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr ht
 {
     httpClient->setAdditionalHeaders(request.headers);
     httpClient->setAuthType(request.authType);
-    if (request.method == Method::Get)
+    if (request.method == Method::get)
         httpClient->doGet(request.url);
     else
         httpClient->doPost(request.url, request.contentType, request.messageBody);

@@ -105,101 +105,6 @@ HttpHeaders::iterator NX_NETWORK_API insertHeader(
 void NX_NETWORK_API removeHeader(
     HttpHeaders* const headers, const StringType& headerName);
 
-static const size_t BufferNpos = size_t(-1);
-
-
-/**
- * Searches first occurence of any element of \0-terminated string toSearch in count elements of str,
- *   starting with element offset.
- * @param toSearch \0-terminated string.
- * @param count number of characters of str to check, 
- *   NOT a length of searchable characters string (toSearch).
- * NOTE: following algorithms differ from stl analogue in following: 
- *   they limit number of characters checked during search.
- */
-template<class Str>
-size_t find_first_of(
-    const Str& str,
-    const typename Str::value_type* toSearch,
-    size_t offset = 0,
-    size_t count = BufferNpos)
-{
-    const size_t toSearchDataSize = strlen(toSearch);
-    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
-    for (const typename Str::value_type*
-        curPos = str.data() + offset;
-        curPos < strEnd;
-        ++curPos)
-    {
-        if (memchr(toSearch, *curPos, toSearchDataSize))
-            return curPos - str.data();
-    }
-
-    return BufferNpos;
-}
-
-template<class Str>
-size_t find_first_not_of(
-    const Str& str,
-    const typename Str::value_type* toSearch,
-    size_t offset = 0,
-    size_t count = BufferNpos)
-{
-    const size_t toSearchDataSize = strlen(toSearch);
-    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
-    for (const typename Str::value_type*
-        curPos = str.data() + offset;
-        curPos < strEnd;
-        ++curPos)
-    {
-        if (memchr(toSearch, *curPos, toSearchDataSize) == NULL)
-            return curPos - str.data();
-    }
-
-    return BufferNpos;
-}
-
-template<class Str>
-size_t find_last_not_of(
-    const Str& str,
-    const typename Str::value_type* toSearch,
-    size_t offset = 0,
-    size_t count = BufferNpos)
-{
-    const size_t toSearchDataSize = strlen(toSearch);
-    const typename Str::value_type* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
-    for (const typename Str::value_type*
-        curPos = strEnd - 1;
-        curPos >= str.data();
-        --curPos)
-    {
-        if (memchr(toSearch, *curPos, toSearchDataSize) == NULL)
-            return curPos - str.data();
-    }
-
-    return BufferNpos;
-}
-
-template<class Str, class StrValueType>
-size_t find_last_of(
-    const Str& str,
-    const StrValueType toSearch,
-    size_t offset = 0,
-    size_t count = BufferNpos)
-{
-    const StrValueType* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
-    for (const StrValueType*
-        curPos = strEnd - 1;
-        curPos >= str.data();
-        --curPos)
-    {
-        if (toSearch == *curPos)
-            return curPos - str.data();
-    }
-
-    return BufferNpos;
-}
-
 template<class MessageType, class MessageLineType>
 bool parseRequestOrResponse(
     const ConstBufferRefType& data,
@@ -221,8 +126,8 @@ bool NX_NETWORK_API parseHeader(
 
 HttpHeader NX_NETWORK_API parseHeader(const ConstBufferRefType& data);
 
-namespace StatusCode
-{
+namespace StatusCode {
+
 /**
  * enum has name "Value" for unification purpose only. Real enumeration name is StatusCode (name of namespace).
  * Enum is referred to as StatusCode::Value, if assign real name to enum it will be StatusCode::StatusCode.
@@ -270,24 +175,27 @@ NX_NETWORK_API bool isSuccessCode(Value statusCode);
 NX_NETWORK_API bool isSuccessCode(int statusCode);
 
 NX_NETWORK_API bool isMessageBodyAllowed(int statusCode);
-};
+
+} // namespace StatusCode
 
 class NX_NETWORK_API Method
 {
 public:
     typedef StringType ValueType;
 
-    static const StringType Get;
-    static const StringType Head;
-    static const StringType Post;
-    static const StringType Put;
-    static const StringType Delete;
-    static const StringType Options;
+    static const StringType get;
+    static const StringType head;
+    static const StringType post;
+    static const StringType put;
+    static const StringType delete_;
+    static const StringType options;
 
     static bool isMessageBodyAllowed(ValueType);
 };
 
-/** Represents string like HTTP/1.1, RTSP/1.0. */
+/**
+ * Represents string like HTTP/1.1, RTSP/1.0.
+ */
 class NX_NETWORK_API MimeProtoVersion
 {
 public:
@@ -356,7 +264,7 @@ public:
     StatusLine& operator=(const StatusLine&) = default;
 
     bool parse(const ConstBufferRefType& data);
-    //!Appends serialized data to dstBuffer
+    /** Appends serialized data to dstBuffer. */
     void serialize(BufferType* const dstBuffer) const;
     StringType toString() const;
 };
@@ -481,7 +389,9 @@ namespace AuthScheme
     NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
 } // namespace AuthScheme
 
-//!Login/password to use in http authorization
+/**
+ * Login/password to use in http authorization.
+ */
 class NX_NETWORK_API UserCredentials
 {
 public:
@@ -541,7 +451,9 @@ private:
     const Authorization& operator=(const Authorization&);
 };
 
-/** Convenient class for generating Authorization header with Basic authentication method. */
+/**
+ * Convenient class for generating Authorization header with Basic authentication method.
+ */
 class NX_NETWORK_API BasicAuthorization:
     public Authorization
 {
@@ -560,7 +472,9 @@ public:
     void addParam(const BufferType& name, const BufferType& value);
 };
 
-/** [rfc2616, 14.47]. */
+/**
+ * [rfc2616, 14.47].
+ */
 class NX_NETWORK_API WWWAuthenticate
 {
 public:
@@ -671,7 +585,7 @@ public:
     public:
         boost::optional<StringType> protoName;
         StringType protoVersion;
-        //!( host [ ":" port ] ) | pseudonym
+        /** ( host [ ":" port ] ) | pseudonym. */
         StringType receivedBy;
         StringType comment;
     };

@@ -87,7 +87,6 @@ public:
         return m_connections.size();
     }
 
-protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
         QnMutexLocker lk(&m_mutex);
@@ -172,6 +171,33 @@ public:
         return m_socket->getLocalAddress();
     }
 
+    void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    {
+        m_connectionInactivityTimeout = value;
+    }
+
+    void setConnectionKeepAliveOptions(boost::optional<KeepAliveOptions> options)
+    {
+        m_keepAliveOptions = std::move(options);
+    }
+
+protected:
+    virtual std::shared_ptr<ConnectionType> createConnection(
+        std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_socket.reset();
+    }
+
+private:
+    std::unique_ptr<AbstractStreamServerSocket> m_socket;
+    boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
+    boost::optional<KeepAliveOptions> m_keepAliveOptions;
+
+    StreamSocketServer(StreamSocketServer&);
+    StreamSocketServer& operator=(const StreamSocketServer&);
+
     void newConnectionAccepted(
         SystemError::ErrorCode code,
         std::unique_ptr<AbstractStreamSocket> socket)
@@ -202,33 +228,6 @@ public:
         connection->startReadingConnection(m_connectionInactivityTimeout);
         this->saveConnection(std::move(connection));
     }
-
-    void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
-    {
-        m_connectionInactivityTimeout = value;
-    }
-
-    void setConnectionKeepAliveOptions(boost::optional<KeepAliveOptions> options)
-    {
-        m_keepAliveOptions = std::move(options);
-    }
-
-protected:
-    virtual std::shared_ptr<ConnectionType> createConnection(
-        std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_socket.reset();
-    }
-
-private:
-    std::unique_ptr<AbstractStreamServerSocket> m_socket;
-    boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
-    boost::optional<KeepAliveOptions> m_keepAliveOptions;
-
-    StreamSocketServer(StreamSocketServer&);
-    StreamSocketServer& operator=(const StreamSocketServer&);
 };
 
 } // namespace server

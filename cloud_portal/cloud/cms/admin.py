@@ -42,7 +42,7 @@ admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(admin.ModelAdmin):
-    list_display = ('customization', 'language', 'data_structure', 'value', 'version')
+    list_display = ('customization', 'language', 'data_structure', 'short_description', 'version')
 admin.site.register(DataRecord, DataRecordAdmin)
 
 

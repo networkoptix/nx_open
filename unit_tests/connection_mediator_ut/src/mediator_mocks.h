@@ -3,7 +3,7 @@
 
 #include <gmock/gmock.h>
 
-#include <mediaserver_api.h>
+#include <mediaserver_endpoint_tester.h>
 
 #include "custom_printers.h"
 
@@ -31,16 +31,16 @@ public:
     };
 };
 
-class MediaserverApiMock
-        : public MediaserverApiBase
+class MediaserverEndpointTesterMock
+        : public MediaserverEndpointTesterBase
 {
 public:
     MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
                                     std::function< void( SocketAddress, bool ) > ) );
 
-    MediaserverApiMock( AbstractCloudDataProvider* cloudData,
+    MediaserverEndpointTesterMock( AbstractCloudDataProvider* cloudData,
                         nx::stun::MessageDispatcher* dispatcher )
-        : MediaserverApiBase( cloudData, dispatcher ) {}
+        : MediaserverEndpointTesterBase( cloudData, dispatcher ) {}
 
     inline
     void expect_pingServer( const SocketAddress& address, const String& serverId,
@@ -56,6 +56,6 @@ public:
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx
 
 #endif // MEDIATOR_MOCKS

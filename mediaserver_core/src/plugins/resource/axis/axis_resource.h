@@ -18,7 +18,6 @@
 #include <nx/network/aio/timer.h>
 
 class QnAxisPtzController;
-typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 class QnPlAxisResource: public QnPhysicalCameraResource
 {
@@ -78,7 +77,6 @@ public:
     AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
-    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -142,7 +140,6 @@ private:
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
-    QnAudioTransmitterPtr m_audioTransmitter;
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 

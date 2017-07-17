@@ -5,19 +5,21 @@
 
 namespace nx {
 namespace network {
+
+class Pollable;
+
 namespace aio {
 
-template<class SocketType>
-class AIOEventHandler
+class NX_NETWORK_API AIOEventHandler
 {
 public:
-    virtual ~AIOEventHandler() {}
+    virtual ~AIOEventHandler() = default;
 
     /**
      * Receives socket state change event.
      * Implementation MUST NOT block otherwise it will result poor performance and/or deadlock.
      */
-    virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() = 0;
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() = 0;
 };
 
 } // namespace aio

@@ -5,25 +5,41 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource_management/resource_pool.h>
 
-QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
+QnCameraBookmarkDialog::QnCameraBookmarkDialog(bool mandatoryDescription, QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraBookmarkDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Bookmarks_Editing_Help);
 
-    connect(ui->bookmarkWidget, &QnBookmarkWidget::validChanged, this, [this] {
-        if (!buttonBox())
-            return;
-        auto okButton = buttonBox()->button(QDialogButtonBox::Ok);
-        if (!okButton)
-            return;
-        okButton->setEnabled(ui->bookmarkWidget->isValid());
-    });
+    connect(ui->bookmarkWidget, &QnBookmarkWidget::validChanged,
+        this, &QnCameraBookmarkDialog::updateOkButtonAvailability);
+    updateOkButtonAvailability();
+
+    ui->bookmarkWidget->setDescriptionMandatory(mandatoryDescription);
 }
 
 QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
+
+void QnCameraBookmarkDialog::initializeButtonBox()
+{
+    base_type::initializeButtonBox();
+    updateOkButtonAvailability();
+}
+
+void QnCameraBookmarkDialog::updateOkButtonAvailability()
+{
+    const auto box = buttonBox();
+    if (!box)
+        return;
+
+    if (auto okButton = box->button(QDialogButtonBox::Ok))
+        okButton->setEnabled(ui->bookmarkWidget->isValid());
+}
 
 const QnCameraBookmarkTagList &QnCameraBookmarkDialog::tags() const {
     return ui->bookmarkWidget->tags();

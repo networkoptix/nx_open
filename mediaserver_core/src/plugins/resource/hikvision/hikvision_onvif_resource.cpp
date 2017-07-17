@@ -23,9 +23,9 @@ bool isResponseOK(const nx_http::HttpClient* client)
 } // namespace
 
 QnHikvisionOnvifResource::QnHikvisionOnvifResource():
-    QnPlOnvifResource(),
-    m_audioTransmitter(new HikvisionAudioTransmitter(this))
+    QnPlOnvifResource()
 {
+    m_audioTransmitter.reset(new HikvisionAudioTransmitter(this));
 }
 
 QnHikvisionOnvifResource::~QnHikvisionOnvifResource()
@@ -112,21 +112,13 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::Put);
+            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
     }
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-QnAudioTransmitterPtr QnHikvisionOnvifResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 #endif  //ENABLE_ONVIF

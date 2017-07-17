@@ -42,22 +42,8 @@ class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
 
 public:
     QnResourceTreeSortProxyModel(QObject *parent = NULL):
-        base_type(parent),
-        m_filterEnabled(false)
+        base_type(parent)
     {
-    }
-
-    bool isFilterEnabled()
-    {
-        return m_filterEnabled;
-    }
-
-    void setFilterEnabled(bool enabled)
-    {
-        if (m_filterEnabled == enabled)
-            return;
-        m_filterEnabled = enabled;
-        invalidateFilter();
     }
 
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
@@ -110,20 +96,6 @@ protected:
 
         return resourceLessThan(left, right);
     }
-
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override
-    {
-        if (!m_filterEnabled)
-            return true;
-
-        QModelIndex root = (sourceParent.column() > Qn::NameColumn)
-            ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
-            : sourceParent;
-        return base_type::filterAcceptsRow(sourceRow, root);
-    }
-
-private:
-    bool m_filterEnabled;
 };
 
 
@@ -203,7 +175,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
         m_resourceProxyModel->setSortRole(Qt::DisplayRole);
         m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         m_resourceProxyModel->sort(Qn::NameColumn);
-        m_resourceProxyModel->setFilterEnabled(false);
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
@@ -326,6 +297,11 @@ void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColu
 
     resourceModel->setCustomColumnDelegate(columnDelegate);
     updateColumns();
+}
+
+void QnResourceTreeWidget::setAutoExpandPolicy(AutoExpandPolicy policy)
+{
+    m_autoExpandPolicy = policy;
 }
 
 void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
@@ -462,10 +438,7 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    m_resourceProxyModel->setQuery({filter});
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
-    if (!filter.isEmpty())
-        ui->resourcesTreeView->expandAll();
+    m_resourceProxyModel->setQuery(filter);
 }
 
 
@@ -542,24 +515,12 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex&
 
 void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
-    /* Auto-expand certain nodes. */
-    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
-    {
-        case Qn::ResourceNode:
-        {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if (!resource || !resource->hasFlags(Qn::server))
-                break;
-        }
-        /* FALL THROUGH */
-        case Qn::ServersNode:
-        case Qn::UserResourcesNode:
-            ui->resourcesTreeView->expand(index);
-            break;
+    bool needExpand = m_autoExpandPolicy
+        ? m_autoExpandPolicy(index)
+        : true;
 
-        default:
-            break;
-    }
+    if (needExpand)
+        ui->resourcesTreeView->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

@@ -684,6 +684,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Zoom to Selection"))
         .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
 
+    factory(AcknowledgeEventAction)
+        .flags(NoTarget);
+
     factory(AddCameraBookmarkAction)
         .flags(Slider | SingleTarget)
         .text(ContextMenu::tr("Add Bookmark..."))
@@ -736,7 +739,7 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
         .condition(new ExportCondition(false));
 
-    factory(ExportTimelapseAction)
+    factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)

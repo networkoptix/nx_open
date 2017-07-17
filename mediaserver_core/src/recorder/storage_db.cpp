@@ -653,7 +653,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
         break;
     }
     default:
-        assert(false);
+        NX_ASSERT(false);
         NX_LOG(lit("%1 Unknown record type.").arg(Q_FUNC_INFO), cl_logWARNING);
         break;
     }

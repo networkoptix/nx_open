@@ -398,7 +398,7 @@ void PlayerPrivate::presentNextFrameDelayed()
 
     qint64 delayToRenderMs = 0;
     auto audioOutput = dataConsumer->audioOutput();
-    if (audioOutput)
+    if (audioOutput && dataConsumer->isAudioEnabled())
     {
         if (audioOutput->isBufferUnderflow())
         {
@@ -857,6 +857,7 @@ void Player::play()
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
+    d->dataConsumer->setAudioEnabled(true);
 
     d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
@@ -870,6 +871,7 @@ void Player::pause()
     d->log(lit("pause()"));
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
+    d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::preview()
@@ -877,6 +879,7 @@ void Player::preview()
     Q_D(Player);
     d->log(lit("preview()"));
     d->setState(State::Previewing);
+    d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::stop()

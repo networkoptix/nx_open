@@ -70,6 +70,9 @@ public:
     void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges,
         const ActionResultCallback& callback = ActionResultCallback());
 
+    /** Apply changes to the given users. */
+    void saveUsers(const QnUserResourceList& users);
+
     /** Save accessible resources for the given user */
     void saveAccessibleResources(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& accessibleResources);

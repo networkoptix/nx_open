@@ -1,7 +1,7 @@
 #include "async_client.h"
 
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace stun {
@@ -15,9 +15,16 @@ AsyncClient::AsyncClient(Settings timeouts):
     bindToAioThread(getAioThread());
 }
 
-AsyncClient::~AsyncClient()
+AsyncClient::AsyncClient(
+    std::unique_ptr<AbstractStreamSocket> tcpConnection,
+    Settings timeouts)
+    :
+    AsyncClient(timeouts)
 {
-    stopWhileInAioThread();
+    m_endpoint = tcpConnection->getForeignAddress();
+
+    bindToAioThread(tcpConnection->getAioThread());
+    initializeMessagePipeline(std::move(tcpConnection));
 }
 
 void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -343,11 +350,9 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
 
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
-    if (m_connectingSocket)
-        m_resolvedEndpoint = m_connectingSocket->getForeignAddress();
-
     NX_LOGX(lm("Connect to %1 completed with result: %2")
-        .arg(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
+        .arg(m_endpoint ? *m_endpoint : SocketAddress())
+        .arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
     const auto executeOnConnectedHandlerGuard = makeScopeGuard(
@@ -363,24 +368,36 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
+    NX_ASSERT(m_connectingSocket);
     m_reconnectTimer->cancelSync();
-    NX_ASSERT(!m_baseConnection);
-    NX_LOGX(lm("Connected to %1").arg(*m_endpoint), cl_logINFO);
 
-    m_baseConnection = std::make_unique<BaseConnectionType>(this, std::move(m_connectingSocket));
-    m_baseConnection->bindToAioThread(getAioThread());
-    m_baseConnection->setMessageHandler(
-        [ this ]( Message message ){ processMessage( std::move(message) ); } );
+    initializeMessagePipeline(std::move(m_connectingSocket));
 
-    m_baseConnection->startReadingConnection();
-
-    m_state = State::connected;
     dispatchRequestsInQueue( &lock );
 
     const auto reconnectHandlers = m_reconnectHandlers;
     lock.unlock();
     for( const auto& handler: reconnectHandlers )
         handler.second();
+}
+
+void AsyncClient::initializeMessagePipeline(
+    std::unique_ptr<AbstractStreamSocket> connection)
+{
+    m_resolvedEndpoint = connection->getForeignAddress();
+
+    NX_ASSERT(!m_baseConnection);
+    NX_LOGX(lm("Connected to %1").arg(*m_endpoint), cl_logINFO);
+
+    m_baseConnection = std::make_unique<BaseConnectionType>(
+        this, std::move(connection));
+    m_baseConnection->bindToAioThread(getAioThread());
+    m_baseConnection->setMessageHandler(
+        [this](Message message) { processMessage(std::move(message)); });
+
+    m_state = State::connected;
+
+    m_baseConnection->startReadingConnection();
 }
 
 void AsyncClient::processMessage(Message message)
@@ -484,5 +501,5 @@ const char* AsyncClient::toString(State state) const
     return "unknown";
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

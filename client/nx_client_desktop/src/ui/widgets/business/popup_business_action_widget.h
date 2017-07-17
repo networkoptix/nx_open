@@ -22,8 +22,14 @@ public:
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
+protected slots:
+    virtual void at_model_dataChanged(Fields fields) override;
+
 private slots:
     void at_settingsButton_clicked();
+
+private:
+    void parametersChanged();
 
 private:
     QScopedPointer<Ui::PopupBusinessActionWidget> ui;

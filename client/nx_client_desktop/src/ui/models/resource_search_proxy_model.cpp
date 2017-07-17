@@ -33,6 +33,20 @@ void QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
     invalidateFilterLater();
 }
 
+QnResourceSearchProxyModel::DefaultBehavior QnResourceSearchProxyModel::defaultBehavor() const
+{
+    return m_defaultBehavior;
+}
+
+void QnResourceSearchProxyModel::setDefaultBehavior(DefaultBehavior value)
+{
+    if (m_defaultBehavior == value)
+        return;
+
+    m_defaultBehavior = value;
+    invalidateFilterLater();
+}
+
 void QnResourceSearchProxyModel::invalidateFilter()
 {
     m_invalidating = false;
@@ -46,17 +60,21 @@ void QnResourceSearchProxyModel::invalidateFilterLater()
         return; /* Already waiting for invalidation. */
 
     m_invalidating = true;
-    executeDelayedParented([this]{invalidateFilter();}, kDefaultDelay, this);
+    executeDelayedParented([this]{ invalidateFilter(); }, kDefaultDelay, this);
 }
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(
-    int source_row,
-    const QModelIndex& source_parent) const
+    int sourceRow,
+    const QModelIndex& sourceParent) const
 {
-    if (m_query.isEmpty())
-        return false;
+    if (m_query.text.isEmpty())
+        return m_defaultBehavior == DefaultBehavior::showAll;
 
-    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+    QModelIndex root = (sourceParent.column() > Qn::NameColumn)
+        ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
+        : sourceParent;
+
+    QModelIndex index = sourceModel()->index(sourceRow, 0, root);
     if (!index.isValid())
         return true;
 
@@ -88,7 +106,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     }
 
     // Simply filter by text first.
-    if (!base_type::filterAcceptsRow(source_row, source_parent))
+    if (!base_type::filterAcceptsRow(sourceRow, root))
         return false;
 
     // Check if no further filtering is required.

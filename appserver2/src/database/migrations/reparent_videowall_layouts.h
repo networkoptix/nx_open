@@ -5,7 +5,7 @@
 namespace ec2 {
 namespace database {
 namespace api {
-    struct Context;
+class QueryContext;
 }
 
 namespace migrations {
@@ -16,7 +16,7 @@ namespace migrations {
  * Unused auto-generated layouts will be deleted from the client side automatically.
  * Cloning and deleting here is forbidden due to synchronization issues.
  */
-bool reparentVideoWallLayouts(ec2::database::api::Context* context);
+bool reparentVideoWallLayouts(ec2::database::api::QueryContext* context);
 
 } // namespace migrations
 } // namespace database

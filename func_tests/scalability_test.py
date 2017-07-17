@@ -37,14 +37,17 @@ def config(test_config):
         )
 
 @pytest.fixture
-def servers(config, server_factory):
+def servers(metrics_saver, server_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     log.info('Creating %d servers:', config.SERVER_COUNT)
     setup_settings = dict(autoDiscoveryEnabled=False)
-    return [server_factory('server_%04d' % (idx + 1),
+    start_time = utils.datetime_utc_now()
+    server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
                            rest_api_timeout_sec=config.REST_API_TIMEOUT_SEC)
-            for idx in range(config.SERVER_COUNT)]
+                       for idx in range(config.SERVER_COUNT)]
+    metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
+    return server_list
 
 
 def get_response(server, method, api_object, api_method):
@@ -112,9 +115,8 @@ def wait_merge_done(servers, method, api_object, api_method, start_time, merge_t
                                                    utils.datetime_utc_now() - api_call_start_time))
             return
         if utils.datetime_utc_now() - start_time >= merge_timeout:
-            pytest.fail("'%s' was not synchronized during %s: '%r' and '%r'" % (
-                api_method, merge_timeout - (api_call_start_time - start_time),
-                servers[0], first_unsynced_server))
+            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
         time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
 
 
@@ -128,7 +130,9 @@ def measure_merge(servers, merge_timeout):
     wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time, merge_timeout)
     wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time, merge_timeout)
     wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time, merge_timeout)
-    log.info('Total merge duration: %s' % (utils.datetime_utc_now() - start_time))
+    merge_duration = utils.datetime_utc_now() - start_time
+    log.info('Total merge duration: %s', merge_duration)
+    return merge_duration
 
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
@@ -194,7 +198,8 @@ def create_test_data(config, servers):
     pool.join()
 
 
-def test_scalability(config, servers):
+def test_scalability(metrics_saver, config, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
     create_test_data(config, servers)
-    measure_merge(servers, config.MERGE_TIMEOUT)
+    merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
+    metrics_saver.save('merge_duration', merge_duration)
