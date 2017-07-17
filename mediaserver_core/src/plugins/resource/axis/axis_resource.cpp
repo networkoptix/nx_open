@@ -113,10 +113,10 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource() :
-    m_lastMotionReadTime(0),
-    m_audioTransmitter(new QnAxisAudioTransmitter(this))
+QnPlAxisResource::QnPlAxisResource():
+    m_lastMotionReadTime(0)
 {
+    m_audioTransmitter.reset(new QnAxisAudioTransmitter(this));
     setVendor(lit("Axis"));
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
@@ -551,9 +551,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
-    
+
     enableDuplexMode();
-    
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -1437,14 +1437,6 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
                     res->asyncUpdateIOSettings();
             });
     }
-}
-
-QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const

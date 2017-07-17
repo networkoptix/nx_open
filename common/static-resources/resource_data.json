@@ -27,6 +27,7 @@
                     "video_encoder_config1,video_encoder_config3"
                 ]
             },
+
             "preStreamConfigureRequests": [
                 {
                     "templateString": "/command/camera.cgi?ImageCodec2=off",
@@ -43,6 +44,20 @@
             ],
             "highStreamAvailableBitrates": ["16000"],
             "lowStreamAvailableBitrates": ["2000"]
+        },
+        {
+            "keys": [
+                "Sony|SNC-CX600*"
+            ],
+
+            "2WayAudio":
+            {
+                "codec": "AAC",
+                "bitrateKbps": 64,
+                "sampleRate": 16,
+                "urlPath": "/audio-out/aac16_64.cgi",
+                "contentType": ""
+            }
         },
         {
             "keys": [
@@ -343,7 +358,8 @@
                     "user": "admin",
                     "password": "12345"
                 }
-            ]
+            ],
+            "unauthorizedTimeoutSec": 185
         },        
         {
             "keys": [
@@ -1883,6 +1899,35 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P"
+            ],
+            "2WayAudio":
+            {
+                "codec": "ALAW",
+                "bitrateKbps": 64,
+                "sampleRate": 12,
+                "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
+                "contentType": "Audio/G.711A",
+                "noAuth": true
+            }
+            
+        },
+        {
+            "keys": [
+                "Dahua|DH-IPC-K35P", "Dahua|IPC-K35P"
+            ],
+            "2WayAudio":
+            {
+                "codec": "ALAW",
+                "bitrateKbps": 64,
+                "sampleRate": 8,
+                "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
+                "contentType": "Audio/G.711A"
+            }
+            
         },
         {
             "keys": [

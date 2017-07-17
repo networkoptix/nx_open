@@ -58,7 +58,8 @@ namespace {
 }
 
 #ifdef Q_OS_WIN
-static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert) {
+static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert)
+{
     Q_UNUSED(Connection)
 
     CertFreeCertificateContext(*ppServerCert);
@@ -67,7 +68,8 @@ static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *
 }
 #endif
 
-class QnLdapFilter {
+class QnLdapFilter
+{
 public:
     QnLdapFilter()
     {
@@ -78,7 +80,8 @@ public:
     {
     }
 
-    QnLdapFilter operator &(const QnLdapFilter& arg) {
+    QnLdapFilter operator &(const QnLdapFilter& arg)
+    {
         if (isEmpty())
             return arg;
 
@@ -88,23 +91,28 @@ public:
         return QnLdapFilter(QString(lit("(&%1%2)")).arg(toCompoundString()).arg(arg.toCompoundString()));
     }
 
-    operator QString() const {
+    operator QString() const
+    {
         return toString();
     }
 
-    QString toString() const {
+    QString toString() const
+    {
         return m_value;
     }
 
-    bool isEmpty() const {
+    bool isEmpty() const
+    {
         return m_value.isEmpty();
     }
 
-    bool isSimple() const {
+    bool isSimple() const
+    {
         return isEmpty() || m_value[0] != QLatin1Char('(');
     }
 
-    QString toCompoundString() const {
+    QString toCompoundString() const
+    {
         if (!isSimple())
             return m_value;
 
@@ -114,60 +122,77 @@ private:
     QString m_value;
 };
 
-enum LdapVendor {
+enum LdapVendor
+    {
     ActiveDirectory,
     OpenLdap
 };
 
-struct DirectoryType {
+struct DirectoryType
+{
     virtual const QString& UidAttr() const = 0;
     virtual const QString& Filter() const = 0;
     virtual const QString& FullNameAttr() const = 0;
 };
 
-struct ActiveDirectoryType : DirectoryType {
-    const QString& UidAttr() const override {
+struct ActiveDirectoryType : DirectoryType
+{
+    const QString& UidAttr() const override
+    {
         static QString attr(lit("sAMAccountName"));
         return attr;
     }
-    const QString& Filter() const override {
+
+    const QString& Filter() const override
+    {
         static QString attr(lit("(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"));
         return attr;
     }
 
-    const QString& FullNameAttr() const {
+    const QString& FullNameAttr() const
+    {
         static QString attr(lit("displayName"));
         return attr;
     }
 };
 
-struct OpenLdapType : DirectoryType {
-    const QString& UidAttr() const override {
+struct OpenLdapType : DirectoryType
+{
+    const QString& UidAttr() const override
+    {
         static QString attr(lit("uid"));
         return attr;
     };
-    const QString& Filter() const override {
+
+    const QString& Filter() const override
+    {
         static QString attr(lit(""));
         return attr;
     }
-    const QString& FullNameAttr() const {
+
+    const QString& FullNameAttr() const
+    {
         static QString attr(lit("gecos"));
         return attr;
     }
 };
 
 
-namespace {
+namespace
+{
     static const QString MAIL(lit("mail"));
 }
 
-namespace {
-    QString GetFirstValue(LDAP *ld, LDAPMessage *e, const QString& name) {
+namespace
+{
+    QString GetFirstValue(LDAP *ld, LDAPMessage *e, const QString& name)
+    {
         QString result;
 
         PWCHAR *values = ldap_get_values(ld, e, QSTOCW(name));
         unsigned long nValues = ldap_count_values(values);
-        for (unsigned long i = 0; i < nValues; i++) {
+        for (unsigned long i = 0; i < nValues; i++)
+            {
 #ifdef Q_OS_WIN
             std::wstring value;
 #else
@@ -175,7 +200,8 @@ namespace {
 #endif
             value = values[i];
 
-            if (!value.empty()) {
+            if (!value.empty())
+            {
                 result = FROM_WCHAR_ARRAY(values[i]);
                 break;
             }
@@ -265,7 +291,8 @@ bool LdapSession::connect()
 
 #ifdef Q_OS_WIN
     // If Windows Vista or later
-    if ((LOBYTE(LOWORD(GetVersion()))) >= 6) {
+    if ((LOBYTE(LOWORD(GetVersion()))) >= 6)
+    {
         ldap_set_option(m_ld, LDAP_OPT_SERVER_CERTIFICATE, &VerifyServerCertificate);
     }
 
@@ -320,14 +347,15 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
     berval *cookie = NULL;
     LDAPControl *pControl = NULL, *serverControls[2], **retServerControls = NULL;
 
-    do {
+    do
+    {
         rc = ldap_create_page_control(m_ld, kPageSize, cookie, 1, &pControl);
-        if (rc != LDAP_SUCCESS) {
+        if (rc != LDAP_SUCCESS)
+        {
             m_lastErrorCode = rc;
             return false;
         }
 
-        memset(serverControls, 0, sizeof(serverControls));
         serverControls[0] = pControl; serverControls[1] = NULL;
 
         rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, serverControls, NULL, LDAP_NO_LIMIT,
@@ -346,7 +374,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
         if((rc = ldap_parse_result(m_ld, result, &lerrno,
                                             NULL, &lerrstr, NULL,
-                                            &retServerControls, 0)) != LDAP_SUCCESS){
+                                            &retServerControls, 0)) != LDAP_SUCCESS)
+        {
             if (pControl)
                 ldap_control_free(pControl);
 
@@ -356,13 +385,15 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
         ldap_memfree(lerrstr);
 
-        if(cookie){
+        if(cookie)
+        {
             ber_bvfree(cookie);
             cookie = NULL;
         }
 
         LDAP_RESULT entcnt = 0;
-        if((rc = ldap_parse_page_control(m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS) {
+        if((rc = ldap_parse_page_control(m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS)
+        {
             if (pControl)
                 ldap_control_free(pControl);
 
@@ -370,20 +401,23 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             return false;
         }
 
-        if (retServerControls){
+        if (retServerControls)
+        {
             ldap_controls_free(retServerControls);
             retServerControls = NULL;
         }
 
-        if (pControl){
+        if (pControl)
+        {
             ldap_control_free(pControl);
             pControl = NULL;
         }
 
-
-        for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e)) {
+        for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e))
+        {
             PWSTR dn;
-            if ((dn = ldap_get_dn(m_ld, e)) != NULL) {
+            if ((dn = ldap_get_dn(m_ld, e)) != NULL)
+            {
                 QnLdapUser user;
                 user.dn = FROM_WCHAR_ARRAY(dn);
 
@@ -475,7 +509,8 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     }
 
     bool isActiveDirectory = false;
-    for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e)) {
+    for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e))
+    {
         PWCHAR *values = ldap_get_values(m_ld, e, QSTOCW(forestFunctionality));
         unsigned long nValues = ldap_count_values(values);
         if (nValues > 0)
@@ -509,7 +544,8 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
     return Qn::Ldap_NoError;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users)
+{
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
     return fetchUsers(users, settings);
 }
@@ -529,6 +565,7 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
         QnMutexLocker lock(&m_cacheMutex);
         dn = m_dnCache.value(login);
     }
+
     if (dn.isEmpty())
     {
         dn = session.getUserDn(login);

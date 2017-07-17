@@ -1052,7 +1052,7 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
     QString val = getProperty(Qn::SUPPORTED_MOTION_PARAM_NAME);
     if (val.isEmpty())
-        return Qn::MT_NoMotion;
+        return Qn::MT_SoftwareGrid;
 
     Qn::MotionTypes result = Qn::MT_Default;
     for(const QString& str: val.split(L',')) {
@@ -1101,6 +1101,9 @@ bool QnSecurityCamResource::isIOModule() const
 #ifdef ENABLE_DATA_PROVIDERS
 QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 {
-    return nullptr;
+    if (!isInitialized())
+        return nullptr;
+    return m_audioTransmitter;
 }
+
 #endif

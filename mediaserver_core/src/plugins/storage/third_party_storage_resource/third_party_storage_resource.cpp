@@ -34,11 +34,6 @@ namespace aux
                return -1;
 
             int ecode;
-            m_io->size(&ecode);
-
-            if (ecode != nx_spl::error::NoError)
-                return -1;
-
             uint32_t bytesRead = m_io->read(data, maxlen, &ecode);
 
             if (ecode != nx_spl::error::NoError)
@@ -148,6 +143,11 @@ namespace aux
             // support truncating.
             NX_ASSERT(false);
             return false;
+        }
+
+        virtual bool eof() const override
+        {
+            return m_impl->atEnd();
         }
 
     private:

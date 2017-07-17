@@ -15,8 +15,8 @@ namespace {
 
 /*
  * Workaround geometry calculations when client is located on several screens with different DPI.
- * Geometry logic for Qt screens is following: screen position is given in pixel coordinates,
- * but screen size in it's own DPI-aware pixels. For example, 4K monitor to the left of main one
+ * Geometry logic for Qt screens is following: screen position is given in device coordinates,
+ * but screen size is in logical coordinates. For example, 4K monitor to the left of main one
  * with DPI 2x will have geometry (-3840, 0, 1920*1080).
  */
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
@@ -28,9 +28,10 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
     const auto sourceDpi = sourceScreen->devicePixelRatio();
     const auto topLeft = geometry.topLeft(); //< Absolute position in pixels
 
-    // This point may lay on other screen really. Position in DPI-pixels.
+    // This point may lay on other screen really. Position in logical coordinates using dpi from
+    // the screen where the biggest part of the client window is located.
     auto scaledPointOnScreen = (point - topLeft);
-    const auto globalPoint = (scaledPointOnScreen * sourceDpi) + topLeft; //< In global pixels.
+    const auto globalPoint = (scaledPointOnScreen * sourceDpi) + topLeft; //< Device coordinates.
 
     // Looking for the screen where point is really located.
     for (auto targetScreen: QGuiApplication::screens())

@@ -59,9 +59,9 @@ QnActiResource::QnActiResource() :
     m_hasAudio(false),
     m_outputCount(0),
     m_inputCount(0),
-    m_inputMonitored(false),
-    m_audioTransmitter(new ActiAudioTransmitter(this))
+    m_inputMonitored(false)
 {
+    m_audioTransmitter.reset(new ActiAudioTransmitter(this));
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
@@ -1442,14 +1442,6 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
     }
 
     return result;
-}
-
-QnAudioTransmitterPtr QnActiResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
