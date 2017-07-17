@@ -40,7 +40,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
-        AudioTransmitCapability             = 0x040
+        AudioTransmitCapability             = 0x040,
+        RemoteArchiveCapability             = 0x100
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

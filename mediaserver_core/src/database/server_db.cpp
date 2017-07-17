@@ -31,6 +31,7 @@ namespace {
 
 const char kDelimiter('$');
 const char kStringListDelimiter('\n');
+static const QString kLastRemoteArchiveSyncTimePropertyName("lastRemoteArchiveSyncTime");
 
 inline int toInt(const QByteArray& ba)
 {
@@ -1415,6 +1416,66 @@ void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
         m_updateBookmarkCount = std::move(handler);
     }
     updateBookmarkCount();
+}
+
+qint64 QnServerDb::getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource)
+{
+    NX_ASSERT(resource, "Resource should be provided");
+    if (!resource)
+        return false;
+
+    auto id = resource->getId();
+
+    QSqlQuery query(m_sdb);
+    query.prepare(R"(
+        SELECT property_value  
+        FROM local_resource_properties
+        WHERE resource_id = :resource_id AND property_name = :property_name)");
+
+    query.bindValue(":resource_id", QnSql::serialized_field(id));
+    query.bindValue(":property_name", kLastRemoteArchiveSyncTimePropertyName);
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return std::numeric_limits<qint64>::min();
+
+    if (!query.next())
+        return std::numeric_limits<qint64>::min();
+
+    bool success = false;
+    auto rawVal = query.value(0);
+
+    auto parsed = rawVal.toLongLong(&success);
+    if (!success)
+        return std::numeric_limits<qint64>::min();
+
+    return parsed;
+}
+
+bool QnServerDb::updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource, qint64 lastSyncTime)
+{
+    NX_ASSERT(resource, "Resource should be provided");
+    if (!resource)
+        return false;
+
+    auto id = resource->getId();
+
+    QSqlQuery updateQuery(m_sdb);
+    updateQuery.prepare(R"(
+        INSERT OR REPLACE INTO local_resource_properties 
+            (id, resource_id, property_name, property_value)
+        VALUES 
+            ((  SELECT id
+                FROM local_resource_properties 
+                WHERE resource_id = :resource_id AND property_name = :property_name),
+                :resource_id,
+                :property_name,
+                :property_value))");
+
+    updateQuery.bindValue(":resource_id", QnSql::serialized_field(id));
+    updateQuery.bindValue(":property_name", kLastRemoteArchiveSyncTimePropertyName);
+    updateQuery.bindValue(":property_value", QString::number(lastSyncTime));
+
+    return execSQLQuery(&updateQuery, Q_FUNC_INFO);
 }
 
 bool QnServerDb::deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete)

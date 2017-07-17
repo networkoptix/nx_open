@@ -1116,3 +1116,8 @@ QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 }
 
 #endif
+
+nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteArchiveManager()
+{
+    return nullptr;
+}

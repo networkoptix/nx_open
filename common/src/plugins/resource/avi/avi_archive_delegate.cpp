@@ -135,6 +135,11 @@ qint64 QnAviArchiveDelegate::startTime() const
     return m_startTimeUs;
 }
 
+void QnAviArchiveDelegate::setStartTimeUs(qint64 startTimeUs)
+{
+    m_startTimeUsec = startTimeUs;
+}
+
 qint64 QnAviArchiveDelegate::endTime() const
 {
     //if (!m_streamsFound && !findStreams())
@@ -630,6 +635,11 @@ QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::getMotionConnection(i
         return QnAbstractMotionArchiveConnectionPtr();
     const QnMetaDataLightVector& motionData = aviResource->getMotionBuffer(channel);
     return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
+}
+
+void QnAviArchiveDelegate::setMotionRegion(const QnMotionRegion& /*region*/)
+{
+    // Do nothing.
 }
 
 /*

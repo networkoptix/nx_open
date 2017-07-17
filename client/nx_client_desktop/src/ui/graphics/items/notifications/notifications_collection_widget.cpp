@@ -745,6 +745,12 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
         }
 
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            break;
+
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
             break;

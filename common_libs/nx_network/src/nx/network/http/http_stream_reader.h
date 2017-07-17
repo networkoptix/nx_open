@@ -76,6 +76,10 @@ public:
      */
     QString errorText() const;
     /**
+     * Forces stream reader state.
+     */
+    void setState(ReadState state);
+    /**
      * Makes reader ready to parse new message.
      */
     void resetState();

@@ -95,6 +95,14 @@ public slots:
     void at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp,
         vms::event::EventReason reasonCode, const QString& reasonText);
 
+    void at_remoteArchiveSyncStarted(const QnResourcePtr& resource);
+
+    void at_remoteArchiveSyncFinished(const QnResourcePtr &resource);
+
+    void at_remoteArchiveSyncError(const QnResourcePtr &resource, const QString& error);
+
+    void at_remoteArchiveSyncProgress(const QnResourcePtr &resource, double progress);
+
     void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId,
         const QnUuid& userId, qint64 timeStamp, vms::event::EventState toggleState);
 
