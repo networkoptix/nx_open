@@ -337,7 +337,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             --handlingData->beingProcessed;
             continue;
         }
-        //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
+        //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
         handlingData->eventHandler->eventTriggered(socket, sockEventType);
         //updating socket's periodic task (it's garanteed that there is periodic task for socket)
         if (handlingData->timeout > 0)

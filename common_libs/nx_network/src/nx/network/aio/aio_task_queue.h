@@ -217,7 +217,7 @@ public:
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
     /**
-     * This method introduced for optimization: if we fast call watchSocket then removeSocket 
+     * This method introduced for optimization: if we fast call startMonitoring then removeSocket 
      * (socket has not been added to pollset yet), then removeSocket can just cancel 
      * "add socket to pollset" task. And vice versa.
      * @return true if reverse task has been cancelled and socket 

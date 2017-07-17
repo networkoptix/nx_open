@@ -44,7 +44,7 @@ protected:
                 if (eventType == EventType::etTimedOut)
                     m_service.registerTimer(m_socket.get(), std::chrono::milliseconds(1), this);
                 else
-                    m_service.watchSocket(m_socket.get(), eventType, this);
+                    m_service.startMonitoring(m_socket.get(), eventType, this);
             }
             else if (action == 1)
             {
@@ -52,12 +52,12 @@ protected:
                     m_socket.get(), 
                     [this]()
                     {
-                        m_service.removeFromWatch(m_socket.get(), eventType, true);
+                        m_service.stopMonitoring(m_socket.get(), eventType, true);
                     });
             }
             else if (action == 2)
             {
-                m_service.removeFromWatch(m_socket.get(), eventType, rand() & 1);
+                m_service.stopMonitoring(m_socket.get(), eventType, rand() & 1);
             }
         }
     }

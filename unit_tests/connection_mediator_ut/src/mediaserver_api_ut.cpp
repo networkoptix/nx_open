@@ -9,11 +9,11 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST( MediaserverApi, DISABLED_Hardcode )
+TEST( MediaserverEndpointTester, DISABLED_Hardcode )
 {
     nx::stun::MessageDispatcher dispatcher;
     CloudDataProviderMock cloud;
-    MediaserverApi api( &cloud, &dispatcher );
+    MediaserverEndpointTester api( &cloud, &dispatcher );
     nx::utils::TestSyncMultiQueue< SocketAddress, bool > results;
 
     // 1. success
