@@ -18,8 +18,8 @@
     </properties>
 
     <modules>
-        <!-- <module>teststorageplugin</module> -->
-        <module>ftpstorageplugin</module>
+        <module>teststorageplugin</module>
+        <!-- <module>ftpstorageplugin</module> -->
         <!-- <module>teststorageplugin/test</module> -->
     </modules>
 

@@ -65,7 +65,7 @@
         <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
-        <!-- <teststorageplugin.guid>{3d6223e8-eca2-47e1-ad40-a24bd2e2a78f}</teststorageplugin.guid> -->
+        <teststorageplugin.guid>{3d6223e8-eca2-47e1-ad40-a24bd2e2a78f}</teststorageplugin.guid>
         <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
@@ -518,7 +518,7 @@
                 <module>plugins/mjpg_link</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
-                <module>storage_plugins/ftpstorageplugin</module>
+                <!-- <module>storage_plugins/ftpstorageplugin</module> -->
                 <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
