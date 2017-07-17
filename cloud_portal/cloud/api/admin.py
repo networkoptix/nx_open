@@ -2,7 +2,7 @@ from django.contrib import admin
 from models import *
 # Register your models here.
 from cloud import settings
-from cloud.cms.admin import CMSAdmin
+from cms.admin import CMSAdmin
 
 
 class AccountAdmin(CMSAdmin):
