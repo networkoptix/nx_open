@@ -96,7 +96,7 @@ QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode)
         case QnLicenseErrorCode::InvalidSignature:
             return tr("Invalid signature");
         case QnLicenseErrorCode::InvalidHardwareID:
-            return tr("Server with matching Hardware ID not found");
+            return tr("Server with matching Hardware Id not found");
         case QnLicenseErrorCode::InvalidBrand:
             return tr("Invalid customization");
         case QnLicenseErrorCode::Expired:
