@@ -47,8 +47,8 @@ public:
 private:
     
     // Returns true if RTP header is correct. In this case value of outIsFatalError is undefined
-    // If this function has returned false and value of outIsFatalError is false we can just skip the data
-    // otherwise we must reset the parser.
+    // If this function has returned false and value of outIsFatalError is false 
+    // we can just skip the data otherwise we must reset the parser.
     bool processRtpHeader(
         uint8_t** outPayload,
         int* outPayloadLength,
