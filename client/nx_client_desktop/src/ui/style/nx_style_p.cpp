@@ -516,7 +516,7 @@ void QnNxStylePrivate::drawTextButton(
     painter->drawText(textRect, kTextFlags, text);
 }
 
-void QnNxStylePrivate::drawArrow(const QStyle* style,
+void QnNxStylePrivate::drawArrowIndicator(const QStyle* style,
     const QStyleOptionToolButton* toolbutton,
     const QRect& rect,
     QPainter* painter,
@@ -549,6 +549,8 @@ void QnNxStylePrivate::drawToolButton(QPainter* painter,
     const QStyleOptionToolButton* option,
     const QWidget* widget) const
 {
+    // Implementation is taken from QCommonStyle except one line (see comment below).
+
     Q_Q(const QnNxStyle);
 
     QRect rect = option->rect;
@@ -588,6 +590,10 @@ void QnNxStylePrivate::drawToolButton(QPainter* painter,
             else
                 mode = QIcon::Normal;
 
+            /*
+             * The only difference is here. Qt code uses rect.size() instead of iconSize here, so
+             * invalid icon rect was returned on hidpi screens (e.g. 24x24 instead on 20x20).
+             */
             pm = option->icon.pixmap(qt_getWindow(widget), option->iconSize, mode, state);
             pmSize = pm.size() / pm.devicePixelRatio();
         }
@@ -612,7 +618,7 @@ void QnNxStylePrivate::drawToolButton(QPainter* painter,
                 }
                 else
                 {
-                    drawArrow(q, option, pr, painter, widget);
+                    drawArrowIndicator(q, option, pr, painter, widget);
                 }
                 alignment |= Qt::AlignCenter;
             }
@@ -627,7 +633,7 @@ void QnNxStylePrivate::drawToolButton(QPainter* painter,
                 }
                 else
                 {
-                    drawArrow(q, option, pr, painter, widget);
+                    drawArrowIndicator(q, option, pr, painter, widget);
                 }
                 alignment |= Qt::AlignLeft | Qt::AlignVCenter;
             }
@@ -641,7 +647,7 @@ void QnNxStylePrivate::drawToolButton(QPainter* painter,
             rect.translate(shiftX, shiftY);
             if (hasArrow)
             {
-                drawArrow(q, option, rect, painter, widget);
+                drawArrowIndicator(q, option, rect, painter, widget);
             }
             else
             {

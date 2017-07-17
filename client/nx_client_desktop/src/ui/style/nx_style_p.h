@@ -57,7 +57,7 @@ public:
             QPalette::ColorRole foregroundRole,
             const QWidget* widget = nullptr) const;
 
-    static void drawArrow(const QStyle* style,
+    static void drawArrowIndicator(const QStyle* style,
         const QStyleOptionToolButton* toolbutton,
         const QRect& rect,
         QPainter* painter,
