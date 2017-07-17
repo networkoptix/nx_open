@@ -22,6 +22,8 @@ class QnResourcePool;
 class StreamingChunkCache:
     public QObject
 {
+    Q_OBJECT
+
 public:
     StreamingChunkCache(
         QnResourcePool* resourcePool,
