@@ -90,8 +90,9 @@ void QnModuleInformationRestHandler::afterExecute(
         || !socket->setRecvTimeout(kConnectionTimeout)
         || !socket->setKeepAlive(kKeepAliveOptions))
     {
+        const auto error = SystemError::getLastOSErrorCode();
         NX_WARNING(this, lm("Failed to configure connection from %1: %2")
-            .args(socket->getForeignAddress(), SystemError::getLastOSErrorText()));
+            .args(socket->getForeignAddress(), SystemError::toString(error)));
         return;
     }
 
@@ -124,7 +125,7 @@ void QnModuleInformationRestHandler::closeAllSockets()
         savedSockets = m_savedSockets;
     }
 
-    NX_DEBUG(this, lm("Close all %1 sockets").arg(m_savedSockets.size()));
+    NX_DEBUG(this, lm("Close all %1 sockets").arg(savedSockets.size()));
     for (const auto& socket: savedSockets)
         socket->pleaseStop([this, socket]() { removeSocket(socket); });
 }

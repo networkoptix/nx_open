@@ -11,6 +11,17 @@ ArgumentParser::ArgumentParser(int argc, const char* argv[])
         parse(argc, argv);
 }
 
+ArgumentParser::ArgumentParser(const QStringList& args)
+{
+    std::vector<QByteArray> latin1Args;
+    for (const auto& arg: args)
+        latin1Args.push_back(arg.toLocal8Bit());
+    std::vector<const char*> argv;
+    for (const auto& arg: latin1Args)
+        argv.push_back(arg.data());
+    parse(latin1Args.size(), &argv[0]);
+}
+
 void ArgumentParser::parse(int argc, const char* argv[])
 {
     std::multimap<QString, QString>::iterator curParamIter = m_args.end();

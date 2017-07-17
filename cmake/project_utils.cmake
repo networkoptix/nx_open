@@ -90,6 +90,8 @@ function(nx_add_target name type)
         add_library(${name} ${NX_LIBRARY_TYPE} ${sources})
     endif()
 
+    nx_strip_target(${name} COPY_DEBUG_INFO)
+
     if(NOT NX_NO_PCH)
         add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
     endif()

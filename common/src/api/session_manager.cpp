@@ -252,6 +252,8 @@ int QnSessionManager::sendAsyncRequest(
 
     const QUrl appServerUrl = connection->connectionInfo().ecUrl;
     auto requestUrl = createApiUrl(url, objectName, params);
+    if (!requestUrl.isValid() || url.host().isEmpty())
+        return -1;
     requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
     requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());
 

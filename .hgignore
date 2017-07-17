@@ -182,6 +182,7 @@ plugins\acs\Paxton\CustomProperties.cs
 plugins/NxControl/NxControl.cs
 
 mobile_client/build-*
+build/*
 
 statserver/.venv
 statserver/build

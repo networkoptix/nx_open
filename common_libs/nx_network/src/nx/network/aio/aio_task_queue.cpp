@@ -33,6 +33,19 @@ void AioTaskQueue::addTask(SocketAddRemoveTask task)
     m_pollSetModificationQueue.push_back(std::move(task));
 }
 
+bool AioTaskQueue::taskExists(
+    Pollable* const socket,
+    aio::EventType eventType,
+    TaskType taskType) const
+{
+    for (const auto& task: m_pollSetModificationQueue)
+    {
+        if (task.socket == socket && task.eventType == eventType && task.type == taskType)
+            return true;
+    }
+    return false;
+}
+
 void AioTaskQueue::postAsyncCall(
     Pollable* const pollable,
     nx::utils::MoveOnlyFunc<void()> func)
@@ -324,7 +337,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             --handlingData->beingProcessed;
             continue;
         }
-        //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
+        //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
         handlingData->eventHandler->eventTriggered(socket, sockEventType);
         //updating socket's periodic task (it's garanteed that there is periodic task for socket)
         if (handlingData->timeout > 0)

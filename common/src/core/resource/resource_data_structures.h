@@ -20,6 +20,19 @@ Q_DECLARE_METATYPE(QnHttpConfigureRequest)
 
 typedef std::vector<quint64> QnBitrateList;
 
+struct TwoWayAudioParams
+{
+    QString codec;
+    int bitrateKbps = 0;
+    int channels = 1;
+    int sampleRate = 0;
+    QString urlPath;
+    QString contentType;
+    bool noAuth = false;
+};
+Q_DECLARE_METATYPE(TwoWayAudioParams);
+#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)
+
 struct QnBounds
 {
     //TODO: #dmishin move to signed integer type and refactor isNull method
@@ -31,7 +44,7 @@ struct QnBounds
 };
 
 #define QnBounds_Fields (min)(max)
-QN_FUSION_DECLARE_FUNCTIONS(QnBounds, (json)(ubjson)(xml)(csv_record))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBounds)(TwoWayAudioParams), (json)(ubjson)(xml)(csv_record))
 Q_DECLARE_METATYPE(QnBounds)
 
 typedef std::vector<QnBounds> QnBoundsList;
