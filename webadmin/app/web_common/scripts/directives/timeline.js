@@ -411,10 +411,13 @@ angular.module('nxCommon')
                 //$canvas.bind('touchcancel', canvasDragEnd);
                 // Actual browser events handling
 
-
-
-
-
+                /*
+                    We use updateTimelineWidth here because the width of the timeline
+                    changes from when the page loads. When the page loads the volume button
+                    is initially there. Then ng-class is applied hiding the button and
+                    adjusting the width of the timeline. After this the timeline is longer
+                    than the previous width causing the time marker to be offset.
+                */
                 scope.$watch('positionProvider',function(){
                     timelineActions.setPositionProvider(scope.positionProvider);
                     $timeout(updateTimelineWidth);
