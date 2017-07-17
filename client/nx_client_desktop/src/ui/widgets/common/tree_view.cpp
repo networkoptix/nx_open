@@ -2,7 +2,7 @@
 
 #include <QtCore/QTimerEvent>
 #include <QtCore/QScopedValueRollback>
-
+#include <QtWidgets/QScrollBar>
 #include <QtGui/QDragMoveEvent>
 
 #include <utils/common/variant.h>
@@ -18,6 +18,8 @@ QnTreeView::QnTreeView(QWidget *parent):
     m_inDragDropEvent(false)
 {
     setDragDropOverwriteMode(true);
+    verticalScrollBar()->setContextMenuPolicy(Qt::PreventContextMenu);
+    horizontalScrollBar()->setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
 QnTreeView::~QnTreeView()

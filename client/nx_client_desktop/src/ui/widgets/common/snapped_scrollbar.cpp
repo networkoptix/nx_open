@@ -10,6 +10,7 @@ QnSnappedScrollBar::QnSnappedScrollBar(QWidget *parent)
     : base_type(Qt::Vertical, parent),
       d_ptr(new QnSnappedScrollBarPrivate(this))
 {
+    setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
 QnSnappedScrollBar::QnSnappedScrollBar(Qt::Orientation orientation, QWidget *parent)
