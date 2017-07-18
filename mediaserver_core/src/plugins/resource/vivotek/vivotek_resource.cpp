@@ -1,6 +1,7 @@
 #include "vivotek_resource.h"
 
 #include <chrono>
+#include <type_traits>
 
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
@@ -26,6 +27,9 @@ const QString kStreamCodecCapabilities = lit("capability_videoin_streamcodec");
 const QString kStreamCodecParameterTemplate = lit("videoin_c%1_s%2_codectype");
 
 const std::chrono::milliseconds kHttpTimeout(5000);
+
+using StreamCodecCapabilityUnderlyingType = 
+    std::underlying_type<VivotekResource::StreamCodecCapability>::type;
 
 } // namespace
 
@@ -149,18 +153,20 @@ bool VivotekResource::parseStreamCodecCapabilities(
 
     for (const auto& streamCapabilities: split)
     {
-        auto capsEncoded = streamCapabilities.trimmed().toUInt(&success);
+        StreamCodecCapabilityUnderlyingType capsEncoded =
+            streamCapabilities.trimmed().toInt(&success);
+
         if (!success)
             return false;
 
         QFlags<StreamCodecCapability> caps;
-        if (capsEncoded & (uint8_t)StreamCodecCapability::h264)
+        if (capsEncoded & (StreamCodecCapabilityUnderlyingType)StreamCodecCapability::h264)
             caps |= StreamCodecCapability::h264;
-        if (capsEncoded & (uint8_t)StreamCodecCapability::mjpeg)
+        if (capsEncoded & (StreamCodecCapabilityUnderlyingType)StreamCodecCapability::mjpeg)
             caps |= StreamCodecCapability::mjpeg;
-        if (capsEncoded & (uint8_t)StreamCodecCapability::mpeg4)
+        if (capsEncoded & (StreamCodecCapabilityUnderlyingType)StreamCodecCapability::mpeg4)
             caps |= StreamCodecCapability::mpeg4;
-        if (capsEncoded & (uint8_t)StreamCodecCapability::svc)
+        if (capsEncoded & (StreamCodecCapabilityUnderlyingType)StreamCodecCapability::svc)
             caps |= StreamCodecCapability::svc;
 
         outCapabilities->push_back(caps);
