@@ -306,7 +306,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             "tree when the database synchronization is finished.");
 
         if (reconnectNeeded)
-            successMessage += L'\n' + tr("You will be reconnected");
+            successMessage += L'\n' + tr("You will be reconnected.");
 
         hide(); //< Do not close dialog here as it will be deleted in messagebox event loop.
 
