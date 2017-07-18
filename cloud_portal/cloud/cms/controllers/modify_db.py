@@ -130,13 +130,14 @@ def send_version_for_review(customization, language, data_structures, product, r
 		alter_records_version(Context.objects.filter(product=product), customization, old_version, None)
 		old_version.delete()
 
-	save_unrevisioned_records(customization, language, data_structures, request_data, request_files, user)
+	upload_errors = save_unrevisioned_records(customization, language, data_structures, request_data, request_files, user)
 
 	version = ContentVersion(customization=customization, name="N/A", created_by=user)
 	version.save()
 
 	alter_records_version(Context.objects.filter(product=product), customization, None, version)
 	notify_version_ready(customization, version.id, product.name)
+	return upload_errors
 
 
 def get_records_for_version(version):
@@ -180,14 +181,14 @@ def check_image_dimensions(data_structure_name, meta_dimensions, image_dimension
 	   						.format(meta_dimensions['width'], image_dimensions['width'])
 	   	size_error_msgs.append((data_structure_name, error_msg))
 
-	if 'height_lt' in meta_dimensions and meta_dimensions['height_lt'] < image_dimensions['height']:
+	if 'height_le' in meta_dimensions and meta_dimensions['height_le'] < image_dimensions['height']:
 		error_msg = "Image height must be equal to or less than {}. Uploaded image's height is {}."\
-	   						.format(meta_dimensions['height_lt'], image_dimensions['height'])
+	   						.format(meta_dimensions['height_le'], image_dimensions['height'])
 		size_error_msgs.append((data_structure_name, error_msg))
 
-	if 'width_lt' in meta_dimensions and meta_dimensions['width_lt'] < image_dimensions['width']:
+	if 'width_le' in meta_dimensions and meta_dimensions['width_le'] < image_dimensions['width']:
 		error_msg = "Image width must be equal to or less than {}. Uploaded image's width is {}."\
-	   						.format(meta_dimensions['width_lt'], image_dimensions['width'])
+	   						.format(meta_dimensions['width_le'], image_dimensions['width'])
 	   	size_error_msgs.append((data_structure_name, error_msg))
 
 	return size_error_msgs
