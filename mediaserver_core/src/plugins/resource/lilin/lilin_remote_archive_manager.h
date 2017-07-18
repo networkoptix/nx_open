@@ -9,7 +9,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 namespace nx {
 namespace mediaserver_core {

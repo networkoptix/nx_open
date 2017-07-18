@@ -8,11 +8,12 @@
 #include <vector>
 #include <atomic>
 
+#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/resource_media_layout.h>
 #include <server/server_globals.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -25,7 +26,7 @@ class SynchronizationTask
     using BufferType = QByteArray;
 
 public:
-    SynchronizationTask();
+    SynchronizationTask(QnCommonModule* commonModule);
     void setResource(const QnSecurityCamResourcePtr& resource);
     void setDoneHandler(std::function<void()> handler);
     void cancel();
@@ -65,6 +66,7 @@ private:
         QnServer::ChunksCatalog catalog) const;
 
 private:
+    QnCommonModule* m_commonModule;
     QnSecurityCamResourcePtr m_resource;
     std::atomic<bool> m_canceled;
     std::function<void()> m_doneHandler;
@@ -75,16 +77,18 @@ private:
 struct SynchronizationTaskContext
 {
     std::shared_ptr<SynchronizationTask> task;
-    QnConcurrent::QnFuture<void> result;
+    nx::utils::concurrent::Future<void> result;
 };
 
 
-class RemoteArchiveSynchronizer: public QObject
+class RemoteArchiveSynchronizer: 
+    public QObject,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    RemoteArchiveSynchronizer();
+    RemoteArchiveSynchronizer(QObject* parent);
     virtual ~RemoteArchiveSynchronizer();
 
 public slots:

@@ -8,6 +8,7 @@
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
+#include <media_server/serverutil.h>
 
 //#define REDUCE_NET_ISSUE_HACK
 
@@ -205,35 +206,35 @@ void EventConnector::at_noStorages(const QnResourcePtr& resource)
     qnEventRuleProcessor->broadcastAction(action);
 }
 
-void QnBusinessEventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
+void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 {
-    QnAbstractBusinessActionPtr action(
-        new QnSystemHealthBusinessAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
+    vms::event::SystemHealthActionPtr action(
+        new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
         serverGuid()));
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
     action->setRuntimeParams(params);
-    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+    qnEventRuleProcessor->broadcastAction(action);
 }
 
-void QnBusinessEventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
+void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
 {
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
         serverGuid()));
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
     action->setRuntimeParams(params);
-    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+    qnEventRuleProcessor->broadcastAction(action);
 }
 
-void QnBusinessEventConnector::at_remoteArchiveSyncError(
+void EventConnector::at_remoteArchiveSyncError(
     const QnResourcePtr &resource,
     const QString& error)
 {
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncError,
         serverGuid()));
 
@@ -241,16 +242,16 @@ void QnBusinessEventConnector::at_remoteArchiveSyncError(
     params.metadata.cameraRefs.push_back(resource->getId());
     params.caption = error;
     action->setRuntimeParams(params);
-    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+    qnEventRuleProcessor->broadcastAction(action);
 }
 
-void QnBusinessEventConnector::at_remoteArchiveSyncProgress(
+void EventConnector::at_remoteArchiveSyncProgress(
     const QnResourcePtr &resource,
     double progress)
 {
     NX_ASSERT(progress >= 0 && progress <= 1);
 
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncProgress,
         serverGuid()));
 
@@ -258,7 +259,7 @@ void QnBusinessEventConnector::at_remoteArchiveSyncProgress(
     params.metadata.cameraRefs.push_back(resource->getId());
     action->setRuntimeParams(params);
     qDebug() << "Broadcasting sync progress business action";
-    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+    qnEventRuleProcessor->broadcastAction(action);
 }
 
 

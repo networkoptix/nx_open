@@ -2522,7 +2522,7 @@ void MediaServerProcess::run()
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
     
     auto remoteArchiveSynchronizer =
-        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>();
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());

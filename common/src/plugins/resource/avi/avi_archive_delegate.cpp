@@ -137,7 +137,7 @@ qint64 QnAviArchiveDelegate::startTime() const
 
 void QnAviArchiveDelegate::setStartTimeUs(qint64 startTimeUs)
 {
-    m_startTimeUsec = startTimeUs;
+    m_startTimeUs = startTimeUs;
 }
 
 qint64 QnAviArchiveDelegate::endTime() const

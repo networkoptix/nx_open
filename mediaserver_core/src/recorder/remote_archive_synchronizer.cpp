@@ -2,11 +2,13 @@
 
 #include <recorder/storage_manager.h>
 #include <recording/stream_recorder.h>
-#include <business/business_event_connector.h>
+#include <nx/mediaserver/event/event_connector.h>
 #include <transcoding/transcoding_utils.h>
 #include <utils/common/util.h>
 #include <motion/motion_helper.h>
 #include <database/server_db.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
@@ -36,13 +38,15 @@ static const QString kArchiveContainerExtension(".mkv");
 
 using namespace nx::core::resource;
 
-RemoteArchiveSynchronizer::RemoteArchiveSynchronizer():
+RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QObject* parent):
+    QnCommonModuleAware(parent),
     m_terminated(false)
 {
     qDebug() << "Creating remote archive synchronizer.";
     NX_LOGX(lit("Starting archive synchronization."), cl_logDEBUG1);
+
     connect(
-        qnResPool,
+        commonModule()->resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
         &RemoteArchiveSynchronizer::at_newResourceAdded);
@@ -140,13 +144,13 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
         return;
 
     auto id = resource->getId();
-    auto task = std::make_shared<SynchronizationTask>();
+    auto task = std::make_shared<SynchronizationTask>(commonModule());
     task->setResource(resource);
     task->setDoneHandler([this, id]() { removeTaskFromAwaited(id); });
 
     SynchronizationTaskContext context;
     context.task = task;
-    context.result = QnConcurrent::run([task]() { task->execute(); });
+    context.result = nx::utils::concurrent::run([task]() { task->execute(); });
     m_syncTasks[id] = context;    
 }
 
@@ -196,7 +200,8 @@ void RemoteArchiveSynchronizer::waitForAllTasks()
 //------------------------------------------------------------------------------------------------
 
 
-SynchronizationTask::SynchronizationTask():
+SynchronizationTask::SynchronizationTask(QnCommonModule* commonModule):
+    m_commonModule(commonModule),
     m_canceled(false),
     m_totalChunksToSynchronize(0),
     m_currentNumberOfSynchronizedChunks(0)
@@ -274,7 +279,7 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     if (broadcastSyncProgressStep > 0.7)
         broadcastSyncProgressStep = 1;
 
-    qnBusinessRuleConnector->at_remoteArchiveSyncStarted(resource);
+    qnEventRuleConnector->at_remoteArchiveSyncStarted(resource);
 
     // 3. In cycle copy all records to archive.
     for (const auto& entry : filtered)
@@ -286,7 +291,7 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
         {
             qDebug() << lit("Can not synchronize video chunk.");
             NX_LOGX(lit("Can not synchronize video chunk."), cl_logDEBUG1);
-            qnBusinessRuleConnector->at_remoteArchiveSyncError(
+            qnEventRuleConnector->at_remoteArchiveSyncError(
                 resource,
                 lit("Can not synchronize video chunk."));
         }
@@ -300,7 +305,7 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
         {
             qDebug() << lit("Remote archive synchronization progress is %1").arg(currentSyncProgress);
             NX_LOGX(lm("Remote archive synchronization progress is %1").arg(currentSyncProgress), cl_logDEBUG1);
-            qnBusinessRuleConnector->at_remoteArchiveSyncProgress(resource, currentSyncProgress);
+            qnEventRuleConnector->at_remoteArchiveSyncProgress(resource, currentSyncProgress);
             qDebug() << "Progress action has been broadcasted";
             lastBroadcastedSyncProgress = currentSyncProgress;
         }
@@ -309,7 +314,7 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     qDebug() << "Archive synchronization is done.";
     NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
 
-    qnBusinessRuleConnector->at_remoteArchiveSyncFinished(resource);
+    qnEventRuleConnector->at_remoteArchiveSyncFinished(resource);
     return true;
 }
 
@@ -535,7 +540,7 @@ bool SynchronizationTask::convertAndWriteBuffer(
     QnResourcePtr storageResource(new DummyResource());
     storageResource->setUrl(temporaryFilePath);
 
-    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
+    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(m_commonModule));
     storage->registerResourceData(temporaryFilePath, ioDevice);
 
     using namespace  nx::mediaserver_core::plugins;
