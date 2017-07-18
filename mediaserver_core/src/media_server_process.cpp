@@ -2681,7 +2681,8 @@ void MediaServerProcess::run()
                 ApiCommand::broadcastPeerSyncTime,
                 commonModule()->moduleGUID());
             tran.params.syncTimeMs = newTime;
-            sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+            if (auto connection = commonModule()->ec2Connection())
+                sendTransaction(connection->messageBus(), tran);
         }
         );
 
@@ -2855,17 +2856,14 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
-    selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    QnModuleInformation selfInformation = commonModule()->moduleInformation();
+    if (compatibilityMode)
+    {
+        selfInformation.brand = QString();
+        selfInformation.customization = QString();
+    }
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 

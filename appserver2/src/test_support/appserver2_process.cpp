@@ -352,16 +352,7 @@ int Appserver2Process::exec()
     }
 
     auto selfInformation = m_commonModule->moduleInformation();
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = QnAppInfo::productNameShort();
-    selfInformation.customization = QnAppInfo::customizationName();
-    selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = true;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.port = tcpListener.getPort();
     commonModule()->setModuleInformation(selfInformation);
 

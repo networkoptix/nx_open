@@ -183,6 +183,23 @@ QnCommonModule::QnCommonModule(bool clientMode,
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_startupTime = QDateTime::currentDateTime();
+
+    m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    m_moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    m_moduleInformation.brand = QnAppInfo::productNameShort();
+    m_moduleInformation.customization = QnAppInfo::customizationName();
+    m_moduleInformation.version = QnSoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.type = clientMode ?
+        QnModuleInformation::nxClientId() : QnModuleInformation::nxMediaServerId();
+}
+
+void QnCommonModule::setModuleGUID(const QnUuid& guid)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_uuid = guid;
+    }
+    resetCachedValue(); //< Update module information
 }
 
 QnCommonModule::~QnCommonModule()
@@ -303,6 +320,8 @@ void QnCommonModule::updateModuleInformationUnsafe()
 {
     // This code works only on server side.
     NX_ASSERT(!moduleGUID().isNull());
+    m_moduleInformation.id = m_uuid;
+    m_moduleInformation.runtimeId = m_runUuid;
 
     QnMediaServerResourcePtr server = m_resourcePool->getResourceById<QnMediaServerResource>(moduleGUID());
     //NX_ASSERT(server);
@@ -387,6 +406,7 @@ void QnCommonModule::updateRunningInstanceGuid()
         m_runUuid = QnUuid::createUuid();
     }
     emit runningInstanceGUIDChanged();
+    resetCachedValue(); //< UpdateModuleInformation
 }
 
 QnUuid QnCommonModule::dbId() const
