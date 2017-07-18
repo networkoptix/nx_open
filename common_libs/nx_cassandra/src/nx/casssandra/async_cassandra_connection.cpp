@@ -278,6 +278,16 @@ bool Query::bind(const std::string& key, const Uuid& value)
     return result == CASS_OK;
 }
 
+bool Query::bindNull(const std::string& key)
+{
+    if (!m_statement)
+        return false;
+
+    auto result = cass_statement_bind_null_by_name_n(m_statement, key.data(), key.size());
+
+    return result == CASS_OK;
+}
+
 #undef NX_CASS_BIND_BASIC_VALUE
 
 /** ---------------------------------- QueryResult ----------------------------------------------*/
@@ -329,7 +339,7 @@ bool QueryResult::next()
     return cass_iterator_next(m_iterator);
 }
 
-bool QueryResult::get(const std::string& key, std::string* value) const
+bool QueryResult::get(const std::string& key, boost::optional<std::string>* value) const
 {
     return getStringImpl(
         [&key](const CassRow* row)
@@ -371,32 +381,32 @@ bool QueryResult::get(const std::string& key, std::string* value) const
         })
 
 
-bool QueryResult::get(const std::string& key, bool* value) const
+bool QueryResult::get(const std::string& key, boost::optional<bool>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_NAME(bool);
 }
 
-bool QueryResult::get(const std::string& key, double* value) const
+bool QueryResult::get(const std::string& key, boost::optional<double>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_NAME(double);
 }
 
-bool QueryResult::get(const std::string& key, float* value) const
+bool QueryResult::get(const std::string& key, boost::optional<float>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_NAME(float);
 }
 
-bool QueryResult::get(const std::string& key, int32_t* value) const
+bool QueryResult::get(const std::string& key, boost::optional<int32_t>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_NAME(int32);
 }
 
-bool QueryResult::get(const std::string& key, int64_t* value) const
+bool QueryResult::get(const std::string& key, boost::optional<int64_t>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_NAME(int64);
 }
 
-bool QueryResult::get(int index, std::string* value) const
+bool QueryResult::get(int index, boost::optional<std::string>* value) const
 {
     return getStringImpl(
         [index](const CassRow* row)
@@ -406,32 +416,32 @@ bool QueryResult::get(int index, std::string* value) const
         value);
 }
 
-bool QueryResult::get(int index, bool* value) const
+bool QueryResult::get(int index, boost::optional<bool>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(bool);
 }
 
-bool QueryResult::get(int index, double* value) const
+bool QueryResult::get(int index, boost::optional<double>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(double);
 }
 
-bool QueryResult::get(int index, float* value) const
+bool QueryResult::get(int index, boost::optional<float>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(float);
 }
 
-bool QueryResult::get(int index, int32_t* value) const
+bool QueryResult::get(int index, boost::optional<int32_t>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(int32);
 }
 
-bool QueryResult::get(int index, int64_t* value) const
+bool QueryResult::get(int index, boost::optional<int64_t>* value) const
 {
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(int64);
 }
 
-bool QueryResult::get(const std::string& key, InetAddr* value) const
+bool QueryResult::get(const std::string& key, boost::optional<InetAddr>* value) const
 {
     return getInetImpl(
         [&key](const CassRow* row)
@@ -441,7 +451,7 @@ bool QueryResult::get(const std::string& key, InetAddr* value) const
         value);
 }
 
-bool QueryResult::get(int index, InetAddr* value) const
+bool QueryResult::get(int index, boost::optional<InetAddr>* value) const
 {
     return getInetImpl(
         [index](const CassRow* row)
@@ -451,7 +461,7 @@ bool QueryResult::get(int index, InetAddr* value) const
         value);
 }
 
-bool QueryResult::get(const std::string& key, Uuid* value) const
+bool QueryResult::get(const std::string& key, boost::optional<Uuid>* value) const
 {
     return getUuidImpl(
         [&key](const CassRow* row)
@@ -461,7 +471,7 @@ bool QueryResult::get(const std::string& key, Uuid* value) const
         value);
 }
 
-bool QueryResult::get(int index, Uuid* value) const
+bool QueryResult::get(int index, boost::optional<Uuid>* value) const
 {
     return getUuidImpl(
         [index](const CassRow* row)

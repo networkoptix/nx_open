@@ -179,7 +179,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                     return std::string();
                 }
 
-                std::string relayId;
+                boost::optional<std::string> relayId;
                 bool getValueResult = result.second.get(std::string("relay_id"), &relayId);
                 if (!getValueResult)
                 {
@@ -187,7 +187,14 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                     return std::string();
                 }
 
-                return relayId;
+                NX_ASSERT((bool) relayId);
+                if (!(bool)relayId)
+                {
+                    NX_VERBOSE(this, "relay_id is NULL");
+                    return std::string();
+                }
+
+                return *relayId;
             });
 }
 

@@ -9,6 +9,7 @@ endif()
 
 nx_add_target(nx_cassandra LIBRARY ${library_type}
     PUBLIC_LIBS
+        boost
         cassandra
         nx_utils)
 

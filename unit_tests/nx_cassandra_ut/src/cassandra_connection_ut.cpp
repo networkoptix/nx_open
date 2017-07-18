@@ -15,7 +15,7 @@ protected:
     {
         bool boolVal = true;
         double doubleVal = 42.02;
-        float floatVal= 0.242;
+        float floatVal= (float)0.242;
         int32_t intVal = 11;
         int64_t int64Val = 32;
         InetAddr inetVal{"17.3.90.11"};
