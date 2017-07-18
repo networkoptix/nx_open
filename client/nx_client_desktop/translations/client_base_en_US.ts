@@ -7133,11 +7133,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server will be connected to the System shortly</source>
+        <source>It will appear in the resource tree when the database synchronization is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>It will appear in the resource tree when the database synchronization is finished.</source>
+        <source>Server will be connected to System shortly</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

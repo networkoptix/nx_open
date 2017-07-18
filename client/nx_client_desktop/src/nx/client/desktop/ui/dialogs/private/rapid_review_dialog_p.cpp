@@ -55,9 +55,9 @@ ExportRapidReviewPrivate::ExportRapidReviewPrivate(QObject* parent):
     m_sliderSpeed(kMinimalSpeed),
     m_maxSpeed(kMinimalSpeed), //< Nope, that is not an error :)
     m_sourcePeriodLengthMs(kMinimalLengthMs * kMinimalSpeed),
-    m_selectedLengthUnit(0),
-    m_minResultLengthUnits(1),
-    m_maxResultLengthUnits(1)
+    m_selectedLengthUnitIndex(0),
+    m_minResultLengthInSelectedUnits(kMinimalLengthMs),
+    m_maxResultLengthInSelectedUnits(kMinimalLengthMs)
 {
     updateUnitsModel();
 }
@@ -109,20 +109,20 @@ int ExportRapidReviewPrivate::maxSliderSpeed() const
     return toSliderScale(m_maxSpeed);
 }
 
-int ExportRapidReviewPrivate::selectedLengthUnit() const
+int ExportRapidReviewPrivate::selectedLengthUnitIndex() const
 {
-    return m_selectedLengthUnit;
+    return m_selectedLengthUnitIndex;
 }
 
 void ExportRapidReviewPrivate::setSelectedLengthUnit(int index)
 {
     // Changed length unit (minutes to seconds or vise versa). Speed must not change.
-    m_selectedLengthUnit = index;
+    m_selectedLengthUnitIndex = index;
 
-    updateResultLengthUnitsRange();
+    updateResultLengthInSelectedUnitsRange();
 
-    const double expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
-    m_resultLengthUnits = expectedLengthMs / expectedLengthMeasureUnit();
+    const qreal expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
+    m_resultLengthInSelectedUnits = expectedLengthMs / selectedLengthMeasureUnitInMs();
 }
 
 qint64 ExportRapidReviewPrivate::sourcePeriodLengthMs() const
@@ -147,30 +147,30 @@ void ExportRapidReviewPrivate::setSourcePeriodLengthMs(qint64 lengthMs)
     updateExpectedLength();
 }
 
-double ExportRapidReviewPrivate::resultLengthUnits() const
+qreal ExportRapidReviewPrivate::resultLengthInSelectedUnits() const
 {
-    return m_resultLengthUnits;
+    return m_resultLengthInSelectedUnits;
 }
 
-void ExportRapidReviewPrivate::setResultLengthUnits(double value)
+void ExportRapidReviewPrivate::setResultLengthInSelectedUnits(qreal value)
 {
-    m_resultLengthUnits = value;
+    m_resultLengthInSelectedUnits = value;
 
-    const double expectedLengthMs = value * expectedLengthMeasureUnit();
+    const qreal expectedLengthMs = value * selectedLengthMeasureUnitInMs();
     m_absoluteSpeed = kMaximalSpeed;
     if (value > 0)
         m_absoluteSpeed = qRound(m_sourcePeriodLengthMs / expectedLengthMs);
     m_sliderSpeed = toSliderScale(m_absoluteSpeed);
 }
 
-double ExportRapidReviewPrivate::minResultLengthUnits() const
+qreal ExportRapidReviewPrivate::minResultLengthInSelectedUnits() const
 {
-    return m_minResultLengthUnits;
+    return m_minResultLengthInSelectedUnits;
 }
 
-double ExportRapidReviewPrivate::maxResultLengthUnits() const
+qreal ExportRapidReviewPrivate::maxResultLengthInSelectedUnits() const
 {
-    return m_maxResultLengthUnits;
+    return m_maxResultLengthInSelectedUnits;
 }
 
 qint64 ExportRapidReviewPrivate::frameStepMs() const
@@ -211,36 +211,36 @@ void ExportRapidReviewPrivate::updateUnitsModel()
 
 void ExportRapidReviewPrivate::updateExpectedLength()
 {
-    const double expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
+    const qreal expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
 
-    m_resultLengthUnits = expectedLengthMs / expectedLengthMeasureUnit();
+    m_resultLengthInSelectedUnits = expectedLengthMs / selectedLengthMeasureUnitInMs();
 
-    while (m_selectedLengthUnit >= 0
-        && m_selectedLengthUnit < unitsModel->rowCount() - 1
-        && m_resultLengthUnits >= kMaxValuePerUnit[m_selectedLengthUnit])
+    while (m_selectedLengthUnitIndex >= 0
+        && m_selectedLengthUnitIndex < unitsModel->rowCount() - 1
+        && m_resultLengthInSelectedUnits >= kMaxValuePerUnit[m_selectedLengthUnitIndex])
     {
-        ++m_selectedLengthUnit;
-        m_resultLengthUnits = expectedLengthMs / expectedLengthMeasureUnit();
+        ++m_selectedLengthUnitIndex;
+        m_resultLengthInSelectedUnits = expectedLengthMs / selectedLengthMeasureUnitInMs();
     }
 
-    while (m_resultLengthUnits < 1.0 && m_selectedLengthUnit > 0)
+    while (m_resultLengthInSelectedUnits < 1.0 && m_selectedLengthUnitIndex > 0)
     {
-        --m_selectedLengthUnit;
-        m_resultLengthUnits = expectedLengthMs / expectedLengthMeasureUnit();
+        --m_selectedLengthUnitIndex;
+        m_resultLengthInSelectedUnits = expectedLengthMs / selectedLengthMeasureUnitInMs();
     }
 
-    updateResultLengthUnitsRange();
+    updateResultLengthInSelectedUnitsRange();
 }
 
-void ExportRapidReviewPrivate::updateResultLengthUnitsRange()
+void ExportRapidReviewPrivate::updateResultLengthInSelectedUnitsRange()
 {
-    qint64 unit = expectedLengthMeasureUnit();
+    qint64 unit = selectedLengthMeasureUnitInMs();
 
-    m_minResultLengthUnits = std::max(1.0 * kMinimalLengthMs / (unit * kMinimalSpeed), 1.0);
-    m_maxResultLengthUnits = std::max(1.0 * m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1.0);
+    m_minResultLengthInSelectedUnits = std::max(1.0 * kMinimalLengthMs / (unit * kMinimalSpeed), 1.0);
+    m_maxResultLengthInSelectedUnits = std::max(1.0 * m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1.0);
 }
 
-double ExportRapidReviewPrivate::sliderExpCoeff() const
+qreal ExportRapidReviewPrivate::sliderExpCoeff() const
 {
     /*
      * Function is: kMinimalSpeed * e ^ (k * kSliderSteps) == maxSpeed.
@@ -248,11 +248,11 @@ double ExportRapidReviewPrivate::sliderExpCoeff() const
      * kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue.
      */
 
-    double speedUp = m_maxSpeed / kMinimalSpeed;
+    qreal speedUp = m_maxSpeed / kMinimalSpeed;
     return log(speedUp) / kSliderSteps;
 }
 
-double ExportRapidReviewPrivate::toSliderScale(double absoluteSpeedValue) const
+qreal ExportRapidReviewPrivate::toSliderScale(qreal absoluteSpeedValue) const
 {
     //Assuming: kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue.
 
@@ -260,14 +260,14 @@ double ExportRapidReviewPrivate::toSliderScale(double absoluteSpeedValue) const
     if (m_maxSpeed - kMinimalSpeed <= kSliderSteps)
         return absoluteSpeedValue - kMinimalSpeed;
 
-    const double k = sliderExpCoeff();
+    const qreal k = sliderExpCoeff();
 
-    const double targetSpeedUp = 1.0 * absoluteSpeedValue / kMinimalSpeed;
-    const double sliderValue = log(targetSpeedUp) / k;
+    const qreal targetSpeedUp = 1.0 * absoluteSpeedValue / kMinimalSpeed;
+    const qreal sliderValue = log(targetSpeedUp) / k;
     return sliderValue;
 }
 
-double ExportRapidReviewPrivate::fromSliderScale(double sliderSpeedValue) const
+qreal ExportRapidReviewPrivate::fromSliderScale(qreal sliderSpeedValue) const
 {
     //Assuming: kMinimalSpeed * e ^ (sliderExpCoeff * sliderValue) == absoluteSpeedValue.
 
@@ -279,16 +279,16 @@ double ExportRapidReviewPrivate::fromSliderScale(double sliderSpeedValue) const
     if (qFuzzyEquals(sliderSpeedValue, kSliderSteps))
         return m_maxSpeed;
 
-    const double k = sliderExpCoeff();
+    const qreal k = sliderExpCoeff();
 
-    const double absoluteSpeed = 1.0 * kMinimalSpeed * exp(k * sliderSpeedValue);
+    const qreal absoluteSpeed = 1.0 * kMinimalSpeed * exp(k * sliderSpeedValue);
     return absoluteSpeed;
 }
 
-qint64 ExportRapidReviewPrivate::expectedLengthMeasureUnit() const
+qint64 ExportRapidReviewPrivate::selectedLengthMeasureUnitInMs() const
 {
-    const auto index = std::max(m_selectedLengthUnit, 0);
-    NX_EXPECT(index == m_selectedLengthUnit);
+    const auto index = std::max(m_selectedLengthUnitIndex, 0);
+    NX_EXPECT(index == m_selectedLengthUnitIndex);
 
     NX_EXPECT(unitsModel->rowCount() > index, Q_FUNC_INFO, "Make sure model is valid");
     if (index >= unitsModel->rowCount())

@@ -3601,7 +3601,9 @@ int QnNxStyle::styleHint(
         case SH_FocusFrame_AboveWidget:
             return 1;
         case SH_DialogButtonLayout:
-            return QDialogButtonBox::KdeLayout;
+            return QDialogButtonBox::KdeLayout;            
+        case SH_ScrollBar_ContextMenu:
+            return 0;
         default:
             break;
     }
