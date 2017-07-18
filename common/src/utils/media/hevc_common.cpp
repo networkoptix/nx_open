@@ -8,7 +8,11 @@ namespace {
 
 static const uint8_t kPayloadHeaderForbiddenZeroBitMask = 0x80;
 static const uint8_t kPayloadHeaderNalUnitTypeMask = 0x7e;
-static const uint16_t kPayloadHeaderLayerIdMask = htons(0x1f8);
+#if defined(Q_BIGENDIAN)
+    static const uint16_t kPayloadHeaderLayerIdMask = 0x1f8;
+#else
+    static const uint16_t kPayloadHeaderLayerIdMask = 0xf801;
+#endif
 static const uint8_t kPayloadHeaderTidMask = 0x07;
 static const uint8_t kStartFuPacketMask = 0x80;
 static const uint8_t kEndFuPacketMask = 0x40;
