@@ -1563,10 +1563,10 @@ bool SslSocket::shutdown()
     return d->wrappedSocket->shutdown();
 }
 
-QString SslSocket::pointerId() const
+QString SslSocket::idForToStringFromPtr() const
 {
     Q_D(const SslSocket);
-    return toString(d->wrappedSocket);
+    return d->wrappedSocket ? d->wrappedSocket->idForToStringFromPtr() : QString();
 }
 
 void SslSocket::connectAsync(

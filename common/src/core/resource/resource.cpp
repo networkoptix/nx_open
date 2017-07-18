@@ -1233,7 +1233,7 @@ QnCommonModule* QnResource::commonModule() const
     return nullptr;
 }
 
-QString QnResource::pointerId() const
+QString QnResource::idForToStringFromPtr() const
 {
     return getId().toSimpleString();
 }

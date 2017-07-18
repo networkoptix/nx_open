@@ -357,9 +357,9 @@ bool CloudStreamSocket::isInSelfAioThread() const
     return m_aioThreadBinder.isInSelfAioThread();
 }
 
-QString CloudStreamSocket::pointerId() const
+QString CloudStreamSocket::idForToStringFromPtr() const
 {
-    return toString(m_socketDelegate.get());
+    return m_socketDelegate ? m_socketDelegate->idForToStringFromPtr() : QString();
 }
 
 void CloudStreamSocket::connectToEntriesAsync(

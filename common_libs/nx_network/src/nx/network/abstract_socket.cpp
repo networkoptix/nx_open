@@ -89,7 +89,7 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
-QString AbstractCommunicatingSocket::pointerId() const
+QString AbstractCommunicatingSocket::idForToStringFromPtr() const
 {
     return lm("%1->%2").args(getLocalAddress(), getForeignAddress());
 }
@@ -169,7 +169,7 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 
 //-------------------------------------------------------------------------------------------------
 
-QString AbstractStreamServerSocket::pointerId() const
+QString AbstractStreamServerSocket::idForToStringFromPtr() const
 {
     return lm("%1").args(getLocalAddress());
 }

@@ -161,7 +161,7 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
-QString ModuleConnector::Module::pointerId() const
+QString ModuleConnector::Module::idForToStringFromPtr() const
 {
     return m_id.toSimpleString();
 }

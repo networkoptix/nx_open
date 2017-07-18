@@ -115,7 +115,7 @@ void BufferedStreamSocket::readSomeAsync(
         });
 }
 
-QString BufferedStreamSocket::pointerId() const
+QString BufferedStreamSocket::idForToStringFromPtr() const
 {
     return toString(m_socket);
 }

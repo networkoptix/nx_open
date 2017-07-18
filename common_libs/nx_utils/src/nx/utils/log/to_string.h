@@ -65,13 +65,13 @@ QString pointerTypeName(const T* value)
 }
 
 template<typename T>
-QString pointerIdSfinae(const T* value, decltype(&T::pointerId))
+QString idForToStringFromPtrSfinae(const T* value, decltype(&T::idForToStringFromPtr))
 {
-    return value ? value->pointerId() : QString();
+    return value ? value->idForToStringFromPtr() : QString();
 }
 
 template<typename T>
-QString pointerIdSfinae(const T* /*value*/, ...)
+QString idForToStringFromPtrSfinae(const T* /*value*/, ...)
 {
     return QString();
 }
@@ -79,10 +79,10 @@ QString pointerIdSfinae(const T* /*value*/, ...)
 template<typename T>
 QString toString(const T* value)
 {
-    const auto pointerId = pointerIdSfinae(value, 0);
+    const auto toString = idForToStringFromPtrSfinae(value, 0);
     return QStringLiteral("%1(0x%2%3)")
         .arg(pointerTypeName(value)).arg(reinterpret_cast<qulonglong>(value), 0, 16)
-        .arg(pointerId.isEmpty() ? QString() : (QStringLiteral(", ") + pointerId));
+        .arg(toString.isEmpty() ? QString() : (QStringLiteral(", ") + toString));
 }
 
 template<typename T>

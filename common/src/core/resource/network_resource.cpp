@@ -336,7 +336,7 @@ void QnNetworkResource::initializationDone()
         setStatus(Qn::Online);
 }
 
-QString QnNetworkResource::pointerId() const
+QString QnNetworkResource::idForToStringFromPtr() const
 {
     return getPhysicalId();
 }

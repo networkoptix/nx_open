@@ -19,11 +19,11 @@ void assertToString(const T& value, const char* string)
 
 TEST(ToString, BuildIn)
 {
-    assertToString(1, "1");
-    assertToString(77777, "77777");
+    assertToString((int) 1, "1");
+    assertToString((uint) 77777, "77777");
 
-    assertToString(2.5, "2.5");
-    assertToString(12.34, "12.34");
+    assertToString((float) 2.5, "2.5");
+    assertToString((double) 12.34, "12.34");
 
     assertToString("hello", "hello");
     assertToString("hello world", "hello world");
@@ -147,7 +147,7 @@ struct CustomInt
 {
     int i = 0;
     CustomInt(int i = 0): i(i) {}
-    QString pointerId() const { return toString(i); }
+    QString idForToStringFromPtr() const { return toString(i); }
 };
 
 TEST(ToString, Pointers)
