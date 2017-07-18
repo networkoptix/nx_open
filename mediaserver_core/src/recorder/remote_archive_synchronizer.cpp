@@ -115,9 +115,9 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
             "Schedule is enabled for resource: %5")
                 .arg(securityCameraResource->getName())
                 .arg(securityCameraResource->isInitialized())
-                .arg(securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)))
+                .arg(securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability))
                 .arg(securityCameraResource->isLicenseUsed())
-                .arg(!securityCameraResource->isScheduleDisabled(),
+                .arg(!securityCameraResource->isScheduleDisabled()),
             cl_logDEBUG1);
 
         cancelTaskForResource(securityCameraResource->getId());
@@ -616,3 +616,4 @@ bool SynchronizationTask::isMotionDetectionNeeded(
 } // namespace reorder
 } // namespace mediaserver_core
 } // namespace nx
+
