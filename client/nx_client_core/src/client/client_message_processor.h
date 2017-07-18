@@ -25,6 +25,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
+    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour) override;
+
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
@@ -41,4 +43,4 @@ private:
 };
 
 #define qnClientMessageProcessor \
-    static_cast<QnClientMessageProcessor*>(commonModule()->messageProcessor())
+    static_cast<QnClientMessageProcessor*>(this->commonModule()->messageProcessor())

@@ -20,7 +20,6 @@ class HikvisionResource: public QnPlOnvifResource
 public:
     HikvisionResource();
     virtual ~HikvisionResource() override;
-    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
@@ -39,7 +38,6 @@ private:
     std::unique_ptr<nx_http::HttpClient> getHttpClient();
 
 private:
-    QnAudioTransmitterPtr m_audioTransmitter;
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
     bool m_hevcSupported = false;
 };

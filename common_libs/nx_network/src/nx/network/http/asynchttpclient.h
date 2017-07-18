@@ -165,9 +165,22 @@ public:
         nx_http::StringType messageBody,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
+    void doDelete(const QUrl& url);
+    void doDelete(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
     void doOptions(const QUrl& url);
     void doOptions(
         const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     const nx_http::Request& request() const;

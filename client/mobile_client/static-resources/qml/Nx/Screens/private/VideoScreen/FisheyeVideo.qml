@@ -68,15 +68,15 @@ Item
             {
                 case MediaDewarpingParams.VerticalUp:
                     return Utils3D.rotationZ(Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
                 case MediaDewarpingParams.VerticalDown:
                     return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
                 default:
                     return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
             }
         }
 
@@ -91,15 +91,15 @@ Item
             {
                 case MediaDewarpingParams.VerticalUp:
                     return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
-                                       normalizedAngle(unboundedRotation.y))
+                        normalizedAngle(unboundedRotation.y))
 
                 case MediaDewarpingParams.VerticalDown:
                     return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
-                                       normalizedAngle(unboundedRotation.y))
+                        normalizedAngle(unboundedRotation.y))
 
                 default:
                     return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
-                                       Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
+                        Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
             }
         }
 
@@ -110,7 +110,11 @@ Item
         property real scalePower: 0.0
         property real animatedScalePower: scalePower
 
-        Behavior on animatedScalePower { NumberAnimation { duration: 150 }}
+        Behavior on animatedScalePower
+        {
+            id: scalePowerAnimationBehavior
+            NumberAnimation { duration: 150 }
+        }
 
         function startRotation()
         {
@@ -126,8 +130,9 @@ Item
                 aroundY * rotationFactor))
         }
 
-        function scaleBy(deltaPower)
+        function scaleBy(deltaPower, animated)
         {
+            scalePowerAnimationBehavior.enabled = animated
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
             unboundedRotation = currentRotation
         }
@@ -141,86 +146,6 @@ Item
                 return angle - 360
             else
                 return angle
-        }
-    }
-
-    MouseArea
-    {
-        id: mouseArea
-
-        anchors.fill: parent
-
-        drag.threshold: 10
- 
-        property bool draggingStarted
-        property int startX
-        property int startY
-
-        readonly property real pixelRadius: Math.min(width, height) / 2.0
-        readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
-
-        onPressed: 
-        { 
-            startX = mouse.x
-            startY = mouse.y
-        }
-
-        onReleased:
-        {
-            if (draggingStarted)
-            {
-                updateDrag(mouse.x - startX, mouse.y - startY)
-                draggingStarted = false
-            }
-            else
-            {
-                content.clicked()
-            }
-        }
-
-        onPositionChanged: 
-        {
-            if (mouse.buttons & Qt.LeftButton)
-            {
-                if (!draggingStarted)
-                {
-                    draggingStarted = Math.abs(mouse.x - startX) > drag.threshold 
-                                   || Math.abs(mouse.y - startY) > drag.threshold
-                    if (draggingStarted)
-                    {
-                        startX = mouse.x
-                        startY = mouse.y
-                        interactor.startRotation()
-                    }
-                }
-
-                if (draggingStarted)
-                    updateDrag(mouse.x - startX, mouse.y - startY)
-            }
-        }
-
-        onWheel:
-        {
-            if (draggingStarted)
-            {
-                updateDrag(mouseX - startX, mouseY - startY)
-                startX = mouseX
-                startY = mouseY
-            }
-
-            const kSensitivity = 100.0
-            interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5)
-
-            if (draggingStarted)
-                interactor.startRotation()
-        }
-
-        function updateDrag(dx, dy)
-        {                  
-            const kSensitivity = 100.0
-            var normalization = kSensitivity / pixelRadius
-            interactor.updateRotation(dy * normalization, 
-                                      dx * normalization)
         }
     }
 
@@ -244,7 +169,87 @@ Item
         function updateScale(scale)
         {
             interactor.scalePower = startScalePower
-            interactor.scaleBy(Math.log(scale) / Math.LN2)
+            interactor.scaleBy(Math.log(scale) / Math.LN2, false)
         }                
+
+        MouseArea
+        {
+            id: mouseArea
+
+            anchors.fill: parent
+
+            drag.threshold: 10
+
+            property bool draggingStarted
+            property int startX
+            property int startY
+
+            readonly property real pixelRadius: Math.min(width, height) / 2.0
+            readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
+
+            onPressed:
+            {
+                startX = mouse.x
+                startY = mouse.y
+            }
+
+            onReleased:
+            {
+                if (draggingStarted)
+                {
+                    updateDrag(mouse.x - startX, mouse.y - startY)
+                    draggingStarted = false
+                }
+                else
+                {
+                    content.clicked()
+                }
+            }
+
+            onPositionChanged:
+            {
+                if (mouse.buttons & Qt.LeftButton)
+                {
+                    if (!draggingStarted)
+                    {
+                        draggingStarted = Math.abs(mouse.x - startX) > drag.threshold
+                            || Math.abs(mouse.y - startY) > drag.threshold
+
+                        if (draggingStarted)
+                        {
+                            startX = mouse.x
+                            startY = mouse.y
+                            interactor.startRotation()
+                        }
+                    }
+
+                    if (draggingStarted)
+                        updateDrag(mouse.x - startX, mouse.y - startY)
+                }
+            }
+
+            onWheel:
+            {
+                if (draggingStarted)
+                {
+                    updateDrag(mouseX - startX, mouseY - startY)
+                    startX = mouseX
+                    startY = mouseY
+                }
+
+                const kSensitivity = 100.0
+                interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5, true)
+
+                if (draggingStarted)
+                    interactor.startRotation()
+            }
+
+            function updateDrag(dx, dy)
+            {
+                const kSensitivity = 100.0
+                var normalization = kSensitivity / pixelRadius
+                interactor.updateRotation(dy * normalization, dx * normalization)
+            }
+        }
     }
 }

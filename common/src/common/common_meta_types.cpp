@@ -70,10 +70,10 @@
 
 #include <core/onvif/onvif_config_data.h>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
-#include <business/business_event_rule.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <licensing/license.h>
 
@@ -139,9 +139,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
+    qRegisterMetaType<Qn::ResourceFlags>();
+    QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
-    qRegisterMetaType<QnBusiness::EventReason>();
+    qRegisterMetaType<nx::vms::event::EventReason>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -203,7 +205,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
-	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+    qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
@@ -212,12 +214,13 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<StreamRecorderErrorStruct>();
 #endif
 
-    qRegisterMetaType<QnAbstractBusinessActionPtr>();
-    qRegisterMetaType<QnAbstractBusinessActionList>();
-    qRegisterMetaType<QnBusinessActionDataListPtr>();
-    qRegisterMetaType<QnAbstractBusinessEventPtr>();
-    qRegisterMetaType<QnBusinessEventRulePtr>();
-    qRegisterMetaType<QnBusinessEventRuleList>();
+    qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
+    qRegisterMetaType<nx::vms::event::AbstractActionList>();
+    qRegisterMetaType<nx::vms::event::ActionDataListPtr>();
+    qRegisterMetaType<nx::vms::event::AbstractEventPtr>();
+    qRegisterMetaType<nx::vms::event::RulePtr>();
+    qRegisterMetaType<nx::vms::event::RuleList>();
+
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
@@ -225,6 +228,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
+    qRegisterMetaType<ApiMultiserverServerDateTimeDataList>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
@@ -347,6 +351,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<nx::common::utils::Credentials>>();
     qRegisterMetaType<QnHttpConfigureRequestList>();
     qRegisterMetaType<QnBitrateList>();
+    qRegisterMetaType<TwoWayAudioParams>();
     qRegisterMetaType<QnBounds>();
     qRegisterMetaType<QnCameraAdvancedParameterOverload>();
 
@@ -371,6 +376,7 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
+    QnJsonSerializer::registerSerializer<TwoWayAudioParams>();
     QnJsonSerializer::registerSerializer<QnBounds>();
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 

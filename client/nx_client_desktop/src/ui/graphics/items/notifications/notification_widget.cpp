@@ -171,8 +171,11 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this,
         [this]
         {
-            if (m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+            if (m_closeButtonAvailable &&
+                m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+            {
                 m_closeButton->show();
+            }
         });
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
@@ -256,6 +259,12 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
     m_closeButton->setGeometry(buttonGeometry);
 }
 
+void QnNotificationWidget::setCloseButtonUnavailable()
+{
+    m_closeButtonAvailable = false;
+    m_closeButton->hide();
+}
+
 void QnNotificationWidget::addActionButton(
     const QIcon& icon,
     ActionType actionId,
@@ -291,8 +300,7 @@ void QnNotificationWidget::addActionButton(
 void QnNotificationWidget::addTextButton(
     const QIcon& icon,
     const QString& text,
-    ActionType actionId,
-    const ParametersType& parameters)
+    const ButtonHandler& handler)
 {
     auto button = new QPushButton();
     if (!text.isEmpty())
@@ -301,10 +309,10 @@ void QnNotificationWidget::addTextButton(
         button->setIcon(icon);
 
     connect(button, &QAbstractButton::clicked, this,
-        [this, actionId, parameters]()
+        [this, handler]()
         {
-            emit buttonClicked(getFullAlias(QnLexical::serialized(actionId)));
-            emit actionTriggered(actionId, parameters);
+            if (handler)
+                handler();
         });
 
     auto proxy = new QGraphicsProxyWidget();

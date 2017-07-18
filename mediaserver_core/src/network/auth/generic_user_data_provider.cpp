@@ -63,11 +63,9 @@ Qn::AuthResult GenericUserDataProvider::authorize(
     if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
     {
         QByteArray ha1;
-        if (auto user = res.dynamicCast<QnUserResource>())
+        auto user = res.dynamicCast<QnUserResource>();
+        if (user)
         {
-            if (!user->isEnabled())
-                return Qn::Auth_Forbidden;
-
             ha1 = user->getDigest();
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
@@ -90,9 +88,11 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         responseHash.addData(ha2);
         const QByteArray calcResponse = responseHash.result().toHex();
 
-        return calcResponse == authorizationHeader.digest->params["response"]
-            ? Qn::Auth_OK
-            : Qn::Auth_WrongPassword;
+        if (calcResponse != authorizationHeader.digest->params["response"])
+            return Qn::Auth_WrongPassword;
+        if (user && !user->isEnabled())
+            return Qn::Auth_DisabledUser;
+        return Qn::Auth_OK;
     }
     else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
     {

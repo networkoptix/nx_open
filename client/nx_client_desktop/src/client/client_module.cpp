@@ -25,7 +25,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
-#include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
@@ -58,7 +57,6 @@
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
-#include <nx_ec/ec2_lib.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -71,6 +69,8 @@
 
 #include <server/server_storage_manager.h>
 
+#include <translation/translation_manager.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
@@ -78,6 +78,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 
 #include <statistics/statistics_manager.h>
@@ -119,25 +120,26 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
+    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
 
 namespace
 {
-    typedef std::unique_ptr<QnClientTranslationManager> QnClientTranslationManagerPtr;
+    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
-    QnClientTranslationManagerPtr initializeTranslations(QnClientSettings *settings
-                                                         , const QString &dynamicTranslationPath)
+    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
     {
-        QnClientTranslationManagerPtr translationManager(new QnClientTranslationManager());
+        QnTranslationManagerPtr translationManager(new QnTranslationManager());
+        translationManager->addPrefix(lit("client_base"));
+        translationManager->addPrefix(lit("client_ui"));
+        translationManager->addPrefix(lit("client_core"));
+        translationManager->addPrefix(lit("client_qml"));
 
         QnTranslation translation;
-        if (!dynamicTranslationPath.isEmpty()) /* From command line. */
-            translation = translationManager->loadTranslation(dynamicTranslationPath);
-
         if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->translationPath());
+            translation = translationManager->loadTranslation(settings->locale());
 
         /* Check if qnSettings value is invalid. */
         if (translation.isEmpty())
@@ -157,9 +159,8 @@ namespace
     }
 }
 
-QnClientModule::QnClientModule(const QnStartupParameters &startupParams
-                               , QObject *parent)
-    : QObject(parent)
+QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
+    QObject(parent)
 {
     initThread();
     initMetaInfo();
@@ -272,6 +273,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
 
+    m_clientCoreModule.reset(new QnClientCoreModule());
+
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
@@ -282,12 +285,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     /// We should load translations before major client's services are started to prevent races
-    QnClientTranslationManagerPtr translationManager(initializeTranslations(
-        clientSettings, startupParams.dynamicTranslationPath));
+    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettings));
 
     /* Init singletons. */
 
-    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
 
     commonModule->store(new QnResourceRuntimeDataManager());
@@ -332,6 +333,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
 
+    // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
+    initLocalInfo(startupParams);
+
     initializeStatisticsManager(commonModule);
 
     /* Long runnables depend on QnCameraHistoryPool and other singletons. */
@@ -351,13 +355,15 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+
+    commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 {
     qnRuntime->setDevMode(startupParams.isDevMode());
     qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
-    qnRuntime->setTranslationPath(qnSettings->translationPath());
+    qnRuntime->setLocale(qnSettings->locale());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
@@ -448,15 +454,29 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.maxBackupCount = 5;
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
+        logSettings,
+        dataLocation,
+        qApp->applicationName(),
+        qApp->applicationFilePath(),
+        lit("log_file") + logFileNameSuffix);
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);
         nx::utils::log::initialize(
-            logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath(),
-            QLatin1String("ec2_tran"), ec2logger);
+            logSettings,
+            dataLocation,
+            qApp->applicationName(),
+            qApp->applicationFilePath(),
+            lit("ec2_tran") + logFileNameSuffix,
+            ec2logger);
+    }
+
+    {
+        // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
+        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        logger->setDefaultLevel(nx::utils::log::Level::info);
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -473,7 +493,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
 
     // TODO: #mu ON/OFF switch in settings?
@@ -484,15 +504,6 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         commonModule->setVideowallGuid(startupParams.videoWallGuid);
         //commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
     }
-
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = commonModule->moduleGUID();
-    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = qnStaticCommon->localPeerType();
-    runtimeData.brand = qnStaticCommon->brand();
-    runtimeData.customization = qnStaticCommon->customization();
-    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
-    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
     commonModule->moduleDiscoveryManager()->start();
 
@@ -526,7 +537,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
-    customization.add(QnCustomization(skin->path("customization_base.json")));
+    customization.add(QnCustomization(skin->path("skin.json")));
 
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
@@ -582,4 +593,22 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
+{
+    auto commonModule = m_clientCoreModule->commonModule();
+
+    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = commonModule->moduleGUID();
+    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
+    runtimeData.peer.peerType = clientPeerType;
+    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
+    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
+    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

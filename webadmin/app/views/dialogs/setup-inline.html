@@ -34,7 +34,7 @@
         <p>Please configure the server first.<br>
             Choose an option.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" ng-click="next()">Setup New System</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">Setup New System</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -243,11 +243,17 @@
                 Password must contain different types of characters and have at least 8 symbols
             </div>
         </div>
-        <div class="form-group has-error"
-             ng-if="!forms.localForm.passwordInput.$valid && !forms.localForm.passwordInput.$error.required">
-            <div class="help-block">
-                Password must contain different types of characters and have at least 8 symbols
-            </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
         </div>
 
         <div class="form-group has-error"
@@ -482,11 +488,11 @@
     <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
+            auto-focus
             ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
+            auto-focus
             ng-click="finish()">Finish</button>
 </div>

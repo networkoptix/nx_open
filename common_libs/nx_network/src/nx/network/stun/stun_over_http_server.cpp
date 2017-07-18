@@ -1,0 +1,27 @@
+#include "stun_over_http_server.h"
+
+namespace nx {
+namespace stun {
+
+const char* const StunOverHttpServer::kStunProtocolName = "STUN/rfc5389";
+
+StunOverHttpServer::StunOverHttpServer(
+    nx::stun::MessageDispatcher* stunMessageDispatcher)
+    :
+    m_dispatcher(stunMessageDispatcher)
+{
+}
+
+void StunOverHttpServer::createStunConnection(
+    std::unique_ptr<AbstractStreamSocket> connection)
+{
+    auto stunConnection = std::make_shared<nx::stun::ServerConnection>(
+        &m_stunConnectionPool,
+        std::move(connection),
+        *m_dispatcher);
+    m_stunConnectionPool.saveConnection(stunConnection);
+    stunConnection->startReadingConnection();
+}
+
+} // namespace stun
+} // namespace nx

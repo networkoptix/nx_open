@@ -7,7 +7,7 @@
 
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
-
+#include <nx/utils/url.h>
 
 namespace {
 
@@ -72,6 +72,12 @@ void QnClientCoreSettings::writeValueToSettings(
             processedValue = nx::utils::xorEncrypt(value.toString(), kEncodeXorKey);
             break;
         }
+        case KnownServerConnections:
+        {
+            auto list = value.value<QList<KnownServerConnection>>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
+            break;
+        }
         case KnownServerUrls:
         {
             auto list = value.value<QList<QUrl>>();
@@ -112,9 +118,14 @@ QVariant QnClientCoreSettings::readValueFromSettings(
         case CloudPassword:
             return nx::utils::xorDecrypt(baseValue.toString(), kEncodeXorKey);
 
+        case KnownServerConnections:
+            return qVariantFromValue(
+                QJson::deserialized<QList<KnownServerConnection>>(baseValue.toByteArray()));
+
         case KnownServerUrls:
             return qVariantFromValue(
                 QJson::deserialized<QList<QUrl>>(baseValue.toByteArray()));
+
         default:
             break;
     }

@@ -32,7 +32,10 @@ project(vms VERSION 3.1.0)
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
+set(releaseVersion.full ${releaseVersion}.${buildNumber})
+
+set(mobileClientVersion 17.2)
+set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -41,17 +44,18 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
+include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
+include(strip_target)
 include(mercurial)
 include(project_utils)
 include(test_utils)
 
 include(ec_protocol)
-include(maven_compatibility)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 
@@ -69,12 +73,13 @@ if(NOT (WINDOWS OR ANDROID OR IOS))
 endif()
 
 include(dependencies)
+include(maven_compatibility)
+include(generate_current_config)
 
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
     set(QT_PREFIX "${QT_DIR}")
-    file(TO_CMAKE_PATH "${QT_PREFIX}" QT_PREFIX)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
@@ -92,7 +97,6 @@ if(LINUX)
 endif()
 
 if(ANDROID)
-    include(android-ndk-workaround)
     include(android-apk)
 endif()
 
@@ -109,6 +113,12 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
+
+if(withDesktopClient OR withTrayTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets)
+endif()
 
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
@@ -146,12 +156,17 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTrayTool)
+    add_subdirectory(traytool)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
+    add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)

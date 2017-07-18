@@ -3,19 +3,21 @@ set -e
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME="${product.name.short}"
-MODULE="mediaserver"
 VERSION="${release.version}.${buildNumber}"
 MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 PACKAGE_NAME="${artifact.name.server}.tar.gz"
 UPDATE_NAME="${artifact.name.server_update}.zip"
-BUILD_OUTPUT_DIR="${libdir}"
 RESOURCE_BUILD_DIR="${project.build.directory}"
+BUILD_OUTPUT_DIR="${libdir}"
 LIBS_DIR="$BUILD_OUTPUT_DIR/lib/${build.configuration}"
 BINS_DIR="$BUILD_OUTPUT_DIR/bin/${build.configuration}"
 STRIP="${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip"
 QT_DIR="${qt.dir}"
+#BOX="${box}"
+
+MODULE="mediaserver"
 INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
 INSTALL_SYMLINK_PATH="opt/$CUSTOMIZATION" #< If not empty, will refer to $INSTALL_PATH.
 SDCARD_STUFF_PATH="sdcard/${CUSTOMIZATION}_service"
@@ -27,11 +29,13 @@ help()
     echo "--no-strip"
 }
 
-parseArgs()
+# [out] TARGET_DIR
+# [out] STRIP
+parseArgs() # "$@"
 {
     local ARG
     for ARG in "$@"; do
-        if [ "$ARG" == "-h" -o "$ARG" == "--help"  ]; then
+        if [ "$ARG" = "-h" -o "$ARG" = "--help"  ]; then
             help
             exit 0
         elif [[ "$ARG" =~ ^--target-dir= ]] ; then
@@ -43,11 +47,11 @@ parseArgs()
 }
 
 # [in] INSTALL_DIR
-copyLibsWithoutQt()
+copyNonQtLibs()
 {
     mkdir -p "$INSTALL_DIR/$MODULE/lib/"
 
-    LIBS_TO_COPY=(
+    local LIBS_TO_COPY=(
         libavcodec.so
         libavdevice.so
         libavfilter.so
@@ -74,7 +78,7 @@ copyLibsWithoutQt()
         libpostproc.so
     )
 
-    [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=( libvpx.so )
+    [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=(libvpx.so)
 
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
@@ -96,7 +100,17 @@ copyQtLibs()
 
     mkdir -p "$INSTALL_DIR/$MODULE/lib/"
 
-    QT_LIBS_TO_COPY=( Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia )
+    local QT_LIBS_TO_COPY=(
+        Core
+        Gui
+        Xml
+        XmlPatterns
+        Concurrent
+        Network
+        Sql
+        Multimedia
+        WebSockets
+    )
 
     local QT_LIB
     for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do
@@ -181,7 +195,7 @@ buildArchives()
 
 main()
 {
-    parseArgs
+    parseArgs "$@"
 
     local WORK_DIR=$(mktemp -d)
     rm -rf "$WORK_DIR"
@@ -195,7 +209,7 @@ main()
 
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
-    copyLibsWithoutQt
+    copyNonQtLibs
     copyQtLibs
     copyBins
     copyConf

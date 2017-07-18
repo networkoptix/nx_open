@@ -77,11 +77,11 @@ private:
     };
 
     DecoderResourcesNameset m_resNameset;
-    mutable std::auto_ptr<PluginUsageWatcher> m_usageWatcher;
-    mutable std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
-    mutable std::auto_ptr<MFXVideoSession> m_mfxSession;
-    mutable std::auto_ptr<D3DGraphicsAdapterDescription> m_graphicsDesc;
-    mutable std::auto_ptr<IntelCPUDescription> m_cpuDesc;
+    mutable std::unique_ptr<PluginUsageWatcher> m_usageWatcher;
+    mutable std::unique_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
+    mutable std::unique_ptr<MFXVideoSession> m_mfxSession;
+    mutable std::unique_ptr<D3DGraphicsAdapterDescription> m_graphicsDesc;
+    mutable std::unique_ptr<IntelCPUDescription> m_cpuDesc;
     //!Graphics adapter number, quicksync is present on
     mutable unsigned int m_adapterNumber;
     mutable bool m_hardwareAccelerationEnabled;

@@ -15,6 +15,7 @@
 #include <net/if_arp.h>
 #include <sys/statvfs.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/file_system.h>
 #endif
 
 
@@ -94,6 +95,7 @@ SystemError::ErrorCode readPartitions(
             continue;
 
         PartitionInfo partitionInfo;
+        partitionInfo.isUsb = nx::utils::file_system::isUsb(deviceAndPath.first);
         partitionInfo.devName = deviceAndPath.first;
         partitionInfo.path = deviceAndPath.second.first;
         partitionInfo.fsName = deviceAndPath.second.second;

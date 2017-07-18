@@ -359,7 +359,16 @@ action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) c
         case action::TimelineScope:
             return navigator()->currentWidget();
         case action::SceneScope:
-            return action::ParameterTypes::widgets(display()->scene()->selectedItems());
+        {
+            auto selectedItems = display()->scene()->selectedItems();
+            if (selectedItems.empty())
+            {
+                auto focused = dynamic_cast<QnResourceWidget*>(display()->scene()->focusItem());
+                if (focused)
+                    selectedItems.append(focused);
+            }
+            return action::ParameterTypes::widgets(selectedItems);
+        }
         default:
             break;
     }
@@ -1410,8 +1419,8 @@ void QnWorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptHoverEvents(false);
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
+    display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
 
-    display()->view()->addAction(action(action::ShowFpsAction));
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
     setFpsVisible(false);

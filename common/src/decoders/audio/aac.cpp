@@ -2,7 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/media/bitStream.h"
+#include <utils/media/bitStream.h>
+#include <utils/math/math.h>
 
 // convert AAC prifle to mpeg 4 object type.
 
@@ -18,6 +19,81 @@ const int AACCodec::object_type[9] = {1, // 'AAC_MAIN' -> AAC Main
 								   27 //DRM_ER_LC
                                   };  
 */
+
+bool AdtsHeader::decodeFromFrame(const uint8_t* const buffer, int bufferSize)
+{
+    if (bufferSize < kMinLength)
+        return false;
+
+    try
+    {
+        BitStreamReader reader(buffer, buffer + bufferSize);
+        uint16_t syncWord = reader.getBits(kSyncWordLength);
+        if (syncWord != kSyncWord)
+            return false;
+
+        mpegVersion = reader.getBits(kMpegVersionLength);
+
+        reader.skipBits(kLayerLength);
+
+        protectionAbsent = reader.getBits(kProtectionAbsentLength);
+        profile = reader.getBits(kProfileLength);
+        mpeg4SamplingFrequencyIndex = reader.getBits(kMpeg4SamplingFrequencyIndexLength);
+
+        reader.skipBits(kPrivateBitLength);
+
+        mpeg4ChannelConfiguration = reader.getBits(kMpeg4ChannelConfigurationLength);
+
+        reader.skipBits(kOriginalityLength
+            + kHomeLength
+            + kCopyrightedIdLength
+            + kCopyrightIdStartLength);
+
+        frameLength = reader.getBits(kFrameLengthLength);
+        bufferFullness = reader.getBits(kBufferFullnessLength);
+        numberOfAacFrames = reader.getBits(kNumberOfAacFramesLength);
+
+        if (!protectionAbsent)
+            protectionAbsent = reader.getBits(kCrcLength);
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool AdtsHeader::encodeToFfmpegExtradata(QByteArray* extradata) const
+{
+    extradata->resize(qPower2Ceil((unsigned int)kAscLength, sizeof(int)));
+    auto buffer = extradata->data();
+    try
+    {
+        BitStreamWriter writer;
+        writer.setBuffer((quint8*)buffer, ((quint8*)buffer) + kAscLength);
+        writer.putBits(kAscObjectTypeLength, profile);
+        writer.putBits(kAscSamplingIndexLength, mpeg4SamplingFrequencyIndex);
+        writer.putBits(kAscChannelConfigLength, mpeg4ChannelConfiguration);
+        writer.putBit(0); //< Frame length - 1024 samples
+        writer.putBit(0); //< Does not depend on core coder
+        writer.putBit(0); //< Is not an extension
+
+        writer.flushBits();
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    extradata->resize(kAscLength);
+    return true;
+}
+
+int AdtsHeader::length() const
+{
+    return protectionAbsent ? kMinLength : kMaxLength;
+}
 
 const int AACCodec::aac_sample_rates[16] = {
     96000, 88200, 64000, 48000, 44100, 32000,

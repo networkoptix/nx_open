@@ -1,56 +1,58 @@
 #include "notification_levels.h"
 
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 
 #include <utils/common/warnings.h>
 
 #include <ui/style/globals.h>
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusinessActionPtr &businessAction)
+using namespace nx;
+
+QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr &businessAction)
 {
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
+    if (businessAction->actionType() == vms::event::playSoundAction)
         return Value::CommonNotification;
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    if (businessAction->actionType() == vms::event::showOnAlarmLayoutAction)
         return Value::CriticalNotification;
 
     auto params = businessAction->getRuntimeParams();
-    QnBusiness::EventType eventType = params.eventType;
+    vms::event::EventType eventType = params.eventType;
 
-    if (eventType >= QnBusiness::UserDefinedEvent)
+    if (eventType >= vms::event::userDefinedEvent)
         return Value::CommonNotification;
 
     switch (eventType)
     {
         /* Green notifications */
-        case QnBusiness::CameraMotionEvent:
-        case QnBusiness::CameraInputEvent:
-        case QnBusiness::ServerStartEvent:
-        case QnBusiness::SoftwareTriggerEvent:
+        case vms::event::cameraMotionEvent:
+        case vms::event::cameraInputEvent:
+        case vms::event::serverStartEvent:
+        case vms::event::softwareTriggerEvent:
             return Value::CommonNotification;
 
         /* Yellow notifications */
-        case QnBusiness::NetworkIssueEvent:
-        case QnBusiness::CameraIpConflictEvent:
-        case QnBusiness::ServerConflictEvent:
+        case vms::event::networkIssueEvent:
+        case vms::event::cameraIpConflictEvent:
+        case vms::event::serverConflictEvent:
             return Value::ImportantNotification;
 
         /* Red notifications */
-        case QnBusiness::CameraDisconnectEvent:
-        case QnBusiness::StorageFailureEvent:
-        case QnBusiness::ServerFailureEvent:
-        case QnBusiness::LicenseIssueEvent:
+        case vms::event::cameraDisconnectEvent:
+        case vms::event::storageFailureEvent:
+        case vms::event::serverFailureEvent:
+        case vms::event::licenseIssueEvent:
             return Value::CriticalNotification;
 
-        case QnBusiness::BackupFinishedEvent:
+        case vms::event::backupFinishedEvent:
         {
-            QnBusiness::EventReason reason = static_cast<QnBusiness::EventReason>(params.reasonCode);
+            vms::event::EventReason reason = static_cast<vms::event::EventReason>(params.reasonCode);
             bool isCriticalNotification =
-                reason == QnBusiness::BackupFailedChunkError ||
-                reason == QnBusiness::BackupFailedNoBackupStorageError ||
-                reason == QnBusiness::BackupFailedSourceFileError ||
-                reason == QnBusiness::BackupFailedSourceStorageError ||
-                reason == QnBusiness::BackupFailedTargetFileError;
+                reason == vms::event::EventReason::backupFailedChunkError ||
+                reason == vms::event::EventReason::backupFailedNoBackupStorageError ||
+                reason == vms::event::EventReason::backupFailedSourceFileError ||
+                reason == vms::event::EventReason::backupFailedSourceStorageError ||
+                reason == vms::event::EventReason::backupFailedTargetFileError;
 
             if (isCriticalNotification)
                 return Value::CriticalNotification;

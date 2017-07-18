@@ -1,23 +1,21 @@
-/**********************************************************
-* Dec 07, 2015
-* rvasilenko
-***********************************************************/
+#include <gtest/gtest.h>
+
+#include <memory>
 #include <QFile>
 #include <vector>
-#include <memory>
 
-#include <gtest/gtest.h>
+#include <nx/utils/test_support/test_options.h>
 #include <nx/utils/uuid.h>
-#include <utils/fs/file.h>
+#include <recorder/recording_manager.h>
+#include <server/server_globals.h>
+#include <test_support/utils.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include <server/server_globals.h>
-#include <recorder/recording_manager.h>
-#include "utils.h"
+#include <utils/fs/file.h>
 
 void doTestInternal(int systemFlags)
 {
-    nx::ut::utils::WorkDirResource workDir;
+    nx::ut::utils::WorkDirResource workDir(nx::utils::TestOptions::temporaryDirectoryPath());
     QnWriterPool writerPool;
     ASSERT_TRUE((bool)workDir.getDirName());
 

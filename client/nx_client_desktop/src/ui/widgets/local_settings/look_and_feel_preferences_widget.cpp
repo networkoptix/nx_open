@@ -7,9 +7,10 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_globals.h>
-#include <client/client_translation_manager.h>
 
 #include <common/common_module.h>
+
+#include <translation/translation_manager.h>
 
 #include <ui/common/aligner.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -90,8 +91,7 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
     qnSettings->setExtraInfoInTree(selectedInfoLevel());
     qnSettings->setTimeMode(selectedTimeMode());
 
-    //TODO: #GDM store locale code instead
-    qnSettings->setTranslationPath(selectedTranslation());
+    qnSettings->setLocale(selectedTranslation());
 
     /* Background changes are applied instantly. */
     if (backgroundAllowed())
@@ -109,13 +109,13 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
-    QString translationPath = qnSettings->translationPath();
+    QString locale = qnSettings->locale();
     for (int i = 0; i < ui->languageComboBox->count(); i++)
     {
         QnTranslation translation = ui->languageComboBox->itemData(
             i, Qn::TranslationRole).value<QnTranslation>();
 
-        if (translation.filePaths().contains(translationPath))
+        if (translation.localeCode() == locale)
             currentLanguage = i;
 
         if (translation.localeCode() == QnAppInfo::defaultLanguage())
@@ -154,7 +154,7 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
     if (backgroundAllowed() && qnSettings->backgroundImage() != m_oldBackground)
         return true;
 
-    return qnSettings->translationPath() != selectedTranslation()
+    return qnSettings->locale() != selectedTranslation()
         || qnSettings->timeMode() != selectedTimeMode()
         || qnSettings->extraInfoInTree() != selectedInfoLevel()
         || qnSettings->tourCycleTime() != selectedTourCycleTimeMs();
@@ -170,7 +170,7 @@ void QnLookAndFeelPreferencesWidget::discardChanges()
 bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return qnRuntime->translationPath() != selectedTranslation();
+    return qnRuntime->locale() != selectedTranslation();
 }
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
@@ -254,7 +254,7 @@ QString QnLookAndFeelPreferencesWidget::selectedTranslation() const
         ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
     return translation.isEmpty()
         ? QString()
-        : translation.filePaths()[0];
+        : translation.localeCode();
 }
 
 Qn::TimeMode QnLookAndFeelPreferencesWidget::selectedTimeMode() const
@@ -283,7 +283,7 @@ Qn::ImageBehaviour QnLookAndFeelPreferencesWidget::selectedImageMode() const
 void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 {
     auto model = new QnTranslationListModel(this);
-    model->setTranslations(commonModule()->instance<QnClientTranslationManager>()->loadTranslations());
+    model->setTranslations(commonModule()->instance<QnTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 
     connect(ui->languageComboBox, QnComboboxCurrentIndexChanged, this,

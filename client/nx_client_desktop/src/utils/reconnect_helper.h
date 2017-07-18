@@ -20,26 +20,11 @@ public:
     void markServerAsInvalid(const QnMediaServerResourcePtr &server);
 
     void next();
+
 private:
-    struct InterfaceInfo {
-        QUrl url;
-        bool online;
-        bool ignored;
-        int count;
+    QnMediaServerResourceList m_servers;
 
-        InterfaceInfo();
-    };
-
-    void updateInterfacesForServer(const QnUuid &id);
-    QUrl bestInterfaceForServer(const QnUuid &id);
-
-    void addInterfaceIfNotExists(QList<InterfaceInfo> &interfaces, const InterfaceInfo &info) const;
-    void replaceInterface(QList<InterfaceInfo> &interfaces, const InterfaceInfo &info) const;
-private:
-    QnMediaServerResourceList m_allServers;
-    QnMediaServerResourcePtr m_currentServer;
-    QUrl m_currentUrl;
+    int m_currentIndex = -1;
     QString m_userName;
     QString m_password;
-    QHash<QnUuid, QList<InterfaceInfo>> m_interfacesByServer;
 };

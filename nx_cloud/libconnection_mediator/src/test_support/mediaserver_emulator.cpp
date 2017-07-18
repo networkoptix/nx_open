@@ -6,14 +6,14 @@
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/string.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include <common/common_globals.h>
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
-#include <nx/utils/sync_call.h>
-#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {
 namespace hpm {
@@ -104,7 +104,8 @@ MediaServerEmulator::MediaServerEmulator(
 
     bindToAioThread(getAioThread());
 
-    m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));
+    m_mediatorConnector->mockupMediatorUrl(
+        nx::network::url::Builder().setScheme("stun").setEndpoint(mediatorEndpoint));
 
     m_mediatorConnector->setSystemCredentials(
         api::SystemCredentials(
@@ -257,6 +258,11 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
     return promise.get_future().get();
 }
 
+hpm::api::MediatorConnector& MediaServerEmulator::mediatorConnector()
+{
+    return *m_mediatorConnector;
+}
+
 std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::mediatorConnection()
 {
     return m_mediatorConnector->systemConnection();
@@ -298,7 +304,7 @@ void MediaServerEmulator::onConnectionRequested(
     {
         m_mediatorUdpClient =
             std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
-                *m_mediatorConnector->mediatorAddress(),
+                *m_mediatorConnector->udpEndpoint(),
                 m_mediatorConnector.get());
         m_mediatorUdpClient->bindToAioThread(getAioThread());
     }

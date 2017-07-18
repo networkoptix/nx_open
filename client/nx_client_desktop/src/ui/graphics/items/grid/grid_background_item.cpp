@@ -488,7 +488,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
     const QImage* imgToLoad = NULL;
-    std::auto_ptr<QImage> tempImgAp;
+    std::unique_ptr<QImage> tempImgAp;
     if( image.format() != QImage::Format_ARGB32 )
     {
         tempImgAp.reset( new QImage() );

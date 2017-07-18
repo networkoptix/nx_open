@@ -8,6 +8,8 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::p2p, MessageType);
 namespace nx {
 namespace p2p {
 
+const char* const kP2pProtoName = "nxp2p";
+
 ec2::ApiPersistentIdData PeerNumberInfo::decode(PeerNumberType number) const
 {
     return m_shortIdToFullId.value(number);

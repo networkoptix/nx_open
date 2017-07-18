@@ -1,0 +1,74 @@
+<ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
+<div class="container auth-hidden">
+    <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
+        החשבון נוצר. <br> הודעת האישור נשלחת אל <br> {{account.email}}
+    </h1>
+
+    <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
+        החשבון נוצר בהצלחה.
+    </h1>
+
+    <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
+        <h1 ng-if="!session.fromClient">צור חשבון</h1>
+
+        <!-- special hack to prevent autocompletion -->
+        <input type="text" style="display:none">
+        <input type="password" style="display:none">
+        <!-- /end of special hack -->
+
+        <div class="form-group" validate-field>
+            <label for="firstName" class="col-sm-4 control-label">שם פרטי</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
+                       required
+ name="firstName" autocomplete="off" autofocus>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">נדרש שם פרטי.</span>
+            </div>
+        </div>
+        <div class="form-group" validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">שם משפחה</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
+                       required
+ name="lastName" autocomplete="off">
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">נדרש שם משפחה.</span>
+            </div>
+        </div>
+        <div class="form-group" validate-field>
+            <label for="registerEmail"  class="col-sm-4 control-label">דוא"ל</label>
+            <div class="col-sm-4">
+                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
+                       name="registerEmail" required autocomplete="off"  validate-email
+ ng-change="hideAlreadyExists()">
+
+                <input type="text" ng-if="lockEmail"
+                       class="form-control" ng-model="account.email" readonly>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> נדרש דוא"ל. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> יש להזין כתובת דוא"ל חוקית. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists"> כתובת זו כבר רשומה ב- {{PRODUCT_NAME}}. </span>
+            </div>
+        </div>
+        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
+        <div class="form-group" >
+            <div class="col-sm-offset-4 col-sm-8">
+                <div class="checkbox">
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> הרשמה לדיוור ישיר</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+                <process-button process="register"
+                                form="registerForm"
+                                class="pull-left"
+                                button-text="$root.L.regActions.createAccount"></process-button>
+                <small class="conditions-note"> על ידי לחיצה על 'צור חשבון', אתה מסכים <br> ל <a href="/content/eula" target="_blank"> תנאים והגבלות </a></small>
+            </div>
+        </div>
+    </form>
+
+</div>

@@ -37,8 +37,8 @@ public:
         /** Use OpenGL double buffering. */
         GL_DOUBLE_BUFFER,
 
-        /** Current translation. */
-        TRANSLATION_PATH,
+        /** Current locale. */
+        LOCALE,
 
         VARIABLE_COUNT
     };
@@ -47,6 +47,11 @@ public:
     ~QnClientRuntimeSettings();
 
     bool isDesktopMode() const;
+
+    /**
+     * Actual maximum value of scene items.
+     */
+    static int maxSceneItems();
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
@@ -59,7 +64,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,    showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false)
         QN_DECLARE_RW_PROPERTY(bool,    ignoreVersionMismatch,  setIgnoreVersionMismatch,   IGNORE_VERSION_MISMATCH,    false)
         QN_DECLARE_RW_PROPERTY(bool,    isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
-        QN_DECLARE_RW_PROPERTY(QString, translationPath,        setTranslationPath,         TRANSLATION_PATH,           QString())
+        QN_DECLARE_RW_PROPERTY(QString, locale,                 setLocale,                  LOCALE,                     QString())
     QN_END_PROPERTY_STORAGE()
 
 };

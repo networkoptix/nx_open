@@ -14,13 +14,16 @@
 #include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <camera/iomodule/iomodule_monitor.h>
-#include <business/business_event_parameters.h>
-#include <business/business_action_parameters.h>
-#include <business/actions/camera_output_business_action.h>
+#include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/actions_fwd.h>
+#include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
+
+using namespace nx;
 
 namespace {
 
@@ -294,17 +297,17 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     newState.isActive = !newState.isActive;
     contents->stateChanged(it->config, newState);
 
-    QnBusinessEventParameters eventParams;
+    vms::event::EventParameters eventParams;
     eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
-    QnBusinessActionParameters params;
+    vms::event::ActionParameters params;
     params.relayOutputId = it->config.id;
     params.durationMs = it->config.autoResetTimeoutMs;
 
-    QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(eventParams));
+    vms::event::CameraOutputActionPtr action(new vms::event::CameraOutputAction(eventParams));
     action->setParams(params);
     action->setResources({ module->getId() });
-    action->setToggleState(it->state.isActive ? QnBusiness::InactiveState : QnBusiness::ActiveState);
+    action->setToggleState(it->state.isActive ? vms::event::EventState::inactive : vms::event::EventState::active);
 
     ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer

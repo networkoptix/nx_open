@@ -293,3 +293,11 @@ void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QS
     QModelIndex customRoleIndex = q->index(count() - 1, 0);
     emit q->dataChanged(customRoleIndex, customRoleIndex);
 }
+
+QnUuid QnUserRolesModelPrivate::id(int row, bool predefinedRoleIdsEnabled) const
+{
+    const auto role = roleByRow(row);
+    return role.roleType != Qn::UserRole::CustomUserRole && predefinedRoleIdsEnabled
+        ? QnUserRolesManager::predefinedRoleId(role.roleType)
+        : role.roleUuid;
+}

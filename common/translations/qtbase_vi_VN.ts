@@ -1,1178 +1,1179 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS language="vi_VN" sourcelanguage="en_US" version="2.1">
-<context>
+<TS version="2.1" language="vi" sourcelanguage="en">
+  <context>
     <name>CloseButton</name>
     <message>
-        <source>Close Tab</source>
-        <translation>Đóng Tab</translation>
+      <source>Close Tab</source>
+      <translation>Đóng Tab</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <source>Services</source>
-        <translation>dịch vụ</translation>
+      <source>Services</source>
+      <translation>dịch vụ</translation>
     </message>
     <message>
-        <source>Hide %1</source>
-        <translation>giấu %1</translation>
+      <source>Hide %1</source>
+      <translation>giấu %1</translation>
     </message>
     <message>
-        <source>Hide Others</source>
-        <translation>ẩn khác</translation>
+      <source>Hide Others</source>
+      <translation>ẩn khác</translation>
     </message>
     <message>
-        <source>Show All</source>
-        <translation>Hiển thị tất cả</translation>
+      <source>Show All</source>
+      <translation>Hiển thị tất cả</translation>
     </message>
     <message>
-        <source>Preferences...</source>
-        <translation>sở thích ...</translation>
+      <source>Preferences...</source>
+      <translation>sở thích ...</translation>
     </message>
     <message>
-        <source>Quit %1</source>
-        <translation>Thoát %1</translation>
+      <source>Quit %1</source>
+      <translation>Thoát %1</translation>
     </message>
     <message>
-        <source>About %1</source>
-        <translation>về %1</translation>
+      <source>About %1</source>
+      <translation>về %1</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAbstractSpinBox</name>
     <message>
-        <source>&amp;Select All</source>
-        <translation>&amp;chọn tất cả</translation>
+      <source>&amp;Select All</source>
+      <translation>&amp;chọn tất cả</translation>
     </message>
     <message>
-        <source>&amp;Step up</source>
-        <translation>&amp;bước lên</translation>
+      <source>&amp;Step up</source>
+      <translation>&amp;bước lên</translation>
     </message>
     <message>
-        <source>Step &amp;down</source>
-        <translation>bước &amp;xuống</translation>
+      <source>Step &amp;down</source>
+      <translation>bước &amp;xuống</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAccessibleActionInterface</name>
     <message>
-        <source>Press</source>
-        <translation>báo chí</translation>
+      <source>Press</source>
+      <translation>báo chí</translation>
     </message>
     <message>
-        <source>Increase</source>
-        <translation>tăng lên</translation>
+      <source>Increase</source>
+      <translation>tăng lên</translation>
     </message>
     <message>
-        <source>Decrease</source>
-        <translation>giảm</translation>
+      <source>Decrease</source>
+      <translation>giảm</translation>
     </message>
     <message>
-        <source>ShowMenu</source>
-        <translation>Hiển thị trình đơn</translation>
+      <source>ShowMenu</source>
+      <translation>Hiển thị trình đơn</translation>
     </message>
     <message>
-        <source>SetFocus</source>
-        <translation>đặt trọng tâm</translation>
+      <source>SetFocus</source>
+      <translation>đặt trọng tâm</translation>
     </message>
     <message>
-        <source>Toggle</source>
-        <translation>chuyển</translation>
+      <source>Toggle</source>
+      <translation>chuyển</translation>
     </message>
     <message>
-        <source>Scroll Left</source>
-        <translation>di chuyển sang trái</translation>
+      <source>Scroll Left</source>
+      <translation>di chuyển sang trái</translation>
     </message>
     <message>
-        <source>Scroll Right</source>
-        <translation>di chuyển sang phải</translation>
+      <source>Scroll Right</source>
+      <translation>di chuyển sang phải</translation>
     </message>
     <message>
-        <source>Scroll Up</source>
-        <translation type="unfinished" />
+      <source>Scroll Up</source>
+      <translation>Di chuyển lên</translation>
     </message>
     <message>
-        <source>Scroll Down</source>
-        <translation type="unfinished" />
+      <source>Scroll Down</source>
+      <translation>cuộn xuống</translation>
     </message>
     <message>
-        <source>Previous Page</source>
-        <translation type="unfinished" />
+      <source>Previous Page</source>
+      <translation type="unfinished">Previous Page</translation>
     </message>
     <message>
-        <source>Next Page</source>
-        <translation type="unfinished" />
+      <source>Next Page</source>
+      <translation type="unfinished">Next Page</translation>
     </message>
     <message>
-        <source>Triggers the action</source>
-        <translation>Gây nên những hành động</translation>
+      <source>Triggers the action</source>
+      <translation>Gây nên những hành động</translation>
     </message>
     <message>
-        <source>Increase the value</source>
-        <translation>Tăng giá trị</translation>
+      <source>Increase the value</source>
+      <translation>Tăng giá trị</translation>
     </message>
     <message>
-        <source>Decrease the value</source>
-        <translation>Giảm giá trị</translation>
+      <source>Decrease the value</source>
+      <translation>Giảm giá trị</translation>
     </message>
     <message>
-        <source>Shows the menu</source>
-        <translation>cho thấy trình đơn</translation>
+      <source>Shows the menu</source>
+      <translation>cho thấy trình đơn</translation>
     </message>
     <message>
-        <source>Sets the focus</source>
-        <translation>tập trung tiêu cự</translation>
+      <source>Sets the focus</source>
+      <translation>tập trung tiêu cự</translation>
     </message>
     <message>
-        <source>Toggles the state</source>
-        <translation>Bập bênh nhà nước</translation>
+      <source>Toggles the state</source>
+      <translation>Bập bênh nhà nước</translation>
     </message>
     <message>
-        <source>Scrolls to the left</source>
-        <translation type="unfinished" />
+      <source>Scrolls to the left</source>
+      <translation type="unfinished">Scrolls to the left</translation>
     </message>
     <message>
-        <source>Scrolls to the right</source>
-        <translation type="unfinished" />
+      <source>Scrolls to the right</source>
+      <translation type="unfinished">Scrolls to the right</translation>
     </message>
     <message>
-        <source>Scrolls up</source>
-        <translation type="unfinished" />
+      <source>Scrolls up</source>
+      <translation type="unfinished">Scrolls up</translation>
     </message>
     <message>
-        <source>Scrolls down</source>
-        <translation type="unfinished" />
+      <source>Scrolls down</source>
+      <translation type="unfinished">Scrolls down</translation>
     </message>
     <message>
-        <source>Goes back a page</source>
-        <translation type="unfinished" />
+      <source>Goes back a page</source>
+      <translation type="unfinished">Goes back a page</translation>
     </message>
     <message>
-        <source>Goes to the next page</source>
-        <translation type="unfinished" />
+      <source>Goes to the next page</source>
+      <translation type="unfinished">Goes to the next page</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAndroidPlatformTheme</name>
     <message>
-        <source>Yes</source>
-        <translation type="unfinished" />
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
-        <source>Yes to All</source>
-        <translation type="unfinished" />
+      <source>Yes to All</source>
+      <translation type="unfinished">Yes to All</translation>
     </message>
     <message>
-        <source>No</source>
-        <translation type="unfinished" />
+      <source>No</source>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
-        <source>No to All</source>
-        <translation type="unfinished" />
+      <source>No to All</source>
+      <translation type="unfinished">No to All</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QCocoaMenuItem</name>
     <message>
-        <source>About Qt</source>
-        <translation>về Qt</translation>
+      <source>About Qt</source>
+      <translation>về Qt</translation>
     </message>
     <message>
-        <source>About</source>
-        <translation>về</translation>
+      <source>About</source>
+      <translation>về</translation>
     </message>
     <message>
-        <source>Config</source>
-        <translation>cấu hình</translation>
+      <source>Config</source>
+      <translation>cấu hình</translation>
     </message>
     <message>
-        <source>Preference</source>
-        <translation>sự ưa thích</translation>
+      <source>Preference</source>
+      <translation>sự ưa thích</translation>
     </message>
     <message>
-        <source>Options</source>
-        <translation>Tùy chọn</translation>
+      <source>Options</source>
+      <translation>Tùy chọn</translation>
     </message>
     <message>
-        <source>Setting</source>
-        <translation>thiết lập</translation>
+      <source>Setting</source>
+      <translation>thiết lập</translation>
     </message>
     <message>
-        <source>Setup</source>
-        <translation>thiết lập</translation>
+      <source>Setup</source>
+      <translation>thiết lập</translation>
     </message>
     <message>
-        <source>Quit</source>
-        <translation>Thoát</translation>
+      <source>Quit</source>
+      <translation>Thoát</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>lối ra</translation>
+      <source>Exit</source>
+      <translation>lối ra</translation>
     </message>
     <message>
-        <source>Cut</source>
-        <translation type="unfinished" />
+      <source>Cut</source>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
-        <source>Copy</source>
-        <translation type="unfinished" />
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
-        <source>Paste</source>
-        <translation type="unfinished" />
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>chọn tất cả</translation>
+      <source>Select All</source>
+      <translation>chọn tất cả</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QCocoaTheme</name>
     <message>
-        <source>Don't Save</source>
-        <translation>không lưu</translation>
+      <source>Don&apos;t Save</source>
+      <translation type="unfinished">Don&apos;t Save</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QColorDialog</name>
     <message>
-        <source>Hu&amp;e:</source>
-        <translation>Hu&amp;e:</translation>
+      <source>Hu&amp;e:</source>
+      <translation type="unfinished">Hu&amp;e:</translation>
     </message>
     <message>
-        <source>&amp;Sat:</source>
-        <translation>&amp;Sat:</translation>
+      <source>&amp;Sat:</source>
+      <translation type="unfinished">&amp;Sat:</translation>
     </message>
     <message>
-        <source>&amp;Val:</source>
-        <translation>&amp;Val:</translation>
+      <source>&amp;Val:</source>
+      <translation type="unfinished">&amp;Val:</translation>
     </message>
     <message>
-        <source>&amp;Red:</source>
-        <translation>&amp;Red:</translation>
+      <source>&amp;Red:</source>
+      <translation type="unfinished">&amp;Red:</translation>
     </message>
     <message>
-        <source>&amp;Green:</source>
-        <translation>&amp;Green:</translation>
+      <source>&amp;Green:</source>
+      <translation type="unfinished">&amp;Green:</translation>
     </message>
     <message>
-        <source>Bl&amp;ue:</source>
-        <translation>Bl&amp;ue:</translation>
+      <source>Bl&amp;ue:</source>
+      <translation type="unfinished">Bl&amp;ue:</translation>
     </message>
     <message>
-        <source>A&amp;lpha channel:</source>
-        <translation>A&amp;lpha channel:</translation>
+      <source>A&amp;lpha channel:</source>
+      <translation type="unfinished">A&amp;lpha channel:</translation>
     </message>
     <message>
-        <source>&amp;HTML:</source>
-        <translation type="unfinished" />
+      <source>&amp;HTML:</source>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
-        <source>Cursor at %1, %2
+      <source>Cursor at %1, %2
 Press ESC to cancel</source>
-        <translation type="unfinished" />
+      <translation type="unfinished">Cursor at %1, %2
+Press ESC to cancel</translation>
     </message>
     <message>
-        <source>&amp;Pick Screen Color</source>
-        <translation type="unfinished" />
+      <source>&amp;Pick Screen Color</source>
+      <translation type="unfinished">&amp;Pick Screen Color</translation>
     </message>
     <message>
-        <source>Select Color</source>
-        <translation>chọn màu</translation>
+      <source>Select Color</source>
+      <translation>chọn màu</translation>
     </message>
     <message>
-        <source>&amp;Basic colors</source>
-        <translation>&amp;màu sắc cơ bản</translation>
+      <source>&amp;Basic colors</source>
+      <translation>&amp;màu sắc cơ bản</translation>
     </message>
     <message>
-        <source>&amp;Custom colors</source>
-        <translation>&amp;tuỳ chỉnh màu sắc</translation>
+      <source>&amp;Custom colors</source>
+      <translation>&amp;tuỳ chỉnh màu sắc</translation>
     </message>
     <message>
-        <source>&amp;Add to Custom Colors</source>
-        <translation>&amp;thêm để tùy chỉnh màu sắc</translation>
+      <source>&amp;Add to Custom Colors</source>
+      <translation>&amp;thêm để tùy chỉnh màu sắc</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QComboBox</name>
     <message>
-        <source>False</source>
-        <translation>sai</translation>
+      <source>False</source>
+      <translation>sai</translation>
     </message>
     <message>
-        <source>True</source>
-        <translation>thật</translation>
+      <source>True</source>
+      <translation>thật</translation>
     </message>
     <message>
-        <source>Open the combo box selection popup</source>
-        <translation>Mở lựa chọn combo box sổ bật lên</translation>
+      <source>Open the combo box selection popup</source>
+      <translation>Mở lựa chọn combo box sổ bật lên</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDateTimeParser</name>
     <message>
-        <source>AM</source>
-        <translation>AM</translation>
+      <source>AM</source>
+      <translation type="unfinished">AM</translation>
     </message>
     <message>
-        <source>am</source>
-        <translation>am</translation>
+      <source>am</source>
+      <translation type="unfinished">am</translation>
     </message>
     <message>
-        <source>PM</source>
-        <translation>PM</translation>
+      <source>PM</source>
+      <translation type="unfinished">PM</translation>
     </message>
     <message>
-        <source>pm</source>
-        <translation>pm</translation>
+      <source>pm</source>
+      <translation type="unfinished">pm</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDialog</name>
     <message>
-        <source>What's This?</source>
-        <translation>Này là gì?</translation>
+      <source>What&apos;s This?</source>
+      <translation type="unfinished">What&apos;s This?</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDialogButtonBox</name>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
+      <source>OK</source>
+      <translation>xác định</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDirModel</name>
     <message>
-        <source>Name</source>
-        <translation>tên</translation>
+      <source>Name</source>
+      <translation>tên</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>kích thước</translation>
+      <source>Size</source>
+      <translation>kích thước</translation>
     </message>
     <message>
-        <source>Kind</source>
-        <comment>Match OS X Finder</comment>
-        <translation>loại</translation>
+      <source>Kind</source>
+      <comment>Match OS X Finder</comment>
+      <translation>loại</translation>
     </message>
     <message>
-        <source>Type</source>
-        <comment>All other platforms</comment>
-        <translation>kiểu</translation>
+      <source>Type</source>
+      <comment>All other platforms</comment>
+      <translation>kiểu</translation>
     </message>
     <message>
-        <source>Date Modified</source>
-        <translation>ngày sửa đổi</translation>
+      <source>Date Modified</source>
+      <translation>ngày sửa đổi</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFile</name>
     <message>
-        <source>Destination file is the same file.</source>
-        <translation>File đích là cùng một tập tin.</translation>
+      <source>Destination file is the same file.</source>
+      <translation>File đích là cùng một tập tin.</translation>
     </message>
     <message>
-        <source>Source file does not exist.</source>
-        <translation>Nguồn tập tin không tồn tại.</translation>
+      <source>Source file does not exist.</source>
+      <translation>Nguồn tập tin không tồn tại.</translation>
     </message>
     <message>
-        <source>Destination file exists</source>
-        <translation>Tập tin đích tồn tại</translation>
+      <source>Destination file exists</source>
+      <translation>Tập tin đích tồn tại</translation>
     </message>
     <message>
-        <source>Error while renaming.</source>
-        <translation>Lỗi khi đổi tên.</translation>
+      <source>Error while renaming.</source>
+      <translation>Lỗi khi đổi tên.</translation>
     </message>
     <message>
-        <source>Unable to restore from %1: %2</source>
-        <translation>Không thể khôi phục lại từ %1: %2</translation>
+      <source>Unable to restore from %1: %2</source>
+      <translation>Không thể khôi phục lại từ %1: %2</translation>
     </message>
     <message>
-        <source>Will not rename sequential file using block copy</source>
-        <translation>Không đổi tên tập tin tuần tự sử dụng khối copy</translation>
+      <source>Will not rename sequential file using block copy</source>
+      <translation>Không đổi tên tập tin tuần tự sử dụng khối copy</translation>
     </message>
     <message>
-        <source>Cannot remove source file</source>
-        <translation>Không thể xoá tập tin nguồn</translation>
+      <source>Cannot remove source file</source>
+      <translation>Không thể xoá tập tin nguồn</translation>
     </message>
     <message>
-        <source>Cannot open %1 for input</source>
-        <translation>Không thể mở %1 cho đầu vào</translation>
+      <source>Cannot open %1 for input</source>
+      <translation>Không thể mở %1 cho đầu vào</translation>
     </message>
     <message>
-        <source>Cannot open for output</source>
-        <translation>Không thể mở cho đầu ra</translation>
+      <source>Cannot open for output</source>
+      <translation>Không thể mở cho đầu ra</translation>
     </message>
     <message>
-        <source>Failure to write block</source>
-        <translation>Thất bại trong việc viết block</translation>
+      <source>Failure to write block</source>
+      <translation>Thất bại trong việc viết block</translation>
     </message>
     <message>
-        <source>Cannot create %1 for output</source>
-        <translation>Không thể tạo ra %1 cho đầu ra</translation>
+      <source>Cannot create %1 for output</source>
+      <translation>Không thể tạo ra %1 cho đầu ra</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFileDialog</name>
     <message>
-        <source>Look in:</source>
-        <translation>Tìm trong:</translation>
+      <source>Look in:</source>
+      <translation>Tìm trong:</translation>
     </message>
     <message>
-        <source>Back</source>
-        <translation>trở lại</translation>
+      <source>Back</source>
+      <translation>trở lại</translation>
     </message>
     <message>
-        <source>Go back</source>
-        <translation>trở lại</translation>
+      <source>Go back</source>
+      <translation>trở lại</translation>
     </message>
     <message>
-        <source>Forward</source>
-        <translation>phía trước</translation>
+      <source>Forward</source>
+      <translation>phía trước</translation>
     </message>
     <message>
-        <source>Go forward</source>
-        <translation>đi về phía trước</translation>
+      <source>Go forward</source>
+      <translation>đi về phía trước</translation>
     </message>
     <message>
-        <source>Parent Directory</source>
-        <translation>thư mục cha</translation>
+      <source>Parent Directory</source>
+      <translation>thư mục cha</translation>
     </message>
     <message>
-        <source>Go to the parent directory</source>
-        <translation>Tới thư mục mẹ</translation>
+      <source>Go to the parent directory</source>
+      <translation>Tới thư mục mẹ</translation>
     </message>
     <message>
-        <source>Create New Folder</source>
-        <translation>tạo thư mục mới</translation>
+      <source>Create New Folder</source>
+      <translation>tạo thư mục mới</translation>
     </message>
     <message>
-        <source>Create a New Folder</source>
-        <translation>tạo ra một thư mục mới</translation>
+      <source>Create a New Folder</source>
+      <translation>tạo ra một thư mục mới</translation>
     </message>
     <message>
-        <source>List View</source>
-        <translation>Xem danh sách</translation>
+      <source>List View</source>
+      <translation>Xem danh sách</translation>
     </message>
     <message>
-        <source>Change to list view mode</source>
-        <translation>Thay đổi danh sách chế độ xem</translation>
+      <source>Change to list view mode</source>
+      <translation>Thay đổi danh sách chế độ xem</translation>
     </message>
     <message>
-        <source>Detail View</source>
-        <translation>chi tiết</translation>
+      <source>Detail View</source>
+      <translation>chi tiết</translation>
     </message>
     <message>
-        <source>Change to detail view mode</source>
-        <translation>Thay đổi chế độ xem chi tiết</translation>
+      <source>Change to detail view mode</source>
+      <translation>Thay đổi chế độ xem chi tiết</translation>
     </message>
     <message>
-        <source>Files of type:</source>
-        <translation>các file kiểu:</translation>
+      <source>Files of type:</source>
+      <translation>các file kiểu:</translation>
     </message>
     <message>
-        <source>Find Directory</source>
-        <translation>tìm thư mục</translation>
+      <source>Find Directory</source>
+      <translation>tìm thư mục</translation>
     </message>
     <message>
-        <source>Open</source>
-        <translation>mở</translation>
+      <source>Open</source>
+      <translation>mở</translation>
     </message>
     <message>
-        <source>Save As</source>
-        <translation>tiết kiệm như</translation>
+      <source>Save As</source>
+      <translation>tiết kiệm như</translation>
     </message>
     <message>
-        <source>Directory:</source>
-        <translation>thư mục:</translation>
+      <source>Directory:</source>
+      <translation>thư mục:</translation>
     </message>
     <message>
-        <source>File &amp;name:</source>
-        <translation>File &amp;name:</translation>
+      <source>File &amp;name:</source>
+      <translation type="unfinished">File &amp;name:</translation>
     </message>
     <message>
-        <source>&amp;Open</source>
-        <translation>&amp; Mở</translation>
+      <source>&amp;Open</source>
+      <translation>&amp; Mở</translation>
     </message>
     <message>
-        <source>&amp;Choose</source>
-        <translation>&amp;chọn</translation>
+      <source>&amp;Choose</source>
+      <translation>&amp;chọn</translation>
     </message>
     <message>
-        <source>&amp;Save</source>
-        <translation>&amp;tiết kiệm</translation>
+      <source>&amp;Save</source>
+      <translation>&amp;tiết kiệm</translation>
     </message>
     <message>
-        <source>All Files (*)</source>
-        <translation>tất cả các file (*)</translation>
+      <source>All Files (*)</source>
+      <translation>tất cả các file (*)</translation>
     </message>
     <message>
-        <source>Show </source>
-        <translation>buổi diễn</translation>
+      <source>Show </source>
+      <translation>buổi diễn</translation>
     </message>
     <message>
-        <source>&amp;Rename</source>
-        <translation>&amp;đổi tên</translation>
+      <source>&amp;Rename</source>
+      <translation>&amp;đổi tên</translation>
     </message>
     <message>
-        <source>&amp;Delete</source>
-        <translation>&amp;xóa bỏ</translation>
+      <source>&amp;Delete</source>
+      <translation>&amp;xóa bỏ</translation>
     </message>
     <message>
-        <source>Show &amp;hidden files</source>
-        <translation>Show &amp;hidden files</translation>
+      <source>Show &amp;hidden files</source>
+      <translation type="unfinished">Show &amp;hidden files</translation>
     </message>
     <message>
-        <source>&amp;New Folder</source>
-        <translation>&amp;thư mục mới</translation>
+      <source>&amp;New Folder</source>
+      <translation>&amp;thư mục mới</translation>
     </message>
     <message>
-        <source>All files (*)</source>
-        <translation type="unfinished" />
+      <source>All files (*)</source>
+      <translation type="unfinished">All files (*)</translation>
     </message>
     <message>
-        <source>Directories</source>
-        <translation>Thư mục</translation>
+      <source>Directories</source>
+      <translation>Thư mục</translation>
     </message>
     <message>
-        <source>%1
+      <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-        <translation>%1
+      <translation>%1
 Thư mục không được tìm thấy.
 Hãy kiểm tra tên thư mục chính xác đã được đưa ra.</translation>
     </message>
     <message>
-        <source>%1 already exists.
+      <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation>%1 đã tồn tại.
+      <translation>%1 đã tồn tại.
 Bạn có muốn thay thế nó?</translation>
     </message>
     <message>
-        <source>%1
+      <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-        <translation>%1
+      <translation>%1
 File không tìm thấy.
 Hãy kiểm tra tên tập tin chính xác đã được đưa ra.</translation>
     </message>
     <message>
-        <source>New Folder</source>
-        <translation>thư mục mới</translation>
+      <source>New Folder</source>
+      <translation>thư mục mới</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>xóa bỏ</translation>
+      <source>Delete</source>
+      <translation>xóa bỏ</translation>
     </message>
     <message>
-        <source>'%1' is write protected.
+      <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-        <translation>'%1' là viết được bảo vệ.
-Bạn có muốn xóa nó không?</translation>
+      <translation type="unfinished">&apos;%1&apos; is write protected.
+Do you want to delete it anyway?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete '%1'?</source>
-        <translation>Bạn có chắc chắn muốn xóa '%1'?</translation>
+      <source>Are you sure you want to delete &apos;%1&apos;?</source>
+      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
     </message>
     <message>
-        <source>Could not delete directory.</source>
-        <translation>Không thể xóa thư mục.</translation>
+      <source>Could not delete directory.</source>
+      <translation>Không thể xóa thư mục.</translation>
     </message>
     <message>
-        <source>Recent Places</source>
-        <translation>Địa điểm gần đây</translation>
+      <source>Recent Places</source>
+      <translation>Địa điểm gần đây</translation>
     </message>
     <message>
-        <source>Remove</source>
-        <translation>tẩy</translation>
+      <source>Remove</source>
+      <translation>tẩy</translation>
     </message>
     <message>
-        <source>My Computer</source>
-        <translation>máy tính của tôi</translation>
+      <source>My Computer</source>
+      <translation>máy tính của tôi</translation>
     </message>
     <message>
-        <source>Drive</source>
-        <translation>lái xe</translation>
+      <source>Drive</source>
+      <translation>lái xe</translation>
     </message>
     <message>
-        <source>%1 File</source>
-        <extracomment>%1 is a file name suffix, for example txt</extracomment>
-        <translation type="unfinished" />
+      <source>%1 File</source>
+      <extracomment>%1 is a file name suffix, for example txt</extracomment>
+      <translation type="unfinished">%1 File</translation>
     </message>
     <message>
-        <source>File</source>
-        <translation>hồ sơ</translation>
+      <source>File</source>
+      <translation>hồ sơ</translation>
     </message>
     <message>
-        <source>File Folder</source>
-        <comment>Match Windows Explorer</comment>
-        <translation>thư mục tập tin</translation>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>thư mục tập tin</translation>
     </message>
     <message>
-        <source>Folder</source>
-        <comment>All other platforms</comment>
-        <translation>thư mục</translation>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>thư mục</translation>
     </message>
     <message>
-        <source>Alias</source>
-        <comment>OS X Finder</comment>
-        <translation>tên giả</translation>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>tên giả</translation>
     </message>
     <message>
-        <source>Shortcut</source>
-        <comment>All other platforms</comment>
-        <translation>shortcut</translation>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>shortcut</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>không biết</translation>
+      <source>Unknown</source>
+      <translation>không biết</translation>
     </message>
     <message>
-        <source>Sidebar</source>
-        <translation>Sidebar</translation>
+      <source>Sidebar</source>
+      <translation type="unfinished">Sidebar</translation>
     </message>
     <message>
-        <source>List of places and bookmarks</source>
-        <translation>Danh sách các địa điểm và các chỉ mục</translation>
+      <source>List of places and bookmarks</source>
+      <translation>Danh sách các địa điểm và các chỉ mục</translation>
     </message>
     <message>
-        <source>Files</source>
-        <translation>văn khố</translation>
+      <source>Files</source>
+      <translation>văn khố</translation>
     </message>
     <message>
-        <source>Alt+Left</source>
-        <translation>Alt+Left</translation>
+      <source>Alt+Left</source>
+      <translation type="unfinished">Alt+Left</translation>
     </message>
     <message>
-        <source>Alt+Right</source>
-        <translation>Alt+Right</translation>
+      <source>Alt+Right</source>
+      <translation type="unfinished">Alt+Right</translation>
     </message>
     <message>
-        <source>Alt+Up</source>
-        <translation>Alt+Up</translation>
+      <source>Alt+Up</source>
+      <translation type="unfinished">Alt+Up</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFileSystemModel</name>
     <message>
-        <source>%1 TB</source>
-        <translation>%1 TB</translation>
+      <source>%1 TB</source>
+      <translation>%1 Tb</translation>
     </message>
     <message>
-        <source>%1 GB</source>
-        <translation>%1 GB</translation>
+      <source>%1 GB</source>
+      <translation>%1 Gb</translation>
     </message>
     <message>
-        <source>%1 MB</source>
-        <translation>%1 MB</translation>
+      <source>%1 MB</source>
+      <translation type="unfinished">%1 MB</translation>
     </message>
     <message>
-        <source>%1 KB</source>
-        <translation>%1 KB</translation>
+      <source>%1 KB</source>
+      <translation type="unfinished">%1 KB</translation>
     </message>
     <message>
-        <source>%1 bytes</source>
-        <translation>%1 bytes</translation>
+      <source>%1 bytes</source>
+      <translation type="unfinished">%1 bytes</translation>
     </message>
     <message>
-        <source>Invalid filename</source>
-        <translation>tên tập tin không hợp lệ</translation>
+      <source>Invalid filename</source>
+      <translation>tên tập tin không hợp lệ</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation>&lt;b&gt;tên "%1" không thể được sử dụng.&lt;/b&gt;&lt;p&gt;Hãy thử sử dụng một tên khác, với ít hoặc không có ký tự punctuations dấu.</translation>
+      <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>tên</translation>
+      <source>Name</source>
+      <translation>tên</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>kích thước</translation>
+      <source>Size</source>
+      <translation>kích thước</translation>
     </message>
     <message>
-        <source>Kind</source>
-        <comment>Match OS X Finder</comment>
-        <translation>loại</translation>
+      <source>Kind</source>
+      <comment>Match OS X Finder</comment>
+      <translation>loại</translation>
     </message>
     <message>
-        <source>Type</source>
-        <comment>All other platforms</comment>
-        <translation>kiểu</translation>
+      <source>Type</source>
+      <comment>All other platforms</comment>
+      <translation>kiểu</translation>
     </message>
     <message>
-        <source>Date Modified</source>
-        <translation>ngày sửa đổi</translation>
+      <source>Date Modified</source>
+      <translation>ngày sửa đổi</translation>
     </message>
     <message>
-        <source>My Computer</source>
-        <translation>máy tính của tôi</translation>
+      <source>My Computer</source>
+      <translation>máy tính của tôi</translation>
     </message>
     <message>
-        <source>Computer</source>
-        <translation>máy tính</translation>
+      <source>Computer</source>
+      <translation>máy tính</translation>
     </message>
     <message>
-        <source>%1 byte(s)</source>
-        <translation>%1 byte(s)</translation>
+      <source>%1 byte(s)</source>
+      <translation type="unfinished">%1 byte(s)</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QGnomeTheme</name>
     <message>
-        <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
+      <source>&amp;OK</source>
+      <translation type="unfinished">&amp;OK</translation>
     </message>
     <message>
-        <source>&amp;Save</source>
-        <translation>&amp;tiết kiệm</translation>
+      <source>&amp;Save</source>
+      <translation>&amp;tiết kiệm</translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;hủy bỏ</translation>
+      <source>&amp;Cancel</source>
+      <translation>&amp;hủy bỏ</translation>
     </message>
     <message>
-        <source>&amp;Close</source>
-        <translation>&amp;gần</translation>
+      <source>&amp;Close</source>
+      <translation>&amp;gần</translation>
     </message>
     <message>
-        <source>Close without Saving</source>
-        <translation>gần mà không lưu</translation>
+      <source>Close without Saving</source>
+      <translation>gần mà không lưu</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QGuiApplication</name>
     <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>Bố trí hướng Qt</translation>
+      <source>QT_LAYOUT_DIRECTION</source>
+      <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QIODevice</name>
     <message>
-        <source>Permission denied</source>
-        <translation>Quyền bị từ chối</translation>
+      <source>Permission denied</source>
+      <translation>Quyền bị từ chối</translation>
     </message>
     <message>
-        <source>Too many open files</source>
-        <translation>Quá nhiều tập tin mở</translation>
+      <source>Too many open files</source>
+      <translation>Quá nhiều tập tin mở</translation>
     </message>
     <message>
-        <source>No such file or directory</source>
-        <translation>Không có tập tin hoặc thư mục</translation>
+      <source>No such file or directory</source>
+      <translation>Không có tập tin hoặc thư mục</translation>
     </message>
     <message>
-        <source>No space left on device</source>
-        <translation>Không có không gian còn lại trên thiết bị</translation>
+      <source>No space left on device</source>
+      <translation>Không có không gian còn lại trên thiết bị</translation>
     </message>
     <message>
-        <source>Unknown error</source>
-        <translation>lỗi không xác định</translation>
+      <source>Unknown error</source>
+      <translation>lỗi không xác định</translation>
     </message>
     <message>
-        <source>file to open is a directory</source>
-        <translation type="unfinished" />
+      <source>file to open is a directory</source>
+      <translation type="unfinished">file to open is a directory</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QImageReader</name>
     <message>
-        <source>Invalid device</source>
-        <translation type="unfinished" />
+      <source>Invalid device</source>
+      <translation type="unfinished">Invalid device</translation>
     </message>
     <message>
-        <source>File not found</source>
-        <translation type="unfinished" />
+      <source>File not found</source>
+      <translation type="unfinished">File not found</translation>
     </message>
     <message>
-        <source>Unsupported image format</source>
-        <translation type="unfinished" />
+      <source>Unsupported image format</source>
+      <translation type="unfinished">Unsupported image format</translation>
     </message>
     <message>
-        <source>Unable to read image data</source>
-        <translation type="unfinished" />
+      <source>Unable to read image data</source>
+      <translation type="unfinished">Unable to read image data</translation>
     </message>
     <message>
-        <source>Unknown error</source>
-        <translation>lỗi không xác định</translation>
+      <source>Unknown error</source>
+      <translation>lỗi không xác định</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QImageWriter</name>
     <message>
-        <source>Unknown error</source>
-        <translation>lỗi không xác định</translation>
+      <source>Unknown error</source>
+      <translation>lỗi không xác định</translation>
     </message>
     <message>
-        <source>Device is not set</source>
-        <translation type="unfinished" />
+      <source>Device is not set</source>
+      <translation type="unfinished">Device is not set</translation>
     </message>
     <message>
-        <source>Device not writable</source>
-        <translation type="unfinished" />
+      <source>Device not writable</source>
+      <translation type="unfinished">Device not writable</translation>
     </message>
     <message>
-        <source>Unsupported image format</source>
-        <translation type="unfinished" />
+      <source>Unsupported image format</source>
+      <translation type="unfinished">Unsupported image format</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QInputDialog</name>
     <message>
-        <source>Enter a value:</source>
-        <translation>Nhập một giá trị:</translation>
+      <source>Enter a value:</source>
+      <translation>Nhập một giá trị:</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QKeySequenceEdit</name>
     <message>
-        <source>Press shortcut</source>
-        <translation type="unfinished" />
+      <source>Press shortcut</source>
+      <translation type="unfinished">Press shortcut</translation>
     </message>
     <message>
-        <source>%1, ...</source>
-        <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
-        <translation type="unfinished" />
+      <source>%1, ...</source>
+      <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
+      <translation type="unfinished">%1, ...</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QLineEdit</name>
     <message>
-        <source>&amp;Undo</source>
-        <translation>&amp;hủy bỏ</translation>
+      <source>&amp;Undo</source>
+      <translation>&amp;hủy bỏ</translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>&amp;Làm lại</translation>
+      <source>&amp;Redo</source>
+      <translation>&amp;Làm lại</translation>
     </message>
     <message>
-        <source>Cu&amp;t</source>
-        <translation>Cu&amp;t</translation>
+      <source>Cu&amp;t</source>
+      <translation type="unfinished">Cu&amp;t</translation>
     </message>
     <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;bản sao</translation>
+      <source>&amp;Copy</source>
+      <translation>&amp;bản sao</translation>
     </message>
     <message>
-        <source>&amp;Paste</source>
-        <translation>&amp;dán</translation>
+      <source>&amp;Paste</source>
+      <translation>&amp;dán</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>xóa bỏ</translation>
+      <source>Delete</source>
+      <translation>xóa bỏ</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>chọn tất cả</translation>
+      <source>Select All</source>
+      <translation>chọn tất cả</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QMessageBox</name>
     <message>
-        <source>Show Details...</source>
-        <translation>Hiển thị chi tiết ...</translation>
+      <source>Show Details...</source>
+      <translation>Hiển thị chi tiết ...</translation>
     </message>
     <message>
-        <source>Hide Details...</source>
-        <translation>Ẩn Chi tiết ...</translation>
+      <source>Hide Details...</source>
+      <translation>Ẩn Chi tiết ...</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
+      <source>OK</source>
+      <translation>xác định</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>giúp</translation>
+      <source>Help</source>
+      <translation>giúp</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QPlatformTheme</name>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
+      <source>OK</source>
+      <translation>xác định</translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation>tiết kiệm</translation>
+      <source>Save</source>
+      <translation>tiết kiệm</translation>
     </message>
     <message>
-        <source>Save All</source>
-        <translation>lưu tất cả</translation>
+      <source>Save All</source>
+      <translation>lưu tất cả</translation>
     </message>
     <message>
-        <source>Open</source>
-        <translation>mở</translation>
+      <source>Open</source>
+      <translation>mở</translation>
     </message>
     <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;Yes</translation>
+      <source>&amp;Yes</source>
+      <translation type="unfinished">&amp;Yes</translation>
     </message>
     <message>
-        <source>Yes to &amp;All</source>
-        <translation>Yes to &amp;All</translation>
+      <source>Yes to &amp;All</source>
+      <translation type="unfinished">Yes to &amp;All</translation>
     </message>
     <message>
-        <source>&amp;No</source>
-        <translation>&amp;No</translation>
+      <source>&amp;No</source>
+      <translation type="unfinished">&amp;No</translation>
     </message>
     <message>
-        <source>N&amp;o to All</source>
-        <translation>N&amp;o to All</translation>
+      <source>N&amp;o to All</source>
+      <translation type="unfinished">N&amp;o to All</translation>
     </message>
     <message>
-        <source>Abort</source>
-        <translation>về</translation>
+      <source>Abort</source>
+      <translation>về</translation>
     </message>
     <message>
-        <source>Retry</source>
-        <translation>thử lại</translation>
+      <source>Retry</source>
+      <translation>thử lại</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>bỏ qua</translation>
+      <source>Ignore</source>
+      <translation>bỏ qua</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>gần</translation>
+      <source>Close</source>
+      <translation>gần</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+      <source>Cancel</source>
+      <translation>hủy bỏ</translation>
     </message>
     <message>
-        <source>Discard</source>
-        <translation>loại bỏ</translation>
+      <source>Discard</source>
+      <translation>loại bỏ</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>giúp</translation>
+      <source>Help</source>
+      <translation>giúp</translation>
     </message>
     <message>
-        <source>Apply</source>
-        <translation>ứng dụng</translation>
+      <source>Apply</source>
+      <translation>ứng dụng</translation>
     </message>
     <message>
-        <source>Reset</source>
-        <translation>thiết lập lại</translation>
+      <source>Reset</source>
+      <translation>thiết lập lại</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation>khôi phục mặc định</translation>
+      <source>Restore Defaults</source>
+      <translation>khôi phục mặc định</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QProgressDialog</name>
     <message>
-        <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+      <source>Cancel</source>
+      <translation>hủy bỏ</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QQnxFileDialogHelper</name>
     <message>
-        <source>All files (*.*)</source>
-        <translation type="unfinished" />
+      <source>All files (*.*)</source>
+      <translation>tất cả các file (*.*)</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QSaveFile</name>
     <message>
-        <source>Existing file %1 is not writable</source>
-        <translation>Hiện tập tin %1 không cho phép ghi</translation>
+      <source>Existing file %1 is not writable</source>
+      <translation>Hiện tập tin %1 không cho phép ghi</translation>
     </message>
     <message>
-        <source>Filename refers to a directory</source>
-        <translation type="unfinished" />
+      <source>Filename refers to a directory</source>
+      <translation type="unfinished">Filename refers to a directory</translation>
     </message>
     <message>
-        <source>Writing canceled by application</source>
-        <translation>Bằng văn bản hủy bỏ bởi ứng dụng</translation>
+      <source>Writing canceled by application</source>
+      <translation>Bằng văn bản hủy bỏ bởi ứng dụng</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QScrollBar</name>
     <message>
-        <source>Scroll here</source>
-        <translation>Di chuyển ở đây</translation>
+      <source>Scroll here</source>
+      <translation>Di chuyển ở đây</translation>
     </message>
     <message>
-        <source>Left edge</source>
-        <translation>cạnh trái</translation>
+      <source>Left edge</source>
+      <translation>cạnh trái</translation>
     </message>
     <message>
-        <source>Top</source>
-        <translation>đỉnh</translation>
+      <source>Top</source>
+      <translation>đỉnh</translation>
     </message>
     <message>
-        <source>Right edge</source>
-        <translation>cạnh phải</translation>
+      <source>Right edge</source>
+      <translation>cạnh phải</translation>
     </message>
     <message>
-        <source>Bottom</source>
-        <translation>đáy</translation>
+      <source>Bottom</source>
+      <translation>đáy</translation>
     </message>
     <message>
-        <source>Page left</source>
-        <translation>trang trái</translation>
+      <source>Page left</source>
+      <translation>trang trái</translation>
     </message>
     <message>
-        <source>Page up</source>
-        <translation>trang lên</translation>
+      <source>Page up</source>
+      <translation>trang lên</translation>
     </message>
     <message>
-        <source>Page right</source>
-        <translation>trang bên phải</translation>
+      <source>Page right</source>
+      <translation>trang bên phải</translation>
     </message>
     <message>
-        <source>Page down</source>
-        <translation>trang xuống</translation>
+      <source>Page down</source>
+      <translation>trang xuống</translation>
     </message>
     <message>
-        <source>Scroll left</source>
-        <translation>Di chuyển sang trái</translation>
+      <source>Scroll left</source>
+      <translation>Di chuyển sang trái</translation>
     </message>
     <message>
-        <source>Scroll up</source>
-        <translation>Di chuyển lên</translation>
+      <source>Scroll up</source>
+      <translation>Di chuyển lên</translation>
     </message>
     <message>
-        <source>Scroll right</source>
-        <translation>Di chuyển sang phải</translation>
+      <source>Scroll right</source>
+      <translation>Di chuyển sang phải</translation>
     </message>
     <message>
-        <source>Scroll down</source>
-        <translation>cuộn xuống</translation>
+      <source>Scroll down</source>
+      <translation>cuộn xuống</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QStandardPaths</name>
     <message>
-        <source>Desktop</source>
-        <translation>máy tính để bàn</translation>
+      <source>Desktop</source>
+      <translation>máy tính để bàn</translation>
     </message>
     <message>
-        <source>Documents</source>
-        <translation>Tài liệu</translation>
+      <source>Documents</source>
+      <translation>Tài liệu</translation>
     </message>
     <message>
-        <source>Fonts</source>
-        <translation>phông chữ</translation>
+      <source>Fonts</source>
+      <translation>phông chữ</translation>
     </message>
     <message>
-        <source>Applications</source>
-        <translation>ứng dụng</translation>
+      <source>Applications</source>
+      <translation>ứng dụng</translation>
     </message>
     <message>
-        <source>Music</source>
-        <translation>âm nhạc</translation>
+      <source>Music</source>
+      <translation>âm nhạc</translation>
     </message>
     <message>
-        <source>Movies</source>
-        <translation>phim</translation>
+      <source>Movies</source>
+      <translation>phim</translation>
     </message>
     <message>
-        <source>Pictures</source>
-        <translation>Hình ảnh</translation>
+      <source>Pictures</source>
+      <translation>Hình ảnh</translation>
     </message>
     <message>
-        <source>Temporary Directory</source>
-        <translation>tạm mục</translation>
+      <source>Temporary Directory</source>
+      <translation>tạm mục</translation>
     </message>
     <message>
-        <source>Home</source>
-        <translation>nhà</translation>
+      <source>Home</source>
+      <translation>nhà</translation>
     </message>
     <message>
-        <source>Application Data</source>
-        <translation>dữ liệu ứng dụng</translation>
+      <source>Application Data</source>
+      <translation>dữ liệu ứng dụng</translation>
     </message>
     <message>
-        <source>Application Configuration</source>
-        <translation type="unfinished" />
+      <source>Application Configuration</source>
+      <translation type="unfinished">Application Configuration</translation>
     </message>
     <message>
-        <source>Cache</source>
-        <translation>bộ nhớ cache</translation>
+      <source>Cache</source>
+      <translation>bộ nhớ cache</translation>
     </message>
     <message>
-        <source>Shared Data</source>
-        <translation>Chia sẻ dữ liệu</translation>
+      <source>Shared Data</source>
+      <translation>Chia sẻ dữ liệu</translation>
     </message>
     <message>
-        <source>Runtime</source>
-        <translation>Runtime</translation>
+      <source>Runtime</source>
+      <translation type="unfinished">Runtime</translation>
     </message>
     <message>
-        <source>Configuration</source>
-        <translation>cấu hình</translation>
+      <source>Configuration</source>
+      <translation>cấu hình</translation>
     </message>
     <message>
-        <source>Shared Configuration</source>
-        <translation type="unfinished" />
+      <source>Shared Configuration</source>
+      <translation type="unfinished">Shared Configuration</translation>
     </message>
     <message>
-        <source>Shared Cache</source>
-        <translation>Chia sẻ bộ nhớ cache</translation>
+      <source>Shared Cache</source>
+      <translation>Chia sẻ bộ nhớ cache</translation>
     </message>
     <message>
-        <source>Download</source>
-        <translation>Tải về</translation>
+      <source>Download</source>
+      <translation>Tải về</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QTabBar</name>
     <message>
-        <source>Scroll Left</source>
-        <translation>di chuyển sang trái</translation>
+      <source>Scroll Left</source>
+      <translation>di chuyển sang trái</translation>
     </message>
     <message>
-        <source>Scroll Right</source>
-        <translation>di chuyển sang phải</translation>
+      <source>Scroll Right</source>
+      <translation>di chuyển sang phải</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QWhatsThisAction</name>
     <message>
-        <source>What's This?</source>
-        <translation>Đây là gì?</translation>
+      <source>What&apos;s This?</source>
+      <translation type="unfinished">What&apos;s This?</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QWidgetTextControl</name>
     <message>
-        <source>&amp;Undo</source>
-        <translation>&amp;hủy bỏ</translation>
+      <source>&amp;Undo</source>
+      <translation>&amp;hủy bỏ</translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>&amp;Làm lại</translation>
+      <source>&amp;Redo</source>
+      <translation>&amp;Làm lại</translation>
     </message>
     <message>
-        <source>Cu&amp;t</source>
-        <translation>Cu&amp;t</translation>
+      <source>Cu&amp;t</source>
+      <translation type="unfinished">Cu&amp;t</translation>
     </message>
     <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;bản sao</translation>
+      <source>&amp;Copy</source>
+      <translation>&amp;bản sao</translation>
     </message>
     <message>
-        <source>Copy &amp;Link Location</source>
-        <translation>bản sao &amp;vị trí liên kết</translation>
+      <source>Copy &amp;Link Location</source>
+      <translation>bản sao &amp;vị trí liên kết</translation>
     </message>
     <message>
-        <source>&amp;Paste</source>
-        <translation>&amp;dán</translation>
+      <source>&amp;Paste</source>
+      <translation>&amp;dán</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>xóa bỏ</translation>
+      <source>Delete</source>
+      <translation>xóa bỏ</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>chọn tất cả</translation>
+      <source>Select All</source>
+      <translation>chọn tất cả</translation>
     </message>
-</context>
+  </context>
 </TS>

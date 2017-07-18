@@ -41,14 +41,14 @@ bool AIOService::isInitialized() const
     return !m_systemSocketAIO.aioThreadPool.empty();
 }
 
-void AIOService::watchSocket(
+void AIOService::startMonitoring(
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    watchSocketNonSafe(
+    startMonitoringNonSafe(
         &lk,
         sock,
         eventToWatch,
@@ -57,14 +57,14 @@ void AIOService::watchSocket(
         std::move(socketAddedToPollHandler));
 }
 
-void AIOService::removeFromWatch(
+void AIOService::stopMonitoring(
     Pollable* const sock,
     aio::EventType eventType,
     bool waitForRunningHandlerCompletion,
     nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    removeFromWatchNonSafe(
+    stopMonitoringNonSafe(
         &lk,
         sock,
         eventType,
@@ -75,7 +75,7 @@ void AIOService::removeFromWatch(
 void AIOService::registerTimer(
     Pollable* const sock,
     std::chrono::milliseconds timeoutMillis,
-    AIOEventHandler<Pollable>* const eventHandler)
+    AIOEventHandler* const eventHandler)
 {
     QnMutexLocker locker(&m_mutex);
     registerTimerNonSafe(&locker, sock, timeoutMillis, eventHandler);
@@ -85,9 +85,9 @@ void AIOService::registerTimerNonSafe(
     QnMutexLockerBase* const locker,
     Pollable* const sock,
     std::chrono::milliseconds timeoutMillis,
-    AIOEventHandler<Pollable>* const eventHandler)
+    AIOEventHandler* const eventHandler)
 {
-    watchSocketNonSafe(
+    startMonitoringNonSafe(
         locker,
         sock,
         aio::etTimedOut,
@@ -176,11 +176,11 @@ void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThr
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
 }
 
-void AIOService::watchSocketNonSafe(
+void AIOService::startMonitoringNonSafe(
     QnMutexLockerBase* const lock,
     Pollable* const sock,
     aio::EventType eventToWatch,
-    AIOEventHandler<Pollable>* const eventHandler,
+    AIOEventHandler* const eventHandler,
     boost::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
@@ -196,7 +196,7 @@ void AIOService::watchSocketNonSafe(
                     lock,
                     sock,
                     std::bind(
-                        &AIOEventHandler<Pollable>::eventTriggered,
+                        &AIOEventHandler::eventTriggered,
                         eventHandler,
                         sock,
                         aio::etError));
@@ -212,7 +212,7 @@ void AIOService::watchSocketNonSafe(
                     lock,
                     sock,
                     std::bind(
-                        &AIOEventHandler<Pollable>::eventTriggered,
+                        &AIOEventHandler::eventTriggered,
                         eventHandler,
                         sock,
                         aio::etError));
@@ -263,13 +263,13 @@ void AIOService::watchSocketNonSafe(
 
     const auto threadToUse = getSocketAioThread(lock, sock);
     if (!m_systemSocketAIO.sockets.emplace(
-        sockCtx,
-        std::make_pair(threadToUse, timeoutMillis.get())).second)
+            sockCtx,
+            std::make_pair(threadToUse, timeoutMillis.get())).second)
     {
         NX_ASSERT(false);
     }
     lock->unlock();
-    threadToUse->watchSocket(
+    threadToUse->startMonitoring(
         sock,
         eventToWatch,
         eventHandler,
@@ -278,7 +278,7 @@ void AIOService::watchSocketNonSafe(
     lock->relock();
 }
 
-void AIOService::removeFromWatchNonSafe(
+void AIOService::stopMonitoringNonSafe(
     QnMutexLockerBase* const lock,
     Pollable* const sock,
     aio::EventType eventType,
@@ -293,7 +293,7 @@ void AIOService::removeFromWatchNonSafe(
     auto aioThread = it->second.first;
     m_systemSocketAIO.sockets.erase(it);
     lock->unlock();
-    aioThread->removeFromWatch(
+    aioThread->stopMonitoring(
         sock,
         eventType,
         waitForRunningHandlerCompletion,

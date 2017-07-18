@@ -2,16 +2,16 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/widgets/business/subject_target_action_widget.h>
 
 namespace Ui {
     class BookmarkBusinessActionWidget;
 }
 
-class QnBookmarkBusinessActionWidget : public QnAbstractBusinessParamsWidget
+class QnBookmarkBusinessActionWidget : public QnSubjectTargetActionWidget
 {
     Q_OBJECT
-    typedef QnAbstractBusinessParamsWidget base_type;
+    typedef QnSubjectTargetActionWidget base_type;
 
 public:
     explicit QnBookmarkBusinessActionWidget(QWidget *parent = 0);
@@ -20,7 +20,7 @@ public:
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;
 
 protected slots:
-    virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
+    virtual void at_model_dataChanged(Fields fields) override;
 
 private slots:
     void paramsChanged();

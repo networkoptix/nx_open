@@ -85,7 +85,7 @@ private:
         m_handler.setHttpStatusCode(statusCode);
 
         nx_http::Message message(nx_http::MessageType::request);
-        message.request->requestLine.method = nx_http::Method::GET;
+        message.request->requestLine.method = nx_http::Method::get;
         message.request->requestLine.url = "/some/url";
         message.request->requestLine.version = nx_http::http_1_1;
 

@@ -12,6 +12,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
+#include <QtCore/QTimeZone>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
@@ -571,6 +572,7 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
+    bool initializeTwoWayAudio();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

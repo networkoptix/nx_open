@@ -304,40 +304,7 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const
     return m_licenseTypes;
 }
 
-QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
-{
-    QString messageId = errorMessage.value(lit("messageId")).toString();
 
-    if (messageId == lit("DatabaseError"))
-        return tr("There was a problem activating your license key. A database error occurred.");  //TODO: Feature #3629 case J
-
-    if (messageId == lit("InvalidData"))
-        return tr("There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.");
-
-    if (messageId == lit("InvalidKey"))
-    {
-        return tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
-            "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
-    }
-
-    if (messageId == lit("InvalidBrand"))
-        return tr("You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.");
-
-    if (messageId == lit("AlreadyActivated"))
-    {
-        QString message = tr("This license key has been previously activated to hardware ID %1 on %2. "
-            "Please contact support team to obtain a valid license key.",
-            "%1 is a hardware ID, %2 is an activation time");
-
-        QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-        QString hwid = arguments.value(lit("hwid")).toString();
-        QString time = arguments.value(lit("time")).toString();
-
-        return message.arg(hwid).arg(time);
-    }
-
-    return errorMessage.value(lit("message")).toString();
-}
 
 /************************************************************************/
 /* QnCamLicenseUsageWatcher                                             */

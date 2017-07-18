@@ -128,7 +128,7 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
 
     //opening connection and sending multiple requests
     nx_http::Request request;
-    request.requestLine.method = nx_http::Method::GET;
+    request.requestLine.method = nx_http::Method::get;
     request.requestLine.version = nx_http::http_1_1;
     request.requestLine.url = PipeliningTestHandler::PATH;
 

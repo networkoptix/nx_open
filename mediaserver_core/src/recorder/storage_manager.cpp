@@ -61,6 +61,11 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
+#ifdef __arm__
+const qint64 kMinSystemStorageFreeSpace = 1000 * 1000 * 1000LL;
+#else
+const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
+#endif
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -430,7 +435,8 @@ QnStorageManager::QnStorageManager(
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_lowSysStorageSpaceWarnShown(false)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
@@ -618,7 +624,8 @@ bool QnStorageManager::getSqlDbPath(
     QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
 
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(commonModule()));
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(
+        commonModule()->moduleGUID()));
     QByteArray dbRefGuidStr;
 
     //checking for file db_ref.guid existence
@@ -653,7 +660,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule());
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule()->moduleGUID());
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -1495,11 +1502,13 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive();
+    NX_VERBOSE(this, lm("Got %1 cameras with archive").arg(archivedListNew.size()));
 
     std::vector<QnUuid> archivedListOld =
         cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
+    NX_VERBOSE(this, lm("Got %1 old cameras with archive").arg(archivedListOld.size()));
     if (archivedListOld == archivedListNew)
         return;
 
@@ -1512,14 +1521,42 @@ void QnStorageManager::updateCameraHistory() const
                     << ec2::toString(errCode);
         return;
     }
+    else
+    {
+        NX_VERBOSE(this, "addCameraHistoryItem success");
+    }
+
     cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
 }
 
+void QnStorageManager::checkSystemStorageSpace()
+{
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
+    for (const auto& storage: getAllStorages())
+    {
+        if (storage->getStatus() == Qn::Online && storage->isSystem())
+        {
+            if (!m_lowSysStorageSpaceWarnShown
+                && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
+            {
+                m_lowSysStorageSpaceWarnShown = true;
+                emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
+            }
+            else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
+            {
+                m_lowSysStorageSpaceWarnShown = false;
+            }
+        }
+    }
+}
+
 void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
+
     // if Backup on Schedule (or on demand) synchronization routine is
     // running at the moment, dont run clearSpace() if it's been triggered by
     // the timer.
@@ -1974,7 +2011,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
-            emit storageFailure(storage, QnBusiness::StorageFullReason);
+            emit storageFailure(storage, nx::vms::event::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -2102,20 +2139,24 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
-        emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+        emit storageFailure(fileStorage, nx::vms::event::EventReason::storageIoError);
 }
 
 void QnStorageManager::startAuxTimerTasks()
 {
     static const std::chrono::minutes kWriteInfoFilesInterval(5);
-
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
         kWriteInfoFilesInterval,
         kWriteInfoFilesInterval);
 
-    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
+    static const std::chrono::minutes kCheckSystemStorageSpace(1);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
+        kCheckSystemStorageSpace,
+        kCheckSystemStorageSpace);
 
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {

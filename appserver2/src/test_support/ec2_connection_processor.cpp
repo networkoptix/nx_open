@@ -6,6 +6,7 @@
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 #include <nx/network/app_info.h>
+#include "appserver2_process.h"
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
@@ -37,8 +38,8 @@ bool Ec2ConnectionProcessor::authenticate()
 {
     Q_D(QnTCPConnectionProcessor);
 
-    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
-    if (!owner->needAuth())
+    auto owner = static_cast<ec2::QnSimpleHttpConnectionListener*>(d->owner);
+    if (!owner->needAuth(d->request))
         return true;
 
     const nx_http::StringType& authorization =
@@ -128,10 +129,10 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     if (!needToStop())
     {
         copyClientRequestTo(*m_processor);
-        if (m_processor->isTakeSockOwnership())
+        if (m_processor->isSocketTaken())
             d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
         m_processor->execute(m_mutex);
-        if (!m_processor->isTakeSockOwnership())
+        if (!m_processor->isSocketTaken())
             m_processor->releaseSocket();
         else
             d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.

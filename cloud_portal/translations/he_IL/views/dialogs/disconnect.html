@@ -1,0 +1,34 @@
+<div ng-controller="DisconnectCtrl">
+    <form name="disconnectForm" novalidate>
+        <div class="modal-body">
+            <p class="warning-label">
+                כל משתמשי הענן יימחקו.
+            </p>
+            <p>
+                המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מקומי.
+            </p>
+            <p>
+                הזן סיסמא כדי להמשיך.
+            </p>
+
+            <div class="form-group" validate-field>
+                <label for="password">סיסמא</label>
+                <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
+                       name="password" type="password" required autofocus>
+                <p class="help-block" >
+                    <span ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
+                        נדרשת סיסמא
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button process="disconnecting"
+                            form="disconnectForm"
+                            action-type="'danger'"
+                            button-text="$root.L.system.confirmDisconnectAction"></process-button>
+
+            <button type="button" class="btn btn-default" ng-click="close()" > ביטול </button>
+        </div>
+    </form>
+</div>

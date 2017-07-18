@@ -1,6 +1,10 @@
 #include "video_decoder_registry.h"
 
+#include <unordered_map>
+
 #include <QtCore/QMutexLocker>
+
+#include <nx/utils/log/log.h>
 
 #include "abstract_video_decoder.h"
 
@@ -50,13 +54,48 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     return VideoDecoderPtr(nullptr, nullptr); //< no compatible decoder found
 }
 
-bool VideoDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution)
+bool VideoDecoderRegistry::hasCompatibleDecoder(
+    const AVCodecID codec, const QSize& resolution,
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
+    auto codecString =
+        [codec, &resolution]()
+        {
+            return lit("%1 [%2x%3]").arg(codec).arg(resolution.width()).arg(resolution.height());
+        };
+
+    NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);
+
+    // Some decoders can be used a limited number of times, e.g., once. Besides, this check could
+    // happen when a player is playing video and thus acquired one or more decoders. The check may
+    // fail if we don't take into account that the player can reuse its decoders.
+
+    std::unordered_map<std::type_index, int> decoderCountByTypeIndex;
+    for (const auto& decoder: currentDecoders)
+        ++decoderCountByTypeIndex[std::type_index(typeid(*decoder))];
+
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
-            return true;
+        const int availableUsageCount =
+            plugin.useCount - decoderCountByTypeIndex[plugin.typeIndex];
+
+        if (availableUsageCount >= plugin.maxUseCount)
+        {
+            NX_LOGX(lm("Count exceeded for plugin %1").arg(plugin.name), cl_logDEBUG2);
+            continue;
+        }
+
+        if (!plugin.isCompatible(codec, resolution))
+        {
+            NX_LOGX(
+                lm("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()),
+                cl_logDEBUG2);
+            continue;
+        }
+
+        NX_LOGX(lm("Selected plugin: %1").arg(plugin.name), cl_logDEBUG2);
+        return true;
     }
     return false;
 }

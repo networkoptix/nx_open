@@ -394,6 +394,47 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBoxPtzControl">
+         <property name="title">
+          <string>PTZ Control</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QCheckBox" name="checkBoxDisableNativePtzPresets">
+            <property name="text">
+             <string>Disable native presets, use system presets instead</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="settingsDisableNativePtzWarningLabel">
+            <property name="text">
+             <string>Warning! Native camera presets will not be avaliable.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="horizontalWidget_3" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

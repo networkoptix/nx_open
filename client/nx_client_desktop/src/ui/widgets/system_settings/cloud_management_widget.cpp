@@ -52,16 +52,12 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     for (auto label: { ui->accountLabel, ui->promo1TextLabel, ui->promo2TextLabel, ui->promo3TextLabel })
         setPaletteColor(label, QPalette::WindowText, nxColor);
 
-    ui->arrow1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_arrow.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->arrow1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_arrow.png"));
     ui->arrow2Label->setPixmap(*ui->arrow1Label->pixmap());
 
-    ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
+    ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));
+    ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
 
     // TODO: #help Set help topic
 

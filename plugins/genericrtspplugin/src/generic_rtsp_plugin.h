@@ -53,7 +53,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::auto_ptr<GenericRTSPDiscoveryManager> m_discoveryManager;
+    std::unique_ptr<GenericRTSPDiscoveryManager> m_discoveryManager;
 };
 
 #endif  //GENERIC_RTSP_PLUGIN_H

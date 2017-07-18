@@ -26,3 +26,4 @@ requests==2.9.1
 wheel==0.29.0
 wsgiref==0.1.2
 pycurl==7.43.0
+pillow==4.2.1

@@ -14,6 +14,14 @@ angular.module('cloudApp')
 
         var service = {
             get:function(){
+                var self = this;
+                if(requestingLogin){
+                    // login is requesting, so we wait
+                    return requestingLogin.then(function(){
+                        requestingLogin = null; // clean requestingLogin reference
+                        return self.get(); // Try again
+                    });
+                }
                 return cloudApi.account().then(function(account){
                     return account.data;
                 });
@@ -122,8 +130,7 @@ angular.module('cloudApp')
 
                 var tempLogin = auth.substring(0,index);
                 var tempPassword = auth.substring(index+1);
-
-                service.login(tempLogin, tempPassword, false).then(function(){
+                var requestingLogin = service.login(tempLogin, tempPassword, false).then(function(){
                     $location.search('auth', null);
                 });
             }

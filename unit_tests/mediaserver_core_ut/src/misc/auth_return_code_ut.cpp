@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <server/server_globals.h>
-#include "utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/utils.h>
+#include <test_support/mediaserver_launcher.h>
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
@@ -69,7 +69,7 @@ public:
         settings->synchronizeNowSync();
     }
 
-    void addLocalUser(QString userName, QString password)
+    void addLocalUser(QString userName, QString password, bool isEnabled = true)
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
@@ -77,7 +77,7 @@ public:
         userData.id = QnUuid::createUuid();
         userData.name = userName;
         userData.digest = nx_http::calcHa1(userName, nx::network::AppInfo::realm(), password);
-        userData.isEnabled = true;
+        userData.isEnabled = isEnabled;
         userData.isCloud = false;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
     }
@@ -92,7 +92,7 @@ public:
             boost::none);
     }
 
-    void testServerReturnCode(
+    void testServerReturnCodeForWrongPassword(
         const ec2::ApiUserData& userDataToUse,
         nx_http::AsyncHttpClient::AuthType authType,
         int expectedStatusCode,
@@ -116,7 +116,7 @@ public:
             login,
             password,
             nx::network::AppInfo::realm().toUtf8(),
-            nx_http::Method::GET,
+            nx_http::Method::get,
             QnAuthHelper::instance()->generateNonce());
 
         auto msgBody = QJson::serialized(cookieLogin);
@@ -139,7 +139,6 @@ public:
 
     static std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
 
-private:
     void testServerReturnCode(
         const QString& login,
         const QString& password,
@@ -192,7 +191,7 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
     // We had bug: server return invalid code if request occurred when server is just started.
     mediaServerLauncher->stop();
     mediaServerLauncher->startAsync();
-    testServerReturnCode(
+    testServerReturnCodeForWrongPassword(
         userData,
         nx_http::AsyncHttpClient::authBasic,
         nx_http::StatusCode::forbidden,
@@ -202,7 +201,7 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
 TEST_F(AuthReturnCodeTest, noCloudConnect)
 {
     // We have cloud user but not connected to cloud yet.
-    testServerReturnCode(
+    testServerReturnCodeForWrongPassword(
         userData,
         nx_http::AsyncHttpClient::authDigest,
         nx_http::StatusCode::unauthorized,
@@ -242,17 +241,30 @@ TEST_F(AuthReturnCodeTest, localUserWithCloudLikeName)
     assertServerAcceptsUserCredentials(userCredentials[0], userCredentials[1]);
 }
 
+TEST_F(AuthReturnCodeTest, disabledUser)
+{
+    const QString userCredentials[] = { "test2", "password" };
+
+    addLocalUser(userCredentials[0], userCredentials[1], false);
+    testServerReturnCode(
+        userCredentials[0],
+        userCredentials[1],
+        nx_http::AsyncHttpClient::authDigest,
+        nx_http::StatusCode::unauthorized,
+        Qn::Auth_DisabledUser);
+}
+
 TEST_F(AuthReturnCodeTest, noLdapConnect)
 {
     // We have cloud user but not connected to cloud yet.
-    testServerReturnCode(
+    testServerReturnCodeForWrongPassword(
         ldapUserWithEmptyDigest,
         nx_http::AsyncHttpClient::authBasicAndDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
 
     // We have cloud user but not connected to cloud yet.
-    testServerReturnCode(
+    testServerReturnCodeForWrongPassword(
         ldapUserWithFilledDigest,
         nx_http::AsyncHttpClient::authDigest,
         nx_http::StatusCode::unauthorized,

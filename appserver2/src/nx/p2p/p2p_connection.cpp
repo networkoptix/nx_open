@@ -116,7 +116,7 @@ Connection::~Connection()
     waitToStop.get_future().wait();
 }
 
-QUrl Connection::remoteUrl() const
+QUrl Connection::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
@@ -141,12 +141,14 @@ void Connection::fillAuthInfo(bool authByKey)
     }
 
     const auto& resPool = commonModule()->resourcePool();
-    QnMediaServerResourcePtr ownServer =
-        resPool->getResourceById<QnMediaServerResource>(localPeer().id);
-    if (ownServer && authByKey)
+    QnMediaServerResourcePtr server =
+        resPool->getResourceById<QnMediaServerResource>(remotePeer().id);
+    if (!server)
+        server = resPool->getResourceById<QnMediaServerResource>(localPeer().id);
+    if (server && authByKey)
     {
-        m_httpClient->setUserName(ownServer->getId().toString().toLower());
-        m_httpClient->setUserPassword(ownServer->getAuthKey());
+        m_httpClient->setUserName(server->getId().toString().toLower());
+        m_httpClient->setUserPassword(server->getAuthKey());
     }
     else
     {
@@ -203,7 +205,7 @@ void Connection::onHttpClientDone()
         {
             using namespace std::placeholders;
             fillAuthInfo(m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doPost(
+            m_httpClient->doGet(
                 m_remotePeerUrl,
                 std::bind(&Connection::onHttpClientDone, this));
         }
@@ -277,6 +279,14 @@ void Connection::onHttpClientDone()
         setState(State::Error);
         m_httpClient.reset();
         return;
+    }
+
+    //saving credentials we used to authorize request
+    if (m_httpClient->request().headers.find(nx_http::header::Authorization::NAME) !=
+        m_httpClient->request().headers.end())
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpAuthCacheItem = m_httpClient->authCacheItem();
     }
 
     auto socket = m_httpClient->takeSocket();
@@ -442,10 +452,15 @@ bool Connection::handleMessage(const nx::Buffer& message)
 #endif
 
     MessageType messageType = (MessageType)message[offset];
-    NX_ASSERT(!m_remotePeer.persistentId.isNull());
     emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
 
     return true;
+}
+
+nx_http::AuthInfoCache::AuthorizationCacheItem Connection::authData() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_httpAuthCacheItem;
 }
 
 QObject* Connection::opaqueObject()

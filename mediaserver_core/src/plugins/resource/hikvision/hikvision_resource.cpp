@@ -37,9 +37,9 @@ namespace plugins {
 using namespace nx::mediaserver_core::plugins::hikvision;
 
 HikvisionResource::HikvisionResource():
-    QnPlOnvifResource(),
-    m_audioTransmitter(new HikvisionAudioTransmitter(this))
+    QnPlOnvifResource()
 {
+    m_audioTransmitter.reset(new HikvisionAudioTransmitter(this));
 }
 
 HikvisionResource::~HikvisionResource()
@@ -192,21 +192,13 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
+            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
     }
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-QnAudioTransmitterPtr HikvisionResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(

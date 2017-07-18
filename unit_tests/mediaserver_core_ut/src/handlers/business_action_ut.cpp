@@ -1,12 +1,12 @@
 #include "media_server_process.h"
-#include "utils.h"
+#include <test_support/utils.h>
 #include "utils/common/util.h"
 #include <core/resource/user_resource.h>
 #include "core/resource_management/resource_pool.h"
 #include <server_query_processor.h>
 #include <transaction/transaction.h>
 #include <nx/utils/std/future.h>
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 

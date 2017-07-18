@@ -14,6 +14,14 @@ boost::optional<data::AccountData> AccountManagerStub::findAccountByUserName(
     return data::AccountData(it->second);
 }
 
+void AccountManagerStub::addExtension(AbstractAccountManagerExtension*)
+{
+}
+
+void AccountManagerStub::removeExtension(AbstractAccountManagerExtension*)
+{
+}
+
 void AccountManagerStub::addAccount(AccountWithPassword account)
 {
     m_emailToAccount.emplace(account.email, std::move(account));

@@ -1,8 +1,8 @@
 #pragma once
 
-
 #include <common/common_globals.h>
 
+#include <nx/core/core_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
@@ -20,7 +20,7 @@ class QnGlobalPermissionsManager:
 
     using base_type = Connective<QObject>;
 public:
-    QnGlobalPermissionsManager(QObject* parent);
+    QnGlobalPermissionsManager(nx::core::access::Mode mode, QObject* parent);
     virtual ~QnGlobalPermissionsManager();
 
     /** Get a set of global permissions that will not work without the given one. */
@@ -54,8 +54,6 @@ signals:
         Qn::GlobalPermissions permissions);
 
 private:
-    void recalculateAllPermissions();
-
     Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
 
     void updateGlobalPermissions(const QnResourceAccessSubject& subject);
@@ -71,6 +69,7 @@ private:
     void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 private:
+    const nx::core::access::Mode m_mode;
     mutable QnMutex m_mutex;
     QHash<QnUuid, Qn::GlobalPermissions> m_cache;
 };

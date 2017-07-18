@@ -8,7 +8,7 @@
 #include <QtGui/QStaticText>
 
 #include <api/server_rest_connection_fwd.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/resource_fwd.h>
 
@@ -218,7 +218,7 @@ protected:
 
     rest::Handle invokeTrigger(const QString& id,
         std::function<void(bool, rest::Handle)> resultHandler,
-        QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
+        nx::vms::event::EventState toggleState = nx::vms::event::EventState::undefined);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -239,7 +239,7 @@ private slots:
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
-    void at_eventRuleAddedOrUpdated(const QnBusinessEventRulePtr& rule);
+    void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_eventRuleRemoved(const QnUuid& ruleId);
 
 private:
@@ -268,6 +268,8 @@ private:
 
     void setupHud();
 
+    void initSoftwareTriggers();
+
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 
@@ -294,9 +296,10 @@ private:
         QnUuid overlayItemId;
     };
 
-    SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
-    bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
-    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
+    SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
+    bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
+    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
+        std::function<void()> clientSideHandler = std::function<void()>());
     void resetTriggers();
 
 private:

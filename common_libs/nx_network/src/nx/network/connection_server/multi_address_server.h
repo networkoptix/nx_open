@@ -13,7 +13,9 @@ namespace nx {
 namespace network {
 namespace server {
 
-//!Listens multiple addresses by creating multiple servers (\a SocketServerType)
+/**
+ * Listens multiple addresses by creating multiple servers (SocketServerType).
+ */
 template<class SocketServerType>
 class MultiAddressServer
 {
@@ -24,17 +26,19 @@ class MultiAddressServer
     }
 
 public:
-    /** Arguments are copied to the actual server object */
+    /**
+     * Arguments are copied to the actual server object.
+     */
     template<typename... Args>
     MultiAddressServer(Args... args)
     {
-        //TODO #ak this is work around gcc 4.8 bug. Return to lambda in gcc 4.9
+        // TODO: #ak This is work around gcc 4.8 bug. Return to lambda in gcc 4.9.
         typedef std::unique_ptr<SocketServerType>(*RealFactoryFuncType)(Args...);
         m_socketServerFactory =
             std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
-    // TODO: #ak inherit this class from QnStoppableAsync.
+    // TODO: #ak Inherit this class from QnStoppableAsync.
     void pleaseStopSync(bool assertIfCalledUnderMutex = true)
     {
         for (auto& listener: m_listeners)
@@ -42,9 +46,9 @@ public:
     }
 
     /**
-        \param bindToEveryAddress If \a true, this method returns success if bind to every input address succeeded.
-        if \a false - just one successful bind is required for this method to succeed
-    */
+     * @param bindToEveryAddress If true, this method returns success if bind to every input address succeeded.
+     * If false - just one successful bind is required for this method to succeed.
+     */
     template<template<typename, typename> class Dictionary, typename AllocatorType>
     bool bind(
         const Dictionary<SocketAddress, AllocatorType>& addrToListenList,
@@ -52,8 +56,8 @@ public:
     {
         m_endpoints.reserve(addrToListenList.size());
 
-        //binding to address(-es) to listen
-        for (const SocketAddress& addr : addrToListenList)
+        // Binding to address(es) to listen.
+        for (const SocketAddress& addr: addrToListenList)
         {
             std::unique_ptr<SocketServerType> socketServer = m_socketServerFactory();
             if (!socketServer->bind(addr))
@@ -84,7 +88,9 @@ public:
         return m_endpoints;
     }
 
-    //!Returns true, if all binded addresses are successfully listened
+    /**
+     * @return true if all bound addresses are successfully listened.
+     */
     bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         for (auto it = m_listeners.cbegin(); it != m_listeners.cend(); )

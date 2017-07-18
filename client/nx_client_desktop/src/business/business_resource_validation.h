@@ -7,9 +7,20 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
-
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/custom_style.h>
+
+#include <nx/vms/event/event_fwd.h>
+
+namespace QnBusiness {
+
+bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+    const QnUserResourcePtr& user);
+
+bool hasAccessToSource(const nx::vms::event::EventParameters& params,
+    const QnUserResourcePtr& user);
+
+} // namespace QnBusiness
 
 class QnCameraInputPolicy
 {
@@ -127,12 +138,17 @@ public:
         if (!m_warningLabel)
             return true;
 
-        auto resources = getResources(selected);
-        bool valid = isResourcesListValid<CheckingPolicy>(resources);
-        m_warningLabel->setVisible(!valid);
-        if (!valid)
-            m_warningLabel->setText(getText(resources));
+        const auto message = validationMessage(selected);
+        m_warningLabel->setHidden(message.isEmpty());
+        m_warningLabel->setText(message);
         return true;
+    }
+
+    QString validationMessage(const QSet<QnUuid>& selected) const override
+    {
+        const auto resources = getResources(selected);
+        const bool valid = isResourcesListValid<CheckingPolicy>(resources);
+        return valid ? QString() : getText(resources);
     }
 
     bool isValid(const QnUuid& resourceId) const override
@@ -161,7 +177,7 @@ public:
 
     void init(QWidget* parent) override;
 
-    bool validate(const QSet<QnUuid>& selected) override;
+    QString validationMessage(const QSet<QnUuid>& selected) const override;
     bool isValid(const QnUuid& resourceId) const override;
 
     static bool isValidList(const QSet<QnUuid>& ids, const QString& additional);

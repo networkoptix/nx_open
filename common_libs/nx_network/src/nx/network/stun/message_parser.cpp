@@ -454,5 +454,5 @@ nx::network::server::ParserState MessageParser::parse( const nx::Buffer& user_bu
     } while( true );
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

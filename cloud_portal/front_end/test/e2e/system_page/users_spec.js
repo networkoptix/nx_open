@@ -13,6 +13,7 @@ describe('User list', function () {
     });
 
     it("Shares system with other users", function() {
+        p.helper.openSystemByLink();
         p.helper.shareSystemWith(p.helper.userEmailAdmin, p.helper.roles.admin);
         p.helper.shareSystemWith(p.helper.userEmailViewer, p.helper.roles.viewer);
         p.helper.shareSystemWith(p.helper.userEmailAdvViewer, p.helper.roles.advViewer);

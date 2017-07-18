@@ -2,8 +2,6 @@
 
 #include <QtSql/QSqlQuery>
 
-#include <database/api/db_resource_api.h>
-
 #include <nx_ec/data/api_layout_data.h>
 
 #include <nx/fusion/model_functions.h>
@@ -34,11 +32,11 @@ bool deleteLayoutInternal(const QSqlDatabase& database, int internalId)
     )sql");
 
     QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool insertOrReplaceLayout(const QSqlDatabase& database, const ApiLayoutData& layout, qint32 internalId)
@@ -70,12 +68,12 @@ bool insertOrReplaceLayout(const QSqlDatabase& database, const ApiLayoutData& la
         )
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     QnSql::bind(layout, &query);
     query.bindValue(":internalId", internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool removeItems(const QSqlDatabase& database, qint32 internalId)
@@ -85,11 +83,11 @@ bool removeItems(const QSqlDatabase& database, qint32 internalId)
     )sql");
 
     QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
@@ -101,12 +99,12 @@ bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
     QByteArray emptyId = QnUuid().toRfc4122();
 
     QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.bindValue(":empty_id", emptyId);
     query.bindValue(":layout_id", layoutId.toRfc4122());
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint32 internalId)
@@ -119,6 +117,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         INSERT INTO vms_layoutitem (
             uuid,
             resource_guid,
+            path,
             layout_id,
             left,
             right,
@@ -137,6 +136,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         ) VALUES (
             :id,
             :resourceId,
+            :resourcePath,
             :layoutId,
             :left,
             :right,
@@ -155,7 +155,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         )
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     for (const ApiLayoutItemData& item : layout.items)
@@ -163,7 +163,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         NX_ASSERT(!item.id.isNull(), "Invalid null id item inserting");
         QnSql::bind(item, &query);
         query.bindValue(":layoutId", internalId);
-        if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
             return false;
     }
 
@@ -204,10 +204,10 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
     )sql");
     queryStr = queryStr.arg(filterStr);
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QSqlQuery queryItems(database);
@@ -217,6 +217,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
             r.guid as layoutId,
             li.uuid as id,
             li.resource_guid as resourceId,
+            li.path as resourcePath,
             li.left,
             li.right,
             li.top,
@@ -236,10 +237,10 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
         ORDER BY r.guid
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
         return false;
 
-    if (!QnDbHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
         return false;
 
     QnSql::fetch_many(query, &layouts);
@@ -251,34 +252,34 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
 }
 
 bool saveLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const ApiLayoutData& layout)
 {
     qint32 internalId;
     if (!insertOrReplaceResource(resourceContext, layout, &internalId))
         return false;
 
-    if (!insertOrReplaceLayout(resourceContext->database, layout, internalId))
+    if (!insertOrReplaceLayout(resourceContext->database(), layout, internalId))
         return false;
 
-    return updateItems(resourceContext->database, layout, internalId);
+    return updateItems(resourceContext->database(), layout, internalId);
 }
 
 bool removeLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const QnUuid& id)
 {
     int internalId = api::getResourceInternalId(resourceContext, id);
     if (internalId == 0)
         return true;
 
-    if (!removeItems(resourceContext->database, internalId))
+    if (!removeItems(resourceContext->database(), internalId))
         return false;
 
-    if (!cleanupVideoWalls(resourceContext->database, id))
+    if (!cleanupVideoWalls(resourceContext->database(), id))
         return false;
 
-    if (!deleteLayoutInternal(resourceContext->database, internalId))
+    if (!deleteLayoutInternal(resourceContext->database(), internalId))
         return false;
 
     return deleteResourceInternal(resourceContext, internalId);

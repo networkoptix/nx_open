@@ -16,7 +16,6 @@ namespace nx {
 namespace network {
 
 class Pollable;
-class AbstractAioThread;
 
 #ifndef _WIN32
 static const int INVALID_SOCKET = -1;

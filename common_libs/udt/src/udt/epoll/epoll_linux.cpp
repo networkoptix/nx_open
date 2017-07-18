@@ -123,10 +123,14 @@ int EpollLinux::poll(
         }
 
         const bool hangup = (ev[i].events & (EPOLLHUP | EPOLLRDHUP)) > 0;
+        const bool failure = (ev[i].events & EPOLLERR) > 0;
+        const int additionalOutputEventFlag = (hangup || failure) ? UDT_EPOLL_ERR : 0;
 
         if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
         {
-            lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
+            lrfds->emplace(
+                (SYSSOCKET)ev[i].data.fd,
+                UDT_EPOLL_IN | additionalOutputEventFlag);
             ++total;
         }
         if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
@@ -134,7 +138,7 @@ int EpollLinux::poll(
             //hangup - is an error when connecting, so adding error flag just for case
             lwfds->emplace(
                 (SYSSOCKET)ev[i].data.fd,
-                int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
+                UDT_EPOLL_OUT | additionalOutputEventFlag);
             ++total;
         }
     }

@@ -17,7 +17,7 @@ namespace ec2 {
 namespace database {
 namespace migrations {
 
-bool addDefaultWebpages(ec2::database::api::Context* context)
+bool addDefaultWebpages(ec2::database::api::QueryContext* context)
 {
     auto addWebPage = [context](const QString& name, const QString& url)
         {

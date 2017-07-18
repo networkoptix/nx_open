@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <test_support/cdb_launcher.h>
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
 #include <test_support/mediator_functional_test.h>
 
 namespace nx {

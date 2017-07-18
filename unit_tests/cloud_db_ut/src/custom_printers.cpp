@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QString>
 
-#include <cloud_db_client/src/data/types.h>
+#include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
@@ -20,18 +20,20 @@ void PrintTo(ResultCode val, ::std::ostream* os)
 
 } // namespace api
 } // namespace cdb
+} // namespace nx
 
+namespace nx {
+namespace utils {
 namespace db {
 
 void PrintTo(const DBResult val, ::std::ostream* os)
 {
-    *os << QnLexical::serialized(val).toStdString();
+    *os << toString(val);
 }
 
 } // namespace db
-
+} // namespace utils
 } // namespace nx
-
 
 namespace ec2 {
 

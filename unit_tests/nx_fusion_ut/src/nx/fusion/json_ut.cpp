@@ -124,6 +124,14 @@ TEST_F(QnFusionTestFixture, enumValue)
     ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value));
 }
 
+TEST_F(QnFusionTestFixture, enumValueCaseSensitive)
+{
+    const auto value = str("Flag0");
+    nx::TestFlag flag = nx::Flag0;
+    ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value.toLower()));
+    ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value.toUpper()));
+}
+
 TEST_F(QnFusionTestFixture, flagsValue)
 {
     const auto value = str("Flag1|Flag2");
@@ -146,6 +154,24 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     nx::TestFlags flags = nx::Flag0;
     ASSERT_TRUE(QJson::deserialize(value, &flags));
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
+}
+
+TEST_F(QnFusionTestFixture, bitArray)
+{
+    QBitArray value(17);
+    value.setBit(1);
+    value.setBit(5);
+    value.setBit(6);
+    value.setBit(9);
+    value.setBit(11);
+    value.setBit(16);
+
+    const auto data = QJson::serialized(value);
+    ASSERT_EQ(data, str("YgoBAQ==")); //< Base64 is expected.
+
+    QBitArray target;
+    ASSERT_TRUE(QJson::deserialize(data, &target));
+    ASSERT_EQ(value, target);
 }
 
 TEST_F(QnFusionTestFixture, deserializeStruct)

@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Output ID:</string>
+      <string>Output Id:</string>
      </property>
      <property name="buddy">
       <cstring>relayComboBox</cstring>

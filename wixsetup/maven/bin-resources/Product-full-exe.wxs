@@ -26,12 +26,13 @@
                 SuppressOptionsUI="no"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
+                SuppressDowngradeFailure="yes"
                 LicenseUrl="License.html"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleBundle)" />
+        <Variable Name="InstallerTitle" Value="!(loc.ClientAndServer)" />
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />

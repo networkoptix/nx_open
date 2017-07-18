@@ -115,7 +115,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
     auto progressDialog = new QnProgressDialog(mainWindow());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->setCancelButton(nullptr);
-    progressDialog->setWindowTitle(tr("Connecting to the current system..."));
+    progressDialog->setWindowTitle(tr("Connecting to the current System..."));
     progressDialog->show();
 
     connect(m_connectTool, &QnConnectToCurrentSystemTool::finished,
@@ -153,7 +153,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(), tr("Server connected to System"));
+            QnMessageBox::success(mainWindow(),
+                tr("Server will be connected to System shortly"),
+                tr("It will appear in the resource tree when the database synchronization is finished."));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:

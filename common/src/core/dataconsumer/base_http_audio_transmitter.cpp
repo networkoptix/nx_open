@@ -17,6 +17,8 @@ AVCodecID toFfmpegCodec(const QString& codec)
         return AV_CODEC_ID_ADPCM_G726;
     else if (codec == lit("MULAW"))
         return AV_CODEC_ID_PCM_MULAW;
+    else if (codec == lit("ALAW"))
+        return AV_CODEC_ID_PCM_ALAW;
     else if (codec == lit("PCM_S16LE"))
         return AV_CODEC_ID_PCM_S16LE;
     else
@@ -29,9 +31,10 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     QnAbstractAudioTransmitter(),
     m_resource(res),
     m_state(TransmitterState::WaitingForConnection),
+    m_bitrateKbps(0),
     m_transcoder(nullptr),
     m_socket(nullptr),
-    m_uploadMethod(nx_http::Method::POST)
+    m_uploadMethod(nx_http::Method::post)
 {
     connect(
         m_resource, &QnResource::parentIdChanged, this,
@@ -67,6 +70,12 @@ void BaseHttpAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
     m_outputFormat = format;
 }
 
+void BaseHttpAudioTransmitter::setBitrateKbps(int value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_bitrateKbps = value;
+}
+
 void BaseHttpAudioTransmitter::setAudioUploadHttpMethod(nx_http::StringType method)
 {
     QnMutexLocker lock(&m_mutex);
@@ -84,6 +93,8 @@ void BaseHttpAudioTransmitter::prepare()
     QnMutexLocker lock(&m_mutex);
     m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
+    if (m_bitrateKbps > 0)
+        m_transcoder->setBitrate(m_bitrateKbps);
 }
 
 bool BaseHttpAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)
@@ -194,16 +205,16 @@ bool BaseHttpAudioTransmitter::startTransmission()
 
     QnMutexLocker lock(&m_mutex);
 
-    if (m_uploadMethod == nx_http::Method::POST)
+    if (m_uploadMethod == nx_http::Method::post)
     {
         httpClient
             ->doPost(
                 url,
                 contentType(),
                 contentBody,
-                true);
+                !contentBody.isEmpty());
     }
-    else if (m_uploadMethod == nx_http::Method::PUT)
+    else if (m_uploadMethod == nx_http::Method::put)
     {
         httpClient
             ->doPut(

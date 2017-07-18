@@ -33,7 +33,9 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
-MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
+MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC  # timeout for local system ids become the same
+MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC = 90  # timeout for mergeSystems REST api request
+MEDIASERVER_START_TIMEOUT_SEC = 60  # timeout when waiting for server become online (pingable)
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -202,7 +204,7 @@ class Server(object):
             self.set_service_status(is_started)
 
     def wait_for_server_become_online(self):
-        wait_time_sec = 30
+        wait_time_sec = MEDIASERVER_START_TIMEOUT_SEC
         start_time = time.time()
         while time.time() < start_time + wait_time_sec:
             if self._is_server_online():
@@ -212,11 +214,11 @@ class Server(object):
                 log.debug('Server is still offline...')
                 time.sleep(0.5)
         else:
-            raise RuntimeError('Server has not went online in %d seconds' % wait_time_sec)
+            raise RuntimeError('Server %s has not went online in %d seconds' % (self, wait_time_sec))
 
     def _is_server_online(self):
         try:
-            self.rest_api.api.ping.GET()
+            self.rest_api.api.ping.GET(timeout_sec=10)
             return True
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
@@ -339,6 +341,7 @@ class Server(object):
             getKey=make_key('GET'),
             postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings,
+            timeout_sec=MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC,
             )
         if take_remote_settings:
             self.set_user_password(other_server.user, other_server.password)

@@ -551,7 +551,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         displayedTime = newDisplayedTime;
                         firstWait = true;
                     }
-                    if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
+                    bool doDelayForAudio = m_playAudio && m_audioDisplay->isPlaying()
+                        && displayedTime > m_audioDisplay->getCurrentTime();
+                    if (ct != DATETIME_NOW && (speedSign *(displayedTime - ct) > 0) || doDelayForAudio)
                     {
                         if (firstWait)
                         {
@@ -1348,7 +1350,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                if( m_display[i] )
+                if (isFillerPacket && m_display[i])
                     m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }

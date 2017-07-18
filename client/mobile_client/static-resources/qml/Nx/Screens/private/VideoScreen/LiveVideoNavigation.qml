@@ -8,18 +8,12 @@ Item
     id: videoNavigation
 
     property var videoScreenController
+    property bool ptzAvailable: false
+
+    signal ptzButtonClicked()
 
     implicitWidth: parent.width
     implicitHeight: content.height
-
-    Image
-    {
-        width: parent.width
-        height: sourceSize.height
-        anchors.bottom: parent.bottom
-        sourceSize.height: 56 * 2
-        source: lp("/images/timeline_gradient.png")
-    }
 
     Column
     {
@@ -70,5 +64,17 @@ Item
                 }
             }
         }
+    }
+
+    IconButton
+    {
+        icon: lp("images/ptz/ptz.png")
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: 4
+        anchors.bottomMargin: 4
+        visible: videoNavigation.ptzAvailable
+
+        onClicked: videoNavigation.ptzButtonClicked()
     }
 }

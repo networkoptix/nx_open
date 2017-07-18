@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', function ($http, $q, $location, $rootScope) {
+    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', '$log',
+    function ($http, $q, $location, $rootScope, $log) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -89,7 +90,7 @@ angular.module('nxCommon')
                     if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
                         // Handler is supposed to try and update auth keys
-                        return self.unauthorizedCallBack().then(function(){
+                        return self.unauthorizedCallBack(error).then(function(){
                             return self._wrapRequest(method, url, data, true);
                         },function(){
                             $rootScope.$broadcast("unauthirosed_" + self.systemId);
@@ -283,7 +284,7 @@ angular.module('nxCommon')
             if(height){
                 data.height = height;
             }
-            return this._setGetParams('/api/image', data, this.systemId && this.authGet());
+            return this._setGetParams('/ec2/cameraThumbnail', data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};
@@ -319,20 +320,18 @@ angular.module('nxCommon')
             if(typeof(periodsType)==='undefined'){
                 periodsType = 0;
             }
-
+            var params={
+                physicalId: physicalId,
+                startTime: startTime,
+                endTime: endTime,
+                detail: detail,
+                periodsType: periodsType
+            }
+            if(limit){
+                params.limit = limit
+            }
             //RecordedTimePeriods
-            return  this._get('/ec2/recordedTimePeriods' +
-            '?' + (label||'') +
-            (limit?'&limit=' + limit:'') +
-            '&physicalId=' + physicalId +
-            '&startTime=' + startTime +
-            '&endTime=' + endTime +
-            '&detail=' + detail +
-            '&periodsType=' + periodsType +
-            '&flat&keepSmallChunks');
-            //http://10.1.5.129:7001/web/ec2/recordedTimePeriods?1h&            physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1488920406724&endTime=1494626406724&detail=3600000&periodsType=0&flat&keepSmallChunks
-
-            //http://localhost:10000/web/ec2/recordedTimePeriods?&limit=100&physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1494625266744&endTime=1494625366744&detail=1      &periodsType=0&flat&keepSmallChunks
+            return this._get('/ec2/recordedTimePeriods?flat&keepSmallChunks&' + (label||''),params);
         };
         /* End of Working with archive*/
 
@@ -357,9 +356,9 @@ angular.module('nxCommon')
                     }
                 }
             }
-            var defaultConnection = connect(null, null, serverId, function(){
+            var defaultConnection = connect(null, null, serverId, function(error){
                 // Unauthorised request here
-                window.location.reload(); // just reload the page and it supposed to handle the problem
+                // We are in webadmin mode - do nothing, let webadmin handle it
                 return $q.reject(); // Do not repeat last request
             });
             return defaultConnection;

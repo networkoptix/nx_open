@@ -1,4 +1,4 @@
-<placeholder preloader="!ready" class="webclient-placeholder"></placeholder>
+<placeholder ng-if='!ready' preloader="true" class="webclient-placeholder"></placeholder>
 <table ng-class="{'visibility-hidden':!ready}" class="webclient-window">
     <tbody>
         <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
@@ -23,6 +23,7 @@
             <td>
                 <div class="view-wrapper">
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
+                                  position-provider="positionProvider" system="systemAPI"
                                   player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
                                   class="cameras-panel-toggle"
                                   ng-class="{'hide-panel':!toggleCameraPanel}"></camera-panel>
@@ -91,7 +92,7 @@
                                     records-provider="activeVideoRecords"
                                     position-handler="switchPosition"
                                     play-handler="switchPlaying" can-view-archive="canViewArchive"
-                                    position-provider="positionProvider" volume-level="volumeLevel" server-time="serverTime"></timeline>
+                                    position-provider="positionProvider" volume-level="volumeLevel"></timeline>
                         </div>
                     </div>
                 </div>

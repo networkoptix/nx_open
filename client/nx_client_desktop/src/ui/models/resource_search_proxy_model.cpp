@@ -2,52 +2,19 @@
 
 #include <client/client_globals.h>
 
-#include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
-#include <nx/network/nettools.h>
-
 #include <nx/utils/string.h>
-#include <utils/common/delete_later.h>
 
-QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent):
-    QSortFilterProxyModel(parent),
-    m_invalidating(false)
+#include <utils/common/delayed.h>
+
+QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
+    base_type(parent)
 {
 }
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel()
 {
-}
-
-void QnResourceSearchProxyModel::addCriterion(const QnResourceCriterion &criterion)
-{
-    m_criterionGroup.addCriterion(criterion);
-
-    invalidateFilterLater();
-}
-
-bool QnResourceSearchProxyModel::removeCriterion(const QnResourceCriterion &criterion)
-{
-    bool removed = m_criterionGroup.removeCriterion(criterion);
-    if (removed)
-        invalidateFilterLater();
-
-    return removed;
-}
-
-void QnResourceSearchProxyModel::clearCriteria()
-{
-    if (m_criterionGroup.empty())
-        return;
-
-    m_criterionGroup.clear();
-    invalidateFilterLater();
-}
-
-const QnResourceCriterionGroup & QnResourceSearchProxyModel::criteria()
-{
-    return m_criterionGroup;
 }
 
 QnResourceSearchQuery QnResourceSearchProxyModel::query() const
@@ -62,24 +29,22 @@ void QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
 
     m_query = query;
 
-    clearCriteria();
     setFilterWildcard(L'*' + query.text + L'*');
-    if (query.text.isEmpty())
-    {
-        addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject,
-            QnResourceCriterion::Reject));
-    }
-    else
-    {
-        addCriterion(QnResourceCriterionGroup(query.text));
-        addCriterion(QnResourceCriterion(Qn::user));
-        addCriterion(QnResourceCriterion(Qn::layout));
-    }
-    if (query.flags != 0)
-    {
-        addCriterion(QnResourceCriterion(query.flags, QnResourceProperty::flags,
-            QnResourceCriterion::Next, QnResourceCriterion::Reject));
-    }
+    invalidateFilterLater();
+}
+
+QnResourceSearchProxyModel::DefaultBehavior QnResourceSearchProxyModel::defaultBehavor() const
+{
+    return m_defaultBehavior;
+}
+
+void QnResourceSearchProxyModel::setDefaultBehavior(DefaultBehavior value)
+{
+    if (m_defaultBehavior == value)
+        return;
+
+    m_defaultBehavior = value;
+    invalidateFilterLater();
 }
 
 void QnResourceSearchProxyModel::invalidateFilter()
@@ -95,28 +60,44 @@ void QnResourceSearchProxyModel::invalidateFilterLater()
         return; /* Already waiting for invalidation. */
 
     m_invalidating = true;
-    QMetaObject::invokeMethod(this, "invalidateFilter", Qt::QueuedConnection);
+    executeDelayedParented([this]{ invalidateFilter(); }, kDefaultDelay, this);
 }
 
-bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+bool QnResourceSearchProxyModel::filterAcceptsRow(
+    int sourceRow,
+    const QModelIndex& sourceParent) const
 {
-    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+    if (m_query.text.isEmpty())
+        return m_defaultBehavior == DefaultBehavior::showAll;
+
+    QModelIndex root = (sourceParent.column() > Qn::NameColumn)
+        ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
+        : sourceParent;
+
+    QModelIndex index = sourceModel()->index(sourceRow, 0, root);
     if (!index.isValid())
         return true;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-
-    if (isSeparatorNode(nodeType))
-        return false;
-
-    if (nodeType == Qn::UsersNode)
-        return false; /* We don't want users in search. */
-
-    if (nodeType == Qn::RecorderNode
-        || nodeType == Qn::LocalResourcesNode
-        || nodeType == Qn::OtherSystemsNode)
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    switch (nodeType)
     {
-        for (int i = 0; i < sourceModel()->rowCount(index); i++)
+        case Qn::CurrentSystemNode:
+        case Qn::CurrentUserNode:
+        case Qn::SeparatorNode:
+        case Qn::LocalSeparatorNode:
+        case Qn::BastardNode:
+        case Qn::AllCamerasAccessNode:
+        case Qn::AllLayoutsAccessNode:
+            return false;
+        default:
+            break;
+    }
+
+    const int childCount = sourceModel()->rowCount(index);
+    const bool hasChildren = childCount > 0;
+    if (hasChildren)
+    {
+        for (int i = 0; i < childCount; i++)
         {
             if (filterAcceptsRow(i, index))
                 return true;
@@ -124,19 +105,17 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
         return false;
     }
 
-    /* Simply filter by text. */
-    if (nodeType == Qn::CloudSystemNode)
-        return base_type::filterAcceptsRow(source_row, source_parent);
-
-    QnResourcePtr resource = this->resource(index);
-    if (!resource)
-        return true;
-
-    QnResourceCriterion::Operation operation = m_criterionGroup.check(resource);
-    if (operation != QnResourceCriterion::Accept)
+    // Simply filter by text first.
+    if (!base_type::filterAcceptsRow(sourceRow, root))
         return false;
 
-    return true;
+    // Check if no further filtering is required.
+    if (m_query.flags == 0)
+        return true;
+
+    // Show only resources with given flags.
+    QnResourcePtr resource = this->resource(index);
+    return resource && resource->hasFlags(m_query.flags);
 }
 
 

@@ -130,11 +130,23 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     connect(m_model, &QnTimeServerSelectionModel::dataChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
+    static constexpr int kUpdateTimeMs = 1000;
+    static constexpr int kUpdateTimeOffsetMs = 5000;
     auto updateTime =
         [this]()
         {
+            static const int k = kUpdateTimeOffsetMs / kUpdateTimeMs;
             if (isVisible())
+            {
+                if (m_timeCounter % k == 0)
+                    m_model->updateTimeOffset();
+                ++m_timeCounter;
                 this->updateTime();
+            }
+            else
+            {
+                m_timeCounter = 0;
+            }
         };
 
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
@@ -210,9 +222,13 @@ void QnTimeServerSelectionWidget::applyChanges()
 
 bool QnTimeServerSelectionWidget::hasChanges() const
 {
-    return m_model->selectedServer() != selectedServer()
-        || (qnGlobalSettings->isSynchronizingTimeWithInternet()
-            != ui->syncWithInternetCheckBox->isChecked());
+    const bool syncWithInternet = ui->syncWithInternetCheckBox->isChecked();
+    if (qnGlobalSettings->isSynchronizingTimeWithInternet() != syncWithInternet)
+        return true;
+
+    return syncWithInternet
+        ? false
+        : m_model->selectedServer() != selectedServer();
 }
 
 QnUuid QnTimeServerSelectionWidget::selectedServer() const

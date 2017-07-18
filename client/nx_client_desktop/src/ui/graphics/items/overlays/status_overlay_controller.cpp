@@ -108,7 +108,7 @@ void QnStatusOverlayController::updateWidgetItems()
     const auto pixmapPath = statusIcon(statusOverlay());
     m_widget->setIconOverlayPixmap(pixmapPath.isEmpty()
         ? QPixmap()
-        : qnSkin->pixmap(pixmapPath));
+        : qnSkin->pixmap(pixmapPath, true));
 }
 
 void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
@@ -128,7 +128,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     m_widget->setDescription(descriptionText(m_statusOverlay));
 
     const auto pixmapPath = statusIcon(m_statusOverlay);
-    m_widget->setIcon(pixmapPath.isEmpty() ? QPixmap() : qnSkin->pixmap(pixmapPath));
+    m_widget->setIcon(pixmapPath.isEmpty() ? QPixmap() : qnSkin->pixmap(pixmapPath, true));
 
     updateErrorState();
     updateVisibleItems();

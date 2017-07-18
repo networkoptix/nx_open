@@ -33,12 +33,12 @@ static const QString kCameraIdParam = lit("cameraId");
 static const QString kTimeParam = lit("time");
 static const QString kRotateParam = lit("rotate");
 static const QString kHeightParam = lit("height");
-static const QString kWidthParam = lit("widht");
+static const QString kDeprecatedWidthParam = lit("widht");
+static const QString kWidthParam = lit("width");
 static const QString kImageFormatParam = lit("imageFormat");
 static const QString kRoundMethodParam = lit("method");
 
 static const QString kLatestTimeValue = lit("latest");
-static const int kMinimumSize = 128;
 
 } // namespace
 
@@ -73,7 +73,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     if (params.contains(kTimeParam))
     {
         QString timeValue = params.value(kTimeParam);
-        if (timeValue == kLatestTimeValue)
+        if (timeValue.toLower() == kLatestTimeValue)
             msecSinceEpoch = kLatestThumbnail;
         else
             msecSinceEpoch = nx::utils::parseDateTimeMsec(timeValue);
@@ -81,7 +81,10 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
 
     rotation = QnLexical::deserialized<int>(params.value(kRotateParam), rotation);
     size.setHeight(QnLexical::deserialized<int>(params.value(kHeightParam), size.height()));
-    size.setWidth(QnLexical::deserialized<int>(params.value(kWidthParam), size.width()));
+    if (params.contains(kWidthParam))
+        size.setWidth(QnLexical::deserialized<int>(params.value(kWidthParam), size.width()));
+    else
+        size.setWidth(QnLexical::deserialized<int>(params.value(kDeprecatedWidthParam), size.width()));
     imageFormat = QnLexical::deserialized<ThumbnailFormat>(
         params.value(kImageFormatParam), imageFormat);
     roundMethod = QnLexical::deserialized<RoundMethod>(

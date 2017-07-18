@@ -1,0 +1,216 @@
+<div class="container">
+    <h1>Configuración avanzada del servidor</h1>
+
+    <div class="alert alert-danger" role="alert">
+        <b>Advertencia</b> Cualquier cambio en esta página puede hacer que el servidor funcione incorrectamente.
+    </div>
+
+
+    <h2>Almacenamiento</h2>
+    <form class="form" role="form" name="form" novalidate>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th >
+                        URL
+                    </th>
+                    <th width="200">
+                        Espacio libre
+                    </th>
+                    <th width="150">
+                        Espacio reservado
+                    </th>
+                    <th >
+                    </th>
+                    <th width="70">
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="storage in storages" ng-form="storageForm">
+
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
+                    <td>
+                        <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
+                             title="{{formatTotalSpace(storage)}}">
+
+                            <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                                 ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
+                            </div>
+
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} de {{formatSpace(storage.totalSpace)}}</div>
+
+
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 ng-style="{width: (storage.freeSpace)*100/storage.totalSpace + '%'}">
+                            </div>
+
+                            <div class="progress-bar progress-bar-danger"
+                                 ng-style="{width: 100-storage.freeSpace*100/storage.totalSpace +'%'}">
+                            </div>
+                        </div>
+
+                        <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
+                            <div class="progress-bar progress-bar-danger" style="width:100%">
+                                Inaccesible
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group" ng-if="storage.isWritable"
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                            <input type="number"  class="form-control input-sm"
+                                   ng-model="storage.reservedSpaceGb"
+                                   name="reservedSpaceGb"
+                                   min="1"
+                                   max="{{toGBs(storage.totalSpace)}}"
+                                   required
+ placeholder="Espacio reservado"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                        <div class="input-group" ng-if="!storage.isWritable">
+                            <input type="number" class="form-control input-sm"
+                                   ng-value="storage.reservedSpaceGb"
+                                   disabled
+ placeholder="Espacio reservado"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                    </td>
+                    <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
+                           <label class="read-container">
+                               <span class="checkbox-wrapper">
+                                <input type="checkbox"
+                                       class="isUsedForWriting"
+                                   ng-model="storage.isUsedForWriting"
+                                   ng-disabled="!storage.isWritable"
+                                   name="isUsedForWriting"
+                                   placeholder="Uso para la escritura"/>
+                                </span>
+                                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
+                                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
+
+                           </label>
+                    </td>
+                    <td>
+                        <span class="read-container">
+                            <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
+                            <icon for="storage.isBackup" on-true="floppy-save" on-false="empty" title-true="Backup storage" ></icon>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
+            Ninguna unidad de almacenamiento principal fue seleccionada para la escritura - vídeo no será registrado en este servidor.
+        </div>
+        <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
+            El espacio reservado en cantidad es mayor que el espacio libre. Videos actuales se pueden extraer para liberar algo de espacio.
+        </div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fijar todos los valores resaltados para guardarlo</div>
+
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Guardar</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancelar</button>
+    </form>
+
+    <h2>Ajustes del Registro</h2>
+    <form class="form" role="form" name="logLevels" novalidate>
+        <div class="form-group">
+            <label class="col-sm-4">Nivel de registro principal</label>
+            <div class="col-sm-8">
+
+                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
+                    <option value="NONE">Ninguno: Registro deshabilitado.</option>
+                    <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
+                    <option value="ERROR">Error: Sólo errores de registro.</option>
+                    <option value="WARNING">Aviso: Las advertencias de registro y errores.</option>
+                    <option value="INFO">Siempre: Registrar errores, advertencias y todos los mensajes.</option>
+                    <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
+                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de ajuste ampliada.</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">Nivel del registro de transacciones</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
+                    <option value="NONE">Ninguno: Registro deshabilitado.</option>
+                    <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
+                    <option value="ERROR">Error: Sólo errores de registro.</option>
+                    <option value="WARNING">Aviso: Las advertencias de registro y errores.</option>
+                    <option value="INFO">Siempre: Registrar errores, advertencias y todos los mensajes.</option>
+                    <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
+                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de ajuste ampliada.</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Guardar</button>
+        </div>
+    </form>
+
+    <h2>Actualización manual</h2>
+    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
+        <div class="form-group">
+            <label class="col-sm-4">Subir el instalador</label>
+            <div class="col-sm-8">
+                <fileupload text="Select server update archive (zip)"></fileupload>
+                <p class="help-block">Por favor, asegúrese de que la configuración sea correcta.</p>
+            </div>
+        </div>
+    </form>
+
+    <h1>Configuración avanzada del sistema</h1>
+    <div class="alert alert-danger" role="alert">
+        <b>Advertencia</b> Cualquier cambio en esta página puede hacer que el servidor funcione incorrectamente.
+    </div>
+
+    <form class="form row" role="form" name="systemSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <div class="col-sm-6">
+                <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                       style="height: 22px"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'password'" type="password"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{AjustesDelSistema[setting]||'vacío'}}</p>
+
+                <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
+                    <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Guardar</button>
+        </div>
+
+    </form>
+    <br>
+    <div class="alert alert-danger row" role="alert">
+        <b>¡Aviso!</b> Algunos cambios requieren reiniciar <b>todos</b> los servidores en Sistema.<br><br>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="restartServer()" >Reiniciar servidor actual</button>
+        </div>
+    </div>
+</div>

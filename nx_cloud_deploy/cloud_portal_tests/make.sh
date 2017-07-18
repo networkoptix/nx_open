@@ -16,6 +16,7 @@ function stage()
     $SED "s/cloud-prod.hdw.mx/nxvms.com/g" stage/test-customizations.json
     $SED "s/cloud-test.hdw.mx/nxvms.com/g" stage/Gruntfile.js
     $SED "s/cloud-test.hdw.mx/nxvms.com/g" stage/test-customizations.json
+    $SED "s/--test-type'/--test-type', '--ignore-certificate-errors'/g" stage/protractor-conf.js
 }
 
 main $@

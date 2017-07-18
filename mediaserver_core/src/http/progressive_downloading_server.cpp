@@ -224,7 +224,7 @@ private:
     bool m_standFrameDuration;
     qint64 m_lastMediaTime;
     qint64 m_utcShift;
-    std::auto_ptr<CachedOutputStream> m_dataOutput;
+    std::unique_ptr<CachedOutputStream> m_dataOutput;
     const unsigned int m_maxFramesToCacheBeforeDrop;
     QnAdaptiveSleep m_adaptiveSleep;
     qint64 m_rtStartTime;
@@ -687,7 +687,8 @@ void QnProgressiveDownloadingConsumer::run()
             QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
             dataProvider = liveReader;
             if (liveReader) {
-                dataConsumer.copyLastGopFromCamera(camera);
+                if (camera->isSomeActivity())
+                    dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
                 liveReader->startIfNotRunning();
                 camera->inUse(this);
             }

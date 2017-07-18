@@ -96,8 +96,8 @@ namespace ec2
                 break;
             }
 
-            if( d->request.requestLine.method != nx_http::Method::POST &&
-                d->request.requestLine.method != nx_http::Method::PUT )
+            if( d->request.requestLine.method != nx_http::Method::post &&
+                d->request.requestLine.method != nx_http::Method::put )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
                 break;

@@ -28,7 +28,7 @@ AxisRelayIOManager::AxisRelayIOManager(
     m_outputPortCount( outputPortCount ),
     m_multipartedParsingState( waitingDelimiter )
 {
-    std::auto_ptr<SyncHttpClient> httpClient;
+    std::unique_ptr<SyncHttpClient> httpClient;
     if( !httpClient.get() )
         httpClient.reset( new SyncHttpClient(
             AxisCameraPlugin::instance()->networkAccessManager(),
@@ -343,7 +343,7 @@ void AxisRelayIOManager::readAxisRelayPortNotification( const QByteArray& notifi
 
     const char eventType = notification[sepPos+1];
     //size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
-    //if( portTypePos == nx_http::BufferNpos )
+    //if( portTypePos == nx::utils::BufferNpos )
     //    return; //Error parsing notification: port type not found
 
     //const unsigned int portNumber = notification.mid(0, portTypePos).toUInt();

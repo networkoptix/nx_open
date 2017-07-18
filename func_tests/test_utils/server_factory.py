@@ -37,8 +37,8 @@ class ServerFactory(object):
             else:
                 box = self._vagrant_box_factory(must_be_recreated=config.leave_initial_cloud_host)
             server = box.get_server(config)
+        self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
         self._prepare_server(config, server)
-        self._allocated_servers.append(server)
         log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
                  server.title, server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
         return server
@@ -72,12 +72,19 @@ class ServerFactory(object):
     def _save_server_artifacts(self, server):
         log_contents = server.get_log_file()
         if log_contents:
-            log_path = self._artifact_factory('server', server.title.lower(), '.log')
+            server_name = server.title.lower()
+            artifact_factory = self._artifact_factory(
+                ['server', server_name], ext='.log', name='server-%s' % server_name, type_name='log')
+            log_path = artifact_factory.produce_file_path()
             with open(log_path, 'wb') as f:
                 f.write(log_contents)
             log.debug('log file for server %s, %s is stored to %s', server.title, server, log_path)
         for remote_core_path in server.list_core_files():
-            local_core_path = self._artifact_factory('server', server.title.lower(), os.path.basename(remote_core_path))
+            fname = os.path.basename(remote_core_path)
+            artifact_factory = self._artifact_factory(
+                ['server', server_name, fname],
+                name='%s-%s' % (server_name, fname), is_error=True, type_name='core')
+            local_core_path = artifact_factory.produce_file_path()
             server.host.get_file(remote_core_path, local_core_path)
             log.debug('core file for server %s, %s is stored to %s', server.title, server, local_core_path)
 

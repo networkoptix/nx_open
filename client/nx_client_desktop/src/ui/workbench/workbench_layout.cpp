@@ -47,6 +47,9 @@ void pointize(const QRect& region, PointContainer* points)
     }
 }
 
+static const auto kItemMapTag(lit("__itemMap"));
+static const auto kFreeSlotTag(lit("__freeSlot"));
+
 } // namespace
 
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObject* parent):
@@ -233,7 +236,7 @@ void QnWorkbenchLayout::notifyTitleChanged()
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 {
-    NX_EXPECT(item);
+    NX_EXPECT(item && item->resource());
     if (!item)
         return;
 
@@ -254,9 +257,12 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
     m_items.insert(item);
 
     if (item->isPinned())
+    {
         m_itemMap.fill(item->geometry(), item);
+        NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+    }
     m_rectSet.insert(item->geometry());
-    m_itemsByUid[item->resourceUid()].insert(item);
+    m_itemsByResource[item->resource()].insert(item);
     m_itemByUuid[item->uuid()] = item;
 
     emit itemAdded(item);
@@ -277,9 +283,12 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
 
     /* Update internal data structures. */
     if (item->isPinned())
+    {
         m_itemMap.clear(item->geometry());
+        NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+    }
     m_rectSet.remove(item->geometry());
-    m_itemsByUid[item->resourceUid()].remove(item);
+    m_itemsByResource[item->resource()].remove(item);
     m_itemByUuid.remove(item->uuid());
 
     item->m_layout = nullptr;
@@ -386,6 +395,9 @@ bool QnWorkbenchLayout::moveItem(QnWorkbenchItem* item, const QRect& geometry)
     {
         m_itemMap.clear(item->geometry());
         m_itemMap.fill(geometry, item);
+        NX_DEBUG(kItemMapTag, lm("Item moved from cell %1 to cell %2")
+            .arg(item->geometry())
+            .arg(geometry));
     }
 
     moveItemInternal(item, geometry);
@@ -401,7 +413,6 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem* item, const QRect& geo
     updateBoundingRectInternal();
 
     item->setGeometryInternal(geometry);
-    emit itemMoved(item);
 }
 
 bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem*>& items,
@@ -497,17 +508,24 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem*>& items,
     for (auto item: items)
     {
         if (item->isPinned())
+        {
             m_itemMap.clear(item->geometry());
+            NX_DEBUG(kItemMapTag, lm("Batch move items: clear cell %1").arg(item->geometry()));
+        }
     }
 
     for (int i = 0; i < items.size(); i++)
     {
         auto item = items[i];
         if (item->isPinned())
+        {
             m_itemMap.fill(geometries[i], item);
+            NX_DEBUG(kItemMapTag, lm("Batch move items: put on cell %1").arg(geometries[i]));
+        }
         moveItemInternal(item, geometries[i]);
     }
 
+    emit itemsMoved(items);
     return true;
 }
 
@@ -523,6 +541,7 @@ bool QnWorkbenchLayout::pinItem(QnWorkbenchItem* item, const QRect& geometry)
         return false;
 
     m_itemMap.fill(geometry, item);
+    NX_DEBUG(kItemMapTag, lm("Pin item to cell %1").arg(geometry));
     moveItemInternal(item, geometry);
     item->setFlagInternal(Qn::Pinned, true);
     return true;
@@ -537,6 +556,7 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem* item)
         return true;
 
     m_itemMap.clear(item->geometry());
+    NX_DEBUG(kItemMapTag, lm("Unpin item from cell %1").arg(item->geometry()));
     item->setFlagInternal(Qn::Pinned, false);
     return true;
 }
@@ -592,10 +612,10 @@ QSet<QnWorkbenchItem*> QnWorkbenchLayout::items(const QList<QRect>& regions) con
     return m_itemMap.values(regions);
 }
 
-const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QString& resourceUniqueId) const
+const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QnResourcePtr& resource) const
 {
-    auto pos = m_itemsByUid.find(resourceUniqueId);
-    return pos == m_itemsByUid.end() ? m_noItems : pos.value();
+    auto pos = m_itemsByResource.find(resource);
+    return pos == m_itemsByResource.end() ? m_noItems : pos.value();
 }
 
 const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const
@@ -618,7 +638,6 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
 
-    const auto kFreeSlotTag = lit("__freeSlot");
     NX_DEBUG(kFreeSlotTag, lm("Seek for closestFreeSlot to %1 of size %2").args(gridPos, size));
 
     /* Grid cell where starting search position lies. */

@@ -455,7 +455,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 }
             }
         }
-        return mouseX && mouseY > top && (mouseY < top + timelineConfig.chunkHeight * self.canvas.height);
+        return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
     function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
@@ -517,7 +517,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     lastMinuteTexture = context.createPattern(img, 'repeat');
                     context.fillStyle = lastMinuteTexture;
                 };
-                img.src = 'images/lastminute.png';
+                img.src = Config.viewsDirCommon + '../images/lastminute.png';
                 lastMinuteTextureImg = img;
             }
             context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
@@ -543,18 +543,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.restore();
     }
 
-    var scrollBarSliderWidth = 0;
     // !!! Draw ScrollBar
     function drawOrCheckScrollBar(context, mouseX, mouseY, catchScrollBarSlider){
         var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
 
-        //2.
-        var relativeCenter =  self.scaleManager.getRelativeCenter();
-        var relativeWidth =  self.scaleManager.getRelativeWidth();
-
-        scrollBarSliderWidth = Math.max(self.canvas.width * relativeWidth, timelineConfig.minScrollBarWidth);
-        // Correction for width if it has minimum width
-        var startCoordinate = self.scaleManager.bound( 0, (self.canvas.width * relativeCenter - scrollBarSliderWidth/2), self.canvas.width - scrollBarSliderWidth) ;
+        var scrollSlider = self.scaleManager.scrollSlider();
+        var startCoordinate = scrollSlider.start;
+        var scrollBarSliderWidth = scrollSlider.width;
 
         var mouseInScrollbarRow = mouseY >= top;
         var mouseInScrollbarSlider = mouseX >= startCoordinate && mouseX <= startCoordinate + scrollBarSliderWidth && mouseY >= top;
@@ -617,7 +612,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawPointerMarker(context, mouseX){
-
         if(window.jscd.mobile || !mouseX){
             return;
         }
@@ -642,7 +636,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
-        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
+        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height + 0.5;
 
         context.beginPath();
         context.moveTo(0.5 + coordinate, top);
@@ -662,9 +656,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height);
-        context.lineTo(0.5 + coordinate, height + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height);
+        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
+        context.lineTo(0.5 + coordinate, height + timelineConfig.triangleHeightOffset + timelineConfig.markerTriangleHeight * self.canvas.height);
+        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
         context.closePath();
         context.fill();
 
@@ -700,12 +694,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
         var canScrollRight = self.scaleManager.canScroll(false);
-        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width;
-        var mouseOverRightScrollButton = canScrollRight && mouseNearRightBorder;
+        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth && mouseX < self.canvas.width;
+        var mouseOverRightScrollButton = canScrollRight &&
+                                        (mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width);
 
         var canScrollLeft = self.scaleManager.canScroll(true);
-        var mouseNearLeftBorder = mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0;
-        var mouseOverLeftScrollButton = canScrollLeft && mouseNearLeftBorder;
+        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth && mouseX > 0;
+        var mouseOverLeftScrollButton = canScrollLeft &&
+                                        (mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0);
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;

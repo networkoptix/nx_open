@@ -7,7 +7,6 @@
 
 #include "api/app_server_connection.h"
 #include "stardot_stream_reader.h"
-#include <business/business_event_rule.h>
 #include "utils/common/synctime.h"
 
 #include <motion/motion_detection.h>

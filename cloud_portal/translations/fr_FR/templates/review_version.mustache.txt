@@ -1,0 +1,10 @@
+Il existe une nouvelle révision pour {{ message.product }}
+
+Cliquez sur le lien pour évaluer le brouillon {{ message.id }} pour {{ message.product }}
+
+Lien pour révision: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+
+Sur cette page, vous pouvez
+1) Créer un aperçu pour voir les changements récents.
+2) Publier cette version qui mettra à jour tout le contenu.
+3) Modifier les contextes en cliquant sur le bouton éditer l'enregistrement. Pour voir ces changements, vous devrez créer une nouvelle version.

@@ -58,11 +58,13 @@ public:
         const ParametersType& parameters = ParametersType(),
         bool defaultAction = false);
 
+    using ButtonHandler = std::function<void ()>;
     void addTextButton(
         const QIcon& icon,
         const QString& text,
-        ActionType actionId = nx::client::desktop::ui::action::NoAction,
-        const ParametersType& parameters = ParametersType());
+        const ButtonHandler& handler);
+
+    void setCloseButtonUnavailable();
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
@@ -134,6 +136,7 @@ private:
     QGraphicsLinearLayout* m_primaryLayout;
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
+    bool m_closeButtonAvailable = true;
     QnNotificationLevel::Value m_notificationLevel;
     QPointer<QnImageProvider> m_imageProvider;
     QColor m_color;

@@ -237,10 +237,13 @@ void OnvifResourceInformationFetcher::findResources(
             manufacturer = existResource->getVendor();
         if (mac.isEmpty())
             mac = existResource->getMAC().toString();
+        if (firmware.isEmpty())
+            firmware = existResource->getFirmware();
     }
 
-    if (model.isEmpty() || manufacturer.isEmpty() || firmware.isEmpty() ||
-        QnMacAddress(mac).isNull())
+    if (model.isEmpty() || manufacturer.isEmpty() ||
+        (!existResource && firmware.isEmpty()) || //< Optional field
+        (!existResource && QnMacAddress(mac).isNull())) //< Optional field
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;

@@ -515,6 +515,22 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
     return d->socket ? d->socket->getForeignAddress() : SocketAddress();
 }
 
+bool QnTCPConnectionProcessor::isSocketTaken() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->isSocketTaken;
+}
+
+QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->isSocketTaken = true;
+
+    const auto socket = d->socket;
+    d->socket.clear();
+    return socket;
+}
+
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -604,8 +620,8 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
 {
     Q_D(QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.method == nx_http::Method::GET ||
-        d->request.requestLine.method == nx_http::Method::HEAD )
+    if( d->request.requestLine.method == nx_http::Method::get ||
+        d->request.requestLine.method == nx_http::Method::head )
     {
         d->response.messageBody = messageBody;
     }

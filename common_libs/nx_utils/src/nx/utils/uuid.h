@@ -82,6 +82,18 @@ private:
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
 
+namespace std
+{
+    template<>
+    struct hash<QnUuid>
+    {
+        size_t operator()(const QnUuid& id) const
+        {
+            return qHash(id.toQUuid());
+        }
+    };
+}
+
 Q_DECLARE_METATYPE(QnUuid);
 
 NX_UTILS_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();

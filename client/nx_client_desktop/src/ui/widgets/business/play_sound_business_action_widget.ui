@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>589</width>
-    <height>149</height>
+    <height>105</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,9 +19,29 @@
      <item>
       <widget class="QCheckBox" name="playToClient">
        <property name="text">
-        <string>Play to user</string>
+        <string>Play to users</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="selectUsersButton">
+       <property name="text">
+        <string notr="true">&lt;All users&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -76,6 +96,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>playToClient</tabstop>
+  <tabstop>selectUsersButton</tabstop>
   <tabstop>pathComboBox</tabstop>
   <tabstop>manageButton</tabstop>
   <tabstop>volumeSlider</tabstop>

@@ -24,6 +24,7 @@ public:
     BaseHttpAudioTransmitter(QnSecurityCamResource* res);
     virtual ~BaseHttpAudioTransmitter();
     virtual void setOutputFormat(const QnAudioFormat& format) override;
+    virtual void setBitrateKbps(int value) override;
     virtual void setAudioUploadHttpMethod(nx_http::StringType method);
     virtual bool isInitialized() const override;
     virtual void prepare() override;
@@ -61,6 +62,7 @@ protected:
     QnSecurityCamResource* m_resource;
     TransmitterState m_state;
     QnAudioFormat m_outputFormat;
+    int m_bitrateKbps;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     QElapsedTimer m_timer;

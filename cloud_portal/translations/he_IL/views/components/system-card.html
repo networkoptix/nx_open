@@ -1,0 +1,28 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>המערכת שלך</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">שינוי שם מערכת</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">התנתק מ <span class="product-name"> {{PRODUCT_NAME}} </span></button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>בעלים</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            ההרשאות שלך: <b> {{$root.L.accessRoles[system.accessRole].label || System.accessRole}} </b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">שינוי שם מערכת</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">התנתק מהחשבון שלי</button>
+    </div>
+</div>

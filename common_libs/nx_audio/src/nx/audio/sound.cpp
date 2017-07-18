@@ -40,6 +40,13 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
         m_size = bitRate() / 32; // use 30+ ms buffers
         // Multiply by 2 to align OpenAL buffer
         int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
+
+        if (sampleSize == 0)
+        {
+            m_isValid = false;
+            return;
+        }
+
         if (m_size % sampleSize)
             m_size += sampleSize - (m_size % sampleSize);
     }
@@ -67,7 +74,9 @@ Sound::~Sound()
     directDisconnectAll();
     if (!m_deinitialized)
         internalClear();
-    delete [] m_proxyBuffer;
+
+    if (m_proxyBuffer)
+        delete [] m_proxyBuffer;
 }
 
 bool Sound::setup()
@@ -245,7 +254,7 @@ qint64 Sound::playTimeElapsedUsec()
         m_timer.restart();
         softResultUs = openalResultUs;
     }
-    return softResultUs + extraAudioDelayUs();
+    return std::max(0LL, softResultUs + extraAudioDelayUs());
 }
 
 bool Sound::isBufferUnderflow()
@@ -305,7 +314,9 @@ bool Sound::isFormatSupported(const QnAudioFormat& format)
 
 QAudio::State Sound::state() const
 {
-    if (m_paused)
+    if (m_deinitialized)
+        return QAudio::StoppedState;
+    else if (m_paused)
         return QAudio::SuspendedState;
     else if (m_isValid)
         return QAudio::ActiveState;

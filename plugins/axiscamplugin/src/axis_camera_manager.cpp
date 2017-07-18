@@ -196,7 +196,7 @@ int AxisCameraManager::updateCameraInfo() const
 {
     m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
 
-    std::auto_ptr<SyncHttpClient> httpClient;
+    std::unique_ptr<SyncHttpClient> httpClient;
     if( std::strlen(m_info.modelName) == 0 )
     {
         if( !httpClient.get() )

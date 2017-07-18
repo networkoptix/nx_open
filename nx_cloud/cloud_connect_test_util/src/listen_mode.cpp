@@ -44,7 +44,7 @@ public:
 
         auto& currentContext = socketContexts.back();
         auto socket = std::make_unique<network::cloud::CloudServerSocket>(
-            currentContext.mediatorConnector->systemConnection());
+            currentContext.mediatorConnector.get());
 
         if (connectionMethonds)
             socket->setSupportedConnectionMethods(*connectionMethonds);
@@ -71,7 +71,6 @@ public:
             socket(nullptr),
             listeningAddress(QString::fromUtf8(serverId))
         {
-            mediatorConnector->mockupAddress(network::SocketGlobals::mediatorConnector());
             mediatorConnector->setSystemCredentials(
                 hpm::api::SystemCredentials(systemId, serverId, authKey));
 

@@ -1114,15 +1114,6 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     {
         m_timeSlider->setThumbnailsLoader(nullptr, -1);
 
-        if (workbench()->currentLayout()->isSearchLayout())
-        {
-            /* Return current item position to fragment start: */
-            QnTimePeriod selection = m_currentWidget->item()->data(
-                Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
-            m_preciseNextSeek = true;
-            at_timeSlider_valueChanged(selection.startTimeMs);
-        }
-
         if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
             for (auto widget: m_syncedWidgets)

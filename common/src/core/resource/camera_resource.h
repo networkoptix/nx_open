@@ -57,8 +57,6 @@ public:
 
     QnAspectRatio aspectRatio() const;
 
-protected:
-
 private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
@@ -107,6 +105,8 @@ private:
 private:
     QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
+    QElapsedTimer m_lastInitTime;
+    QAuthenticator m_lastCredentials;
 };
 
 

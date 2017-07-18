@@ -19,10 +19,12 @@ Item
     property bool savePassword: expandedArea.savePasswordCheckbox.checked;
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
     property bool isConnecting: false;
+    property bool isAvailable: false
     property var hostsModel;
     property var authenticationDataModel;
 
     property var prevTabObject;
+    property alias indicators: indicatorsRow
 
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
@@ -32,7 +34,7 @@ Item
 
     signal connectRequested();
 
-    height: collapsedArea.height + expandedArea.height;
+    height: collapsedArea.height + expandedArea.height + collapsedArea.y
 
     anchors.left: (parent ? parent.left : undefined);
     anchors.right: (parent ? parent.right : undefined);
@@ -69,15 +71,15 @@ Item
         onDataChanged: { control.impl.updatePasswordData(startRow); }
     }
 
-    Column
+    Item
     {
         id: collapsedArea;
 
-        topPadding: 12;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        property int spacing: hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 2
 
-        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 2);
+        y: 12
+        width: parent.width
+        height: hostChooseItem.height + spacing + bottomControls.height
 
         InfoItem
         {
@@ -85,6 +87,11 @@ Item
 
             model: control.hostsModel;
 
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            enabled: control.isAvailable
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxValueRole: "url";
@@ -99,53 +106,79 @@ Item
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
 
             onAccepted: control.connectRequested();
-
         }
 
-        InfoItem
+        Item
         {
-            id: userChooseItem;
+            id: bottomControls
 
-            model: control.authenticationDataModel;
+            anchors.top: hostChooseItem.bottom
+            anchors.topMargin: collapsedArea.spacing
+            width: parent.width
+            height: Math.max(
+                userChooseItem.visible ? userChooseItem.height : 0,
+                indicatorsRow.opacity == 1 ? indicatorsRow.height : 0)
+            clip: !userChooseItem.visible || indicatorsRow.opacity == 0
 
-            Connections
+            InfoItem
             {
-                target: authDataAccessor;
-                onDataChanged:
+                id: userChooseItem;
+
+                model: control.authenticationDataModel;
+                width: indicatorsRow.opacity == 1 ? indicatorsRow.x : parent.width
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                Connections
                 {
-                    if (startRow == 0)
-                        userChooseItem.forceCurrentIndex(0); // Resets user to first.
+                    target: authDataAccessor;
+                    onDataChanged:
+                    {
+                        if (startRow == 0)
+                            userChooseItem.forceCurrentIndex(0); // Resets user to first.
+                    }
+                    onModelChanged:
+                    {
+                        userChooseItem.forceCurrentIndex(userChooseItem.currentItemIndex);
+                    }
                 }
-                onModelChanged:
+
+                enabled: control.isAvailable
+                isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
+                visible: control.impl.hasRecentConnections;
+
+                iconUrl: "qrc:/skin/welcome_page/user.png";
+                hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
+                disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
+                hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
+
+                Component.onCompleted: activeItemSelector.addItem(this);
+
+                KeyNavigation.tab: expandedArea.loginTextField;
+                KeyNavigation.backtab: hostChooseItem;
+
+                onCurrentItemIndexChanged:
                 {
-                    userChooseItem.forceCurrentIndex(userChooseItem.currentItemIndex);
+                    control.impl.updatePasswordData(currentItemIndex);
                 }
+
+                onValueChanged:
+                {
+                    expandedArea.loginTextField.text = value;
+                }
+
+                onAccepted: control.connectRequested();
             }
 
-            isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections;
-
-            iconUrl: "qrc:/skin/welcome_page/user.png";
-            hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
-            disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
-            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
-
-            Component.onCompleted: activeItemSelector.addItem(this);
-
-            KeyNavigation.tab: expandedArea.loginTextField;
-            KeyNavigation.backtab: hostChooseItem;
-
-            onCurrentItemIndexChanged:
+            IndicatorsRow
             {
-                control.impl.updatePasswordData(currentItemIndex);
-            }
+                id: indicatorsRow
 
-            onValueChanged:
-            {
-                expandedArea.loginTextField.text = value;
-            }
+                maxWidth: userChooseItem.visible ? 200 : parent.width
 
-            onAccepted: control.connectRequested();
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
     }
 

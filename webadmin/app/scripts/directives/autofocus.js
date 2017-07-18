@@ -27,6 +27,8 @@ angular.module('webadminApp')
                             return false;
                         }
                         $element.click();
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
                     return false;
                 }

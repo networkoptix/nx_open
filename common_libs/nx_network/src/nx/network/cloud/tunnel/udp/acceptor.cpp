@@ -1,10 +1,9 @@
-
 #include "acceptor.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/socket_global.h>
 
 #include "incoming_tunnel_connection.h"
-
 
 namespace nx {
 namespace network {
@@ -12,13 +11,16 @@ namespace cloud {
 namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
+    const SocketAddress& mediatorUdpEndpoint,
     std::list<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
+    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
-    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions)
+    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions),
+    m_holePunchingEnabled(true)
 {
 }
 
@@ -33,6 +35,11 @@ void TunnelAcceptor::setUdpMaxRetransmissions(int count)
     m_udpMaxRetransmissions = count;
 }
 
+void TunnelAcceptor::setHolePunchingEnabled(bool value)
+{
+    m_holePunchingEnabled = value;
+}
+
 void TunnelAcceptor::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler);
@@ -43,7 +50,7 @@ void TunnelAcceptor::accept(AcceptHandler handler)
             m_acceptHandler = std::move(handler);
             m_udpMediatorConnection = std::make_unique<
                 hpm::api::MediatorServerUdpConnection>(
-                    m_mediatorConnection->remoteAddress(),
+                    m_mediatorUdpEndpoint,
                     m_mediatorConnection->credentialsProvider());
 
             m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());
@@ -95,12 +102,18 @@ void TunnelAcceptor::connectionAckResult(
         return executeAcceptHandler(SystemError::connectionAbort);
     }
 
+    if (!m_holePunchingEnabled)
+    {
+        NX_VERBOSE(this, lm("Interrupting UDP hole punching due to configuration"));
+        return executeAcceptHandler(SystemError::interrupted);
+    }
+
     auto udpSocket = m_udpMediatorConnection->takeSocket();
     m_udpMediatorConnection.reset();
 
     auto localAddress = udpSocket->getLocalAddress();
     auto timeout = m_connectionParameters.rendezvousConnectTimeout.count();
-    for (const auto& address : m_peerAddresses)
+    for (const auto& address: m_peerAddresses)
     {
         auto udtSocket = std::make_unique<UdtStreamSocket>(AF_INET);
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());

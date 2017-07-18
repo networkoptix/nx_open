@@ -27,6 +27,8 @@ public:
 private:
     QWidget* createWidget(QPushButton* nextButton);
 
+    static QStringList reasons();
+
 private:
     license::RequestInfo m_info;
     QSet<QWidget*> m_invalidFields;

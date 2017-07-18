@@ -15,6 +15,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/custom_style.h>
+#include <ui/widgets/common/alert_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
@@ -163,6 +164,14 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
     setMinimumWidth(dialogMinimumWidth);
 
     setDelegate(new BackupCamerasDialogDelegate(this));
+
+    const auto alertBar = new QnPromoBar(this);
+    alertBar->setText(tr("If the backup is not set up on the current server of the cameras, "
+        "their archive will not be backed up."));
+
+    const auto layout = qobject_cast<QBoxLayout*>(this->layout());
+    NX_ASSERT(layout);
+    layout->insertWidget(0, alertBar);
 }
 
 bool QnBackupCamerasDialog::backupNewCameras() const

@@ -24,14 +24,15 @@
 #include <utils/ping_utility.h>
 #include <nx/client/desktop/utils/server_file_cache.h>
 
-#include <cdb/result_code.h>
-#include <cdb/system_data.h>
+#include <nx/cloud/cdb/api/result_code.h>
+#include <nx/cloud/cdb/api/system_data.h>
 #include <api/server_rest_connection.h>
 
 namespace {
-    volatile bool qn_clientMetaTypes_initialized = false;
 
-}
+volatile bool qn_clientMetaTypes_initialized = false;
+
+} // namespace
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
@@ -53,6 +54,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QnUuid> >();
     qRegisterMetaType<QVector<QColor> >();
+    qRegisterMetaType<QValidator::State>();
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
 

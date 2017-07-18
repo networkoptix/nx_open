@@ -11,8 +11,8 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <cdb/auth_provider.h>
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

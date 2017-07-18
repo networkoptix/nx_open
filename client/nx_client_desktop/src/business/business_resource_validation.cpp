@@ -2,6 +2,10 @@
 
 #include <QtWidgets/QLayout>
 
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
+
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 
@@ -9,7 +13,9 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -26,6 +32,15 @@ QString braced(const QString& source)
 QString getShortResourceName(const QnResourcePtr& resource)
 {
     return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+}
+
+int countEnabledUsers(const QnUserResourceList& users)
+{
+    return std::count_if(users.cbegin(), users.cend(),
+        [](const QnUserResourcePtr& user) -> bool
+        {
+            return user && user->isEnabled();
+        });
 }
 
 class QnBusinessResourceValidationStrings
@@ -126,7 +141,7 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
 
 bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return  camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability)
+    return camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability)
         || camera->getDewarpingParams().enabled;
 }
 
@@ -199,26 +214,24 @@ void QnSendEmailActionDelegate::init(QWidget* parent)
     parent->layout()->addWidget(m_warningLabel);
 }
 
-bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
+QString QnSendEmailActionDelegate::validationMessage(const QSet<QnUuid>& selected) const
 {
-    if (!m_warningLabel)
-        return true;
-
-    bool valid = isValidList(selected, QString());
-    m_warningLabel->setVisible(!valid);
-    if (!valid)
-        m_warningLabel->setText(getText(selected, true, QString()));
-    return true;
+    const bool valid = isValidList(selected, QString()); //TODO: FIXME! Why additional is empty?
+    return valid ? QString() : getText(selected, true, QString());
 }
 
 bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 {
+    if (resourceId.isNull()) //< custom permissions "Custom" role is not accepted.
+        return false;
+
     if (auto user = resourcePool()->getResourceById<QnUserResource>(resourceId))
         return isValidUser(user);
 
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
-    return !userRolesManager()->userRole(resourceId).isNull();
+    return !userRolesManager()->userRole(resourceId).isNull()
+        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::CustomUserRole;
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -227,12 +240,9 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 
     auto module = qnClientCoreModule->commonModule();
 
-    /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
-        [](const QnUserResourcePtr& user)
-    {
-        return user->isEnabled();
-    });
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    module->userRolesManager()->usersAndRoles(ids, users, roles);
 
     if (!all_of(users, &isValidUser))
         return false;
@@ -241,10 +251,19 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     if (!all_of(additionalRecipients, nx::email::isValidAddress))
         return false;
 
-    /* Using lazy calculations to avoid counting roles when not needed. */
-    return !users.empty()
-        || !additionalRecipients.empty()
-        || !module->userRolesManager()->userRoles(ids).empty();
+    for (const auto& roleId: roles)
+    {
+        const auto isValidSubject =
+            [isValid = &isValidUser](const QnResourceAccessSubject& subject)
+            {
+                return isValid(subject.user());
+            };
+
+        if (!all_of(module->resourceAccessSubjectsCache()->usersInRole(roleId), isValidSubject))
+            return false;
+    }
+
+    return countEnabledUsers(users) != 0 || !roles.empty() || !additionalRecipients.empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
@@ -252,40 +271,71 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 {
     auto module = qnClientCoreModule->commonModule();
 
-    auto roles = module->userRolesManager()->userRoles(ids);
-    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
-        [](const QnUserResourcePtr& user)
-    {
-        return user->isEnabled();
-    });
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    module->userRolesManager()->usersAndRoles(ids, users, roles);
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
+
     auto additional = parseAdditional(additionalList);
 
-    if (users.isEmpty() && roles.empty() && additional.isEmpty())
-        return tr("Select at least one user");
+    if (users.empty() && roles.empty() && additional.isEmpty())
+        return nx::vms::event::StringsHelper::needToSelectUserText();
+
+    if (!detailed)
+    {
+        QStringList recipients;
+        if (!users.empty() || !roles.empty())
+        {
+            recipients << nx::vms::event::StringsHelper(qnClientCoreModule->commonModule())
+                .actionSubjects(users, roles, true);
+        }
+
+        if (!additional.empty())
+            recipients << tr("%n additional", "", additional.size());
+
+        NX_ASSERT(!recipients.empty());
+        return recipients.join(lit(", "));
+    }
 
     QStringList receivers;
-    int invalid = 0;
+    QSet<QnUserResourcePtr> invalidUsers;
+
     for (const auto& user : users)
     {
         QString userMail = user->getEmail();
         if (isValidUser(user))
             receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
         else
-            invalid++;
+            invalidUsers << user;
     }
 
-    for (const auto& role : roles)
-        receivers << role.name;
+    int total = users.size();
 
-    if (detailed && invalid > 0)
+    for (const auto& roleId: roles)
     {
-        if (users.size() == 1)
-            return tr("User %1 has invalid Email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid Email address", "", invalid).arg(users.size());
+        receivers << module->userRolesManager()->userRoleName(roleId);
+        for (const auto& subject: module->resourceAccessSubjectsCache()->usersInRole(roleId))
+        {
+            const auto& user = subject.user();
+            if (!user || !user->isEnabled())
+                continue;
+
+            ++total;
+            if (!isValidUser(user))
+                invalidUsers << user;
+        }
+    }
+
+    int invalid = invalidUsers.size();
+    if (invalid > 0)
+    {
+        return invalid == 1
+            ? tr("User %1 has invalid email address").arg((*invalidUsers.cbegin())->getName())
+            : tr("%n of %1 users have invalid email address", "", invalid).arg(total);
     }
 
     invalid = 0;
-    for (const QString &email : additional)
+    for (const QString& email: additional)
     {
         if (nx::email::isValidAddress(email))
             receivers << email;
@@ -293,26 +343,14 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
             invalid++;
     }
 
-    //
-    if (detailed && invalid > 0)
+    if (invalid > 0)
+    {
         return (additional.size() == 1)
-        ? tr("Invalid Email address %1").arg(additional.first())
-        : tr("%n of %1 additional Email addresses are invalid", "", invalid).arg(additional.size());
+            ? tr("Invalid email address %1").arg(additional.first())
+            : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
+    }
 
-    if (detailed)
-        return tr("Send Email to %1").arg(receivers.join(QLatin1String("; ")));
-
-
-    QStringList recipients;
-    if (!users.empty())
-        recipients << tr("%n Users", "", users.size());
-    if (!roles.empty())
-        recipients << tr("%n Roles", "", (int)roles.size());
-    if (!additional.empty())
-        recipients << tr("%n additional", "", additional.size());
-
-    NX_ASSERT(!recipients.empty());
-    return recipients.join(lit(", "));
+    return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 }
 
 QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)
@@ -336,3 +374,61 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 
     return nx::email::isValidAddress(user->getEmail());
 }
+
+namespace QnBusiness {
+
+// TODO: #vkutin It's here until full refactoring.
+bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+    const QnUserResourcePtr& user)
+{
+    if (!user)
+        return false;
+
+    if (params.allUsers)
+        return true;
+
+    const auto userId = user->getId();
+    const auto& subjects = params.additionalResources;
+
+    if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
+        return true;
+
+    const auto roleId = QnUserRolesManager::unifiedUserRoleId(user);
+    return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
+}
+
+bool hasAccessToSource(const nx::vms::event::EventParameters& params,
+    const QnUserResourcePtr& user)
+{
+    if (!user || !user->commonModule())
+        return false;
+
+    const auto context = user->commonModule();
+
+    const auto eventType = params.eventType;
+
+    const auto resource = context->resourcePool()->getResourceById(params.eventResourceId);
+    const bool hasViewPermission = resource && context->resourceAccessManager()->hasPermission(
+        user,
+        resource,
+        Qn::ViewContentPermission);
+
+    if (nx::vms::event::isSourceCameraRequired(eventType))
+    {
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+        return camera && hasViewPermission;
+    }
+
+    if (nx::vms::event::isSourceServerRequired(eventType))
+    {
+        const auto server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+        /* Only admins should see notifications with servers. */
+        return server && hasViewPermission;
+    }
+
+    return true;
+}
+
+} // namespace QnBusiness

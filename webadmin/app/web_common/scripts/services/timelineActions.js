@@ -9,7 +9,7 @@ function TimelineActions(timelineConfig, positionProvider, scaleManager, animati
     this.timelineConfig = timelineConfig;
 
     this.stopDelay = null;
-    this.nextPlayedPosition = 0;
+    this.nextPlayedPosition = false;
     this.scope.lastPlayedPosition = 0;
 
     this.scrollingNow = false;
@@ -67,7 +67,7 @@ TimelineActions.prototype.delayWatchingPlayingPosition = function(){
 
 
 TimelineActions.prototype.stopAnimatingMove = function(){
-    var animation = this.animateScope.animating(self.scope, 'lastPlayedPosition');
+    var animation = this.animateScope.animating(this.scope, 'lastPlayedPosition');
     if(animation){
         animation.breakAnimation();
     }
@@ -75,15 +75,11 @@ TimelineActions.prototype.stopAnimatingMove = function(){
 TimelineActions.prototype.updatePosition = function(){
     var self = this;
     if(self.positionProvider) {
-
-        if(self.nextPlayedPosition ){
-            self.stopAnimatingMove();
-
+        if(self.nextPlayedPosition){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
-                self.scope.lastPlayedPosition = self.nextPlayedPosition;
-                self.nextPlayedPosition = 0;
-                self.scaleManager.tryToSetLiveDate(self.scope.lastPlayedPosition, self.positionProvider.liveMode, (new Date()).getTime());
+                self.nextPlayedPosition = false;
             }
+
             return; // ignore changes until played position wasn't changed
         }
 
@@ -95,6 +91,7 @@ TimelineActions.prototype.updatePosition = function(){
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
+            // this animation makes scaleManager move smoothly while playing
             self.animateScope.animate(self.scope, 'lastPlayedPosition', self.positionProvider.playedPosition,
                 largeJump ? 'smooth' : 'linear', duration).then(
                 function () {},
@@ -102,22 +99,25 @@ TimelineActions.prototype.updatePosition = function(){
                 function (value) {
                     if(self.nextPlayedPosition){
                         console.log("problem with playing position",value,self.nextPlayedPosition);
+                        self.scope.lastPlayedPosition = self.nextPlayedPosition;
                         return;
                     }
-                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode, (new Date()).getTime());
+                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode);
                 });
         }
     }
 };
 
 TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
-    this.delayWatchingPlayingPosition();
-    this.stopAnimatingMove();
+    var position = this.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
 
-    this.nextPlayedPosition = this.scaleManager.screenCoordinateToDate(mouseX);
-    this.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
+    this.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
 
-    return this.nextPlayedPosition;
+    this.stopAnimatingMove(); // Instantly jump to new position
+    this.scope.lastPlayedPosition = position;
+    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode);
+
+    return position;
 };
 
 
@@ -166,10 +166,18 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
     this.delayWatchingPlayingPosition();   
 };
 
-//Absolute zoom - to target level from 0 to 1
-TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linear){
+
+/* Zoom logic */
+
+// Main zoom function - handle zoom logic, animations, etc
+// gets absolute zoom value - to target level from 0 to 1
+TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant){
     var self = this;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
+
+    if(typeof(zoomCoordinate)=='undefined'){
+        zoomCoordinate = this.scaleManager.viewportWidth/2;
+    }
 
     var zoom = self.scaleManager.zoom();
     if(zoom == zoomTarget){
@@ -222,14 +230,12 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
 
 
     function setZoom(value){
-        if (zoomDate) {
-            self.scaleManager.zoomAroundDate(
-                value,
-                zoomDate
-            );
-        } else {
-            self.scaleManager.zoom(value);
-        }
+
+    // Actually, we'd better use zoom around coordinate instead of date?
+        self.scaleManager.zoomAroundPoint(
+            value,
+            zoomCoordinate
+        );
         self.scaleManager.checkZoomAsync().then(function(){
             // TODO: here we need to apply the change to scope - call digest if anything changed
             self.scope.$digest();
@@ -239,63 +245,86 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
 
 
     if(!instant) {
-        if(!self.zoomTarget) {
-            self.zoomTarget = self.scaleManager.zoom();
+        if(!self.scope.zoomTarget) {
+            self.scope.zoomTarget = self.scaleManager.zoom();
         }
 
         self.delayWatchingPlayingPosition();
-        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, linear?'linear':'dryResistance').then(
-            function () {},
+        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
+            function () {
+                self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
+            },
             function () {},
             setZoom);
     }else{
         setZoom(zoomTarget);
-        self.zoomTarget = self.scaleManager.zoom();
+        self.scope.zoomTarget = self.scaleManager.zoom();
+        self.zoomByWheelTarget = 0;
     }
 };
 
-//Relative zoom (step)
-TimelineActions.prototype.zoom = function(zoomIn,slow,linear, zoomDate){
-    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?this.timelineConfig.slowZoomSpeed:this.timelineConfig.zoomSpeed);
-    this.zoomTo(zoomTarget, zoomDate, false, linear);
+// Relative zoom (incremental)
+TimelineActions.prototype.zoom = function(zoomIn){
+    var markerDate = this.scaleManager.playedPosition;
+
+    //By default - use point under time marker
+    var zoomCoordinate = this.scaleManager.dateToScreenCoordinate(markerDate);
+
+    // If time marker is not displayed - use center of the timeline
+    if(zoomCoordinate < -1 || zoomCoordinate > this.scaleManager.viewportWidth+1) {
+        zoomCoordinate = this.scaleManager.viewportWidth/2;
+    }
+    // If time marker is displayed in extreme 64px (on both sides) - the extreme side point of the timeline
+    if(zoomCoordinate < this.timelineConfig.borderAreaWidth){
+        zoomCoordinate = 0;
+    }
+    if(zoomCoordinate > this.scaleManager.viewportWidth - this.timelineConfig.borderAreaWidth){
+        zoomCoordinate = this.scaleManager.viewportWidth;
+    }
+
+    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
+    this.zoomTo(zoomTarget, zoomCoordinate, false);
 };
 
-
-
+// Continuus zooming - every render
 TimelineActions.prototype.zoomingRenew = function(){ // renew zooming
-    if(this.zoomingNow) {
-        this.zoom(this.zoomingIn, true, false);
+    if(this.zoomingNow) { // If continuous zooming is on
+        this.zoom(this.zoomingIn); // Repeat incremental zoom
     }
 };
 
+// Release zoom button - stop continuus zooming
 TimelineActions.prototype.zoomingStop = function() {
-    if( this.zoomingNow) {
-        this.zoomingNow = false;
-        this.zoom( this.zoomingIn, true, true);
+    this.zoomingNow = false; //  Stop continuous zooming
+    this.zoomByWheelTarget = 0;
+    var animation = this.animateScope.animating(self.scope, 'zoomTarget');
+    if(animation){
+        animation.breakAnimation();
     }
 };
 
+// Press zoom button - start continuus zooming
 TimelineActions.prototype.zoomingStart = function(zoomIn) {
+    // check if we can start zooming in that direction:
     if(this.scaleManager.disableZoomOut&&!zoomIn || this.scaleManager.disableZoomIn&&zoomIn){
         return;
     }
-
-    this.zoomingNow = true;
-    this.zoomingIn = zoomIn;
-
-    this.zoomingRenew();
+    this.zoomingNow = true; // Start continuous zooming
+    this.zoomingIn = zoomIn; // Set continuous zooming direction
+    this.zoom(this.zoomingIn); // Run zoom at least once
 };
 
+// Double click zoom out button - zoom out completely
 TimelineActions.prototype.fullZoomOut = function(){
-    this.zoomingStop();
-    this.zoomTo(1);
+    this.zoomingStop(); // stop slow zooming
+    this.zoomTo(1); // zoom out completely
 };
 
+// Zoom by wheel logic - slighly different for Mac and Win (Mac does smooth scroll on OS level, Win - does not
 TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mouseXOverTimeline){
-
-    var zoom = this.scaleManager.zoom();
-
-    if(window.jscd.touch ) {
+    var zoom = this.scaleManager.zoom(); // Get instant zoom level
+    if(window.jscd.touch) { // Mac support - touchpad, clicks changes smoothly
+        this.zoomingStop(); // Stop all previous zoom animations
         this.zoomByWheelTarget = zoom - clicks / this.timelineConfig.maxVerticalScrollForZoomWithTouch;
     }else{
         // We need to smooth zoom here
@@ -307,39 +336,42 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
         this.zoomByWheelTarget = this.scaleManager.boundZoom(this.zoomByWheelTarget);
     }
 
-    var zoomDate = this.scaleManager.screenCoordinateToDate(mouseXOverTimeline);
-    if(mouseOverElements.rightBorder && !mouseOverElements.rightButton){
-        zoomDate = this.scaleManager.end;
-    }
-    if(mouseOverElements.leftBorder && !mouseOverElements.leftButton){
-        zoomDate = this.scaleManager.start;
-    }
+    // Actually, we'd better use zoom coordinate instead of date?
 
-    this.zoomTo(this.zoomByWheelTarget, zoomDate, window.jscd.touch);
+    // Get anchor date for zoom
+    var zoomCoordinate = mouseXOverTimeline;
+    if(mouseOverElements.rightBorder){ // Close to right border - use right visible end date
+        zoomCoordinate = this.scaleManager.viewportWidth;
+    }
+    if(mouseOverElements.leftBorder){ // Close to left border - use left visible end date
+        zoomCoordinate = 0;
+    }
+    this.zoomTo(this.zoomByWheelTarget, zoomCoordinate, window.jscd.touch);
 };
 
+/* / End of Zoom logic */
+
+
+// Update timeline state - process animations every render
 TimelineActions.prototype.updateState = function(){
     this.updatePosition();
     this.zoomingRenew();
     this.scrollingRenew();
 };
 
-
-TimelineActions.prototype.zoomInToPoint = function(mouseX) {
-    this.zoom(true, false, false, this.scaleManager.setAnchorCoordinate(mouseX));
-};
-
-
-
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.scaleManager.stopWatching();
     this.catchScrollBar = mouseX;
+    this.catchScrollSlider = this.scaleManager.scrollSlider();
 };
 TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
+    if(!this.catchScrollSlider.scrollingWidth){ // Do not scroll on full zoom out
+        return;
+    }
     if(this.catchScrollBar) {
         var moveScroll = mouseX - this.catchScrollBar;
-        this.scaleManager.scroll(this.scaleManager.scroll() + moveScroll / this.scaleManager.viewportWidth);
-        this.catchScrollBar = mouseX;
+        var targetScroll = (this.catchScrollSlider.start + moveScroll) / this.catchScrollSlider.scrollingWidth;
+        this.scaleManager.scroll(targetScroll);
         return moveScroll !== 0;
     }
     return false;

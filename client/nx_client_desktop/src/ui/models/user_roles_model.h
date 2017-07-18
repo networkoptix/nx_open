@@ -34,7 +34,7 @@ public:
     enum Column
     {
         NameColumn = 0,
-        CheckColumn = 1 //< exists if isCheckable()
+        CheckColumn = 1 //< exists if hasCheckBoxes()
     };
 
     explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = DefaultRoleFlags);
@@ -47,17 +47,25 @@ public:
 
     void setUserRoles(const ec2::ApiUserRoleDataList& roles);
 
-    /* If we want to override "Custom" role name and tooltip: */
+    /* If we want to override "Custom" role name and tooltip. */
     void setCustomRoleStrings(const QString& name, const QString& description);
-
-    bool isCheckable() const;
-    void setCheckable(bool value);
 
     /* Controls if UuidRole data contains predefined role pseudo uuids. */
     bool predefinedRoleIdsEnabled() const;
     void setPredefinedRoleIdsEnabled(bool value);
 
-    /* QAbstractItemModel implementation: */
+    /* Role selection support. */
+
+    bool hasCheckBoxes() const;
+    void setHasCheckBoxes(bool value);
+
+    bool userCheckable() const;
+    void setUserCheckable(bool value);
+
+    QSet<QnUuid> checkedRoles() const; //< Returns predefined and user role ids.
+    void setCheckedRoles(const QSet<QnUuid>& ids);
+
+    /* QAbstractItemModel implementation. */
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex& child) const override;

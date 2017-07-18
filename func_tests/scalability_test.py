@@ -14,36 +14,40 @@ import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
 from test_utils.utils import SimpleNamespace
 from multiprocessing import Pool as ThreadPool
-from test_utils.server import Server
+from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT_SEC
 import transaction_log
 
 log = logging.getLogger(__name__)
 
 
-MERGE_TIMEOUT = datetime.timedelta(hours=1)
 MERGE_DONE_CHECK_PERIOD_SEC = 2.
 SET_RESOURCE_STATUS_CMD = '202'
-
-REST_API_TIMEOUT_SEC = 60.
 
 
 @pytest.fixture
 def config(test_config):
     return test_config.with_defaults(
         SERVER_COUNT=2,
-        TOTAL_CAMERA_COUNT=2,
-        TOTAL_STORAGE_COUNT=2,
-        TOTAL_USER_COUNT=2,
+        CAMERAS_PER_SERVER=1,
+        STORAGES_PER_SERVER=1,
+        USERS_PER_SERVER=1,
         RESOURCES_PER_CAMERA=2,
+        MERGE_TIMEOUT=datetime.timedelta(seconds=MEDIASERVER_MERGE_TIMEOUT_SEC),
+        REST_API_TIMEOUT_SEC=60
         )
 
 @pytest.fixture
-def servers(config, server_factory):
+def servers(metrics_saver, server_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     log.info('Creating %d servers:', config.SERVER_COUNT)
     setup_settings = dict(autoDiscoveryEnabled=False)
-    return [server_factory('server_%04d' % (idx + 1), setup_settings=setup_settings)
-            for idx in range(config.SERVER_COUNT)]
+    start_time = utils.datetime_utc_now()
+    server_list = [server_factory('server_%04d' % (idx + 1),
+                           setup_settings=setup_settings,
+                           rest_api_timeout_sec=config.REST_API_TIMEOUT_SEC)
+                       for idx in range(config.SERVER_COUNT)]
+    metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
+    return server_list
 
 
 def get_response(server, method, api_object, api_method):
@@ -87,16 +91,16 @@ def compare_json_data(api_method, json_1, json_2):
     return json_1 == json_2
 
 
-def wait_merge_done(servers, method, api_object, api_method, start_time):
+def wait_merge_done(servers, method, api_object, api_method, start_time, merge_timeout):
     api_call_start_time = utils.datetime_utc_now()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
         if result_expected is None:
-            if utils.datetime_utc_now() - start_time >= MERGE_TIMEOUT:
+            if utils.datetime_utc_now() - start_time >= merge_timeout:
                 pytest.fail("%r can't get response for '%s' during %s" % (
                     servers[0], api_method,
-                    MERGE_TIMEOUT - (api_call_start_time - start_time)))
+                    merge_timeout - (api_call_start_time - start_time)))
             continue
 
         def check(servers, result_expected):
@@ -110,24 +114,25 @@ def wait_merge_done(servers, method, api_object, api_method, start_time):
             log.info('%s/%s merge duration: %s' % (api_object, api_method,
                                                    utils.datetime_utc_now() - api_call_start_time))
             return
-        if utils.datetime_utc_now() - start_time >= MERGE_TIMEOUT:
-            pytest.fail("'%s' was not synchronized during %s: '%r' and '%r'" % (
-                api_method, MERGE_TIMEOUT - (api_call_start_time - start_time),
-                servers[0], first_unsynced_server))
+        if utils.datetime_utc_now() - start_time >= merge_timeout:
+            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
         time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
 
 
-def measure_merge(servers):
+def measure_merge(servers, merge_timeout):
     start_time = utils.datetime_utc_now()
     for i in range(1, len(servers)):
         servers[0].merge_systems(servers[i])
-    wait_merge_done(servers, 'GET', 'ec2', 'getUsers', start_time)
-    wait_merge_done(servers, 'GET', 'ec2', 'getStorages', start_time)
-    wait_merge_done(servers, 'GET', 'ec2', 'getLayouts', start_time)
-    wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time)
-    wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time)
-    wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time)
-    log.info('Total merge duration: %s' % (utils.datetime_utc_now() - start_time))
+    wait_merge_done(servers, 'GET', 'ec2', 'getUsers', start_time, merge_timeout)
+    wait_merge_done(servers, 'GET', 'ec2', 'getStorages', start_time, merge_timeout)
+    wait_merge_done(servers, 'GET', 'ec2', 'getLayouts', start_time, merge_timeout)
+    wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time, merge_timeout)
+    wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time, merge_timeout)
+    wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time, merge_timeout)
+    merge_duration = utils.datetime_utc_now() - start_time
+    log.info('Total merge duration: %s', merge_duration)
+    return merge_duration
 
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
@@ -161,22 +166,22 @@ def get_server_admin(server):
     return admins[0]
 
 
-def create_test_data_on_server((config, server, index, cameras_per_server, users_per_server, storages_per_server)):
+def create_test_data_on_server((config, server, index)):
     resource_generators = dict(
-        saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * cameras_per_server),
+        saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * config.CAMERAS_PER_SERVER),
         saveCameraUserAttributes=resource_test.ResourceGenerator(generator.generate_camera_user_attributes_data),
         setResourceParams=resource_test.SeedResourceList(generator.generate_resource_params_data_list, config.RESOURCES_PER_CAMERA),
-        saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * users_per_server),
-        saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * storages_per_server),
-        saveLayout=resource_test.LayoutGenerator(index * (users_per_server + 1)))
+        saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
+        saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
+        saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
     servers_with_guids = [(server, server.ecs_guid)]
     users = create_resources_on_server_by_size(
-        server, 'saveUser',  resource_generators, users_per_server)
+        server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
     cameras = create_resources_on_server(server, 'saveCamera',
-                                         resource_generators, servers_with_guids * cameras_per_server)
+                                         resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
     create_resources_on_server(server, 'saveStorage',
-                               resource_generators, servers_with_guids * storages_per_server)
+                               resource_generators, servers_with_guids * config.STORAGES_PER_SERVER)
     layout_items_generator = resource_generators['saveLayout'].items_generator
     layout_items_generator.set_resources(cameras)
     create_resources_on_server(server, 'saveLayout', resource_generators, users)
@@ -185,10 +190,7 @@ def create_test_data_on_server((config, server, index, cameras_per_server, users
 
 
 def create_test_data(config, servers):
-    cameras_per_server = config.TOTAL_CAMERA_COUNT / len(servers)
-    users_per_server = config.TOTAL_USER_COUNT / len(servers)
-    storages_per_server = config.TOTAL_STORAGE_COUNT / len(servers)
-    server_tupples = [(config, server, i, cameras_per_server, users_per_server, storages_per_server)
+    server_tupples = [(config, server, i)
                       for i, server in enumerate(servers)]
     pool = ThreadPool(len(servers))
     pool.map(create_test_data_on_server, server_tupples)
@@ -196,6 +198,8 @@ def create_test_data(config, servers):
     pool.join()
 
 
-def test_scalability(config, servers):
+def test_scalability(metrics_saver, config, servers):
+    assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
     create_test_data(config, servers)
-    measure_merge(servers)
+    merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
+    metrics_saver.save('merge_duration', merge_duration)

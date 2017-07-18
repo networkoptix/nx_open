@@ -89,19 +89,10 @@ QnAuthHelper::QnAuthHelper(
     const auto logger = nx::utils::log::addLogger({"QnAuthHelper"});
     logger->setDefaultLevel(static_cast<nx::utils::log::Level>(ini.logLevel));
     logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
-
-#ifndef USE_USER_RESOURCE_PROVIDER
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-#endif
 }
 
 QnAuthHelper::~QnAuthHelper()
 {
-#ifndef USE_USER_RESOURCE_PROVIDER
-    disconnect(resourcePool(), NULL, this, NULL);
-#endif
 }
 
 Qn::AuthResult QnAuthHelper::authenticate(
@@ -218,6 +209,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                     QString desiredRealm = nx::network::AppInfo::realm();
                     bool needRecalcPassword =
                         userResource->getRealm() != desiredRealm ||
+                        (userResource->isLdap() && userResource->passwordExpired()) ||
                         (userResource->getDigest().isEmpty() && !userResource->isCloud());
                     if (canUpdateRealm && needRecalcPassword)
                     {
@@ -405,19 +397,10 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     if (nonce.isEmpty() || userName.isEmpty() || realm.isEmpty())
         return Qn::Auth_WrongDigest;
 
-#ifndef USE_USER_RESOURCE_PROVIDER
-    QCryptographicHash md5Hash(QCryptographicHash::Md5);
-    md5Hash.addData(method);
-    md5Hash.addData(":");
-    md5Hash.addData(uri);
-    QByteArray ha2 = md5Hash.result().toHex();
-#endif
-
     QnUserResourcePtr userResource;
     Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (m_nonceProvider->isNonceValid(nonce))
     {
-#ifdef USE_USER_RESOURCE_PROVIDER
         errCode = Qn::Auth_WrongLogin;
 
         QnResourcePtr res;
@@ -431,61 +414,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 
         if (errCode == Qn::Auth_OK)
             return Qn::Auth_OK;
-#else
-        errCode = Qn::Auth_WrongLogin;
-        userResource = findUserByName(userName);
-        if (userResource)
-        {
-            errCode = Qn::Auth_WrongPassword;
-
-            if (userResource->passwordExpired())
-            {
-                //user password has expired, validating password
-                errCode = doPasswordProlongation(userResource);
-                if (errCode != Qn::Auth_OK)
-                    return errCode;
-            }
-
-            QByteArray dbHash = userResource->getDigest();
-
-            QCryptographicHash md5Hash(QCryptographicHash::Md5);
-            md5Hash.addData(dbHash);
-            md5Hash.addData(":");
-            md5Hash.addData(nonce);
-            md5Hash.addData(":");
-            md5Hash.addData(ha2);
-            QByteArray calcResponse = md5Hash.result().toHex();
-
-            if (authUserId)
-                *authUserId = userResource->getId();
-            if (calcResponse == response)
-                return Qn::Auth_OK;
-        }
-
-        QnMutexLocker lock(&m_mutex);
-
-        // authenticate by media server auth_key
-        for (const QnMediaServerResourcePtr& server : m_servers)
-        {
-            if (server->getId().toString().toUtf8().toLower() == userName)
-            {
-                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(nx::network::AppInfo::realm()).arg(server->getAuthKey());
-                QCryptographicHash ha1(QCryptographicHash::Md5);
-                ha1.addData(ha1Data.toUtf8());
-
-                QCryptographicHash md5Hash(QCryptographicHash::Md5);
-                md5Hash.addData(ha1.result().toHex());
-                md5Hash.addData(":");
-                md5Hash.addData(nonce);
-                md5Hash.addData(":");
-                md5Hash.addData(ha2);
-                QByteArray calcResponse = md5Hash.result().toHex();
-
-                if (calcResponse == response)
-                    return Qn::Auth_OK;
-            }
-        }
-#endif
     }
 
     if (userResource &&
@@ -517,7 +445,6 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
 
-#ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
     std::tie(errCode, res) = m_userDataProvider->authorize(
         method,
@@ -543,45 +470,6 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
         }
         return Qn::Auth_OK;
     }
-#else
-    for (const QnUserResourcePtr& user : m_users)
-    {
-        if (user->getName().toLower() == authorization.basic->userid)
-        {
-            errCode = Qn::Auth_WrongPassword;
-            if (authUserId)
-                *authUserId = user->getId();
-
-            if (!user->isEnabled())
-                continue;
-
-            if (user->passwordExpired())
-            {
-                //user password has expired, validating password
-                auto authResult = doPasswordProlongation(user);
-                if (authResult != Qn::Auth_OK)
-                    return authResult;
-            }
-
-            if (user->checkPassword(authorization.basic->password))
-            {
-                if (user->getDigest().isEmpty())
-                    emit emptyDigestDetected(user, authorization.basic->userid, authorization.basic->password);
-                return Qn::Auth_OK;
-            }
-        }
-    }
-
-    // authenticate by media server auth_key
-    for (const QnMediaServerResourcePtr& server : m_servers)
-    {
-        if (server->getId().toString().toLower() == authorization.basic->userid)
-        {
-            if (server->getAuthKey() == authorization.basic->password)
-                return Qn::Auth_OK;
-        }
-    }
-#endif
 
     return errCode;
 }
@@ -654,28 +542,6 @@ QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const
         return m_timeBasedNonceProvider->generateNonce();
 }
 
-#ifndef USE_USER_RESOURCE_PROVIDER
-void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    QnUserResourcePtr user = res.dynamicCast<QnUserResource>();
-    QnMediaServerResourcePtr server = res.dynamicCast<QnMediaServerResource>();
-    if (user)
-        m_users.insert(user->getId(), user);
-    else if (server)
-        m_servers.insert(server->getId(), server);
-}
-
-void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    m_users.remove(res->getId());
-    m_servers.remove(res->getId());
-}
-#endif
-
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
     const QByteArray& method,
@@ -697,7 +563,6 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
         return Qn::Auth_WrongDigest;
 
-#ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
     std::tie(errCode, res) = m_userDataProvider->authorize(
@@ -714,53 +579,13 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     }
 
     return errCode;
-#else
-    QnMutexLocker lock(&m_mutex);
-    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
-    for (const QnUserResourcePtr& user : m_users)
-    {
-        if (user->getName().toUtf8().toLower() != authorization.digest->userid)
-            continue;
-        errCode = Qn::Auth_WrongPassword;
-        if (authUserId)
-            *authUserId = user->getId();
-        const QByteArray& ha1 = user->getDigest();
-
-        QCryptographicHash md5Hash(QCryptographicHash::Md5);
-        md5Hash.addData(method);
-        md5Hash.addData(":");
-        const QByteArray nedoHa2 = md5Hash.result().toHex();
-
-        md5Hash.reset();
-        md5Hash.addData(ha1);
-        md5Hash.addData(":");
-        md5Hash.addData(authorization.digest->params["nonce"]);
-        md5Hash.addData(":");
-        md5Hash.addData(nedoHa2);
-        const QByteArray calcResponse = md5Hash.result().toHex();
-
-        if (calcResponse == authorization.digest->params["response"])
-            return Qn::Auth_OK;
-    }
-
-    return errCode;
-#endif
 }
 
 QnUserResourcePtr QnAuthHelper::findUserByName(const QByteArray& nxUserName) const
 {
-#ifdef USE_USER_RESOURCE_PROVIDER
     auto res = m_userDataProvider->findResByName(nxUserName);
     if (auto user = res.dynamicCast<QnUserResource>())
         return user;
-#else
-    QnMutexLocker lock(&m_mutex);
-    for (const QnUserResourcePtr& user : m_users)
-    {
-        if (user->getName().toUtf8().toLower() == nxUserName)
-            return user;
-    }
-#endif
     return QnUserResourcePtr();
 }
 

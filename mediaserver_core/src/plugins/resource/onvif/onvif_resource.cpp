@@ -51,6 +51,7 @@
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
+#include <core/dataconsumer/basic_audio_transmitter.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -245,7 +246,7 @@ bool compareByProfiles(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2,
 
     if (firstPriority != secondPriority)
         return firstPriority > secondPriority;
-    
+
     return videoOptsGreaterThan(s1, s2);
 }
 
@@ -258,7 +259,7 @@ VideoOptionsComparator createComparator(const QString& profiles)
         for (auto i = 0; i < profileList.size(); ++i)
             profilePriorities[profileList[i]] = profileList.size() - i;
 
-        return 
+        return
             [profilePriorities](const VideoOptionsLocal &s1, const VideoOptionsLocal &s2) -> bool
             {
                 return compareByProfiles(s1, s2, profilePriorities);
@@ -556,7 +557,9 @@ void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    auto result = QnPhysicalCameraResource::initInternal();
+    if (!result)
+        return result;
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -564,7 +567,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     CapabilitiesResp capabilitiesResponse;
     DeviceSoapWrapper* soapWrapper = nullptr;
 
-    auto result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
+    result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
     if(!checkResultAndSetStatus(result))
         return result;
 
@@ -614,6 +617,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
             ? m_prevOnvifResultCode
             : CameraDiagnostics::RequestFailedResult(lit("getDeviceOnvifUrl"), QString());
     }
+
     calcTimeDrift();
 
     if (m_appStopping)
@@ -698,6 +702,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
             setCustomAspectRatio(ar);
         }
     }
+
+	if (initializeTwoWayAudio())
+        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 
     return result;
 }
@@ -2104,7 +2111,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
     auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
 
-    if (forcedParams && forcedParams->videoEncoders.size() > getChannel()) 
+    if (forcedParams && forcedParams->videoEncoders.size() > getChannel())
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
     }
@@ -2224,7 +2231,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     bool dualStreamingAllowed = optionsList.size() >= 2;
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1; 
+        int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1;
         QnMutexLocker lock( &m_mutex );
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
@@ -4205,6 +4212,32 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
         return true;
 
     return false;
+}
+
+bool QnPlOnvifResource::initializeTwoWayAudio()
+{
+    // TODO: move this function to the PhysicalCamResource class
+    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
+    if (params.codec.isEmpty() || params.urlPath.isEmpty())
+        return false;
+
+    QnAudioFormat format;
+    format.setCodec(params.codec);
+    format.setSampleRate(params.sampleRate * 1000);
+    format.setChannelCount(params.channels);
+    auto audioTransmitter = new QnBasicAudioTransmitter(this);
+    m_audioTransmitter.reset(audioTransmitter);
+    m_audioTransmitter->setOutputFormat(format);
+    m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
+    audioTransmitter->setContentType(params.contentType.toUtf8());
+    audioTransmitter->setNoAuth(params.noAuth);
+
+    QUrl srcUrl(getUrl());
+    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+    audioTransmitter->setTransmissionUrl(url);
+
+    return true;
 }
 
 #endif //ENABLE_ONVIF

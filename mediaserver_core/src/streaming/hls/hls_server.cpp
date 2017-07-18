@@ -88,7 +88,6 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
-            QnMediaServerModule::instance()->streamingChunkCache()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
@@ -221,6 +220,29 @@ namespace nx_hls
         }
     }
 
+    namespace {
+
+        static QString formatGUID(const QnUuid& guid)
+        {
+            QString rez = guid.toString();
+            if (rez.startsWith(L'{'))
+                return rez;
+            else
+                return QString(lit("{%1}")).arg(rez);
+        }
+
+    } // namespace
+
+    void QnHttpLiveStreamingProcessor::prepareUrlPath(QUrl* url)
+    {
+#if 0 // Not needed because currently hls requests are forwarded via AutoRequestForwarder.
+        //TODO #ak check that request has been proxied via media server, not regular Http proxy
+        const QString& currentPath = url.path();
+        url.setPath(lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID()),
+            currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath));
+#endif // 0
+    }
+
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
         const nx_http::Request& request,
         nx_http::Response* const response )
@@ -278,7 +300,7 @@ namespace nx_hls
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
-            NX_LOG( lit("HLS. Requested resource %1 is not camera").
+            NX_LOG( lit("HLS. Requested resource %1 is not a camera").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -287,7 +309,7 @@ namespace nx_hls
         QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( lit("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -377,15 +399,6 @@ namespace nx_hls
             arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 
         m_state = sSending;
-    }
-
-    static QString formatGUID(const QnUuid& guid)
-    {
-        QString rez = guid.toString();
-        if (rez.startsWith(L'{'))
-            return rez;
-        else
-            return QString(lit("{%1}")).arg(rez);
     }
 
     bool QnHttpLiveStreamingProcessor::prepareDataToSend()
@@ -556,12 +569,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = playlistData.url.path();
-                playlistData.url.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&playlistData.url);
         }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
@@ -682,12 +690,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = baseChunkUrl.path();
-                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&baseChunkUrl);
         }
 
         const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
@@ -815,7 +818,7 @@ namespace nx_hls
             containerFormat,
             aliasIter != requestParams.end() ? aliasIter->second : QString(),
             startTimestamp,
-            chunkDuration,
+            std::chrono::microseconds(chunkDuration),
             streamQuality,
             requestParams );
 
@@ -825,26 +828,25 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        //retrieving streaming chunk
-        StreamingChunkPtr chunk;
-        const auto& chunkCache = QnMediaServerModule::instance()->streamingChunkCache();
-        if( !chunkCache->takeForUse( currentChunkKey, &chunk ) )
-        {
-            NX_LOG( lit("Could not get chunk %1 of resource %2 requested by %3").
-                arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
         //streaming chunk
-        if( m_currentChunk )
+        if (m_currentChunk)
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
-            chunkCache->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 
+        //retrieving streaming chunk
+        StreamingChunkPtr chunk;
+        m_chunkInputStream = qnServerModule->streamingChunkCache()->getChunkForReading(
+            currentChunkKey, &chunk);
+        if (!m_chunkInputStream)
+        {
+            NX_LOG(lm("Could not get chunk %1 of resource %2 requested by %3")
+                .arg(request.requestLine.url.query()).arg(uniqueResourceID.toString())
+                .arg(remoteHostAddress().toString()), cl_logDEBUG1);
+            return nx_http::StatusCode::notFound;
+        }
         m_currentChunk = chunk;
-        m_chunkInputStream.reset( new StreamingChunkInputStream( m_currentChunk.get() ) );
 
         //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
         const auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");

@@ -13,6 +13,7 @@ namespace cloud {
 
 using TunnelAcceptorFactoryFunction =
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>>(
+        const SocketAddress& mediatorUdpEndpoint,
         const hpm::api::ConnectionRequestedEvent&);
 
 class NX_NETWORK_API TunnelAcceptorFactory:
@@ -23,10 +24,16 @@ class NX_NETWORK_API TunnelAcceptorFactory:
 public:
     TunnelAcceptorFactory();
 
+    void setUdpHolePunchingEnabled(bool val);
+    void setRelayingEnabled(bool val);
+
     static TunnelAcceptorFactory& instance();
 
 private:
+    hpm::api::ConnectionMethods m_enabledConnectionMethods;
+
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> defaultFactoryFunction(
+        const SocketAddress& mediatorUdpEndpoint,
         const hpm::api::ConnectionRequestedEvent&);
 };
 

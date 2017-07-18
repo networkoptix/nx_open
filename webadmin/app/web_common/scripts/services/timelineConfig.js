@@ -144,7 +144,8 @@ function TimelineConfig(){
         markerWidth: 140,
         markerHeight: 48/100,
         markerPullDown: 3,
-        markerTriangleHeight: 5/100,
+        markerTriangleHeight: 3/100,
+        triangleHeightOffset: 3,
         markerLineHeightOffset: 4,
         dateFormat: 'd mmmm yyyy', // Timemarker format for date
         timeFormat: 'HH:MM:ss', // Timemarker format for time
@@ -154,6 +155,7 @@ function TimelineConfig(){
         scrollButtonsHoverColor: [105,135,150,0.5],  //$light16
         scrollButtonsActiveColor: [105,135,150,0.4],  //$light16
         scrollButtonsWidth: 24,
+        borderAreaWidth: 64,
         scrollButtonsHeight: 48/100,
         scrollButtonsArrowLineWidth:2,
         scrollButtonsArrowColor:[255,255,255,0.8],  //$light1

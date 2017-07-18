@@ -9,6 +9,7 @@
 
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/utils/log/log.h>
+#include <plugins/resource/arecontvision/resource/av_panoramic.h>
 
 
 QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)
@@ -142,6 +143,14 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
 QnConstResourceAudioLayoutPtr QnArecontRtspStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
+}
+
+void QnArecontRtspStreamReader::beforeRun()
+{
+    parent_type::beforeRun();
+    QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
+    if (res)
+        res->updateFlipState();
 }
 
 #endif // ENABLE_ARECONT

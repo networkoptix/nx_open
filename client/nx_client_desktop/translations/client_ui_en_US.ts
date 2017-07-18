@@ -139,7 +139,7 @@
 <context>
     <name>ApplauncherControlDialog</name>
     <message>
-        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
         <source>Add External Storage...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -416,11 +416,6 @@
     </message>
     <message>
         <location/>
-        <source>at</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule...</source>
         <translation></translation>
     </message>
@@ -442,6 +437,11 @@
     <message>
         <location/>
         <source>Do</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>At</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -729,13 +729,28 @@
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>PTZ Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable native presets, use system presets instead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Native camera presets will not be avaliable.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-        <source>Input ID:</source>
-        <translation></translation>
+        <source>Input Id</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -750,17 +765,17 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-        <source>Output ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Fixed duration:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Id:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -894,7 +909,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1040,9 +1055,9 @@
     </message>
 </context>
 <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
         <source>Export Rapid Review</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1058,12 +1073,12 @@
     </message>
     <message>
         <location/>
-        <source>Rapid Review speed</source>
+        <source>Frames Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Frames Interval</source>
+        <source>Rapid Review speed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1400,13 +1415,13 @@
     </message>
     <message>
         <location/>
-        <source>Locked to Hardware ID:</source>
+        <source>Features</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Features</source>
-        <translation></translation>
+        <source>Locked to Hardware Id:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1509,12 +1524,12 @@
     </message>
     <message>
         <location/>
-        <source>Hardware ID</source>
+        <source>Activation Key File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Activation Key File</source>
+        <source>Hardware Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1710,7 +1725,7 @@
     </message>
     <message>
         <location/>
-        <source>Play to user</source>
+        <source>Play to users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1718,13 +1733,18 @@
     <name>PopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-        <source>Show to administrators only</source>
+        <source>Global Notification Settings...</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Global Notification Settings...</source>
-        <translation></translation>
+        <source>for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force Acknowledgment</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1898,7 +1918,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1930,11 +1950,6 @@
     <message>
         <location/>
         <source>Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>You will be reconnected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2205,27 +2220,22 @@
         <source>Post-Recording:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Fixed duration:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
         <source>Temporary Folder</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Capture Mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Fullscreen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Application Window</source>
         <translation></translation>
     </message>
     <message>
@@ -2241,11 +2251,6 @@
     <message>
         <location/>
         <source>Capture Cursor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quality</source>
         <translation></translation>
     </message>
     <message>
@@ -2266,6 +2271,16 @@
     <message>
         <location/>
         <source>Recording Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Screen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2306,7 +2321,7 @@
     </message>
     <message>
         <location/>
-        <source>Speak to user</source>
+        <source>Speak to users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2643,6 +2658,24 @@
     </message>
 </context>
 <context>
+    <name>SoftwareTriggerBusinessEventWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
+        <source>Available to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StorageAnalyticsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2750,6 +2783,29 @@
     </message>
 </context>
 <context>
+    <name>SubjectSelectionDialog</name>
+    <message>
+        <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+        <source>Roles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show all users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nothing matches your search.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
@@ -2781,8 +2837,7 @@
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if System has no Internet access.</source>
+        <source>Sync time with the Internet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2846,6 +2901,14 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location/>
         <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WebpageDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
+        <source>Web Page</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

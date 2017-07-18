@@ -77,13 +77,15 @@ void GraphicsPixmap::setPixmap(const QPixmap &pixmap) {
 QSizeF GraphicsPixmap::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
     Q_D(const GraphicsPixmap);
 
-    if (!d->pixmap.isNull()) {
-        switch (which) {
-        case Qt::PreferredSize:
-        case Qt::MinimumSize:
-            return d->pixmap.size();
-        default:
-            break;
+    if (!d->pixmap.isNull())
+    {
+        switch (which)
+        {
+            case Qt::PreferredSize:
+            case Qt::MinimumSize:
+                return d->pixmap.size() / d->pixmap.devicePixelRatio();
+            default:
+                break;
         }
     }
 

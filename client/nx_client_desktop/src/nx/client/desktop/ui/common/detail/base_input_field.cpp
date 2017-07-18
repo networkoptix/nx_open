@@ -25,6 +25,7 @@ public:
         const BaseInputField::AccessorPtr& textAccessor,
         const BaseInputField::AccessorPtr& readOnlyAccessor,
         const BaseInputField::AccessorPtr& placeholderAccessor,
+        bool useWarningStyleForControl,
         BaseInputField* parent);
 
     virtual bool eventFilter(QObject* watched, QEvent* event);
@@ -36,8 +37,11 @@ public:
     QString getText() const;
 
     Qn::ValidationResult getLastResult() const;
-    bool setLastResult(Qn::ValidationResult result);
-    void clearValidationResult();
+    void setLastResult(Qn::ValidationResult result);
+    void setAcceptableResult();
+    void setIntermediateResult();
+
+    void updateStateWhileActive();
 
 public:
     BaseInputField* parent;
@@ -47,10 +51,14 @@ public:
     QPalette defaultPalette;
 
     Qn::TextValidateFunction validator;
+    bool useWarningStyleForControl;
 
     const BaseInputField::AccessorPtr textAccessor;
     const BaseInputField::AccessorPtr readOnlyAccessor;
     const BaseInputField::AccessorPtr placeholderAccessor;
+
+private:
+    void updateVisualStateDelayed();
 
 private:
     Qn::ValidationResult lastResult;
@@ -61,6 +69,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     const BaseInputField::AccessorPtr& textAccessor,
     const BaseInputField::AccessorPtr& readOnlyAccessor,
     const BaseInputField::AccessorPtr& placeholderAccessor,
+    bool useWarningStyleForControl,
     BaseInputField* parent)
     :
     QObject(parent),
@@ -69,15 +78,27 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     hint(new QnWordWrappedLabel(parent)),
     input(inputInstance),
     defaultPalette(),
+    useWarningStyleForControl(useWarningStyleForControl),
 
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),
     placeholderAccessor(placeholderAccessor),
 
-    lastResult(QValidator::Acceptable)
+    lastResult(QValidator::Intermediate)
 {
     input->installEventFilter(this);
     parent->setFocusProxy(input);
+}
+
+void BaseInputFieldPrivate::updateStateWhileActive()
+{
+    if (!parent->hasFocus())
+        return;
+
+    if (parent->calculateValidationResult().state == QValidator::Invalid)
+        parent->setIntermediateResult();
+    else
+        parent->validate();
 }
 
 Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
@@ -85,20 +106,44 @@ Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
     return lastResult;
 }
 
-bool BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)
+void BaseInputFieldPrivate::updateVisualStateDelayed()
+{
+    const auto updateFunction =
+        [this]()
+        {
+            setHintText(lastResult.errorMessage);
+
+            QPalette palette = defaultPalette;
+            if (lastResult.state == QValidator::Invalid)
+                setWarningStyle(&palette);
+
+            if (useWarningStyleForControl)
+                input->setPalette(palette);
+
+            hint->setPalette(palette);
+        };
+    executeDelayedParented(updateFunction, 0, this);
+}
+
+void BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)
 {
     if (lastResult.state == result.state)
-        return false;
+        return;
 
     lastResult = result;
 
+    updateVisualStateDelayed();
     emit parent->isValidChanged();
-    return true;
 }
 
-void BaseInputFieldPrivate::clearValidationResult()
+void BaseInputFieldPrivate::setAcceptableResult()
 {
     setLastResult(Qn::ValidationResult(QValidator::Acceptable));
+}
+
+void BaseInputFieldPrivate::setIntermediateResult()
+{
+    setLastResult(Qn::ValidationResult(QValidator::Intermediate));
 }
 
 bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
@@ -116,20 +161,16 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         }
         case QEvent::FocusIn:
         {
-            // On focus gain make input look usual even if there is error.
-            setHintText(QString());
-            input->setPalette(defaultPalette);
-            lastResult.state = QValidator::Intermediate;
+            updateStateWhileActive();
             break;
         }
         case QEvent::FocusOut:
         {
-            // On focus loss perform validate, unless it's a popup or programmable focus change.
+            // On focus loss perform validate, unless it's a popup focus change.
             switch (static_cast<QFocusEvent*>(event)->reason())
             {
                 case Qt::ActiveWindowFocusReason:
                 case Qt::MenuBarFocusReason:
-                case Qt::PopupFocusReason:
                 case Qt::OtherFocusReason:
                     break;
 
@@ -211,11 +252,12 @@ BaseInputField::BaseInputField(
     const AccessorPtr& textAccessor,
     const AccessorPtr& readOnlyAccessor,
     const AccessorPtr& placeholderAccessor,
+    bool useWarningStyleForControl,
     QWidget* parent)
     :
     base_type(parent),
     d_ptr(new BaseInputFieldPrivate(inputInstance, textAccessor,
-        readOnlyAccessor, placeholderAccessor, this))
+        readOnlyAccessor, placeholderAccessor, useWarningStyleForControl, this))
 {
     Q_D(BaseInputField);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -230,6 +272,8 @@ BaseInputField::BaseInputField(
     d->title->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     d->title->setVisible(false);
     d->hint->setVisible(false);
+
+    connect(this, &BaseInputField::textChanged, d, &BaseInputFieldPrivate::updateStateWhileActive);
 }
 
 BaseInputField::~BaseInputField()
@@ -286,25 +330,29 @@ void BaseInputField::setText(const QString& value)
 QString BaseInputField::placeholderText() const
 {
     Q_D(const BaseInputField);
-    return d->placeholderAccessor->get(d->input).toString();
+    return d->input && d->placeholderAccessor
+        ? d->placeholderAccessor->get(d->input).toString()
+        : QString();
 }
 
 void BaseInputField::setPlaceholderText(const QString& value)
 {
     Q_D(BaseInputField);
-    d->placeholderAccessor->set(d->input, value);
+    if (d->placeholderAccessor && d->input)
+        d->placeholderAccessor->set(d->input, value);
 }
 
 bool BaseInputField::isReadOnly() const
 {
     Q_D(const BaseInputField);
-    return d->readOnlyAccessor->get(d->input).toBool();
+    return d->readOnlyAccessor && d->input && d->readOnlyAccessor->get(d->input).toBool();
 }
 
 void BaseInputField::setReadOnly(bool value)
 {
     Q_D(BaseInputField);
-    d->readOnlyAccessor->set(d->input, value);
+    if (d->input &&d->readOnlyAccessor)
+        d->readOnlyAccessor->set(d->input, value);
 }
 
 bool BaseInputField::validate()
@@ -313,21 +361,9 @@ bool BaseInputField::validate()
 
     d->input->ensurePolished();
     const auto result = calculateValidationResult();
-    if (!d->setLastResult(result))
-        return lastValidationResult() != QValidator::Invalid;
 
-    d->setHintText(result.errorMessage);
-
-    QPalette palette = d->defaultPalette;
-    if (result.state != QValidator::Acceptable)
-        setWarningStyle(&palette);
-
-    if (!d->input->hasFocus())
-        d->input->setPalette(palette);
-
-    d->hint->setPalette(palette);
-
-    return result.state != QValidator::Invalid;
+    d->setLastResult(result);
+    return lastValidationResult() != QValidator::Invalid;
 }
 
 void BaseInputField::updateDisplayStateDelayed()
@@ -345,7 +381,6 @@ void BaseInputField::clear()
 
 bool BaseInputField::isValid() const
 {
-    Q_D(const BaseInputField);
     return calculateValidationResult().state == QValidator::Acceptable;
 }
 
@@ -369,13 +404,19 @@ void BaseInputField::setValidator(
 void BaseInputField::reset()
 {
     Q_D(BaseInputField);
-    d->clearValidationResult();
+    d->setAcceptableResult();
     d->setHintText(QString());
 }
 
 AbstractAccessor* BaseInputField::createLabelWidthAccessor()
 {
     return new LabelWidthAccessor();
+}
+
+void BaseInputField::setIntermediateResult()
+{
+    Q_D(BaseInputField);
+    d->setIntermediateResult();
 }
 
 Qn::ValidationResult BaseInputField::calculateValidationResult() const

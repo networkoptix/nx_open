@@ -33,7 +33,6 @@ set(enableAllVendors ON)
 
 if(ANDROID OR IOS)
     remove_definitions(
-        -DENABLE_SSL
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
@@ -120,8 +119,14 @@ if(UNIX)
         -Werror=return-type
         -Werror=conversion-null
         -Wuninitialized
+        -Wno-error=unused-function
     )
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.0)
+            add_compile_options(-Wno-error=dangling-else)
+        endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override

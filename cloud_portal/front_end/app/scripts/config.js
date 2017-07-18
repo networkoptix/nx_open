@@ -141,23 +141,23 @@ var Config = {
                     },
                     {
                         platform: 'win64',
-                        appType: 'bundle',
+                        appType: 'server',
                     },
                     {
                         platform: 'win64',
-                        appType: 'server',
-                    },
-                    {
-                        platform: 'win86',
                         appType: 'bundle',
-                    },
-                    {
-                        platform: 'win86',
-                        appType: 'server',
                     },
                     {
                         platform: 'win86',
                         appType: 'client',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'bundle',
                     }
                 ]
             },
@@ -175,11 +175,11 @@ var Config = {
                     },
                     {
                         platform: 'linux86',
-                        appType: 'server',
+                        appType: 'client',
                     },
                     {
                         platform: 'linux86',
-                        appType: 'client',
+                        appType: 'server',
                     }
                 ]
             },
@@ -198,7 +198,8 @@ var Config = {
     webclient:{
         useServerTime: true,
         disableVolume: true,
-        reloadInterval: 5*1000
+        reloadInterval: 5*1000,
+        leftPanelPreviewHeight: 38 // 38px is the height for previews in the left panel
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',

@@ -332,8 +332,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     if (m_httpMessage.type == MessageType::request)
     {
-        if (m_httpMessage.request->requestLine.method != nx_http::Method::POST &&
-            m_httpMessage.request->requestLine.method != nx_http::Method::PUT)
+        if (m_httpMessage.request->requestLine.method != nx_http::Method::post &&
+            m_httpMessage.request->requestLine.method != nx_http::Method::put)
         {
             // Only POST and PUT are allowed to have message body.
             m_contentLength = 0;
