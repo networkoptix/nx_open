@@ -5,6 +5,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
+#include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/mediator_service.h>
 #include <libtraffic_relay/src/model/listening_peer_pool.h>
 
@@ -12,6 +13,8 @@ namespace nx {
 namespace network {
 namespace cloud {
 namespace test {
+
+static const char* const kCloudModulesXmlPath = "/cloud_modules.xml";
 
 void PredefinedCredentialsProvider::setCredentials(
     hpm::api::SystemCredentials cloudSystemCredentials)
@@ -29,6 +32,9 @@ boost::optional<hpm::api::SystemCredentials>
 
 BasicTestFixture::BasicTestFixture():
     m_staticMsgBody("Hello, hren!"),
+    m_mediator(
+        nx::hpm::MediatorFunctionalTest::allFlags &
+            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
     m_unfinishedRequestsLeft(0)
 {
 }
@@ -44,9 +50,6 @@ BasicTestFixture::~BasicTestFixture()
     for (const auto& httpClient: httpClients)
         httpClient->pleaseStopSync();
 
-    if (m_stunClient)
-        m_stunClient->pleaseStopSync();
-
     m_httpServer.reset();
 }
 
@@ -60,12 +63,24 @@ void BasicTestFixture::SetUp()
     m_mediator.addArg(m_relayUrl.toString().toStdString().c_str());
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+    ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
 
-    SocketGlobals::mediatorConnector().mockupAddress(
-        nx::network::url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
+    switch (m_mediatorApiProtocol)
+    {
+        case MediatorApiProtocol::stun:
+            initializeCloudModulesXmlWithDirectStunPort();
+            break;
 
-    m_stunClient = std::make_shared<nx::stun::AsyncClient>();
-    m_stunClient->connect(m_mediator.moduleInstance()->impl()->stunEndpoints()[0]);
+        case MediatorApiProtocol::http:
+            initializeCloudModulesXmlWithStunOverHttp();
+            break;
+    }
+
+    SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+        nx::network::url::Builder().setScheme("http")
+            .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
+            .setPath(kCloudModulesXmlPath));
+    SocketGlobals::mediatorConnector().enable(true);
 }
 
 void BasicTestFixture::startServer()
@@ -75,7 +90,8 @@ void BasicTestFixture::startServer()
     m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
     m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
-    m_credentialsProvider.setCredentials(m_cloudSystemCredentials);
+
+    SocketGlobals::mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
 
     startHttpServer();
 }
@@ -160,15 +176,48 @@ void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
     m_remotePeerName = remotePeerName;
 }
 
+void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol)
+{
+    m_mediatorApiProtocol = mediatorApiProtocol;
+}
+
+void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()
+{
+    static const char* const kCloudModulesXmlTemplate = R"xml(
+        <sequence>
+            <set resName="hpm" resValue="stun://%1"/>
+        </sequence>
+    )xml";
+
+    m_cloudModulesXmlProvider.registerStaticProcessor(
+        kCloudModulesXmlPath,
+        lm(kCloudModulesXmlTemplate).arg(m_mediator.stunEndpoint()).toUtf8(),
+        "application/xml");
+}
+
+void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
+{
+    static const char* kCloudModulesXmlTemplate = R"xml(
+        <sequence>
+            <sequence>
+                <set resName="hpm.tcpUrl" resValue="http://%1%2"/>
+                <set resName="hpm.udpUrl" resValue="stun://%3"/>
+            </sequence>
+        </sequence>
+    )xml";
+
+    m_cloudModulesXmlProvider.registerStaticProcessor(
+        kCloudModulesXmlPath,
+        lm(kCloudModulesXmlTemplate)
+            .arg(m_mediator.httpEndpoint()).arg(nx::hpm::http::kStunOverHttpTunnelPath)
+            .arg(m_mediator.stunEndpoint()).toUtf8(),
+        "application/xml");
+}
+
 void BasicTestFixture::startHttpServer()
 {
-    auto serverConnection =
-        std::make_unique<hpm::api::MediatorServerTcpConnection>(
-            m_stunClient,
-            &m_credentialsProvider);
-
-    auto cloudServerSocket =
-        std::make_unique<CloudServerSocket>(std::move(serverConnection));
+    auto cloudServerSocket = std::make_unique<CloudServerSocket>(
+        &SocketGlobals::mediatorConnector());
 
     m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");

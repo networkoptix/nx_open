@@ -278,9 +278,7 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout()
     auto peers = m_pendingPeers; // Copy to safely remove elements from m_pendingPeers.
     for (const auto& id: peers)
     {
-        const auto server = resourcePool()->getIncompatibleResourceById(id, true)
-            .dynamicCast<QnMediaServerResource>();
-
+        const auto server = resourcePool()->getIncompatibleServerById(id, true);
         if (!server)
             continue;
 

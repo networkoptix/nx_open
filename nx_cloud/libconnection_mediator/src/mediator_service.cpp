@@ -1,8 +1,3 @@
-/**********************************************************
-* 27 aug 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "mediator_service.h"
 
 #include <algorithm>
@@ -75,6 +70,10 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     http::Server httpServer(settings, controller.listeningPeerRegistrator());
     m_httpServer = &httpServer;
+
+    // TODO: #ak Following call should be removed. 
+    // Http server should be passed to stun server via constructor.
+    stunServer->initializeHttpTunnelling(&httpServer);
 
     // process privilege reduction
     nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);

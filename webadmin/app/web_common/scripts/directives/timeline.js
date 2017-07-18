@@ -76,6 +76,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
+                    timelineConfig.minScrollBarWidth,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -130,10 +131,6 @@ angular.module('nxCommon')
 
                     timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
-
-                    if(scope.loading){
-                        scope.loading = false;
-                    }
                 }
 
 
@@ -329,8 +326,9 @@ angular.module('nxCommon')
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         var scrollLeft = true;
                         //checking if mouse is to the left or right of the scrollbar
-                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline)
+                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline){
                             scrollLeft = false;
+                        }
                         scrollbarClickOrHold(scrollLeft);
                     }
                 }
@@ -419,6 +417,7 @@ angular.module('nxCommon')
 
                 scope.$watch('positionProvider',function(){
                     timelineActions.setPositionProvider(scope.positionProvider);
+                    $timeout(updateTimelineWidth);
                 });
 
                 // !!! Subscribe for different events which affect timeline
@@ -433,10 +432,11 @@ angular.module('nxCommon')
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
+                        scope.loading = true;
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                         scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
-                            scope.loading = hasArchive;
+                            scope.loading = false;
                         });
 
                         timelineRender.setRecordsProvider(scope.recordsProvider);
@@ -445,7 +445,8 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                $timeout(updateTimelineWidth); // Adjust width
+                //We need a delay for the timeline to fully load then we can calculate the width of the timeline
+                $timeout(updateTimelineWidth); // Adjust width.
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing

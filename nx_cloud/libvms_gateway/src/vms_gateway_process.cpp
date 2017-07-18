@@ -148,7 +148,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 {
     if (!settings.general().mediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
     }
@@ -206,6 +206,7 @@ void VmsGatewayProcess::publicAddressFetched(
         auto& pool = nx::network::SocketGlobals::tcpReversePool();
         pool.setPoolSize(rcSettings.poolSize);
         pool.setKeepAliveOptions(rcSettings.keepAlive);
+        pool.setStartTimeout(rcSettings.startTimeout);
         if (pool.start(publicAddress, rcSettings.port))
         {
             NX_LOG(lm("TCP reverse pool has started with port=%1, poolSize=%2, keepAlive=%3")

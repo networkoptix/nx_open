@@ -8,11 +8,15 @@
 #include <api/app_server_connection.h>
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
+#include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
 #include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -22,12 +26,17 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-#include <watchers/cloud_status_watcher.h>
-
+#include <utils/camera/bookmark_helpers.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/actions/common_action.h>
+#include <ui/dialogs/camera_bookmark_dialog.h>
+#include <camera/camera_bookmarks_manager.h>
+#include <nx_ec/ec_api.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -37,7 +46,25 @@ namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
 
+QnCameraBookmark extractBookmarkFromAction(
+    const nx::vms::event::AbstractActionPtr& action,
+    QnCommonModule* commonModule)
+{
+    const auto resourcePool = commonModule->resourcePool();
+    const auto cameraResourceId = action->getRuntimeParams().eventResourceId;
+    const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(cameraResourceId);
+    if (!camera)
+    {
+        NX_EXPECT(false, "Invalid camera resource");
+        return QnCameraBookmark();
+    }
+
+    return helpers::bookmarkFromAction(action, camera, commonModule);
+}
+
 } // namespace
+
+using namespace nx::vms::event;
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -104,11 +131,67 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this,
         &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
+
+    connect(action(action::AcknowledgeEventAction), &QAction::triggered,
+        this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler()
 {
+}
 
+void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
+{
+    const auto actionParams = menu()->currentParameters(sender());
+    const auto businessAction =
+        actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
+
+    auto bookmark = extractBookmarkFromAction(businessAction, commonModule());
+    if (!bookmark.isValid())
+        return;
+
+    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
+        new QnCameraBookmarkDialog(true, mainWindow()));
+
+    bookmark.description = QString(); //< Force user to fill description out.
+    bookmarksDialog->loadData(bookmark);
+    if (bookmarksDialog->exec() != QDialog::Accepted)
+        return;
+
+    const auto creationCallback =
+        [this, businessAction, parentThreadId = QThread::currentThreadId()](bool success)
+        {
+            if (QThread::currentThreadId() != parentThreadId)
+            {
+                NX_ASSERT(false, "Invalid thread!");
+                return;
+            }
+
+            if (!success)
+                return;
+
+            const auto action = CommonAction::createBroadcastAction(
+                ActionType::showPopupAction, businessAction->getParams());
+            action->setToggleState(nx::vms::event::EventState::inactive);
+
+            if (const auto connection = commonModule()->ec2Connection())
+            {
+                static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
+
+                const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
+                manager->broadcastBusinessAction(action, this, fakeHandler);
+            }
+            emit notificationRemoved(businessAction);
+        };
+
+    bookmarksDialog->submitData(bookmark);
+
+    const auto currentUserId = context()->user()->getId();
+    const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    bookmark.creatorId = currentUserId;
+    bookmark.creationTimeStampMs = currentTimeMs;
+
+    qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction, creationCallback);
 }
 
 void QnWorkbenchNotificationsHandler::clear()
@@ -320,17 +403,15 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         {
             const bool isOwner = context()->user()
                 && context()->user()->userRole() == Qn::UserRole::Owner;
-            const bool isLoggedIntoCloud = qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
 
             const bool canShow =
                 // show only to owners
                 isOwner
-                // hide if we are already in the cloud
-                && !isLoggedIntoCloud
                 // only if system is not connected to the cloud
                 && qnGlobalSettings->cloudSystemId().isNull()
                 // and if user did not close notification manually at least once
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+
             setSystemHealthEventVisible(message, canShow);
             return;
         }
@@ -368,15 +449,14 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
         return;
 
+    if (!QnBusiness::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+        return;
+
     switch (action->actionType())
     {
-        case vms::event::showPopupAction:
         case vms::event::showOnAlarmLayoutAction:
-        {
             addNotification(action);
             break;
-        }
-
         case vms::event::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
@@ -387,10 +467,12 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
+        case vms::event::showPopupAction: //< Fallthrough
         case vms::event::playSoundAction:
         {
             switch (action->getToggleState())
             {
+                case vms::event::EventState::undefined:
                 case vms::event::EventState::active:
                     addNotification(action);
                     break;

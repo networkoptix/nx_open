@@ -30,7 +30,7 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
@@ -38,7 +38,8 @@ protected:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server)
     {
-        auto serverSocket = std::make_unique<CloudServerSocket>(server->mediatorConnection());
+        auto serverSocket = std::make_unique<CloudServerSocket>(
+            &server->mediatorConnector());
         serverSocket->setSupportedConnectionMethods(hpm::api::ConnectionMethod::reverseConnect);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));

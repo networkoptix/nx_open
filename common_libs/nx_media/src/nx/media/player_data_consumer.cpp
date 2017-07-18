@@ -46,7 +46,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
     m_emptyPacketCounter(0),
-    m_audioEnabled(true)
+    m_audioEnabled(true),
+    m_needToResetAudio(true)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
@@ -121,12 +122,21 @@ ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
+    if (m_needToResetAudio)
     {
-        if (!m_audioEnabled && m_audioOutput)
-        {
-            QnMutexLocker lock(&m_decoderMutex);
-            m_audioOutput.reset();
-        }
+        m_needToResetAudio = false;
+        QnMutexLocker lock(&m_decoderMutex);
+        m_audioOutput.reset();
+    }
+
+    const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    if (!mediaData)
+        return true;
+
+    if (!checkSequence(mediaData->opaque))
+    {
+        NX_VERBOSE(this, lm("PlayerDataConsumer::processData(): Ignoring old frame"));
+        return true; //< No error. Just ignore the old frame.
     }
 
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
@@ -167,13 +177,12 @@ bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
     const QnCompressedVideoDataPtr& videoFrame)
 {
-    if (!m_audioOutput)
-        return videoFrame; //< Pre-decoding queue is not required.
+    QnMutexLocker lock(&m_queueMutex);
 
     m_predecodeQueue.push_back(videoFrame);
 
     QnCompressedVideoDataPtr result = m_predecodeQueue.front();
-    if (result->timestamp < m_audioOutput->playbackPositionUsec())
+    if (!m_audioOutput || result->timestamp < m_audioOutput->playbackPositionUsec())
     {
         // Frame time is earlier than the audio buffer, no need to delay it anyway.
         m_predecodeQueue.pop_front();
@@ -191,12 +200,6 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
-    if (!checkSequence(videoFrame->opaque))
-    {
-        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): Ignoring old frame"), cl_logDEBUG2);
-        return true; //< No error. Just ignore the old frame.
-    }
-
     quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
     if (archiveReader)
@@ -285,6 +288,8 @@ void PlayerDataConsumer::clearUnprocessedData()
     base_type::clearUnprocessedData();
     QnMutexLocker lock(&m_queueMutex);
     m_decodedVideo.clear();
+    m_predecodeQueue.clear();
+    m_needToResetAudio = true;
     m_queueWaitCond.wakeAll();
 }
 
@@ -353,6 +358,24 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));
     }
     m_audioOutput->write(decodedFrame);
+
+
+    const auto currentPos = m_audioOutput->playbackPositionUsec();
+
+    {
+        QnMutexLocker lock(&m_queueMutex);
+        while (!m_audioOutput->isBuffering()
+            && !m_predecodeQueue.empty()
+            && m_predecodeQueue.front()->timestamp < currentPos)
+        {
+            QnCompressedVideoDataPtr videoFrame = m_predecodeQueue.front();
+            m_predecodeQueue.pop_front();
+            lock.unlock();
+            if (!processVideoFrame(videoFrame))
+                return false;
+            lock.relock();
+        }
+    }
     return true;
 }
 
@@ -475,6 +498,19 @@ qint64 PlayerDataConsumer::getExternalTime() const
 void PlayerDataConsumer::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
+    QnMutexLocker lock(&m_decoderMutex);
+    if (m_audioOutput)
+    {
+        if (!value)
+            m_audioOutput->suspend();
+        else if (!m_audioOutput->isBuffering())
+            m_audioOutput->resume();
+    }
+}
+
+bool PlayerDataConsumer::isAudioEnabled() const
+{
+    return m_audioEnabled;
 }
 
 } // namespace media

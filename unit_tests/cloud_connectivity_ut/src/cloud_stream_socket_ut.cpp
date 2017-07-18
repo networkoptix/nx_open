@@ -519,7 +519,7 @@ protected:
 
         base_type::SetUp();
 
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(serverAddress()));
     }
 

@@ -48,6 +48,9 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     ui->camerasView->setHorizontalScrollBar(horizontalScrollBar->proxyScrollBar());
 
     m_resourceSearch->setSourceModel(m_model);
+    m_resourceSearch->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_resourceSearch->setFilterRole(Qn::ResourceSearchStringRole);
+
     updateCriterion();
 
     connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);
@@ -153,21 +156,13 @@ void QnCameraListDialog::updateWindowTitle() {
     const QString title = lit("%1 - %2").arg(titleServerPart).arg(titleCamerasPart);
     setWindowTitle(title);
 
+    // TODO: #common Semantically misplaced. Required to update columns after filtering.
     ui->camerasView->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    resize({ sizeHint().width(), height() });
 }
 
-void QnCameraListDialog::updateCriterion() {
-    QString text = ui->filterLineEdit->text();
-
-    QString searchString = text.isEmpty()
-        ? lit("*")
-        : lit("*%1*").arg(text);
-    m_resourceSearch->clearCriteria();
-    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
-    m_resourceSearch->addCriterion(QnResourceCriterion(Qn::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
-
-
+void QnCameraListDialog::updateCriterion()
+{
+    m_resourceSearch->setQuery(ui->filterLineEdit->text());
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

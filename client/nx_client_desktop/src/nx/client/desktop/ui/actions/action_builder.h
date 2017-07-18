@@ -49,14 +49,11 @@ public:
     Builder requiredTargetPermissions(Qn::Permissions permissions);
     Builder separator(bool isSeparator = true);
     Builder conditionalText(const QString& text, ConditionWrapper&& condition);
-    Builder conditionalText(const QString& text, const QnResourceCriterion& criterion,
-        MatchMode matchMode = All);
     Builder checkable(bool isCheckable = true);
     Builder checked(bool isChecked = true);
     Builder showCheckBoxInMenu(bool show);
     Builder accent(Qn::ButtonAccent value);
     Builder condition(ConditionWrapper&& condition);
-    Builder condition(const QnResourceCriterion& criterion, MatchMode matchMode = All);
     Builder childFactory(const FactoryPtr& childFactory);
 
 private:

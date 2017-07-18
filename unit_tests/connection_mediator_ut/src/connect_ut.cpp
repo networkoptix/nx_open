@@ -52,7 +52,7 @@ protected:
 
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
-        network::SocketGlobals::mediatorConnector().mockupAddress(
+        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun").setEndpoint(m_address));
     }
 
@@ -127,4 +127,4 @@ TEST_F( ConnectTest, BindConnect )
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

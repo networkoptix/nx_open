@@ -29,9 +29,6 @@ void initialize(
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
     {
-        if (settings.level == Level::none)
-            return;
-
         logger->setDefaultLevel(settings.level);
         logger->setExceptionFilters(settings.exceptionFilers);
         if (baseName != QLatin1String("-"))

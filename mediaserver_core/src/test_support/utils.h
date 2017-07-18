@@ -10,10 +10,10 @@ namespace cfg {
 
 struct Config
 {
-    // Every test tmp work dir.
+    /** Every test tmp work dir. */
     QString tmpDir;
 
-    // Storage tests ftp and smb storages urls.
+    /** Storage tests ftp and smb storages urls. */
     QString ftpUrl;
     QString smbUrl;
 };
@@ -24,10 +24,14 @@ nx::ut::cfg::Config& configInstance();
 
 namespace utils {
 
-// If successfull, returns directory name.
+/**
+ * @return Directory name on success, boost::none on failure.
+ */
 boost::optional<QString> createRandomDir();
 
-// Auto creation and cleaning up of working directory helper.
+/**
+ * Creates specified directory in the constructor and removes it in the destructor.
+ */
 class WorkDirResource
 {
 public:

@@ -22,7 +22,7 @@ typedef MoveOnlyFunc<DeinitFunctions(const ArgumentParser& args)> InitFunction;
 /**
  * Sets up environment and runs Google Tests. Should be used for all unit tests.
  */
-inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullptr)
+inline int runTest(int& argc, const char* argv[], InitFunction extraInit = nullptr)
 {
     nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
     nx::kit::IniConfig::setOutput(nullptr);
@@ -49,7 +49,7 @@ inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullpt
     return result;
 }
 
-inline int runTest(int argc, char* argv[], InitFunction extraInit = nullptr)
+inline int runTest(int& argc, char* argv[], InitFunction extraInit = nullptr)
 {
     return runTest(argc, (const char**) argv, std::move(extraInit));
 }

@@ -37,6 +37,11 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
+nx_http::MessageDispatcher& Server::messageDispatcher()
+{
+    return *m_httpMessageDispatcher;
+}
+
 bool Server::launchHttpServerIfNeeded(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator)

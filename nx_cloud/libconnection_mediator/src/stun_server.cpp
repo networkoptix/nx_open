@@ -1,8 +1,10 @@
 #include "stun_server.h"
 
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
+#include "http/http_api_path.h"
+#include "http/http_server.h"
 #include "settings.h"
 
 namespace nx {
@@ -10,6 +12,7 @@ namespace hpm {
 
 StunServer::StunServer(const conf::Settings& settings):
     m_settings(settings),
+    m_stunOverHttpServer(&m_stunMessageDispatcher),
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
@@ -55,6 +58,13 @@ const std::vector<SocketAddress>& StunServer::endpoints() const
 nx::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
+}
+
+void StunServer::initializeHttpTunnelling(http::Server* httpServer)
+{
+    m_stunOverHttpServer.setupHttpTunneling(
+        &httpServer->messageDispatcher(),
+        http::kStunOverHttpTunnelPath);
 }
 
 bool StunServer::bind()

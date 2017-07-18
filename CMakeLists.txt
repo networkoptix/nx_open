@@ -44,11 +44,13 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
+include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
+include(strip_target)
 include(mercurial)
 include(project_utils)
 include(test_utils)

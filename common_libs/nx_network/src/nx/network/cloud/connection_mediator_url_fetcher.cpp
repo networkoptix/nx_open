@@ -20,9 +20,9 @@ void ConnectionMediatorUrlFetcher::get(
 
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
-    if (m_mediator)
+    if (m_mediatorHostDescriptor)
     {
-        auto mediator = *m_mediator;
+        auto mediator = *m_mediatorHostDescriptor;
         lk.unlock();
         handler(
             nx_http::StatusCode::ok,
@@ -42,20 +42,20 @@ bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
     if (searchResult.get(CloudInstanceSelectionAttributeNameset::hpmTcpUrl, &foundTcpUrlStr) &&
         searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUdpUrl, &foundUdpUrlStr))
     {
-        m_mediator = Mediator();
-        m_mediator->tcpUrl = QUrl(foundTcpUrlStr);
-        m_mediator->udpUrl = QUrl(foundUdpUrlStr);
+        m_mediatorHostDescriptor = MediatorHostDescriptor();
+        m_mediatorHostDescriptor->tcpUrl = QUrl(foundTcpUrlStr);
+        m_mediatorHostDescriptor->udpUrl = QUrl(foundUdpUrlStr);
         return true;
     }
 
     QString foundHpmUrlStr;
     if (searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUrl, &foundHpmUrlStr))
     {
-        m_mediator = Mediator();
-        m_mediator->tcpUrl = buildUrl(
+        m_mediatorHostDescriptor = MediatorHostDescriptor();
+        m_mediatorHostDescriptor->tcpUrl = buildUrl(
             foundHpmUrlStr,
             CloudInstanceSelectionAttributeNameset::hpmUrl);
-        m_mediator->udpUrl = m_mediator->tcpUrl;
+        m_mediatorHostDescriptor->udpUrl = m_mediatorHostDescriptor->tcpUrl;
         return true;
     }
 
@@ -66,11 +66,11 @@ void ConnectionMediatorUrlFetcher::invokeHandler(
     const Handler& handler,
     nx_http::StatusCode::Value statusCode)
 {
-    NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_mediator));
+    NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_mediatorHostDescriptor));
     handler(
         statusCode,
-        m_mediator ? m_mediator->tcpUrl : QUrl(),
-        m_mediator ? m_mediator->udpUrl : QUrl());
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : QUrl(),
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : QUrl());
 }
 
 } // namespace cloud

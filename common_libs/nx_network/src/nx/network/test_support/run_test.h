@@ -12,7 +12,7 @@ namespace test {
  * Sets up environment and runs Google Tests. Should be used for all unit tests which use network.
  */
 inline int runTest(
-    int argc, const char* argv[],
+    int& argc, const char* argv[],
     utils::test::InitFunction extraInit = nullptr,
     int socketGlobalsFlags = 0)
 {
@@ -42,7 +42,7 @@ inline int runTest(
 }
 
 inline int runTest(
-    int argc, char* argv[],
+    int& argc, char* argv[],
     utils::test::InitFunction extraInit = nullptr,
     int socketGlobalsFlags = 0)
 {

@@ -44,7 +44,7 @@ public:
 
         auto& currentContext = socketContexts.back();
         auto socket = std::make_unique<network::cloud::CloudServerSocket>(
-            currentContext.mediatorConnector->systemConnection());
+            currentContext.mediatorConnector.get());
 
         if (connectionMethonds)
             socket->setSupportedConnectionMethods(*connectionMethonds);

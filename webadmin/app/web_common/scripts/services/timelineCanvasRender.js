@@ -517,7 +517,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     lastMinuteTexture = context.createPattern(img, 'repeat');
                     context.fillStyle = lastMinuteTexture;
                 };
-                img.src = 'images/lastminute.png';
+                img.src = Config.viewsDirCommon + '../images/lastminute.png';
                 lastMinuteTextureImg = img;
             }
             context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
@@ -543,18 +543,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.restore();
     }
 
-    var scrollBarSliderWidth = 0;
     // !!! Draw ScrollBar
     function drawOrCheckScrollBar(context, mouseX, mouseY, catchScrollBarSlider){
         var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
 
-        //2.
-        var relativeCenter =  self.scaleManager.getRelativeCenter();
-        var relativeWidth =  self.scaleManager.getRelativeWidth();
-
-        scrollBarSliderWidth = Math.max(self.canvas.width * relativeWidth, timelineConfig.minScrollBarWidth);
-        // Correction for width if it has minimum width
-        var startCoordinate = self.scaleManager.bound( 0, (self.canvas.width * relativeCenter - scrollBarSliderWidth/2), self.canvas.width - scrollBarSliderWidth) ;
+        var scrollSlider = self.scaleManager.scrollSlider();
+        var startCoordinate = scrollSlider.start;
+        var scrollBarSliderWidth = scrollSlider.width;
 
         var mouseInScrollbarRow = mouseY >= top;
         var mouseInScrollbarSlider = mouseX >= startCoordinate && mouseX <= startCoordinate + scrollBarSliderWidth && mouseY >= top;

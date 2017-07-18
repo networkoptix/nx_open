@@ -6,6 +6,7 @@
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 #include <nx/network/app_info.h>
+#include "appserver2_process.h"
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
@@ -37,8 +38,8 @@ bool Ec2ConnectionProcessor::authenticate()
 {
     Q_D(QnTCPConnectionProcessor);
 
-    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
-    if (!owner->needAuth())
+    auto owner = static_cast<ec2::QnSimpleHttpConnectionListener*>(d->owner);
+    if (!owner->needAuth(d->request))
         return true;
 
     const nx_http::StringType& authorization =

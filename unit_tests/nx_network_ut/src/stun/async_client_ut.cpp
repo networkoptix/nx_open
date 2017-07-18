@@ -11,6 +11,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/sync_queue.h>
 
+#include "stun_async_client_acceptance_tests.h"
+
 namespace nx {
 namespace stun {
 namespace test {
@@ -341,6 +343,10 @@ TEST_F(StunClientUser, correct_cancellation)
     assertIfResponseReportedAfterClientRemoval();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+INSTANTIATE_TYPED_TEST_CASE_P(StunAsyncClient, StunAsyncClientAcceptanceTest, AsyncClient);
+
 } // namespace test
 } // namespace stun
-} // namespase nx
+} // namespace nx

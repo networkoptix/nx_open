@@ -176,9 +176,8 @@ void QnServerUpdatesModel::resetResourses() {
     for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
-    for (const QnResourcePtr &resource: resourcePool()->getAllIncompatibleResources())
+    for (const auto& server: resourcePool()->getIncompatibleServers())
     {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server || !helpers::serverBelongsToCurrentSystem(server))
             continue;
 

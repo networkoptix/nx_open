@@ -904,7 +904,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1050,9 +1050,9 @@
     </message>
 </context>
 <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
         <source>Export Rapid Review</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1068,12 +1068,12 @@
     </message>
     <message>
         <location/>
-        <source>Rapid Review speed</source>
+        <source>Frames Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Frames Interval</source>
+        <source>Rapid Review speed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1908,7 +1908,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or Password</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2671,19 +2671,6 @@
     </message>
 </context>
 <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-        <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-        <source>&lt;Some Caption&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Some description&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>StorageAnalyticsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2794,17 +2781,22 @@
     <name>SubjectSelectionDialog</name>
     <message>
         <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Roles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Show all users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nothing matches your search.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

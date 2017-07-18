@@ -295,7 +295,7 @@
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Definições Servidor</translation>
     </message>
     <message>
       <location/>
@@ -371,7 +371,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -475,7 +475,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Log de eventos...</translation>
     </message>
   </context>
   <context>
@@ -849,7 +849,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <location/>
@@ -864,7 +864,7 @@
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>Mostrar FPS</translation>
     </message>
     <message>
       <location/>
@@ -884,7 +884,7 @@
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movimento + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Tamanho</translation>
     </message>
     <message>
       <location/>
@@ -1698,7 +1698,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Avançado</translation>
     </message>
   </context>
   <context>
@@ -1968,7 +1968,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproduzir</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activar</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2271,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Origem</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Ecrã</translation>
     </message>
   </context>
   <context>
@@ -2353,7 +2353,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2500,7 +2500,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2555,7 +2555,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restaurar</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
@@ -2794,11 +2794,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2801,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2857,12 +2862,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Utilizadores</translation>
     </message>
     <message>
       <location/>

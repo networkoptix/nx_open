@@ -202,4 +202,4 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

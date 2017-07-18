@@ -3,7 +3,7 @@
 #include <atomic>
 
 #include "common/common_module.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "utils/common/synctime.h"
 
 #include "nx/fusion/model_functions.h"

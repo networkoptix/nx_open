@@ -104,7 +104,7 @@ MediaServerEmulator::MediaServerEmulator(
 
     bindToAioThread(getAioThread());
 
-    m_mediatorConnector->mockupAddress(
+    m_mediatorConnector->mockupMediatorUrl(
         nx::network::url::Builder().setScheme("stun").setEndpoint(mediatorEndpoint));
 
     m_mediatorConnector->setSystemCredentials(
@@ -256,6 +256,11 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
         });
 
     return promise.get_future().get();
+}
+
+hpm::api::MediatorConnector& MediaServerEmulator::mediatorConnector()
+{
+    return *m_mediatorConnector;
 }
 
 std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::mediatorConnection()

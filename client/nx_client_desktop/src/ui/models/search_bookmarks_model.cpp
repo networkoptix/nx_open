@@ -12,6 +12,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/qtimespan.h>
 #include <nx/utils/collection.h>
@@ -30,19 +31,23 @@ namespace
         {
             switch(col)
             {
-            case QnSearchBookmarksModel::kName:
-                return Qn::BookmarkName;
-            case QnSearchBookmarksModel::kStartTime:
-                return Qn::BookmarkStartTime;
-            case QnSearchBookmarksModel::kLength:
-                return Qn::BookmarkDuration;
-            case QnSearchBookmarksModel::kTags:
-                return Qn::BookmarkTags;
-            case QnSearchBookmarksModel::kCamera:
-                return Qn::BookmarkCameraName;
-            default:
-                NX_ASSERT(false, Q_FUNC_INFO, "Wrong column");
-                return Qn::BookmarkStartTime;
+                case QnSearchBookmarksModel::kName:
+                    return Qn::BookmarkName;
+                case QnSearchBookmarksModel::kStartTime:
+                    return Qn::BookmarkStartTime;
+                case QnSearchBookmarksModel::kLength:
+                    return Qn::BookmarkDuration;
+                case QnSearchBookmarksModel::kCreationTime:
+                    return Qn::BookmarkCreationTime;
+                case QnSearchBookmarksModel::kCreator:
+                    return Qn::BookmarkCreator;
+                case QnSearchBookmarksModel::kTags:
+                    return Qn::BookmarkTags;
+                case QnSearchBookmarksModel::kCamera:
+                    return Qn::BookmarkCameraName;
+                default:
+                    NX_ASSERT(false, Q_FUNC_INFO, "Wrong column");
+                    return Qn::BookmarkStartTime;
             }
         }();
 
@@ -83,6 +88,8 @@ public:
 
     QVariant getData(const QModelIndex &index
         , int role);
+
+    QDateTime displayTime(qint64 millisecondsSinceEpoch);
 
 private:
     typedef QHash<QString, QString> UniqIdToStringHash;
@@ -161,6 +168,12 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
 
 QnSearchBookmarksModel::Impl::~Impl()
 {
+}
+
+QDateTime QnSearchBookmarksModel::Impl::displayTime(qint64 millisecondsSinceEpoch)
+{
+    const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+    return timeWatcher->displayTime(millisecondsSinceEpoch);
 }
 
 void QnSearchBookmarksModel::Impl::setRange(qint64 utcStartTimeMs
@@ -247,10 +260,20 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
 
     if (role == Qt::DecorationRole)
     {
-        if (index.column() != kCamera)
-            return QVariant();
+        if (index.column() == kCamera)
+            return qnResIconCache->icon(QnResourceIconCache::Camera);
+        if (index.column() == kCreator)
+        {
+            if (bookmark.isCreatedInOlderVMS())
+                return QVariant();
 
-        return qnResIconCache->icon(QnResourceIconCache::Camera);
+            return bookmark.isCreatedBySystem()
+                ? qnResIconCache->icon(QnResourceIconCache::CurrentSystem)
+                : qnResIconCache->icon(QnResourceIconCache::User);
+        }
+
+        return QVariant();
+
     }
 
     switch(index.column())
@@ -258,7 +281,11 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kName:
         return bookmark.name;
     case kStartTime:
-        return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(bookmark.startTimeMs);
+        return displayTime(bookmark.startTimeMs);
+    case kCreationTime:
+        return displayTime(bookmark.creationTimeMs());
+    case kCreator:
+        return helpers::getBookmarkCreatorName(bookmark, resourcePool());
     case kLength:
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(
             QTimeSpan::kDoNotSuppressSecondUnit);
@@ -300,6 +327,10 @@ int QnSearchBookmarksModel::sortFieldToColumn(Qn::BookmarkSortField field)
         return Column::kStartTime;
     case Qn::BookmarkDuration:
         return Column::kLength;
+    case Qn::BookmarkCreationTime:
+        return Column::kCreationTime;
+    case Qn::BookmarkCreator:
+        return Column::kCreator;
     case Qn::BookmarkTags:
         return Column::kTags;
     case Qn::BookmarkCameraName:
@@ -373,7 +404,7 @@ QVariant QnSearchBookmarksModel::headerData(int section, Qt::Orientation orienta
     if ((orientation != Qt::Horizontal) || (role != Qt::DisplayRole) || (section >= kColumnsCount))
         return QAbstractItemModel::headerData(section, orientation, role);
 
-    switch(section)
+    switch (section)
     {
         case kName:
             return tr("Name");
@@ -383,6 +414,10 @@ QVariant QnSearchBookmarksModel::headerData(int section, Qt::Orientation orienta
             return tr("Start time");
         case kLength:
             return tr("Length");
+        case kCreationTime:
+            return tr("Created");
+        case kCreator:
+            return tr("Creator");
         case kTags:
             return tr("Tags");
         default:

@@ -16,7 +16,7 @@ var RegisterPage = function () {
     this.url = '/register';
 
     this.openRegisterButton = p.helper.forms.register.triggerRegisterButton;
-    this.openRegisterButtonAdv = element(by.linkText('Create account now')); // Register button on home page
+    this.openRegisterButtonAdv = element(by.linkText('Create Account')); // Register button on home page
 
     this.firstNameInput = element(by.model('account.firstName'));
     this.lastNameInput = element(by.model('account.lastName'));
@@ -33,7 +33,7 @@ var RegisterPage = function () {
         return field.element(by.xpath('../..'));
     };
 
-    this.preRegisterMessage = "By clicking 'Create Account', you agree\nto Terms and Conditions";
+    this.preRegisterMessage = 'By clicking "Create Account", you agree\nto Terms and Conditions';
 
     this.invalidClassRequired = 'ng-invalid-required';
     this.invalidClass = 'ng-invalid';
@@ -62,7 +62,7 @@ var RegisterPage = function () {
 
     this.checkEmailExists = function () {
         this.checkInputInvalid(this.emailInput, this.invalidClassExists);
-        expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('This email address has been already registered in');
+        expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain(' ');
     };
 
     this.passCheck = {

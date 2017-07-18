@@ -73,6 +73,7 @@ public:
         boost::optional<nx::String> serverId);
 
     nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
+    hpm::api::MediatorConnector& mediatorConnector();
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 
 private:

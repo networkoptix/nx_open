@@ -15,7 +15,7 @@
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
-#include <mediaserver_api.h>
+#include <mediaserver_endpoint_tester.h>
 
 #include "mediator_mocks.h"
 
@@ -51,7 +51,7 @@ protected:
     SocketAddress address;
     MessageDispatcher stunMessageDispatcher;
     CloudDataProviderMock cloudData;
-    MediaserverApiMock mediaserverApi;
+    MediaserverEndpointTesterMock mediaserverApi;
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
@@ -328,4 +328,4 @@ TEST_F(StunCustomTest, ClientBind)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

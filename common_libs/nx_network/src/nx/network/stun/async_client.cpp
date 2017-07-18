@@ -23,9 +23,7 @@ AsyncClient::AsyncClient(
 {
     m_endpoint = tcpConnection->getForeignAddress();
 
-    bindToAioThread(getAioThread());
-    tcpConnection->bindToAioThread(getAioThread());
-
+    bindToAioThread(tcpConnection->getAioThread());
     initializeMessagePipeline(std::move(tcpConnection));
 }
 
@@ -503,5 +501,5 @@ const char* AsyncClient::toString(State state) const
     return "unknown";
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

@@ -49,6 +49,7 @@
 #include "server/server_globals.h"
 #include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
+#include <api/model/password_data.h>
 
 namespace
 {
@@ -92,11 +93,6 @@ QString getDataDirectory()
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json),
-    _Fields)
 
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,

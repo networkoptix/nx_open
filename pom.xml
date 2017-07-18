@@ -211,7 +211,7 @@
         <additional.defines/>
         <customization.defines/>
 
-        <additionalQrcPathes/>
+        <additionalQrcPaths/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
@@ -322,7 +322,6 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
-                                <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -330,14 +329,16 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>get-cloud-url-property</id>
+                        <id>get-generated-properties</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>

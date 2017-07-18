@@ -367,26 +367,18 @@ angular.module('nxCommon')
                             scope.flashls = false;
                             scope.jsHls = false;
                             scope.loading = false; // no supported format - no loading
+                            recyclePlayer(null); //There is no player so it should be set to null
                             return;
                         }
-                        if(!recyclePlayer(format)){ // Remove or recycle old player.
-                            // Some problem happened. We must reload video here
-                            if(scope.vgApi){
-                                scope.vgApi.kill();
-                            }
-                            if(videoPlayers){
-                                videoPlayers.pop();
-                            }
-                            $timeout(initNewPlayer);
-                        }
-                        else{
-                            scope.vgApi.load(getFormatSrc(format == 'webm' ? 'webm' : 'hls'));
 
-                            if(scope.playing){
-                                scope.vgApi.play();
-                            }
-
+                        recyclePlayer(format);
+                        if(scope.vgApi){
+                            scope.vgApi.kill();
                         }
+                        if(videoPlayers){
+                            videoPlayers.pop();
+                        }
+                        $timeout(initNewPlayer);
 
                         if(scope.rotation != 0 && scope.rotation != 180){
                             updateWidth();
@@ -397,14 +389,16 @@ angular.module('nxCommon')
                 scope.$watch("vgSrc",srcChanged, true);
 
                 scope.$on('$destroy',function(){
-                    recyclePlayer();
+                    recyclePlayer(null);
                     scope.vgApi.kill();
-                    if(videoPlayers.length == 1){
-                        videoPlayers.pop();
-                    }
-                    else{
+
+                    if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
+                    }
+
+                    if(videoPlayers.length > 0){
+                        videoPlayers.pop();
                     }
                 });
 

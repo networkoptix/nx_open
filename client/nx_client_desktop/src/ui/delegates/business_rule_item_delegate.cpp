@@ -18,7 +18,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
@@ -166,7 +165,7 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator()),
+    m_lexComparator(new QnBusinessTypesComparator(true)),
     m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
 {
 }

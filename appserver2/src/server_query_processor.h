@@ -5,7 +5,7 @@
 #include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include <transaction/binary_transaction_serializer.h>
@@ -228,6 +228,19 @@ public:
         NX_ASSERT(tran.command == ApiCommand::saveLayouts);
         return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(
             tran, handler, ApiCommand::saveLayout);
+    }
+
+    /**
+    * Execute transaction.
+    * Transaction executed locally and broadcast through the whole cluster.
+    * @param handler Called upon request completion. Functor(ErrorCode).
+    */
+    template<class HandlerType>
+    void processUpdateAsync(QnTransaction<ApiUserDataList>& tran, HandlerType handler)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveUsers);
+        return processMultiUpdateAsync<ApiUserDataList, ApiUserData>(
+            tran, handler, ApiCommand::saveUser);
     }
 
     /**

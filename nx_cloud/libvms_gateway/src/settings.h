@@ -63,6 +63,7 @@ struct TcpReverseOptions
     uint16_t port = 0;
     size_t poolSize = 0;
     boost::optional<KeepAliveOptions> keepAlive;
+    std::chrono::seconds startTimeout{0};
 };
 
 class CloudConnect

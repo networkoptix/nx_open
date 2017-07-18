@@ -48,7 +48,7 @@ public:
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
@@ -67,7 +67,7 @@ public:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
     {
         auto serverSocket = std::make_unique<CloudServerSocket>(
-            SocketGlobals::mediatorConnector().systemConnection());
+            &SocketGlobals::mediatorConnector());
 
         serverSocket->setSupportedConnectionMethods(m_methods);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);

@@ -190,7 +190,7 @@ void AsyncHttpClient::doGet(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::Get);
+    composeRequest(nx_http::Method::get);
     initiateHttpMessageDelivery();
 }
 
@@ -215,8 +215,9 @@ void AsyncHttpClient::doPost(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::Post);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
+    composeRequest(nx_http::Method::post);
+    if (!contentType.isEmpty())
+        m_request.headers.insert(make_pair("Content-Type", contentType));
     if (includeContentLength)
         m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
     //TODO #ak support chunked encoding & compression
@@ -257,7 +258,7 @@ void AsyncHttpClient::doPut(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::Put);
+    composeRequest(nx_http::Method::put);
     m_request.headers.insert(make_pair("Content-Type", contentType));
     m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
     //TODO #ak support chunked encoding & compression
@@ -292,7 +293,7 @@ void AsyncHttpClient::doDelete(const QUrl& url)
     m_requestUrl = url;
     m_contentLocationUrl = url;
     m_contentLocationUrl.setPath(QLatin1String("*"));
-    composeRequest(nx_http::Method::Delete);
+    composeRequest(nx_http::Method::delete_);
     initiateHttpMessageDelivery();
 }
 
@@ -315,7 +316,7 @@ void AsyncHttpClient::doOptions(const QUrl& url)
     m_requestUrl = url;
     m_contentLocationUrl = url;
     m_contentLocationUrl.setPath(QLatin1String("*"));
-    composeRequest(nx_http::Method::Options);
+    composeRequest(nx_http::Method::options);
     initiateHttpMessageDelivery();
 }
 
@@ -342,7 +343,7 @@ void AsyncHttpClient::doUpgrade(
     m_contentLocationUrl = url;
     m_additionalHeaders.emplace("Connection", "Upgrade");
     m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    composeRequest(nx_http::Method::Options);
+    composeRequest(nx_http::Method::options);
     initiateHttpMessageDelivery();
 }
 
@@ -1122,7 +1123,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
     if (useHttp11)
     {
-        if (httpMethod == nx_http::Method::Get || httpMethod == nx_http::Method::Head)
+        if (httpMethod == nx_http::Method::get || httpMethod == nx_http::Method::head)
         {
             //m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if (m_contentEncodingUsed)

@@ -308,6 +308,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
         SF_SupportsTranscoding = 0x200,
         SF_HasLiteClient = 0x400,
+        SF_P2pSyncDone = 0x800, //< For UT purpose only
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -510,11 +511,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
     {
-        BookmarkName
-        , BookmarkStartTime
-        , BookmarkDuration
-        , BookmarkTags          // Sorted manually!
-        , BookmarkCameraName    // Sorted manually!
+        BookmarkName,
+        BookmarkStartTime,
+        BookmarkDuration,
+        BookmarkCreationTime,   //< Sorted manually!
+                                // TODO: #ynikitenkov add migration from older version to prevent
+                                // empty/zero creation time. It would allow as to sort bookmarks
+                                // by database, not manually, which is faster.
+        BookmarkCreator,        //< Sorted manually!
+        BookmarkTags,           //< Sorted manually!
+        BookmarkCameraName      //< Sorted manually!
     };
 
     /**

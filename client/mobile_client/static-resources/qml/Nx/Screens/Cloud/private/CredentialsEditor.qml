@@ -142,7 +142,7 @@ Item
             if (error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
-                showWarning(qsTr("Incorrect Email or Password"))
+                showWarning(qsTr("Incorrect email or password"))
             }
             else
             {

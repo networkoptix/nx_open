@@ -61,13 +61,13 @@
   <String Id="InstallLicenseText">En cliquant sur « Accepter et installer » vous acceptez</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Sélectionnez les applications à installer:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">Impossible de connecter au pare-feu Windows. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Configuration du pare-feu Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Configuration du pare-feu Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Restaurer la configuration du pare-feu Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">Installer la configuration du pare-feu Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Restaurer la configuration du pare-feu Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Désinstaller la configuration du pare-feu Windows</String>
+  <String Id="Product_ArchMismatch_x86">Ce paquet est conçu pour un OS 32 bits. Le programme d\'installation va maintenant quitter.</String>
+  <String Id="Product_ArchMismatch_x64">Ce paquet est conçu pour un OS 64 bits. Le programme d\'installation va maintenant quitter.</String>
 </WixLocalization>

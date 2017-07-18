@@ -10,18 +10,27 @@
 
 CUSTOMIZATION=${deb.customization.company.name}
 
-LIBS_PATH="/opt/$CUSTOMIZATION/lib"
+INSTALL_DIR="/opt/$CUSTOMIZATION"
+LIBS_DIR="$INSTALL_DIR/lib"
 SERVICE_NAME="mediaserver"
-PREFIX="/opt/$CUSTOMIZATION/mediaserver"
+MEDIASERVER_DIR="$INSTALL_DIR/mediaserver"
 BIN_NAME="mediaserver"
-BIN_PATH="$PREFIX/bin/$BIN_NAME"
-LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
-LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
+BIN_FILE="$MEDIASERVER_DIR/bin/$BIN_NAME"
+LOGS_DIR="$MEDIASERVER_DIR/var/log"
+LOG_OUTPUT_FLAG="$LOGS_DIR/log_output.flag"
+VERSION_FILE="$INSTALL_DIR/version.txt"
+INITIALIZED_FLAG="$INSTALL_DIR/initialized-$(cat "$VERSION_FILE").flag"
 RUN_ARGS="-e"
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
-export VMS_PLUGIN_DIR="$PREFIX/plugins"
-export SASL_PATH="$LIBS_PATH/sasl2"
+OBSOLETE_LIBS=(
+    ffmpeg #< Was a dedicated ffmpeg for vdpau. Now one ffmpeg is used for vms and vdpau.
+    libclient_core.so #< Renamed to libnx_client_core.so.
+    libnx_streaming.so #< Eliminated.
+)
+
+export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"
+export SASL_PATH="$LIBS_DIR/sasl2"
 
 ulimit -n $(cat /proc/sys/fs/file-max 2>/dev/null || echo 8192)
 ulimit -c unlimited
@@ -35,14 +44,14 @@ process_core_dump()
         return 0 # gdb is alrady engaged
     fi
 
-    CORE_ORIG=$(dirname "$BIN_PATH")/core
+    CORE_ORIG=$(dirname "$BIN_FILE")/core
     TIME=$(date +"%s")
     CORE="$CORE_ORIG.$TIME"
     if mv "$CORE_ORIG" "$CORE" 2>/dev/null; then
-        REPORT="${BIN_NAME}_$("$BIN_PATH" --version)_$TIME.gdb-bt"
+        REPORT="${BIN_NAME}_$("$BIN_FILE" --version)_$TIME.gdb-bt"
 
         echo "Generate crash report (in background) $REPORT"
-        echo "t apply all bt 25" |gdb "$BIN_PATH" "$CORE" 2>&1 >"/tmp/$REPORT" && \
+        echo "t apply all bt 25" |gdb "$BIN_FILE" "$CORE" 2>/dev/null >"/tmp/$REPORT" && \
             mv "/tmp/$REPORT" "/root/$REPORT" &
 
         ls "$CORE_ORIG".* |grep -v "$CORE" |xargs rm 2>/dev/null
@@ -62,27 +71,27 @@ start()
     DISK=$(fdisk -l |grep "Disk" |grep "dev/sd" |awk '{print substr($2, 0, length($2))}')
     local HDPARM="hdparm"
     if ! which hdparm >/dev/null; then
-        HDPARM="$PREFIX/bin/hdparm"
+        HDPARM="$MEDIASERVER_DIR/bin/hdparm"
     fi
     if [ ! -z "$DISK" ]; then
         "$HDPARM" -I /dev/sd? |grep 'Model' >/tmp/hddlist
     fi
 
     if [ -f "$LOG_OUTPUT_FLAG" ]; then
-        mkdir -p "$LOGS_PATH"
-        REDIRECT_OUTPUT="$LOGS_PATH/mediaserver-out.log"
+        mkdir -p "$LOGS_DIR"
+        REDIRECT_OUTPUT="$LOGS_DIR/mediaserver-out.log"
     else
         REDIRECT_OUTPUT="/dev/null"
     fi
 
     echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
     set -x
-    "$BIN_PATH" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
+    "$BIN_FILE" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
     { set +x; } 2>/dev/null
 
     sleep 1
     # See if the server instantly crashes.
-    if pidof $BIN_NAME >/dev/null; then
+    if pidof "$BIN_NAME" >/dev/null; then
         echo "OK"
     else
         echo "FAILED"
@@ -144,11 +153,31 @@ run_watchdog()
     done
 }
 
-register_autostart_if_needed()
+initialize_if_needed()
 {
-    if ! grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
-        echo "Enabling mediaserver autostart via update-rc.d"
-        update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
+    if [ ! -f "$INITIALIZED_FLAG" ]; then
+        echo "First run: initialization BEGIN"
+
+        # Register autostart for Debian 8, if not yet.
+        if grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
+            echo "Mediaserver autostart already enabled."
+        else
+            echo "Enabling mediaserver autostart via update-rc.d"
+            update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
+        fi
+
+        # Delete obsolete libs.
+        local LIB
+        for LIB in "${OBSOLETE_LIBS[@]}"; do
+            local LIB_PATH="$LIBS_DIR/$LIB"
+            if [ -e "$LIB_PATH" ]; then
+                echo "Deleting obsolete $LIB_PATH"
+                rm -rf "$LIB_PATH"
+            fi
+        done
+
+        touch "$INITIALIZED_FLAG"
+        echo "First run: initialization END"
     fi
 }
 
@@ -157,7 +186,7 @@ register_autostart_if_needed()
 
 case "$1" in
     start)
-        register_autostart_if_needed
+        initialize_if_needed
         start
         start_watchdog
         ;;
@@ -165,10 +194,10 @@ case "$1" in
         start
         ;;
     start_console)
-        "$BIN_PATH" $RUN_ARGS
+        "$BIN_FILE" $RUN_ARGS
         ;;
     start_gdb)
-        gdbserver 0.0.0.0:12345 "$BIN_PATH" $RUN_ARGS
+        gdbserver 0.0.0.0:12345 "$BIN_FILE" $RUN_ARGS
         ;;
     stop)
         stop_watchdog

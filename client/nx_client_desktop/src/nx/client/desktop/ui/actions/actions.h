@@ -944,9 +944,9 @@ enum IDType
     ExportLayoutAction,
 
     /**
-     * Exports timelapse.
+     * Exports rapid review.
      */
-    ExportTimelapseAction,
+    ExportRapidReviewAction,
 
     /**
      * Bookmark selected range.
@@ -967,6 +967,8 @@ enum IDType
      * Batch bookmarks deleting.
      */
     RemoveBookmarksAction,
+
+    AcknowledgeEventAction,
 
     /**
      * Opens new layout for Quick Search.

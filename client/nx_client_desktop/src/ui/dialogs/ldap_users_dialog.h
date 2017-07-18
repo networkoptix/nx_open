@@ -34,7 +34,7 @@ private:
     QnLdapUsers visibleUsers() const;
     QnLdapUsers visibleSelectedUsers() const;
 
-
+    void setupUsersTable(const QnLdapUsers& filteredUsers);
 
 private slots:
     void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);

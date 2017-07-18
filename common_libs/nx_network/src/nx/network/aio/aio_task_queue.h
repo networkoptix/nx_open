@@ -39,14 +39,14 @@ class AioEventHandlingData
 public:
     std::atomic<int> beingProcessed;
     std::atomic<int> markedForRemoval;
-    AIOEventHandler<Pollable>* eventHandler;
+    AIOEventHandler* eventHandler;
     /** 0 means no timeout. */
     unsigned int timeout;
     qint64 updatedPeriodicTaskClock;
     /** Clock when timer will be triggered. 0 - no clock. */
     qint64 nextTimeoutClock;
 
-    AioEventHandlingData(AIOEventHandler<Pollable>* _eventHandler):
+    AioEventHandlingData(AIOEventHandler* _eventHandler):
         beingProcessed(0),
         markedForRemoval(0),
         eventHandler(_eventHandler),
@@ -63,7 +63,7 @@ public:
     // TODO: #ak This shared_ptr is probably not needed. Need to review usages.
     std::shared_ptr<AioEventHandlingData> data;
 
-    AioEventHandlingDataHolder(AIOEventHandler<Pollable>* _eventHandler):
+    AioEventHandlingDataHolder(AIOEventHandler* _eventHandler):
         data(new AioEventHandlingData(_eventHandler))
     {
     }
@@ -78,7 +78,7 @@ public:
     /** Socket number that is still unique after socket has been destroyed. */
     SocketSequenceType socketSequence;
     aio::EventType eventType;
-    AIOEventHandler<Pollable>* eventHandler;
+    AIOEventHandler* eventHandler;
     /** 0 means no timeout. */
     unsigned int timeout;
     std::atomic<int>* taskCompletionEvent;
@@ -92,7 +92,7 @@ public:
         TaskType _type,
         Pollable* const _socket,
         aio::EventType _eventType,
-        AIOEventHandler<Pollable>* const _eventHandler,
+        AIOEventHandler* const _eventHandler,
         unsigned int _timeout = 0,
         std::atomic<int>* const _taskCompletionEvent = nullptr,
         nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
@@ -207,13 +207,17 @@ public:
     qint64 getSystemTimerVal() const;
 
     void addTask(SocketAddRemoveTask task);
+    bool taskExists(
+        Pollable* const sock,
+        aio::EventType eventType,
+        TaskType taskType) const;
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
     
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
     /**
-     * This method introduced for optimization: if we fast call watchSocket then removeSocket 
+     * This method introduced for optimization: if we fast call startMonitoring then removeSocket 
      * (socket has not been added to pollset yet), then removeSocket can just cancel 
      * "add socket to pollset" task. And vice versa.
      * @return true if reverse task has been cancelled and socket 
@@ -223,7 +227,7 @@ public:
         Pollable* const sock,
         aio::EventType eventType,
         TaskType taskType,
-        AIOEventHandler<Pollable>* const eventHandler,
+        AIOEventHandler* const eventHandler,
         unsigned int newTimeoutMS);
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
@@ -258,7 +262,7 @@ private:
         Pollable* socket,
         aio::EventType eventType,
         int timeout,
-        AIOEventHandler<Pollable>* eventHandler);
+        AIOEventHandler* eventHandler);
 
     void addPeriodicTask(
         const qint64 taskClock,

@@ -86,6 +86,7 @@ namespace ec2 {
     struct ApiMiscData;
     typedef std::vector<ApiMiscData> ApiMiscDataList;
     struct ApiPeerSystemTimeData;
+    struct ApiPeerSyncTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
@@ -171,6 +172,7 @@ namespace ec2 {
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
     (ApiPeerSystemTimeData)\
+    (ApiPeerSyncTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiReverseConnectionData)\

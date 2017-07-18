@@ -114,7 +114,7 @@ public:
         updateInteractivity();
     }
 
-    virtual ~ZoomWindowWidget();
+    virtual ~ZoomWindowWidget() override;
 
     QPointer<ZoomOverlayWidget> overlay() const
     {
@@ -261,7 +261,7 @@ public:
         setAcceptedMouseButtons(Qt::NoButton);
     }
 
-    ~ZoomOverlayWidget()
+    virtual ~ZoomOverlayWidget() override
     {
         auto widgets = m_rectByWidget.keys();
         for (auto widget: widgets)

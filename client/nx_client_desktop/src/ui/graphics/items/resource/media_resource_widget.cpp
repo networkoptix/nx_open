@@ -792,6 +792,25 @@ void QnMediaResourceWidget::setupHud()
     m_compositeOverlay->stackBefore(m_triggersContainer);
 
     setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+
+    const auto updateTriggersMinHeight =
+        [this]()
+        {
+            // Calculate minimum height for downscaling no more than kMaxDownscaleFactor times.
+            static const qreal kMaxDownscaleFactor = 2.0;
+            const auto content = m_hudOverlay->content();
+            const qreal available = content->fixedSize().height() / content->sceneScale();
+            const qreal desired = m_triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
+            const qreal extra = content->size().height() - m_triggersContainer->size().height();
+            const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
+            m_triggersContainer->setMinimumHeight(min);
+        };
+
+    connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
+        this, updateTriggersMinHeight);
+
+    connect(m_triggersContainer, &QnScrollableItemsWidget::contentHeightChanged,
+        this, updateTriggersMinHeight);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
@@ -2319,7 +2338,7 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 }
 
 /*
-* Software Triggers
+* Soft Triggers
 */
 
 QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
@@ -2338,8 +2357,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
     std::function<void()> clientSideHandler;
 
-    if (rule->actionType() == nx::vms::event::bookmarkAction
-        && !rule->actionParams().needConfirmation)
+    if (rule->actionType() == nx::vms::event::bookmarkAction)
     {
         clientSideHandler =
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
@@ -2386,7 +2404,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
     button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
+        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
         : name);
 
     const auto resultHandler =

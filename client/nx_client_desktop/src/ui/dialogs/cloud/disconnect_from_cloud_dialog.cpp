@@ -5,12 +5,11 @@
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <cloud/cloud_connection.h>
 
 #include <client/client_settings.h>
 
@@ -72,7 +71,7 @@ private:
     void setupResetPasswordPage();
     void setupConfirmationPage();
 
-    void onCloudPassowrdValidated(
+    void onCloudPasswordValidated(
         bool success,
         const QString& password);
 
@@ -89,7 +88,6 @@ public:
 
 private:
     QHash<QString, bool> m_cloudPasswordCache;
-    std::unique_ptr<nx::cdb::api::Connection> m_connection;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -99,8 +97,8 @@ QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
     d_ptr->setupUi();
 
     Q_D(QnDisconnectFromCloudDialog);
-    connect(this, &QnDisconnectFromCloudDialog::cloudPassowrdValidated,
-        d, &QnDisconnectFromCloudDialogPrivate::onCloudPassowrdValidated, Qt::QueuedConnection);
+    connect(this, &QnDisconnectFromCloudDialog::cloudPasswordValidated,
+        d, &QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated, Qt::QueuedConnection);
 }
 
 QnDisconnectFromCloudDialog::~QnDisconnectFromCloudDialog()
@@ -164,8 +162,7 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     confirmPasswordField(nullptr),
     nextButton(nullptr),
     okButton(nullptr),
-    unlinkedSuccessfully(false),
-    m_connection(qnCloudConnectionProvider->createConnection())
+    unlinkedSuccessfully(false)
 {
     createAuthorizeWidget();
     createResetPasswordWidget();
@@ -340,7 +337,7 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
     return tr("You will be disconnected from this System and able to login again through local network with local account");
 }
 
-void QnDisconnectFromCloudDialogPrivate::onCloudPassowrdValidated(
+void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
     bool success,
     const QString& password)
 {
@@ -368,23 +365,22 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
     const QString password = authorizePasswordField->text();
 
-    m_connection->setCredentials(
-        context()->user()->getName().toStdString(),
-        password.toStdString());
-
     Q_Q(QnDisconnectFromCloudDialog);
     auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
     auto handler =
-        [guard, this, password](nx::cdb::api::ResultCode code, nx::cdb::api::AccountData /*data*/)
+        [guard, this, password]
+        (int /*handle*/, ec2::ErrorCode errorCode, const QnConnectionInfo& /*info*/)
         {
             if (!guard)
                 return;
 
-            emit guard->cloudPassowrdValidated((code == nx::cdb::api::ResultCode::ok), password);
+            emit guard->cloudPasswordValidated((errorCode == ec2::ErrorCode::ok), password);
         };
 
+    auto url = commonModule()->currentUrl();
+    url.setPassword(password);
     lockUi(true);
-    m_connection->accountManager()->getAccount(handler);
+    qnClientCoreModule->connectionFactory()->testConnection(url, this, handler);
 }
 
 void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
