@@ -2,7 +2,6 @@
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
-. ../env/bin/activate
 
 TARGET_DIR="../cloud/static"
 CUSTOMIZATION=$1
