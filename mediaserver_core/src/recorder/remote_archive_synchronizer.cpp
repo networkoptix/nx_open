@@ -42,9 +42,7 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QObject* parent):
     QnCommonModuleAware(parent),
     m_terminated(false)
 {
-    qDebug() << "Creating remote archive synchronizer.";
-    NX_LOGX(lit("Starting archive synchronization."), cl_logDEBUG1);
-
+    NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
     connect(
         commonModule()->resourcePool(),
         &QnResourcePool::resourceAdded,
@@ -59,7 +57,7 @@ RemoteArchiveSynchronizer::~RemoteArchiveSynchronizer()
         m_terminated = true;
     }
 
-    qDebug() << "!!!! Attention !!!! RemoteArchiveSynchronizer destructor";
+    NX_LOGX(lit("Remote archive synchronizer destructor has been called."), cl_logDEBUG1);
     cancelAllTasks();
     waitForAllTasks();
 }
@@ -109,17 +107,19 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 
     if (!archiveCanBeSynchronized)
     {
-        qDebug()
-            << "Archive for resource"
-            << securityCameraResource->getName()
-            << "can not be synchronized. Resource is initialized:" 
-            << securityCameraResource->isInitialized()
-            << "Resource has remote archive capability:" 
-            << securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)
-            << "License used for resource:"
-            << securityCameraResource->isLicenseUsed()
-            << "Schedule is enabled for resource:"
-            << !securityCameraResource->isScheduleDisabled();
+        NX_LOGX(lm(
+            "Archive for resource %1 can not be synchronized. "
+            "Resource is initiliazed: %2, "
+            "Resource has remote archive capability: %3, "
+            "License is used for resource: %4, "
+            "Schedule is enabled for resource: %5")
+                .arg(securityCameraResource->getName())
+                .arg(securityCameraResource->isInitialized())
+                .arg(securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)))
+                .arg(securityCameraResource->isLicenseUsed())
+                .arg(!securityCameraResource->isScheduleDisabled(),
+            cl_logDEBUG1);
+
         cancelTaskForResource(securityCameraResource->getId());
         return;
     }
@@ -132,9 +132,7 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 
 void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
-    qDebug() << "!!!! ATTENTION !!!!! resource parent ID has been changed"
-        << resource->getParentId();
-
+    NX_LOGX(lm("Resource parent ID has changed").arg(resource->getParentId()), cl_logDEBUG1);
     cancelTaskForResource(resource->getId());
 }
 
@@ -230,14 +228,12 @@ bool SynchronizationTask::execute()
 
 bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& resource)
 {
-    qDebug() << "Starting archive synchronization.";
-    NX_LOGX(lit("Starting archive synchronization."), cl_logDEBUG1);
+    NX_LOGX(lit("Starting archive synchronization."), cl_logINFO);
 
     auto res = resource;
     auto manager = res->remoteArchiveManager();
     if (!manager)
     {
-        qDebug() << "Resource" << resource->getName() << "has no remote archive manager";
         NX_LOGX(
             lm("Resource %1 has no remote archive manager")
                 .arg(resource->getName()),
@@ -252,7 +248,6 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
 
     if (m_canceled)
     {
-        qDebug() << "Remote archive synchronization task for resource" << resource->getName() << "was canceled";
         NX_LOGX(
             lm("Remote archive synchronization task for resource %1 was canceled")
                 .arg(resource->getName()),
@@ -264,7 +259,6 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     auto filtered = filterEntries(resource, sdCardArchiveEntries);
     if (filtered.empty())
     {
-        qDebug() << "Archive is fully synchronized. There is no need in any further actions";
         NX_LOGX(lit("Archive is fully synchronized. There is no need in any further actions"), cl_logDEBUG1);
         return true;
     }
@@ -284,13 +278,12 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     // 3. In cycle copy all records to archive.
     for (const auto& entry : filtered)
     {
-        qDebug() << "Copying entry to archive";
+        NX_LOGX(lit("Copying entry to archive"), cl_logDEBUG2);
         bool result = copyEntryToArchive(resource, entry);
 
         if (!result)
         {
-            qDebug() << lit("Can not synchronize video chunk.");
-            NX_LOGX(lit("Can not synchronize video chunk."), cl_logDEBUG1);
+            NX_LOGX(lit("Can not synchronize video chunk."), cl_logWARNING);
             qnEventRuleConnector->at_remoteArchiveSyncError(
                 resource,
                 lit("Can not synchronize video chunk."));
@@ -303,16 +296,13 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
 
         if (currentSyncProgress - lastBroadcastedSyncProgress > broadcastSyncProgressStep)
         {
-            qDebug() << lit("Remote archive synchronization progress is %1").arg(currentSyncProgress);
-            NX_LOGX(lm("Remote archive synchronization progress is %1").arg(currentSyncProgress), cl_logDEBUG1);
+            NX_LOGX(lm("Remote archive synchronization progress is %1").arg(currentSyncProgress), cl_logDEBUG2);
             qnEventRuleConnector->at_remoteArchiveSyncProgress(resource, currentSyncProgress);
-            qDebug() << "Progress action has been broadcasted";
             lastBroadcastedSyncProgress = currentSyncProgress;
         }
     }
 
-    qDebug() << "Archive synchronization is done.";
-    NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
+    NX_LOGX(lit("Archive synchronization is done."), cl_logINFO);
 
     qnEventRuleConnector->at_remoteArchiveSyncFinished(resource);
     return true;
@@ -346,26 +336,32 @@ std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
         bool needSyncEntry = (lastSyncTimeMs < (int64_t)(entry.startTimeMs + entry.durationMs))
             && !catalog->containTime(entry.startTimeMs + entry.durationMs / 2);
 
-        qDebug() << "ENTRY NEED TO BE SYNCHRONIZED:" << needSyncEntry
-            << "(ENTRY ID)" << entry.id
-            << "(CONTAIN TIME)" << catalog->containTime(entry.startTimeMs + entry.durationMs / 2)
-            << "(LASTSYNC TIME)" << lastSyncTimeMs
-            << "(ENTRY END TIME)" << entry.startTimeMs + entry.durationMs
-            << "(MIDDLE)" << entry.startTimeMs + entry.durationMs / 2
-            << "(DURATION)" << entry.durationMs;
+        NX_LOGX(lm(
+            "Entry need to be synchronized: %1, "
+            "Entry id: %2, "
+            "Contain time: %3, "
+            "Last sync time: %4, "
+            "Entry end time: %5, "
+            "Entry middle time: %6, "
+            "Entry duration: %7")
+                .arg(needSyncEntry)
+                .arg(entry.id)
+                .arg(catalog->containTime(entry.startTimeMs + entry.durationMs / 2))
+                .arg(lastSyncTimeMs)
+                .arg(entry.startTimeMs + entry.durationMs)
+                .arg(entry.startTimeMs + entry.durationMs / 2)
+                .arg(entry.durationMs),
+            cl_logDEBUG1);
 
         if (needSyncEntry)
-        {
             filtered.push_back(entry);
-        }
     }
 
-    qDebug() << "Filtered entries count" << filtered.size() << ". All entries count" << allEntries.size();
     NX_LOGX(
-        lm("Filtered entries count %1. All entries count %2.")
+        lm("Remote archive synchronization: filtered entries count %1. Total entries count %2.")
             .arg(filtered.size())
             .arg(allEntries.size()),
-        cl_logDEBUG1);
+        cl_logINFO);
 
     return filtered;
 }
@@ -388,7 +384,6 @@ bool SynchronizationTask::copyEntryToArchive(
 
     bool result = manager->fetchArchiveEntry(entry.id, &buffer);
 
-    qDebug() << "Archive entry with id" << entry.id << "has been fetched, result" << result;
     NX_LOGX(
         lm("Archive entry with id %1 has been fetched, result %2")
             .arg(entry.id)
@@ -398,15 +393,11 @@ bool SynchronizationTask::copyEntryToArchive(
     if (!result)
         return false;
 
-    qDebug() << "Archive entry with id " << entry.id << " has size" << buffer.size();
     NX_LOGX(
         lm("Archive entry with id %1 has size %2")
             .arg(entry.id)
             .arg(buffer.size()),
         cl_logDEBUG1);
-
-    if (buffer.size() < 1000)
-        qDebug() << "!!!! Buffer too small. Buffer:" << buffer << "String:" << QString::fromUtf8(buffer); 
 
     int64_t realDurationMs = 0;
     result = writeEntry(resource, entry, &buffer, &realDurationMs);
@@ -430,7 +421,6 @@ bool SynchronizationTask::writeEntry(
     auto helper = nx::transcoding::Helper(&ioDevice);
     if (!helper.open())
     {
-        qDebug() << "Can not open buffer";
         NX_LOGX(lit("Can not open buffer"), cl_logDEBUG1);
         return false;
     }
@@ -501,7 +491,7 @@ bool SynchronizationTask::writeEntry(
     if (!succesfulWrite)
         return false; //< Should we call fileFinished?
 
-    qDebug() << "File " << fileNameWithExtension << "has been written";
+    NX_LOGX(lm("File %1 has been written").arg(fileNameWithExtension), cl_logDEBUG2);
 
     if (outRealDurationMs)
         *outRealDurationMs = realDurationMs;
@@ -529,8 +519,7 @@ bool SynchronizationTask::convertAndWriteBuffer(
     bool needMotion,
     int64_t* outRealDurationMs)
 {
-    qDebug() << "Converting and writing file" << fileName;
-    NX_LOGX(lm("Converting and writing file %1").arg(fileName), cl_logDEBUG1);
+    NX_LOGX(lm("Converting and writing file %1").arg(fileName), cl_logDEBUG2);
 
     QBuffer* ioDevice = new QBuffer(); //< Will be freed by the owning storage.
     ioDevice->setBuffer(buffer);
@@ -588,11 +577,9 @@ bool SynchronizationTask::convertAndWriteBuffer(
         if (mediaData->dataType == QnAbstractMediaData::EMPTY_DATA)
             break;
 
-
         recorder.processData(mediaData);
     }
 
-    qDebug() << "=======> Duration of the chunk!" << recorder.duration();
     if (outRealDurationMs)
         *outRealDurationMs = recorder.duration() / 1000;
 
@@ -629,4 +616,3 @@ bool SynchronizationTask::isMotionDetectionNeeded(
 } // namespace reorder
 } // namespace mediaserver_core
 } // namespace nx
-

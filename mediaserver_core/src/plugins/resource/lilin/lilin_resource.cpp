@@ -32,7 +32,6 @@ CameraDiagnostics::Result LilinResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-
 nx::core::resource::AbstractRemoteArchiveManager* LilinResource::remoteArchiveManager()
 {
     if (!m_remoteArchiveManager)
