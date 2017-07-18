@@ -142,7 +142,7 @@ void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint 
         emit systemDiscovered(systemDescription);
     }
 
-    updatePrimaryAddress(module); //< Can remove server and, therefore, hole system.
+    updatePrimaryAddress(module); //< Can remove server and, therefore, whole system.
 }
 
 void QnDirectSystemsFinder::removeServer(QnUuid id)
