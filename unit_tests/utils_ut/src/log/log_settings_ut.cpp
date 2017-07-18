@@ -24,7 +24,7 @@ TEST(Settings, correct_parsing)
     log::Settings logSettings;
     logSettings.load(settings, "log");
 
-    ASSERT_EQ(cl_logDEBUG2, logSettings.level);
+    ASSERT_EQ(Level::verbose, logSettings.level.primary);
     ASSERT_EQ(QString("/var/log/"), logSettings.directory);
     ASSERT_EQ(77, logSettings.maxBackupCount);
     ASSERT_EQ(184632U, logSettings.maxFileSize);

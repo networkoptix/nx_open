@@ -305,6 +305,9 @@ public:
 
     void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
+
+    virtual QString idForToStringFromPtr() const;
+
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
