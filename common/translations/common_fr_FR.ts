@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -486,22 +494,6 @@
         <numerusform>%n %2 seront utilisées sur %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>La clé de licence que vous avez entrée est invalide. S.V.P., vérifiez que la licence est correctement entrée. Si le problème persiste, S.V.P. contactez l'assistance technique pour confirmer que la licence est valide ou pour obtenir une licence valide.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Vous essayez d'activer une licence incompatible avec votre logiciel. S.V.P, contactez l'assistance technique pour obtenir une licence valide.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Il a eu un problème d'activation de votre clé de licence. Une erreur de base de données s'est produite.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Il a eu un problème d'activation de votre licence. Données invalides reçues. S.V.P., contactez l’assistance technique pour signaler cette erreur.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -516,21 +508,12 @@
         <numerusform>%n plus %1 seront utilisées.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>Cette clé de licence a été préalablement activée avec matériel ID %1 sur %2. S.V.P, contactez l’équipe d’assistance pour obtenir une clé de licence valide.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>Signature Invalide</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Aucun Serveur avec ID matériel correspondant trouvé</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -555,6 +538,10 @@
     <message>
       <source>Unknown error</source>
       <translation>Erreur inconnue</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -672,16 +659,16 @@
       <translation>Licence gratuite</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>ID Matériel: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Licence à : %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Filigrane: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1050,10 +1037,6 @@
       <translation>Enregistrement Panic</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>Envoyer Courriel</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>Écrire dans journal</translation>
     </message>
@@ -1151,10 +1134,6 @@
     <message>
       <source>Any Event</source>
       <translation>Tout Événement</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation>Déclencheur de logiciel</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1273,16 +1252,8 @@
       <translation>Événement Générique %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation>Déclencheur de logiciel %1 à %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>Évènement inconnu s'est produit</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation>Déclencheur de logiciel %1 à été activé plusieurs fois</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1473,7 +1444,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Nom du déclencheur</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1504,6 +1475,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>Sélectionner au moins un usager</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation>Déclencheur</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation>Déclencheur %1 à %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation>Déclencheur %1 à été activé plusieurs fois</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation>Envoyer Courriel</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>Reconnaître</translation>
     </message>
   </context>
   <context>

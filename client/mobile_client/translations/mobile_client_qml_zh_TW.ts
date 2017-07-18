@@ -80,8 +80,8 @@
       <translation>登入</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>不正確的電子郵件或密碼</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>

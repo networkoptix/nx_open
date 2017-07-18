@@ -74,13 +74,13 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     {
         const QString emailLink = lit("<a href=\"mailto:%1\">%1</a>").arg(licensingEmail.value());
         ui->manualActivationTextWidget->setText(
-            tr("Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
+            tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(emailLink));
     }
     else
     {
         ui->manualActivationTextWidget->setText(
-            tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
+            tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(QnAppInfo::licensingEmailAddress()));
     }
 
@@ -118,7 +118,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     connect(ui->copyHwidButton, &QPushButton::clicked, this, [this]
     {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QnMessageBox::success(this, tr("Hardware ID copied to clipboard"));
+        QnMessageBox::success(this, tr("Hardware Id copied to clipboard"));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked, this, [this]

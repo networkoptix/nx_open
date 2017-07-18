@@ -222,7 +222,14 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
     emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
 }
 
-bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
-    return camera
-        && (!m_server  || camera->getParentId() == m_server->getId());
+bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr& camera) const
+{
+    NX_EXPECT(camera);
+    if (!camera)
+        return false;
+
+    if (camera->hasFlags(Qn::desktop_camera))
+        return false;
+
+    return !m_server || camera->getParentId() == m_server->getId();
 }

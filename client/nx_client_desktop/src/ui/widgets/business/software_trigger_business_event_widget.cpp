@@ -280,8 +280,17 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 
     if (params.metadata.allUsers)
     {
+        const auto users = resourcePool()->getResources<QnUserResource>()
+            .filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
+
+        const bool allValid =
+            std::all_of(users.begin(), users.end(),
+                [this](const QnUserResourcePtr& user) { return isUserValid(user); });
+
         ui->usersButton->setText(vms::event::StringsHelper::allUsersText());
-        ui->usersButton->setIcon(icon(lit("tree/users.png")));
+        ui->usersButton->setIcon(icon(allValid
+            ? lit("tree/users.png")
+            : lit("tree/users_alert.png")));
     }
     else
     {

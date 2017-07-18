@@ -177,6 +177,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
         row << item;
         m_actionTypesModel->appendRow(row);
     }
+
+    m_actionParams.additionalResources = userRolesManager()->adminRoleIds().toVector().toStdVector();
+
     updateActionTypesModel();
     updateEventStateModel();
 }
@@ -561,19 +564,35 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
     if (m_actionType == value)
         return;
 
-    bool cameraRequired = vms::event::requiresCameraResource(m_actionType);
-    bool userRequired = vms::event::requiresUserResource(m_actionType);
+    const bool cameraWasRequired = vms::event::requiresCameraResource(m_actionType);
+    const bool userWasRequired = vms::event::requiresUserResource(m_actionType);
+    const bool additionalUserWasRequired = vms::event::requiresAdditionalUserResource(m_actionType);
 
-    bool wasEmailAction = m_actionType == vms::event::sendMailAction;
-    bool aggregationWasDisabled = !vms::event::allowsAggregation(m_actionType);
+    const bool wasEmailAction = m_actionType == vms::event::sendMailAction;
+    const bool aggregationWasDisabled = !vms::event::allowsAggregation(m_actionType);
 
     m_actionType = value;
     m_modified = true;
 
+    const bool cameraIsRequired = vms::event::requiresCameraResource(m_actionType);
+    const bool userIsRequired = vms::event::requiresUserResource(m_actionType);
+    const bool additionalUserIsRequired = vms::event::requiresAdditionalUserResource(m_actionType);
+
+    if (userIsRequired && !userWasRequired)
+        m_actionResources = userRolesManager()->adminRoleIds().toSet();
+
     Fields fields = Field::actionType | Field::modified;
-    if (vms::event::requiresCameraResource(m_actionType) != cameraRequired ||
-        vms::event::requiresUserResource(m_actionType) != userRequired)
+    if (cameraIsRequired != cameraWasRequired || userIsRequired != userWasRequired)
         fields |= Field::actionResources;
+
+    if (additionalUserWasRequired != additionalUserIsRequired)
+    {
+        fields |= Field::actionParams;
+        m_actionParams.allUsers = false;
+        m_actionParams.additionalResources = additionalUserIsRequired
+            ? userRolesManager()->adminRoleIds().toVector().toStdVector()
+            : std::vector<QnUuid>();
+    }
 
     if (!vms::event::allowsAggregation(m_actionType))
     {
@@ -980,22 +999,22 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
                 case vms::event::playSoundAction:
                 case vms::event::playSoundOnceAction:
-		            return !m_actionParams.url.isEmpty()
-		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
-		                    || m_actionParams.playToClient
-		                );
+                    return !m_actionParams.url.isEmpty()
+                        && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            || m_actionParams.playToClient
+                        );
 
                 case vms::event::showPopupAction:
                     return m_actionParams.allUsers || !filterSubjectIds(
                         m_actionParams.additionalResources).empty();
 
                 case vms::event::sayTextAction:
-		            return !m_actionParams.sayText.isEmpty()
-		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
-		                    || m_actionParams.playToClient
-		                );
+                    return !m_actionParams.sayText.isEmpty()
+                        && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            || m_actionParams.playToClient
+                        );
 
                 case vms::event::executePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(

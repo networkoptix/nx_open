@@ -53,6 +53,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
@@ -283,7 +284,12 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
             static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
             actionParams.durationMs = kDurationMs.count();
 
-            menu()->trigger(action::AcknowledgeEventAction, {Qn::ActionDataRole, action});
+            // Action will trigger additional event loop, which will cause problems here.
+            executeDelayedParented(
+                [this, action]
+                {
+                    menu()->trigger(action::AcknowledgeEventAction, {Qn::ActionDataRole, action});
+                }, kDefaultDelay, this);
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);

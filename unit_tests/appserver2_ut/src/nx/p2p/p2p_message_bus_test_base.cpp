@@ -128,7 +128,7 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, int baseTcpPort)
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 baseTcpPort)
 {
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
@@ -160,7 +160,7 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, int baseTc
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, int baseTcpPort)
+void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, quint16 baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();

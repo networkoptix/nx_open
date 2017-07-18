@@ -31,8 +31,8 @@ protected:
     static void circleConnect(std::vector<Appserver2Ptr>& servers);
     static void fullConnect(std::vector<Appserver2Ptr>& servers);
 
-    void startServers(int count, int keekDbAtServerIndex = -1, int baseTcpPort = 0);
-    Appserver2Ptr createAppserver(bool keepDbFile = false, int port = 0);
+    void startServers(int count, int keekDbAtServerIndex = -1, quint16 baseTcpPort = 0);
+    Appserver2Ptr createAppserver(bool keepDbFile = false, quint16 port = 0);
 
     void initResourceTypes(ec2::AbstractECConnection* ec2Connection);
     void createData(

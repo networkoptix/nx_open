@@ -194,9 +194,6 @@ class QnFlirEIPResource;
 typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
 typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
 
-class QnAdamResource;
-typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
-
 namespace nx {
 namespace plugins {
 namespace flir {
@@ -211,13 +208,24 @@ class OnvifResource;
 typedef QnSharedResourcePointer<nx::plugins::flir::FcResource> QnFlirFcResourcePtr;
 typedef QnSharedResourcePointerList<nx::plugins::flir::FcResource> QnFlirFcResourceList;
 
+typedef QnSharedResourcePointer<nx::plugins::flir::OnvifResource> QnFlirOnvifResourcePtr;
+typedef QnSharedResourcePointerList<nx::plugins::flir::OnvifResource> QnFlirOnvifResourceList;
+
+class QnAdamResource;
+typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HikvisionResource;
 class LilinResource;
-using LilinResourcePtr = QnSharedResourcePointer<LilinResource>;
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+typedef QnSharedResourcePointer<nx::mediaserver_core::plugins::LilinResource> LilinResourcePtr;
+
+typedef
+QnSharedResourcePointer<nx::mediaserver_core::plugins::HikvisionResource> QnHikvisionResourcePtr;
