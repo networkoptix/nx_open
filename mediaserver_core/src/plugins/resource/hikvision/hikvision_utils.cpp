@@ -372,7 +372,7 @@ bool doGetRequest(
     return doRequest(
         url,
         auth,
-        nx_http::Method::GET,
+        nx_http::Method::get,
         /*bufferToSend*/ nullptr,
         outBuffer,
         outStatusCode);
@@ -387,7 +387,7 @@ bool doPutRequest(
     return doRequest(
         url,
         auth,
-        nx_http::Method::PUT,
+        nx_http::Method::put,
         &buffer,
         /*outResponseBuffer*/ nullptr,
         outStatusCode);
@@ -409,9 +409,9 @@ bool doRequest(
         return false;
 
     bool result = false;
-    if (method == nx_http::Method::GET)
+    if (method == nx_http::Method::get)
         result = httpClient.doGet(url);
-    else if (method == nx_http::Method::PUT && bufferToSend)
+    else if (method == nx_http::Method::put && bufferToSend)
         result = httpClient.doPut(url, kContentType.toUtf8(), *bufferToSend);
     
     if (!result)
@@ -428,7 +428,7 @@ bool doRequest(
         *outStatusCode = statusCode;
 
     result = nx_http::StatusCode::isSuccessCode(statusCode);
-    if (method == nx_http::Method::PUT && result)
+    if (method == nx_http::Method::put && result)
         result = responseIsOk(parseCommonResponse(responseBuffer));
 
     if (result && outResponseBuffer)
