@@ -36,17 +36,14 @@ admins:
 
 languages:
     - en_US
-    - en_GB
-    - ru
-    - fr
-    - de
-    - es
-    - ja
-    - ko
-    - tr
-    - zh_CN
-    - zh_TW
-    - he
+    - ru_RU
+    - fr_FR
+    - de_DE
+    - es_ES
+    - ja_JP
+    - ko_KR
+    - tr_TR
+    - hu_HU
 
 queue_name: '$INSTANCE_NAME'
 
