@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -119,7 +120,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
 
 # Create your views here.
-@api_view(["GET", "POST"])
+@require_http_methods(["GET", "POST"])
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
         context, form, language = handle_get_view(request, context, language)
@@ -151,7 +152,7 @@ def context_edit_view(request, context=None, language=None):
                                                        'title': 'Content Editor'})
 
 
-@api_view(["POST"])
+@require_http_methods(["POST"])
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
         preview_link = generate_preview()
@@ -173,7 +174,7 @@ def review_version_request(request, context=None, language=None):
     raise SuspiciousOperation('Invalid command')
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 def review_version_view(request, version_id=None):
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
