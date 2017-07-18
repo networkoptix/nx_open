@@ -448,7 +448,12 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                //We need a delay for the timeline to fully load then we can calculate the width of the timeline
+                /*
+                    This timeout gets us the initial width. If volume is not disabled then
+                    the width is correct. Otherwise we update the width in the positionProvider
+                    watcher function. This is done when the postion provider changes because
+                    the timeline's width should not change after that.
+                */
                 $timeout(updateTimelineWidth); // Adjust width.
                 initTimeline(); // Setup boundaries and scale
 
