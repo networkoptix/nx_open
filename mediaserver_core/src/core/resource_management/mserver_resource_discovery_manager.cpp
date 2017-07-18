@@ -306,8 +306,8 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
     for (const auto& camera: cameras)
     {
         const int port = QUrl(camera->getUrl()).port();
-        if (portList.contains(port))
-            return true;
+        if (port == 0 || portList.contains(port))
+            return true; //< Conflict detected
         portList << port;
     }
     return false;
