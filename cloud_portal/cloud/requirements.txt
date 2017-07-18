@@ -27,4 +27,4 @@ wheel==0.29.0
 wsgiref==0.1.2
 pycurl==7.43.0
 pillow
-django-tinymce
+django-tinymce==2.6.0
