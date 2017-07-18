@@ -181,7 +181,6 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
                 const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
                 manager->broadcastBusinessAction(action, this, fakeHandler);
             }
-            emit notificationRemoved(businessAction);
         };
 
     bookmarksDialog->submitData(bookmark);
@@ -192,6 +191,9 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     bookmark.creationTimeStampMs = currentTimeMs;
 
     qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction, creationCallback);
+
+    // Hiding notification instantly to keep UX smooth.
+    emit notificationRemoved(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::clear()

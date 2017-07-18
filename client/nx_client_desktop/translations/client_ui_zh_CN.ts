@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>延录:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -739,13 +729,28 @@
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -760,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation>&amp;输出ID:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation>默认持续时间:</translation>
     </message>
@@ -772,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation>s</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -904,8 +909,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>错误的邮箱或密码</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1055,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>导出快速回放</translation>
     </message>
@@ -1068,13 +1073,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>快速回放速度</translation>
+      <source>Frames Interval</source>
+      <translation>帧间隔</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>帧间隔</translation>
+      <source>Rapid Review speed</source>
+      <translation>快速回放速度</translation>
     </message>
   </context>
   <context>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>硬件ID绑定:</translation>
+      <source>Features</source>
+      <translation>功能</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation>功能</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1519,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation>硬件ID:</translation>
+      <source>Activation Key File</source>
+      <translation>激活密钥文件:</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation>激活密钥文件:</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1741,11 @@
       <source>for</source>
       <translation>执行</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1918,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>错误的邮箱或密码</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1941,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation>检查</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation>将重连.</translation>
     </message>
     <message>
       <location/>
@@ -2668,19 +2673,6 @@
       <location/>
       <source>Icon</source>
       <translation type="unfinished">Icon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
     </message>
   </context>
   <context>

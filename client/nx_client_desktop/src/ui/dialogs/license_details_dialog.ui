@@ -74,7 +74,7 @@
            <item>
             <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>Locked to Hardware ID:</string>
+              <string>Locked to Hardware Id:</string>
              </property>
             </widget>
            </item>
