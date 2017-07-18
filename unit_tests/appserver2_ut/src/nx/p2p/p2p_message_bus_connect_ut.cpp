@@ -127,28 +127,28 @@ protected:
         for (const auto& tran: tranList)
             totalDbData += tran.dataSize;
 
-        NX_LOG(lit("Total bytes sent: %1, dbSize: %2, ratio: %3")
+        NX_INFO(this, lit("Total bytes sent: %1, dbSize: %2, ratio: %3")
             .arg(nx::network::totalSocketBytesSent())
             .arg(totalDbData)
-            .arg(nx::network::totalSocketBytesSent() / (float)totalDbData), cl_logINFO);
+            .arg(nx::network::totalSocketBytesSent() / (float)totalDbData));
 
         const auto& counters = Connection::sendCounters();
         qint64 webSocketBytes = 0;
         for (int i = 0; i < (int) MessageType::counter; ++i)
             webSocketBytes += counters[i];
 
-        NX_LOG(lit("Total bytes via P2P: %1, dbSize: %2, ratio: %3")
+        NX_INFO(this, lit("Total bytes via P2P: %1, dbSize: %2, ratio: %3")
             .arg(webSocketBytes)
             .arg(totalDbData)
-            .arg(webSocketBytes / (float)totalDbData), cl_logINFO);
+            .arg(webSocketBytes / (float)totalDbData));
 
         for (int i = 0; i < (int) MessageType::counter; ++i)
         {
-            NX_LOG(lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
+            NX_INFO(this, lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
                 .arg(toString(MessageType(i)))
                 .arg(counters[i])
                 .arg(totalDbData)
-                .arg(counters[i] / (float)totalDbData), cl_logINFO);
+                .arg(counters[i] / (float)totalDbData));
         }
 
         int totalConnections = 0;

@@ -14,12 +14,19 @@
 #include "p2p_serialization.h"
 
 // For debug purpose only
-#define CHECK_SEQUENCE
+//#define CHECK_SEQUENCE
 
 namespace nx {
 namespace p2p {
 
 SendCounters Connection::m_sendCounters = {};
+
+#ifdef CHECK_SEQUENCE
+const int kMessageOffset = 8;
+#else
+const int kMessageOffset = 0;
+#endif
+
 
 QString toString(Connection::State value)
 {
@@ -377,7 +384,7 @@ void Connection::sendMessage(const nx::Buffer& data)
 
             if (m_dataToSend.size() == 1)
             {
-                quint8 messageType = (quint8)m_dataToSend.front().at(0);
+                quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
                 m_sendCounters[messageType] += m_dataToSend.front().size();
 
                 using namespace std::placeholders;
@@ -401,7 +408,7 @@ void Connection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSen
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8)m_dataToSend.front().at(0);
+        quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(
@@ -439,20 +446,18 @@ void Connection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytes
 bool Connection::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.isEmpty());
-    int offset = 0;
 #ifdef CHECK_SEQUENCE
-    offset = 8;
     quint32* dataPtr = (quint32*) message.data();
     quint32 sequence = ntohl(dataPtr[0]);
     quint32 dataSize = ntohl(dataPtr[1]);
 
     NX_CRITICAL(sequence == m_lastReceivedSequence);
     m_lastReceivedSequence++;
-    NX_CRITICAL(dataSize == message.size() - offset);
+    NX_CRITICAL(dataSize == message.size() - kMessageOffset);
 #endif
 
-    MessageType messageType = (MessageType)message[offset];
-    emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
+    MessageType messageType = (MessageType)message[kMessageOffset];
+    emit gotMessage(weakPointer(), messageType, message.mid(kMessageOffset + 1));
 
     return true;
 }

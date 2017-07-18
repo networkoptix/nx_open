@@ -131,6 +131,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/p2p_stats_rest_handler.h>
 #include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
@@ -260,6 +261,7 @@
 #include <recorder/storage_db_pool.h>
 #include <transaction/message_bus_selector.h>
 #include <managers/discovery_manager.h>
+#include "rest/helper/p2p_stats_rest_helper.h"
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1836,6 +1838,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
     reg("api/ping", new QnPingRestHandler());
+    reg(rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
