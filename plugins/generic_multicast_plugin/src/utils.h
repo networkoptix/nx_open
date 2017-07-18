@@ -6,7 +6,9 @@
 
 extern "C" {
 
-int readFromQIODevice(void* opaque, uint8_t* buf, int size);
+int readFromIoDevice(void* opaque, uint8_t* buf, int size);
+
+int checkIoDevice(void* opaque);
 
 } // extern "C"
 
