@@ -57,9 +57,11 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
         ui->customTextEdit->setPlainText(useCustomText
             ? m_lastCustomText : getPlaceholderText());
 
-        ui->customTextEdit->setEnabled(useCustomText);
         paramsChanged();
     });
+
+    ui->customTextEdit->setEnabled(ui->customTextCheckBox->isChecked());
+    connect(ui->customTextCheckBox, &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {

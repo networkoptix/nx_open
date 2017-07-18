@@ -222,8 +222,10 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
-        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
+        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+                                                        Used in action::ConnectAction. */
         CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */

@@ -429,7 +429,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Reset all rules to default?"),
+        tr("Restore all rules to default?"),
         tr("This action cannot be undone."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);

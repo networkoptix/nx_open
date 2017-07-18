@@ -13,6 +13,11 @@ ArgumentParser::ArgumentParser(int argc, const char* argv[])
 
 ArgumentParser::ArgumentParser(const QStringList& args)
 {
+    parse(args);
+}
+
+void ArgumentParser::parse(const QStringList& args)
+{
     std::vector<QByteArray> latin1Args;
     for (const auto& arg: args)
         latin1Args.push_back(arg.toLocal8Bit());

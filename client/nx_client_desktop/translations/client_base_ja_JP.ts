@@ -278,10 +278,6 @@ to view more bookmarks</source>
       <translation>操作履歴...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>ブックマーク検索...</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>%1 にログイン...</translation>
@@ -868,6 +864,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>通知を固定表示しない</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -951,12 +951,12 @@ to view more bookmarks</source>
       <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
-    </message>
-    <message>
       <source>Number of deactivations exceeded limit for this license.</source>
       <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+    </message>
+    <message>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1507,6 +1507,10 @@ to view more bookmarks</source>
       <source>Select Cameras to Backup...</source>
       <translation>選択カメラのバックアップ...</translation>
     </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
@@ -1588,6 +1592,10 @@ to view more bookmarks</source>
     <message>
       <source>Name cannot be empty.</source>
       <translation>名前を空にすることはできません</translation>
+    </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -1976,10 +1984,6 @@ to view more bookmarks</source>
       <translation>ロード中...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>カメラ ID</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>プライマリ ストリーム</translation>
     </message>
@@ -1990,10 +1994,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>カメラのセカンダリ ストリームがありません</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O モジュール ID</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2018,6 +2018,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>I/O モジュールにはオーディオ ストリームがありません</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2939,8 +2947,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3371,10 +3379,6 @@ to %1</source>
       <translation>無効なステータス</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation>ID</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation>クリック</translation>
     </message>
@@ -3396,6 +3400,10 @@ to %1</source>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
       <translation>インパルス</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
     </message>
   </context>
   <context>
@@ -3608,12 +3616,12 @@ to %1</source>
       <translation>ライセンスキー</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation>ハードウェアID</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation>機能:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3724,10 +3732,6 @@ to %1</source>
       <translation>アクティブ化しようとしているライセンスはソフトウェアと互換性がありません</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation>ライセンスは既にアクティベートされています</translation>
     </message>
@@ -3760,24 +3764,12 @@ to %1</source>
       <translation>無効なデータを受信しました　問題をカスタマーサポートに問い合わせてください</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation>無効なライセンス キー</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>ライセンスのアクティベートに失敗しました</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>ネットワークエラー.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation>手動でライセンス キーをアクティベートするにはカスタマー サポートに連絡してください</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3802,14 +3794,6 @@ to %1</source>
     <message>
       <source>Please make sure it is entered correctly.</source>
       <translation>正しく入力されたことを確認してください</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation>このライセンスは既にアクティベートされハードウェア ID %1 にリンクされています</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation>このライセンスは既にアクティベートされ %2 のハードウェア ID %1 にリンクされています</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
@@ -3889,6 +3873,30 @@ to %1</source>
         <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>無効なライセンス キー</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -3913,16 +3921,16 @@ to %1</source>
       <translation>ファイルが開けませんでした</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation>ハードウェア ID をクリップボードにコピー</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>ライセン スキーを記載したメールを送信してください、アクティベーションキーを取得すにたにハードウェアIDが %1 に提供されています</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4181,13 +4189,13 @@ to %1</source>
       <translation>低解像度</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
     </message>
   </context>
   <context>
@@ -4207,10 +4215,6 @@ to %1</source>
     <message>
       <source>Merge with %1</source>
       <translation>%1 と統合</translation>
-    </message>
-    <message>
-      <source>Success!</source>
-      <translation>成功!</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -4233,16 +4237,8 @@ to %1</source>
       <translation>システム統合に失敗しました</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation>システムは正常に構成されました</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL が無効です</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation>リモートシステムのサーバーは直ぐに表示されます</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4251,6 +4247,18 @@ to %1</source>
     <message>
       <source>This is the current System URL.</source>
       <translation>既存のシステムURL</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4333,16 +4341,16 @@ to %1</source>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation>b/s</translation>
+      <source>B/s</source>
+      <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation>Kb/s</translation>
+      <source>MB/s</source>
+      <translation type="unfinished">MB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation>Mb/s</translation>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -4419,18 +4427,8 @@ to %1</source>
       <translation>アラーム: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation type="unfinished">Bookmark it</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks created</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -4487,8 +4485,8 @@ to %1</source>
       <translation>ユーザー入力</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
@@ -5021,6 +5019,14 @@ to %1</source>
       <source>Camera</source>
       <translation>カメラ</translation>
     </message>
+    <message>
+      <source>Created</source>
+      <translation type="unfinished">Created</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation type="unfinished">Creator</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchLineEdit</name>
@@ -5101,26 +5107,10 @@ to %1</source>
   <context>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>ユーザー %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n 役割</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n additional</source>
       <translation>
         <numerusform>%n 追加</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Send Email to %1</source>
-      <translation>%1 にメールを送信</translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
@@ -5141,6 +5131,10 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Send email to %1</source>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
@@ -5678,6 +5672,41 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation type="unfinished">Role %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation type="unfinished">Selected roles have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation type="unfinished">User %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation type="unfinished">Selected users have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -6108,42 +6137,42 @@ to %1</source>
       <translation>詳細</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation>Email送信中のエラー</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation>システムがセーフ モードで実行されています</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
-      <translation>システム通知メールを受信できません</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by Email.</source>
-      <translation>彼らは、システム通知メールを受信できません</translation>
-    </message>
-    <message>
-      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>接続</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses</source>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses.</source>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
   </context>
   <context>
@@ -6658,8 +6687,8 @@ to %1</source>
       <translation>パスワードが一致しません</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
-      <translation>そのEmailのクラウド ユーザーは既に存在します</translation>
+      <source>Cloud user with specified email already exists.</source>
+      <translation type="unfinished">Cloud user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7001,10 +7030,6 @@ to %1</source>
       <translation>アドミニストレーターパスワード</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation>システムに接続...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>システムをすぐに統合されます</translation>
     </message>
@@ -7025,16 +7050,24 @@ to %1</source>
       <translation>ライセンスの合計数が減少します</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation>システムに接続されたサーバ</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation>パスワードは空白にできません</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>クラウド システムを統合することはできません</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation type="unfinished">Connecting to the current System...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>
@@ -7381,16 +7414,16 @@ to %1</source>
       <translation type="unfinished">- Choose one -</translation>
     </message>
     <message>
-      <source>I&apos;m upgrading my machine</source>
-      <translation type="unfinished">I&apos;m upgrading my machine</translation>
-    </message>
-    <message>
       <source>I accidentally assigned the license to a wrong machine</source>
       <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
       <translation type="unfinished">Other Reason</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
   </context>
   <context>

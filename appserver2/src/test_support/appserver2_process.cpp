@@ -40,6 +40,7 @@
 #include <api/model/ping_reply.h>
 #include <core/resource/media_server_resource.h>
 #include <transaction/transaction_message_bus.h>
+#include <rest/helper/ping_rest_helper.h>
 
 static int registerQtResources()
 {
@@ -352,16 +353,7 @@ int Appserver2Process::exec()
     }
 
     auto selfInformation = m_commonModule->moduleInformation();
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = QnAppInfo::productNameShort();
-    selfInformation.customization = QnAppInfo::customizationName();
-    selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = true;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.port = tcpListener.getPort();
     commonModule()->setModuleInformation(selfInformation);
 
@@ -389,13 +381,7 @@ int Appserver2Process::exec()
     tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/ping",
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
-            ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
-            QnPingReply reply;
-            reply.moduleGuid = owner->commonModule()->moduleGUID();
-            reply.localSystemId = owner->commonModule()->globalSettings()->localSystemId();
-            reply.sysIdTime = owner->commonModule()->systemIdentityTime();
-            reply.tranLogTime = ec2Connection->getTransactionLogTime();
-            result->setReply(reply);
+            result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
         });
 
     tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",

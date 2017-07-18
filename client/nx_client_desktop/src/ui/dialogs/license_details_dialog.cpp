@@ -64,7 +64,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
     result << tr("Generic:");
     addStringValue(tr("License Type"), license->displayName());
     addStringValue(tr("License Key"), QString::fromUtf8(license->key()));
-    addStringValue(tr("Locked to Hardware ID"), license->hardwareId());
+    addStringValue(tr("Locked to Hardware Id"), license->hardwareId());
     result << QString(); //spacer
     result << tr("Features:");
     if (license->type() == Qn::LC_VideoWall) {

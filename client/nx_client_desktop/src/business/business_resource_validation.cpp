@@ -274,45 +274,22 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     QnUserResourceList users;
     QList<QnUuid> roles;
     module->userRolesManager()->usersAndRoles(ids, users, roles);
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
     auto additional = parseAdditional(additionalList);
 
-    QStringList receivers;
-    int invalid = 0;
-    int total = 0;
-    int explicitUsers = 0;
-    QnUserResourcePtr invalidUser;
-
-    for (const auto& user: users)
-    {
-        if (!user->isEnabled())
-            continue;
-
-        ++explicitUsers;
-
-        QString userMail = user->getEmail();
-        if (isValidUser(user))
-        {
-            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
-        }
-        else
-        {
-            ++invalid;
-            if (!invalidUser)
-                invalidUser = user;
-        }
-    }
-
-    if (explicitUsers == 0 && roles.empty() && additional.isEmpty())
+    if (users.empty() && roles.empty() && additional.isEmpty())
         return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (!detailed)
     {
         QStringList recipients;
-        if (explicitUsers)
-            recipients << tr("%n Users", "", explicitUsers);
-        if (!roles.empty())
-            recipients << tr("%n Roles", "", (int)roles.size());
+        if (!users.empty() || !roles.empty())
+        {
+            recipients << nx::vms::event::StringsHelper(qnClientCoreModule->commonModule())
+                .actionSubjects(users, roles, true);
+        }
+
         if (!additional.empty())
             recipients << tr("%n additional", "", additional.size());
 
@@ -320,7 +297,19 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
         return recipients.join(lit(", "));
     }
 
-    total = explicitUsers;
+    QStringList receivers;
+    QSet<QnUserResourcePtr> invalidUsers;
+
+    for (const auto& user : users)
+    {
+        QString userMail = user->getEmail();
+        if (isValidUser(user))
+            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
+        else
+            invalidUsers << user;
+    }
+
+    int total = users.size();
 
     for (const auto& roleId: roles)
     {
@@ -333,18 +322,15 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 
             ++total;
             if (!isValidUser(user))
-            {
-                ++invalid;
-                if (!invalidUser)
-                    invalidUser = user;
-            }
+                invalidUsers << user;
         }
     }
 
+    int invalid = invalidUsers.size();
     if (invalid > 0)
     {
         return invalid == 1
-            ? tr("User %1 has invalid email address").arg(invalidUser->getName())
+            ? tr("User %1 has invalid email address").arg((*invalidUsers.cbegin())->getName())
             : tr("%n of %1 users have invalid email address", "", invalid).arg(total);
     }
 

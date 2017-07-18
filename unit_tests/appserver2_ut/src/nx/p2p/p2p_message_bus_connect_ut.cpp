@@ -22,7 +22,7 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-static const int kDefaultInstanceCount = 2;
+static const int kDefaultInstanceCount = 3;
 static const int kDefaultPropertiesPerCamera = 5;
 static const int kDefaultCamerasCount = 20;
 static const int kDefaultUsersCount = 0;
