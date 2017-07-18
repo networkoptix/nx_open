@@ -136,13 +136,13 @@ void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint 
         systemDescription->addServer(module, QnSystemDescription::kDefaultPriority);
 
     m_serverToSystem[module.id] = systemId;
-    updatePrimaryAddress(module);
-
     if (createNewSystem)
     {
         NX_LOGX(lm("New system %1").arg(systemDescription->id()), cl_logDEBUG2);
         emit systemDiscovered(systemDescription);
     }
+    updatePrimaryAddress(module);
+
 }
 
 void QnDirectSystemsFinder::removeServer(QnUuid id)
