@@ -110,11 +110,11 @@ CloudDataProvider::CloudDataProvider(
     std::chrono::milliseconds startTimeout)
 :
     m_updateInterval(std::move(updateInterval)),
+    m_startTime(std::chrono::steady_clock::now()),
+    m_startTimeout(startTimeout),
     m_isTerminated(false),
     m_connectionFactory(makeConnectionFactory(cdbUrl)),
-    m_connection(m_connectionFactory->createConnection()),
-    m_startTime(std::chrono::steady_clock::now()),
-    m_startTimeout(m_startTimeout)
+    m_connection(m_connectionFactory->createConnection())
 {
     m_connection->setCredentials(user, password);
     updateSystemsAsync();
