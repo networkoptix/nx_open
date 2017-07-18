@@ -262,6 +262,8 @@
 #include <transaction/message_bus_selector.h>
 #include <managers/discovery_manager.h>
 #include "rest/helper/p2p_stats_rest_helper.h"
+#include <recorder/remote_archive_synchronizer.h>
+#include <nx/utils/std/cpp14.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2521,7 +2523,9 @@ void MediaServerProcess::run()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
+    
+    auto remoteArchiveSynchronizer =
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -3195,6 +3199,7 @@ void MediaServerProcess::run()
     qnServerModule->runTimeSettings()->setValue("lastRunningTime", 0);
 
     authHelper.reset();
+    remoteArchiveSynchronizer.reset();
     //fileDeletor.reset();
     //qnNormalStorageMan.reset();
     //qnBackupStorageMan.reset();

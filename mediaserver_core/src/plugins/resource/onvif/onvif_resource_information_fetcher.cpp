@@ -20,6 +20,7 @@
 #include <plugins/resource/hikvision/hikvision_resource.h>
 #include <plugins/resource/flir/flir_onvif_resource.h>
 #include <plugins/resource/vivotek/vivotek_resource.h>
+#include <plugins/resource/lilin/lilin_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -438,6 +439,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("vivotek")))
         resource = QnPlOnvifResourcePtr(new VivotekResource());
+	else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
+        resource = QnPlOnvifResourcePtr(new LilinResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

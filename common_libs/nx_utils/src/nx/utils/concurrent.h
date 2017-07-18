@@ -566,7 +566,7 @@ Future<typename std::result_of<Function()>::type> run(
 template<typename Function>
 Future<typename std::result_of<Function()>::type> run(Function function)
 {
-    return run(*QThreadPool::globalInstance(), kDefaultTaskPriority, function);
+    return run(QThreadPool::globalInstance(), kDefaultTaskPriority, function);
 }
 
 } // namespace concurrent

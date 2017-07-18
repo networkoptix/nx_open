@@ -219,10 +219,13 @@ namespace mediaserver_core {
 namespace plugins {
 
 class HikvisionResource;
+class LilinResource;
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+typedef QnSharedResourcePointer<nx::mediaserver_core::plugins::LilinResource> LilinResourcePtr;
 
 typedef
 QnSharedResourcePointer<nx::mediaserver_core::plugins::HikvisionResource> QnHikvisionResourcePtr;
