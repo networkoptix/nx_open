@@ -67,6 +67,37 @@ bool requiresUserResource(ActionType actionType)
     }
 }
 
+// TODO: #vkutin #3.2 User resources and device resources of actions will be refactored.
+bool requiresAdditionalUserResource(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case undefinedAction:
+        case panicRecordingAction:
+        case cameraOutputAction:
+        case cameraRecordingAction:
+        case diagnosticsAction:
+        case playSoundAction:
+        case executePtzPresetAction:
+        case showTextOverlayAction:
+        case execHttpRequestAction:
+        case acknowledgeAction:
+        case sendMailAction:
+            return false;
+
+        case bookmarkAction:
+        case showPopupAction:
+        case playSoundOnceAction:
+        case sayTextAction:
+        case showOnAlarmLayoutAction:
+            return true;
+
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            return false;
+    }
+}
+
 bool hasToggleState(ActionType actionType)
 {
     switch (actionType)

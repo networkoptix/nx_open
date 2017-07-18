@@ -61,13 +61,13 @@
   <String Id="InstallLicenseText">Нажав кнопку «Принять и установить», вы соглашаетесь с</String>
   <String Id="Options">Параметры</String>
   <String Id="SelectApps">Выбор приложений для установки:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">Невозможно получить доступ к брандмауэру Windows.  ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Выполняется настройка брандмауэра Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Выполняется настройка брандмауэра Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Выполняется откат изменений брандмауэра Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">Устанавливаются настройки брандмауэра Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Выполняется откат изменений брандмауэра Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Выполняется удаление настроек брандмауэра Windows</String>
+  <String Id="Product_ArchMismatch_x86">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>
+  <String Id="Product_ArchMismatch_x64">Этот продукт предназначен для 64-разрядной ОС. Установка будет закончена.</String>
 </WixLocalization>

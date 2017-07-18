@@ -10,8 +10,6 @@
 #include <set>
 
 #include <QByteArray>
-#include <QObject>
-#include <QSize>
 #include <QString>
 
 #include <nx/utils/thread/mutex.h>
@@ -19,7 +17,6 @@
 #include <nx/network/buffer.h>
 #include <nx/network/http/http_types.h>
 
-#include "camera/camera_pool.h"
 #include "streaming_chunk_cache_key.h"
 
 //#define DUMP_CHUNK_TO_FILE
@@ -41,11 +38,8 @@ typedef std::shared_ptr<StreamingChunk> StreamingChunkPtr;
 */
 class StreamingChunk
 :
-    public QObject,
     public std::enable_shared_from_this<StreamingChunk>
 {
-    Q_OBJECT
-
 public:
     //!For sequential chunk reading
     class SequentialReadingContext
@@ -70,7 +64,9 @@ public:
         rcError
     };
 
-    StreamingChunk(QnResourcePool* resPool, const StreamingChunkCacheKey& params );
+    StreamingChunk(
+        const StreamingChunkCacheKey& params,
+        std::size_t maxInternalBufferSize);
     virtual ~StreamingChunk();
 
     const StreamingChunkCacheKey& params() const;
@@ -80,6 +76,7 @@ public:
     //!Returns whole chunk data
     nx::Buffer data() const;
 
+    bool startsWithZeroOffset() const;
     //!Sequential reading
     /*!
         Appends data to \a dataBuffer.
@@ -106,7 +103,7 @@ public:
     //!Add more data to chunk
     void appendData( const nx::Buffer& data );
     //!
-    void doneModification( ResultCode result );
+    virtual void doneModification( ResultCode result );
     bool isClosed() const;
     size_t sizeInBytes() const;
     //!Blocks until chunk is non-empty and closed or internal buffer has been filled
@@ -145,7 +142,6 @@ private:
     */
     quint64 m_dataOffsetAtTheFrontOfTheBuffer;
     std::set<SequentialReadingContext*> m_readers;
-    std::unique_ptr<VideoCameraLocker> m_videoCameraLocker;
 };
 
 class AbstractInputByteStream

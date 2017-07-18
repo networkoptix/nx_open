@@ -5,6 +5,7 @@
 #ifndef STREAMING_CHUNK_CACHE_KEY_H
 #define STREAMING_CHUNK_CACHE_KEY_H
 
+#include <chrono>
 #include <map>
 
 #include <QDateTime>
@@ -42,7 +43,7 @@ public:
         const QString& containerFormat,
         const QString& alias,
         quint64 startTimestamp,
-        quint64 duration,
+        std::chrono::microseconds duration,
         MediaQuality streamQuality,
         const std::multimap<QString, QString>& auxiliaryParams );
     StreamingChunkCacheKey( const QString& uniqueResourceID );
@@ -54,7 +55,7 @@ public:
     //!Chunk start timestamp (micros). This is internal timestamp, not calendar time
     quint64 startTimestamp() const;
     //!Duration in micros
-    quint64 duration() const;
+    std::chrono::microseconds duration() const;
     //!startTimestamp() + duration
     quint64 endTimestamp() const;
     MediaQuality streamQuality() const;
@@ -84,7 +85,7 @@ private:
     QString m_containerFormat;
     QString m_alias;
     quint64 m_startTimestamp;
-    quint64 m_duration;
+    std::chrono::microseconds m_duration;
     MediaQuality m_streamQuality;
     bool m_isLive;
     QSize m_pictureSizePixels;

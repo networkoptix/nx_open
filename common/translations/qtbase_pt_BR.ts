@@ -90,11 +90,11 @@
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Scroll Acima</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Scroll Abaixo</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -659,11 +659,11 @@ Do you want to delete it anyway?</translation>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 Tb</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -975,7 +975,7 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Todos (*.*)</translation>
     </message>
   </context>
   <context>
@@ -1120,7 +1120,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descarregar</translation>
     </message>
   </context>
   <context>

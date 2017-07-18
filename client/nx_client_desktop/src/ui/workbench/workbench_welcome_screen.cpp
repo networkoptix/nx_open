@@ -42,6 +42,8 @@
 #include <utils/common/app_info.h>
 #include <utils/connection_diagnostics_helper.h>
 
+#include <nx/utils/log/log.h>
+
 using namespace nx::client::desktop::ui;
 
 namespace
@@ -419,6 +421,9 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
     if (localId.isNull())
         return;
 
+    NX_DEBUG("CredentialsManager", lm("Forget password of %1 to the system %2")
+        .arg(userName).arg(localSystemId));
+
     const auto callback = [localId, userName]()
         {
             nx::client::core::helpers::storeCredentials(
@@ -461,6 +466,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             params.setArgument(Qn::UrlRole, url);
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
+            params.setArgument(Qn::StoreSessionRole, true);
             menu()->trigger(action::ConnectAction, params);
         };
 

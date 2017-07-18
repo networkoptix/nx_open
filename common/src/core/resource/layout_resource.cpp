@@ -91,6 +91,11 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     item.resource.id = resource->getId();
     if (resource->hasFlags(Qn::local_media))
         item.resource.uniqueId = resource->getUniqueId();
+
+    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+    if (!forcedRotation.isEmpty())
+        item.rotation = forcedRotation.toInt();
+
     layout->addItem(item);
 
     return layout;

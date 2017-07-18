@@ -10,25 +10,31 @@ describe('Login with correct credentials', function () {
 
     it("works at registration page before submit", function() {
         p.helper.get( p.helper.urls.register );
+        browser.sleep(500);
         p.loginButton.click();
         p.helper.loginFromCurrPage();
     });
 
     it("works at registration page after submit success", function() {
+        p.helper.sleepInIgnoredSync(2000);
         p.helper.register();
+        p.helper.sleepInIgnoredSync(2000);
         p.loginButton.click();
         p.helper.loginFromCurrPage();
     });
 
     it("works at registration page after submit with alert error message", function() {
         p.helper.get( p.helper.urls.register );
+        browser.sleep(500);
         p.helper.fillRegisterForm(null, null, p.helper.userEmailViewer);
         p.loginButton.click();
         p.helper.loginFromCurrPage();
     });
 
     it("works at registration page on account activation success", function() {
+        p.helper.sleepInIgnoredSync(2000);
         p.helper.createUser();
+        p.helper.sleepInIgnoredSync(2000);
         p.loginButton.click();
         p.helper.loginFromCurrPage();
     });
@@ -78,7 +84,7 @@ describe('Login with correct credentials', function () {
         p.helper.forms.restorePassEmail.sendLinkToEmail(email);
         p.helper.getEmailedLink(email, p.helper.emailSubjects.restorePass, 'restore_password').then(function(url) {
             p.helper.get(url);
-
+            browser.sleep(1000);
             p.loginButton.click();
             p.helper.loginFromCurrPage();
         });
@@ -94,7 +100,7 @@ describe('Login with correct credentials', function () {
             p.helper.get(url);
             p.helper.forms.restorePassPassword.passwordInput.sendKeys(p.helper.userPassword);
             p.helper.forms.restorePassPassword.submitButton.click();
-
+            browser.sleep(2000);
             p.loginButton.click();
             p.helper.loginFromCurrPage();
         });

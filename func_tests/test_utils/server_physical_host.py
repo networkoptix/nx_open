@@ -103,6 +103,7 @@ class PhysicalInstallationHost(object):
         self._available_installations = self._installations[:]  # ServerInstallation list, set up but yet unallocated
         self._allocated_server_list = []
         self._timezone = host.get_timezone()
+        self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
 
     def reset_installations(self):
         log.info('%s: removing directory: %s', self._name, self._root_dir)
@@ -140,6 +141,12 @@ class PhysicalInstallationHost(object):
     def _read_installations(self):
         for dir in sorted(self._host.expand_glob(os.path.join(self._root_dir, 'server-*'))):
             yield ServerInstallation(self._host, dir)
+
+    def _ensure_servers_are_stopped(self):
+        for installation in self._installations:
+            server_ctl = PhysicalHostServerCtl(self._host, installation.dir)
+            if server_ctl.get_state():
+                server_ctl.set_state(is_started=False)
 
     def _create_installation(self):
         if self._limit and len(self._installations) >= self._limit:

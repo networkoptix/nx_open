@@ -252,6 +252,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
+            parameters.setArgument(Qn::StoreSessionRole, false);
             menu()->trigger(action::ConnectAction, parameters);
             return true;
 
@@ -282,11 +283,7 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 
     auto params = action::Parameters().withArgument(Qn::UrlRole, appServerUrl);
     params.setArgument(Qn::ForceRole, true);
-    if (qnSettings->autoLogin())
-    {
-        params.setArgument(Qn::AutoLoginRole, true);
-        params.setArgument(Qn::StorePasswordRole, true);
-    }
+    params.setArgument(Qn::StoreSessionRole, false);
     menu()->trigger(action::ConnectAction, params);
     return true;
 }
