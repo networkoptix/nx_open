@@ -3177,6 +3177,7 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
+    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3199,7 +3200,6 @@ void MediaServerProcess::run()
     qnServerModule->runTimeSettings()->setValue("lastRunningTime", 0);
 
     authHelper.reset();
-    remoteArchiveSynchronizer.reset();
     //fileDeletor.reset();
     //qnNormalStorageMan.reset();
     //qnBackupStorageMan.reset();
