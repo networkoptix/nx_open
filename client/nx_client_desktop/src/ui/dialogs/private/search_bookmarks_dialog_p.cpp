@@ -1,7 +1,6 @@
 #include "search_bookmarks_dialog_p.h"
 
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "ui_search_bookmarks_dialog.h"
@@ -151,9 +150,6 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, boldItemDelegate);
     grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
-
-    grid->verticalScrollBar()->setContextMenuPolicy(Qt::PreventContextMenu);
-    grid->horizontalScrollBar()->setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()
