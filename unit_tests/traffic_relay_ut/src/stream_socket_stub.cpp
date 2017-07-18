@@ -11,6 +11,8 @@ StreamSocketStub::StreamSocketStub():
     base_type(&m_delegatee)
 {
     setNonBlockingMode(true);
+
+    m_timer.bindToAioThread(getAioThread());
 }
 
 StreamSocketStub::~StreamSocketStub()
@@ -24,6 +26,12 @@ void StreamSocketStub::post(nx::utils::MoveOnlyFunc<void()> func)
         m_timer.start(*m_postDelay, std::move(func));
     else
         base_type::post(std::move(func));
+}
+
+void StreamSocketStub::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_timer.bindToAioThread(aioThread);
 }
 
 void StreamSocketStub::readSomeAsync(

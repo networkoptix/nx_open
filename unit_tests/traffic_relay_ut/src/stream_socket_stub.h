@@ -20,6 +20,7 @@ public:
     ~StreamSocketStub();
 
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void readSomeAsync(
         nx::Buffer* const /*buffer*/,

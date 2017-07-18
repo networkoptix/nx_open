@@ -344,7 +344,7 @@ TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
 
 TEST_F(ListeningPeerPool, connection_closed_simultaneously_with_take_request)
 {
-    setConnectionPostDelay(std::chrono::minutes(1));
+    setConnectionPostDelay(std::chrono::milliseconds(17));
 
     givenConnectionFromPeer();
 
