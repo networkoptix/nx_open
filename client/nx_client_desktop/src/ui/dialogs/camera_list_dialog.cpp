@@ -84,6 +84,8 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(m_selectAllAction,  &QAction::triggered,                            ui->camerasView, &QTableView::selectAll);
 
     ui->camerasView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->camerasView->horizontalHeader()->setSectionResizeMode(QnCameraListModel::NameColumn,
+        QHeaderView::Interactive); //< Name may be of any length
 
     setHelpTopic(this, Qn::CameraList_Help);
 
