@@ -44,7 +44,7 @@ NX_UTILS_API struct LevelSettings
     QString toString() const;
 
     /**
-     * Parses settings according to grammar:
+     * Parses settings according to the grammar:
      * <pre><code>
      *     settings ::= levelDescription (',' levelDescription)*
      *     levelDescription ::= level ('[' tags ']')?

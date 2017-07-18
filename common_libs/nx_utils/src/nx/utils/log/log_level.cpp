@@ -99,17 +99,17 @@ QString LevelSettings::toString() const
 
 static bool isSeparator(const QChar& c)
 {
-    return c == QChar(',') || c == QChar(';') || c == QChar('|');
+    return c == QChar(',');
 };
 
 static bool isOpenBracket(const QChar& c)
 {
-    return c == QChar('[') || c == QChar('{');
+    return c == QChar('[');
 };
 
 static bool isCloseBracket(const QChar& c)
 {
-    return c == QChar(']') || c == QChar('}');
+    return c == QChar(']');
 };
 
 static bool isTokenPart(const QChar& c)
