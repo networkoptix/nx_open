@@ -278,10 +278,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmark Search...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Log in to %1...</source>
         <comment>Log in to Nx Cloud</comment>
         <translation type="unfinished"></translation>
@@ -868,6 +864,10 @@ to view more bookmarks</source>
         <source>Unpin Notifications</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bookmark Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
@@ -955,7 +955,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+        <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1601,6 +1601,10 @@ to view more bookmarks</source>
         <source>Name cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Description cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
@@ -1996,10 +2000,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Primary Stream</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2009,10 +2009,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2037,6 +2033,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2970,7 +2974,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
+        <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3408,10 +3412,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>On click</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3432,6 +3432,10 @@ to %1</source>
     <message>
         <source>Impulse</source>
         <comment>IO Output Port Action</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3646,12 +3650,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Locked to Hardware ID</source>
+        <source>Features:</source>
         <translation></translation>
     </message>
     <message>
-        <source>Features:</source>
-        <translation></translation>
+        <source>Locked to Hardware Id</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3763,10 +3767,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact Customer Support to get a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You already activated this license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3799,23 +3799,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid license key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contact Customer Support to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please contact Customer Support to activate license key manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3842,14 +3830,6 @@ to %1</source>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware ID %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -3937,6 +3917,30 @@ to %1</source>
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Invalid License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to obtain a valid License Key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to activate License Key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support to get a valid License Key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to Hardware Id %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
@@ -3961,15 +3965,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hardware ID copied to clipboard</source>
+        <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <source>Hardware Id copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4261,10 +4265,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Success!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Testing...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4285,15 +4285,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System was configured successfully.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>URL is invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The servers from the remote System should appear in your System soon.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4302,6 +4294,18 @@ to %1</source>
     </message>
     <message>
         <source>This is the current System URL.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will be reconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Systems will be merged shortly</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4385,15 +4389,15 @@ to %1</source>
 <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-        <source>b/s</source>
+        <source>B/s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Kb/s</source>
+        <source>MB/s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mb/s</source>
+        <source>kB/s</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4472,19 +4476,8 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmark it</source>
+        <source>Acknowledge</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bookmark created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n bookmarks created</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -5081,6 +5074,14 @@ to %1</source>
         <source>Camera</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creator</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5162,20 +5163,6 @@ to %1</source>
 </context>
 <context>
     <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-        <source>%n Users</source>
-        <translation>
-            <numerusform>%n User</numerusform>
-            <numerusform>%n Users</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Roles</source>
-        <translation>
-            <numerusform>%n Role</numerusform>
-            <numerusform>%n Roles</numerusform>
-        </translation>
-    </message>
     <message numerus="yes">
         <source>%n additional</source>
         <translation>
@@ -7134,10 +7121,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server connected to System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Password cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7147,6 +7130,14 @@ to %1</source>
     </message>
     <message>
         <source>Connecting to the current System...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will be connected to the System shortly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It will appear in the resource tree when the database synchronization is finished.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

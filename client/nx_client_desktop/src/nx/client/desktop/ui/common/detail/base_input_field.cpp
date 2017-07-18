@@ -108,16 +108,21 @@ Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
 
 void BaseInputFieldPrivate::updateVisualState()
 {
-    setHintText(lastResult.errorMessage);
+    const auto updateFunction =
+        [this]()
+        {
+            setHintText(lastResult.errorMessage);
 
-    QPalette palette = defaultPalette;
-    if (lastResult.state == QValidator::Invalid)
-        setWarningStyle(&palette);
+            QPalette palette = defaultPalette;
+            if (lastResult.state == QValidator::Invalid)
+                setWarningStyle(&palette);
 
-    if (useWarningStyleForControl)
-        input->setPalette(palette);
+            if (useWarningStyleForControl)
+                input->setPalette(palette);
 
-    hint->setPalette(palette);
+            hint->setPalette(palette);
+        };
+    executeDelayedParented(updateFunction, 0, this);
 }
 
 void BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)

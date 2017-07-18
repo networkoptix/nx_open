@@ -88,11 +88,6 @@ public:
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
-    /**
-     *  Get full error message from activation server
-     */
-    static QString activationMessage(const QJsonObject& errorMessage);
-
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 

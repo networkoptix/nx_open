@@ -379,7 +379,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>A rendszer használatra kész</h2>
+    <h2>Rendszer készen áll a használatra</h2>
     <p>Szerver címe</p>
     <h4>{{serverAddress}}</h4>
     <p>Adminisztrátor bejelentkezés</p>
@@ -464,7 +464,7 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Webböngésző használata</b></div>
-            <div class="col-xs-4 text-right">Cím</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right">Cím</div><div class="col-xs-8 text-left"><b>https: // {{IP}}: {{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>{{Config.productName}} alkalmazás használata</b></div>
@@ -480,19 +480,16 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Cancel</button>
-    <button class="btn btn-default"
+            ng-click="cancel()">Mégse</button>     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right"
+ ng-click="next()">Következő <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">Finish</button>
+ ng-click="finish()">Befejezés</button>
 </div>

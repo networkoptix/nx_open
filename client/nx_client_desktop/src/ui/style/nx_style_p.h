@@ -57,6 +57,16 @@ public:
             QPalette::ColorRole foregroundRole,
             const QWidget* widget = nullptr) const;
 
+    static void drawArrowIndicator(const QStyle* style,
+        const QStyleOptionToolButton* toolbutton,
+        const QRect& rect,
+        QPainter* painter,
+        const QWidget* widget = nullptr);
+
+    void drawToolButton(QPainter* painter,
+        const QStyleOptionToolButton* option,
+        const QWidget* widget = nullptr) const;
+
     static bool isCheckableButton(const QStyleOption* option);
 
     /** TextButton is a PushButton which looks like a simple text (without bevel). */

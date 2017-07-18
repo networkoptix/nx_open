@@ -34,6 +34,8 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (!model() || m_updating)
         return;
 
+    base_type::at_model_dataChanged(fields);
+
     if (fields.testFlag(Field::eventType))
     {
         const auto sourceCameraRequired =

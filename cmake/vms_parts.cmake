@@ -24,7 +24,7 @@ if("${platform}" STREQUAL "linux")
     endif()
 endif()
 
-if("${platform}" STREQUAL "android" OR "${platform}" STREQUAL "ios")
+if("${platform}" MATCHES "android|ios")
     set(_withMediaServer OFF)
     set(_withDesktopClient OFF)
     set(_withClouds OFF)
