@@ -243,7 +243,7 @@ void Settings::loadSettings()
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
     m_cloudConnect.tcpReverse.startTimeout =
         nx::utils::parseTimerDuration(
-            settings().value(tcp_reverse::kStartTimeout), tcp_reverse::kDefaultStartTimeout);
+            settings().value(tcp_reverse::kStartTimeout).toString(), tcp_reverse::kDefaultStartTimeout);
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")
