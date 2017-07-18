@@ -1,9 +1,13 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
 
+{% block extrahead %}
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+{% endblock %}
+
 {% block extrastyle %}
-    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+    {{ block.super }}
 {% endblock %}
 
 {% block content%}
@@ -84,5 +88,20 @@
     if(langSelector){
         langSelector.addEventListener('change', languageChanged, false);
     }
+
+    tinymce.init({
+        selector: '.tinymce',
+        menubar: false,
+        plugins: [
+            'advlist autolink lists charmap preview',
+            'visualblocks code',
+            'contextmenu paste code'
+        ],
+        toolbar: 'undo redo | insert | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+        content_css: [
+            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+            '//www.tinymce.com/css/codepen.min.css'],
+        ]
+    });
 </script>
 {% endblock%}
