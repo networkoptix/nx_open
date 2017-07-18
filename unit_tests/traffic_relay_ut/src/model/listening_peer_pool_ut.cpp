@@ -53,9 +53,11 @@ protected:
     void addConnection(const std::string& peerName)
     {
         auto connection = std::make_unique<relay::test::StreamSocketStub>();
+        connection->setPostDelay(m_connectionPostDelay);
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
+        m_peerConnections.push_back(connection.get());
         pool().addConnection(peerName, std::move(connection));
     }
 
@@ -105,6 +107,12 @@ protected:
     void whenAddedConnectionToThePool()
     {
         addConnection(m_peerName);
+    }
+
+    void whenCloseAllConnections()
+    {
+        for (int i = 0; i < m_peerConnections.size(); ++i)
+            m_peerConnections[i]->setConnectionToClosedState();
     }
 
     void assertConnectionHasBeenAdded()
@@ -192,6 +200,11 @@ protected:
         m_peerName = peerName;
     }
 
+    void setConnectionPostDelay(std::chrono::milliseconds postDelay)
+    {
+        m_connectionPostDelay = postDelay;
+    }
+
 private:
     struct TakeIdleConnectionResult
     {
@@ -203,8 +216,10 @@ private:
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
     relay::test::StreamSocketStub* m_peerConnection;
+    std::vector<relay::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     SettingsLoader m_settingsLoader;
+    boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -325,6 +340,18 @@ TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
 {
     whenAddedConnectionToThePool();
     thenKeepAliveHasBeenEnabledOnConnection();
+}
+
+TEST_F(ListeningPeerPool, connection_closed_simultaneously_with_take_request)
+{
+    setConnectionPostDelay(std::chrono::minutes(1));
+
+    givenConnectionFromPeer();
+
+    whenRequestedConnection();
+    whenCloseAllConnections();
+
+    thenConnectRequestHasCompleted();
 }
 
 //-------------------------------------------------------------------------------------------------

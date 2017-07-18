@@ -273,6 +273,7 @@ void ListeningPeerPool::closeConnection(
         });
     if (connectionContextIter != peerContext.connections.end())
     {
+        NX_ASSERT(connectionContextIter->connection->isInSelfAioThread());
         peerContext.connections.erase(connectionContextIter);
         if (peerContext.connections.empty())
             startPeerExpirationTimer(lock, peerName, &peerContext);
@@ -303,6 +304,7 @@ void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& /*lock*
         auto peerIter = m_peers.find(peerName);
         NX_ASSERT(peerIter != m_peers.end());
         NX_ASSERT(peerIter->second.takeConnectionRequestQueue.empty());
+        NX_ASSERT(peerIter->second.connections.empty());
         m_peers.erase(peerIter);
         m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
     }
