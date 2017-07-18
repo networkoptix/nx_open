@@ -34,39 +34,39 @@ public:
     int minSliderSpeed() const;
     int maxSliderSpeed() const;
 
-    int selectedLengthUnit() const;
+    int selectedLengthUnitIndex() const;
     void setSelectedLengthUnit(int index);
 
     qint64 sourcePeriodLengthMs() const;
     void setSourcePeriodLengthMs(qint64 lengthMs);
 
-    double resultLengthUnits() const;
-    void setResultLengthUnits(double value);
-    double minResultLengthUnits() const;
-    double maxResultLengthUnits() const;
+    qreal resultLengthInSelectedUnits() const;
+    void setResultLengthInSelectedUnits(qreal value);
+    qreal minResultLengthInSelectedUnits() const;
+    qreal maxResultLengthInSelectedUnits() const;
 
     qint64 frameStepMs() const;
 
 private:
     void updateUnitsModel();
     void updateExpectedLength();
-    void updateResultLengthUnitsRange();
+    void updateResultLengthInSelectedUnitsRange();
 
-    double sliderExpCoeff() const;
-    double toSliderScale(double absoluteSpeedValue) const;
-    double fromSliderScale(double sliderSpeedValue) const;
+    qreal sliderExpCoeff() const;
+    qreal toSliderScale(qreal absoluteSpeedValue) const;
+    qreal fromSliderScale(qreal sliderSpeedValue) const;
 
-    qint64 expectedLengthMeasureUnit() const;
+    qint64 selectedLengthMeasureUnitInMs() const;
 
 private:
-    double m_absoluteSpeed;
-    double m_sliderSpeed;
+    qreal m_absoluteSpeed;
+    qreal m_sliderSpeed;
     int m_maxSpeed;
     qint64 m_sourcePeriodLengthMs;
-    int m_selectedLengthUnit;
-    double m_resultLengthUnits;
-    double m_minResultLengthUnits;
-    double m_maxResultLengthUnits;
+    int m_selectedLengthUnitIndex;
+    qreal m_resultLengthInSelectedUnits;
+    qreal m_minResultLengthInSelectedUnits;
+    qreal m_maxResultLengthInSelectedUnits;
 };
 
 } // namespace dialogs
