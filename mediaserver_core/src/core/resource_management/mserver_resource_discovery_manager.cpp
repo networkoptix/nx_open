@@ -252,7 +252,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // ========================= send conflict info =====================
     for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
-        if (itr.value().size() > 1)
+        if (hasIpConflict(itr.value()))
         {
             QHostAddress hostAddr(itr.key());
             QStringList conflicts;
@@ -296,6 +296,21 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         printInLogNetResources(resources);
     }
     return true;
+}
+
+bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const
+{
+    if (cameras.size() < 2)
+        return false;
+    QSet<int> portList;
+    for (const auto& camera: cameras)
+    {
+        const int port = QUrl(camera->getUrl()).port();
+        if (portList.contains(port))
+            return true;
+        portList << port;
+    }
+    return false;
 }
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
