@@ -185,7 +185,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 			}
 		}
 
-		if (newCamRes && newCamRes->needCheckIpConflicts())
+		if (newCamRes)
 		{
 			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
 			if (ips)
@@ -303,10 +303,15 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
     if (cameras.size() < 2)
         return false;
     QSet<int> portList;
-    for (const auto& camera: cameras)
+    for (const auto& netRes: cameras)
     {
+        auto camera = netRes.dynamicCast<QnSecurityCamResource>();
+        if (!camera || !camera->needCheckIpConflicts())
+            continue;
+        if (!camera->isManuallyAdded())
+            return true;
         const int port = QUrl(camera->getUrl()).port();
-        if (port == 0 || portList.contains(port))
+        if (portList.contains(port))
             return true; //< Conflict detected
         portList << port;
     }
