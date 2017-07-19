@@ -7,7 +7,7 @@ namespace nx {
 namespace network {
 
 // TODO: #ak Remove this class when AbstractStreamServerSocket inherits AbstractStreamSocketAcceptor.
-class StreamServerSocketToAcceptorWrapper:
+class NX_NETWORK_API StreamServerSocketToAcceptorWrapper:
     public AbstractStreamSocketAcceptor
 {
     using base_type = AbstractStreamSocketAcceptor;
