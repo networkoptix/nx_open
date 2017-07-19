@@ -33,7 +33,14 @@
 				<tr>
 					<td>{{ record.language.code }}</td>
 					<td>{{ record.data_structure.name }}</td>
-					<td>{{ record }}</td>
+					<td>
+					{% if record.data_structure.type == 1 %}
+						<img style="height: 100px" src="data:image/png;base64,{{record}}">
+					{% endif %}
+					{% if record.data_structure.type != 1 %}
+						{{record}}
+					{% endif %}
+					</td>
 					<td>
 						{% if record.language %}
 						<a class="button"

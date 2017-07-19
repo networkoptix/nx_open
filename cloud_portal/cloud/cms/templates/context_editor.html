@@ -1,9 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
+{% load static %}
+
+{% block extrahead %}
+    <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
+{% endblock %}
 
 {% block extrastyle %}
-    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+    {{ block.super }}
 {% endblock %}
 
 {% block content%}
@@ -29,7 +34,12 @@
             {% endif %}
             
             <div>
-                <p>Image preview</p>
+                <br>
+                <div>
+                    <label for="Remove_{{field.label}}">Remove Image</label>
+                    <input id="Remove_{{field.label}}" type="checkbox" name="Remove_{{field.label}}">
+                </div>
+                <h4>Preview for {{field.label}}</h4>
                 <img style="width: 400px" src="data:image/png;base64,{{field.value}}"
                      onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
             </div>
@@ -82,5 +92,16 @@
     if(langSelector){
         langSelector.addEventListener('change', languageChanged, false);
     }
+
+    tinymce.init({
+        selector: '.tinymce',
+        menubar: false,
+        theme:'advanced',
+        theme_advanced_buttons1: 'undo,redo,separator,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent',
+        theme_advanced_toolbar_location: 'top',
+        theme_advanced_toolbar_align: 'left',
+        paste_text_sticky: true,
+        paste_text_sticky_default : true
+    });
 </script>
 {% endblock%}

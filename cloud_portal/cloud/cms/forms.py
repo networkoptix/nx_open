@@ -31,13 +31,18 @@ class CustomContextForm(forms.ModelForm):
 			record_value = latest_record.latest('created_date').value if latest_record.exists() else data_structure.default
 
 			widget_type = forms.TextInput(attrs={'size': 80})
-			if data_structure.type == DataStructure.get_type("Long Text") or data_structure.type == DataStructure.get_type("HTML"):
+
+			if data_structure.type == DataStructure.get_type("Long Text"):
 				widget_type = forms.Textarea
+
+			if data_structure.type == DataStructure.get_type("HTML"):
+				widget_type = forms.Textarea(attrs={'cols':80, 'rows': 10, 'class': 'tinymce'})
 
 			if data_structure.type == DataStructure.get_type("Image"):
 				self.fields[ds_name] = forms.ImageField(label=ds_name,
 														help_text=ds_description,
-														initial=record_value)
+														initial=record_value,
+														required=False)
 				continue
 
 			self.fields[ds_name] = forms.CharField(required=False,
