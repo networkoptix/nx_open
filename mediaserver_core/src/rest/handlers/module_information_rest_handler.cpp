@@ -96,12 +96,11 @@ void QnModuleInformationRestHandler::afterExecute(
         return;
     }
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_savedSockets.insert(socket);
-        NX_DEBUG(this, lm("Connection from %1 asks to keep connection open, %2 total")
-            .args(socket->getForeignAddress(), m_savedSockets.size()));
-    }
+    QnMutexLocker lock(&m_mutex);
+
+    m_savedSockets.insert(socket);
+    NX_DEBUG(this, lm("Connection from %1 asks to keep connection open, %2 total")
+        .args(socket->getForeignAddress(), m_savedSockets.size()));
 
     connect(owner->commonModule(), &QnCommonModule::moduleInformationChanged,
         this, &QnModuleInformationRestHandler::closeAllSockets, Qt::UniqueConnection);
