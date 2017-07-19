@@ -70,6 +70,11 @@ protected:
             ASSERT_TRUE(m_relayPool->addPeer(relayToDomain.second).get());
     }
 
+    void whenTableIsFilledWithTestData()
+    {
+
+    }
+
     void assertSelectFromTablesResult(
         std::pair<CassError, cassandra::QueryResult>* selectResult)
     {
@@ -172,6 +177,10 @@ protected:
         ASSERT_EQ((int)m_relayToDomainTestData.size(), rowCount);
     }
 
+    void thenRelaysShouldBeFoundCorrectly()
+    {
+    }
+
 private:
     std::unique_ptr<TestRelayPool> m_relayPool;
     std::vector<std::pair<std::string, std::string>> m_relayToDomainTestData;
@@ -198,11 +207,20 @@ TEST_F(RemoteRelayPeerPool, addPeer)
 {
     givenDbWithNotExistentCdbKeyspace();
     whenRelayPoolObjectHasBeenCreated();
-
     whenFivePeersHaveBeenAdded();
+
     thenAllRecordsExistAndSplitCorreclty();
 }
 
+TEST_F(RemoteRelayPeerPool, getRelayByDomain)
+{
+    givenDbWithNotExistentCdbKeyspace();
+    whenRelayPoolObjectHasBeenCreated();
+    whenTableIsFilledWithTestData();
+
+    thenRelaysShouldBeFoundCorrectly();
+
+}
 
 } // namespace test
 } // namespace model
