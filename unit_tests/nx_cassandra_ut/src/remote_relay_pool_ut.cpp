@@ -1,9 +1,11 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <model/remote_relay_peer_pool.h>
 #include <nx/casssandra/async_cassandra_connection.h>
+#include <nx/utils/std/algorithm.h>
 #include "options.h"
 
 
@@ -100,10 +102,71 @@ protected:
 
         ASSERT_EQ(CASS_OK, selectResult.first);
 
+        boost::optional<std::string> suffix1, suffix2, suffix3, domainTail;
+        boost::optional<cassandra::Uuid> relayId;
+
         int rowCount = 0;
         while (selectResult.second.next())
         {
             ++rowCount;
+            ASSERT_TRUE(selectResult.second.get(0, &relayId));
+            ASSERT_TRUE(selectResult.second.get(1, &suffix1));
+            ASSERT_TRUE(selectResult.second.get(2, &suffix2));
+            ASSERT_TRUE(selectResult.second.get(3, &suffix3));
+            ASSERT_TRUE(selectResult.second.get(4, &domainTail));
+
+            ASSERT_TRUE((bool)relayId);
+            ASSERT_TRUE((bool)suffix1);
+            ASSERT_TRUE((bool)suffix2);
+            ASSERT_TRUE((bool)suffix3);
+            ASSERT_TRUE((bool)domainTail);
+
+            ASSERT_FALSE(relayId->uuidString.empty());
+
+            auto testDataIt = std::find_if(m_relayToDomainTestData.cbegin(),
+                m_relayToDomainTestData.cend(),
+                [&](const std::pair<std::string, std::string>& p)
+                {
+                    auto testStringReversed = nx::utils::reverseWords(p.second, ".");
+                    std::vector<std::string> reversedParts;
+                    boost::split(reversedParts, testStringReversed, boost::is_any_of("."));
+
+                    std::string domainTailString;
+                    if (reversedParts.size() >= 4)
+                    {
+                        for (size_t i = 3; i < reversedParts.size(); ++i)
+                        {
+                            domainTailString += reversedParts[i];
+                            if (i != reversedParts.size() - 1)
+                                domainTailString += ".";
+                        }
+                    }
+
+                    if (reversedParts[0] != *suffix1)
+                        return false;
+
+                    if ((reversedParts.size() > 1 && reversedParts[1] != *suffix2)
+                        || (reversedParts.size() <= 1 && *suffix2 != ""))
+                    {
+                        return false;
+                    }
+
+                    if ((reversedParts.size() > 2 && reversedParts[2] != *suffix3)
+                        || (reversedParts.size() <= 2 && *suffix3 != ""))
+                    {
+                        return false;
+                    }
+
+                    if ((reversedParts.size() > 3 && domainTailString != *domainTail)
+                        || (reversedParts.size() <= 3 && *domainTail!= ""))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                });
+
+            ASSERT_NE(m_relayToDomainTestData.cend(), testDataIt);
         }
 
         ASSERT_EQ((int)m_relayToDomainTestData.size(), rowCount);
