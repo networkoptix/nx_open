@@ -58,7 +58,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	mediatorPort := services.Items[0].Spec.Ports[0].NodePort
+	mediatorPort := int32(0);
+
+	for _, v := range services.Items[0].Spec.Ports {
+		if v.Protocol == "UDP" {
+			mediatorPort = v.NodePort
+			break
+		}
+	}
+
+	if mediatorPort == 0 {
+		panic("Couldn't find mediator")
+	}
 
 	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "kubernetes.io/role=node"})
 	if err != nil {
