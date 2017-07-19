@@ -412,7 +412,7 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
     return m_newLiveParams;
 }
 
-QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
+QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
 {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)

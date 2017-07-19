@@ -571,7 +571,7 @@ quint64 DecodedPictureToOpenGLUploader::UploadedPicture::pts() const
     return m_pts;
 }
 
-QnMetaDataV1Ptr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
+QnAbstractCompressedMetadataPtr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
 {
     return m_metadata;
 }

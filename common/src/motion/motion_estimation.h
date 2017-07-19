@@ -34,7 +34,7 @@ public:
     */
     bool analizeFrame(const QnCompressedVideoDataPtr& frame);
 #endif
-    QnMetaDataV1Ptr getMotion();
+    QnAbstractCompressedMetadataPtr getMotion();
     bool existsMetadata() const;
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analizeFrame call)

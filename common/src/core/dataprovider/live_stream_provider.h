@@ -94,7 +94,7 @@ public:
 protected:
     /*! Called when @param currentStreamParams are updated */
 
-    QnMetaDataV1Ptr getMetaData();
+    QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     /*!

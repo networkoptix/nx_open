@@ -82,7 +82,7 @@ public:
         //!Serial number of decoded picture (always different from 0)
         unsigned int sequence() const;
         quint64 pts() const;
-        QnMetaDataV1Ptr metadata() const;
+        QnAbstractCompressedMetadataPtr metadata() const;
         QnGlRendererTexturePack* texturePack();
         //!Returns opengl texture holding plane \a index data. Index of a plane depends on color format (Y, U, V for YV12; Y, UV for NV12 and RGB for rgb format)
         QnGlRendererTexture* texture( int index ) const;
@@ -110,7 +110,7 @@ public:
         int m_height;
         unsigned int m_sequence;
         quint64 m_pts;
-        QnMetaDataV1Ptr m_metadata;
+        QnAbstractCompressedMetadataPtr m_metadata;
         std::vector<PBOData> m_pbo;
         bool m_skippingForbidden;
         int m_flags;
