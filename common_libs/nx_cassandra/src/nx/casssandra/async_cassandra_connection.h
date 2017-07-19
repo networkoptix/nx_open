@@ -70,6 +70,11 @@ public:
     QueryResult& operator=(QueryResult&&);
 
     bool next();
+
+    /**
+     * These functions return true if query itself is successful. If function returned true, but
+     * 'value' is equal to boost::none, than corresponding DB value is equal to NULL.
+     */
     bool get(const std::string& key, boost::optional<std::string>* value) const;
     bool get(const std::string& key, boost::optional<bool>* value) const;
     bool get(const std::string& key, boost::optional<double>* value) const;
@@ -114,17 +119,20 @@ private:
 
         *cassValue = getIndexFunc(row);
         if (cass_value_is_null(*cassValue))
+        {
             *userValue = boost::none;
+            return true;
+        }
 
         *userValue = T();
         return true;
     }
 
-    template<typename GetIndexFunc>
-    bool getStringImpl(GetIndexFunc getIndexFunc, boost::optional<std::string>* value) const
+    template<typename GetCassValueFunc>
+    bool getStringImpl(GetCassValueFunc getCassValueFunc, boost::optional<std::string>* value) const
     {
         const CassValue* cassValue;
-        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
+        NX_GET_CASS_VALUE(getCassValueFunc, cassValue, value);
 
         const char* stringVal;
         size_t stringValSize;
@@ -139,11 +147,11 @@ private:
         return result == CASS_OK;
     }
 
-    template<typename GetIndexFunc>
-    bool getInetImpl(GetIndexFunc getIndexFunc, boost::optional<InetAddr>* value) const
+    template<typename GetCassValueFunc>
+    bool getInetImpl(GetCassValueFunc getCassValueFunc, boost::optional<InetAddr>* value) const
     {
         const CassValue* cassValue;
-        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
+        NX_GET_CASS_VALUE(getCassValueFunc, cassValue, value);
 
         CassInet val;
         auto result = cass_value_get_inet(cassValue, &val);
@@ -157,11 +165,11 @@ private:
         return result == CASS_OK;
     }
 
-    template<typename GetIndexFunc>
-    bool getUuidImpl(GetIndexFunc getIndexFunc, boost::optional<Uuid>* value) const
+    template<typename GetCassValueFunc>
+    bool getUuidImpl(GetCassValueFunc getCassValueFunc, boost::optional<Uuid>* value) const
     {
         const CassValue* cassValue;
-        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
+        NX_GET_CASS_VALUE(getCassValueFunc, cassValue, value);
 
         CassUuid val;
         auto result = cass_value_get_uuid(cassValue, &val);

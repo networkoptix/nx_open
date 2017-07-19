@@ -349,7 +349,7 @@ bool QueryResult::get(const std::string& key, boost::optional<std::string>* valu
         value);
 }
 
-#define NX_CASS_GET_BASIC_VALUE(type, getIndexFactory) \
+#define NX_CASS_GET_BASIC_VALUE(type, getCassValueFactory) \
     if (!m_iterator) \
         return false; \
     \
@@ -357,11 +357,18 @@ bool QueryResult::get(const std::string& key, boost::optional<std::string>* valu
     if (!row) \
         return false; \
     \
+    const CassValue* cassValue = getCassValueFactory(row); \
+    if (cass_value_is_null(cassValue)) \
+    { \
+        *value = boost::none; \
+        return true; \
+    } \
+    \
     cass_##type##_t val; \
-    auto result = cass_value_get_##type(getIndexFactory(row), &val); \
+    auto result = cass_value_get_##type(getCassValueFactory(row), &val); \
     \
     if (result == CASS_OK) \
-        *value = val; \
+        *value = (type)val; \
     \
     return result == CASS_OK;
 
@@ -398,11 +405,13 @@ bool QueryResult::get(const std::string& key, boost::optional<float>* value) con
 
 bool QueryResult::get(const std::string& key, boost::optional<int32_t>* value) const
 {
+    using int32 = int32_t;
     NX_CASS_GET_BASIC_VALUE_BY_NAME(int32);
 }
 
 bool QueryResult::get(const std::string& key, boost::optional<int64_t>* value) const
 {
+    using int64 = int64_t;
     NX_CASS_GET_BASIC_VALUE_BY_NAME(int64);
 }
 
@@ -433,11 +442,13 @@ bool QueryResult::get(int index, boost::optional<float>* value) const
 
 bool QueryResult::get(int index, boost::optional<int32_t>* value) const
 {
+    using int32 = int32_t;
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(int32);
 }
 
 bool QueryResult::get(int index, boost::optional<int64_t>* value) const
 {
+    using int64 = int64_t;
     NX_CASS_GET_BASIC_VALUE_BY_INDEX(int64);
 }
 
