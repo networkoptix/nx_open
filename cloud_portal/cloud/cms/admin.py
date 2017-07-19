@@ -12,7 +12,7 @@ class CMSAdmin(admin.ModelAdmin):
     # 2. customization admins cannot see anything in another customizations (get_queryset)
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
-            return None
+            return []
         return list(self.readonly_fields) + \
                [field.name for field in obj._meta.fields] + \
                [field.name for field in obj._meta.many_to_many]
