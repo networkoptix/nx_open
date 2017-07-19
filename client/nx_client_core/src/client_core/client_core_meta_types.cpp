@@ -28,7 +28,6 @@ void QnClientCoreMetaTypes::initialize()
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
-    qmlRegisterType<QnFilteringSystemsModel>("Nx.Models", 1, 0, "FilteringSystemsModel");
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 

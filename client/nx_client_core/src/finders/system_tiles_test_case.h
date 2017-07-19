@@ -15,7 +15,7 @@ enum class QnTileTest
     MaximizeAppOnCollapse,
     SwitchPage,
 
-    Count = 1
+    Count
 };
 
 class QnSystemTilesTestCase : public QObject
@@ -60,7 +60,7 @@ private: //< Tests section
 
     void switchPageTest(CompletionHandler completionHandler);
 
-    void vms6515FirstPageIsEmpty(CompletionHandler completionHandler);
+    void vms6515and6519(CompletionHandler completionHandler);
 
 private:
     void showAutohideMessage(
