@@ -60,10 +60,10 @@ QnPresetPtzController::~QnPresetPtzController()
     return;
 }
 
-bool QnPresetPtzController::extends(Ptz::Capabilities capabilities)
+bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool disableNative)
 {
     return (capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities
-        && !capabilities.testFlag(Ptz::PresetsPtzCapability)
+        && (disableNative || !capabilities.testFlag(Ptz::PresetsPtzCapability))
         && (capabilities.testFlag(Ptz::DevicePositioningPtzCapability)
             || capabilities.testFlag(Ptz::LogicalPositioningPtzCapability));
 }

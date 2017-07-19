@@ -3,7 +3,7 @@
 #include "cloud_data_provider.h"
 #include "listening_peer_pool.h"
 #include "peer_registrator.h"
-#include "mediaserver_api.h"
+#include "mediaserver_endpoint_tester.h"
 #include "server/hole_punching_processor.h"
 #include "statistics/stats_manager.h"
 
@@ -30,7 +30,7 @@ public:
 private:
     stats::StatsManager m_statsManager;
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
-    MediaserverApi m_mediaserverApi;
+    MediaserverEndpointTester m_mediaserverApi;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     HolePunchingProcessor m_cloudConnectProcessor;

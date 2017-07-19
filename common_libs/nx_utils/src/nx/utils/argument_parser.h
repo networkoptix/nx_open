@@ -17,6 +17,7 @@ class NX_UTILS_API ArgumentParser
 {
 public:
     ArgumentParser(int argc = 0, const char* argv[] = nullptr);
+    ArgumentParser(const QStringList& args);
     void parse(int argc, const char* argv[]);
 
     bool read(const QString& name, QString* const value) const;

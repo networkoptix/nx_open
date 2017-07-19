@@ -335,6 +335,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [this]
         {
             disconnectFromServer(DisconnectFlag::Force);
+            action(action::ResourcesModeAction)->setChecked(true);
         });
 
     connect(action(action::LogoutFromCloud), &QAction::triggered, this,
@@ -390,6 +391,10 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(resourceModeAction, &QAction::toggled, this,
         [this, welcomeScreen](bool checked)
         {
+            // Check if action state was changed during queued connection.
+            if (action(action::ResourcesModeAction)->isChecked() != checked)
+                return;
+
             if (welcomeScreen)
                 welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())

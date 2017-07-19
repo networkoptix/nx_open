@@ -43,7 +43,7 @@ const QString kMode = lit("mode");
 const QString kInfo = lit("info");
 const QString kKey = lit("key");
 
-// TODO: some strings can be reused when server will become translatable
+// TODO: Some strings can be reused when when the server supports translations.
 QString activationMessage(const QJsonObject& errorMessage)
 {
     QString messageId = errorMessage.value(lit("messageId")).toString();
@@ -55,13 +55,13 @@ QString activationMessage(const QJsonObject& errorMessage)
     if (messageId == lit("InvalidData"))
     {
         return lit("There was a problem activating your License Key. Invalid data received. "
-            "Please contact support team to report the issue.");
+            "Please contact the support team to report the issue.");
     }
 
     if (messageId == lit("InvalidKey"))
     {
         return lit("License Key you have entered is invalid. Please check that License Key is "
-            "entered correctly. If problem continues, please contact the support team to confirm "
+            "entered correctly. If problem persists, please contact the support team to confirm "
             "if License Key is valid or to obtain a valid License Key.");
     }
 
@@ -73,7 +73,7 @@ QString activationMessage(const QJsonObject& errorMessage)
 
     if (messageId == lit("AlreadyActivated"))
     {
-        QString message = lit("This License Key has been previously activated to Hardware ID %1 on %2. "
+        QString message = lit("This License Key has been previously activated to Hardware Id %1 on %2. "
             "Please contact the support team to obtain a valid License Key.");
 
         QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();

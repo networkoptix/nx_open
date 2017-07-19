@@ -279,10 +279,6 @@ to view more bookmarks</source>
       <translation>使用者行為記錄...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>書籤搜尋...</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>登入到 %1...</translation>
@@ -869,6 +865,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>不固定顯示通知</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -956,8 +956,8 @@ to view more bookmarks</source>
       <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
-      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1985,10 +1985,6 @@ to view more bookmarks</source>
       <translation>載入...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>攝影機 ID</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>主串流</translation>
     </message>
@@ -1999,10 +1995,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>攝影機沒有次串流</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O 模組 ID</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2027,6 +2019,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>I/O 模組無聲音串流</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2952,8 +2952,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3384,10 +3384,6 @@ to %1</source>
       <translation>無效狀態</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation>ID</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation>點擊</translation>
     </message>
@@ -3409,6 +3405,10 @@ to %1</source>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
       <translation>脈衝</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
     </message>
   </context>
   <context>
@@ -3621,12 +3621,12 @@ to %1</source>
       <translation>授權序號</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation>鎖定硬體ID</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation>功能:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3891,16 +3891,16 @@ to %1</source>
       <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
-    </message>
-    <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
       <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
     </message>
   </context>
   <context>
@@ -3926,16 +3926,16 @@ to %1</source>
       <translation>開啟檔案失敗</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation>複製硬體 ID 至剪貼簿</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>請將授權及硬體 ID 提供到 %1 以取得離線授權檔.</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4222,10 +4222,6 @@ to %1</source>
       <translation>與 %1 合併</translation>
     </message>
     <message>
-      <source>Success!</source>
-      <translation>成功!</translation>
-    </message>
-    <message>
       <source>Testing...</source>
       <translation>測試中...</translation>
     </message>
@@ -4246,16 +4242,8 @@ to %1</source>
       <translation>無法合併系統</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation>系統已成功配置.</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL 無效.</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation>遠端系統中的伺服器應該很快會出現在您的系統.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4264,6 +4252,18 @@ to %1</source>
     <message>
       <source>This is the current System URL.</source>
       <translation>這是目前的系統 URL.</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4350,12 +4350,12 @@ to %1</source>
       <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
-    </message>
-    <message>
       <source>MB/s</source>
       <translation type="unfinished">MB/s</translation>
+    </message>
+    <message>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -5111,18 +5111,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n 使用者</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n 角色</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
@@ -7067,10 +7055,6 @@ to %1</source>
       <translation>授權的總數量將減少</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation>連接到系統的伺服器</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation>密碼不可為空.</translation>
     </message>
@@ -7081,6 +7065,14 @@ to %1</source>
     <message>
       <source>Connecting to the current System...</source>
       <translation type="unfinished">Connecting to the current System...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>

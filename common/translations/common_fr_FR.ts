@@ -87,7 +87,7 @@
     <name>QObject</name>
     <message>
       <source>System Event</source>
-      <comment>Shows that bookmark was created by system event</comment>
+      <comment>Shows that the bookmark was created by a system event</comment>
       <translation type="unfinished">System Event</translation>
     </message>
   </context>
@@ -540,8 +540,8 @@
       <translation>Erreur inconnue</translation>
     </message>
     <message>
-      <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -659,16 +659,16 @@
       <translation>Licence gratuite</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>ID Matériel: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Licence à : %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Filigrane: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1478,23 +1478,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Déclencheur</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Déclencheur %1 à %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Déclencheur %1 à été activé plusieurs fois</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Envoyer Courriel</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Reconnaître</translation>
     </message>
   </context>
   <context>

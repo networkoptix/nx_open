@@ -141,12 +141,14 @@ void Connection::fillAuthInfo(bool authByKey)
     }
 
     const auto& resPool = commonModule()->resourcePool();
-    QnMediaServerResourcePtr ownServer =
-        resPool->getResourceById<QnMediaServerResource>(localPeer().id);
-    if (ownServer && authByKey)
+    QnMediaServerResourcePtr server =
+        resPool->getResourceById<QnMediaServerResource>(remotePeer().id);
+    if (!server)
+        server = resPool->getResourceById<QnMediaServerResource>(localPeer().id);
+    if (server && authByKey)
     {
-        m_httpClient->setUserName(ownServer->getId().toString().toLower());
-        m_httpClient->setUserPassword(ownServer->getAuthKey());
+        m_httpClient->setUserName(server->getId().toString().toLower());
+        m_httpClient->setUserPassword(server->getAuthKey());
     }
     else
     {

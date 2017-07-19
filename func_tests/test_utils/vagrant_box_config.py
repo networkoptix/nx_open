@@ -3,6 +3,7 @@
 Functional tests define configuration required for them indirectly (via 'box' fixture) using BoxConfig class.
 '''
 
+import os.path
 from netaddr import IPNetwork, IPAddress
 from .utils import is_list_inst, quote
 
@@ -11,7 +12,6 @@ DEFAULT_NATNET1 = '10.10.0/24'
 DEFAULT_PRIVATE_NET = '10.10.1/24'
 MEDIASERVER_LISTEN_PORT = 7001
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
-MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # expected in vagrant dir
 SSH_PORT_OFFSET=2220
 
 
@@ -46,7 +46,6 @@ class ConfigCommand(object):
             )
 
 
-# we only support address mask of 24
 def make_vm_config_internal_network_command(vbox_manage, network):
     kwargs = {}
     if network.network == network.ip:  # it is just a network, and dhcp must be used
@@ -57,8 +56,10 @@ def make_vm_config_internal_network_command(vbox_manage, network):
     kwargs['virtualbox__intnet'] = quote(network_name)
     return ConfigCommand('network', [':private_network'], kwargs)
 
-def make_vm_provision_command(script, env=None):
+def make_vm_provision_command(script, args=None, env=None):
     kwargs = dict(path=quote(script))
+    if args:
+        kwargs['args'] = '[%s]' % ', '.join(quote(arg) for arg in args)
     if env:
         kwargs['env'] = '{%s}' % ', '.join('%s: %s' % (name, value) for name, value in env.items())
     return ConfigCommand('provision', [':shell'], kwargs)
@@ -69,7 +70,8 @@ def make_vbox_host_time_disabled_command():
 
 class BoxConfigFactory(object):
 
-    def __init__(self, customization_company_name):
+    def __init__(self, mediaserver_dist_path, customization_company_name):
+        self._mediaserver_dist_path = mediaserver_dist_path
         self._customization_company_name = customization_company_name
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
@@ -83,9 +85,12 @@ class BoxConfigFactory(object):
         if not sync_time:
             vbox_commands += [make_vbox_host_time_disabled_command()]
         if install_server:
+            mediaserver_dist_fname = os.path.basename(self._mediaserver_dist_path)
             vm_commands += [make_vm_provision_command(
-                BOX_PROVISION_MEDIASERVER, env=dict(COMPANY_NAME=quote(self._customization_company_name)))]
-            required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
+                BOX_PROVISION_MEDIASERVER,
+                args=[mediaserver_dist_fname],
+                env=dict(COMPANY_NAME=quote(self._customization_company_name)))]
+            required_file_list += [self._mediaserver_dist_path,
                                    '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
         for script in provision_scripts or []:
             vm_commands += [make_vm_provision_command(script)]

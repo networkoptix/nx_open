@@ -1071,8 +1071,8 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& time)
 {
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
-        : tr("This license is already activated and linked to Hardware ID %1 on %2")
+        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware Id %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

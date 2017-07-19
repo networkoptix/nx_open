@@ -361,7 +361,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     return getDisplayedTimeInternal();
 }
 
-qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
+qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal(bool useEofItems) const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
@@ -369,7 +369,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     qint64 displayTime = AV_NOPTS_VALUE;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.reader->isEnabled() && !info.isEOF) {
+        if (info.reader->isEnabled() && (!info.isEOF || useEofItems))
+        {
             qint64 time = info.cam->getCurrentTime();
             //if (time == DATETIME_NOW)
             //    time = qnSyncTime->currentMSecsSinceEpoch()*1000;
@@ -686,7 +687,9 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
-    if (displayedTime == qint64(AV_NOPTS_VALUE) || displayedTime == DATETIME_NOW || qFuzzyIsNull(d->speed))
+    if (displayedTime == qint64(AV_NOPTS_VALUE))
+        return getDisplayedTimeInternal(/*useEofItems*/ true);
+    else if (displayedTime == DATETIME_NOW || qFuzzyIsNull(d->speed))
         return displayedTime;
     if (d->speed >= 0)
         return qMin(expectTime, displayedTime + SYNC_EPS);

@@ -8,12 +8,13 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
+#include <nx/utils/test_support/test_options.h>
 
 class DataBase: public testing::Test
 {
 public:
     DataBase():
-        m_file("/tmp/db.sqlite"),
+        m_file(nx::utils::TestOptions::temporaryDirectoryPath() + QLatin1String("/db.sqlite")),
         m_db(QSqlDatabase::addDatabase("QSQLITE", "db"))
     {
         NX_INFO(this) "Database" << m_file;

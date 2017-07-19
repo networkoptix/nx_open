@@ -301,7 +301,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
 
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), m_versionStr);
 
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: %1").arg(m_hwIdStr));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware Id: %1").arg(m_hwIdStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed To: %1").arg(m_licensedToStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: %1").arg(QLatin1String(m_sign.toHex())));
     }

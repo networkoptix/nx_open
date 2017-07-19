@@ -12,6 +12,6 @@
     "emailSubject":"מערכת הווידאו {{message.system_name}} שותפה איתך"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"גרסה {{message.id}} מוכנה לבדיקה"
   }
 }

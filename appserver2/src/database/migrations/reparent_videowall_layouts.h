@@ -5,7 +5,7 @@
 namespace ec2 {
 namespace database {
 namespace api {
-    class QueryContext;
+class QueryContext;
 }
 
 namespace migrations {

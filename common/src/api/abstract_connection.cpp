@@ -94,6 +94,8 @@ int QnAbstractConnection::sendAsyncRequest(
 {
     if (!isReady())
         return -1;
+    if (!m_url.isValid() || m_url.host().isEmpty())
+        return -1;
 
     NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!commonModule())
