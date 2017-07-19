@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <rest/server/json_rest_handler.h>
 
 class QnModuleInformationRestHandler: public QnJsonRestHandler
@@ -23,11 +24,9 @@ public:
         const QnRestConnectionProcessor* owner);
 
 private slots:
-    void closeAllSockets();
-    void removeSocket(const QSharedPointer<AbstractStreamSocket>& socket);
+    void changeModuleInformation();
 
 private:
-    QnMutex m_mutex;
-    QnWaitCondition m_condition;
+    nx::network::aio::BasicPollable m_pollable;
     std::set<QSharedPointer<AbstractStreamSocket>> m_savedSockets;
 };
