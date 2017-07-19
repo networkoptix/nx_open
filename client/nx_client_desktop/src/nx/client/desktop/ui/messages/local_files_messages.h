@@ -19,7 +19,7 @@ public:
     static void pathInvalid(QWidget* parent, const QString& path);
     static void fileExists(QWidget* parent, const QString& filename);
     static void fileIsBusy(QWidget* parent, const QString& filename);
-}
+};
 
 } // namespace messages
 } // namespace ui
