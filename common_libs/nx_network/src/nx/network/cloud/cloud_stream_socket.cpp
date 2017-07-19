@@ -359,8 +359,7 @@ bool CloudStreamSocket::isInSelfAioThread() const
 
 QString CloudStreamSocket::getForeignHostFullCloudName() const
 {
-    // TODO
-    return QString();
+    return m_cloudTunnelAttributes.remotePeerName;
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
@@ -433,6 +432,7 @@ void CloudStreamSocket::connectToEntryAsync(
                 getSocketAttributes(),
                 [this, sharedOperationGuard](
                     SystemError::ErrorCode errorCode,
+                    TunnelAttributes cloudTunnelAttributes,
                     std::unique_ptr<AbstractStreamSocket> cloudConnection)
                 {
                     //NOTE: this handler is called from unspecified thread
@@ -446,10 +446,13 @@ void CloudStreamSocket::connectToEntryAsync(
                         NX_ASSERT(!cloudConnection);
 
                     dispatch(
-                        [this, errorCode, cloudConnection = std::move(cloudConnection)]() mutable
+                        [this, errorCode,
+                            cloudTunnelAttributes = std::move(cloudTunnelAttributes),
+                            cloudConnection = std::move(cloudConnection)]() mutable
                         {
                             onCloudConnectDone(
                                 errorCode,
+                                std::move(cloudTunnelAttributes),
                                 std::move(cloudConnection));
                         });
                 });
@@ -493,6 +496,7 @@ void CloudStreamSocket::onDirectConnectDone(SystemError::ErrorCode errorCode)
 
 void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
+    TunnelAttributes cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
     NX_VERBOSE(this, lm("onCloudConnectDone. Result: %1").arg(SystemError::toString(errorCode)));
@@ -502,6 +506,7 @@ void CloudStreamSocket::onCloudConnectDone(
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
         if (errorCode != SystemError::noError)
             cloudConnection.reset();
+        m_cloudTunnelAttributes = std::move(cloudTunnelAttributes);
     }
 
     if (errorCode == SystemError::noError)

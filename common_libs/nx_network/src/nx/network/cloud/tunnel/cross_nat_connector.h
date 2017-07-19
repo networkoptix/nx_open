@@ -41,6 +41,7 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler) override;
+    virtual QString getRemotePeerName() const override;
 
     SocketAddress localAddress() const;
     void replaceOriginatingHostAddress(const QString& address);

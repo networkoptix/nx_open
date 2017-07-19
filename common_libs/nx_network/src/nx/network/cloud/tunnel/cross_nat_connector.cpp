@@ -92,6 +92,12 @@ void CrossNatConnector::connect(
         });
 }
 
+QString CrossNatConnector::getRemotePeerName() const
+{
+    // TODO
+    return QString();
+}
+
 SocketAddress CrossNatConnector::localAddress() const
 {
     return m_localAddress;

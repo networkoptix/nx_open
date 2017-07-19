@@ -104,6 +104,11 @@ public:
             });
     }
 
+    virtual QString getRemotePeerName() const override
+    {
+        return QString();
+    }
+
 private:
     std::tuple<OutgoingTunnelConnectionArgs...> m_outgoingTunnelConnectionArgs;
 };

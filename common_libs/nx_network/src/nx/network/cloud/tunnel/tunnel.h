@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <nx/network/async_stoppable.h>
@@ -6,7 +5,7 @@
 #include "nx/network/cloud/address_resolver.h"
 #include "nx/network/socket_attributes_cache.h"
 #include "nx/network/socket_common.h"
-
+#include "tunnel_attributes.h"
 
 namespace nx {
 namespace network {
