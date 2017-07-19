@@ -72,9 +72,10 @@ protected:
         ASSERT_EQ(CASS_OK, selectResult->first);
         ASSERT_TRUE(selectResult->second.next());
 
-        std::string tableName;
+        boost::optional<std::string> tableName;
         ASSERT_TRUE(selectResult->second.get(std::string("table_name"), &tableName));
-        ASSERT_EQ("relay_peers", tableName);
+        ASSERT_TRUE((bool)tableName);
+        ASSERT_EQ("relay_peers", *tableName);
     }
 
     void thenKeyspaceAndTableShouldBeCreated()

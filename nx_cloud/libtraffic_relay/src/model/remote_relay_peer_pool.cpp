@@ -99,7 +99,7 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                     return (int)CASS_ERROR_SERVER_INVALID_QUERY;
                 }
 
-                cassandra::Uuid localHostId;
+                boost::optional<cassandra::Uuid> localHostId;
                 auto getValueResult = result.second.get(0, &localHostId);
                 if (!getValueResult)
                 {
@@ -107,9 +107,15 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                     return (int)CASS_ERROR_SERVER_INVALID_QUERY;
                 }
 
+                if (!(bool)localHostId)
+                {
+                    NX_VERBOSE(this, "Local host id is NULL");
+                    return (int)CASS_ERROR_SERVER_INVALID_QUERY;
+                }
+
                 {
                     QnMutexLocker lock(&m_mutex);
-                    m_hostId = localHostId.uuidString;
+                    m_hostId = localHostId->uuidString;
                 }
 
                 return (int)CASS_OK;

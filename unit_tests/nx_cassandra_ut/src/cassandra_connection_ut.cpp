@@ -65,13 +65,20 @@ protected:
     template<typename T>
     static void getValAndAssert(const QueryResult& queryResult, const std::string& key, T* t)
     {
-        ASSERT_TRUE(queryResult.get(key, t));
+        boost::optional<T> resultValue;
+        ASSERT_TRUE(queryResult.get(key, &resultValue));
+        bool isResultEmpty = !(bool)resultValue;
+        ASSERT_TRUE((bool)resultValue);
+        *t = *resultValue;
     }
 
     template<typename T>
     static void getValAndAssert(const QueryResult& queryResult, int index, T* t)
     {
-        ASSERT_TRUE(queryResult.get(index, t));
+        boost::optional<T> resultValue;
+        ASSERT_TRUE(queryResult.get(index, &resultValue));
+        ASSERT_TRUE((bool)resultValue);
+        *t = *resultValue;
     }
 
 

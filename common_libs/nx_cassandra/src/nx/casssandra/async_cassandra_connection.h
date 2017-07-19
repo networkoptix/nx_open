@@ -92,11 +92,19 @@ private:
     const CassResult* m_result = nullptr;
     CassIterator* m_iterator = nullptr;
 
-    CassRow* nextRow() const;
+#define NX_GET_CASS_VALUE(getIndexFunc, cassValue, userValue) \
+    auto getCassValueResult = getCassValueFromIterator(getIndexFunc, &cassValue, userValue); \
+    if (cassValue == nullptr || *userValue == boost::none) \
+        return getCassValueResult;
 
-    template<typename GetIndexFunc>
-    bool getStringImpl(GetIndexFunc getIndexFunc, boost::optional<std::string>* value) const
+
+    template<typename GetIndexFunc, typename T>
+    bool getCassValueFromIterator(
+        GetIndexFunc getIndexFunc,
+        const CassValue** cassValue,
+        boost::optional<T>* userValue) const
     {
+        *cassValue = nullptr;
         if (!m_iterator)
             return false;
 
@@ -104,12 +112,19 @@ private:
         if (!row)
             return false;
 
-        const CassValue* cassValue = getIndexFunc(row);
-        if (cass_value_is_null(cassValue))
-        {
-            *value = boost::none;
-            return true;
-        }
+        *cassValue = getIndexFunc(row);
+        if (cass_value_is_null(*cassValue))
+            *userValue = boost::none;
+
+        *userValue = T();
+        return true;
+    }
+
+    template<typename GetIndexFunc>
+    bool getStringImpl(GetIndexFunc getIndexFunc, boost::optional<std::string>* value) const
+    {
+        const CassValue* cassValue;
+        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
 
         const char* stringVal;
         size_t stringValSize;
@@ -127,19 +142,8 @@ private:
     template<typename GetIndexFunc>
     bool getInetImpl(GetIndexFunc getIndexFunc, boost::optional<InetAddr>* value) const
     {
-        if (!m_iterator)
-            return false;
-
-        const CassRow* row = cass_iterator_get_row(m_iterator);
-        if (!row)
-            return false;
-
-        const CassValue* cassValue = getIndexFunc(row);
-        if (cass_value_is_null(cassValue))
-        {
-            *value = boost::none;
-            return true;
-        }
+        const CassValue* cassValue;
+        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
 
         CassInet val;
         auto result = cass_value_get_inet(cassValue, &val);
@@ -156,19 +160,8 @@ private:
     template<typename GetIndexFunc>
     bool getUuidImpl(GetIndexFunc getIndexFunc, boost::optional<Uuid>* value) const
     {
-        if (!m_iterator)
-            return false;
-
-        const CassRow* row = cass_iterator_get_row(m_iterator);
-        if (!row)
-            return false;
-
-        const CassValue* cassValue = getIndexFunc(row);
-        if (cass_value_is_null(cassValue))
-        {
-            *value = boost::none;
-            return true;
-        }
+        const CassValue* cassValue;
+        NX_GET_CASS_VALUE(getIndexFunc, cassValue, value);
 
         CassUuid val;
         auto result = cass_value_get_uuid(cassValue, &val);
@@ -176,11 +169,13 @@ private:
         if (result == CASS_OK)
         {
             (*value)->uuidString.resize(CASS_UUID_STRING_LENGTH);
-            cass_uuid_string(val, (char*)value->uuidString.data());
+            cass_uuid_string(val, (char*)((*value)->uuidString.data()));
         }
 
         return result == CASS_OK;
     }
+
+#undef NX_GET_CASS_VALUE
 };
 
 class NX_CASSANDRA_API AsyncConnection
