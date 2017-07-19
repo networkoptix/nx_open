@@ -1,7 +1,7 @@
 #pragma once
 
 #include <chrono>
-#include <list>
+#include <deque>
 #include <map>
 #include <memory>
 #include <string>
@@ -82,7 +82,7 @@ private:
     
     struct PeerContext
     {
-        std::list<ConnectionContext> connections;
+        std::deque<std::unique_ptr<ConnectionContext>> connections;
         boost::optional<DisconnectedPeerExpirationTimers::iterator> expirationTimer;
         std::list<ConnectionAwaitContext> takeConnectionRequestQueue;
     };
@@ -107,7 +107,7 @@ private:
         TakeIdleConnectionHandler completionHandler);
 
     void giveAwayConnection(
-        std::unique_ptr<AbstractStreamSocket> connection,
+        std::unique_ptr<ConnectionContext> connectionContext,
         TakeIdleConnectionHandler completionHandler);
 
     void monitoringConnectionForClosure(

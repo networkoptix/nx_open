@@ -28,7 +28,9 @@ ReverseConnectionPool::ReverseConnectionPool(
             NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
             getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
-    m_isReconnectHandlerSet(false)
+    m_isReconnectHandlerSet(false),
+    m_startTime(std::chrono::steady_clock::now()),
+    m_startTimeout(0)
 {
     bindToAioThread(getAioThread());
 }
@@ -136,6 +138,12 @@ void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions
     m_acceptor.setKeepAliveOptions(std::move(value));
 }
 
+void ReverseConnectionPool::setStartTimeout(std::chrono::milliseconds value)
+{
+    m_startTime = std::chrono::steady_clock::now();
+    m_startTimeout = value;
+}
+
 void ReverseConnectionPool::stopWhileInAioThread()
 {
     m_mediatorConnection.reset();
@@ -176,7 +184,9 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
             else
             {
                 NX_LOGX(lm("Could not register on mediator by %1: %2")
-                    .args(m_acceptor.selfHostName(), code), cl_logWARNING);
+                    .args(m_acceptor.selfHostName(), code),
+                    (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
+                        ? cl_logWARNING : cl_logDEBUG1);
             }
 
             if (!m_isReconnectHandlerSet)
