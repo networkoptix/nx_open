@@ -73,7 +73,7 @@ public:
 
     /**
      * These functions return true if query itself is successful. If function returned true, but
-     * 'value' is equal to boost::none, than corresponding DB value is equal to NULL.
+     * 'value' is equal to boost::none, then corresponding DB value is equal to NULL.
      */
     bool get(const std::string& key, boost::optional<std::string>* value) const;
     bool get(const std::string& key, boost::optional<bool>* value) const;
