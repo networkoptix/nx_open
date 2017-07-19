@@ -45,6 +45,7 @@ bool isLowMediaQuality(MediaQuality q);
 struct QnAbstractMediaData;
 struct QnEmptyMediaData;
 struct QnAbstractCompressedMetadata;
+struct QnCompressedMetadata;
 struct QnMetaDataV1;
 struct QnMetaDataV1Light;
 
@@ -55,6 +56,9 @@ using QnEmptyMediaDataPtr = std::shared_ptr<QnEmptyMediaData>;
 
 using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
 using QnConstAbstractCompressedMetadataPtr = std::shared_ptr<const QnAbstractCompressedMetadata>;
+
+using QnCompressedMetadataPtr = std::shared_ptr<QnCompressedMetadata>;
+using QnConstCompressedMetadataPtr = std::shared_ptr<const QnCompressedMetadata>;
 
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
@@ -186,6 +190,19 @@ public:
     MetadataType metadataType;
     qint64 m_duration;
     QnByteArray m_data;
+};
+
+
+struct QnCompressedMetadata: public QnAbstractCompressedMetadata
+{
+    QnCompressedMetadata(MetadataType type);
+    QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator);
+
+    virtual QnAbstractMediaData* clone(
+        QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
+    virtual const char* data() const override;
+    virtual size_t dataSize() const override;
+    virtual bool setData(const char* data, std::size_t dataSize);
 };
 
 /**
