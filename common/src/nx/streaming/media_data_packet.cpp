@@ -510,3 +510,38 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, Qn
             : 0)
 {
 }
+
+//------------------------------------ QnCompressedMetadata --------------------------------------
+
+QnCompressedMetadata::QnCompressedMetadata(MetadataType type):
+    QnAbstractCompressedMetadata(MetadataType::ObjectDetection)
+{
+}
+
+QnCompressedMetadata::QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
+    QnAbstractCompressedMetadata(MetadataType::ObjectDetection, allocator)
+{
+}
+
+QnAbstractMediaData* QnCompressedMetadata::clone(QnAbstractAllocator* allocator) const
+{
+    QnCompressedMetadata* cloned = new QnCompressedMetadata(metadataType, allocator);
+    cloned->assign(this);
+    cloned->m_data.write(m_data.constData(), m_data.size());
+    return cloned;
+}
+
+const char* QnCompressedMetadata::data() const
+{
+    return m_data.constData();
+}
+
+size_t QnCompressedMetadata::dataSize() const
+{
+    return m_data.size();
+}
+
+bool QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
+{
+    return m_data.write(data, dataSize) != 0;
+}
