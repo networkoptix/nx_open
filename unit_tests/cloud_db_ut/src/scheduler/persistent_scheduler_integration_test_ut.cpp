@@ -38,7 +38,7 @@ protected:
         if (scheduler)
             scheduler->stop();
 
-        // mind destruction order
+        // destruction order is important
         scheduler.reset();
         executor.reset();
         dbHelper.reset();
@@ -165,25 +165,26 @@ protected:
         user1Task1Id = u1t1f.get();
     }
 
-    void whenFirstUserSchedulesALongTaskWithNewSubscribeInside()
+    void whenUserDecidesToSubscribeFromTimerFunction()
     {
-        whenFirstUserSchedulesALongTask();
         user1->setShouldSubscribe();
     }
 
-    void whenFirstUserSchedulesALongTaskWithUnSubscribeInside()
+    void whenUserDecidesToUnSubscribeFromTimerFunction()
     {
-        whenFirstUserSchedulesALongTask();
         user1->setShouldUnsubscribe(
             user1Task1Id,
-            [this](const QnUuid& taskId, const SchedulerUser::Task&)
+            [this](const QnUuid& taskId, const SchedulerUser::Task& task)
             {
                 unsubsribeCalledIds.emplace(taskId);
+                user1Task1FiredWhileUnsubscribe = task.fired;
             });
     }
 
     void andWhenTimeToFireComesButServerIsOffline()
     {
+        TearDown();
+        qWarning() << "Server stopped";
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
@@ -383,14 +384,14 @@ protected:
     void thenTaskShouldHaveAlreadyUnsubscribed()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(0U, user1Tasks.size());
         ASSERT_NE(unsubsribeCalledIds.find(user1Task1Id), unsubsribeCalledIds.cend());
     }
 
     void thenNoNewFires()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(0U, user1Tasks.size());
+        ASSERT_EQ(1U, user1Tasks.size());
+        ASSERT_LE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe, 1);
     }
 
     QString dbPath;
@@ -524,13 +525,14 @@ TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_TaskTimeExpiresWhenSer
 
 TEST_F(SchedulerIntegrationTest, SubscribeFromExpiredTask)
 {
-    whenFirstUserSchedulesALongTaskWithNewSubscribeInside();
+    whenFirstUserSchedulesALongTask();
     andWhenSchedulerWorksForSomeTime();
     thenLongTaskNotFiredYet();
 
     andWhenTimeToFireComesButServerIsOffline();
     andWhenSystemRestarts();
     whenFirstUserInitializedAndRegisteredToScheduler();
+    whenUserDecidesToSubscribeFromTimerFunction();
     andWhenSchedulerWorksForSomeVeryShortTime();
     thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed();
 
@@ -541,13 +543,14 @@ TEST_F(SchedulerIntegrationTest, SubscribeFromExpiredTask)
 
 TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
 {
-    whenFirstUserSchedulesALongTaskWithUnSubscribeInside();
+    whenFirstUserSchedulesALongTask();
     andWhenSchedulerWorksForSomeTime();
     thenLongTaskNotFiredYet();
 
     andWhenTimeToFireComesButServerIsOffline();
     andWhenSystemRestarts();
     whenFirstUserInitializedAndRegisteredToScheduler();
+    whenUserDecidesToUnSubscribeFromTimerFunction();
     andWhenSchedulerWorksForSomeVeryShortTime();
     thenTaskShouldHaveAlreadyUnsubscribed();
 

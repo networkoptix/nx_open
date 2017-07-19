@@ -50,6 +50,8 @@ const QLatin1String kDefaultCdbPassword("123456");
 const QLatin1String kCdbUpdateInterval("cloud_db/updateIntervalSec");
 const std::chrono::seconds kDefaultCdbUpdateInterval(std::chrono::minutes(10));
 
+const QLatin1String kCdbStartTimeout("cloud_db/startTimeout");
+
 //STUN
 const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
 const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
@@ -259,6 +261,10 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(settings().value(
             kCdbUpdateInterval,
             static_cast<qulonglong>(kDefaultCdbUpdateInterval.count())).toString()));
+    m_cloudDB.startTimeout = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(settings().value(
+            kCdbStartTimeout,
+            static_cast<qulonglong>((m_cloudDB.updateInterval * 5).count())).toString()));
 
     readEndpointList(
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
