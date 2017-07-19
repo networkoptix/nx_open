@@ -43,7 +43,8 @@ void RemoteRelayPeerPool::prepareDbStructure()
                         domain_suffix_2     text, \
                         domain_suffix_3     text, \
                         domain_name_tail    text, \
-                        PRIMARY KEY (relay_id, domain_suffix_1, domain_suffix_2, domain_suffix_3) \
+                        PRIMARY KEY (relay_id, domain_suffix_1, domain_suffix_2, domain_suffix_3, \
+                            domain_name_tail) \
                     );");
             })
         .then(

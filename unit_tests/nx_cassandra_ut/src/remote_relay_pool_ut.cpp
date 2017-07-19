@@ -44,7 +44,9 @@ protected:
         m_relayToDomainTestData.push_back(
             std::make_pair("3CB0A381-A6A1-4905-A1E9-E1CF743A7042", "someServer3.com"));
         m_relayToDomainTestData.push_back(
-            std::make_pair("68094200-0598-46B9-AE5D-9F08DF45C062", "someServer4.nx.network.org"));
+            std::make_pair(
+                "68094200-0598-46B9-AE5D-9F08DF45C062",
+                "someServer4.subdomain.nx.network.org"));
     }
 
     void givenDbWithNotExistentCdbKeyspace() {}
