@@ -61,14 +61,16 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 
 				#Gets the meta_settings form the DataStructure to check if the sizes are valid
 				data_structure_meta_string = data_structure.meta_settings
-				#ast.literal_eval used to convert string to dict
-				data_structure_meta = ast.literal_eval(data_structure_meta_string)
+				#if the length is zero then there is no meta settings
+				if len(data_structure_meta_string):
+					#ast.literal_eval used to convert string to dict
+					data_structure_meta = ast.literal_eval(data_structure_meta_string)
 
-				size_errors = check_image_dimensions(data_structure_name, data_structure_meta, dimensions)
+					size_errors = check_image_dimensions(data_structure_name, data_structure_meta, dimensions)
 
-				if size_errors:
-					upload_errors.extend(size_errors)
-					continue
+					if size_errors:
+						upload_errors.extend(size_errors)
+						continue
 			#If file was not uploaded remove it if user chooses to delete it
 			elif "Remove_" + data_structure_name in request_data:
 				new_record_value = ""
