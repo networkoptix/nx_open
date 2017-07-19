@@ -177,7 +177,7 @@ private:
     {
         auto socket = std::make_unique<TestCloudStreamSocket>();
         socket->setForeignHostFullCloudName(m_hlsServerFullCloudName);
-        return socket;
+        return std::move(socket);
     }
 };
 
