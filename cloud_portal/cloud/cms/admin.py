@@ -39,13 +39,6 @@ admin.site.register(Product, ProductAdmin)
 class ContextAdmin(CMSAdmin):
     list_display = ('product', 'name', 'description', 'url', 'translatable', 'context_actions')
 
-    class Meta:
-        verbose_name = 'Content page'
-        verbose_name_plural = 'Content pages'
-        permissions = (
-            ("edit_content", "Can edit content and send for review"),
-        )
-
     def context_actions(self, obj):
         return format_html('<a class="button" href="{}">edit content</a>',
                             reverse('context_editor', args=[obj.id]))
@@ -82,11 +75,6 @@ class ContentVersionAdmin(CMSAdmin):
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by',
                     'content_version_actions')
-
-    class Meta:
-        permissions = (
-            ("publish_version", "Can publish content to production"),
-        )
 
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',

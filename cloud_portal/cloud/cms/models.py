@@ -17,6 +17,13 @@ class Product(models.Model):
 
 
 class Context(models.Model):
+    class Meta:
+        verbose_name = 'Content page'
+        verbose_name_plural = 'Content pages'
+        permissions = (
+            ("edit_content", "Can edit content and send for review"),
+        )
+
     product = models.ForeignKey(Product, null=True)
     name = models.CharField(max_length=1024)
     description = models.TextField()
@@ -75,6 +82,11 @@ class Customization(models.Model):
 # CMS data. Partners can change that
 
 class ContentVersion(models.Model):
+    class Meta:
+        permissions = (
+            ("publish_version", "Can publish content to production"),
+        )
+
     customization = models.ForeignKey(Customization)
     name = models.CharField(max_length=1024)
 
