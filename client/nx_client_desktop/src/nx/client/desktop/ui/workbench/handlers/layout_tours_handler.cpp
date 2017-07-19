@@ -101,7 +101,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
                 if (other.name == name)
                 {
-                    if (!ui::resources::overrideLayoutTour(mainWindow()))
+                    if (!ui::messages::Resources::overrideLayoutTour(mainWindow()))
                         return;
 
                     layoutTourManager()->removeTour(other.id);
@@ -243,18 +243,27 @@ void LayoutToursHandler::submitState(QnWorkbenchState* state)
 void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
 {
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
+    auto stateManager = qnClientCoreModule->layoutTourStateManager();
+
     if (const auto connection = commonModule()->ec2Connection())
     {
         int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
-            [tour](int /*reqId*/, ec2::ErrorCode errorCode)
+            [tour, stateManager](int reqId, ec2::ErrorCode errorCode)
             {
-                qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, false);
+                stateManager->removeSaveRequest(tour.id, reqId);
+                if (stateManager->hasSaveRequests(tour.id))
+                    return;
+
+                stateManager->markBeingSaved(tour.id, false);
                 if (errorCode == ec2::ErrorCode::ok)
-                    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, false);
+                    stateManager->markChanged(tour.id, false);
             });
         const bool success = (reqId > 0);
         if (success)
-            qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, true);
+        {
+            stateManager->markBeingSaved(tour.id, true);
+            stateManager->addSaveRequest(tour.id, reqId);
+        }
     };
 }
 

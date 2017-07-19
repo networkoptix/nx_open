@@ -63,3 +63,37 @@ if(ANDROID)
         KEYSTORE_KEY_PASSWORD "31O2zNNy"
     )
 endif()
+
+if(IOS)
+    configure_file("maven/filter-resources/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
+
+    set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
+
+    if(beta)
+        configure_file("maven/filter-resources/mobile_client-beta.entitlements"
+            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+        set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
+    else()
+        configure_file("maven/filter-resources/mobile_client-release.entitlements"
+            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+        set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
+    endif()
+
+    execute_process(
+        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/shell/get_provisioning_id.sh" "${provisioning_profile}"
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE provisioning_profile_id
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
+    endif()
+
+    set_target_properties(mobile_client PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+        XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+    )
+endif()

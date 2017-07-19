@@ -99,6 +99,20 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
     emit imageChanged(data.thumbnail);
 }
 
+bool QnCameraThumbnailManager::autoRotate() const
+{
+    return m_autoRotate;
+}
+
+void QnCameraThumbnailManager::setAutoRotate(bool value)
+{
+    if (m_autoRotate == value)
+        return;
+
+    m_autoRotate = value;
+    forceRefreshThumbnails();
+}
+
 QSize QnCameraThumbnailManager::thumbnailSize() const
 {
     return m_thumbnailSize;
@@ -242,6 +256,9 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
     request.imageFormat = QnThumbnailRequestData::JpgFormat;
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
     request.format = Qn::SerializationFormat::UbjsonFormat;
+    request.rotation = m_autoRotate
+        ? QnThumbnailRequestData::kDefaultRotation
+        : 0;
 
     if (!commonModule()->currentServer())
         return kInvalidHandle;

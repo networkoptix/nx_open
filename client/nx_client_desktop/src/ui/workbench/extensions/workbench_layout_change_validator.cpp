@@ -53,6 +53,6 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     if (inaccessible.isEmpty())
         return true;
 
-    return nx::client::desktop::ui::resources::changeVideoWallLayout(mainWindow(), inaccessible);
+    return nx::client::desktop::ui::messages::Resources::changeVideoWallLayout(mainWindow(), inaccessible);
 }
 

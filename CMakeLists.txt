@@ -58,6 +58,7 @@ include(test_utils)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+set(static_customization_dir "$ENV{environment}/customization/${customization}")
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
