@@ -14,7 +14,7 @@ class AccountAdmin(CMSAdmin):
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
-        if obj.is_superuser and not obj.endswith(settings.SUPERUSER_DOMAIN):
+        if obj.is_superuser and not obj.email.endswith(settings.SUPERUSER_DOMAIN):
             obj.is_superuser = False
 
         # if this is superuser - make him is_staff too
