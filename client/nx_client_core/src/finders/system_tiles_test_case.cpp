@@ -146,8 +146,8 @@ QString getMessage(QnTileTest test)
 {
     static const QHash<int, QString> kMessages =
         {
-            { castTileToInt(QnTileTest::VMS_6515_FirstPageIsEmpty),
-                lit("VMS 6515 - empty first page after swich from another one")},
+            { castTileToInt(QnTileTest::Vms6515And6519),
+                lit("VMS 6515/6519 - wrong page/empty tiles on first page")},
             { castTileToInt(QnTileTest::ChangeWeightOnCollapse),
                 lit("change order of systems on tile collapse")},
             { castTileToInt(QnTileTest::ChangeVersion),
@@ -233,7 +233,7 @@ void QnSystemTilesTestCase::startTest(
         {
             switch(test)
             {
-                case QnTileTest::VMS_6515_FirstPageIsEmpty:
+                case QnTileTest::Vms6515And6519:
                     vms6515and6519(completionHandler);
                     break;
                 case QnTileTest::ChangeWeightOnCollapse:
@@ -395,7 +395,7 @@ void QnSystemTilesTestCase::vms6515and6519(CompletionHandler completionHandler)
       */
     const auto systems = createSeveralSystems(9 , m_finder);
     const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
-        QnTileTest::VMS_6515_FirstPageIsEmpty, completionHandler, systems.guard, this);
+        QnTileTest::Vms6515And6519, completionHandler, systems.guard, this);
 
     const auto switchToFirstPage =
         [this, completionGuard]()
