@@ -20,6 +20,8 @@ from django.views.generic.base import TemplateView
 import settings
 # from django.views.generic.base import RedirectView
 
+admin.autodiscover()
+
 urlpatterns = [
     url(r'^admin/cms/', include('cms.urls')),
     url(r'^admin/', include(admin.site.urls)),
