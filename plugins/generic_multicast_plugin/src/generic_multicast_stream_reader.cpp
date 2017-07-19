@@ -71,7 +71,7 @@ bool GenericMulticastStreamReader::open()
         kBufferSize,
         kReadOnlyBufferFlag,
         m_ioDevice.get(),
-        readFromQIODevice,
+        readFromIoDevice,
         nullptr,
         nullptr);
 
@@ -81,6 +81,8 @@ bool GenericMulticastStreamReader::open()
         return false;
 
     m_formatContext->pb = avioContext;
+    m_formatContext->interrupt_callback.callback = checkIoDevice;
+    m_formatContext->interrupt_callback.opaque = m_ioDevice.get();
 
     if (avformat_open_input(&m_formatContext, "", nullptr, nullptr) < 0)
         return false;

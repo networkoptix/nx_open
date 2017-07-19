@@ -34,7 +34,8 @@ struct CloudDb
     boost::optional<QUrl> url;
     QString user;
     QString password;
-    std::chrono::seconds updateInterval;
+    std::chrono::seconds updateInterval{0};
+    std::chrono::seconds startTimeout{0};
 
     CloudDb():
         runWithCloud(true)
