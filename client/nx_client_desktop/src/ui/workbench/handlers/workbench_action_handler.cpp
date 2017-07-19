@@ -783,7 +783,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
-        if (!ui::videowall::checkLocalFiles(mainWindow(), index, resources, true))
+        if (!messages::Videowall::checkLocalFiles(mainWindow(), index, resources, true))
             return;
     }
 
@@ -1684,7 +1684,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
         }
         else if (checkedFlags == Qn::videowall)
         {
-            ui::videowall::anotherVideoWall(mainWindow());
+            messages::Videowall::anotherVideoWall(mainWindow());
         }
         else if (checkedFlags == Qn::local_media)
         {
@@ -1812,7 +1812,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (ui::resources::deleteResources(mainWindow(), resources))
+    if (ui::messages::Resources::deleteResources(mainWindow(), resources))
         qnResourcesChangesManager->deleteResources(resources);
 }
 

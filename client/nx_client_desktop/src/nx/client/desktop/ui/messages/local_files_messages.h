@@ -1,6 +1,6 @@
 #pragma once
 
-#include <text/tr_functions.h>
+#include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
