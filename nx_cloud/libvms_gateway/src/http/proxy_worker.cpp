@@ -1,5 +1,6 @@
 #include "proxy_worker.h"
 
+#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
@@ -22,6 +23,8 @@ ProxyWorker::ProxyWorker(
     m_proxyingId(++m_proxyingIdSequence)
 {
     using namespace std::placeholders;
+
+    replaceTargetHostWithFullCloudNameIfAppropriate(connectionToTheTargetPeer.get());
 
     NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
         .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
@@ -76,6 +79,23 @@ void ProxyWorker::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_targetHostPipeline.reset();
+}
+
+void ProxyWorker::replaceTargetHostWithFullCloudNameIfAppropriate(
+    const AbstractStreamSocket* connectionToTheTargetPeer)
+{
+    auto cloudStreamSocket =
+        dynamic_cast<const nx::network::cloud::CloudStreamSocket*>(connectionToTheTargetPeer);
+    if (!cloudStreamSocket)
+        return;
+    
+    auto foreignHostFullCloudName = cloudStreamSocket->getForeignHostFullCloudName();
+    if (foreignHostFullCloudName.isEmpty())
+        return;
+    if (!foreignHostFullCloudName.endsWith(m_targetHost))
+        return; //< We only make address more precise here, not replacing it.
+
+    m_targetHost = cloudStreamSocket->getForeignHostFullCloudName().toUtf8();
 }
 
 void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)

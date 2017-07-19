@@ -84,6 +84,8 @@ public:
 
     virtual bool isInSelfAioThread() const override;
 
+    virtual QString getForeignHostFullCloudName() const;
+
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
         SocketResultPrimisePtr;

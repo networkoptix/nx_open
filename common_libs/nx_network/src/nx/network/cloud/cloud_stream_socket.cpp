@@ -357,6 +357,12 @@ bool CloudStreamSocket::isInSelfAioThread() const
     return m_aioThreadBinder.isInSelfAioThread();
 }
 
+QString CloudStreamSocket::getForeignHostFullCloudName() const
+{
+    // TODO
+    return QString();
+}
+
 void CloudStreamSocket::connectToEntriesAsync(
     std::deque<AddressEntry> dnsEntries,
     int port,
