@@ -19,6 +19,7 @@ public:
     ArgumentParser(int argc = 0, const char* argv[] = nullptr);
     ArgumentParser(const QStringList& args);
     void parse(int argc, const char* argv[]);
+    void parse(const QStringList& args);
 
     bool read(const QString& name, QString* const value) const;
     bool read(const QString& name, int* const value) const;

@@ -217,8 +217,8 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
         m_startBufferingTime = data->timestamp - bufferSizeMs * 1000;
     }
 
-    bool CanDropLateAudio = !m_sound || m_sound->state() != QAudio::State::ActiveState;
-    if (CanDropLateAudio && data && data->timestamp < minTime)
+    bool canDropLateAudio = !m_sound || m_sound->state() != QAudio::State::ActiveState;
+    if (canDropLateAudio && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
         m_startBufferingTime = data->timestamp;

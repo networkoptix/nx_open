@@ -90,11 +90,11 @@
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Di chuyển lên</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>cuộn xuống</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -340,7 +340,7 @@ Press ESC to cancel</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
   </context>
   <context>
@@ -659,11 +659,11 @@ Do you want to delete it anyway?</translation>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 Tb</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -882,7 +882,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
     <message>
       <source>Help</source>
@@ -893,7 +893,7 @@ Do you want to delete it anyway?</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
     <message>
       <source>Save</source>
@@ -975,7 +975,7 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>tất cả các file (*.*)</translation>
     </message>
   </context>
   <context>

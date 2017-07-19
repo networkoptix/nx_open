@@ -37,8 +37,8 @@ class ServerFactory(object):
             else:
                 box = self._vagrant_box_factory(must_be_recreated=config.leave_initial_cloud_host)
             server = box.get_server(config)
+        self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
         self._prepare_server(config, server)
-        self._allocated_servers.append(server)
         log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
                  server.title, server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
         return server

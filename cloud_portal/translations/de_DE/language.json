@@ -29,7 +29,7 @@
     "restorePassword":"Passwort zurücksetzen -",
     "restorePasswordSuccess":"Passwort gespeichert -",
     "restorePasswordCode":"Passwort zurücksetzen -",
-    "view":"View cameras - ",
+    "view":"Kameras ansehen - ",
     "contentPage":"",
     "debug":"Debug",
     "login":"Anmelden -",
@@ -117,7 +117,7 @@
     "cantEditAdmin":"Dieser Benutzer hat Administratorberechtigungen",
     "cantOpenClient":"Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
     "lostConnection":"Verbindung zu {{systemName}} verloren",
-    "thisSystem":"the system"
+    "thisSystem":"das System"
   },
   "passwordRequirements":{
     "minLengthMessage":"Passwort muss mindestens 8 Zeichen enthalten",
@@ -214,7 +214,7 @@
     "createAccount":"Account erstellen"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Alle Systeme",
     "systems":"Systeme"
   }
 }

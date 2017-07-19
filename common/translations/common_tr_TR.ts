@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -486,22 +494,6 @@
         <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>Girdiğiniz Lisans Anahtarı Geçersiz. Lütfen Girdiğiniz Lisans Anahtarını Kontrol Ediniz. Sorun Devam Ederse Lisans Anahtarının Geçerli Olup Olmadığını Doğrulamak veya Geçerli Bir Lisans Anahtarı Edinmek İçin Lütfen Destek Birimiyle İletişime Geçiniz.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Yazılımınızla Uyuşmayan Bir Lisans Etkinleştirmeye Çalışıyorsunuz. Geçerli Bir Lisans Anahtarı Edinmek İçin LÜtfen Destek Birimiyle İletişime Geçin.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Lisans Anahtarınızı Etkinleştirirken Bir Sorun Oluştu. Bir Veri Tabanı Hatası Meydana Geldi.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Lisans Anahtarınızı Etkinleştirirken Bir Sorun Oluştu. Geçersiz Veri Alındı. Lütfen Sorunu Bildirmek İçin Destek Birimiyle İletişime Geçin.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -516,21 +508,12 @@
         <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>Bu %1 hardware ID daha önce %2 üzerine kaydedilmiş. Lütfen destek birimiyle iletişim kurun.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>Geçersiz imza</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -555,6 +538,10 @@
     <message>
       <source>Unknown error</source>
       <translation>Bilinmeyen Hata</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -672,16 +659,16 @@
       <translation>ÜCRETSİZ Lisans</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Lisans sahibi: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1050,10 +1037,6 @@
       <translation>Panik Kaydı</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>E-Posta Gönder</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>Günlüğe Yaz</translation>
     </message>
@@ -1151,10 +1134,6 @@
     <message>
       <source>Any Event</source>
       <translation>Herhangi Bir Durum</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1273,16 +1252,8 @@
       <translation>%1 Genel Durum</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>Bilinmeyen Bir Durum Oluştu</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1504,6 +1475,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>En az bir kullanıcı seçin</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

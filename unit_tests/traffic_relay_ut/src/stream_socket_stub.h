@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/aio/timer.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/byte_stream/pipeline.h>
@@ -16,6 +17,10 @@ class StreamSocketStub:
 
 public:
     StreamSocketStub();
+    ~StreamSocketStub();
+
+    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void readSomeAsync(
         nx::Buffer* const /*buffer*/,
@@ -32,12 +37,17 @@ public:
     void setConnectionToClosedState();
     void setForeignAddress(const SocketAddress& endpoint);
 
+    void setPostDelay(boost::optional<std::chrono::milliseconds> postDelay);
+
 private:
+    nx::Buffer* m_readBuffer = nullptr;
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     nx::network::TCPSocket m_delegatee;
     nx::utils::bstream::ReflectingPipeline m_reflectingPipeline;
     SocketAddress m_foreignAddress;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    boost::optional<std::chrono::milliseconds> m_postDelay;
+    network::aio::Timer m_timer;
 };
 
 } // namespace test

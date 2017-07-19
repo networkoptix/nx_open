@@ -85,7 +85,7 @@ public:
         const std::string& user,
         const std::string& password,
         std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL,
-        std::chrono::milliseconds startTimeout = {0});
+        std::chrono::milliseconds startTimeout = std::chrono::milliseconds::zero());
     ~CloudDataProvider();
 
     virtual boost::optional< System > getSystem(const String& systemId) const override;
@@ -93,7 +93,7 @@ public:
 private:
     const std::chrono::milliseconds m_updateInterval;
     const std::chrono::steady_clock::time_point m_startTime;
-    const boost::optional<std::chrono::milliseconds> m_startTimeout;
+    const std::chrono::milliseconds m_startTimeout;
 
     void updateSystemsAsync();
 
