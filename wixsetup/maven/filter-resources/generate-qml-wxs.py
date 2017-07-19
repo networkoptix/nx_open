@@ -2,8 +2,8 @@ import os, sys, subprocess
 from subprocess import Popen, PIPE
 
 # Windows only
-target_bin_path = '${target_bin_path}'.replace("/", "\\")
-qtdir = '${qt.dir}'.replace("/", "\\")
+target_bin_path = os.path.normcase('${target_bin_path}')
+qtdir = os.path.normcase('${qt.dir}')
 qmldir = os.path.join(qtdir, 'qml')
 qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
 

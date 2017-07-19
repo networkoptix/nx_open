@@ -14,7 +14,7 @@
   <Property Id="ARPNOREPAIR" Value="1" />
   <Property Id="ARPNOMODIFY" Value="1" />
 
-  <Icon Id="favicon.ico" SourceFile="favicon.ico"/>
+  <Icon Id="favicon.ico" SourceFile="${customization.dir}/icons/all/favicon.ico"/>
 
 
   <!-- Set up ARPINSTALLLOCATION property -->
@@ -30,7 +30,7 @@
         <Directory Id="Common" Name="Common">
             <Directory Id="Resource" Name="Resource">
                 <Component Id="AlwaysFiles">
-                    <File Id="alwayseve.ico" Name="favicon.ico" Source="favicon.ico"/>
+                    <File Id="alwayseve.ico" Name="favicon.ico" Source="${customization.dir}/icons/all/favicon.ico"/>
                 </Component>
             </Directory>
         </Directory>

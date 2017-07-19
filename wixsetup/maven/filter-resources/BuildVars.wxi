@@ -81,8 +81,9 @@
     <?endif?>
 
     <?define SourceDir="${target_bin_path}"?>
-    <?define NxtoolSourceDir="${libdir}/bin/${build.configuration}"?>
-    <?define PluginsDir="${libdir}/bin/${build.configuration}/plugins"?>
+    <?define CustomizationDir="${customization.dir}"?>
+    <?define NxtoolSourceDir="${target_bin_path}"?>
+    <?define PluginsDir="${target_bin_path}/plugins"?>
     <?define QtDir="${qt.dir}/bin"?>
     <?define QtPluginsDir="${qt.dir}/plugins"?>
 

@@ -136,26 +136,27 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-	add_subdirectory(wixsetup)
+    add_subdirectory(traytool)
+    add_subdirectory(wixsetup)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
-#include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
+include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-#add_subdirectory(common_libs)
-#add_subdirectory(common)
-#add_subdirectory(appserver2)
-#add_subdirectory(nx_cloud)
+add_subdirectory(common_libs)
+add_subdirectory(common)
+add_subdirectory(appserver2)
+add_subdirectory(nx_cloud)
 
 if(withMediaServer)
-#    add_subdirectory(mediaserver_core)
-#    add_subdirectory(mediaserver)
-#    add_subdirectory(plugins)
-#    add_subdirectory(storage_plugins)
+    add_subdirectory(mediaserver_core)
+    add_subdirectory(mediaserver)
+    add_subdirectory(plugins)
+    add_subdirectory(storage_plugins)
 endif()
 
 if(withDesktopClient OR withMobileClient)
-#    add_subdirectory(client)
+    add_subdirectory(client)
 endif()
 
 if(withTests)
