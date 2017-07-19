@@ -399,7 +399,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     //TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
-#ifndef __arm__
+#if !defined(__arm__) && !defined(__aarch64__)
     QnPerformanceTest::detectLightMode();
 #else
     // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
