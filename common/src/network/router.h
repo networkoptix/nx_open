@@ -2,14 +2,15 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <nx/utils/thread/mutex.h>
 
-#include <nx/utils/singleton.h>
-#include <nx/network/http/httptypes.h>
-#include <nx/network/socket_common.h>
 #include <common/common_module_aware.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
-class QnModuleFinder;
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 struct QnRoute
 {
@@ -30,14 +31,15 @@ class QnRouter: public QObject, public QnCommonModuleAware
 public:
     explicit QnRouter(
         QObject* parent,
-        QnModuleFinder *moduleFinder);
+        nx::vms::discovery::Manager* moduleManager);
     ~QnRouter();
 
     // todo: new routing functions below. We have to delete above functions
     QnRoute routeTo(const QnUuid &id);
     void updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id);
+
 private:
-    const QnModuleFinder *m_moduleFinder;
+    const nx::vms::discovery::Manager* m_moduleManager;
 };
 
 #endif // ROUTER_H

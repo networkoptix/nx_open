@@ -50,11 +50,11 @@ bool insertOrReplaceTour(const QSqlDatabase& database, const ApiLayoutTourData& 
         )
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     QnSql::bind(tour, &query);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool removeTourInternal(const QSqlDatabase& database, const QnUuid& tourId)
@@ -64,11 +64,11 @@ bool removeTourInternal(const QSqlDatabase& database, const QnUuid& tourId)
     )sql");
 
     QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(tourId.toRfc4122());
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool removeItems(const QSqlDatabase& database, const QnUuid& tourId)
@@ -78,11 +78,11 @@ bool removeItems(const QSqlDatabase& database, const QnUuid& tourId)
     )sql");
 
     QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(tourId.toRfc4122());
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
@@ -94,23 +94,23 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
     const QString queryStr(R"sql(
         INSERT INTO vms_layout_tour_items (
             tourId,
-            layoutId,
+            resourceId,
             delayMs
         ) VALUES (
             :tourId,
-            :layoutId,
+            :resourceId,
             :delayMs
         )
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     for (const ApiLayoutTourItemData& item: tour.items)
     {
         ApiLayoutTourItemWithRefData ref(item, tour.id);
         QnSql::bind(ref, &query);
-        if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
             return false;
     }
 
@@ -133,10 +133,10 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
         ORDER BY id
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QSqlQuery queryItems(database);
@@ -147,10 +147,10 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
         ORDER BY tourId
     )sql");
 
-    if (!QnDbHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
         return false;
 
-    if (!QnDbHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
         return false;
 
     QnSql::fetch_many(query, &tours);

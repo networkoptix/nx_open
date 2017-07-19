@@ -22,7 +22,7 @@ protected:
 
     void whenSentRequest(const nx_http::StringType& requestPath)
     {
-        assertRequestIsDispatched(requestPath, nx_http::Method::GET);
+        assertRequestIsDispatched(requestPath, nx_http::Method::get);
     }
 
     void thenParametersHaveBeenPassedToTheHandler(

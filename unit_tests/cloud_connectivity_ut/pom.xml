@@ -18,7 +18,7 @@
 
     <properties>
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -ludt -lcloud_db_client -lconnection_mediator -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lconnection_mediator -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
         <guid>${cloud_connectivity_ut.guid}</guid>
 

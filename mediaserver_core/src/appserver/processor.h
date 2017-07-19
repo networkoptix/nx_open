@@ -52,7 +52,7 @@ private:
         QnVirtualCameraResourcePtr cameraResource;
     };
     QMap<QString, LockData> m_lockInProgress;
-    ec2::QnMutexCameraDataHandler* m_cameraDataHandler;
+    ec2::QnMutexCameraDataHandler* m_cameraDataHandler = nullptr;
     QnMutex m_mutex;
 
 private:

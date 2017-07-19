@@ -88,11 +88,6 @@ public:
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
-    /**
-     *  Get full error message from activation server
-     */
-    static QString activationMessage(const QJsonObject& errorMessage);
-
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 
@@ -223,7 +218,8 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
     Q_OBJECT
     using base_type = QnLicenseUsageHelper;
 public:
-    QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
+    QnVideoWallLicenseUsageHelper(QObject *parent);
+    QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
@@ -234,7 +230,9 @@ protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 private:
-    int m_proposed;
+    void init();
+private:
+    int m_proposed = 0;
 };
 
 /** Utility RAAA class to propose some licenses usage. */

@@ -25,11 +25,11 @@ void QnResourceTreeModelLayoutToursNode::initialize()
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModelLayoutToursNode::rebuild);
 
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourAdded, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourAdded, this,
         &QnResourceTreeModelLayoutToursNode::handleTourAdded);
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &QnResourceTreeModelLayoutToursNode::handleTourChanged);
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourRemoved, this,
         &QnResourceTreeModelLayoutToursNode::handleTourRemoved);
 
     rebuild();
@@ -74,7 +74,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourN
 void QnResourceTreeModelLayoutToursNode::rebuild()
 {
     clean();
-    for (const auto& tour: qnLayoutTourManager->tours())
+    for (const auto& tour: layoutTourManager()->tours())
         handleTourAdded(tour);
 }
 

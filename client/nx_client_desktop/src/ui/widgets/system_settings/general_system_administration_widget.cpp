@@ -78,7 +78,10 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
             auto button = static_cast<const QPushButton*>(widget);
             QRect rect = button->rect();
 
-            if (option->state.testFlag(QStyle::State_Enabled))
+            const bool enabled = option->state.testFlag(QStyle::State_Enabled);
+            const bool hasFocus = option->state.testFlag(QStyle::State_HasFocus);
+
+            if (enabled)
             {
                 if (button->isDown())
                     painter->fillRect(button->rect(), option->palette.base());
@@ -95,17 +98,25 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
             painter->drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, button->text());
 
+            if (hasFocus && enabled)
+                style()->drawPrimitive(QStyle::PE_FrameFocusRect, option, painter, widget);
+
             return true;
         };
 
-    for (auto& button : m_buttons)
+    QWidget* prevTabItem = ui->buttonWidget;
+    for (auto& button: m_buttons)
     {
         button = new CustomPaintedButton(ui->buttonWidget);
         button->setFixedHeight(kPreferencesButtonSize);
         button->setMinimumWidth(kPreferencesButtonSize);
         button->setCustomPaintFunction(paintButtonFunction);
         buttonLayout->addWidget(button, 1);
+        setTabOrder(prevTabItem, button);
+        prevTabItem = button;
     }
+
+    ui->buttonWidget->setFocusPolicy(Qt::NoFocus);
 
     m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/event_rules.png"));
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
@@ -136,7 +147,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         [this] { menu()->trigger(action::OpenBusinessLogAction); });
 
     connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenInNewLayoutAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
+        [this] { menu()->trigger(action::OpenInNewTabAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(action::OpenBookmarksSearchAction); });

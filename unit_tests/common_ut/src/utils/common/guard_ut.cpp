@@ -6,7 +6,7 @@ TEST(UtilsCommon, Guard)
     int a = 1;
     {
         Guard g([&](){ a = 2; });
-        ASSERT_TRUE( g );
+        ASSERT_TRUE( static_cast<bool>(g) );
     }
     ASSERT_EQ(a, 2);
     {

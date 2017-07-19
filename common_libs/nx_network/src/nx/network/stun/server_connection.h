@@ -18,7 +18,7 @@ namespace stun {
 class MessageDispatcher;
 
 class NX_NETWORK_API ServerConnection:
-    public nx_api::BaseStreamProtocolConnection<
+    public nx::network::server::BaseStreamProtocolConnection<
         stun::ServerConnection,
         Message,
         MessageParser,
@@ -27,7 +27,7 @@ class NX_NETWORK_API ServerConnection:
     public std::enable_shared_from_this<ServerConnection>
 {
 public:
-    typedef nx_api::BaseStreamProtocolConnection<
+    typedef nx::network::server::BaseStreamProtocolConnection<
         ServerConnection,
         Message,
         MessageParser,
@@ -35,7 +35,7 @@ public:
     > BaseType;
 
     ServerConnection(
-        StreamConnectionHolder<ServerConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
@@ -49,8 +49,10 @@ public:
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
 
-    void processMessage(Message message);
     void setDestructHandler(std::function< void() > handler = nullptr);
+
+protected:
+    virtual void processMessage(Message message) override;
 
 private:
     void processBindingRequest(Message message);

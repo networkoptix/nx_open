@@ -6,7 +6,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_peer_alive_data.h"
@@ -45,14 +45,13 @@ public:
     virtual void updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
 
-    QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
-
     void resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList );
     void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
     void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
     void resetStatusList(const ec2::ApiResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
     void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
+
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -64,20 +63,16 @@ signals:
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
-    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(const QnUuid &id);
-    void businessRuleReset(const QnBusinessEventRuleList &rules);
-    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-    void execBusinessAction(const QnAbstractBusinessActionPtr& action);
+    void businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 
     void videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
 
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
-    void remotePeerFound(const ec2::ApiPeerAliveData &data);
-    void remotePeerLost(const ec2::ApiPeerAliveData &data);
+    void remotePeerFound(QnUuid data, Qn::PeerType peerType);
+    void remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     void syncTimeChanged(qint64 syncTime);
-    void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 
     void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);
@@ -86,15 +81,17 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
 
-    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data);
-    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data);
+    virtual void handleRemotePeerFound(QnUuid data, Qn::PeerType peerType);
+    virtual void handleRemotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
         ec2::NotificationSource source) = 0;
-    virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
+    virtual void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& /*action*/) {}
+
+    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour);
 
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
@@ -108,7 +105,7 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const = 0;
 
 public slots:
-    void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
+    void on_businessEventAddedOrUpdated(const nx::vms::event::RulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
     void on_licenseRemoved(const QnLicensePtr &license);
 
@@ -116,8 +113,8 @@ private slots:
     void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
-    void on_remotePeerFound(const ec2::ApiPeerAliveData& data);
-    void on_remotePeerLost(const ec2::ApiPeerAliveData& data);
+    void on_remotePeerFound(QnUuid data, Qn::PeerType peerType);
+    void on_remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
@@ -137,15 +134,14 @@ private slots:
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);
-    void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
+    void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
     void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
-    void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
-    void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
+    void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
+    void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
 private:
     template <class Datatype> void updateResources(const std::vector<Datatype>& resList, QHash<QnUuid, QnResourcePtr>& remoteResources);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
-    QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
 #define qnCommonMessageProcessor commonModule()->messageProcessor()

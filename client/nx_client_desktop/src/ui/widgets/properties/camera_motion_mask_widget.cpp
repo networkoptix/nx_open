@@ -65,9 +65,6 @@ void QnCameraMotionMaskWidget::init()
     m_controller->resizingInstrument()->disable();
     m_controller->rubberBandInstrument()->disable();
     m_controller->itemLeftClickInstrument()->disable();
-    m_controller->handScrollInstrument()->disable();
-    m_controller->wheelZoomInstrument()->disable();
-    m_controller->gridAdjustmentInstrument()->disable();
     m_controller->sceneClickInstrument()->disable();
     m_controller->setMenuEnabled(false);
 
@@ -104,6 +101,7 @@ void QnCameraMotionMaskWidget::createWorkbenchLayout()
 {
     const auto workbenchLayout = qnWorkbenchLayoutsFactory->create(this);
     workbenchLayout->setCellSpacing(0);
+    workbenchLayout->setFlags(workbenchLayout->flags() | QnLayoutFlag::FixedViewport);
     m_context->workbench()->setCurrentLayout(workbenchLayout);
 }
 
@@ -159,7 +157,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     if (m_camera)
     {
         /* Add single item to the layout. */
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid(), this);
+        QnWorkbenchItem* item = new QnWorkbenchItem(resource, QnUuid::createUuid(), this);
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
         item->setRotation(0);

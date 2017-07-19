@@ -1,7 +1,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/auth_tools.h>
 
 #define USE_GMOCK
@@ -15,13 +15,7 @@ int main(int argc, char** argv)
 
     const auto resultCode = nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser& args)
-        {
-            if (const auto value = args.get("tmp"))
-                nx::utils::TestOptions::setTemporaryDirectoryPath(*value);
-
-            return nx::utils::test::DeinitFunctions();
-        },
+        nullptr,
         nx::network::InitializationFlags::disableUdt);
 
     return resultCode;

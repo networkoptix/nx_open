@@ -4,6 +4,7 @@
 #include <atomic>
 #include <vector>
 #include <map>
+#include <nx/utils/std/future.h>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -16,6 +17,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include "nx/utils/thread/long_runnable.h"
 #include <common/common_module_aware.h>
+#include <nx/utils/std/future.h>
 
 class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware
 {
@@ -65,7 +67,7 @@ public:
 signals:
     void backupFinished(
         qint64                      timestampMs,
-        QnBusiness::EventReason     status
+        nx::vms::event::EventReason     status
     );
 
 public:
@@ -118,7 +120,7 @@ private:
 
 private:
     template<typename NeedMoveOnCB>
-    QnBusiness::EventReason synchronize(NeedMoveOnCB needMoveOn);
+    nx::vms::event::EventReason synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
@@ -158,7 +160,7 @@ private:
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
     CopyError             m_lastError;
-    std::promise<void>    m_stopPromise;
+    nx::utils::promise<void>    m_stopPromise;
 };
 
 #endif

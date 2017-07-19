@@ -31,9 +31,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#ifdef _DEBUG
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+
+//#ifdef _DEBUG
 #define DEBUG_ACTIONS
-#endif
+//#endif
 
 using namespace nx::client::desktop::ui;
 
@@ -216,6 +219,25 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 #endif
+
+    auto supressLog = [](const QString& tag)
+        {
+            const auto logger = nx::utils::log::addLogger({tag});
+            logger->setDefaultLevel(nx::utils::log::Level::none);
+            logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+        };
+
+    auto consoleLog = [](const QString& tag)
+        {
+            const auto logger = nx::utils::log::addLogger({tag});
+            logger->setDefaultLevel(nx::utils::log::Level::verbose);
+            logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+        };
+
+    supressLog(lit("__freeSlot"));
+    supressLog(lit("__workbenchState"));
+    supressLog(lit("__itemMap"));
+    supressLog(QnLog::PERMISSIONS_LOG);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

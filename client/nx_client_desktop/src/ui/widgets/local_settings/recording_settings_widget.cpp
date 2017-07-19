@@ -28,17 +28,6 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QnVideoRecorderSettings* se
     setWarningStyle(ui->recordingWarningLabel);
     setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
 
-    connect(ui->fullscreenButton, &QRadioButton::toggled, this,
-        [this](bool checked)
-        {
-            ui->screenComboBox->setEnabled(checked);
-            updateDisableAeroCheckbox();
-            emit hasChangesChanged();
-        });
-
-    connect(ui->windowButton, &QRadioButton::toggled, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-
     connect(ui->disableAeroCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->captureCursorCheckBox, &QCheckBox::toggled, this,
@@ -201,39 +190,20 @@ bool QnRecordingSettingsWidget::isPrimaryScreenSelected() const
 
 Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
 {
-    if (ui->fullscreenButton->isChecked())
-    {
-        if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
-            return Qn::FullScreenMode; // no need to disable aero if dwm is disabled
+    if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
+        return Qn::FullScreenMode; // no need to disable aero if dwm is disabled
 
-        if (!isPrimaryScreenSelected())
-            return Qn::FullScreenMode; // recording from secondary screen without aero is not supported
+    if (!isPrimaryScreenSelected())
+        return Qn::FullScreenMode; // recording from secondary screen without aero is not supported
 
-        return (ui->disableAeroCheckBox->isChecked()
-            ? Qn::FullScreenNoAeroMode
-            : Qn::FullScreenMode);
-    }
-    return Qn::WindowMode;
+    return (ui->disableAeroCheckBox->isChecked()
+        ? Qn::FullScreenNoAeroMode
+        : Qn::FullScreenMode);
 }
 
 void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
 {
-    switch (c)
-    {
-        case Qn::FullScreenMode:
-            ui->fullscreenButton->setChecked(true);
-            ui->disableAeroCheckBox->setChecked(false);
-            break;
-        case Qn::FullScreenNoAeroMode:
-            ui->fullscreenButton->setChecked(true);
-            ui->disableAeroCheckBox->setChecked(true);
-            break;
-        case Qn::WindowMode:
-            ui->windowButton->setChecked(true);
-            break;
-        default:
-            break;
-    }
+    ui->disableAeroCheckBox->setChecked(c == Qn::FullScreenNoAeroMode);
 }
 
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
@@ -280,9 +250,7 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
     // without Aero only recording from primary screen is supported
 
     const bool isPrimary = isPrimaryScreenSelected();
-    const bool isFullscreenMode = (ui->fullscreenButton->isChecked());
-    const bool enabled = (isPrimary && isFullscreenMode);
-    ui->disableAeroCheckBox->setEnabled(enabled);
+    ui->disableAeroCheckBox->setEnabled(isPrimary);
     if (!isPrimary)
         ui->disableAeroCheckBox->setChecked(false);
 

@@ -144,7 +144,21 @@ namespace
     /** Gap between position marker and tooltip tail. */
     const qreal kToolTipMargin = 4.0;
 
-    const qreal kDegreesFor2x = 90.0;
+    /** Mouse wheel sensitivities. */
+    const qreal kWheelDegreesFor2xScale = 90.0;
+    const qreal kWheelDegreesFor1PixelScroll = 3.0;
+
+    /** Window zooming maximum speed for kinetic processor. */
+    const qreal kWindowZoomMaxSpeed = kWheelDegreesFor2xScale * 8;
+
+    /** Window zooming friction for kinetic processor. */
+    const qreal kWindowZoomFriction = kWheelDegreesFor2xScale / 2.0;
+
+    /** Window dragging maximum speed for kinetic processor. */
+    const qreal kWindowScrollMaxSpeed = 10000.0;
+
+    /** Window dragging friction for kinetic processor. */
+    const qreal kWindowScrollFriction = 1000.0;
 
     const qreal kZoomSideSnapDistance = 0.075;
 
@@ -448,15 +462,100 @@ private:
 
 Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 
+// -------------------------------------------------------------------------- //
+// QnTimeSlider::KineticHandlerBase
+// -------------------------------------------------------------------------- //
+
+class QnTimeSlider::KineticHandlerBase : public KineticProcessHandler
+{
+public:
+    KineticHandlerBase(QnTimeSlider* slider): m_slider(slider) {}
+
+    void hurry()
+    {
+        if (!kineticProcessor()->isRunning())
+            return; /* Nothing to hurry up. */
+
+        if (m_hurried)
+            return;
+
+        m_hurried = true;
+        updateKineticProcessor();
+    }
+
+    virtual void updateKineticProcessor() {}
+
+    virtual void finishKinetic() override
+    {
+        if (!m_hurried)
+            return;
+
+        m_hurried = false;
+        updateKineticProcessor();
+    }
+
+protected:
+    QnTimeSlider* const m_slider;
+    bool m_hurried = false;
+};
+
+// -------------------------------------------------------------------------- //
+// QnTimeSlider::KineticZoomHandler
+// -------------------------------------------------------------------------- //
+
+class QnTimeSlider::KineticZoomHandler: public QnTimeSlider::KineticHandlerBase
+{
+public:
+    using KineticHandlerBase::KineticHandlerBase;
+
+    virtual void kineticMove(const QVariant& degrees) override
+    {
+        qreal factor = std::pow(2.0, -degrees.toReal() / kWheelDegreesFor2xScale);
+
+        if (!m_slider->scaleWindow(factor, m_slider->m_zoomAnchor))
+            kineticProcessor()->reset();
+    }
+
+    virtual void updateKineticProcessor() override
+    {
+        kineticProcessor()->setFriction(m_hurried
+            ? kWindowZoomFriction * 4.0
+            : kWindowZoomFriction);
+    }
+};
+
+// -------------------------------------------------------------------------- //
+// QnTimeSlider::KineticScrollHandler
+// -------------------------------------------------------------------------- //
+
+class QnTimeSlider::KineticScrollHandler: public QnTimeSlider::KineticHandlerBase
+{
+public:
+    using KineticHandlerBase::KineticHandlerBase;
+
+    virtual void kineticMove(const QVariant& distance) override
+    {
+        const auto oldWindowStart = m_slider->m_windowStart;
+        m_slider->shiftWindow(qint64(distance.toReal() * m_slider->m_msecsPerPixel));
+
+        if (oldWindowStart == m_slider->m_windowStart)
+            kineticProcessor()->reset();
+    }
+
+    virtual void updateKineticProcessor() override
+    {
+        kineticProcessor()->setFriction(m_hurried
+            ? kWindowScrollFriction * 4.0
+            : kWindowScrollFriction);
+    }
+};
 
 
 // -------------------------------------------------------------------------- //
 // QnTimeSlider
 // -------------------------------------------------------------------------- //
-QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
-    , QGraphicsItem* tooltipParent):
+QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     base_type(parent),
-
     m_windowStart(0),
     m_windowEnd(0),
     m_minimalWindow(0),
@@ -495,7 +594,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_selectionInitiated(false),
     m_tooltipLine1(new GraphicsLabel(this)),
     m_tooltipLine2(new GraphicsLabel(this)),
-    m_updatingValue(false)
+    m_updatingValue(false),
+    m_kineticZoomHandler(new KineticZoomHandler(this)),
+    m_kineticScrollHandler(new KineticScrollHandler(this))
 {
     setAutoHideToolTip(false);
 
@@ -528,11 +629,30 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     font.setBold(true);
     m_tooltipLine2->setFont(font);
 
+    /* Fine-tuned kinetic processor contants. */
+    static const qreal kZoomProcessorMaxShiftIntervalSeconds = 0.4;
+    static const qreal kScrollProcessorMaxShiftIntervalSeconds = 0.05;
+    static const qreal kZoomProcessorSpeedCuttingThreshold = kWindowZoomMaxSpeed / 24.0;
+    static const qreal kScrollProcessorSpeedCuttingThreshold = kWindowScrollMaxSpeed / 10.0;
+
     /* Prepare kinetic zoom processor. */
-    KineticCuttingProcessor* kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
-    kineticProcessor->setHandler(this);
-    registerAnimation(kineticProcessor);
-    updateKineticProcessor();
+    const auto kineticZoomProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    kineticZoomProcessor->setHandler(m_kineticZoomHandler.data());
+    kineticZoomProcessor->setMaxShiftInterval(kZoomProcessorMaxShiftIntervalSeconds);
+    kineticZoomProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
+    kineticZoomProcessor->setMaxSpeedMagnitude(kWindowZoomMaxSpeed);
+    kineticZoomProcessor->setSpeedCuttingThreshold(kZoomProcessorSpeedCuttingThreshold);
+    registerAnimation(kineticZoomProcessor);
+    m_kineticZoomHandler->updateKineticProcessor();
+
+    /* Prepare kinetic drag processor. */
+    const auto kineticScrollProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    kineticScrollProcessor->setHandler(m_kineticScrollHandler.data());
+    kineticScrollProcessor->setMaxShiftInterval(kScrollProcessorMaxShiftIntervalSeconds);
+    kineticScrollProcessor->setMaxSpeedMagnitude(kWindowScrollMaxSpeed);
+    kineticScrollProcessor->setSpeedCuttingThreshold(kScrollProcessorSpeedCuttingThreshold);
+    registerAnimation(kineticScrollProcessor);
+    m_kineticScrollHandler->updateKineticProcessor();
 
     /* Prepare zoom processor. */
     DragProcessor* dragProcessor = new DragProcessor(this);
@@ -552,11 +672,14 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | SnapZoomToSides | UnzoomOnDoubleClick;
+    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize
+        | SelectionEditable | ClearSelectionOnClick | SnapZoomToSides | UnzoomOnDoubleClick
+        | UpdateToolTip;
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow | StillBookmarksViewer;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection
+        | DragScrollsWindow | StillBookmarksViewer;
 #endif
     setOptions(defaultOptions);
 
@@ -571,6 +694,11 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_bookmarksViewer->setZValue(std::numeric_limits<qreal>::max());
     toolTipItem()->setParentItem(tooltipParent);
     toolTipItem()->stackBefore(m_bookmarksViewer);
+}
+
+bool QnTimeSlider::isWindowBeingDragged() const
+{
+    return dragProcessor()->isRunning() && m_dragMarker == NoMarker;
 }
 
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
@@ -918,7 +1046,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
     {
         if (animate)
         {
-            kineticProcessor()->reset(); /* Stop kinetic zoom. */
+            m_kineticZoomHandler->kineticProcessor()->reset();
+            m_kineticScrollHandler->kineticProcessor()->reset();
             m_animatingSliderWindow = true;
             setTargetStart(start);
             setTargetEnd(end);
@@ -991,7 +1120,7 @@ void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
         qint64 oldValue = this->value();
         setValue(value);
 
-        if (keepInWindow && windowContains(oldValue))
+        if (keepInWindow && !isWindowBeingDragged() && windowContains(oldValue))
         {
             if (m_options.testFlag(StillPosition))
                 shiftWindow(this->value() - oldValue);
@@ -1124,19 +1253,14 @@ void QnTimeSlider::finishAnimations()
         m_animatingSliderWindow = false;
     }
 
-    kineticProcessor()->reset();
+    m_kineticZoomHandler->kineticProcessor()->reset();
+    m_kineticScrollHandler->kineticProcessor()->reset();
 }
 
 void QnTimeSlider::hurryKineticAnimations()
 {
-    if (!kineticProcessor()->isRunning())
-        return; /* Nothing to hurry up. */
-
-    if (m_kineticsHurried)
-        return;
-
-    m_kineticsHurried = true;
-    updateKineticProcessor();
+    m_kineticZoomHandler->hurry();
+    m_kineticScrollHandler->hurry();
 }
 
 void QnTimeSlider::setTargetStart(qint64 start)
@@ -1206,7 +1330,9 @@ void QnTimeSlider::generateProgressPatterns()
 
 bool QnTimeSlider::isAnimatingWindow() const
 {
-    return m_animatingSliderWindow || kineticProcessor()->isRunning();
+    return m_animatingSliderWindow
+        || m_kineticZoomHandler->kineticProcessor()->isRunning()
+        || m_kineticScrollHandler->kineticProcessor()->isRunning();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor)
@@ -1558,28 +1684,6 @@ void QnTimeSlider::updatePixmapCache()
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();
-}
-
-void QnTimeSlider::updateKineticProcessor()
-{
-    KineticCuttingProcessor* kineticProcessor = checked_cast<KineticCuttingProcessor*>(this->kineticProcessor());
-
-    if (m_kineticsHurried)
-    {
-        kineticProcessor->setMaxShiftInterval(0.4);
-        kineticProcessor->setFriction(kDegreesFor2x * 2.0);
-        kineticProcessor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
-        kineticProcessor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
-        kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
-    }
-    else
-    {
-        kineticProcessor->setMaxShiftInterval(0.4);
-        kineticProcessor->setFriction(kDegreesFor2x / 2);
-        kineticProcessor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
-        kineticProcessor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
-        kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
-    }
 }
 
 void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
@@ -2212,6 +2316,7 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
         {
         case QEvent::GraphicsSceneMousePress:
             m_dragDelta = toolTipItem()->tailPos() - static_cast<QGraphicsSceneMouseEvent*>(event)->pos();
+            m_dragMarker = DragMarker;
             dragProcessor()->mousePressEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event), true);
             return true;
 
@@ -2861,7 +2966,7 @@ void QnTimeSlider::sliderChange(SliderChange change)
             bool wasAtMinimum = windowStart == m_oldMinimum;
             bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            //TODO: #vkutin Enable this when thumbnail updates fully support it
+            // TODO: #vkutin Enable this when thumbnail updates fully support it
             bool keepFullRange = false; // wasAtMinimum && wasAtMaximum;
             if (keepFullRange)
             {
@@ -2928,22 +3033,32 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
 
     /* delta() returns the distance that the wheel is rotated
      * in eighths (1/8s) of a degree. */
-    qreal degrees = event->delta() / 8.0;
+    const qreal degrees = event->delta() / 8.0;
 
-    m_zoomAnchor = valueFromPosition(event->pos());
-
-    /* Snap zoom anchor to window sides. */
-    if (m_options.testFlag(SnapZoomToSides))
+    if (event->modifiers().testFlag(Qt::ControlModifier))
     {
-        qreal windowRange = m_windowEnd - m_windowStart;
-        if ((m_zoomAnchor - m_windowStart) / windowRange < kZoomSideSnapDistance)
-            m_zoomAnchor = m_windowStart;
-        else if ((m_windowEnd - m_zoomAnchor) / windowRange < kZoomSideSnapDistance)
-            m_zoomAnchor = m_windowEnd;
+        /* Kinetic drag: */
+        m_kineticScrollHandler->kineticProcessor()->shift(degrees / kWheelDegreesFor1PixelScroll);
+        m_kineticScrollHandler->kineticProcessor()->start();
     }
+    else
+    {
+        /* Kinetic zoom: */
+        m_zoomAnchor = valueFromPosition(event->pos());
 
-    kineticProcessor()->shift(degrees);
-    kineticProcessor()->start();
+        /* Snap zoom anchor to window sides. */
+        if (m_options.testFlag(SnapZoomToSides))
+        {
+            qreal windowRange = m_windowEnd - m_windowStart;
+            if ((m_zoomAnchor - m_windowStart) / windowRange < kZoomSideSnapDistance)
+                m_zoomAnchor = m_windowStart;
+            else if ((m_windowEnd - m_zoomAnchor) / windowRange < kZoomSideSnapDistance)
+                m_zoomAnchor = m_windowEnd;
+        }
+
+        m_kineticZoomHandler->kineticProcessor()->shift(degrees);
+        m_kineticZoomHandler->kineticProcessor()->start();
+    }
 
     event->accept();
 }
@@ -2958,23 +3073,6 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
         updateMinimalWindow();
         updateThumbnailsStepSize(false);
         updateThumbnailsVisibility();
-    }
-}
-
-void QnTimeSlider::kineticMove(const QVariant& degrees)
-{
-    qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
-
-    if (!scaleWindow(factor, m_zoomAnchor))
-        kineticProcessor()->reset();
-}
-
-void QnTimeSlider::finishKinetic()
-{
-    if (m_kineticsHurried)
-    {
-        m_kineticsHurried = false;
-        updateKineticProcessor();
     }
 }
 
@@ -3045,7 +3143,12 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverMoveEvent(event);
+
     m_hoverMousePos = event->pos();
+    updateBookmarksViewerLocation();
+
+    if (isWindowBeingDragged())
+        return;
 
     if (thumbnailsRect().contains(event->pos()) && thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty() && !m_thumbnailsUpdateTimer->isActive())
     {
@@ -3069,18 +3172,16 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     {
         switch (markerFromPosition(event->pos(), kHoverEffectDistance))
         {
-        case SelectionStartMarker:
-        case SelectionEndMarker:
-            setCursor(Qt::SplitHCursor);
-            break;
+            case SelectionStartMarker:
+            case SelectionEndMarker:
+                setCursor(Qt::SplitHCursor);
+                break;
 
-        default:
-            unsetCursor();
-            break;
+            default:
+                unsetCursor();
+                break;
         }
     }
-
-    updateBookmarksViewerLocation();
 }
 
 void QnTimeSlider::updateBookmarksViewerLocation()
@@ -3115,23 +3216,25 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
     switch (event->button())
     {
-    case Qt::LeftButton:
-        m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
-        if (canSelect && m_dragMarker == NoMarker && !extendSelectionRequested)
-            m_dragMarker = CreateSelectionMarker;
-        immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
-        break;
+        case Qt::LeftButton:
+            m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
+            if (canSelect && m_dragMarker == NoMarker && !extendSelectionRequested)
+                m_dragMarker = CreateSelectionMarker;
+            immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
+            if (m_dragMarker == NoMarker)
+                m_dragMarker = DragMarker; // TODO: #vkutin #3.2 Simplify all this logic!
+            break;
 
-    case Qt::RightButton:
-        immediateDrag = false;
-        m_dragMarker = canSelect ?
-            CreateSelectionMarker :
-            NoMarker;
-        break;
+        case Qt::RightButton:
+            immediateDrag = false;
+            m_dragMarker = canSelect ?
+                CreateSelectionMarker :
+                NoMarker;
+            break;
 
-    default:
-        m_dragMarker = NoMarker;
-        break;
+        default:
+            m_dragMarker = DragMarker;
+            break;
     }
 
     bool thumbnailHasBeenClicked(false);
@@ -3173,8 +3276,11 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
+    if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
+        && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
+    {
         setSelectionValid(false);
+    }
 
     m_dragMarker = NoMarker;
 
@@ -3210,7 +3316,8 @@ void QnTimeSlider::changeEvent(QEvent* event)
 
 void QnTimeSlider::startDragProcess(DragInfo* info)
 {
-    m_dragIsClick = true;
+    m_dragIsClick = !m_kineticScrollHandler->kineticProcessor()->isRunning();
+    m_kineticScrollHandler->kineticProcessor()->reset();
 
     /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself. */
     if (m_dragMarker == CreateSelectionMarker)
@@ -3227,25 +3334,32 @@ void QnTimeSlider::startDrag(DragInfo* info)
     qint64 pos = valueFromPosition(mousePos + m_dragDelta);
 
     m_dragIsClick = false;
-    setSliderDown(true);
+
+    if (m_dragMarker != NoMarker)
+        setSliderDown(true);
 
     switch (m_dragMarker)
     {
-    case NoMarker:
-        setSliderPosition(pos);
-        break;
+        case NoMarker:
+            m_dragWindowStart = m_windowStart;
+            setCursor(Qt::ClosedHandCursor);
+            break;
 
-    case CreateSelectionMarker:
-        setSelectionValid(true);
-        setSelection(pos, pos);
-        m_dragMarker = SelectionStartMarker;
-        /* FALL THROUGH */
-    case SelectionStartMarker:
-    case SelectionEndMarker:
-        m_selecting = true;
-        m_dragDelta = positionFromMarker(m_dragMarker) - mousePos;
-        emit selectionPressed();
-        break;
+        case DragMarker:
+            setSliderPosition(pos);
+            break;
+
+        case CreateSelectionMarker:
+            setSelectionValid(true);
+            setSelection(pos, pos);
+            m_dragMarker = SelectionStartMarker;
+            /* FALL THROUGH */
+        case SelectionStartMarker:
+        case SelectionEndMarker:
+            m_selecting = true;
+            m_dragDelta = positionFromMarker(m_dragMarker) - mousePos;
+            emit selectionPressed();
+            break;
     }
 }
 
@@ -3254,6 +3368,17 @@ void QnTimeSlider::dragMove(DragInfo* info)
     /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself.
      * We have to use scene coordinates because of possible redrag events when real tooltip coordinates differ from those stored in the DragInfo object. */
     QPointF mousePos = mapFromScene(info->mouseScenePos());
+
+    if (m_dragMarker == NoMarker)
+    {
+        const auto delta = valueFromPosition(mapFromScene(info->mousePressScenePos())) - valueFromPosition(mousePos);
+        const auto relativeDelta = m_dragWindowStart - m_windowStart + delta;
+        const auto prevWindowStart = m_windowStart;
+        shiftWindow(relativeDelta, false);
+
+        m_kineticScrollHandler->kineticProcessor()->shift(qreal(m_windowStart - prevWindowStart) / m_msecsPerPixel);
+        return;
+    }
 
     if (m_options.testFlag(DragScrollsWindow))
     {
@@ -3294,18 +3419,18 @@ void QnTimeSlider::dragMove(DragInfo* info)
 
         switch (m_dragMarker)
         {
-        case SelectionStartMarker:
-            selectionStart = sliderPosition();
-            otherMarker = SelectionEndMarker;
-            break;
+            case SelectionStartMarker:
+                selectionStart = sliderPosition();
+                otherMarker = SelectionEndMarker;
+                break;
 
-        case SelectionEndMarker:
-            selectionEnd = sliderPosition();
-            otherMarker = SelectionStartMarker;
-            break;
+            case SelectionEndMarker:
+                selectionEnd = sliderPosition();
+                otherMarker = SelectionStartMarker;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
 
         if (selectionStart > selectionEnd)
@@ -3321,6 +3446,12 @@ void QnTimeSlider::dragMove(DragInfo* info)
 void QnTimeSlider::finishDragProcess(DragInfo* info)
 {
     Q_UNUSED(info);
+
+    if (m_dragMarker == NoMarker)
+    {
+        unsetCursor();
+        m_kineticScrollHandler->kineticProcessor()->start();
+    }
 
     if (m_selecting)
     {

@@ -8,7 +8,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -218,9 +218,6 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
-        if (resource->getMAC().isNull())
-            return resList; // MAC address is mandatory for manual search
-
         // Clarify resource type
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();

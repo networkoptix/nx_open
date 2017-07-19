@@ -199,7 +199,7 @@ private:
 
     void onNewConnection(
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* newConnection);
+        std::unique_ptr<AbstractStreamSocket> newConnection);
     void onConnectionDone(TestConnection* connection);
 };
 

@@ -6,7 +6,7 @@ namespace nx {
 namespace stun {
 
 ServerConnection::ServerConnection(
-    StreamConnectionHolder<ServerConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
@@ -61,6 +61,15 @@ void ServerConnection::close()
     socket.reset();
 }
 
+void ServerConnection::setDestructHandler(std::function< void() > handler)
+{
+    QnMutexLocker lk(&m_mutex);
+    NX_ASSERT(!(handler && m_destructHandler), Q_FUNC_INFO,
+        "Can not set new handler while previous is not removed");
+
+    m_destructHandler = std::move(handler);
+}
+
 void ServerConnection::processMessage( Message message )
 {
     switch( message.header.messageClass )
@@ -85,15 +94,6 @@ void ServerConnection::processMessage( Message message )
     // Message handler has closed connection.
     if (!socket())
         closeConnection(SystemError::noError);
-}
-
-void ServerConnection::setDestructHandler( std::function< void() > handler )
-{
-    QnMutexLocker lk( &m_mutex );
-    NX_ASSERT( !(handler && m_destructHandler), Q_FUNC_INFO,
-                "Can not set new handler while previous is not removed" );
-
-    m_destructHandler = std::move( handler );
 }
 
 void ServerConnection::processBindingRequest( Message message )

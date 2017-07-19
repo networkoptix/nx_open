@@ -1,25 +1,17 @@
 #include "aligned_mem_video_buffer.h"
 
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
-
 #include <nx/utils/log/assert.h>
-#include <nx/utils/debug_utils.h>
-
 QT_BEGIN_NAMESPACE
-
 /**
  * This definition is needed because we inherit QAbstractVideoBufferPrivate class declared in a private Qt header.
  */
 int QAbstractVideoBufferPrivate::map(
-    QAbstractVideoBuffer::MapMode mode,
-    int* numBytes,
-    int bytesPerLine[4],
-    uchar* data[4])
+    QAbstractVideoBuffer::MapMode /*mode*/,
+    int* /*numBytes*/,
+    int /*bytesPerLine*/[4],
+    uchar* /*data*/[4])
 {
-    Q_UNUSED(mode);
-    Q_UNUSED(numBytes);
-    Q_UNUSED(bytesPerLine);
-    Q_UNUSED(data);
     NX_CRITICAL(false);
     return 0;
 }
@@ -32,9 +24,9 @@ namespace media {
 class AlignedMemVideoBufferPrivate: public QAbstractVideoBufferPrivate
 {
     Q_DECLARE_PUBLIC(AlignedMemVideoBuffer)
+
 public:
-    AlignedMemVideoBufferPrivate()
-    :
+    AlignedMemVideoBufferPrivate():
         QAbstractVideoBufferPrivate(),
         mapMode(QAbstractVideoBuffer::NotMapped),
         dataSize(0),
@@ -64,9 +56,7 @@ public:
     int planeCount;
     bool ownBuffer;
 };
-
-AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine)
-:
+AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
     QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
 {
     Q_D(AlignedMemVideoBuffer);
@@ -76,9 +66,7 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int byte
     d->planeCount = 1;
     d->ownBuffer = true;
 }
-
-AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount)
-:
+AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount):
     QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
 {
     Q_D(AlignedMemVideoBuffer);
@@ -94,19 +82,14 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4]
 AlignedMemVideoBuffer::~AlignedMemVideoBuffer()
 {
     Q_D(AlignedMemVideoBuffer);
-
     if (d->ownBuffer)
-    {
         qFreeAligned(d->data[0]);
-    }
 }
-
 AlignedMemVideoBuffer::MapMode AlignedMemVideoBuffer::mapMode() const
 {
     return d_func()->mapMode;
 }
-
-uchar* AlignedMemVideoBuffer::map(MapMode mode, int *numBytes, int *bytesPerLine)
+uchar* AlignedMemVideoBuffer::map(MapMode mode, int* numBytes, int* bytesPerLine)
 {
     Q_D(AlignedMemVideoBuffer);
 

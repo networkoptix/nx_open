@@ -1,8 +1,8 @@
 #include "save_cloud_system_credentials.h"
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -10,7 +10,7 @@
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>
@@ -87,7 +87,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
     nx_http::StatusCode::Value* const authorizationStatusCode)
 {
     using namespace nx_http;
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
@@ -224,7 +224,7 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_LOGX(
-            lm("Error inserting cloud owner to the local DB. %1").str(resultCode),
+            lm("Error inserting cloud owner to the local DB. %1").arg(resultCode),
             cl_logWARNING);
         result->setError(
             QnJsonRestResult::CantProcessRequest,
@@ -245,7 +245,7 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
-    const CloudCredentialsData& data,
+    const CloudCredentialsData& /*data*/,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;

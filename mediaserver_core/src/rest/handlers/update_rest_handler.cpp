@@ -73,7 +73,7 @@ int QnUpdateRestHandler::executePost(
     {
         QBuffer buffer(const_cast<QByteArray*>(&body)); // we're going to read data, so const_cast is safe
         if (!verifyUpdatePackage(&buffer, &version, &sysInfo)) {
-            cl_log.log("An upload has been received but not veryfied", cl_logWARNING);
+            NX_WARNING(this, "An upload has been received but not veryfied");
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INVALID_FILE"));
             return nx_http::StatusCode::ok;
         }

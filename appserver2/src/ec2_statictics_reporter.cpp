@@ -94,7 +94,7 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        QnBusinessEventRuleList bRules;
+        nx::vms::event::RuleList bRules;
         errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
         if (errCode != ErrorCode::ok)
             return errCode;
@@ -179,7 +179,7 @@ namespace ec2
         if (!settings->isStatisticsAllowed()
             || settings->isNewSystem())
         {
-            NX_LOGX(lm("Automatic report system is disabled"), cl_logINFO);
+            NX_LOGX(lm("Automatic report system is disabled"), cl_logDEBUG1);
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();
@@ -294,7 +294,7 @@ namespace ec2
         {
             m_timerCycle = kInitialTimerCycle;
             NX_LOGX(lm("Statistics report successfully sent to %1")
-                .str(httpClient->url()), cl_logINFO);
+                .arg(httpClient->url()), cl_logINFO);
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
@@ -311,7 +311,7 @@ namespace ec2
                 m_timerCycle = kMaxTimerCycle;
 
             NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
-                .str(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
+                .arg(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
         }
 
         setupTimer();

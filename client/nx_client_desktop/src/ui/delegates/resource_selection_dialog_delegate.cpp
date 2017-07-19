@@ -25,6 +25,12 @@ bool QnResourceSelectionDialogDelegate::validate(const QSet<QnUuid>& /*selectedR
     return true;
 }
 
+QString QnResourceSelectionDialogDelegate::validationMessage(
+    const QSet<QnUuid>& /*selectedResources*/) const
+{
+    return QString();
+}
+
 bool QnResourceSelectionDialogDelegate::isValid(const QnUuid& /*resource*/) const
 {
     return true;

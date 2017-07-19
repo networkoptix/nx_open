@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
-<context>
+<TS version="2.1" language="vi" sourcelanguage="en">
+  <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
-        <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+      <source>All Cameras</source>
+      <translation>Tất cả máy ảnh</translation>
     </message>
-</context>
+  </context>
 </TS>

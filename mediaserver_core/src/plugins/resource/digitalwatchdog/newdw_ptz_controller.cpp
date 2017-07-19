@@ -19,16 +19,17 @@ QnNewDWPtzController::~QnNewDWPtzController()
 
 }
 
-Qn::PtzCapabilities QnNewDWPtzController::getCapabilities()
+Ptz::Capabilities QnNewDWPtzController::getCapabilities() const
 {
-    return Qn::ContinuousZoomCapability | Qn::ContinuousPanCapability | Qn::PresetsPtzCapability;
+    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability
+        | Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
 }
 
-static QString zoomDirection(qreal speed) 
+static QString zoomDirection(qreal speed)
 {
     if(qFuzzyIsNull(speed))
         return lit("stop");
-    else if(speed < 0) 
+    else if(speed < 0)
         return lit("out");
     else
         return lit("in");
@@ -39,11 +40,11 @@ static int toNativeSpeed(qreal speed)
     return int (qAbs(speed * 10) + 0.5);
 }
 
-static QString panDirection(qreal speed) 
+static QString panDirection(qreal speed)
 {
     if(qFuzzyIsNull(speed))
         return lit("stop");
-    else if(speed < 0) 
+    else if(speed < 0)
         return lit("left");
     else
         return lit("right");
@@ -59,7 +60,7 @@ bool QnNewDWPtzController::continuousMove(const QVector3D &speed)
     return doQuery(request);
 }
 
-bool QnNewDWPtzController::doQuery(const QString &request, QByteArray* body) const 
+bool QnNewDWPtzController::doQuery(const QString &request, QByteArray* body) const
 {
     static const int TCP_TIMEOUT = 1000 * 5;
     QString resourceUrl = m_resource->getUrl();
@@ -87,7 +88,7 @@ bool QnNewDWPtzController::doQuery(const QString &request, QByteArray* body) con
     return status == CL_HTTP_SUCCESS;
 }
 
-bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
+bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets) const
 {
     if (m_cacheUpdateTimer.isNull() || m_cacheUpdateTimer.elapsed() > CACHE_UPDATE_TIMEOUT)
     {
@@ -102,7 +103,7 @@ bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
             if (line.startsWith("list="))
             {
                 QList<QByteArray> presetTokens = line.split(L'=')[1].split(L' ');
-                for(const QByteArray& token: presetTokens) 
+                for(const QByteArray& token: presetTokens)
                 {
                     if (token.isEmpty())
                         continue;
@@ -111,7 +112,7 @@ bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
             }
         }
     }
-    
+
     for (auto itr = m_cachedData.begin(); itr != m_cachedData.end(); ++itr)
         presets->push_back(QnPtzPreset(itr.key(), itr.value()));
     return true;

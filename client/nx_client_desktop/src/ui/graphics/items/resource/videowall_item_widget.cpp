@@ -13,7 +13,10 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
+#include <core/resource_access/resource_access_filter.h>
+
 #include <core/resource_management/resource_pool.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -39,12 +42,13 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
+#include <nx/client/desktop/utils/mime_data.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -315,29 +319,13 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
 
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
-    QnResourceList media;
-    QnResourceList layouts;
-    QnResourceList servers;
+    // Scene drop is working only for resources that are already in the pool.
+    MimeData data(mimeData);
+    const auto ids = data.getIds();
 
-    m_dragged.resources.clear();
-    m_dragged.videoWallItems.clear();
-
-    foreach(QnResourcePtr res, resources)
-    {
-        if (dynamic_cast<QnMediaResource*>(res.data()))
-            media.push_back(res);
-        if (res.dynamicCast<QnLayoutResource>())
-            layouts.push_back(res);
-        if (res.dynamicCast<QnMediaServerResource>())
-            servers.push_back(res);
-    }
-
-    m_dragged.resources = media;
-    m_dragged.resources << layouts;
-    m_dragged.resources << servers;
-
-    m_dragged.videoWallItems = resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
+    const auto resources = resourcePool()->getResources(ids);
+    m_dragged.resources = resources.filtered(QnResourceAccessFilter::isDroppable);
+    m_dragged.videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
 
     if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
@@ -402,12 +390,14 @@ void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void QnVideowallItemWidget::startDrag(DragInfo *info)
 {
-    QDrag *drag = new QDrag(this);
-    QMimeData *mimeData = new QMimeData();
+    MimeData data;
+    data.setIds({m_itemUuid});
 
-    QnVideoWallItem::serializeUuids(QList<QnUuid>() << m_itemUuid, mimeData);
+    auto mimeData = new QMimeData();
+    data.toMimeData(mimeData);
     mimeData->setData(Qn::NoSceneDrop, QByteArray());
 
+    auto drag = new QDrag(this);
     drag->setMimeData(mimeData);
 
     Qt::DropAction dropAction = Qt::MoveAction;

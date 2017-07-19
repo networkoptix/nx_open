@@ -18,9 +18,10 @@
 
     <properties>
         <product.title>traffic_relay unit tests</product.title>
+        <template>app</template>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lnx_network -lcommon -lnx_streaming -ludt -ltraffic_relay -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lnx_network -ludt -ltraffic_relay -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>

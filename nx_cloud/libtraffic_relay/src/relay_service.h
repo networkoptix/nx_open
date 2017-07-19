@@ -14,7 +14,11 @@ namespace cloud {
 namespace relay {
 
 namespace conf { class Settings; }
+
+class Model;
 class View;
+
+namespace model { class ListeningPeerPool; };
 
 class RelayService:
     public nx::utils::Service
@@ -26,11 +30,14 @@ public:
 
     std::vector<SocketAddress> httpEndpoints() const;
 
+    const model::ListeningPeerPool& listeningPeerPool() const;
+
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
+    Model* m_model = nullptr;
     View* m_view = nullptr;
 };
 

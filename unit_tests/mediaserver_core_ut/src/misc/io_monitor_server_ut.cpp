@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <api/test_api_requests.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
@@ -23,7 +23,7 @@ namespace {
 namespace nx {
 namespace test {
 
-class IoMonitorParser: public nx::utils::bsf::AbstractByteStreamFilter
+class IoMonitorParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     IoMonitorParser(const QnIOStateDataList& data): m_data(data) {}
@@ -120,7 +120,7 @@ TEST(IoServerMonitorTest, main)
     QUrl url = launcher.apiUrl();
     url.setPath("/api/iomonitor");
     QUrlQuery query;
-    query.addQueryItem(Qn::CAMERA_UNIQUE_ID_HEADER_NAME, kTestCamPhysicalId);
+    query.addQueryItem(Qn::PHYSICAL_ID_URL_QUERY_ITEM, kTestCamPhysicalId);
     url.setQuery(query);
 
     auto contentParser = std::make_shared<nx_http::MultipartContentParser>();

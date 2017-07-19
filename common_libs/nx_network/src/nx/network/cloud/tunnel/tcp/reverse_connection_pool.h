@@ -45,6 +45,7 @@ public:
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
+    void setStartTimeout(std::chrono::milliseconds value);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -57,6 +58,8 @@ private:
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;
     bool m_isReconnectHandlerSet;
+    std::chrono::steady_clock::time_point m_startTime;
+    std::chrono::milliseconds m_startTimeout;
 
     mutable QnMutex m_mutex;
     typedef std::map<String /*name*/, std::shared_ptr<ReverseConnectionHolder>> HoldersByName;

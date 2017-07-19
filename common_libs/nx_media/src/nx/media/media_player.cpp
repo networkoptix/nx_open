@@ -6,10 +6,9 @@
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
-#include <common/common_module.h>
+#include <nx/kit/debug.h>
 
-#include <nx/utils/debug_utils.h>
-#include <nx/utils/flag_config.h>
+#include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/long_runable_cleanup.h>
 
@@ -21,8 +20,12 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+
+#include <nx/media/ini.h>
 
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
@@ -60,23 +63,6 @@ static constexpr int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static constexpr int kPeriodicTasksTimeoutMs = 1000;
-
-static constexpr const char* OUTPUT_PREFIX = "media_player: ";
-
-struct NxMediaFlagConfig: public nx::utils::FlagConfig
-{
-    using nx::utils::FlagConfig::FlagConfig;
-
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
-    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-    NX_FLAG(0, enableFps, "");
-    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
-    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
-    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
-    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
-    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
-};
-NxMediaFlagConfig conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -412,7 +398,7 @@ void PlayerPrivate::presentNextFrameDelayed()
 
     qint64 delayToRenderMs = 0;
     auto audioOutput = dataConsumer->audioOutput();
-    if (audioOutput)
+    if (audioOutput && dataConsumer->isAudioEnabled())
     {
         if (audioOutput->isBufferUnderflow())
         {
@@ -471,7 +457,7 @@ QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
 
 void PlayerPrivate::presentNextFrame()
 {
-    NX_SHOW_FPS("presentNextFrame");
+    NX_FPS(PresentNextFrame);
 
     if (!videoFrameToRender)
         return;
@@ -581,11 +567,11 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
         liveMode && lastVideoPtsMs.is_initialized() && mediaQueueLenMs == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLenMs > liveBufferMs;
 
-    if (conf.outputFrameDelays)
+    if (ini().outputFrameDelays)
     {
         if (frameDelayMs < 0)
         {
-            PRINT << "ptsMs: " << ptsMs << ", ptsDeltaMs: " << ptsDeltaMs
+            NX_PRINT << "ptsMs: " << ptsMs << ", ptsDeltaMs: " << ptsDeltaMs
                 << ", frameDelayMs: " << frameDelayMs;
         }
     }
@@ -629,6 +615,8 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
 
 void PlayerPrivate::applyVideoQuality()
 {
+    Q_Q(Player);
+
     if (!archiveReader)
         return;
 
@@ -636,31 +624,44 @@ void PlayerPrivate::applyVideoQuality()
     if (!camera)
         return; //< Setting videoQuality for files is not supported.
 
-    const QSize& quality = media_player_quality_chooser::chooseVideoQuality(
+    const auto currentVideoDecoders = dataConsumer
+        ? dataConsumer->currentVideoDecoders()
+        : std::vector<AbstractVideoDecoder*>();
+
+    const auto& result = media_player_quality_chooser::chooseVideoQuality(
         archiveReader->getTranscodingCodec(),
         videoQuality,
         liveMode,
         positionMs,
-        camera);
+        camera,
+        currentVideoDecoders);
 
-    if (quality == media_player_quality_chooser::kQualityHigh)
+    switch (result.quality)
     {
-        archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLow)
-    {
-        archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
-    {
-        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
-    }
-    else
-    {
-        // Use "auto" width for correct aspect ratio, because quality.width() is in logical pixels.
-        NX_ASSERT(quality.isValid());
-        archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
-            QSize(/*width*/ 0, quality.height()));
+        case Player::UnknownVideoQuality:
+            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+            return;
+
+        case Player::HighVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
+            break;
+
+        case Player::LowVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
+            break;
+
+        case Player::LowIframesOnlyVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+            break;
+
+        default:
+            // Use "auto" width for correct aspect ratio, because quality.width() is in logical
+            // pixels.
+            NX_ASSERT(result.frameSize.isValid());
+            archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
+                QSize(/*width*/ 0, result.frameSize.height()));
     }
     at_hurryUp(); //< skip waiting for current frame
 }
@@ -691,6 +692,10 @@ bool PlayerPrivate::initDataProvider()
     }
 
     applyVideoQuality();
+
+    if (!archiveReader)
+        return false;
+
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
 
@@ -704,14 +709,14 @@ bool PlayerPrivate::initDataProvider()
                 r = guardedThis->videoGeometry;
             }
 
-            if (conf.hwVideoX != -1)
-                r.setX(conf.hwVideoX);
-            if (conf.hwVideoY != -1)
-                r.setY(conf.hwVideoY);
-            if (conf.hwVideoWidth != -1)
-                r.setWidth(conf.hwVideoWidth);
-            if (conf.hwVideoHeight != -1)
-                r.setHeight(conf.hwVideoHeight);
+            if (ini().hwVideoX != -1)
+                r.setX(ini().hwVideoX);
+            if (ini().hwVideoY != -1)
+                r.setY(ini().hwVideoY);
+            if (ini().hwVideoWidth != -1)
+                r.setWidth(ini().hwVideoWidth);
+            if (ini().hwVideoHeight != -1)
+                r.setHeight(ini().hwVideoHeight);
 
             return r;
         });
@@ -758,7 +763,7 @@ Player::Player(QObject *parent):
 {
     Q_D(const Player);
     d->log(lit("Player()"));
-    conf.reload();
+    ini().reload();
 }
 
 Player::~Player()
@@ -852,6 +857,7 @@ void Player::play()
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
+    d->dataConsumer->setAudioEnabled(true);
 
     d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
@@ -865,6 +871,7 @@ void Player::pause()
     d->log(lit("pause()"));
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
+    d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::preview()
@@ -872,6 +879,7 @@ void Player::preview()
     Q_D(Player);
     d->log(lit("preview()"));
     d->setState(State::Previewing);
+    d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::stop()
@@ -904,7 +912,7 @@ void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
 
-    const QUrl& newUrl = *conf.substitutePlayerUrl ? QUrl(conf.substitutePlayerUrl) : url;
+    const QUrl& newUrl = *ini().substitutePlayerUrl ? QUrl(ini().substitutePlayerUrl) : url;
 
     if (newUrl == d->url)
     {
@@ -1004,9 +1012,9 @@ void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
 
-    if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
+    if (ini().forceIframesOnly && videoQuality == LowVideoQuality)
     {
-        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+        d->log(lit("setVideoQuality(%1): .ini forceIframesOnly is set => use value %2")
             .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
         videoQuality = LowIframesOnlyVideoQuality;
     }
@@ -1046,6 +1054,80 @@ Player::VideoQuality Player::actualVideoQuality() const
         default:
             return HighVideoQuality;
     }
+}
+
+QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) const
+{
+    Q_D(const Player);
+
+    d->log(lit("availableVideoQualities() BEGIN"));
+
+    QList<int> result;
+
+    const auto transcodingCoded = d->archiveReader
+        ? d->archiveReader->getTranscodingCodec()
+        : QnArchiveStreamReader(d->resource).getTranscodingCodec();
+
+    const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return result; //< Setting videoQuality for files is not supported.
+
+    auto getQuality =
+        [&camera,
+            transcodingCoded,
+            liveMode = d->liveMode,
+            positionMs = d->positionMs,
+            currentVideoDecoders = d->dataConsumer
+                ? d->dataConsumer->currentVideoDecoders()
+                : std::vector<AbstractVideoDecoder*>()](
+                    int quality)
+        {
+            return media_player_quality_chooser::chooseVideoQuality(
+                transcodingCoded, quality, liveMode, positionMs, camera, currentVideoDecoders);
+        };
+
+    const auto& highQuality = getQuality(HighVideoQuality);
+    const auto& maximumResolution = highQuality.frameSize;
+
+    bool customResolutionAvailable = false;
+    QList<int> customQualities;
+
+    for (auto videoQuality: videoQualities)
+    {
+        switch (videoQuality)
+        {
+            case LowIframesOnlyVideoQuality:
+            case LowVideoQuality:
+                if (getQuality(videoQuality).quality == videoQuality)
+                    result.append(videoQuality);
+                break;
+
+            case HighVideoQuality:
+                if (highQuality.quality == videoQuality)
+                    result.append(videoQuality);
+                break;
+
+            default:
+            {
+                const auto& resultQuality = getQuality(videoQuality);
+                if (resultQuality.quality != UnknownVideoQuality
+                    && resultQuality.frameSize.height() <= maximumResolution.height())
+                {
+                    customQualities.append(videoQuality);
+
+                    if (resultQuality.quality == CustomVideoQuality)
+                        customResolutionAvailable = true;
+                }
+            }
+        }
+    }
+
+    d->log(lit("availableVideoQualities() END"));
+
+    if (customResolutionAvailable)
+        return result + customQualities;
+
+    return result;
 }
 
 QSize Player::currentResolution() const
@@ -1114,6 +1196,8 @@ void Player::testSetCamera(const QnResourcePtr& camera)
     Q_D(Player);
     d->resource = camera;
 }
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
 
 } // namespace media
 } // namespace nx

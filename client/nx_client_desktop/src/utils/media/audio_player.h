@@ -141,7 +141,7 @@ private:
     QnWaitCondition m_cond;
     State m_state;
     QnExtIODeviceStorageResourcePtr m_storage;
-    std::auto_ptr<QBuffer> m_synthesizingTarget;
+    std::unique_ptr<QBuffer> m_synthesizingTarget;
     QString m_textToPlay;
     ResultCode m_resultCode;
 

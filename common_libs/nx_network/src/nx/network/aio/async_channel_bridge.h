@@ -104,16 +104,22 @@ public:
             [this]()
             {
                 m_leftToRight->start(
-                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this, _1));
+                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this,
+                        _1, m_rightToLeft.get()));
                 m_rightToLeft->start(
-                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this, _1));
+                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this,
+                        _1, m_leftToRight.get()));
                 startInactivityTimerIfNeeded();
             });
     }
 
 private:
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftChannel, RightChannel>> m_leftToRight;
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightChannel, LeftChannel>> m_rightToLeft;
+    std::unique_ptr<
+        detail::AsyncChannelUnidirectionalBridgeImpl<LeftChannel, RightChannel>
+    > m_leftToRight;
+    std::unique_ptr<
+        detail::AsyncChannelUnidirectionalBridgeImpl<RightChannel, LeftChannel>
+    > m_rightToLeft;
 
     LeftChannel m_leftChannel;
     RightChannel m_rightChannel;
@@ -143,12 +149,12 @@ private:
 
     template<typename Source, typename Destination>
     void initializeOneWayChannel(
-        std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>* channel,
+        std::unique_ptr<detail::AsyncChannelUnidirectionalBridgeImpl<Source, Destination>>* channel,
         Source* source,
         Destination* destination)
     {
         *channel =
-            std::make_unique<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>(
+            std::make_unique<detail::AsyncChannelUnidirectionalBridgeImpl<Source, Destination>>(
                 *source,
                 *destination);
         (*channel)->setReadBufferSize(AsyncChannelBridge::kDefaultReadBufferSize);
@@ -156,11 +162,16 @@ private:
         (*channel)->setOnSomeActivity([this]() { onSomeActivity(); });
     }
 
-    void handleChannelClosure(SystemError::ErrorCode reason)
+    void handleChannelClosure(
+        SystemError::ErrorCode reason,
+        const detail::AsyncChannelUnidirectionalBridge* theOtherUnidirectionalBridge)
     {
         ++m_closedChannelCount;
-        if (m_closedChannelCount < 2)
+        if (m_closedChannelCount < 2 && 
+            !theOtherUnidirectionalBridge->isSendQueueEmpty())
+        {
             return;
+        }
         reportFailure(reason);
     }
 

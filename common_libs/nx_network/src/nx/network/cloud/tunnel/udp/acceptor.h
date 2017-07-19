@@ -6,7 +6,6 @@
 #include <nx/network/cloud/tunnel/udp/incoming_control_connection.h>
 #include <nx/network/udt/udt_socket.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -17,20 +16,21 @@ namespace udp {
  * wrapped into IncomingTunnelConnection. In case if control connection can not be estabilished
  * the error is returned.
  */
-class NX_NETWORK_API TunnelAcceptor
-:
+class NX_NETWORK_API TunnelAcceptor:
     public AbstractTunnelAcceptor
 {
 public:
     TunnelAcceptor(
+        const SocketAddress& mediatorUdpEndpoint,
         std::list<SocketAddress> peerAddresses,
         nx::hpm::api::ConnectionParameters connectionParametes);
 
     void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
     void setUdpMaxRetransmissions(int count);
+    void setHolePunchingEnabled(bool value);
 
-    void accept(AcceptHandler handler) override;
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void accept(AcceptHandler handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void connectionAckResult(nx::hpm::api::ResultCode code);
@@ -45,8 +45,10 @@ private:
 
     const std::list<SocketAddress> m_peerAddresses;
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
+    SocketAddress m_mediatorUdpEndpoint;
     std::chrono::milliseconds m_udpRetransmissionTimeout;
     int m_udpMaxRetransmissions;
+    bool m_holePunchingEnabled;
 
     std::unique_ptr<hpm::api::MediatorServerUdpConnection> m_udpMediatorConnection;
     std::list<std::unique_ptr<UdtStreamSocket>> m_sockets;

@@ -25,9 +25,9 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString OldEcConnection::authInfo() const
+    void OldEcConnection::updateConnectionUrl(const QUrl& /*url*/)
     {
-        return m_connectionInfo.ecUrl.password();
+        NX_EXPECT(false, "Should never get here");
     }
 
     AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
@@ -65,7 +65,7 @@ namespace ec2
         return AbstractLayoutManagerPtr();
     }
 
-    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData& userAccessData)
+    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
     {
         return AbstractLayoutTourManagerPtr();
     }
@@ -201,11 +201,11 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const QUrl& /*url*/)
     {
     }
 
-    void OldEcConnection::deleteRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::deleteRemotePeer(const QnUuid& /*id*/)
     {
     }
 

@@ -6,9 +6,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 
+#include <ui/common/palette.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/busy_indicator.h>
+#include <ui/widgets/common/autoscaled_plain_text.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -24,9 +29,13 @@ LayoutPreviewPainter::LayoutPreviewPainter(
     base_type(parent),
     m_thumbnailManager(thumbnailManager),
     m_frameColor(Qt::black),
-    m_backgroundColor(Qt::darkGray)
+    m_backgroundColor(Qt::darkGray),
+    m_itemBackgroundColor(Qt::black),
+    m_fontColor(Qt::white),
+    m_busyIndicator(new QnBusyIndicator())
 {
     NX_EXPECT(thumbnailManager);
+
 }
 
 LayoutPreviewPainter::~LayoutPreviewPainter()
@@ -63,6 +72,26 @@ void LayoutPreviewPainter::setBackgroundColor(const QColor& value)
     m_backgroundColor = value;
 }
 
+QColor LayoutPreviewPainter::itemBackgroundColor() const
+{
+    return m_itemBackgroundColor;
+}
+
+void LayoutPreviewPainter::setItemBackgroundColor(const QColor& value)
+{
+    m_itemBackgroundColor = value;
+}
+
+QColor LayoutPreviewPainter::fontColor() const
+{
+    return m_fontColor;
+}
+
+void LayoutPreviewPainter::setFontColor(const QColor& value)
+{
+    m_fontColor = value;
+}
+
 void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 {
     static const int kFrameWidth = 1;
@@ -90,7 +119,8 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     if (bounding.isEmpty())
         return;
 
-    qreal space = m_layout->cellSpacing() * 0.5;
+    // Handle negative spacing for exported layouts.
+    qreal space = std::max(0.0, m_layout->cellSpacing() * 0.5);
 
     qreal cellAspectRatio = m_layout->hasCellAspectRatio()
         ? m_layout->cellAspectRatio()
@@ -100,7 +130,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
 
     QRect contentsRect(paintRect);
-    contentsRect.adjust(kFrameWidth * 2, kFrameWidth * 2, -kFrameWidth * 2, -kFrameWidth * 2);
+    contentsRect.adjust(-kFrameWidth, -kFrameWidth, kFrameWidth, kFrameWidth);
     qreal targetAr = QnGeometry::aspectRatio(contentsRect);
     if (sourceAr > targetAr)
     {
@@ -121,7 +151,6 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         xoffset = (contentsRect.width() - w) * 0.5 + contentsRect.left();
     }
 
-    bool allItemsAreLoaded = true;
     for (const auto& data: m_layout->getItems())
     {
         QRectF cellRect = data.combinedGeometry;
@@ -135,102 +164,187 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         qreal h1 = (cellRect.height() - space * 2) * yscale;
 
         QRectF itemRect(x1, y1, w1, h1);
-        QnNxStyle::paintCosmeticFrame(painter, itemRect, m_frameColor, kFrameWidth, 0);
-        if (!paintItem(painter, itemRect, data))
-            allItemsAreLoaded = false;
+        paintItem(painter, QnGeometry::eroded(itemRect, 1), data);
     }
 
     QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
-
-//     const auto overlay = allItemsAreLoaded ? Qn::EmptyOverlay : Qn::LoadingOverlay;
-//     m_statusOverlayController->setStatusOverlay(overlay, true);
 }
 
-bool LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
-    const QnLayoutItemData& item)
+LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
+    const QnLayoutItemData& item) const
 {
-    // Return true in all invalid cases to avoid "Loading..." overlay when it is not needed anyway
-    NX_EXPECT(m_layout && m_layout->resourcePool());
-    if (!m_layout || !m_layout->resourcePool())
-        return true;
+    NX_EXPECT(m_layout);
+    if (!m_layout)
+        return ThumbnailInfo();
+
+    auto resourcePool = m_layout->resourcePool();
+    if (!resourcePool)
+        resourcePool = m_thumbnailManager->resourcePool();
+    NX_EXPECT(resourcePool);
+    if (!resourcePool)
+        return ThumbnailInfo();
+
+    const auto resource = resourcePool->getResourceByDescriptor(item.resource);
+    if (!resource)
+        return ThumbnailInfo();
+
+    //TODO: #GDM #rename placeholders
+    if (resource->hasFlags(Qn::server))
+        return qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png");
+
+    if (resource->hasFlags(Qn::web_page))
+        return qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png");
+
+    if (resource->hasFlags(Qn::local_media))
+        return qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png");
 
     if (!m_thumbnailManager)
-        return true;
-
-    const auto resource = m_layout->resourcePool()->getResourceByDescriptor(item.resource);
-    if (!resource)
-        return true;
+        return ThumbnailInfo();
 
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    NX_EXPECT(camera);
 
-    auto drawFixedThumbnail = [painter, &itemRect](const QPixmap& thumb)
+    //TODO: #GDM remove m_thumbnailManager->select and thumbnailReady?
+    if (!m_thumbnailManager->hasThumbnailForCamera(camera))
+        m_thumbnailManager->selectCamera(camera);
+
+    return ThumbnailInfo{
+        m_thumbnailManager->statusForCamera(camera),
+        false,
+        QPixmap::fromImage(m_thumbnailManager->thumbnailForCamera(camera))};
+}
+
+void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
+    const QnLayoutItemData& item)
+{
+    const auto info = thumbnailForItem(item);
+    if (!info.pixmap.isNull())
+    {
+        auto ar = QnGeometry::aspectRatio(info.pixmap.size());
+        auto rect = QnGeometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
+
+        if (info.ignoreTrasformation)
         {
-            auto ar = QnGeometry::aspectRatio(thumb.size());
-            auto rect = QnGeometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
-            painter->drawPixmap(rect, thumb);
-        };
-
-    if (resource->hasFlags(Qn::server))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png"));
-    }
-    else if (resource->hasFlags(Qn::web_page))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png"));
-    }
-    else if (resource->hasFlags(Qn::local_media))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png"));
-    }
-    else if (m_thumbnailManager->hasThumbnailForCamera(camera))
-    {
-        QPixmap pixmap = QPixmap::fromImage(m_thumbnailManager->thumbnailForCamera(camera));
-        QSize mediaLayout = camera->getVideoLayout()->size();
-        // ensure width and height are not zero
-        mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
-        mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
-
-        QRectF sourceRect(0, 0, pixmap.width() * mediaLayout.width(),
-            pixmap.height() * mediaLayout.height());
-
-        auto drawPixmap =
-            [painter, &pixmap, &mediaLayout](const QRectF& targetRect)
-            {
-                int width = targetRect.width() / mediaLayout.width();
-                int height = targetRect.height() / mediaLayout.height();
-                for (int i = 0; i < mediaLayout.width(); ++i)
-                {
-                    for (int j = 0; j < mediaLayout.height(); ++j)
-                    {
-                        painter->drawPixmap(QRectF(targetRect.left() + width * i,
-                            targetRect.top() + height * j, width, height).toRect(), pixmap);
-                    }
-                }
-            };
-
-        if (!qFuzzyIsNull(item.rotation))
-        {
-            QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
-            painter->translate(itemRect.center());
-            painter->rotate(item.rotation);
-            painter->translate(-itemRect.center());
-            drawPixmap(QnGeometry::encloseRotatedGeometry(itemRect, QnGeometry::aspectRatio(sourceRect), item.rotation));
+            painter->drawPixmap(rect, info.pixmap);
         }
         else
         {
-            drawPixmap(itemRect);
+            auto drawPixmap =
+                [painter, &info, zoomRect = item.zoomRect](const QRect& targetRect)
+                {
+                    if (zoomRect.isNull())
+                    {
+                        painter->drawPixmap(targetRect, info.pixmap);
+                    }
+                    else
+                    {
+                        painter->drawPixmap(targetRect, info.pixmap,
+                            QnGeometry::subRect(info.pixmap.rect(), zoomRect).toRect());
+                    }
+                };
+
+            if (!qFuzzyIsNull(item.rotation))
+            {
+                QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
+                painter->translate(itemRect.center());
+                painter->rotate(item.rotation);
+                painter->translate(-itemRect.center());
+                const auto targetRect = QnGeometry::encloseRotatedGeometry(rect,
+                    QnGeometry::aspectRatio(info.pixmap.size()), item.rotation);
+
+                drawPixmap(targetRect.toRect());
+            }
+            else
+            {
+                drawPixmap(rect);
+            }
         }
-        return true;
     }
-
-    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+    else // Pixmap is absent
     {
-        m_thumbnailManager->selectCamera(camera);
-        return false;
-    }
+        switch (info.status)
+        {
+            case Qn::ThumbnailStatus::Loaded:
+                NX_EXPECT(false);
+                //fall-through
+            case Qn::ThumbnailStatus::Refreshing:
+            case Qn::ThumbnailStatus::Invalid:
+            case Qn::ThumbnailStatus::NoData:
+            {
+                static const int kMargin = 4;
 
-    return true;
+                QScopedPointer<QnAutoscaledPlainText> pw(new QnAutoscaledPlainText());
+                pw->setText(tr("NO DATA"));
+                pw->setProperty(style::Properties::kDontPolishFontProperty, true);
+                pw->setAlignment(Qt::AlignCenter);
+                pw->setGeometry(QnGeometry::eroded(itemRect.toRect(), kMargin));
+                setPaletteColor(pw.data(), QPalette::Window, m_itemBackgroundColor);
+
+                const int devicePixelRatio = painter->device()->devicePixelRatio();
+
+                /* Paint into sub-cache: */
+                QPixmap pixmap(itemRect.size().toSize() * devicePixelRatio);
+                pixmap.setDevicePixelRatio(devicePixelRatio);
+                pixmap.fill(Qt::transparent);
+                pw->render(&pixmap);
+
+                paintPixmapSharp(painter, pixmap, itemRect.topLeft() + QPoint(kMargin, kMargin));
+
+                break;
+            }
+
+            case Qn::ThumbnailStatus::Loading:
+            {
+                static const qreal kFillFactor = 0.5;
+                const auto busyRect = QnGeometry::expanded(
+                    QnGeometry::aspectRatio(m_busyIndicator->size()),
+                    itemRect.size() * kFillFactor,
+                    itemRect.center(),
+                    Qt::KeepAspectRatio);
+
+                qreal scaleFactor = QnGeometry::scaleFactor(m_busyIndicator->size(),
+                    busyRect.size(), Qt::KeepAspectRatio);
+
+                QnScopedPainterTransformRollback transformRollback(painter);
+                QnScopedPainterBrushRollback brushRollback(painter, m_fontColor);
+                QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+                QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+
+                painter->translate(busyRect.topLeft());
+                painter->scale(scaleFactor, scaleFactor);
+                m_busyIndicator->paint(painter);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
+
+LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo():
+    status(Qn::ThumbnailStatus::Invalid),
+    ignoreTrasformation(true)
+{
+}
+
+LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo(const QPixmap& pixmap):
+    status(Qn::ThumbnailStatus::Loaded),
+    ignoreTrasformation(true),
+    pixmap(pixmap)
+{
+}
+
+LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo(
+    Qn::ThumbnailStatus status,
+    bool ignoreTrasformation,
+    const QPixmap& pixmap)
+    :
+    status(status),
+    ignoreTrasformation(ignoreTrasformation),
+    pixmap(pixmap)
+{
+}
+
 
 } // namespace ui
 } // namespace desktop

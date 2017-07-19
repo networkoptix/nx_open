@@ -5,7 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
-#include <ec2/transaction_log_cache.h>
+#include <nx/cloud/cdb/ec2/transaction_log_cache.h>
 
 namespace nx {
 namespace cdb {
@@ -49,7 +49,7 @@ protected:
     void modifyDataUnderTran(TranId tranId)
     {
         CacheState& rawData = m_rawData[tranId];
-        rawData.timestampSequence = 
+        rawData.timestampSequence =
             nx::utils::random::number<int>(m_committedData.timestampSequence + 1);
 
         m_cache.updateTimestampSequence(tranId, rawData.timestampSequence);
@@ -95,7 +95,7 @@ protected:
     void assertIfCacheStateIsNotValid()
     {
         const auto newSequence = m_cache.generateTransactionSequence(
-            ::ec2::QnTranStateKey(QnUuid(m_peerId), m_dbId));
+            ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
         if (!m_transactionSequenceGenerated.empty())
         {
             ASSERT_GT(newSequence, *m_transactionSequenceGenerated.begin());
@@ -141,9 +141,9 @@ private:
         transactionHeader.peerID = QnUuid(m_peerId);
         transactionHeader.command = ::ec2::ApiCommand::saveCamera;
         transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
-        transactionHeader.persistentInfo.sequence = 
+        transactionHeader.persistentInfo.sequence =
             m_cache.generateTransactionSequence(
-                ::ec2::QnTranStateKey(QnUuid(m_peerId), m_dbId));
+                ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
         transactionHeader.persistentInfo.dbID = m_dbId;
         transactionHeader.persistentInfo.timestamp = m_cache.generateTransactionTimestamp(tranId);
         m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);

@@ -3,9 +3,9 @@
 
 namespace cf {
 async_thread_pool_executor::worker_thread::worker_thread() {
-  thread_ = nx::utils::thread([this] {
+  thread_ = std::thread([this] {
+    std::unique_lock<std::mutex> lock(m_);
     while (!need_stop_) {
-      std::unique_lock<std::mutex> lock(m_);
       start_cond_.wait(lock, [this] {
         return (bool)task_ || need_stop_; 
       });
@@ -26,8 +26,11 @@ async_thread_pool_executor::worker_thread::~worker_thread() {
 }
 
 void async_thread_pool_executor::worker_thread::stop() {
-  need_stop_ = true;
-  start_cond_.notify_all();
+  {
+    std::lock_guard<std::mutex> lock(m_);
+    need_stop_ = true;
+    start_cond_.notify_all();
+  }
   if (thread_.joinable())
     thread_.join();
 }
@@ -57,9 +60,9 @@ void async_thread_pool_executor::worker_thread::start_task(
 async_thread_pool_executor::async_thread_pool_executor(size_t size)
   : tp_(size),
     available_count_(size) {
-  manager_thread_ = nx::utils::thread([this] {
+  manager_thread_ = std::thread([this] {
+    std::unique_lock<std::mutex> lock(mutex_);
     while (!need_stop_) {
-      std::unique_lock<std::mutex> lock(mutex_);
       cond_.wait(lock, [this] {
         return need_stop_ || (!task_queue_.empty() && 
                               available_count_ > 0); 
@@ -86,8 +89,11 @@ async_thread_pool_executor::async_thread_pool_executor(size_t size)
 }
 
 async_thread_pool_executor::~async_thread_pool_executor() {
-  need_stop_ = true;
-  cond_.notify_all();
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    need_stop_ = true;
+    cond_.notify_all();
+  }
   if (manager_thread_.joinable())
     manager_thread_.join();
   for (auto& worker : tp_) {

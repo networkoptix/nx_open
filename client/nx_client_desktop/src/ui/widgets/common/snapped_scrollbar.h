@@ -18,12 +18,11 @@ public:
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment alignment);
 
-    bool useHeaderShift() const;
-    void setUseHeaderShift(bool useHeaderShift);
-
     bool useItemViewPaddingWhenVisible() const;
     void setUseItemViewPaddingWhenVisible(bool useItemViewPaddingWhenVisible);
 
+    // If useMaximumSpace is true, snapped scroll bar length fills entire parent.
+    // If false, snapped scroll bar aligns its length along original scroll bar.
     bool useMaximumSpace() const;
     void setUseMaximumSpace(bool useMaximumSpace);
 

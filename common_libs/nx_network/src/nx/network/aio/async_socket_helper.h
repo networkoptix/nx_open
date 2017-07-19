@@ -66,7 +66,7 @@ protected:
 template<class SocketType>
 class AsyncSocketImplHelper:
     public BaseAsyncSocketImplHelper<SocketType>,
-    public aio::AIOEventHandler<Pollable>
+    public aio::AIOEventHandler
 {
 public:
     AsyncSocketImplHelper(
@@ -262,7 +262,7 @@ public:
 
         QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
         ++m_recvAsyncCallCounter;
-        nx::network::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::network::SocketGlobals::aioService().startMonitoringNonSafe(
             &lk, this->m_socket, aio::etRead, this);
     }
 
@@ -283,7 +283,7 @@ public:
 
         QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
         ++m_connectSendAsyncCallCounter;
-        nx::network::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::network::SocketGlobals::aioService().startMonitoringNonSafe(
             &lk, this->m_socket, aio::etWrite, this);
     }
 
@@ -299,7 +299,7 @@ public:
 
         QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
         ++m_registerTimerCallCounter;
-        nx::network::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::network::SocketGlobals::aioService().startMonitoringNonSafe(
             &lk,
             this->m_socket,
             aio::etTimedOut,
@@ -352,7 +352,7 @@ public:
         std::atomic_thread_fence(std::memory_order_acquire);    //TODO #ak looks like it is not needed
 
         //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-        //  avoiding unnecessary removeFromWatch calls in eventTriggered
+        //  avoiding unnecessary stopMonitoring calls in eventTriggered
 
         if (eventType == aio::etRead || eventType == aio::etNone)
             ++m_recvAsyncCallCounter;
@@ -438,7 +438,7 @@ private:
                         return;     //most likely, socket has been removed in handler
                     QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
                     if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
-                        nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(
+                        nx::network::SocketGlobals::aioService().stopMonitoringNonSafe(
                             &lk, this->m_socket, aio::etWrite);
                 };
 
@@ -463,7 +463,7 @@ private:
                         return;     //most likely, socket has been removed in handler
                     QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
                     if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
-                        nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(
+                        nx::network::SocketGlobals::aioService().stopMonitoringNonSafe(
                             &lk, this->m_socket, aio::etRead);
                 };
 
@@ -489,7 +489,7 @@ private:
                         return;     //most likely, socket has been removed in handler
                     QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
                     if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
-                        nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(
+                        nx::network::SocketGlobals::aioService().stopMonitoringNonSafe(
                             &lk, this->m_socket, aio::etWrite);
                 };
 
@@ -559,7 +559,7 @@ private:
 
         QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
         ++m_connectSendAsyncCallCounter;
-        nx::network::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::network::SocketGlobals::aioService().startMonitoringNonSafe(
             &lk,
             this->m_socket,
             aio::etWrite,
@@ -587,7 +587,7 @@ private:
                 QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
                 {
-                    nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(
+                    nx::network::SocketGlobals::aioService().stopMonitoringNonSafe(
                         &lk, sock, aio::etTimedOut);
                 }
             };
@@ -803,14 +803,14 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
-            nx::network::SocketGlobals::aioService().removeFromWatch(
+            nx::network::SocketGlobals::aioService().stopMonitoring(
                 this->m_socket, aio::etRead, true);
             m_recvHandler = nullptr;
         }
 
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
-            nx::network::SocketGlobals::aioService().removeFromWatch(
+            nx::network::SocketGlobals::aioService().stopMonitoring(
                 this->m_socket, aio::etWrite, true);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
@@ -819,7 +819,7 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
         {
-            nx::network::SocketGlobals::aioService().removeFromWatch(
+            nx::network::SocketGlobals::aioService().stopMonitoring(
                 this->m_socket, aio::etTimedOut, true);
             m_timerHandler = nullptr;
         }
@@ -828,7 +828,7 @@ private:
 
 template <class SocketType>
 class AsyncServerSocketHelper:
-    public aio::AIOEventHandler<Pollable>
+    public aio::AIOEventHandler
 {
 public:
     AsyncServerSocketHelper(SocketType* _sock):
@@ -855,21 +855,23 @@ public:
         m_terminatedFlagPtr = &terminated;
         m_threadHandlerIsRunningIn.store(QThread::currentThreadId(), std::memory_order_release);
         const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
-        auto acceptHandlerBak = std::move(m_acceptHandler);
+        
+        decltype(m_acceptHandler) acceptHandlerBak;
+        acceptHandlerBak.swap(m_acceptHandler);
 
         auto acceptHandlerBakLocal = 
             [this, sock, acceptHandlerBak = std::move(acceptHandlerBak),
                     &terminated, acceptAsyncCallCountBak](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* newConnection)
+                std::unique_ptr<AbstractStreamSocket> newConnection)
             {
-                acceptHandlerBak(errorCode, newConnection);
+                acceptHandlerBak(errorCode, std::move(newConnection));
                 if (terminated)
                     return;
-                //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+                //if asyncAccept has been called from onNewConnection, no need to call stopMonitoring
                 QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
                 if (m_acceptAsyncCallCount == acceptAsyncCallCountBak)
-                    nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(&lk, sock, aio::etRead);
+                    nx::network::SocketGlobals::aioService().stopMonitoringNonSafe(&lk, sock, aio::etRead);
                 m_threadHandlerIsRunningIn.store(nullptr, std::memory_order_release);
                 m_terminatedFlagPtr = nullptr;
             };
@@ -879,10 +881,11 @@ public:
             case aio::etRead:
             {
                 //accepting socket
-                AbstractStreamSocket* newSocket = m_sock->systemAccept();
-                acceptHandlerBakLocal(
-                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
-                    newSocket);
+                std::unique_ptr<AbstractStreamSocket> newSocket(m_sock->systemAccept());
+                const auto resultCode = newSocket != nullptr
+                    ? SystemError::noError
+                    : SystemError::getLastOSErrorCode();
+                acceptHandlerBakLocal(resultCode, std::move(newSocket));
                 break;
             }
 
@@ -904,28 +907,25 @@ public:
         }
     }
 
-    void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler)
+    void acceptAsync(AcceptCompletionHandler handler)
     {
         m_acceptHandler = std::move(handler);
 
         QnMutexLocker lk(nx::network::SocketGlobals::aioService().mutex());
         ++m_acceptAsyncCallCount;
         // TODO: #ak Usually, acceptAsync is called repeatedly. 
-        // SHOULD avoid unneccessary watchSocket and removeFromWatch calls.
-        return nx::network::SocketGlobals::aioService().watchSocketNonSafe(
+        // SHOULD avoid unneccessary startMonitoring and stopMonitoring calls.
+        return nx::network::SocketGlobals::aioService().startMonitoringNonSafe(
             &lk, m_sock, aio::etRead, this);
     }
 
-    void cancelIOAsync(nx::utils::MoveOnlyFunc< void() > handler)
+    void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
     {
         nx::network::SocketGlobals::aioService().dispatch(
             this->m_sock,
             [this, handler = move(handler)]() mutable
             {
-                nx::network::SocketGlobals::aioService().removeFromWatch(
+                nx::network::SocketGlobals::aioService().stopMonitoring(
                     m_sock, aio::etRead, true);
 
                 ++m_acceptAsyncCallCount;
@@ -945,18 +945,16 @@ public:
     {
         nx::network::SocketGlobals::aioService().cancelPostedCalls(
             m_sock, true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().stopMonitoring(
             m_sock, aio::etRead, true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().stopMonitoring(
             m_sock, aio::etTimedOut, true);
     }
 
 private:
     SocketType* m_sock;
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> m_acceptHandler;
+    AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };

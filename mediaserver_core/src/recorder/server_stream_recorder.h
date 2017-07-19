@@ -1,5 +1,6 @@
-#ifndef __SERVER_STREAM_RECORDER_H__
-#define __SERVER_STREAM_RECORDER_H__
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include <server/server_globals.h>
 
@@ -13,7 +14,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <recorder/dualstreaming_helper.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {
@@ -39,7 +40,7 @@ public:
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
-    void startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    void startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDurationSec);
 
     /*
     * Switch from forced recording mode to normal recording mode specified by schedule task
@@ -54,7 +55,7 @@ signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::event::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
@@ -121,6 +122,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
     QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
+    QElapsedTimer m_forcedSchedileRecordTimer;
+    int m_forcedScheduleRecordDurationMs;
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
@@ -135,5 +138,3 @@ private:
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
 };
-
-#endif // __SERVER_STREAM_RECORDER_H__

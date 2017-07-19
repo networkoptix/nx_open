@@ -66,7 +66,7 @@ void ConnectHandler::processRequest(
 
 void ConnectHandler::closeConnection(
     SystemError::ErrorCode /*closeReason*/,
-    nx_http::AsyncMessagePipeline* /*connection*/)
+    nx_http::deprecated::AsyncMessagePipeline* /*connection*/)
 {
     m_connectionSocket.reset();
     m_targetSocket.reset();
@@ -74,7 +74,7 @@ void ConnectHandler::closeConnection(
 
 void ConnectHandler::connect(const SocketAddress& address)
 {
-    NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").str(address)
+    NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
         .arg(m_connectionSocket).arg(m_targetSocket), cl_logDEBUG1);
 
     m_targetSocket->connectAsync(

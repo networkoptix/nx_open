@@ -3,10 +3,14 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx/network/socket_global.h>
@@ -17,16 +21,6 @@
 #include <utils/common/app_info.h>
 
 #include <nx/utils/log/log.h>
-
-namespace {
-
-void trace(const QString& message)
-{
-    qDebug() << "QnClientMessageProcessor: " << message;
-    //NX_LOG(lit("QnClientMessageProcessor: ") + message), cl_logDEBUG1);
-}
-
-}
 
 QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
     base_type(parent),
@@ -42,13 +36,13 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     {
         if (m_status.state() != QnConnectionState::Reconnecting)
         {
-            trace(lit("init, state -> Connecting"));
+            NX_DEBUG(this, "init, state -> Connecting");
             m_status.setState(QnConnectionState::Connecting);
         }
     }
     else
     {
-        trace(lit("init NULL, state -> Disconnected"));
+        NX_DEBUG(this, lit("init NULL, state -> Disconnected"));
         m_status.setState(QnConnectionState::Disconnected);
     }
 
@@ -57,7 +51,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     {
         auto info = connection->connectionInfo();
         const auto serverId = info.serverId();
-        trace(lit("Connection established to %1").arg(serverId.toString()));
+        NX_DEBUG(this, lit("Connection established to %1").arg(serverId.toString()));
 
         /*
          * For cloud connections we can get here url, containing only system id.
@@ -72,13 +66,10 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
             NX_EXPECT(nx::network::SocketGlobals::addressResolver().isCloudHostName(fullHost));
             if (host != fullHost)
             {
-                trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
-                NX_ASSERT(false, "Correct url must be filled in ecUrl");
-                //TODO: #GDM #FIXME #3.1 Restore functionality
-//                 info.ecUrl.setHost(fullHost);
-//                 connection->setConnectionInfo(info);
-//
-//                 QnAppServerConnectionFactory::setUrl(currentUrl);
+                NX_DEBUG(this, lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
+                NX_EXPECT(false, "Correct url must be filled in ecUrl");
+                currentUrl.setHost(fullHost);
+                connection->updateConnectionUrl(currentUrl);
             }
         }
 
@@ -91,6 +82,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
         data.peer.id = commonModule()->remoteGUID();
         commonModule()->setRemoteGUID(QnUuid());
         m_connected = false;
+        NX_DEBUG(this, "Deinit while connected, connection closed");
         emit connectionClosed();
     }
     else if (!commonModule()->remoteGUID().isNull())
@@ -108,13 +100,17 @@ const QnClientConnectionStatus* QnClientMessageProcessor::connectionStatus() con
 
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 {
+    NX_DEBUG(this, lm("Hold connection set to %1").arg(holdConnection));
     if (m_holdConnection == holdConnection)
         return;
 
     m_holdConnection = holdConnection;
 
     if (!m_holdConnection && !m_connected && !commonModule()->remoteGUID().isNull())
+    {
+        NX_DEBUG(this, "Unholding connection while disconnected, connection closed");
         emit connectionClosed();
+    }
 }
 
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -126,6 +122,14 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 {
     base_type::disconnectFromConnection(connection);
     connection->getMiscNotificationManager()->disconnect(this);
+}
+
+void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+{
+    if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
+        return;
+
+    base_type::handleTourAddedOrUpdated(tour);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(
@@ -180,9 +184,9 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     }
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data)
+void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerFound(data);
+    base_type::handleRemotePeerFound(peer, peerType);
 
     /*
      * Avoiding multiple connectionOpened() if client was on breakpoint or
@@ -193,30 +197,31 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
 
     if (commonModule()->remoteGUID().isNull())
     {
-        qWarning() << "at_remotePeerFound received while disconnected";
+        NX_WARNING(this, "Remote peer found while disconnected");
         return;
     }
 
-    if (data.peer.id != commonModule()->remoteGUID())
+    if (peer != commonModule()->remoteGUID())
         return;
 
-    trace(lit("peer found, state -> Connected"));
+    NX_DEBUG(this, lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
+    NX_DEBUG(this, "Remote peer found, connection opened");
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data)
+void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerLost(data);
+    base_type::handleRemotePeerLost(peer, peerType);
 
     if (commonModule()->remoteGUID().isNull())
     {
-        qWarning() << "at_remotePeerLost received while disconnected";
+        NX_WARNING(this, "Remote peer lost while disconnected");
         return;
     }
 
-    if (data.peer.id != commonModule()->remoteGUID())
+    if (peer != commonModule()->remoteGUID())
         return;
 
     /*
@@ -227,7 +232,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     if (!m_connected)
         return;
 
-    trace(lit("peer lost, state -> Reconnecting"));
+    NX_DEBUG(this, lit("peer lost, state -> Reconnecting"));
     m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
@@ -237,15 +242,22 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     m_connected = false;
 
     if (!m_holdConnection)
+    {
+        NX_DEBUG(this, "Connection closed");
         emit connectionClosed();
+    }
+    else
+    {
+        NX_DEBUG(this, "Holding connection...");
+    }
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-    trace(lit("resources received, state -> Ready"));
+    NX_DEBUG(this, lit("resources received, state -> Ready"));
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
-    trace(lit("Received initial notification while connected to %1")
+    NX_DEBUG(this, lit("Received initial notification while connected to %1")
         .arg(commonModule()->remoteGUID().toString()));
     NX_EXPECT(commonModule()->currentServer());
 

@@ -9,6 +9,7 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
 
 namespace nx {
@@ -47,7 +48,9 @@ public:
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(mediator().stunEndpoint());
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(mediator().stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
 
@@ -64,7 +67,7 @@ public:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
     {
         auto serverSocket = std::make_unique<CloudServerSocket>(
-            SocketGlobals::mediatorConnector().systemConnection());
+            &SocketGlobals::mediatorConnector());
 
         serverSocket->setSupportedConnectionMethods(m_methods);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
@@ -99,8 +102,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
 TEST_F(UdpHolePunching, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket().release(), false); },
-        []() { return std::make_unique<deprecated::SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket(), false); },
+        []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
         SocketAddress(m_server->fullName()));
 }
 
@@ -185,10 +188,11 @@ protected:
     {
         m_serverSocket = cloudServerSocket();
         m_serverSocket->acceptAsync(
-            [this](SystemError::ErrorCode /*errorCode*/, AbstractStreamSocket* newConnection)
+            [this](
+                SystemError::ErrorCode /*errorCode*/,
+                std::unique_ptr<AbstractStreamSocket> newConnection)
             {
-                m_acceptedConnections.push_back(
-                    std::unique_ptr<AbstractStreamSocket>(newConnection));
+                m_acceptedConnections.push_back(std::move(newConnection));
             });
     }
 

@@ -5,8 +5,8 @@
 #include <nx/network/cloud/tunnel/relay/relay_connector.h>
 #include <nx/utils/std/future.h>
 
-#include "client_to_relay_connection.h"
-#include "cloud_relay_fixture_base.h"
+#include "api/relay_api_client_stub.h"
+#include "cloud_relay_basic_fixture.h"
 
 namespace nx {
 namespace network {
@@ -14,19 +14,21 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+static constexpr auto kTimeout = std::chrono::milliseconds(1);
+
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
 
-class CloudRelayConnector:
-    public CloudRelayFixtureBase
+class RelayConnector:
+    public BasicFixture
 {
 public:
-    CloudRelayConnector():
+    RelayConnector():
         m_prevClientToRelayConnectionInstanciated(nullptr)
     {
     }
 
-    ~CloudRelayConnector()
+    ~RelayConnector()
     {
         m_connector->pleaseStopSync();
     }
@@ -34,33 +36,33 @@ public:
 protected:
     void givenHappyRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
     }
 
     void givenUnhappyRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
-        m_prevClientToRelayConnectionInstanciated.load()->setFailRequests(true);
+        m_prevClientToRelayConnectionInstanciated.load()->setFailRequests();
     }
 
     void givenSilentRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
-        m_prevClientToRelayConnectionInstanciated.load()->setIgnoreRequests(true);
+        m_prevClientToRelayConnectionInstanciated.load()->setIgnoreRequests();
     }
 
     void whenConnectorIsInvoked()
@@ -70,7 +72,7 @@ protected:
         m_connector->connect(
             hpm::api::ConnectResponse(),
             std::chrono::milliseconds::zero(),
-            std::bind(&CloudRelayConnector::onConnectFinished, this, _1, _2, _3));
+            std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
     }
 
     void whenConnectorIsInvokedWithTimeout()
@@ -79,8 +81,13 @@ protected:
 
         m_connector->connect(
             hpm::api::ConnectResponse(),
-            std::chrono::milliseconds(1),
-            std::bind(&CloudRelayConnector::onConnectFinished, this, _1, _2, _3));
+            kTimeout,
+            std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
+    }
+
+    void waitForAnyResponseReported()
+    {
+        m_connectFinished.get_future().get();
     }
 
     void assertConnectorProvidedAConnection()
@@ -115,6 +122,12 @@ protected:
             m_prevClientToRelayConnectionInstanciated.load()->scheduledRequestCount() == 0);
     }
 
+    void assertConnectorTimeoutIsNotReported()
+    {
+        // Reporting timeout reuslts in crash, so just have to wait.
+        std::this_thread::sleep_for(kTimeout * 7);
+    }
+
 private:
     struct Result
     {
@@ -136,17 +149,18 @@ private:
 
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
-    SocketAddress m_relayEndpoint;
-    std::atomic<ClientToRelayConnection*> m_prevClientToRelayConnectionInstanciated;
+    QUrl m_relayUrl;
+    std::atomic<nx::cloud::relay::api::test::ClientImpl*>
+        m_prevClientToRelayConnectionInstanciated;
 
     virtual void onClientToRelayConnectionInstanciated(
-        ClientToRelayConnection* connection) override
+        nx::cloud::relay::api::test::ClientImpl* connection) override
     {
         m_prevClientToRelayConnectionInstanciated = connection;
     }
 
     virtual void onClientToRelayConnectionDestroyed(
-        ClientToRelayConnection* clientToRelayConnection) override
+        nx::cloud::relay::api::test::ClientImpl* clientToRelayConnection) override
     {
         m_prevClientToRelayConnectionInstanciated.compare_exchange_strong(
             clientToRelayConnection, nullptr);
@@ -164,26 +178,34 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(CloudRelayConnector, creates_connection_on_success_response_from_relay)
+TEST_F(RelayConnector, creates_connection_on_success_response_from_relay)
 {
     givenHappyRelay();
     whenConnectorIsInvoked();
     assertConnectorProvidedAConnection();
 }
 
-TEST_F(CloudRelayConnector, reports_error_on_relay_request_failure)
+TEST_F(RelayConnector, reports_error_on_relay_request_failure)
 {
     givenUnhappyRelay();
     whenConnectorIsInvoked();
     assertConnectorReportedError();
 }
 
-TEST_F(CloudRelayConnector, reports_timedout_on_relay_request_timeout)
+TEST_F(RelayConnector, reports_timedout_on_relay_request_timeout)
 {
     givenSilentRelay();
     whenConnectorIsInvokedWithTimeout();
     assertTimedOutHasBeenReported();
     assertRequestToRelayServerHasBeenCancelled();
+}
+
+TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
+{
+    givenHappyRelay();
+    whenConnectorIsInvokedWithTimeout();
+    waitForAnyResponseReported();
+    assertConnectorTimeoutIsNotReported();
 }
 
 } // namespace test

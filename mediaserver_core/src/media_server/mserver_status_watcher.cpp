@@ -5,16 +5,15 @@
 
 #include "mserver_status_watcher.h"
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <media_server/serverutil.h>
 #include <utils/common/synctime.h>
-
-#include "business/business_event_connector.h"
-#include "serverutil.h"
-#include "business/events/mserver_failure_business_event.h"
-#include "business/business_rule_processor.h"
-#include <common/common_module.h>
-
+#include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/event/events/server_failure_event.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/mediaserver/event/rule_processor.h>
 
 static const long long USEC_PER_MSEC = 1000;
 static const int SEND_ERROR_TIMEOUT = 1000 * 60;
@@ -37,7 +36,7 @@ void MediaServerStatusWatcher::sendError()
         OfflineServerData& data = itr.value();
         if (data.timer.elapsed() > SEND_ERROR_TIMEOUT/2)
         {
-            qnBusinessRuleProcessor->processBusinessEvent(data.serverData);
+            qnEventRuleProcessor->processEvent(data.serverData);
             itr = m_candidatesToError.erase(itr);
         }
         else {
@@ -54,6 +53,7 @@ void MediaServerStatusWatcher::at_resource_removed( const QnResourcePtr& resourc
 
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
+
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
     if( !mserverRes )
         return;
@@ -97,16 +97,18 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
             return; //it is not we who was chosen to send event
     }
 
-    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(mserverRes, qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC, QnBusiness::ServerTerminatedReason, QString()));
+    nx::vms::event::ServerFailureEventPtr event(new nx::vms::event::ServerFailureEvent(
+        mserverRes, qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC,
+        nx::vms::event::EventReason::serverTerminated, QString()));
     OfflineServerData data;
-    data.serverData = mserverEvent;
+    data.serverData = event;
     m_candidatesToError[mserverRes->getId()] = data;
     QTimer::singleShot(SEND_ERROR_TIMEOUT, this, SLOT(sendError()));
     /*
-    qnBusinessRuleConnector->at_mserverFailure(
+    qnEventRuleConnector->at_mserverFailure(
         mserverRes,
         qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC,
-        QnBusiness::ServerTerminatedReason,
+        nx::vms::event::ServerTerminatedReason,
         QString() );
     */
 }

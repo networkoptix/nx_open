@@ -21,23 +21,24 @@ public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnPresetPtzController();
 
-    static bool extends(Qn::PtzCapabilities capabilities);
+    static bool extends(Ptz::Capabilities capabilities, bool disableNative = false);
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
-    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool getPresets(QnPtzPresetList *presets) const override;
 
 private:
 	QString serializePresets(const QnPtzPresetRecordHash& presets);
 	QnPtzPresetRecordHash deserializePresets(const QString& presetsSerialized);
-	bool doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset);
+    bool doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset);
+    bool doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset) const;
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 	QnVirtualCameraResourcePtr m_camera;
 	std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>> m_propertyHandler;
 };

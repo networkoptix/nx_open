@@ -3,26 +3,34 @@
 #include <functional>
 #include <QtGui/QValidator>
 
-namespace Qn
+#include <core/resource/resource_fwd.h>
+
+class QnUuid;
+
+namespace Qn {
+
+struct ValidationResult
 {
-    struct ValidationResult
-    {
-        QValidator::State state;
-        QString errorMessage;
+    QValidator::State state;
+    QString errorMessage;
 
-        ValidationResult();
-        ValidationResult(const QString& errorMessage);
-        ValidationResult(QValidator::State state, const QString& errorMessage = QString());
-    };
+    ValidationResult();
+    ValidationResult(const QString& errorMessage);
+    ValidationResult(QValidator::State state, const QString& errorMessage = QString());
+};
 
-    static const ValidationResult kValidResult(QValidator::Acceptable);
+static const ValidationResult kValidResult(QValidator::Acceptable);
 
-    using TextValidateFunction = std::function<ValidationResult (const QString&)>;
-    using TextAccessorFunction = std::function<QString(void)>;
+using TextValidateFunction = std::function<ValidationResult (const QString&)>;
+using TextAccessorFunction = std::function<QString(void)>;
 
-    TextValidateFunction defaultIntValidator(int minValue, int maxValue, const QString& errorMessage);
-    TextValidateFunction defaultEmailValidator(bool allowEmpty = true);
-    TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
-    TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& emptyPasswordMessage = QString());
-    TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText, const QString& errorMessage);
-}
+TextValidateFunction defaultIntValidator(int minValue, int maxValue, const QString& errorMessage);
+TextValidateFunction defaultEmailValidator(bool allowEmpty = true);
+TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
+TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& emptyPasswordMessage = QString());
+TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText, const QString& errorMessage);
+
+using UserValidator = std::function<bool (const QnUserResourcePtr&)>;
+using RoleValidator = std::function<QValidator::State (const QnUuid&)>;
+
+} // namespace Qn

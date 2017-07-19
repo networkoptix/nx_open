@@ -4,7 +4,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <business/events/camera_input_business_event.h>
+#include <nx/vms/event/events/camera_input_event.h>
 
 #include <ui/common/aligner.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -30,13 +30,14 @@ void QnCameraInputBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *
     setTabOrder(ui->relayComboBox, after);
 }
 
-void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields & QnBusiness::EventResourcesField) {
+    if (fields.testFlag(Field::eventResources))
+    {
         QnIOPortDataList inputPorts;
         bool inited = false;
 
@@ -71,7 +72,8 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields f
             ui->relayComboBox->addItem(relayInput.getName(), relayInput.id);
     }
 
-    if (fields & QnBusiness::EventParamsField) {
+    if (fields.testFlag(Field::eventParams))
+    {
         QString text = model()->eventParams().inputPortId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));

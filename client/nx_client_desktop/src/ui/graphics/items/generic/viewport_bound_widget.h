@@ -16,31 +16,38 @@ class QnViewportScaleWatcher;
 class QnViewportBoundWidget: public GraphicsWidget
 {
     Q_OBJECT
+    using base_type = GraphicsWidget;
 
-    typedef GraphicsWidget base_type;
 public:
-    QnViewportBoundWidget(QGraphicsItem *parent = NULL);
+    QnViewportBoundWidget(QGraphicsItem* parent = nullptr);
     virtual ~QnViewportBoundWidget();
 
     /**
      * \returns                         Fixed size of this graphics widget, in parent coordinates.
      */
-    const QSizeF &fixedSize();
+    const QSizeF& fixedSize();
 
     /**
      * \param desiredSize               Fixed size of this graphics widget, in parent coordinates.
      */
-    void setFixedSize(const QSizeF &fixedSize);
+    void setFixedSize(const QSizeF& fixedSize);
 
-    virtual void setGeometry(const QRectF &geometry) override;
+    virtual void setGeometry(const QRectF& geometry) override;
 
     void updateScale();
+
+    qreal scale() const; //< Absolute scale
+    qreal sceneScale() const;
+    qreal relativeScale() const; //< scale() / sceneScale()
+
+signals:
+    void scaleChanged();
+
 protected:
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
 private:
     QSizeF m_fixedSize;
-
-    QGraphicsScale *m_scale;
+    QGraphicsScale* m_scale;
     QnViewportScaleWatcher* m_scaleWatcher;
 };

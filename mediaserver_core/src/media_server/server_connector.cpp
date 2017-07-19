@@ -2,7 +2,7 @@
 
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "network/module_information.h"
 #include <network/connection_validator.h>
 #include <nx/utils/log/log.h>
@@ -27,151 +27,105 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
 {
 }
 
-void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 {
-    if (!QnConnectionValidator::isCompatibleToCurrentSystem(
-        moduleInformation,
-        commonModule()))
-    {
-        bool used;
-        {
-            QnMutexLocker lock( &m_mutex );
-            used = m_usedAddresses.contains(address.toString());
-        }
-        if (used)
-        {
-            NX_LOG(lit("QnServerConnector: Module %1 has become incompatible. Url = %2, System name = %3, version = %4")
-                   .arg(moduleInformation.id.toString())
-                   .arg(address.toString())
-                   .arg(moduleInformation.systemName)
-                   .arg(moduleInformation.version.toString()),
-                   cl_logINFO);
-        }
-        NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since incompatible")
-            .arg(address.toString()).arg(moduleInformation.id.toString()),
-            cl_logDEBUG1);
-        removeConnection(moduleInformation, address);
-        return;
-    }
-
-    addConnection(moduleInformation, address);
+    QUrl moduleUrl;
+    moduleUrl.setScheme(module.sslAllowed ? lit("https") : lit("http"));
+    moduleUrl.setHost(module.endpoint.address.toString());
+    moduleUrl.setPort(module.endpoint.port);
+    return moduleUrl.toString();
 }
 
-void QnServerConnector::at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since address has been lost")
-        .arg(address.toString()).arg(moduleInformation.id.toString()),
-        cl_logDEBUG1);
-    removeConnection(moduleInformation, address);
-}
-
-void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
+void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& module)
 {
-    const auto& moduleFinder = commonModule()->moduleFinder();
-    if (QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule()))
+    const auto newUrl = makeModuleUrl(module);
     {
-        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
-            addConnection(moduleInformation, address);
-    }
-    else
-    {
-        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
+        QnMutexLocker lock(&m_mutex);
+        auto& value = m_urls[module.id];
+        if (value == newUrl)
         {
-            NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since module has been changed")
-                .arg(address.toString()).arg(moduleInformation.id.toString()),
-                cl_logDEBUG1);
-            removeConnection(moduleInformation, address);
-        }
-    }
-}
-
-void QnServerConnector::addConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    AddressInfo urlInfo;
-
-    {
-        QnMutexLocker lock( &m_mutex );
-
-        QString addressString = address.toString();
-
-        if (m_usedAddresses.contains(addressString)) {
-            NX_LOG(lit("QnServerConnector: Address %1 is already used.").arg(address.toString()), cl_logINFO);
+            NX_VERBOSE(this, lm("Module %1 change does not affect URL %2").args(module.id, newUrl));
             return;
         }
-
-        QUrl moduleUrl;
-        moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
-        moduleUrl.setHost(address.address.toString());
-        moduleUrl.setPort(address.port);
-        urlInfo.urlString = moduleUrl.toString();
-        urlInfo.peerId = moduleInformation.id;
-        m_usedAddresses.insert(addressString, urlInfo);
+        value = newUrl;
     }
 
-    NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
-
-    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    ec2Connection->addRemotePeer(urlInfo.urlString);
+    NX_DEBUG(this, lm("Adding connection to module %1 by URL %2").args(module.id, newUrl));
+    commonModule()->ec2Connection()->addRemotePeer(module.id, newUrl);
 }
 
-void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    QnMutexLocker lock( &m_mutex );
-    AddressInfo urlInfo = m_usedAddresses.take(address.toString());
-    lock.unlock();
-    if (urlInfo.peerId.isNull())
+void QnServerConnector::removeConnection(const QnUuid& id)
+{
+    QString moduleUrl;
+    {
+        QnMutexLocker lock(&m_mutex);
+        moduleUrl = m_urls.take(id);
+    }
+
+    if (moduleUrl.isNull())
         return;
 
-    NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
+    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
+    commonModule()->ec2Connection()->deleteRemotePeer(id);
 
-    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    ec2Connection->deleteRemotePeer(urlInfo.urlString);
-
-    QnResourcePtr mServer = resourcePool()->getResourceById(moduleInformation.id);
-    if (mServer && mServer->getStatus() == Qn::Unauthorized)
-        mServer->setStatus(Qn::Offline);
+    const auto server = resourcePool()->getResourceById(id);
+    if (server && server->getStatus() == Qn::Unauthorized)
+        server->setStatus(Qn::Offline);
 }
 
 void QnServerConnector::start()
 {
-    const auto& moduleFinder = commonModule()->moduleFinder();
-    connect(moduleFinder,     &QnModuleFinder::moduleAddressFound,    this,   &QnServerConnector::at_moduleFinder_moduleAddressFound);
-    connect(moduleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerConnector::at_moduleFinder_moduleAddressLost);
-    connect(moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
-
-    for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
-    {
-        if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule()))
-            continue;
-
-        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
-            addConnection(moduleInformation, address);
-    }
+    NX_DEBUG(this, "Started");
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
+        &QnServerConnector::at_moduleChanged,
+        &QnServerConnector::at_moduleChanged,
+        &QnServerConnector::at_moduleLost);
 }
 
 void QnServerConnector::stop()
 {
-    const auto& moduleFinder = commonModule()->moduleFinder();
-    moduleFinder->disconnect(this);
+    NX_DEBUG(this, "Stopped");
+    commonModule()->moduleDiscoveryManager()->disconnect(this);
 
-    QHash<QString, AddressInfo> usedUrls;
+    decltype(m_urls) usedUrls;
     {
-        QnMutexLocker lock( &m_mutex );
-        usedUrls = m_usedAddresses;
+        QnMutexLocker lock(&m_mutex);
+        usedUrls = m_urls;
     }
 
-    for (auto it = usedUrls.begin(); it != usedUrls.end(); ++it)
-    {
-        NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since stopping...")
-            .arg(it.key()).arg(it->peerId.toString()),
-            cl_logDEBUG1);
-        removeConnection(moduleFinder->moduleInformation(it->peerId), it.key());
-    }
+    for (const auto& it: m_urls.keys())
+        removeConnection(it);
 
     {
-        QnMutexLocker lock( &m_mutex );
-        m_usedAddresses.clear();
+        QnMutexLocker lock(&m_mutex);
+        m_urls.clear();
     }
 }
 
-void QnServerConnector::restart() {
+void QnServerConnector::restart()
+{
     stop();
     start();
+}
+
+void QnServerConnector::at_moduleFound(nx::vms::discovery::ModuleEndpoint module)
+{
+    if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
+        return addConnection(module);
+
+    NX_VERBOSE(this, lm("Ignore incompatable server %1 %2 %3 %4")
+        .args(module.id, module.endpoint, module.systemName, module.version));
+}
+
+void QnServerConnector::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
+{
+    if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
+        return addConnection(module);
+    else
+        return removeConnection(module.id);
+}
+
+void QnServerConnector::at_moduleLost(QnUuid id)
+{
+    removeConnection(id);
 }

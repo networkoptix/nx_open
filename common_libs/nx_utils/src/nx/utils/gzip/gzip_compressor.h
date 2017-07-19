@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 namespace gzip {
 
 class NX_UTILS_API Compressor
@@ -14,6 +14,6 @@ public:
 };
 
 } // namespace gzip
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

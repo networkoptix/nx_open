@@ -47,7 +47,7 @@ public:
     };
     Q_ENUM(Status)
 
-    explicit QnCloudStatusWatcher(QObject *parent = nullptr);
+    explicit QnCloudStatusWatcher(QObject *parent = nullptr, bool isMobile = true);
     ~QnCloudStatusWatcher();
 
     QnEncodedCredentials credentials() const;
@@ -66,7 +66,10 @@ public:
 
     void logSession(const QString& cloudSystemId);
 
-    QnEncodedCredentials createTemporaryCredentials() const;
+    /**
+     * Get temporary credentials for one-time use. Fast sequential calls will get the same result.
+     */
+    QnEncodedCredentials createTemporaryCredentials();
 
     Status status() const;
 

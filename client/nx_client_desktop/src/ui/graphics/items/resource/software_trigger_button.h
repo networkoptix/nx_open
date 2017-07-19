@@ -36,12 +36,12 @@ public:
     bool prolonged() const;
     void setProlonged(bool value);
 
-    enum State
+    enum class State
     {
-        kDefaultState, //< default state
-        kWaitingState, //< waiting for server response state
-        kSuccessState, //< show success notification state
-        kFailureState  //< show failure notification state
+        Default, //< default state
+        Waiting, //< waiting for server response state
+        Success, //< show success notification state
+        Failure  //< show failure notification state
     };
 
     State state() const;
@@ -49,6 +49,9 @@ public:
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
+
+    bool isLive() const;
+    void setLive(bool value);
 
 protected:
     using base_type::setIcon;

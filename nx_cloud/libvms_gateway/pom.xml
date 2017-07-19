@@ -23,23 +23,14 @@
         <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
         <rdep.packages>openssl any/qtsinglecoreapplication any/qtservice</rdep.packages>
     </properties>
-    
+
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
@@ -48,16 +39,16 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloud_db_client</artifactId>

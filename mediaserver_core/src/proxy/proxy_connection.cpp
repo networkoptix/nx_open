@@ -9,13 +9,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include "core/resource/network_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "media_server/server_message_processor.h"
 #include "network/router.h"
 #include "network/tcp_listener.h"
 #include "network/universal_tcp_listener.h"
 #include "proxy_connection_processor_p.h"
-#include "transaction/transaction_message_bus.h"
+#include <transaction/message_bus_selector.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -27,9 +27,8 @@
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
 #include "core/resource/network_resource.h"
-#include "transaction/transaction_message_bus.h"
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/unified_pollset.h>
@@ -46,14 +45,13 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-    ec2::QnTransactionMessageBus* messageBus,
+    ec2::QnTransactionMessageBusBase* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner->commonModule())
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
     d->messageBus = messageBus;
 }
@@ -63,10 +61,9 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(priv, std::move(socket), owner->commonModule())
+    QnTCPConnectionProcessor(priv, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
 }
 
@@ -136,10 +133,10 @@ static bool isLocalAddress(const QString& addr)
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-
+    auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
     if (route.reverseConnect) {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        d->dstSocket = d->owner->getProxySocket(
+        d->dstSocket = owner->getProxySocket(
             target.toString(),
             d->connectTimeout.count(),
             [&](int socketCount)
@@ -149,7 +146,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
                     commonModule()->moduleGUID());
                 tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
-                d->messageBus->sendTransaction(tran, target);
+                sendTransaction(d->messageBus, tran, target);
             });
     } else {
         d->dstSocket.clear();

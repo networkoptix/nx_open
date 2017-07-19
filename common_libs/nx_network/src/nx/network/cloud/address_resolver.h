@@ -107,11 +107,11 @@ public:
         \note Peer can have multiple addresses
     */
     void addFixedAddress(
-        const HostAddress& hostName, const SocketAddress& hostAddress);
+        const HostAddress& hostName, const SocketAddress& endpoint);
 
-    //!Removes added address
+    //!Removes added address, if endpoint is boost::none, removes all addresses.
     void removeFixedAddress(
-        const HostAddress& hostName, const SocketAddress& hostAddress);
+        const HostAddress& hostName, boost::optional<SocketAddress> endpoint = boost::none);
 
     //!Resolves domain address to the list of subdomains
     /*!
@@ -175,6 +175,9 @@ public:
     static const bool kResolveOnMediator = false;
 
     DnsResolver& dnsResolver() { return m_dnsResolver; }
+
+    /** @return true If endpoint is valid for socket connect. */
+    bool isValidForConnect(const SocketAddress& endpoint) const;
 
 protected:
     struct NX_NETWORK_API HostAddressInfo

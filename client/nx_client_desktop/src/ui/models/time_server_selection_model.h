@@ -1,17 +1,15 @@
-#ifndef TIME_SERVER_SELECTION_MODEL_H
-#define TIME_SERVER_SELECTION_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractTableModel>
+#include <QtCore/QTimer>
 
 #include <client/client_color_types.h>
-
 #include <utils/common/connective.h>
 #include <ui/customization/customized.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
-
-#include <ui/workbench/workbench_context_aware.h>
-
+#include <api/server_rest_connection.h>
 
 struct QnPeerRuntimeInfo;
 
@@ -57,8 +55,13 @@ public:
 
     bool sameTimezone() const;
 
+    bool hasInternetAccess() const;
+
     const QVector<QColor>& colors() const;
     void setColors(const QVector<QColor>& colors);
+    void updateTimeOffset();
+signals:
+    void hasInternetAccessChanged();
 
 private:
     void addItem(const QnPeerRuntimeInfo& info);
@@ -69,6 +72,7 @@ private:
 
     void updateFirstItemCheckbox();
 
+    void updateHasInternetAccess();
 private:
     struct Item
     {
@@ -86,8 +90,10 @@ private:
 
     QVector<QColor> m_colors;
 
+    bool m_hasInternetAccess;
+
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;
-};
 
-#endif // TIME_SERVER_SELECTION_MODEL_H
+    rest::Handle m_currentRequest;
+};

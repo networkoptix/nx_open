@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
@@ -7,7 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activex_client-x86", "${roo
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_desktop.guid} = ${nx_client_desktop.guid}
 	EndProjectSection
@@ -16,7 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x86", "${roo
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_desktop.guid} = ${nx_client_desktop.guid}
 	EndProjectSection
@@ -25,7 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_desktop-x86", "${
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_core.guid} = ${nx_client_core.guid}
 		${nx_speech_synthesizer.guid} = ${nx_speech_synthesizer.guid}
@@ -53,8 +50,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x86", "${root.di
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x86", "${root.dir}\common_libs\nx_streaming\src\nx_streaming-x86.vcxproj", "${nx_streaming.guid}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udt-x86", "${root.dir}\common_libs\udt\src\udt-x86.vcxproj", "${udt.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x86", "${root.dir}\common_libs\nx_audio\src\nx_audio-x86.vcxproj", "${nx_audio.guid}"
@@ -72,7 +67,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x86", "${root.dir}\common_libs\nx_media\src\nx_media-x86.vcxproj", "${nx_media.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x86", "${root.dir}\common_libs\nx_network\src\nx_network-x86.vcxproj", "${nx_network.guid}"
@@ -93,6 +87,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_vms_utils-x86", "${root.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x86", "${root.dir}\common_libs\nx_utils\src\nx_utils-x86.vcxproj", "${nx_utils.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_kit.guid} = ${nx_kit.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x86", "${root.dir}\nx_kit\src\nx_kit-x86.vcxproj", "${nx_kit.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -137,10 +136,6 @@ Global
 		${appserver2.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${appserver2.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${appserver2.guid}.Release|Win32.Build.0 = Release|Win32
-		${nx_streaming.guid}.Debug|Win32.ActiveCfg = Debug|Win32
-		${nx_streaming.guid}.Debug|Win32.Build.0 = Debug|Win32
-		${nx_streaming.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${nx_streaming.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_audio.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_audio.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_audio.guid}.Release|Win32.ActiveCfg = Release|Win32

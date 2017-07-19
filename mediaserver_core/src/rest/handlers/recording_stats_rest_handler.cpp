@@ -3,7 +3,7 @@
 
 #include <api/model/recording_stats_reply.h>
 #include <common/common_module.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include "recorder/storage_manager.h"
 #include "api/model/recording_stats_reply.h"

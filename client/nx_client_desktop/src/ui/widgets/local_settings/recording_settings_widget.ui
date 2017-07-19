@@ -44,42 +44,65 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="captureModeGroupBox">
+    <widget class="QGroupBox" name="mainGroupBox">
      <property name="title">
-      <string>Capture Mode</string>
+      <string>Source</string>
      </property>
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="fullscreenButton">
-        <property name="toolTip">
-         <string comment="Grabs video from entire screen"/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <property name="labelAlignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="resoulitionLabel">
         <property name="text">
-         <string>Fullscreen</string>
+         <string>Resolution</string>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="windowButton">
-        <property name="toolTip">
-         <string comment="Grabs Eve window"/>
-        </property>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="resolutionComboBox"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="qualityLabel">
         <property name="text">
-         <string>Application Window</string>
+         <string>Recording Quality</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="qualityComboBox"/>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="recordingWarningLabel">
+        <property name="text">
+         <string>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="screenComboBox"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Screen</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -110,57 +133,6 @@
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="qualityGroupBox">
-     <property name="title">
-      <string>Quality</string>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="resoulitionLabel">
-        <property name="text">
-         <string>Resolution</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="resolutionComboBox"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="qualityLabel">
-        <property name="text">
-         <string>Recording Quality</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="qualityComboBox"/>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QLabel" name="recordingWarningLabel">
-        <property name="text">
-         <string>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</string>
         </property>
        </widget>
       </item>

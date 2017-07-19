@@ -29,16 +29,16 @@ TEST( TcpSocket, KeepAliveOptions )
     ASSERT_TRUE( static_cast< bool >( result ) );
 
     #if defined( Q_OS_LINUX )
-        EXPECT_EQ( result->time.count(), 5 );
-        EXPECT_EQ( result->interval.count(), 1 );
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
+        EXPECT_EQ( result->probeSendPeriod.count(), 1 );
         EXPECT_EQ( result->probeCount, 3U );
     #elif defined( Q_OS_WIN )
-        EXPECT_EQ( result->time.count(), 5 );
-        EXPECT_EQ( result->interval.count(), 1 );
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
+        EXPECT_EQ( result->probeSendPeriod.count(), 1 );
         EXPECT_EQ( result->probeCount, 0U ); // means default
     #elif defined( Q_OS_MACX )
-        EXPECT_EQ( result->time.count(), 5 );
-        EXPECT_EQ( result->interval.count(), 0 ); // means default
+        EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
+        EXPECT_EQ( result->probeSendPeriod.count(), 0 ); // means default
         EXPECT_EQ( result->probeCount, 0U ); // means default
     #endif
 
@@ -74,7 +74,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
     ASSERT_TRUE(server->listen(testClientCount()));
-    NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
+    NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
 
     std::unique_ptr<AbstractStreamSocket> client(server->accept());
     ASSERT_TRUE(client != nullptr);

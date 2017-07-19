@@ -1,0 +1,11 @@
+系統與您共用
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) 共用系統 {{message.system_name}} 給您.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+與您共用系統 {{message.system_name}}.
+{{/message.sharer_name}}
+
+開啟系統: {{config.portal_url}}/系統/{{message.system_id}}

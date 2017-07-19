@@ -1,12 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <list>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace cloud {
@@ -80,11 +82,24 @@ public:
         ConnectToPeerHandler completionHandler) override;
 
 private:
+    struct RelaySession
+    {
+        std::string id;
+        std::string clientPeerName;
+        std::unique_ptr<AbstractStreamSocket> clientConnection;
+        std::string listeningPeerName;
+        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection;
+        nx_http::StringType openTunnelNotificationBuffer;
+    };
+
     const conf::Settings& m_settings;
     model::ClientSessionPool* m_clientSessionPool;
     model::ListeningPeerPool* m_listeningPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
     utils::Counter m_apiCallCounter;
+    std::list<RelaySession> m_relaySessions;
+    QnMutex m_mutex;
+    bool m_terminated = false;
 
     void saveServerConnection(
         const std::string& peerName,
@@ -97,10 +112,17 @@ private:
         api::ResultCode resultCode,
         std::unique_ptr<AbstractStreamSocket> listeningPeerConnection);
     void startRelaying(
-        const std::string& clientSessionId,
+        const std::string& connectSessionId,
         const std::string& listeningPeerName,
         std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
         nx_http::HttpServerConnection* httpConnection);
+    void sendOpenTunnelNotification(
+        std::list<RelaySession>::iterator relaySessionIter);
+    void onOpenTunnelNotificationSent(
+        SystemError::ErrorCode sysErrorCode,
+        std::size_t bytesSent,
+        std::list<RelaySession>::iterator relaySessionIter);
+    void startRelaying(RelaySession relaySession);
 };
 
 class ConnectSessionManagerFactory

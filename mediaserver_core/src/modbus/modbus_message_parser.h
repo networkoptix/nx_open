@@ -4,12 +4,11 @@
 
 #include <nx/network/connection_server/base_protocol_message_types.h>
 
-namespace nx
-{
-namespace modbus
-{
+namespace nx {
+namespace modbus {
 
-class ModbusMessageParser
+class ModbusMessageParser:
+    public nx::network::server::AbstractMessageParser<ModbusMessage>
 {
     enum class State
     {
@@ -23,13 +22,14 @@ class ModbusMessageParser
 public:
     ModbusMessageParser();
 
-    void setMessage(ModbusMessage* const msg);
+    virtual void setMessage(ModbusMessage* const msg) override;
 
-    nx_api::ParserState parse(const nx::Buffer& buf, size_t* bytesProcessed);
+    virtual nx::network::server::ParserState parse(
+        const nx::Buffer& buf, size_t* bytesProcessed) override;
 
-    nx_api::ParserState state() const;
+    virtual void reset() override;
 
-    void reset();
+    nx::network::server::ParserState state() const;
 
 private:
     State parseHeader(const nx::Buffer& buf, size_t* bytesProcessed);
@@ -42,7 +42,6 @@ private:
 
 };
 
-} //< Closing namespace modbus
-
-} //< Cosing namespace nx
+} // namespace modbus
+} // namespace nx
 

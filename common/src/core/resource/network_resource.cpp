@@ -10,7 +10,7 @@
 #include <nx/network/ping.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "nx/utils/thread/long_runnable.h"

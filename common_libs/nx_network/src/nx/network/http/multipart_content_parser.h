@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "nx/utils/abstract_byte_stream_filter.h"
-#include "linesplitter.h"
+#include "nx/utils/byte_stream/abstract_byte_stream_filter.h"
+#include "line_splitter.h"
 
 namespace nx_http {
 
@@ -10,7 +10,7 @@ namespace nx_http {
  * Output: separate content frames.
  */
 class NX_NETWORK_API MultipartContentParser:
-    public nx::utils::bsf::AbstractByteStreamFilter
+    public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     MultipartContentParser();

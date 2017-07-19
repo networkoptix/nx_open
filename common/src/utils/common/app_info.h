@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 class QnAppInfo: public QObject
 {
@@ -31,7 +32,6 @@ public:
     static Q_INVOKABLE QString armBox();
     static Q_INVOKABLE bool    beta();
 
-    static Q_INVOKABLE QString productName();
     static Q_INVOKABLE QString productNameShort();
     static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();

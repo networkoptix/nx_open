@@ -139,8 +139,7 @@ bool SpecialLayoutPanel::isPinned() const
 
 bool SpecialLayoutPanel::isOpened() const
 {
-    Q_D(const SpecialLayoutPanel);
-    return d->panelWidget();
+    return true;
 }
 
 void SpecialLayoutPanel::setOpened(bool /* opened */, bool /* animate */)

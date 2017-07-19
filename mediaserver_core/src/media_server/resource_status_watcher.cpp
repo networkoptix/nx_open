@@ -6,12 +6,26 @@
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
 #include <common/common_module.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
+#include <core/resource/camera_resource.h>
+
+namespace {
+
+static constexpr int kServerCheckStatusTimeoutMs = 1000;
+
+} // namespace
 
 QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
     connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
     connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
+    connect(&m_checkStatusTimer, &QTimer::timeout, this, &QnResourceStatusWatcher::at_timer);
+}
+
+QnResourceStatusWatcher::~QnResourceStatusWatcher()
+{
+    m_checkStatusTimer.stop();
 }
 
 void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)
@@ -24,10 +38,73 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
     return m_setStatusInProgress.contains(resource->getId());
 }
 
+void QnResourceStatusWatcher::addResourcesImmediatly(const QnVirtualCameraResourceList& cameras) const
+{
+    auto resPool = commonModule()->resourcePool();
+    QSet<QString> foreignCameras;
+    for (const auto camera: cameras)
+        foreignCameras << camera->getPhysicalId();
+    QSet<QString> discoveredCameras = commonModule()->resourceDiscoveryManager()->lastDiscoveredIds();
+    auto camerasToAddSet = discoveredCameras.intersect(foreignCameras);
+    QnResourceList camerasToAdd;
+    for (const auto& cameraPhysicalId: camerasToAddSet)
+    {
+        if (auto res = resPool->getResourceByUniqueId(cameraPhysicalId))
+            camerasToAdd << res;
+    }
+    commonModule()->resourceDiscoveryManager()->addResourcesImmediatly(camerasToAdd);
+}
+
+void QnResourceStatusWatcher::at_timer()
+{
+    auto resPool = commonModule()->resourcePool();
+    const auto ownServer = resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    if (!ownServer)
+        return;
+    for (auto itr = m_offlineServersToCheck.begin(); itr != m_offlineServersToCheck.end();)
+    {
+        QnMediaServerResourcePtr mServer = *itr;
+        if (mServer->currentStatusTime() > QnMediaServerResource::kMinFailoverTimeoutMs)
+        {
+            if (ownServer->isRedundancy() && mServer->getStatus() == Qn::Offline)
+                addResourcesImmediatly(resPool->getAllCameras(mServer, /*ignoreDesktop*/ true));
+            itr = m_offlineServersToCheck.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+    if (m_offlineServersToCheck.isEmpty())
+        m_checkStatusTimer.stop();
+}
+
 void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
 {
     if (reason == Qn::StatusChangeReason::Local)
         updateResourceStatusInternal(resource);
+
+    const QnSecurityCamResourcePtr& cameraRes = resource.dynamicCast<QnSecurityCamResource>();
+    if (cameraRes)
+    {
+        if (cameraRes->getStatus() >= Qn::Online &&
+            !cameraRes->hasFlags(Qn::foreigner) &&
+            !cameraRes->isInitialized())
+        {
+            cameraRes->initAsync(false /*optional*/);
+        }
+        return;
+    }
+
+    if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+    {
+        if (server->getStatus() == Qn::Offline)
+        {
+            m_offlineServersToCheck << server;
+            if (!m_checkStatusTimer.isActive())
+                m_checkStatusTimer.start(kServerCheckStatusTimeoutMs);
+        }
+    }
 }
 
 void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& resource)

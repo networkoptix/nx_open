@@ -32,6 +32,9 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
+#include <http/p2p_connection_listener.h>
+
+#include <ini.h>
 
 namespace ec2 {
 
@@ -41,38 +44,59 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
     QnCommonModule* commonModule)
-    :
+:
     QnCommonModuleAware(commonModule),
     // dbmanager is initialized by direct connection.
-    m_dbManager(
-        peerType == Qn::PT_Server
-        ? new detail::QnDbManager(commonModule)
-        : nullptr),
-    m_transactionLog(
-        peerType == Qn::PT_Server
-        ? new QnTransactionLog(m_dbManager.get())
-        : nullptr),
-    m_transactionMessageBus(
-        new QnTransactionMessageBus(m_dbManager.get(), peerType, commonModule)),
-    m_timeSynchronizationManager(
-        new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get())),
-    m_serverQueryProcessor(
-        peerType == Qn::PT_Server
-        ? new ServerQueryProcessorAccess(m_dbManager.get(), m_transactionMessageBus.get())
-        : nullptr),
-    m_distributedMutexManager(
-        new QnDistributedMutexManager(m_transactionMessageBus.get())),
+
+    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
     m_remoteQueryProcessor(commonModule)
 {
+    if (peerType == Qn::PT_Server)
+    {
+        m_dbManager.reset(new detail::QnDbManager(commonModule));
+        m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
+    }
+
+    if (ini().isP2pMode)
+    {
+        m_bus.reset(new nx::p2p::MessageBus(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get()));
+    }
+    else
+    {
+        QnTransactionMessageBus* messageBus = new QnTransactionMessageBus(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get());
+        m_bus.reset(messageBus);
+        m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
+    }
+
+    m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+        peerType,
+        timerManager,
+        m_bus.get(),
+        &m_settingsInstance));
+
+    if (peerType == Qn::PT_Server)
+        m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+
     if (m_dbManager)
     {
         m_dbManager->setTransactionLog(m_transactionLog.get());
         m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
     }
-    m_transactionMessageBus->setTimeSyncManager(m_timeSynchronizationManager.get());
+    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
     if (peerType != Qn::PT_Server)
         m_timeSynchronizationManager->start(nullptr);
 
@@ -88,12 +112,13 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 
 Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
 {
-    pleaseStop();
-    join();
-
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-    m_timeSynchronizationManager->pleaseStop();
+    if (m_timeSynchronizationManager)
+        m_timeSynchronizationManager->pleaseStop();
+
+    pleaseStop();
+    join();
 }
 
 void Ec2DirectConnectionFactory::pleaseStop()
@@ -150,10 +175,18 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
-        "HTTP", "ec2/events", m_transactionMessageBus.get());
-    httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
-        "HTTP", kIncomingTransactionsPath, m_transactionMessageBus.get());
+    if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus.get()))
+    {
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus*>(
+            "HTTP", "ec2/events", bus);
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus*>(
+            "HTTP", kIncomingTransactionsPath, bus);
+    }
+    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus.get()))
+    {
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
+    }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
@@ -957,11 +990,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
      *     based on UTF-8 password as follows:
-     *     <code>digest = md5(name + ":" + realm + ":" + password).toHex();</code>
+     *     <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
      * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
      *     When creating a new user, calculate the value based on UTF-8 password as follows:
-     *     <code>salt = rand().toHex();
-     *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
+     *     <code>salt = rand_hex();
+     *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
      * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
@@ -978,6 +1011,65 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %// AbstractUserManager::save
      */
     regUpdate<ApiUserData>(p, ApiCommand::saveUser);
+
+    /**%apidoc POST /ec2/saveUsers
+    * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
+    * <p>
+    * Parameters should be passed as a JSON array of objects in POST message body with
+    * content type "application/json". Example of such object can be seen in
+    * the result of the corresponding GET function.
+    * </p>
+    * %permissions Administrator.
+    * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
+    *     exists, omitted fields will not be changed.
+    * %param[opt] parentId Should be empty.
+    * %param name User name.
+    * %param fullName Full name of the user.
+    * %param[opt] url Should be empty.
+    * %param[proprietary] typeId Should have fixed value.
+    *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
+    * %param[proprietary] isAdmin Indended for internal use; keep the value when saving
+    *     a previously received object, use false when creating a new one.
+    *     %value false
+    *     %value true
+    * %param permissions Combination (via "|") of the following flags:
+    *     %value GlobalAdminPermission Admin, can edit other non-admins.
+    *     %value GlobalEditCamerasPermission Can edit camera settings.
+    *     %value GlobalControlVideoWallPermission Can control video walls.
+    *     %value GlobalViewArchivePermission Can view archives of available cameras.
+    *     %value GlobalExportPermission Can export archives of available cameras.
+    *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+    *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+    *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
+    *         buttons.
+    *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
+    *     %value GlobalCustomUserPermission Flag: this user has custom permissions
+    * %param[opt] userRoleId User role unique id.
+    * %param email User's email.
+    * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
+    *     existing user, supply empty string. When creating a new user, calculate the value
+    *     based on UTF-8 password as follows:
+    *     <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
+    * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
+    *     When creating a new user, calculate the value based on UTF-8 password as follows:
+    *     <code>salt = rand_hex();
+    *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
+    * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
+    *     when creating, keep the value when modifying.
+    * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
+    *     /api/gettime.
+    * %param[opt] isLdap Whether the user was imported from LDAP.
+    *     %value false
+    *     %value true
+    * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+    *     %value false Default value.
+    *     %value true
+    * %param[opt] isEnabled Whether the user is enabled.
+    *     %value false
+    *     %value true Default value.
+    * %// AbstractUserManager::save
+    */
+    regUpdate<ApiUserDataList>(p, ApiCommand::saveUsers);
 
     /**%apidoc POST /ec2/removeUser
      * Delete the specified user.
@@ -1231,7 +1323,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *     exists, omitted fields will not be changed.
     * %param name Tour name.
     * %param items List of the layout tour items.
-    * %param item.layoutId Layout unique id.
+    * %param item.resourceId Resource unique id. Can be a layout or a camera or something else.
     * %param item.delayMs Delay between layouts switching in milliseconds.
     * %// AbstractLayoutTourManager::save
     */
@@ -1317,7 +1409,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
         std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
             m_timeSynchronizationManager.get(), _1));
-    // TODO: #ak register AbstractTimeManager::getPeerTimeInfoList
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
@@ -1368,7 +1459,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
 
-    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_transactionMessageBus.get()));
+    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
     p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
@@ -1405,7 +1496,8 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
                     url));
             if (m_directConnection->initialized())
             {
-                m_timeSynchronizationManager->start(m_directConnection);
+                if (m_timeSynchronizationManager)
+                    m_timeSynchronizationManager->start(m_directConnection);
             }
             else
             {
@@ -1607,6 +1699,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         case ec2::ErrorCode::forbidden:
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
+        case ec2::ErrorCode::disabled_user_unauthorized:
             break;
 
         default:
@@ -1626,6 +1719,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         this,
+        connectionInfo.serverId(),
         std::make_shared<FixedUrlClientQueryProcessor>(
             &m_remoteQueryProcessor,
             connectionInfoCopy.ecUrl),
@@ -1647,7 +1741,8 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::unauthorized
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
-        || errorCode == ErrorCode::cloud_temporary_unauthorized)
+        || errorCode == ErrorCode::cloud_temporary_unauthorized
+        || errorCode == ErrorCode::disabled_user_unauthorized)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);
@@ -1684,7 +1779,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-    connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
+    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     if (response)
     {
@@ -1855,9 +1950,9 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
         permission);
 }
 
-QnTransactionMessageBus* Ec2DirectConnectionFactory::messageBus() const
+QnTransactionMessageBusBase* Ec2DirectConnectionFactory::messageBus() const
 {
-    return m_transactionMessageBus.get();
+    return m_bus.get();
 }
 
 QnDistributedMutexManager* Ec2DirectConnectionFactory::distributedMutex() const

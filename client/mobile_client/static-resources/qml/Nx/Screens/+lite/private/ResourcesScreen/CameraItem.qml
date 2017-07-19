@@ -13,7 +13,7 @@ Control
 
     property alias resourceId: resourceHelper.resourceId
     property bool paused: false
-    property QnLiteClientLayoutHelper layoutHelper: null
+    property LiteClientLayoutHelper layoutHelper: null
     property int layoutX: -1
     property int layoutY: -1
 
@@ -203,8 +203,6 @@ Control
             VideoPositioner
             {
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
-                videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
                 item: videoOutput

@@ -1,9 +1,9 @@
 #include "graphics_tooltip_widget.h"
 
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QBoxLayout>
 
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/text_edit_label.h>
@@ -19,7 +19,7 @@ static const int kNoDataFontWeight = QFont::Light;
 
 QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     base_type(parent),
-    m_proxyWidget(new Clickable<QGraphicsProxyWidget>(this)),
+    m_proxyWidget(new Clickable<QnMaskedProxyWidget>(this)),
     m_embeddedWidget(new QWidget()),
     m_textLabel(new QnTextEditLabel(m_embeddedWidget)),
     m_previewWidget(new QnResourcePreviewWidget(m_embeddedWidget))

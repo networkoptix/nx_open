@@ -62,7 +62,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
-    m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::AllRoleFlags)),
+    m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::DefaultRoleFlags)),
     m_aligner(new QnAligner(this)),
     m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
@@ -461,7 +461,7 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified Email already exists."));
+                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
             }
 
             result = Qn::defaultEmailValidator()(text);

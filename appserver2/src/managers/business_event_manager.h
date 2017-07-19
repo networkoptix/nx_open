@@ -5,7 +5,7 @@
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "business/business_event_rule.h"
+#include <nx/vms/event/rule.h>
 
 namespace ec2
 {
@@ -17,7 +17,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran, NotificationSource /*source*/)
         {
             NX_ASSERT( tran.command == ApiCommand::broadcastAction || tran.command == ApiCommand::execAction);
-            QnAbstractBusinessActionPtr businessAction;
+            nx::vms::event::AbstractActionPtr businessAction;
             fromApiToResource(tran.params, businessAction);
             businessAction->setReceivedFromRemoteHost(true);
             if (tran.command == ApiCommand::broadcastAction)
@@ -35,7 +35,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran, NotificationSource source)
         {
             NX_ASSERT( tran.command == ApiCommand::saveEventRule);
-            QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
+            nx::vms::event::RulePtr businessRule( new nx::vms::event::Rule() );
             fromApiToResource(tran.params, businessRule);
             emit addedOrUpdated( businessRule, source);
         }
@@ -54,25 +54,25 @@ namespace ec2
     {
     public:
         QnBusinessEventManager(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             QueryProcessorType* const queryProcessor,
             const Qn::UserAccessData &userAccessData);
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
 
-        virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
+        virtual int save( const nx::vms::event::RulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
         virtual int deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler ) override;
-        virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
-        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler ) override;
+        virtual int broadcastBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
+        virtual int sendBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler ) override;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
     private:
-        QnTransactionMessageBus* m_messageBus;
+        QnTransactionMessageBusBase* m_messageBus;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
 
-        QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
+        QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const nx::vms::event::AbstractActionPtr& resource );
     };
 }
 

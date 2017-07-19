@@ -31,7 +31,7 @@ private:
     void onAcceptCompletion(
         AcceptCompletionHandler handler,
         SystemError::ErrorCode sysErrorCode,
-        AbstractStreamSocket* streamSocket);
+        std::unique_ptr<AbstractStreamSocket> streamSocket);
 };
 
 } // namespace ssl

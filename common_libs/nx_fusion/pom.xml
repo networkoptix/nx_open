@@ -24,6 +24,7 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_utils</artifactId>
@@ -32,6 +33,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
+
     </dependencies>    
     
     <profiles>

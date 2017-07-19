@@ -7,7 +7,6 @@
 #include <functional>
 #include <memory>
 
-#include <business/business_event_rule.h>
 #include <nx_ec/dummy_handler.h>
 
 #include <api/app_server_connection.h>
@@ -60,9 +59,9 @@ QnActiResource::QnActiResource() :
     m_hasAudio(false),
     m_outputCount(0),
     m_inputCount(0),
-    m_inputMonitored(false),
-    m_audioTransmitter(new ActiAudioTransmitter(this))
+    m_inputMonitored(false)
 {
+    m_audioTransmitter.reset(new ActiAudioTransmitter(this));
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
@@ -741,7 +740,8 @@ void QnActiResource::stopInputPortMonitoringAsync()
 
     QAuthenticator auth = getAuth();
     QUrl url = getUrl();
-    url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
+    url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
+    url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
@@ -1443,14 +1443,6 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
     }
 
     return result;
-}
-
-QnAudioTransmitterPtr QnActiResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)

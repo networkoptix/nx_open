@@ -20,7 +20,7 @@
         <targetName>traffic_relay</targetName>
 
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -ludt -lnx_network -lnx_streaming -lnx_fusion -lnx_utils -lcloud_db_client</global.libs>
+        <global.libs>-ludt -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

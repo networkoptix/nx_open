@@ -20,10 +20,10 @@
         <guid>${connection_mediator_ut.guid}</guid>
 
         <qt.libs>core multimedia sql concurrent</qt.libs>
-        <global.libs>-lnx_media -lcommon -lnx_streaming -lnx_audio -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lnx_media -lcommon -lnx_audio -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
         <linux.oslibs>-lopenal</linux.oslibs>
-        <windows.defines>_VARIADIC_MAX=10 WIN32_LEAN_AND_MEAN</windows.defines>
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
         <rdep.packages>gtest gmock openssl quazip ffmpeg</rdep.packages>
         <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>

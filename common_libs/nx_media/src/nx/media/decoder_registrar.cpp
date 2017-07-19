@@ -6,20 +6,14 @@
 #include "ffmpeg_video_decoder.h"
 #include "ffmpeg_audio_decoder.h"
 
-#if defined(ENABLE_PROXY_DECODER)
-    #include "proxy_video_decoder.h"
-#endif // ENABLE_PROXY_DECODER
-
-#if defined(Q_OS_ANDROID)
-    #include "android_video_decoder.h"
-    #include "android_audio_decoder.h"
-#endif // Q_OS_ANDROID
-
-#if defined(Q_OS_IOS)
+#include "proxy_video_decoder/proxy_video_decoder.h"
+#include "android_video_decoder.h"
+#include "android_audio_decoder.h"
 #include "ios_video_decoder.h"
-#endif // Q_OS_IOS
 
 #include "jpeg_decoder.h"
+
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace media {
@@ -29,7 +23,7 @@ void DecoderRegistrar::registerDecoders(
     const QSize& maxFfmpegResolution,
     bool isTranscodingEnabled)
 {
-    assert(allocator);
+    NX_ASSERT(allocator);
 
     VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
@@ -40,26 +34,26 @@ void DecoderRegistrar::registerDecoders(
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(allocator,
             kHardwareDecodersCount);
-        // HW audio decoder crashes in readOutputBuffer() for some reason. So far disabling it...
-        // AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
+        // HW audio decoder crashes in readOutputBuffer() for some reason. So far, disabling it.
+        //AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
     }
-    #endif // Q_OS_ANDROID
+    #endif
 
-#if defined(Q_OS_IOS)
+    #if defined(Q_OS_IOS)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(allocator,
             kHardwareDecodersCount);
     }
-#endif // Q_OS_IOS
-    
+    #endif
+
     #if defined(ENABLE_PROXY_DECODER)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<ProxyVideoDecoder>(allocator,
             kHardwareDecodersCount);
     }
-    #endif // ENABLE_PROXY_DECODER
+    #endif
 
     {
         FfmpegVideoDecoder::setMaxResolution(maxFfmpegResolution);

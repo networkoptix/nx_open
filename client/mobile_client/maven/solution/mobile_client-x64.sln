@@ -1,143 +1,141 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mobile_client-x64", "${root.dir}\client\mobile_client\src\mobile_client-x64.vcxproj", "${mobile_client.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${appserver2.guid} = ${appserver2.guid}
-        ${common.guid} = ${common.guid}
-        ${nx_streaming.guid} = ${nx_streaming.guid}
-        ${nx_media.guid} = ${nx_media.guid}
-        ${nx_audio.guid} = ${nx_audio.guid}
-        ${nx_utils.guid} = ${nx_utils.guid}
-        ${udt.guid} = ${udt.guid}
-        ${nx_network.guid} = ${nx_network.guid}
-        ${nx_fusion.guid} = ${nx_fusion.guid}
-        ${nx_vms_utils.guid} = ${nx_vms_utils.guid}
-        ${nx_client_core.guid} = ${nx_client_core.guid}
-        ${cloud_db_client.guid} = ${cloud_db_client.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${appserver2.guid} = ${appserver2.guid}
+		${common.guid} = ${common.guid}
+		${nx_media.guid} = ${nx_media.guid}
+		${nx_audio.guid} = ${nx_audio.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+		${udt.guid} = ${udt.guid}
+		${nx_network.guid} = ${nx_network.guid}
+		${nx_fusion.guid} = ${nx_fusion.guid}
+		${nx_vms_utils.guid} = ${nx_vms_utils.guid}
+		${nx_client_core.guid} = ${nx_client_core.guid}
+		${cloud_db_client.guid} = ${cloud_db_client.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_core-x64", "${root.dir}\client\nx_client_core\src\nx_client_core-x64.vcxproj", "${nx_client_core.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${appserver2.guid} = ${appserver2.guid}
-        ${common.guid} = ${common.guid}
-        ${nx_vms_utils.guid} = ${nx_vms_utils.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${appserver2.guid} = ${appserver2.guid}
+		${common.guid} = ${common.guid}
+		${nx_vms_utils.guid} = ${nx_vms_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x64", "${root.dir}\common\src\common-x64.vcxproj", "${common.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${nx_fusion.guid} = ${nx_fusion.guid}
-        ${nx_utils.guid} = ${nx_utils.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_fusion.guid} = ${nx_fusion.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "${root.dir}\appserver2\src\appserver2-x64.vcxproj", "${appserver2.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${common.guid} = ${common.guid}
-        ${nx_network.guid} = ${nx_network.guid}
-        ${nx_utils.guid} = ${nx_utils.guid}
-    EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "${root.dir}\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_network.guid} = ${nx_network.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x64", "${root.dir}\common_libs\nx_media\src\nx_media-x64.vcxproj", "${nx_media.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udt-x64", "${root.dir}\common_libs\udt\src\udt-x64.vcxproj", "${udt.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x64", "${root.dir}\common_libs\nx_audio\src\nx_audio-x64.vcxproj", "${nx_audio.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${common.guid} = ${common.guid}
-        ${nx_utils.guid} = ${nx_utils.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x64", "${root.dir}\common_libs\nx_network\src\nx_network-x64.vcxproj", "${nx_network.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${common.guid} = ${common.guid}
-        ${nx_utils.guid} = ${nx_utils.guid}
-        ${udt.guid} = ${udt.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_utils.guid} = ${nx_utils.guid}
+		${udt.guid} = ${udt.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_fusion-x64", "${root.dir}\common_libs\nx_fusion\src\nx_fusion-x64.vcxproj", "${nx_fusion.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${nx_utils.guid} = ${nx_utils.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_vms_utils-x64", "${root.dir}\common_libs\nx_vms_utils\src\nx_vms_utils-x64.vcxproj", "${nx_vms_utils.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${nx_utils.guid} = ${nx_utils.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x64", "${root.dir}\common_libs\nx_utils\src\nx_utils-x64.vcxproj", "${nx_utils.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_kit.guid} = ${nx_kit.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x64", "${root.dir}\nx_kit\src\nx_kit-x64.vcxproj", "${nx_kit.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cloud_db_client-x64", "${root.dir}\nx_cloud\cloud_db_client\src\cloud_db_client-x64.vcxproj", "${cloud_db_client.guid}"
-    ProjectSection(ProjectDependencies) = postProject
-        ${nx_utils.guid} = ${nx_utils.guid}
-        ${nx_network.guid} = ${nx_network.guid}
-    EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_utils.guid} = ${nx_utils.guid}
+		${nx_network.guid} = ${nx_network.guid}
+	EndProjectSection
 EndProject
 Global
-    GlobalSection(SolutionConfigurationPlatforms) = preSolution
-        Debug|x64 = Debug|x64
-        Release|x64 = Release|x64
-    EndGlobalSection
-    GlobalSection(ProjectConfigurationPlatforms) = postSolution
-        ${mobile_client.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${mobile_client.guid}.Debug|x64.Build.0 = Debug|x64
-        ${mobile_client.guid}.Release|x64.ActiveCfg = Release|x64
-        ${mobile_client.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_client_core.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_client_core.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_client_core.guid}.Release|x64.Build.0 = Release|x64
-        ${common.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${common.guid}.Debug|x64.Build.0 = Debug|x64
-        ${common.guid}.Release|x64.ActiveCfg = Release|x64
-        ${common.guid}.Release|x64.Build.0 = Release|x64
-        ${appserver2.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
-        ${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
-        ${appserver2.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_media.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_media.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_media.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_media.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_audio.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_audio.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_audio.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_audio.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_network.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_network.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_network.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_network.guid}.Release|x64.Build.0 = Release|x64
-        ${udt.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${udt.guid}.Debug|x64.Build.0 = Debug|x64
-        ${udt.guid}.Release|x64.ActiveCfg = Release|x64
-        ${udt.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_utils.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_fusion.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_fusion.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_fusion.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_fusion.guid}.Release|x64.Build.0 = Release|x64
-        ${nx_vms_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${nx_vms_utils.guid}.Debug|x64.Build.0 = Debug|x64
-        ${nx_vms_utils.guid}.Release|x64.ActiveCfg = Release|x64
-        ${nx_vms_utils.guid}.Release|x64.Build.0 = Release|x64
-        ${cloud_db_client.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${cloud_db_client.guid}.Debug|x64.Build.0 = Debug|x64
-        ${cloud_db_client.guid}.Release|x64.ActiveCfg = Release|x64
-        ${cloud_db_client.guid}.Release|x64.Build.0 = Release|x64
-    EndGlobalSection
-    GlobalSection(SolutionProperties) = preSolution
-        HideSolutionNode = FALSE
-    EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		${mobile_client.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${mobile_client.guid}.Debug|x64.Build.0 = Debug|x64
+		${mobile_client.guid}.Release|x64.ActiveCfg = Release|x64
+		${mobile_client.guid}.Release|x64.Build.0 = Release|x64
+		${nx_client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_client_core.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_client_core.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_client_core.guid}.Release|x64.Build.0 = Release|x64
+		${common.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${common.guid}.Debug|x64.Build.0 = Debug|x64
+		${common.guid}.Release|x64.ActiveCfg = Release|x64
+		${common.guid}.Release|x64.Build.0 = Release|x64
+		${appserver2.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
+		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
+		${appserver2.guid}.Release|x64.Build.0 = Release|x64
+		${nx_media.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_media.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_media.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_media.guid}.Release|x64.Build.0 = Release|x64
+		${nx_audio.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_audio.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_audio.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_audio.guid}.Release|x64.Build.0 = Release|x64
+		${nx_network.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_network.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_network.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_network.guid}.Release|x64.Build.0 = Release|x64
+		${udt.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${udt.guid}.Debug|x64.Build.0 = Debug|x64
+		${udt.guid}.Release|x64.ActiveCfg = Release|x64
+		${udt.guid}.Release|x64.Build.0 = Release|x64
+		${nx_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_utils.guid}.Release|x64.Build.0 = Release|x64
+		${nx_fusion.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_fusion.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_fusion.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_fusion.guid}.Release|x64.Build.0 = Release|x64
+		${nx_vms_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_vms_utils.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_vms_utils.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_vms_utils.guid}.Release|x64.Build.0 = Release|x64
+		${cloud_db_client.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${cloud_db_client.guid}.Debug|x64.Build.0 = Debug|x64
+		${cloud_db_client.guid}.Release|x64.ActiveCfg = Release|x64
+		${cloud_db_client.guid}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 EndGlobal

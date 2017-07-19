@@ -33,7 +33,6 @@ class QAction;
 class QMenu;
 
 class QnProgressDialog;
-class QnMimeData;
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
@@ -51,6 +50,9 @@ class QnGraphicsMessageBox;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class MimeData;
+
 namespace ui {
 namespace workbench {
 
@@ -118,7 +120,6 @@ protected:
 protected slots:
 
     void submitDelayedDrops();
-    void submitInstantDrop();
 
     void at_context_userChanged(const QnUserResourcePtr &user);
 
@@ -127,23 +128,21 @@ protected slots:
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
-    void at_openLayoutsAction_triggered();
 
     void at_openInLayoutAction_triggered();
 
     void at_openInCurrentLayoutAction_triggered();
-    void at_openInNewLayoutAction_triggered();
+    void at_openInNewTabAction_triggered();
     void at_openInNewWindowAction_triggered();
 
-    void at_openLayoutsInNewWindowAction_triggered();
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
+    void at_reviewLayoutTourInNewWindowAction_triggered();
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
     void at_delayedDropResourcesAction_triggered();
     void at_instantDropResourcesAction_triggered();
-    void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
@@ -181,7 +180,6 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void setCurrentLayoutBackground(const QString &filename);
 
-    void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
 
@@ -241,8 +239,7 @@ private:
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
     * the user logs in. */
-    QList<QnMimeData> m_delayedDrops;
-    QList<QnMimeData> m_instantDrops;
+    QList<MimeData> m_delayedDrops;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;

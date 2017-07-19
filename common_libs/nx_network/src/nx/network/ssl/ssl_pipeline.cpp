@@ -20,7 +20,6 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
     m_eof(false),
     m_failed(false)
 {
-    initOpenSSLGlobalLock();
     initSslBio(sslContext);
 }
 
@@ -115,7 +114,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t count)
             return handleSslIoResult(ret);
     }
     if (m_state < State::handshakeDone)
-        return utils::pipeline::StreamIoError::wouldBlock;
+        return utils::bstream::StreamIoError::wouldBlock;
 
     const int ret = sslFunc(m_ssl.get(), data, static_cast<int>(count));
     return handleSslIoResult(ret);
@@ -133,14 +132,14 @@ int Pipeline::doHandshake()
 int Pipeline::bioRead(void* buffer, unsigned int bufferLen)
 {
     const auto result = m_inputStream->read(buffer, bufferLen);
-    m_readThirsty = (result == utils::pipeline::StreamIoError::wouldBlock) || (result == 0);
+    m_readThirsty = (result == utils::bstream::StreamIoError::wouldBlock) || (result == 0);
     return result;
 }
 
 int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 {
     const auto result = m_outputStream->write(buffer, bufferLen);
-    m_writeThirsty = (result == utils::pipeline::StreamIoError::wouldBlock) || (result == 0);
+    m_writeThirsty = (result == utils::bstream::StreamIoError::wouldBlock) || (result == 0);
     return result;
 }
 
@@ -166,12 +165,12 @@ int Pipeline::handleSslIoResult(int result)
         case SSL_ERROR_SSL:
             m_eof = true;
             m_failed = true;
-            return utils::pipeline::StreamIoError::nonRecoverableError;
+            return utils::bstream::StreamIoError::nonRecoverableError;
 
         case SSL_ERROR_SYSCALL:
             if (m_readThirsty || m_writeThirsty)
-                return utils::pipeline::StreamIoError::wouldBlock;
-            return utils::pipeline::StreamIoError::osError;
+                return utils::bstream::StreamIoError::wouldBlock;
+            return utils::bstream::StreamIoError::osError;
 
         default:
             break;
@@ -187,7 +186,7 @@ int Pipeline::bioRead(BIO* b, char* out, int outl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int ret = sslSock->bioRead(out, outl);
-    if (ret == utils::pipeline::StreamIoError::osError)
+    if (ret == utils::bstream::StreamIoError::osError)
     {
         BIO_clear_retry_flags(b);
         BIO_set_retry_read(b);
@@ -200,7 +199,7 @@ int Pipeline::bioWrite(BIO* b, const char* in, int inl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int ret = sslSock->bioWrite(in, inl);
-    if (ret == utils::pipeline::StreamIoError::osError)
+    if (ret == utils::bstream::StreamIoError::osError)
     {
         BIO_clear_retry_flags(b);
         BIO_set_retry_write(b);

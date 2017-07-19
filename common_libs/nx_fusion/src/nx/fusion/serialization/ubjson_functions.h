@@ -13,15 +13,13 @@
 #include <boost/preprocessor/cat.hpp>
 #endif
 
-#ifndef QN_NO_QT
-#   include <QtCore/QString>
-#   include <QtCore/QByteArray>
-#   include <QtCore/QUrl>
-#   include <nx/utils/uuid.h>
-#endif
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QUrl>
 
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/uuid.h>
 
 #include "collection_fwd.h"
 #include "ubjson.h"

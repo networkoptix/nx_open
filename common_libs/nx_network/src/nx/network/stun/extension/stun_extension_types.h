@@ -116,7 +116,7 @@ enum AttributeType
     tcpReverseEndpointList,
     isPersistent,
     isListening,
-    trafficRelayEndpointList,
+    trafficRelayUrl,
 
     udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
     rendezvousConnectTimeout,
@@ -131,6 +131,10 @@ enum AttributeType
     tcpReverseHttpMsgBodyTimeout,
     tunnelInactivityTimeout,
     tcpConnectionKeepAlive,
+
+    udpHolePunchingStartDelay,
+    trafficRelayingStartDelay,
+    directTcpConnectStartDelay,
 
     systemErrorCode = stun::attrs::userDefined + 0x500,
 };
@@ -216,8 +220,13 @@ struct NX_NETWORK_API SystemErrorCodeAttr: stun::attrs::IntAttribute
 };
 
 
+struct NX_NETWORK_API Endpoint: BaseStringAttribute
+{
+    Endpoint(int type, const SocketAddress& endpoint);
+    SocketAddress get() const;
+};
 
-/** Base class for endpoint attributes */
+/** Base class for endpoint attributes. */
 struct NX_NETWORK_API EndpointList : BaseStringAttribute
 {
     EndpointList( int type, const std::list< SocketAddress >& endpoints );
@@ -245,11 +254,11 @@ struct NX_NETWORK_API UdtHpEndpointList : EndpointList
         : EndpointList( TYPE, endpoints ) {}
 };
 
-struct NX_NETWORK_API TrafficRelayEndpointList: EndpointList
+struct NX_NETWORK_API TrafficRelayUrl: BaseStringAttribute
 {
-    static const AttributeType TYPE = trafficRelayEndpointList;
-    TrafficRelayEndpointList( const std::list< SocketAddress >& endpoints )
-        : EndpointList( TYPE, endpoints ) {}
+    static const AttributeType TYPE = trafficRelayUrl;
+    TrafficRelayUrl(const String& value)
+        : BaseStringAttribute( TYPE, value) {}
 };
 
 struct NX_NETWORK_API TcpReverseEndpointList : EndpointList

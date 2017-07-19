@@ -44,7 +44,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct QnTranStateKey;
+    struct ApiPersistentIdData;
     struct QnTranState;
     struct QnTranStateResponse;
     struct ApiSyncRequestData;
@@ -86,9 +86,11 @@ namespace ec2 {
     struct ApiMiscData;
     typedef std::vector<ApiMiscData> ApiMiscDataList;
     struct ApiPeerSystemTimeData;
+    struct ApiPeerSyncTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
+    struct ApiPeerDataEx;
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
@@ -170,6 +172,7 @@ namespace ec2 {
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
     (ApiPeerSystemTimeData)\
+    (ApiPeerSyncTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiReverseConnectionData)\
@@ -179,7 +182,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (QnTranStateKey)\
+    (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\
     (QnTranStateResponse)\
@@ -214,6 +217,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\
+    (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\
@@ -222,12 +226,10 @@ namespace ec2 {
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 
-#ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
         (ubjson)(xml)(json)(sql_record)(csv_record)
     );
-#endif
 
 } // namespace ec2
 

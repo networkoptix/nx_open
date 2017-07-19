@@ -40,7 +40,8 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         maxConnections,
         useSsl),
     m_cloudConnectionManager(cloudConnectionManager),
-    m_boundToCloud(false)
+    m_boundToCloud(false),
+    m_httpModManager(new nx_http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
@@ -72,7 +73,8 @@ void QnUniversalTcpListener::addProxySenderConnections(
     for (int i = 0; i < size; ++i)
     {
         auto connect = new QnProxySenderConnection(
-            proxyUrl, commonModule()->moduleGUID(), this);
+            proxyUrl, commonModule()->moduleGUID(), this, needAuth());
+
         connect->start();
         addOwnership(connect);
     }
@@ -126,7 +128,10 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 
     #ifdef ENABLE_SSL
         if (sslNeeded)
-            m_serverSocket.reset(new nx::network::deprecated::SslServerSocket(m_serverSocket.release(), true));
+        {
+            m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
+                std::move(m_serverSocket), true);
+        }
     #endif
 
    return m_serverSocket.get();
@@ -195,7 +200,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(
-                nx::network::SocketGlobals::mediatorConnector().systemConnection(),
+                &nx::network::SocketGlobals::mediatorConnector(),
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
@@ -205,4 +210,14 @@ void QnUniversalTcpListener::updateCloudConnectState(
         NX_ASSERT(m_multipleServerSocket->count() == kTotalListeningSockets);
         m_multipleServerSocket->removeSocket(kCloudSocketIndex);
     }
+}
+
+void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
+{
+    m_httpModManager->apply(request);
+}
+
+nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const
+{
+    return m_httpModManager.get();
 }

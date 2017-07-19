@@ -233,8 +233,8 @@ const CredentialsList PasswordHelper::getCredentialsByManufacturer(
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
         << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
 #endif
-    if (manufacturerPasswords.contains(manufacturer))
-        return manufacturerPasswords[manufacturer];
+    if (manufacturerPasswords.contains(manufacturer.toLower()))
+        return manufacturerPasswords[manufacturer.toLower()];
 
     return manufacturerPasswords[DEFAULT_MANUFACTURER];
 }

@@ -2,7 +2,7 @@
 
 namespace nx {
 namespace utils {
-namespace pipeline {
+namespace bstream {
 namespace test {
 
 int NotifyingOutput::write(const void* data, size_t count)

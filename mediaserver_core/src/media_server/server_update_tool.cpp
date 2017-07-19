@@ -214,12 +214,33 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
         return NoReply;
 
-    if (!data.isEmpty()) {
-        if (m_file->pos() >= offset) {
-            m_file->seek(offset);
-            if (m_file->write(data) != data.size())
-                return NoFreeSpace;
+    if (!data.isEmpty())
+    {
+        if (m_file->pos() < offset)
+        {
+            NX_ERROR(this,
+                lm("The requested offset %1 is more than current position %2.")
+                    .arg(offset).arg(m_file->pos()));
+
+            return UnknownError;
         }
+
+        m_file->seek(offset);
+
+        if (m_file->write(data) != data.size())
+            return NoFreeSpace;
+
+        const auto pos = m_file->pos();
+
+        if (m_file->size() > pos)
+        {
+            NX_WARNING(this,
+                lm("Update file size %1 is more than current position %2. Truncating...")
+                    .arg(m_file->size()).arg(pos));
+
+            m_file->resize(pos);
+        }
+
         return m_file->pos();
     }
 
@@ -321,7 +342,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updat
         NX_LOG(lit("QnServerUpdateTool: The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
         executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
     }
-    if( cl_log.logLevel() >= cl_logDEBUG1 )
+    if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
     {
         QString argumentsStr(" APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\" SERVER_PASSWORD_CONFIRM=\"\"");
         for( const QString& arg: arguments )

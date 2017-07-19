@@ -20,6 +20,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <nx/vms/event/rule_manager.h>
+
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -30,6 +32,8 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/layout_tour_manager.h>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -42,7 +46,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/resource_factory.h>
 
-#include <business/business_event_rule.h>
+#include <nx/vms/event/rule.h>
 
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
@@ -52,6 +56,7 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx;
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
     base_type(parent),
@@ -161,11 +166,24 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto timeManager = connection->getTimeNotificationManager();
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
-    connect(timeManager, &ec2::AbstractTimeNotificationManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
 
     auto discoveryManager = connection->getDiscoveryNotificationManager();
     connect(discoveryManager, &ec2::AbstractDiscoveryNotificationManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData);
     connect(discoveryManager, &ec2::AbstractDiscoveryNotificationManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
+
+    auto layoutTourManager = connection->getLayoutTourNotificationManager();
+
+    connect(layoutTourManager,
+        &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
+        this,
+        &QnCommonMessageProcessor::handleTourAddedOrUpdated,
+        Qt::DirectConnection);
+
+    connect(layoutTourManager,
+        &ec2::AbstractLayoutTourNotificationManager::removed,
+        this->layoutTourManager(),
+        &QnLayoutTourManager::removeTour,
+        Qt::DirectConnection);
 
 #undef on_resourceUpdated
 }
@@ -184,11 +202,16 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getDiscoveryNotificationManager()->disconnect(this);
     connection->getTimeNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
+    connection->getLayoutTourNotificationManager()->disconnect(this);
+
+    layoutTourManager()->resetTours();
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     onGotInitialNotification(fullData);
+
+    //TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
     on_businessRuleReset(fullData.rules);
 }
 
@@ -202,13 +225,13 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
         } else {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
         }
         return;
     }
@@ -235,16 +258,17 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerFound(data);
-    emit remotePeerFound(data);
+void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerFound(data, peerType);
+    emit remotePeerFound(data, peerType);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerLost(data);
-    emit remotePeerLost(data);
+void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerLost(data, peerType);
+    emit remotePeerLost(data, peerType);
 }
-
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
@@ -419,41 +443,41 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
     licensePool()->removeLicense(license);
 }
 
-void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
-    m_rules.insert(businessRule->id(), businessRule);
-    emit businessRuleChanged(businessRule);
+void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const vms::event::RulePtr& rule)
+{
+    eventRuleManager()->addOrUpdateRule(rule);
 }
 
-void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid &id) {
-    m_rules.remove(id);
-    emit businessRuleDeleted(id);
+void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
+{
+    eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& /* businessAction */ )
+void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::AbstractActionPtr& /* businessAction */ )
 {
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset( const ec2::ApiBusinessRuleDataList& rules )
+void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
 {
-    QnBusinessEventRuleList qnRules;
-    fromApiToResourceList(rules, qnRules);
-
-    m_rules.clear();
-    for(const QnBusinessEventRulePtr &bRule: qnRules)
-        m_rules[bRule->id()] = bRule;
-
-    emit businessRuleReset(qnRules);
+    vms::event::RuleList ruleList;
+    fromApiToResourceList(rules, ruleList);
+    eventRuleManager()->resetRules(ruleList);
 }
 
-void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
+void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
 {
     emit businessActionReceived(action);
 }
 
-void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessActionPtr& action )
+void QnCommonMessageProcessor::on_execBusinessAction( const vms::event::AbstractActionPtr& action )
 {
     execBusinessActionInternal(action);
+}
+
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+{
+    layoutTourManager()->addOrUpdateTour(tour);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)
@@ -540,18 +564,6 @@ void QnCommonMessageProcessor::resetTime()
             return;
 
         emit syncTimeChanged(syncTime);
-
-        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager(Qn::kSystemAccess)->getPeerTimeInfoList();
-        for (const ec2::QnPeerTimeInfo &info : peers)
-        {
-            if (!runtimeManager->hasItem(info.peerId))
-            {
-                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
-                continue;
-            }
-            NX_ASSERT(ec2::ApiPeerData::isServer(runtimeManager->item(info.peerId).data.peer.peerType));
-            emit peerTimeChanged(info.peerId, syncTime, info.time);
-        }
     });
 }
 
@@ -574,14 +586,13 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
-
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {
@@ -653,7 +664,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
-    QnServerAdditionalAddressesDictionary::instance()->clear();
+    commonModule()->serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
     resetResources(fullData);
@@ -666,15 +677,12 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
     resetTime();
+    layoutTourManager()->resetTours(fullData.layoutTours);
 
     resourceAccessProvider()->endUpdate();
     resourceAccessManager()->endUpdate();
 
     emit initialResourcesReceived();
-}
-
-QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
-    return m_rules;
 }
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)

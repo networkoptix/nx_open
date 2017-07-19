@@ -1,18 +1,19 @@
 #pragma once
 
 #include <ui/customization/customized.h>
-#include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
 
 class QnResourceTitleItem;
+class QnViewportBoundWidget;
 class QnHtmlTextItem;
 struct QnResourceHudColors;
 
 class QnHudOverlayWidgetPrivate;
 
-class QnHudOverlayWidget: public Customized<QnViewportBoundWidget>
+class QnHudOverlayWidget: public Customized<GraphicsWidget>
 {
     Q_OBJECT
-    using base_type = Customized<QnViewportBoundWidget>;
+    using base_type = Customized<GraphicsWidget>;
 
 public:
     QnHudOverlayWidget(QGraphicsItem* parent = nullptr);
@@ -20,6 +21,9 @@ public:
 
     /** Resource title bar item. */
     QnResourceTitleItem* title() const;
+
+    /** Everything under title bar. */
+    QnViewportBoundWidget* content() const;
 
     /** Resource details text item. */
     QnHtmlTextItem* details() const;

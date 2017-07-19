@@ -8,6 +8,8 @@
 #include <common/static_common_module.h>
 #include <common/common_module.h>
 
+#include <nx/core/access/access_types.h>
+
 #include <recording/time_period_list.h>
 #include <nx/utils/test_support/test_options.h>
 #include <network/tcp_connection_processor.h>
@@ -26,10 +28,10 @@ class TestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     TestConnectionProcessor(
-        QnCommonModule* commonModule,
-        QSharedPointer<AbstractStreamSocket> socket)
-        :
-        QnTCPConnectionProcessor(socket, commonModule)
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner)
+    :
+        QnTCPConnectionProcessor(socket, owner)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -69,7 +71,7 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override
     {
-        return new TestConnectionProcessor(commonModule(), clientSocket);
+        return new TestConnectionProcessor(clientSocket, this);
     }
 };
 
@@ -77,7 +79,9 @@ protected:
 TEST( TcpConnectionProcessor, sendAsyncData )
 {
     QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
-    QnCommonModule commonModule(true);
+
+    // TcpListener uses commonModule()->moduleGuid().
+    QnCommonModule commonModule(false, nx::core::access::Mode::direct);
 
     TestTcpListener tcpListener(&commonModule, QHostAddress::Any, 0);
     tcpListener.start();

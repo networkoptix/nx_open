@@ -20,7 +20,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 
 namespace

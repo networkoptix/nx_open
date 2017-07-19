@@ -1,0 +1,216 @@
+<div class="container">
+    <h1>הגדרות שרת מתקדמות</h1>
+
+    <div class="alert alert-danger" role="alert">
+        <b>אזהרה!</b> כל שינוי בדף זה עלול לגרום לשרת לעבוד בצורה לא תקינה.
+    </div>
+
+
+    <h2>אחסון</h2>
+    <form class="form" role="form" name="form" novalidate>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th >
+                        כתובת אינטרנט
+                    </th>
+                    <th width="200">
+                        שטח אחסון פנוי
+                    </th>
+                    <th width="150">
+                        שטח אחסון שמור
+                    </th>
+                    <th >
+                    </th>
+                    <th width="70">
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="storage in storages" ng-form="storageForm">
+
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
+                    <td>
+                        <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
+                             title="{{formatTotalSpace(storage)}}">
+
+                            <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                                 ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
+                            </div>
+
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} של {{formatSpace(storage.totalSpace)}}</div>
+
+
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 ng-style="{width: (storage.freeSpace)*100/storage.totalSpace + '%'}">
+                            </div>
+
+                            <div class="progress-bar progress-bar-danger"
+                                 ng-style="{width: 100-storage.freeSpace*100/storage.totalSpace +'%'}">
+                            </div>
+                        </div>
+
+                        <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
+                            <div class="progress-bar progress-bar-danger" style="width:100%">
+                                לא נגיש
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group" ng-if="storage.isWritable"
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                            <input type="number"  class="form-control input-sm"
+                                   ng-model="storage.reservedSpaceGb"
+                                   name="reservedSpaceGb"
+                                   min="1"
+                                   max="{{toGBs(storage.totalSpace)}}"
+                                   required
+ placeholder="שטח אחסון שמור"/>
+                            <div class="input-group-addon">ג"ב</div>
+                        </div>
+                        <div class="input-group" ng-if="!storage.isWritable">
+                            <input type="number" class="form-control input-sm"
+                                   ng-value="storage.reservedSpaceGb"
+                                   disabled
+ placeholder="שטח אחסון שמור"/>
+                            <div class="input-group-addon">ג"ב</div>
+                        </div>
+                    </td>
+                    <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
+                           <label class="read-container">
+                               <span class="checkbox-wrapper">
+                                <input type="checkbox"
+                                       class="isUsedForWriting"
+                                   ng-model="storage.isUsedForWriting"
+                                   ng-disabled="!storage.isWritable"
+                                   name="isUsedForWriting"
+                                   placeholder="השתמש עבור כתיבה"/>
+                                </span>
+                                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
+                                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
+
+                           </label>
+                    </td>
+                    <td>
+                        <span class="read-container">
+                            <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
+                            <icon for="storage.isBackup" on-true="floppy-save" on-false="empty" title-true="Backup storage" ></icon>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
+            לא נבחר דיסק איחסון ראשי לכתיבה - וידאו לא יוקלט בשרת זה.
+        </div>
+        <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
+            שטח אחסון שמור גדול מהשטח הפנוי. קטעי הוידאו הנוכחים יוסרו בכדי לפנות מקום.
+        </div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">תקן את כל ההגדרות המסומנות בכדי לבצע שמירה</div>
+
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >שמור</button>
+        <button class="btn btn-warning" ng-click="cancel()">ביטול</button>
+    </form>
+
+    <h2>הגדרות יומן רישום</h2>
+    <form class="form" role="form" name="logLevels" novalidate>
+        <div class="form-group">
+            <label class="col-sm-4">רמת יומן הראשי</label>
+            <div class="col-sm-8">
+
+                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
+                    <option value="NONE">ללא: יומן רישום כבוי.</option>
+                    <option value="ALWAYS">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
+                    <option value="ERROR">שגיאה: שמור שגיאות בלבד.</option>
+                    <option value="WARNING">אזהרה: שמור אזהרות ושגיאות.</option>
+                    <option value="INFO">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
+                    <option value="DEBUG">איתור באגים: שמור כל הודעת מערכת ומידע לאיתור באגים.</option>
+                    <option value="DEBUG2">איתור באגים 2: שמור כל הודעת מערכת ומידע מורחב לאיתור באגים.</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">רמת יומן הטרנזקציות</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
+                    <option value="NONE">ללא: יומן רישום כבוי.</option>
+                    <option value="ALWAYS">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
+                    <option value="ERROR">שגיאה: שמור שגיאות בלבד.</option>
+                    <option value="WARNING">אזהרה: שמור אזהרות ושגיאות.</option>
+                    <option value="INFO">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
+                    <option value="DEBUG">איתור באגים: שמור כל הודעת מערכת ומידע לאיתור באגים.</option>
+                    <option value="DEBUG2">איתור באגים 2: שמור כל הודעת מערכת ומידע מורחב לאיתור באגים.</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >שמור</button>
+        </div>
+    </form>
+
+    <h2>עדכון ידני</h2>
+    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
+        <div class="form-group">
+            <label class="col-sm-4">העלה תוכנית ההתקנה</label>
+            <div class="col-sm-8">
+                <fileupload text="Select server update archive (zip)"></fileupload>
+                <p class="help-block">נא ודא שהתצורה נכונה.</p>
+            </div>
+        </div>
+    </form>
+
+    <h1>הגדרות מערכת מתקדמות</h1>
+    <div class="alert alert-danger" role="alert">
+        <b>אזהרה!</b> כל שינוי בדף זה עלול לגרום לשרת לעבוד בצורה לא תקינה.
+    </div>
+
+    <form class="form row" role="form" name="systemSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <div class="col-sm-6">
+                <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                       style="height: 22px"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'password'" type="password"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] ||' ריק '}}</p>
+
+                <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
+                    <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >שמור</button>
+        </div>
+
+    </form>
+    <br>
+    <div class="alert alert-danger row" role="alert">
+        <b>אזהרה!</b> שינויים מסוימים מצריכים הפעלה מחדש <b>הכל</b> השרתים במערכת.<br><br>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="restartServer()" >הפעל מחדש את השרת הנוכחי</button>
+        </div>
+    </div>
+</div>

@@ -7,8 +7,8 @@
 
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
-#include <nx/network/http/httpclient.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>

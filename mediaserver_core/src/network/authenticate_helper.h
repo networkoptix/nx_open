@@ -15,7 +15,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
 
@@ -24,9 +24,6 @@
 #include "network/auth/abstract_user_data_provider.h"
 #include <core/resource_access/user_access_data.h>
 #include <common/common_module_aware.h>
-
-#define USE_USER_RESOURCE_PROVIDER
-
 
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
@@ -70,8 +67,6 @@ public:
         const QString& path,
         unsigned int periodMillis);
 
-    static QByteArray symmetricalEncode(const QByteArray& data);
-
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
@@ -88,14 +83,11 @@ public:
 
     bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
+    QnLdapManager* ldapManager() const;
+
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
-#ifndef USE_USER_RESOURCE_PROVIDER
-private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &);
-#endif
 private:
     class TempAuthenticationKeyCtx
     {
@@ -159,29 +151,25 @@ private:
         Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
-#ifndef USE_USER_RESOURCE_PROVIDER
-    QMap<QnUuid, QnUserResourcePtr> m_users;
-    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
-#endif
     nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     AbstractNonceProvider* m_timeBasedNonceProvider;
     AbstractNonceProvider* m_nonceProvider;
     AbstractUserDataProvider* m_userDataProvider;
+    std::unique_ptr<QnLdapManager> m_ldap;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
-    void applyClientCalculatedPasswordHashToResource(
-        const QnUserResourcePtr& userResource,
-        const UserDigestData& userDigestData );
-    Qn::AuthResult doPasswordProlongation(QnUserResourcePtr userResource);
+    void updateUserHashes(const QnUserResourcePtr& userResource, const QString& password);
+
+    bool decodeBasicAuthData(const QByteArray& authData, QString* outUserName, QString* outPassword);
+    bool decodeLDAPPassword(const QByteArray& hash, QString* outPassword);
 
     /*!
         \return \a true if password expiration timestamp has been increased
     */
     //!Check \a digest validity with external authentication service (LDAP currently)
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
-
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

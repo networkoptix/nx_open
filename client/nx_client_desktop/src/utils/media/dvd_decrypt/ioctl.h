@@ -201,7 +201,6 @@ typedef union dvd_authinfo dvd_authinfo;
  *****************************************************************************/
 #if defined( WIN32 )
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #define IOCTL_DVD_START_SESSION         CTL_CODE(FILE_DEVICE_DVD, 0x0400, METHOD_BUFFERED, FILE_READ_ACCESS)

@@ -71,7 +71,7 @@ public:
     id get_id() const noexcept;
     native_handle_type native_handle() noexcept;
     void join() noexcept(false);
-    void detach() throw (std::system_error);
+    void detach() noexcept (false);
     void swap(thread& other) noexcept;
 
     static unsigned int hardware_concurrency() noexcept;

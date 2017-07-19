@@ -55,7 +55,7 @@ UDPHolePunchingConnectionInitiationFsm::~UDPHolePunchingConnectionInitiationFsm(
 void UDPHolePunchingConnectionInitiationFsm::bindToAioThread(
     network::aio::AbstractAioThread* aioThread)
 {
-    Parent::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
 
     m_timer.bindToAioThread(aioThread);
 }
@@ -301,6 +301,8 @@ api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectRespo
     connectResponse.udpEndpointList = std::move(connectionAckRequest.udpEndpointList);
     connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
     connectResponse.cloudConnectVersion = connectionAckRequest.cloudConnectVersion;
+    if (!m_settings.trafficRelay().url.isEmpty())
+        connectResponse.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
 
     return connectResponse;
 }

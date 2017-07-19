@@ -1,12 +1,10 @@
-
 #include "test_setup.h"
 
 #include <QtCore/QUrlQuery>
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/chunked_transfer_encoder.h>
-#include <nx/network/http/httpclient.h>
-
+#include <nx/network/http/http_client.h>
 
 namespace nx {
 namespace cloud {
@@ -20,8 +18,7 @@ static const QString checkuedTestPathAndQuery(lit("%1?%2&chunked").arg(testPath)
 static const nx_http::BufferType testMsgBody("bla-bla-bla");
 static const nx_http::BufferType testMsgContentType("text/plain");
 
-class VmsGatewayProxyTestHandler
-    :
+class VmsGatewayProxyTestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
@@ -72,9 +69,10 @@ public:
     boost::optional<bool> m_securityExpectation;
 };
 
-class VmsGatewayProxyTest
-:
-    public VmsGatewayFunctionalTest
+//-------------------------------------------------------------------------------------------------
+
+class Proxy:
+    public BasicComponentTest
 {
 public:
     void SetUp() override
@@ -101,7 +99,7 @@ public:
         const QUrl& url,
         nx_http::StatusCode::Value expectedReponseStatusCode)
     {
-        NX_LOGX(lm("testProxyUrl(%1)").str(url), cl_logINFO);
+        NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_EQ(
@@ -133,7 +131,9 @@ private:
     boost::optional<bool> m_securityExpectation{boost::none};
 };
 
-TEST_F(VmsGatewayProxyTest, IpSpecified)
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(Proxy, IpSpecified)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
@@ -163,7 +163,7 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
         nx_http::StatusCode::notFound);
 }
 
-TEST_F(VmsGatewayProxyTest, SslEnabled)
+TEST_F(Proxy, SslEnabled)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
@@ -206,7 +206,7 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslEnforced)
+TEST_F(Proxy, SslEnforced)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "enabled");
@@ -231,7 +231,7 @@ TEST_F(VmsGatewayProxyTest, SslEnforced)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslRestricted)
+TEST_F(Proxy, SslRestricted)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "disabled");
@@ -274,7 +274,7 @@ TEST_F(VmsGatewayProxyTest, SslRestricted)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslForbidden)
+TEST_F(Proxy, SslForbidden)
 {
     addArg("-http/sslSupport", "false");
     addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
@@ -304,7 +304,7 @@ TEST_F(VmsGatewayProxyTest, SslForbidden)
         nx_http::StatusCode::forbidden);
 }
 
-TEST_F(VmsGatewayProxyTest, IpForbidden)
+TEST_F(Proxy, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, false));
 
@@ -317,7 +317,7 @@ TEST_F(VmsGatewayProxyTest, IpForbidden)
 }
 
 //testing proxying in case of request line like "GET http://192.168.0.1:2343/some/path HTTP/1.1"
-TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
+TEST_F(Proxy, proxyByRequestUrl)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
@@ -331,7 +331,7 @@ TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
-TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
+TEST_F(Proxy, proxyingChunkedBody)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
@@ -345,7 +345,7 @@ TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
-TEST_F(VmsGatewayProxyTest, ModRewrite)
+TEST_F(Proxy, ModRewrite)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/sslAllowed", "true");
@@ -362,7 +362,74 @@ TEST_F(VmsGatewayProxyTest, ModRewrite)
         .arg(testPathAndQuery)));
 }
 
-}   // namespace test
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+//-------------------------------------------------------------------------------------------------
+
+static const char* kEmptyResourcePath = "/proxy/empty";
+
+class ProxyNewTest:
+    public Proxy
+{
+    using base_type = Proxy;
+
+protected:
+    void whenRequestEmptyResource()
+    {
+        fetchResource(kEmptyResourcePath);
+    }
+
+    void thenEmptyResponseIsDelivered()
+    {
+        ASSERT_EQ(nx_http::StatusCode::noContent, m_response->statusLine.statusCode);
+        ASSERT_TRUE(m_msgBody.isEmpty());
+    }
+
+private:
+    boost::optional<nx_http::Response> m_response;
+    nx::Buffer m_msgBody;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        base_type::SetUp();
+
+        testHttpServer()->registerRequestProcessorFunc(
+            kEmptyResourcePath,
+            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    void returnEmptyHttpResponse(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        completionHandler(nx_http::StatusCode::noContent);
+    }
+
+    void fetchResource(const char* path)
+    {
+        const QUrl url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE(httpClient.doGet(url));
+        ASSERT_NE(nullptr, httpClient.response());
+
+        m_response = *httpClient.response();
+        while (!httpClient.eof())
+            m_msgBody += httpClient.fetchMessageBodyBuffer();
+    }
+};
+
+TEST_F(ProxyNewTest, response_contains_no_content)
+{
+    whenRequestEmptyResource();
+    thenEmptyResponseIsDelivered();
+}
+
+} // namespace test
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

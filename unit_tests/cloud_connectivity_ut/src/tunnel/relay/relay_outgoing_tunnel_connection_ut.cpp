@@ -7,8 +7,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include "cloud_relay_fixture_base.h"
-#include "client_to_relay_connection.h"
+#include "api/relay_api_client_stub.h"
+#include "cloud_relay_basic_fixture.h"
 
 namespace nx {
 namespace network {
@@ -16,11 +16,13 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+using RequestProcessingBehavior = nx::cloud::relay::api::test::RequestProcessingBehavior;
+
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
 
-class CloudRelayOutgoingTunnelConnection:
-    public CloudRelayFixtureBase
+class RelayOutgoingTunnelConnection:
+    public BasicFixture
 {
     struct Result
     {
@@ -47,16 +49,20 @@ class CloudRelayOutgoingTunnelConnection:
     };
 
 public:
-    CloudRelayOutgoingTunnelConnection():
+    RelayOutgoingTunnelConnection():
         m_clientToRelayConnectionCounter(0),
         m_destroyTunnelConnectionOnConnectFailure(false),
-        m_relayType(RelayType::happy),
+        m_relayType(RequestProcessingBehavior::succeed),
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
+        m_resultingSocketAttributes.aioThread = 
+            SocketGlobals::aioService().getRandomAioThread();
+        m_resultingSocketAttributes.recvBufferSize = 
+            nx::utils::random::number<unsigned int>(10000, 50000);
     }
 
-    ~CloudRelayOutgoingTunnelConnection()
+    ~RelayOutgoingTunnelConnection()
     {
         if (m_tunnelConnection)
             m_tunnelConnection->pleaseStopSync();
@@ -70,17 +76,22 @@ protected:
 
     void givenHappyRelay()
     {
-        m_relayType = RelayType::happy;
+        m_relayType = RequestProcessingBehavior::succeed;
     }
 
     void givenUnhappyRelay()
     {
-        m_relayType = RelayType::unhappy;
+        m_relayType = RequestProcessingBehavior::fail;
     }
     
     void givenSilentRelay()
     {
-        m_relayType = RelayType::silent;
+        m_relayType = RequestProcessingBehavior::ignore;
+    }
+
+    void givenRelayProducingLogicError()
+    {
+        m_relayType = RequestProcessingBehavior::produceLogicError;
     }
 
     void givenIdleTunnel()
@@ -113,11 +124,6 @@ protected:
         m_connection = std::move(m_connectResultQueue.pop().connection);
         ASSERT_NE(nullptr, m_connection);
     }
-
-    //void whenControlConnectionIsBroken()
-    //{
-    //    // TODO
-    //}
 
     void thenRequestToRelayHasBeenIssued()
     {
@@ -189,10 +195,11 @@ protected:
             m_tunnelClosed.get_future().wait_for(*m_tunnelInactivityTimeout * 3));
     }
 
-    //void thenTunnelReopensControlConnection()
-    //{
-    //    // TODO
-    //}
+    void thenSocketAttributesHaveBeenAppliedToTheResultingSocket()
+    {
+        ASSERT_TRUE(nx::network::verifySocketAttributes(
+            *m_connection, m_resultingSocketAttributes));
+    }
 
     void enableDestroyingTunnelConnectionOnConnectFailure()
     {
@@ -210,41 +217,24 @@ protected:
     }
 
 private:
-    enum class RelayType
-    {
-        happy,
-        unhappy,
-        silent,
-    };
-
     std::unique_ptr<relay::OutgoingTunnelConnection> m_tunnelConnection;
     nx::utils::SyncQueue<Result> m_connectResultQueue;
-    SocketAddress m_relayEndpoint;
     std::atomic<int> m_clientToRelayConnectionCounter;
     bool m_isRelayHappy;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosed;
     bool m_destroyTunnelConnectionOnConnectFailure;
-    RelayType m_relayType;
+    RequestProcessingBehavior m_relayType = RequestProcessingBehavior::succeed;
     std::chrono::milliseconds m_connectTimeout;
     int m_connectionsToCreateCount;
     boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     aio::BasicPollable m_aioThreadBinder;
+    nx::network::SocketAttributes m_resultingSocketAttributes;
 
     virtual void onClientToRelayConnectionInstanciated(
-        ClientToRelayConnection* relayClient) override
+        nx::cloud::relay::api::test::ClientImpl* relayClient) override
     {
-        switch (m_relayType)
-        {
-            case RelayType::unhappy:
-                relayClient->setFailRequests(true);
-                break;
-            case RelayType::silent:
-                relayClient->setIgnoreRequests(true);
-                break;
-            default:
-                break;
-        }
+        relayClient->setBehavior(m_relayType);
 
         ++m_clientToRelayConnectionCounter;
     }
@@ -254,16 +244,17 @@ private:
         using namespace std::placeholders;
         using namespace nx::cloud::relay;
 
-        auto clientToRelayConnection = api::ClientFactory::create(
-            nx::network::url::Builder().setScheme("http").setEndpoint(m_relayEndpoint));
+        const auto relayUrl = QUrl("http://127.0.0.1:12345");
+
+        auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
-            m_relayEndpoint,
+            relayUrl,
             nx::String(),
             std::move(clientToRelayConnection));
         m_tunnelConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_tunnelConnection->setControlConnectionClosedHandler(
-            std::bind(&CloudRelayOutgoingTunnelConnection::onTunnelClosed, this, _1));
+            std::bind(&RelayOutgoingTunnelConnection::onTunnelClosed, this, _1));
         if (m_tunnelInactivityTimeout)
             m_tunnelConnection->setInactivityTimeout(*m_tunnelInactivityTimeout);
 
@@ -306,8 +297,8 @@ private:
                 {
                     m_tunnelConnection->establishNewConnection(
                         m_connectTimeout,
-                        nx::network::SocketAttributes(),
-                        std::bind(&CloudRelayOutgoingTunnelConnection::onConnectDone, this,
+                        m_resultingSocketAttributes,
+                        std::bind(&RelayOutgoingTunnelConnection::onConnectDone, this,
                             _1, _2, _3));
                 }
 
@@ -321,14 +312,14 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(CloudRelayOutgoingTunnelConnection, asks_relay_for_connection_using_proper_session_id)
+TEST_F(RelayOutgoingTunnelConnection, asks_relay_for_connection_using_proper_session_id)
 {
     givenHappyRelay();
     whenRequestingConnection();
     thenConnectionIsProvided();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_receiving_error_from_relay)
+TEST_F(RelayOutgoingTunnelConnection, shuts_down_on_receiving_error_from_relay)
 {
     givenUnhappyRelay();
 
@@ -338,7 +329,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_receiving_error_from_re
     thenTunnelReportedClosure();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, tunnel_removed_from_closed_handler)
+TEST_F(RelayOutgoingTunnelConnection, tunnel_removed_from_closed_handler)
 {
     givenUnhappyRelay();
     enableDestroyingTunnelConnectionOnConnectFailure();
@@ -349,7 +340,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, tunnel_removed_from_closed_handler)
     thenTunnelDidNotReportClosure();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, connect_timeout)
+TEST_F(RelayOutgoingTunnelConnection, connect_timeout)
 {
     givenSilentRelay();
 
@@ -359,14 +350,14 @@ TEST_F(CloudRelayOutgoingTunnelConnection, connect_timeout)
     thenTunnelReportedClosure();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, multiple_concurrent_connections)
+TEST_F(RelayOutgoingTunnelConnection, multiple_concurrent_connections)
 {
     givenHappyRelay();
     whenRequestingMultipleConnection();
     thenAllConnectionsHaveBeenProvided();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_tunnel_creation)
+TEST_F(RelayOutgoingTunnelConnection, inactivity_timeout_just_after_tunnel_creation)
 {
     enableInactivityTimeout();
 
@@ -374,7 +365,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_tunnel_
     thenTunnelIsClosedByTimeout();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_some_activity)
+TEST_F(RelayOutgoingTunnelConnection, inactivity_timeout_just_after_some_activity)
 {
     enableInactivityTimeout();
 
@@ -387,7 +378,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_some_ac
 }
 
 TEST_F(
-    CloudRelayOutgoingTunnelConnection,
+    RelayOutgoingTunnelConnection,
     inactivity_timer_does_not_start_while_provided_connections_are_in_use)
 {
     enableInactivityTimeout();
@@ -397,7 +388,7 @@ TEST_F(
     thenTunnelInactivityTimeoutIsNotTriggered();
 }
 
-TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_tunnel_connection)
+TEST_F(RelayOutgoingTunnelConnection, provided_connection_destroyed_after_tunnel_connection)
 {
     givenHappyRelay();
     whenReceivedAndSavedConnection();
@@ -405,16 +396,20 @@ TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_t
     destroySavedConnection();
 }
 
-//TEST_F(CloudRelayOutgoingTunnelConnection, reopens_control_connection_on_failure)
-//{
-//    givenHappyRelay();
-//    givenIdleTunnel();
-//    whenControlConnectionIsBroken();
-//    thenTunnelReopensControlConnection();
-//}
-//
-//TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_repeated_control_connection_failure)
-//TEST_F(CloudRelayOutgoingTunnelConnection, terminating)
+TEST_F(RelayOutgoingTunnelConnection, applies_socket_attributes)
+{
+    givenHappyRelay();
+    whenReceivedAndSavedConnection();
+    thenSocketAttributesHaveBeenAppliedToTheResultingSocket();
+}
+
+TEST_F(RelayOutgoingTunnelConnection, does_not_return_connection_on_error)
+{
+    // In this case client reports error in still provides connection.
+    givenRelayProducingLogicError();
+    whenRequestingConnection();
+    thenErrorIsReported();
+}
 
 } // namespace test
 } // namespace relay

@@ -717,8 +717,8 @@ bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) 
 {
     // UDT has keep-alives but provides no way to modify it...
     (*result)->probeCount = 10; // TODO: #ak find real value in udt.
-    (*result)->time = std::chrono::seconds(5);
-    (*result)->interval = std::chrono::seconds(5);
+    (*result)->inactivityPeriodBeforeFirstProbe = std::chrono::seconds(5);
+    (*result)->probeSendPeriod = std::chrono::seconds(5);
     return true;
 }
 
@@ -922,7 +922,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 
     //this method always blocks
     nx::utils::promise<
-        std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
+        std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > acceptedSocketPromise;
 
     if (!setNonBlockingMode(true))
@@ -930,14 +930,14 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 
     acceptAsync(
         [this, &acceptedSocketPromise](
-            SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
+            SystemError::ErrorCode errorCode, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            //need post here to be sure that aio subsystem does not use socket anymore
+            // Need post here to be sure that aio subsystem does not use socket anymore.
             post(
-                [&acceptedSocketPromise, errorCode, socket]
+                [&acceptedSocketPromise, errorCode, socket = std::move(socket)]() mutable
                 {
                     acceptedSocketPromise.set_value(
-                        std::make_pair(errorCode, socket));
+                        std::make_pair(errorCode, std::move(socket)));
                 });
         });
 
@@ -951,13 +951,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         SystemError::setLastErrorCode(acceptedSocketPair.first);
         return nullptr;
     }
-    return acceptedSocketPair.second;
+    return acceptedSocketPair.second.release();
 }
 
-void UdtStreamServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     bool nonBlockingMode = false;
     if (!getNonBlockingMode(&nonBlockingMode))
@@ -975,19 +972,18 @@ void UdtStreamServerSocket::acceptAsync(
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,
-            AbstractStreamSocket* socket)
+            std::unique_ptr<AbstractStreamSocket> socket)
         {
             //every accepted socket MUST be in blocking mode!
             if (socket)
             {
                 if (!socket->setNonBlockingMode(false))
                 {
-                    delete socket;
-                    socket = nullptr;
+                    socket.reset();
                     errorCode = SystemError::getLastOSErrorCode();
                 }
             }
-            handler(errorCode, socket);
+            handler(errorCode, std::move(socket));
         });
 }
 
@@ -1040,6 +1036,7 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
         m_ipVersion,
         new detail::UdtSocketImpl(ret),
         detail::SocketState::connected);
+    acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
     if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
     {

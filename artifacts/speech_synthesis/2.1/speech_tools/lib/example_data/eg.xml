@@ -1,0 +1,9 @@
+<!DOCTYPE text SYSTEM "//EST//Test/eg" []>
+<text>
+	<sentence>
+	<phrase>This</phrase>
+	<phrase>is</phrase>
+	<phrase>an example <phrase>of <phrase>an XML file</phrase></phrase></phrase>
+	<punct mark='.'/>
+	</sentence>
+</text>

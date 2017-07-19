@@ -19,8 +19,8 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include <business/business_event_connector.h>
-#include <business/events/reasoned_business_event.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
@@ -52,6 +52,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_catalog(catalog),
     m_mediaProvider(mediaProvider),
     m_dualStreamingHelper(0),
+    m_forcedScheduleRecordDurationMs(0),
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
     m_lastMotionState(false),
@@ -77,9 +78,18 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
     connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
-    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
-    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
-    connect(dev.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_camera_propertyChanged(const QnResourcePtr &, const QString &)));
+    connect(this, &QnServerStreamRecorder::motionDetected, qnEventRuleConnector,
+        &nx::mediaserver::event::EventConnector::at_motionDetected);
+
+    using storageFailureWithResource = void (nx::mediaserver::event::EventConnector::*)
+        (const QnResourcePtr&, qint64, nx::vms::event::EventReason, const QnResourcePtr&);
+
+    connect(this, &QnServerStreamRecorder::storageFailure, qnEventRuleConnector,
+        storageFailureWithResource(&nx::mediaserver::event::EventConnector::at_storageFailure));
+
+    connect(dev.data(), &QnResource::propertyChanged, this,
+        &QnServerStreamRecorder::at_camera_propertyChanged);
+
     at_camera_propertyChanged(m_device, QString());
 }
 
@@ -87,7 +97,6 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
 }
-
 
 void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
@@ -119,7 +128,7 @@ void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruc
                 emit storageFailure(
                     m_mediaServer,
                     qnSyncTime->currentUSecsSinceEpoch(),
-                    QnBusiness::StorageIoErrorReason ,
+                    nx::vms::event::EventReason::storageIoError,
                     status.storage
                 );
             m_diskErrorWarned = true;
@@ -214,11 +223,11 @@ bool QnServerStreamRecorder::cleanupQueueIfOverflow()
         emit storageFailure(
             m_mediaServer,
             qnSyncTime->currentUSecsSinceEpoch(),
-            QnBusiness::StorageTooSlowReason,
+            nx::vms::event::EventReason::storageTooSlow,
             m_recordingContextVector[slowestStorageIndex].storage
             );
     }
-    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
+    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::StorageTooSlowReason, m_storage);
 
     qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
     markNeedKeyData();
@@ -467,7 +476,7 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     }
 }
 
-void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDurationSec)
 {
     Q_UNUSED(beforeThreshold)
 
@@ -477,15 +486,18 @@ void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int
     scheduleData.m_beforeThreshold = 0; // beforeThreshold not used now
     scheduleData.m_afterThreshold = afterThreshold;
     scheduleData.m_fps = getFpsForValue(fps);
-    if (maxDuration) {
+    if (maxDurationSec)
+    {
         QDateTime dt = qnSyncTime->currentDateTime();
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
-        scheduleData.m_endTime = currentWeekSeconds + maxDuration;
+        scheduleData.m_endTime = currentWeekSeconds + maxDurationSec;
     }
     scheduleData.m_recordType = Qn::RT_Always;
     scheduleData.m_streamQuality = quality;
 
     m_forcedSchedileRecord.setData(scheduleData);
+    m_forcedSchedileRecordTimer.restart();
+    m_forcedScheduleRecordDurationMs = maxDurationSec * 1000;
 
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
@@ -566,7 +578,12 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             setSpecialRecordingMode(m_forcedSchedileRecord);
             m_usedSpecialRecordingMode = true;
         }
-        return;
+        bool isExpired = m_forcedScheduleRecordDurationMs > 0
+             && m_forcedSchedileRecordTimer.hasExpired(m_forcedScheduleRecordDurationMs);
+        if (isExpired)
+            stopForcedRecording();
+        else
+            return;
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;

@@ -33,7 +33,6 @@
         <media_db_util.guid>{931E412E-4CB2-426B-93CD-1F581CA69D93}</media_db_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_speech_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speech_synthesizer.guid>
-        <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
@@ -48,8 +47,8 @@
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
+        <generic_multicast_plugin.guid>{e03f4c6d-2831-44e7-b636-e37f904d7388}</generic_multicast_plugin.guid>
         <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
-        <isd_native_plugin.guid>{9d3f6a6f-ec63-4269-bf34-cc1060f80e90}</isd_native_plugin.guid>
         <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
         <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
         <quicksyncdecoder.guid>{84ca6c5b-525e-438a-940c-50c14db49c66}</quicksyncdecoder.guid>
@@ -70,6 +69,7 @@
         <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
+        <cloud_connect_integration_tests.guid>{2b60d0be-4d05-4547-a0a9-73c98d720b1a}</cloud_connect_integration_tests.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
@@ -85,6 +85,8 @@
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
         <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
+        <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
+        <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -112,6 +114,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
+        <generic_multicast_plugin.name>${company.name} generic multicast plugin</generic_multicast_plugin.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
@@ -142,6 +145,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -153,7 +157,7 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -166,7 +170,7 @@
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
-        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.1-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
@@ -174,14 +178,15 @@
         <quazip.version>0.7.1</quazip.version>
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
-        <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>${release.version}</server-external.version>
-        <help.version>${customization}-${release.version}</help.version>
+        <cpro.version>1.0.0</cpro.version>
+        <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
         <global.libs/>
+        <subdirectory.global.libs/>
         <windows.oslibs/>
         <linux.oslibs/>
         <mac.oslibs/>
@@ -205,6 +210,8 @@
 
         <additional.defines/>
         <customization.defines/>
+
+        <additionalQrcPaths/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
@@ -244,9 +251,12 @@
         -->
         <artifact.name.product>${installer.name}</artifact.name.product>
         <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
-        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
-        <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
-        <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
+        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform>
+        <!-- will be defined in each platform separately -->
+        <artifact.name.beta.suffix/>
+        <!-- will be defined in artifact-name-beta profile -->
+        <artifact.name.cloud.suffix/>
+        <!-- will be defined in artifact-name-cloud profile -->
 
         <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
         <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
@@ -269,7 +279,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.135</nxcloud.version>
+        <nxcloud.version>latest</nxcloud.version>
     </properties>
 
     <build>
@@ -312,7 +322,6 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
-                                <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -320,14 +329,16 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>get-cloud-url-property</id>
+                        <id>get-generated-properties</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
@@ -473,8 +484,8 @@
                 <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
                 <module>nx_cloud/cloud_db_client</module>
-                <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
+                <module>nx_kit</module>
             </modules>
         </profile>
         <profile>
@@ -487,6 +498,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -512,12 +524,13 @@
                 <module>mediaserver_core</module>
 
                 <module>plugins/genericrtspplugin</module>
+                <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -590,7 +603,7 @@
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
-                <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <global.windows.defines>ENABLE_VMAX _WINSOCKAPI_=</global.windows.defines>
                 <machine.type>X64</machine.type>
                 <qt.version>5.6.1-1</qt.version>
                 <artifact.name.platform>win64</artifact.name.platform>
@@ -613,6 +626,28 @@
                 <machine.type>X86</machine.type>
                 <artifact.name.platform>win86</artifact.name.platform>
             </properties>
+        </profile>
+        <!-- Paxton stuff can be built only on Windows x86 -->
+        <profile>
+            <id>paxton</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
+            </activation>
+            <modules>
+                <module>client/activex_client</module>
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton-plugin</module>
+            </modules>
         </profile>
         <profile>
             <id>windows-nomobile</id>
@@ -645,29 +680,7 @@
                 <module>wixsetup</module>
             </modules>
         </profile>
-        <!-- Paxton stuff can be built only on Windows x86 -->
-        <profile>
-            <id>paxton</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>x86</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/paxton.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>client/activex_client</module>
-                <module>plugins/nxinterface</module>
-                <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton-plugin</module>
-                <module>plugins/acs/paxton-installer</module>
-            </modules>
-        </profile>
+
         <profile>
             <id>nxtool</id>
             <activation>
@@ -806,7 +819,6 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
 
-                <module>storage_plugins/teststorageplugin</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
@@ -840,7 +852,7 @@
         </profile>
 
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -849,36 +861,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <qt.spec/>
-                <openssl.version>1.0.0j</openssl.version>
-                <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
-            </properties>
-            <modules>
-                <module>plugins/isd_native_plugin</module>
-                <module>edge_firmware/isd</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>
@@ -887,12 +870,12 @@
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd_s2</modification>
+                <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>
-                <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
             </modules>
         </profile>
@@ -1225,6 +1208,7 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -1237,7 +1221,10 @@
                 </property>
             </activation>
             <modules>
+                <!-- TODO: Move unit_tests to tests/ -->
+                <module>tests</module>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>

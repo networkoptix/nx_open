@@ -1,0 +1,112 @@
+/* Warning! Keep this file and other templates consistent between cloud_portal/cloud/notifications and nx_vms */
+h1{
+    font-size:20px;
+    font-weight:normal;
+    line-height:30px;
+    margin:0px;
+}
+p{
+    font-size:15px;
+    line-height:20px;
+    margin-top:5px;
+}
+
+.logo{
+    max-width:100px;
+    max-height:40px;
+}
+.right-border{
+  border-right: 1px solid #E1E7EA;
+  padding-right:20px;
+}
+.left-border{
+  padding-left:20px;
+}
+.side-spacer{
+  padding:20px;
+}
+.header{
+  width:800px;
+  padding-top:30px;
+  padding-bottom:10px;
+  height:40px;
+}
+.footer{
+  width:800px;
+  padding-top:20px;
+  padding-bottom:30px;
+}
+.footer td{
+  font-size:12px;
+  height:40px;
+  vertical-align:middle;
+}
+.container,table{
+  color:#263137;
+}
+
+.content{
+    width:800px;
+    padding: 15px 0;
+    border: 1px solid #E1E7EA;
+    border-radius: 2px;
+}
+
+.content>*{
+    padding: 0 20px;
+}
+
+.btn{
+  border-radius:2px;
+  background-color:$brand_core;
+  display:inline-block;
+  padding:10px 20px;
+  text-decoration:none;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size:13px;
+  margin-left:20px;
+}
+
+.disclaimer{
+  margin-top:20px;
+  padding-top:20px;
+  border-top:1px solid #E1E7EA;
+}
+
+.disclaimer,
+.footer td{
+  color:#53707F;
+}
+
+.icon{
+    width:20px;
+    height:20px;
+    padding-right:10px;
+}
+
+.system-info{
+    display:inline-block;
+    border: 1px solid #E1E7EA;
+    border-radius: 2px;
+    padding:10px;
+}
+.system-info td{
+    vertical-align:top;
+}
+
+.name{
+    font-size: 14px;
+    font-weight:bold;
+    line-height:20px;
+}
+
+.hint{
+    font-size: 12px;
+    line-height:20px;
+}
+
+.cloud-info td{
+    padding-top:5px;
+}

@@ -20,8 +20,8 @@
         <template>lib</template>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lnx_streaming -ludt -lnx_fusion -lnx_utils</global.libs>
-        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
+        <global.libs>-ludt -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <linux.oslibs>-lswscale</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
@@ -37,31 +37,13 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>
- 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>nx_fusion</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency> 
- 
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_utils</artifactId>

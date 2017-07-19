@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 namespace gzip {
 
 static const int OUTPUT_BUFFER_SIZE = 16 * 1024;
@@ -48,6 +48,7 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                     NX_ASSERT(false);
                 }
                 m_state = State::inProgress;
+                continue;
 
             case State::inProgress:
             {
@@ -124,6 +125,8 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                                 m_nextFilter->processData(QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size() - m_zStream.avail_out));
                             return true;
                         }
+                        m_state = State::failed;
+                        break;
 
                     default:
                         m_state = State::failed;
@@ -163,6 +166,6 @@ size_t Uncompressor::flush()
 }
 
 } // namespace gzip
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

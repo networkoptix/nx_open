@@ -9,13 +9,11 @@ class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
 public:
     QnTCPConnectionProcessor* processor;
     QnMutex mutex;
-    QnUniversalTcpListener* owner;
     bool needAuth;
 
     QnUniversalRequestProcessorPrivate()
     :
         processor( nullptr ),
-        owner( nullptr ),
         needAuth( false )
     {
     }

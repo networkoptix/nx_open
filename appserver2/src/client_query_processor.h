@@ -25,7 +25,7 @@
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
 #include "nx/fusion/serialization/ubjson.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "api/model/audit/auth_session.h"
 #include <common/common_module.h>
 
@@ -189,6 +189,8 @@ namespace ec2
                             return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
                         else if (authResult == Qn::Auth_CloudConnectError)
                             return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
+                        else if (authResult == Qn::Auth_DisabledUser)
+                            return handler(ErrorCode::disabled_user_unauthorized, OutputData());
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }

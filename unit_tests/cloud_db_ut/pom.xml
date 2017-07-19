@@ -20,7 +20,7 @@
         <product.title>cloud_db unit tests</product.title>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -ludt -lcloud_db -lcloud_db_client -lnx_fusion -lnx_utils -lappserver2</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db -lcloud_db_client -lnx_fusion -lnx_utils -lappserver2</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>

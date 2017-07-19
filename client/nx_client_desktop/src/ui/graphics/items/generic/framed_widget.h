@@ -33,6 +33,9 @@ public:
     Qt::PenStyle frameStyle() const;
     void setFrameStyle(Qt::PenStyle frameStyle);
 
+    const QVector<qreal>& dashPattern() const;
+    void setDashPattern(const QVector<qreal>& dashPattern);
+
     QBrush frameBrush() const;
     void setFrameBrush(const QBrush& frameBrush);
 
@@ -68,6 +71,7 @@ private:
     QPainterPath m_customFramePath;
     QRectF m_customFramePathBoundingRect;
     Qt::Edges m_frameBorders;
+    QVector<qreal> m_dashPattern;
 };
 
 

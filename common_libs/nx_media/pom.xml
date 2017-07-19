@@ -18,7 +18,7 @@
         <product.title>${company.name} nx_media</product.title>
 
         <qt.libs>core gui multimedia multimedia-private</qt.libs>
-        <global.libs>-lcommon -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_kit</global.libs>
 
         <rdep.packages>ffmpeg</rdep.packages>
         <rdep.android.packages>libjpeg-turbo</rdep.android.packages>
@@ -34,15 +34,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>
     </dependencies>
 
     <profiles>
@@ -55,7 +46,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
+                <windows.defines></windows.defines>
             </properties>
         </profile>
 

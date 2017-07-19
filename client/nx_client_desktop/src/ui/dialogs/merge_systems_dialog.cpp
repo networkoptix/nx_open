@@ -41,19 +41,9 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
-    m_mergeTool(new QnMergeSystemsTool(this)),
-    m_successfullyFinished(false)
+    m_mergeTool(new QnMergeSystemsTool(this))
 {
     ui->setupUi(this);
-
-    QStringList successMessage;
-    successMessage
-        << tr("Success!")
-        << QString()
-        << QString()
-        << tr("System was configured successfully.")
-        << tr("The servers from the remote System should appear in your System soon.");
-    ui->successLabel->setText(successMessage.join(L'\n'));
 
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
@@ -93,27 +83,6 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 
 QnMergeSystemsDialog::~QnMergeSystemsDialog() {}
 
-void QnMergeSystemsDialog::done(int result)
-{
-    base_type::done(result);
-
-    if (m_successfullyFinished && ui->remoteSystemRadioButton->isChecked())
-    {
-        m_successfullyFinished = false;
-
-        context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
-        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
-
-        //TODO: #GDM #FIXME #3.1 Restore functionality
-//         QUrl url = commonModule()->currentUrl();
-//         url.setUserName(m_remoteOwnerCredentials.user());
-//         url.setPassword(m_remoteOwnerCredentials.password());
-//         QnAppServerConnectionFactory::setUrl(url);
-
-        menu()->trigger(action::ReconnectAction);
-        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
-    }
-}
 
 QUrl QnMergeSystemsDialog::url() const {
     /* filter unnecessary information from the URL */
@@ -133,7 +102,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 {
     ui->urlComboBox->clear();
 
-    for (const QnMediaServerResourcePtr& server: resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    for (const auto& server: resourcePool()->getIncompatibleServers())
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
@@ -199,7 +168,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     m_discoverer.clear();
     m_url.clear();
     m_remoteOwnerCredentials = QAuthenticator();
-    m_successfullyFinished = false;
+
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -228,11 +197,10 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
-void QnMergeSystemsDialog::at_mergeButton_clicked() {
+void QnMergeSystemsDialog::at_mergeButton_clicked()
+{
     if (!m_discoverer)
         return;
-
-    m_successfullyFinished = false;
 
     bool ownSettings = ui->currentSystemRadioButton->isChecked();
     ui->credentialsGroupBox->setEnabled(false);
@@ -332,27 +300,49 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
 
     if (mergeStatus == utils::MergeSystemsStatus::ok)
     {
-        m_mergeButton->hide();
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->hide();
-
         const bool reconnectNeeded = ui->remoteSystemRadioButton->isChecked();
-        QDialogButtonBox::StandardButton closeButton = reconnectNeeded ? QDialogButtonBox::Ok : QDialogButtonBox::Close;
-        ui->buttonBox->button(closeButton)->show();
-        ui->buttonBox->button(closeButton)->setFocus();
 
-        ui->reconnectLabel->setVisible(reconnectNeeded);
-        ui->stackedWidget->setCurrentWidget(ui->finalPage);
-        m_successfullyFinished = true;
-        return;
+        QString successMessage = tr("Servers from the other System will appear in the resource "
+            "tree when the database synchronization is finished.");
+
+        if (reconnectNeeded)
+            successMessage += L'\n' + tr("You will be reconnected.");
+
+        hide(); //< Do not close dialog here as it will be deleted in messagebox event loop.
+
+        if (reconnectNeeded)
+        {
+            context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
+            context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
+
+            if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+            {
+                QUrl url = connection->connectionInfo().ecUrl;
+                url.setUserName(m_remoteOwnerCredentials.user());
+                url.setPassword(m_remoteOwnerCredentials.password());
+                connection->updateConnectionUrl(url);
+            }
+
+            menu()->trigger(action::ReconnectAction);
+            context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
+        }
+
+        QnMessageBox::success(mainWindow(),
+            tr("Systems will be merged shortly"),
+            successMessage);
+
+        accept();
     }
+    else
+    {
+        auto message = utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+        if (!message.isEmpty())
+            message.prepend(lit("\n"));
 
-    auto message = utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
-    if (!message.isEmpty())
-        message.prepend(lit("\n"));
+        QnMessageBox::critical(this, tr("Failed to merge Systems"), message);
 
-    QnMessageBox::critical(this, tr("Failed to merge Systems"), message);
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
-    context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
-
-    updateConfigurationBlock();
+        updateConfigurationBlock();
+    }
 }

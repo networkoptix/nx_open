@@ -74,15 +74,6 @@ bool QnAppInfo::beta()
     return beta;
 }
 
-QString QnAppInfo::productName()
-{
-#ifdef _WIN32
-    return QStringLiteral("${product.name}");
-#else
-    return QStringLiteral("${product.appName}");
-#endif
-}
-
 QString QnAppInfo::productNameShort()
 {
     return QStringLiteral("${product.name.short}");
@@ -100,7 +91,7 @@ QString QnAppInfo::customizationName()
 
 QString QnAppInfo::defaultLanguage()
 {
-    return QStringLiteral("${translation1}");
+    return QStringLiteral("${defaultTranslation}");
 }
 
 QString QnAppInfo::clientExecutableName()

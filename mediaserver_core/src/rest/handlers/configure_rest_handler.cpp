@@ -7,7 +7,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 
-#include "transaction/transaction_message_bus.h"
+#include "transaction/transaction_message_bus_base.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -17,7 +17,7 @@
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "network/tcp_connection_priv.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "api/model/configure_reply.h"
 #include "rest/server/rest_connection_processor.h"
 #include "network/tcp_listener.h"
@@ -30,6 +30,7 @@
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -42,7 +43,7 @@ namespace
 
 }
 
-QnConfigureRestHandler::QnConfigureRestHandler(ec2::QnTransactionMessageBus* messageBus):
+QnConfigureRestHandler::QnConfigureRestHandler(ec2::QnTransactionMessageBusBase* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {
@@ -80,7 +81,7 @@ int QnConfigureRestHandler::execute(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);

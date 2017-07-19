@@ -1,6 +1,17 @@
 #include "scrollable_items_widget.h"
 #include "private/scrollable_items_widget_p.h"
 
+namespace {
+
+QSizeF contentsMarginsSize(const QGraphicsWidget* item)
+{
+    qreal left = 0.0, right = 0.0, top = 0.0, bottom = 0.0;
+    item->getContentsMargins(&left, &top, &right, &bottom);
+    return QSizeF(left + right, top + bottom);
+}
+
+} // namespace
+
 QnScrollableItemsWidget::QnScrollableItemsWidget(QGraphicsItem* parent):
     base_type(parent),
     d_ptr(new QnScrollableItemsWidgetPrivate(this))
@@ -78,6 +89,18 @@ QGraphicsWidget* QnScrollableItemsWidget::item(const QnUuid& id) const
     return d->item(id);
 }
 
+int QnScrollableItemsWidget::lineHeight() const
+{
+    Q_D(const QnScrollableItemsWidget);
+    return d->lineHeight();
+}
+
+void QnScrollableItemsWidget::setLineHeight(int value)
+{
+    Q_D(QnScrollableItemsWidget);
+    d->setLineHeight(value);
+}
+
 qreal QnScrollableItemsWidget::spacing() const
 {
     Q_D(const QnScrollableItemsWidget);
@@ -98,7 +121,7 @@ QSizeF QnScrollableItemsWidget::sizeHint(Qt::SizeHint which, const QSizeF& const
         case Qt::PreferredSize:
         {
             Q_D(const QnScrollableItemsWidget);
-            auto hint = d->contentSizeHint(which, constraint);
+            auto hint = d->contentSizeHint(which, constraint) + contentsMarginsSize(this);
             if (which == Qt::MinimumSize)
                 hint.setHeight(0);
             return hint;

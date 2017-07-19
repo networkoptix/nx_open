@@ -16,8 +16,8 @@ class TestPipeline
 {
 public:
     TestPipeline(
-        std::unique_ptr<utils::pipeline::TwoWayPipeline> clientPipeline,
-        std::unique_ptr<utils::pipeline::TwoWayPipeline> serverPipeline)
+        std::unique_ptr<utils::bstream::TwoWayPipeline> clientPipeline,
+        std::unique_ptr<utils::bstream::TwoWayPipeline> serverPipeline)
         :
         m_clientPipeline(std::move(clientPipeline)),
         m_serverPipeline(std::move(serverPipeline)),
@@ -39,7 +39,7 @@ public:
     }
 
     void insertBetweenClientAndServer(
-        std::unique_ptr<utils::pipeline::AbstractOutputConverter> stream)
+        std::unique_ptr<utils::bstream::AbstractOutputConverter> stream)
     {
         m_betweenClientAndServer = std::move(stream);
 
@@ -81,7 +81,7 @@ public:
                     dataToSend.remove(0, bytesWritten);
                 else if (bytesWritten == 0)
                     ; // TODO
-                else if (bytesWritten != utils::pipeline::StreamIoError::wouldBlock)
+                else if (bytesWritten != utils::bstream::StreamIoError::wouldBlock)
                     senderActive = false;
             }
 
@@ -94,7 +94,7 @@ public:
                     result += readBuffer.mid(0, bytesRead);
                 else if (bytesRead == 0)
                     ; // TODO
-                else if (bytesRead != utils::pipeline::StreamIoError::wouldBlock)
+                else if (bytesRead != utils::bstream::StreamIoError::wouldBlock)
                     receiverActive = false;
             }
         }
@@ -103,11 +103,11 @@ public:
     }
 
 private:
-    utils::pipeline::ReflectingPipeline m_clientToServerPipeline;
-    utils::pipeline::ReflectingPipeline m_serverToClientPipeline;
-    std::unique_ptr<utils::pipeline::TwoWayPipeline> m_clientPipeline;
-    std::unique_ptr<utils::pipeline::TwoWayPipeline> m_serverPipeline;
-    std::unique_ptr<utils::pipeline::AbstractOutputConverter> m_betweenClientAndServer;
+    utils::bstream::ReflectingPipeline m_clientToServerPipeline;
+    utils::bstream::ReflectingPipeline m_serverToClientPipeline;
+    std::unique_ptr<utils::bstream::TwoWayPipeline> m_clientPipeline;
+    std::unique_ptr<utils::bstream::TwoWayPipeline> m_serverPipeline;
+    std::unique_ptr<utils::bstream::AbstractOutputConverter> m_betweenClientAndServer;
     const int m_maxBytesToWrite;
     std::size_t m_clientToServerTotalBytesThrough;
     std::size_t m_serverToClientTotalBytesThrough;
@@ -117,13 +117,13 @@ private:
  * Invokes handler when pipelined wrapped writes any data to the output pipeline.
  */
 class NotifyingTwoWayPipelineWrapper:
-    public utils::pipeline::TwoWayPipeline
+    public utils::bstream::TwoWayPipeline
 {
 public:
     using DataWrittenEventHandler = nx::utils::MoveOnlyFunc<void(const void*, size_t)>;
 
     NotifyingTwoWayPipelineWrapper(
-        std::unique_ptr<utils::pipeline::TwoWayPipeline> twoWayPipeline)
+        std::unique_ptr<utils::bstream::TwoWayPipeline> twoWayPipeline)
         :
         m_twoWayPipeline(std::move(twoWayPipeline))
     {
@@ -157,7 +157,7 @@ public:
 private:
     //DataReadEventHandler m_onDataRead;
     DataWrittenEventHandler m_onDataWritten;
-    std::unique_ptr<utils::pipeline::TwoWayPipeline> m_twoWayPipeline;
+    std::unique_ptr<utils::bstream::TwoWayPipeline> m_twoWayPipeline;
     std::unique_ptr<AbstractOutput> m_customOutput;
 
     int writeCustom(const void* data, size_t count)
@@ -170,7 +170,7 @@ private:
 };
 
 class FailingOutputStream:
-    public utils::pipeline::AbstractOutputConverter
+    public utils::bstream::AbstractOutputConverter
 {
 public:
     int write(const void* data, size_t count)
@@ -425,7 +425,7 @@ protected:
             if (result < 0)
                 break;
         }
-        ASSERT_EQ(utils::pipeline::StreamIoError::wouldBlock, result);
+        ASSERT_EQ(utils::bstream::StreamIoError::wouldBlock, result);
 
         ASSERT_TRUE(one->isWriteThirsty());
 

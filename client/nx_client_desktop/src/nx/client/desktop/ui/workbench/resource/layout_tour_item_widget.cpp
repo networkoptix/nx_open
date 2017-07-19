@@ -1,5 +1,7 @@
 #include "layout_tour_item_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtGui/QGuiApplication>
 
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -8,14 +10,17 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
+#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 
 #include <text/time_strings.h>
 
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_pixmap.h>
 #include <nx/client/desktop/ui/graphics/painters/layout_preview_painter.h>
@@ -26,6 +31,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <utils/common/event_processors.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -34,7 +41,21 @@ namespace workbench {
 
 namespace {
 
-class LayoutPreviewWidget: public GraphicsWidget
+class MouseEaterWidget: public QGraphicsWidget
+{
+public:
+    MouseEaterWidget()
+    {
+        setAcceptedMouseButtons(Qt::LeftButton);
+        auto eventEater = new QnMultiEventEater(Qn::AcceptEvent, this);
+        eventEater->addEventType(QEvent::GraphicsSceneMousePress);
+        eventEater->addEventType(QEvent::GraphicsSceneMouseRelease);
+        eventEater->addEventType(QEvent::GraphicsSceneMouseDoubleClick);
+        installEventFilter(eventEater);
+    }
+};
+
+class LayoutPreviewWidget: public QGraphicsWidget
 {
 public:
     LayoutPreviewWidget(QSharedPointer<LayoutPreviewPainter> previewPainter):
@@ -54,6 +75,9 @@ private:
     QWeakPointer<LayoutPreviewPainter> m_previewPainter;
 };
 
+static const int kMargin = 8; //< Pixels.
+static const int kSpacing = 8; //< Pixels.
+
 } // namespace
 
 LayoutTourItemWidget::LayoutTourItemWidget(
@@ -62,18 +86,16 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     QGraphicsItem* parent)
     :
     base_type(context, item, parent),
-    m_layout(base_type::resource().dynamicCast<QnLayoutResource>()),
     m_previewPainter(new LayoutPreviewPainter(context->instance<QnCameraThumbnailManager>()))
 {
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
-    NX_EXPECT(m_layout, "LayoutTourItemWidget was created with a non-layout resource.");
-    m_previewPainter->setLayout(m_layout);
-    m_previewPainter->setFrameColor(Qt::black);                 //TODO: #GDM #3.1 customize
-    m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
+    QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
+    if (!layout)
+        layout = QnLayoutResource::createFromResource(resource());
 
-    setAcceptDrops(true);
+    m_previewPainter->setLayout(layout);
 
     initOverlay();
 }
@@ -82,12 +104,21 @@ LayoutTourItemWidget::~LayoutTourItemWidget()
 {
 }
 
+Qn::ResourceStatusOverlay LayoutTourItemWidget::calculateStatusOverlay() const
+{
+    return Qn::EmptyOverlay;
+}
+
+int LayoutTourItemWidget::calculateButtonsVisibility() const
+{
+    return Qn::CloseButton;
+}
+
 void LayoutTourItemWidget::initOverlay()
 {
     auto font = this->font();
     font.setPixelSize(14);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, QColor("#a5b7c0")); //TODO: #GDM #3.1 customize
 
     auto titleFont(font);
     titleFont.setWeight(QFont::DemiBold);
@@ -100,12 +131,13 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateIcon = [this, icon]
         {
-            const auto pixmap = qnResIconCache->icon(m_layout)
+            auto pixmap = qnResIconCache->icon(resource())
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
+            pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
             icon->setPixmap(pixmap);
         };
     updateIcon();
-    connect(m_layout, &QnResource::parentIdChanged, this, updateIcon);
+    connect(resource(), &QnResource::parentIdChanged, this, updateIcon);
 
     auto title = new GraphicsLabel();
     title->setAcceptedMouseButtons(0);
@@ -115,10 +147,10 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateTitle = [this, title]
         {
-            title->setText(m_layout->getName());
+            title->setText(resource()->getName());
         };
     updateTitle();
-    connect(m_layout, &QnResource::nameChanged, this, updateTitle);
+    connect(resource(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
     const auto closeButtonIcon = qnSkin->icon(lit("buttons/clear.png"));
@@ -139,7 +171,8 @@ void LayoutTourItemWidget::initOverlay()
     orderLabel->setAcceptedMouseButtons(0);
     orderLabel->setAlignment(Qt::AlignVCenter);
     orderLabel->setFont(orderFont);
-    auto updateOrder = [this, orderLabel](Qn::ItemDataRole role)
+    auto updateOrder =
+        [this, orderLabel](Qn::ItemDataRole role)
         {
             if (role != Qn::LayoutTourItemOrderRole)
                 return;
@@ -150,12 +183,51 @@ void LayoutTourItemWidget::initOverlay()
     updateOrder(Qn::LayoutTourItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
-    auto delayHintLabel = new GraphicsLabel(tr("Display for"));
+    auto updateLightText =
+        [this, title, orderLabel]
+        {
+            setPaletteColor(title, QPalette::WindowText, palette().color(QPalette::Light));
+            setPaletteColor(orderLabel, QPalette::WindowText, palette().color(QPalette::Light));
+        };
+    installEventHandler(this, QEvent::PaletteChange, this, updateLightText);
+    updateLightText();
+
+    auto delayHintLabel = new GraphicsLabel();
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     delayHintLabel->setAcceptedMouseButtons(0);
     delayHintLabel->setAlignment(Qt::AlignVCenter);
     delayHintLabel->setFont(font);
-    setPaletteColor(delayHintLabel, QPalette::WindowText, QColor("#53707f")); //TODO: #GDM #3.1 customize
+
+    auto updateHint =
+        [this, delayHintLabel]
+        {
+            const bool isManual = item()->layout()
+                && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
+            QColor textColor = palette().color(QPalette::Dark);
+            QString text = isManual
+                ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192")) //< Arrows.
+                : tr("Display for");
+
+            if (!isManual)
+            {
+                switch (selectionState())
+                {
+                    case SelectionState::selected:
+                    case SelectionState::focusedAndSelected:
+                        textColor = palette().color(QPalette::Highlight);
+                        text = tr("Display selected for");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
+            delayHintLabel->setText(text);
+        };
+
+    connect(this, &QnResourceWidget::selectionStateChanged, this, updateHint);
+    installEventHandler(this, QEvent::PaletteChange, this, updateHint);
+    updateHint();
 
     auto delayEdit = new QSpinBox();
     delayEdit->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
@@ -163,10 +235,32 @@ void LayoutTourItemWidget::initOverlay()
     delayEdit->setMaximum(99);
     const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
     delayEdit->setValue(delayMs / 1000);
+
     connect(delayEdit, QnSpinboxIntValueChanged, this,
         [this](int value)
         {
+            if (m_updating)
+                return;
+
+            QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+        });
+
+    connect(delayEdit, &QSpinBox::editingFinished, this,
+        [this]
+        {
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
+        });
+
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this,
+        [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        {
+            if (m_updating || role != Qn::LayoutTourItemDelayMsRole || id != item()->uuid())
+                return;
+
+            QScopedValueRollback<bool> guard(m_updating, true);
+            delayEdit->setValue(data.toInt() / 1000);
         });
 
     auto delayWidget = new QnMaskedProxyWidget();
@@ -177,36 +271,45 @@ void LayoutTourItemWidget::initOverlay()
     footerLayout->addStretch();
     footerLayout->addItem(delayHintLabel);
     footerLayout->addItem(delayWidget);
+    // Additional top margin to compensate outer preview border.
+    footerLayout->setContentsMargins(0, 2, 0, 0);
+    footerLayout->setSpacing(kSpacing);
 
-    auto updateManualMode = [this, delayHintLabel, delayWidget]
+    auto footerWidget = new MouseEaterWidget();
+    footerWidget->setLayout(footerLayout);
+
+    auto updateManualMode = [this, delayWidget]
         {
             const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
-            delayHintLabel->setVisible(!isManual);
             delayWidget->setVisible(!isManual);
         };
 
     connect(item()->layout(), &QnWorkbenchLayout::dataChanged, this,
-        [updateManualMode](int role)
+        [updateManualMode, updateHint](int role)
         {
             if (role == Qn::LayoutTourIsManualRole)
+            {
                 updateManualMode();
+                updateHint();
+            }
         });
     updateManualMode();
 
     auto contentWidget = new LayoutPreviewWidget(m_previewPainter);
 
     auto layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
+    layout->setContentsMargins(kMargin, kMargin, kMargin, kMargin);
     layout->addItem(headerLayout);
     layout->addItem(contentWidget);
-    layout->addItem(footerLayout);
+    layout->addItem(footerWidget);
+    layout->setSpacing(kSpacing);
     layout->setStretchFactor(contentWidget, 1000);
 
     auto overlayWidget = new QnViewportBoundWidget(this);
     overlayWidget->setLayout(layout);
     overlayWidget->setAcceptedMouseButtons(0);
     overlayWidget->setAutoFillBackground(true);
-    setPaletteColor(overlayWidget, QPalette::Window, qApp->palette().color(QPalette::Window));
+    setPaletteColor(overlayWidget, QPalette::Window, qApp->palette().color(QPalette::Dark));
     addOverlayWidget(overlayWidget, Visible);
 }
 

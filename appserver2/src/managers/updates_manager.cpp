@@ -46,9 +46,14 @@ namespace ec2 {
 
 
     template<class QueryProcessorType>
-    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
+    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(
+        QueryProcessorType * const queryProcessor,
+        const Qn::UserAccessData &userAccessData,
+        QnTransactionMessageBusBase* messageBus)
+    :
         m_queryProcessor(queryProcessor),
-        m_userAccessData(userAccessData)
+        m_userAccessData(userAccessData),
+        m_messageBus(messageBus)
     {
     }
 
@@ -56,20 +61,21 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet& peers, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
 
-        ApiUpdateUploadData params;
-        params.updateId = updateId;
-        params.data = data;
-        params.offset = offset;
+        QnTransaction<ApiUpdateUploadData> transaction(
+            ApiCommand::uploadUpdate,
+            m_messageBus->commonModule()->moduleGUID());
+        transaction.params.updateId = updateId;
+        transaction.params.data = data;
+        transaction.params.offset = offset;
 
-        using namespace std::placeholders;
-        // todo: #singletone refactor peers param are lost
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::uploadUpdate, params,
-            [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
+        sendTransaction(m_messageBus, transaction, peers);
+        nx::utils::concurrent::run(
+            Ec2ThreadPool::instance(),
+            [handler, reqId]() { handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
@@ -88,22 +94,6 @@ namespace ec2 {
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdateResponce, params,
             [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-        return reqId;
-    }
-
-    template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
-    {
-        const int reqId = generateRequestID();
-
-        ApiUpdateInstallData params;
-        params.updateId = updateId;
-
-        using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::installUpdate, params,
-            [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
 
         return reqId;
     }

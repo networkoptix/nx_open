@@ -3,6 +3,7 @@
     <?define installerLanguage="${installer.language}"?>
     <?define companyName="${company.name}"?>
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+    <?define ProductTitle="${product.title}"?>
 
     <?define serverUpgradeCode = "${customization.upgradeCode}"?>
     <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
@@ -10,6 +11,7 @@
     <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
     <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
     <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+    <?define axBundleUpgradeCode = "${customization.axBundleUpgradeCode}"?>
 
     <?define cloudHost = "${cloudHost}"?>
 
@@ -23,15 +25,17 @@
     <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
     <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
-    <?define ECRegPath="Software\${company.name}\${appserver.name}"?>    
-    
+    <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
+
     <?define clientInternalName = "${client.name}"?>
+    <?define nxtoolName = "${nxtool.name}"?>
+    <?define mediaserverName = "${mediaserver.name}"?>
     <?define productName = "${display.product.name}"?>
+    <?define productTitle = "${product.title}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
     <?define clientName = "${product.name}"?>
     <?define clientDisplayName = "${client.display.name}"?>
-    <?define nxtoolName = "${short.company.name} Server Tool"?>
     <?define launcherVersionFile = "${launcher.version.file}"?>
 
     <?define productExeName = "${product.name}"?>
@@ -40,7 +44,7 @@
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
-    <?define translation1 = "${translation1}"?>
+    <?define defaultTranslation = "${defaultTranslation}"?>
 
 
     <?if $(var.arch) = x86?>
@@ -76,7 +80,7 @@
     <?define archSuffix = "x86_x64" ?>
     <?endif?>
 
-    <?define SourceDir="${libdir}/bin/${build.configuration}"?>
+    <?define SourceDir="${target_bin_path}"?>
     <?define NxtoolSourceDir="${libdir}/bin/${build.configuration}"?>
     <?define PluginsDir="${libdir}/bin/${build.configuration}/plugins"?>
     <?define QtDir="${qt.dir}/bin"?>
@@ -85,4 +89,5 @@
     <?define VC14RedistPath="${VC14RedistPath}"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
+    <?define paxtonDirId = "${customization}_${release.version}_Paxton"?>
 </Include>

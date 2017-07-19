@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 
 namespace QnSystemHealth {
 
@@ -12,11 +12,10 @@ namespace QnSystemHealth {
 enum MessageType
 {
     // These messages are generated on the client
-    EmailIsEmpty,
+    EmailIsEmpty,       /*< Current user email is empty. */
     NoLicenses,
     SmtpIsNotSet,
     UsersEmailIsEmpty,  /*< Other user's email is empty. */
-    ConnectionLost,     /*< Current user email is empty. */
     NoPrimaryTimeServer,
     SystemIsReadOnly,
 

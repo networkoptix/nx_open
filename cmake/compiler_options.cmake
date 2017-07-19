@@ -14,12 +14,15 @@ add_definitions(
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
     -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS)
+    -DENABLE_MDNS
+)
 
-if(WIN32)
+if(WINDOWS)
     add_definitions(
+        -D_WINSOCKAPI_=
         -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA)
+        -DENABLE_DESKTOP_CAMERA
+    )
 endif()
 
 if(UNIX)
@@ -30,18 +33,19 @@ set(enableAllVendors ON)
 
 if(ANDROID OR IOS)
     remove_definitions(
-        -DENABLE_SSL
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
         -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS)
-
+        -DENABLE_MDNS
+    )
     set(enableAllVendors OFF)
 endif()
 
-if(ISD OR ISD_S2)
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
+    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(enableAllVendors)
@@ -57,10 +61,11 @@ if(enableAllVendors)
         -DENABLE_IQE
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
-        -DENABLE_FLIR)
+        -DENABLE_FLIR
+    )
 endif()
 
-if(WIN32)
+if(WINDOWS)
     set(API_IMPORT_MACRO "__declspec(dllimport)")
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
@@ -69,7 +74,7 @@ else()
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(NOT WIN32)
+    if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
     add_definitions(-DUSE_OWN_MUTEX)
@@ -78,7 +83,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
-if(WIN32)
+if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
@@ -92,7 +97,8 @@ if(WIN32)
         /wd4290
         /wd4661
         /wd4100
-        /we4717)
+        /we4717
+    )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
@@ -112,12 +118,19 @@ if(UNIX)
         -Werror=delete-non-virtual-dtor
         -Werror=return-type
         -Werror=conversion-null
-        -Wuninitialized)
+        -Wuninitialized
+        -Wno-error=unused-function
+    )
 
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.0)
+            add_compile_options(-Wno-error=dangling-else)
+        endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
-            -Wno-inconsistent-missing-override)
+            -Wno-inconsistent-missing-override
+        )
     endif()
 endif()
 
@@ -127,8 +140,8 @@ if(LINUX)
     endif()
     add_compile_options(
         -Wno-unknown-pragmas
-        -Wno-ignored-qualifiers)
-
+        -Wno-ignored-qualifiers
+    )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
@@ -136,7 +149,8 @@ if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
 endif()
@@ -144,7 +158,8 @@ endif()
 if(MACOSX)
     add_compile_options(
         -msse4.1
-        -Wno-unused-local-typedef)
+        -Wno-unused-local-typedef
+    )
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 

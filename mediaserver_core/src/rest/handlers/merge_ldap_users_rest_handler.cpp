@@ -6,7 +6,7 @@
 #include "merge_ldap_users_rest_handler.h"
 
 #include <common/common_module.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <core/resource/user_resource.h>
 #include <ldap/ldap_manager.h>
@@ -17,6 +17,7 @@
 
 #include <nx/utils/uuid.h>
 #include "rest/server/rest_connection_processor.h"
+#include <network/authenticate_helper.h>
 
 int QnMergeLdapUsersRestHandler::executePost(
     const QString &path,
@@ -27,9 +28,8 @@ int QnMergeLdapUsersRestHandler::executePost(
 {
     QN_UNUSED(path, params, body);
 
-    QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
-    Qn::LdapResult ldapResult = ldapManager->fetchUsers(ldapUsers);
+    Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers);
     if (ldapResult != Qn::Ldap_NoError)
 	{
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));

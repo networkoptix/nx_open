@@ -1,0 +1,216 @@
+<div class="container">
+    <h1>進階伺服器設定</h1>
+
+    <div class="alert alert-danger" role="alert">
+        <b>警告 ！</b>此頁面上的任何變更可能會導致伺服器無法正常工作.
+    </div>
+
+
+    <h2>儲存裝置</h2>
+    <form class="form" role="form" name="form" novalidate>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th >
+                        網址
+                    </th>
+                    <th width="200">
+                        剩餘空間
+                    </th>
+                    <th width="150">
+                        保留空間
+                    </th>
+                    <th >
+                    </th>
+                    <th width="70">
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="storage in storages" ng-form="storageForm">
+
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
+                    <td>
+                        <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
+                             title="{{formatTotalSpace(storage)}}">
+
+                            <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                                 ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
+                            </div>
+
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+
+
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 ng-style="{width: (storage.freeSpace)*100/storage.totalSpace + '%'}">
+                            </div>
+
+                            <div class="progress-bar progress-bar-danger"
+                                 ng-style="{width: 100-storage.freeSpace*100/storage.totalSpace +'%'}">
+                            </div>
+                        </div>
+
+                        <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
+                            <div class="progress-bar progress-bar-danger" style="width:100%">
+                                無法存取
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group" ng-if="storage.isWritable"
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                            <input type="number"  class="form-control input-sm"
+                                   ng-model="storage.reservedSpaceGb"
+                                   name="reservedSpaceGb"
+                                   min="1"
+                                   max="{{toGBs(storage.totalSpace)}}"
+                                   required
+ placeholder="保留空間"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                        <div class="input-group" ng-if="!storage.isWritable">
+                            <input type="number" class="form-control input-sm"
+                                   ng-value="storage.reservedSpaceGb"
+                                   disabled
+ placeholder="保留空間"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                    </td>
+                    <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
+                           <label class="read-container">
+                               <span class="checkbox-wrapper">
+                                <input type="checkbox"
+                                       class="isUsedForWriting"
+                                   ng-model="storage.isUsedForWriting"
+                                   ng-disabled="!storage.isWritable"
+                                   name="isUsedForWriting"
+                                   placeholder="用於錄影"/>
+                                </span>
+                                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
+                                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
+
+                           </label>
+                    </td>
+                    <td>
+                        <span class="read-container">
+                            <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
+                            <icon for="storage.isBackup" on-true="floppy-save" on-false="empty" title-true="Backup storage" ></icon>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
+            沒有主要儲存裝置 - 影像將無法被儲存在此伺服器內.
+        </div>
+        <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
+            保留空間量大於剩餘空間. 錄影資料可能會被刪除以釋放一些空間.
+        </div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">修正所有標記的設定並儲存</div>
+
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >儲存</button>
+        <button class="btn btn-warning" ng-click="cancel()">取消</button>
+    </form>
+
+    <h2>日誌設定</h2>
+    <form class="form" role="form" name="logLevels" novalidate>
+        <div class="form-group">
+            <label class="col-sm-4">主要日誌層級</label>
+            <div class="col-sm-8">
+
+                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
+                    <option value="NONE">無︰關閉日誌.</option>
+                    <option value="ALWAYS">總是︰錯誤日誌, 警告和最重要的訊息.</option>
+                    <option value="ERROR">錯誤：只記錄錯誤日誌.</option>
+                    <option value="WARNING">警告︰警告日誌和錯誤.</option>
+                    <option value="INFO">總是：錯誤日誌, 警告和所有訊息.</option>
+                    <option value="DEBUG">除錯：記錄所有系統訊息以及除錯資訊.</option>
+                    <option value="DEBUG2">除錯2：記錄所有系統訊息以及延伸的除錯資訊.</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">事務日誌層級</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
+                    <option value="NONE">無︰關閉日誌.</option>
+                    <option value="ALWAYS">總是︰錯誤日誌, 警告和最重要的訊息.</option>
+                    <option value="ERROR">錯誤：只記錄錯誤日誌.</option>
+                    <option value="WARNING">警告︰警告日誌和錯誤.</option>
+                    <option value="INFO">總是：錯誤日誌, 警告和所有訊息.</option>
+                    <option value="DEBUG">除錯：記錄所有系統訊息以及除錯資訊.</option>
+                    <option value="DEBUG2">除錯2：記錄所有系統訊息以及延伸的除錯資訊.</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >儲存</button>
+        </div>
+    </form>
+
+    <h2>手動更新</h2>
+    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
+        <div class="form-group">
+            <label class="col-sm-4">上傳安裝程式</label>
+            <div class="col-sm-8">
+                <fileupload text="Select server update archive (zip)"></fileupload>
+                <p class="help-block">請確認設定值是正確的.</p>
+            </div>
+        </div>
+    </form>
+
+    <h1>進階系統設定</h1>
+    <div class="alert alert-danger" role="alert">
+        <b>警告 ！</b>此頁面上的任何變更可能會導致伺服器無法正常工作.
+    </div>
+
+    <form class="form row" role="form" name="systemSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <div class="col-sm-6">
+                <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                       style="height: 22px"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'password'" type="password"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] | | '空 '}}</p>
+
+                <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
+                    <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >儲存</button>
+        </div>
+
+    </form>
+    <br>
+    <div class="alert alert-danger row" role="alert">
+        <b>警告!</b> 某些更改需要重新開機 <b>全部</b> 系統中的伺服器.<br><br>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="restartServer()" >重開這部伺服器</button>
+        </div>
+    </div>
+</div>

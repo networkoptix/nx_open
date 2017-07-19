@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QPushButton>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -35,11 +36,13 @@ QString getFullAlias(const QString& postfix)
 
 const char* kActionIndexPropertyName = "_qn_actionIndex";
 
-const int kColorSignMargin = 4;
-const int kHorizontalMargin = 12;
-const int kVerticalMargin = 6;
+static constexpr int kColorSignMargin = 4;
+static constexpr int kHorizontalMargin = 12;
+static constexpr int kExtraHorizontalMargin = 28;
+static constexpr int kVerticalMargin = 6;
+static constexpr int kNotificationIconWidth = 24;
 
-} // anonymous namespace
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnNotificationToolTipWidget
@@ -108,8 +111,9 @@ void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF& enclosingGe
 // -------------------------------------------------------------------------- //
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
-    m_defaultActionIdx(-1),
-    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
+    m_defaultActionIdx(-1),    
+    m_verticalLayout(new QGraphicsLinearLayout(Qt::Vertical)),
+    m_primaryLayout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
     m_closeButton(new QnImageButtonWidget(this)),
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
@@ -137,12 +141,14 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
-    m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin,
-        closeButtonSize.width(), kVerticalMargin);
-    m_layout->addItem(m_textLabel);
-    m_layout->setStretchFactor(m_textLabel, 1.0);
+    m_primaryLayout->setContentsMargins(0, 0, closeButtonSize.width(), 0);
+    m_primaryLayout->addItem(m_textLabel);
+    m_primaryLayout->setStretchFactor(m_textLabel, 1.0);
 
-    setLayout(m_layout);
+    m_verticalLayout->setSpacing(8);
+    m_verticalLayout->setContentsMargins(kHorizontalMargin, kVerticalMargin, 0, kVerticalMargin);
+    m_verticalLayout->addItem(m_primaryLayout);
+    setLayout(m_verticalLayout);
 
     m_tooltipWidget->setFocusProxy(this);
     m_tooltipWidget->setOpacity(0.0);
@@ -165,8 +171,11 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this,
         [this]
         {
-            if (m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+            if (m_closeButtonAvailable &&
+                m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+            {
                 m_closeButton->show();
+            }
         });
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
@@ -250,13 +259,20 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
     m_closeButton->setGeometry(buttonGeometry);
 }
 
+void QnNotificationWidget::setCloseButtonUnavailable()
+{
+    m_closeButtonAvailable = false;
+    m_closeButton->hide();
+}
+
 void QnNotificationWidget::addActionButton(
-    const QIcon& icon, action::IDType actionId,
-    const action::Parameters& parameters, bool defaultAction)
+    const QIcon& icon,
+    ActionType actionId,
+    const ParametersType& parameters,
+    bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);
-
     button->setIcon(icon);
     button->setProperty(kActionIndexPropertyName, m_actions.size());
     button->setFixedSize(QnSkin::maximumSize(icon));
@@ -264,13 +280,14 @@ void QnNotificationWidget::addActionButton(
     if (m_defaultActionIdx < 0 || defaultAction)
         m_defaultActionIdx = m_actions.size();
 
-
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    layout->setMinimumWidth(kNotificationIconWidth);
     layout->setSpacing(0.0);
     layout->addItem(button);
-    layout->addStretch(1);
-    m_layout->insertItem(0, layout);
+    layout->setAlignment(button, Qt::AlignHCenter);
+    layout->addStretch();
+    m_primaryLayout->insertItem(0, layout);
 
     connect(button, &QnImageButtonWidget::clicked, this, [this, actionId, parameters]()
     {
@@ -278,6 +295,34 @@ void QnNotificationWidget::addActionButton(
         emit actionTriggered(actionId, parameters);
     });
     m_actions << ActionData(actionId, parameters); //still required for thumbnails click and base notification click
+}
+
+void QnNotificationWidget::addTextButton(
+    const QIcon& icon,
+    const QString& text,
+    const ButtonHandler& handler)
+{
+    auto button = new QPushButton();
+    if (!text.isEmpty())
+        button->setText(text);
+    if (!icon.isNull())
+        button->setIcon(icon);
+
+    connect(button, &QAbstractButton::clicked, this,
+        [this, handler]()
+        {
+            if (handler)
+                handler();
+        });
+
+    auto proxy = new QGraphicsProxyWidget();
+    proxy->setWidget(button);
+
+    auto rowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    rowLayout->setContentsMargins(kNotificationIconWidth, 0, kHorizontalMargin, 0);
+    rowLayout->addItem(proxy);
+    rowLayout->addStretch(1);
+    m_verticalLayout->addItem(rowLayout);
 }
 
 void QnNotificationWidget::triggerDefaultAction()

@@ -5,7 +5,6 @@
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -17,7 +16,7 @@ IncomingControlConnection::IncomingControlConnection(
     String connectionId,
     std::unique_ptr<UdtStreamSocket> socket,
     const nx::hpm::api::ConnectionParameters& connectionParameters)
-:
+    :
     m_connectionId(std::move(connectionId)),
     m_socket(std::move(socket)),
     m_maxKeepAliveInterval(
@@ -27,6 +26,14 @@ IncomingControlConnection::IncomingControlConnection(
 {
     m_buffer.reserve(kBufferSize);
     m_parser.setMessage(&m_message);
+
+    bindToAioThread(getAioThread());
+}
+
+void IncomingControlConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_socket->bindToAioThread(aioThread);
 }
 
 void IncomingControlConnection::setErrorHandler(
@@ -49,6 +56,11 @@ void IncomingControlConnection::resetLastKeepAlive()
 {
     m_lastKeepAlive = std::chrono::steady_clock::now();
     NX_LOGX(lm("Update last keep alive"), cl_logDEBUG2);
+}
+
+void IncomingControlConnection::stopWhileInAioThread()
+{
+    m_socket.reset();
 }
 
 const AbstractStreamSocket* IncomingControlConnection::socket()
@@ -92,14 +104,19 @@ void IncomingControlConnection::continueReadRequest()
             size_t processed = 0;
             switch(m_parser.parse(m_buffer, &processed))
             {
-                case nx_api::ParserState::init:
-                case nx_api::ParserState::inProgress:
+                case nx::network::server::ParserState::init:
+                case nx::network::server::ParserState::readingMessage:
                     return continueReadRequest();
 
-                case nx_api::ParserState::done:
+                case nx::network::server::ParserState::done:
                     return processRequest();
 
-                case nx_api::ParserState::failed:
+                case nx::network::server::ParserState::failed:
+                    return handleError(SystemError::invalidData);
+
+                case nx::network::server::ParserState::readingBody:
+                    // Stun message cannot have body.
+                    NX_ASSERT(false);
                     return handleError(SystemError::invalidData);
             };
         });

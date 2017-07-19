@@ -2,7 +2,7 @@
 
 #include <QFile>
 
-#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/line_splitter.h>
 #include <nx/network/nettools.h>
 #include <utils/common/app_info.h>
 

@@ -1,0 +1,6 @@
+Új üzenet
+
+Típus: {{message.type}}
+Adat: {{{message.data}}}
+
+Ehhez az üzenettípushoz nincs minta

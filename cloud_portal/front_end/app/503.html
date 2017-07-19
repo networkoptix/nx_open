@@ -1,0 +1,65 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+
+    <base href="/" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+
+    <!-- build:css({.tmp,app}) static/styles/503.css -->
+
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast.css">
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast-animations.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+</head>
+<body class="loading">
+
+<!-- Add your site or application content here -->
+
+
+<div class="jumbotron error-page">
+    <img src="/static/images/503.png"  srcset="/static/images/503@2x.png 2x">
+    <h1>{{PRODUCT_NAME}} is under maintenance</h1>
+    <p>
+        New better version will be online soon!
+    </p>
+    <p>
+        Your {{VMS_NAME}} system is still recording and<br> you can connect there using <a href="{{downloadLink}}">our apps</a>
+    </p>
+
+</div>
+
+
+<!-- build:js({.tmp,app}) static/scripts/scripts-503.js -->
+
+<script src="scripts/config.js"></script>
+
+<!-- endbuild -->
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer',Config.googleTagsCode);</script>
+<!-- End Google Tag Manager -->
+
+</body>
+</html>

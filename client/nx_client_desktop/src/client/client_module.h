@@ -9,9 +9,9 @@
 
 class QGLWidget;
 class QnClientCoreModule;
-class QnPtzControllerPool;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
+class QnCloudStatusWatcher;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -24,9 +24,8 @@ public:
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
 
-    QnPtzControllerPool* ptzControllerPool() const;
     QnNetworkProxyFactory* networkProxyFactory() const;
-
+    QnCloudStatusWatcher* cloudStatusWatcher() const;
 private:
     void initApplication();
     void initThread();
@@ -37,11 +36,13 @@ private:
     void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
+    void initLocalInfo(const QnStartupParameters& startupParams);
 
 private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
+    QnCloudStatusWatcher* m_cloudStatusWatcher;
 };
 
 #define qnClientModule QnClientModule::instance()

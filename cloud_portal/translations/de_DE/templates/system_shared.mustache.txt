@@ -1,0 +1,11 @@
+System wurde mit Ihnen geteilt
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) hat sein System {{message.system_name}} mit Ihnen geteilt.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Das System {{message.system_name}} wurde mit Ihnen geteilt.
+{{/message.sharer_name}}
+
+System öffnen: {{config.portal_url}}/systems/{{message.system_id}}

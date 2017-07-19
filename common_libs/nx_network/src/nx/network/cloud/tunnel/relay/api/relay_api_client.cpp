@@ -3,7 +3,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/std/cpp14.h>
-#include <http/custom_headers.h>
+#include <nx/utils/type_utils.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/url/url_parse_helper.h>
 
 #include "relay_api_http_paths.h"
 
@@ -59,11 +61,13 @@ void ClientImpl::beginListening(
     BeginListeningRequest request;
     request.peerName = peerName.toStdString();
 
-    issueRequest<BeginListeningRequest, BeginListeningResponse>(
-        std::move(request),
-        kServerIncomingConnectionsPath,
-        {peerName},
-        std::move(completionHandler));
+    issueUpgradeRequest<
+        BeginListeningRequest, nx::String, BeginListeningHandler, BeginListeningResponse>(
+            kRelayProtocolName,
+            std::move(request),
+            kServerIncomingConnectionsPath,
+            {peerName},
+            std::move(completionHandler));
 }
 
 void ClientImpl::startSession(
@@ -93,19 +97,13 @@ void ClientImpl::openConnectionToTheTargetHost(
     ConnectToPeerRequest request;
     request.sessionId = sessionId.toStdString();
 
-    auto httpClient = prepareHttpClient<ConnectToPeerRequest, void>(
-        std::move(request),
-        kClientSessionConnectionsPath,
-        {sessionId});
-    
-    post(
-        [this, httpClient = std::move(httpClient), 
-            completionHandler = std::move(completionHandler)]() mutable
-        {
-            executeOpenConnectionRequest(
-                std::move(httpClient),
-                std::move(completionHandler));
-        });
+    issueUpgradeRequest<
+        ConnectToPeerRequest, nx::String, OpenRelayConnectionHandler>(
+            kRelayProtocolName,
+            std::move(request),
+            kClientSessionConnectionsPath,
+            {sessionId},
+            std::move(completionHandler));
 }
 
 SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
@@ -120,6 +118,39 @@ void ClientImpl::stopWhileInAioThread()
 
 template<
     typename Request,
+    typename RequestPathArgument,
+    typename CompletionHandler,
+    typename ... Response
+>
+void ClientImpl::issueUpgradeRequest(
+    const nx_http::StringType& protocolToUpgradeTo,
+    Request request,
+    const char* requestPathTemplate,
+    std::initializer_list<RequestPathArgument> requestPathArguments,
+    CompletionHandler completionHandler)
+{
+    using ResponseOrVoid = 
+        typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type;
+
+    auto httpClient = prepareHttpRequest<Request, ResponseOrVoid>(
+        std::move(request),
+        requestPathTemplate,
+        std::move(requestPathArguments));
+
+    post(
+        [this, protocolToUpgradeTo, httpClient = std::move(httpClient),
+            completionHandler = std::move(completionHandler)]() mutable
+        {
+            executeUpgradeRequest<
+                decltype(httpClient), decltype(completionHandler), Response...>(
+                    protocolToUpgradeTo,
+                    std::move(httpClient),
+                    std::move(completionHandler));
+        });
+}
+
+template<
+    typename Request,
     typename Response,
     typename RequestPathArgument,
     typename CompletionHandler
@@ -130,7 +161,7 @@ void ClientImpl::issueRequest(
     std::initializer_list<RequestPathArgument> requestPathArguments,
     CompletionHandler completionHandler)
 {
-    auto httpClient = prepareHttpClient<Request, Response>(
+    auto httpClient = prepareHttpRequest<Request, Response>(
         std::move(request),
         requestPathTemplate,
         std::move(requestPathArguments));
@@ -144,21 +175,18 @@ void ClientImpl::issueRequest(
         });
 }
 
-template<
-    typename Request,
-    typename Response,
-    typename RequestPathArgument
->
+template<typename Request, typename Response, typename RequestPathArgument>
 std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
-    ClientImpl::prepareHttpClient(
+    ClientImpl::prepareHttpRequest(
         Request request,
         const char* requestPathTemplate,
         std::initializer_list<RequestPathArgument> requestPathArguments)
 {
     QUrl requestUrl = m_baseUrl;
-    requestUrl.setPath(
+    requestUrl.setPath(network::url::normalizePath(
+        requestUrl.path() +
         nx_http::rest::substituteParameters(
-            requestPathTemplate, std::move(requestPathArguments)));
+            requestPathTemplate, std::move(requestPathArguments))));
 
     auto httpClient = std::make_unique<
         nx_http::FusionDataHttpClient<Request, Response>>(
@@ -169,11 +197,35 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
     return httpClient;
 }
 
-template<
-    typename Response,
-    typename HttpClient,
-    typename CompletionHandler
->
+template<typename HttpClient, typename CompletionHandler, typename ... Response>
+void ClientImpl::executeUpgradeRequest(
+    const nx_http::StringType& protocolToUpgradeTo,
+    HttpClient httpClient,
+    CompletionHandler completionHandler)
+{
+    auto httpClientPtr = httpClient.get();
+    m_activeRequests.push_back(std::move(httpClient));
+    httpClientPtr->executeUpgrade(
+        protocolToUpgradeTo,
+        [this, httpClientPtr,
+            httpClientIter = std::prev(m_activeRequests.end()),
+            completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode,
+                const nx_http::Response* httpResponse,
+                Response ... response) mutable
+        {
+            auto connection = httpClientPtr->takeSocket();
+            m_prevSysErrorCode = sysErrorCode;
+            const auto resultCode = toUpgradeResultCode(sysErrorCode, httpResponse);
+            m_activeRequests.erase(httpClientIter);
+            completionHandler(
+                resultCode,
+                std::move(response)...,
+                std::move(connection));
+        });
+}
+
+template<typename Response, typename HttpClient, typename CompletionHandler>
 void ClientImpl::executeRequest(
     HttpClient httpClient,
     CompletionHandler completionHandler)
@@ -195,26 +247,23 @@ void ClientImpl::executeRequest(
         });
 }
 
-template<typename HttpClient, typename CompletionHandler>
-void ClientImpl::executeOpenConnectionRequest(
-    HttpClient httpClient,
-    CompletionHandler completionHandler)
+ResultCode ClientImpl::toUpgradeResultCode(
+    SystemError::ErrorCode sysErrorCode,
+    const nx_http::Response* httpResponse)
 {
-    auto httpClientPtr = httpClient.get();
-    m_activeRequests.push_back(std::move(httpClient));
-    httpClientPtr->execute(
-        [this, httpClientPtr,
-            httpClientIter = std::prev(m_activeRequests.end()),
-            completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode,
-                const nx_http::Response* httpResponse) mutable
-        {
-            auto connection = httpClientPtr->takeSocket();
-            m_prevSysErrorCode = sysErrorCode;
-            const auto resultCode = toResultCode(sysErrorCode, httpResponse);
-            m_activeRequests.erase(httpClientIter);
-            completionHandler(resultCode, std::move(connection));
-        });
+    if (sysErrorCode != SystemError::noError || !httpResponse)
+        return ResultCode::networkError;
+
+    if (httpResponse->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
+        return ResultCode::ok;
+
+    const auto resultCode = toResultCode(sysErrorCode, httpResponse);
+    if (resultCode == api::ResultCode::ok)
+    {
+        // Server did not upgrade connection, but reported OK. It is unexpected...
+        return api::ResultCode::unknownError; 
+    }
+    return resultCode;
 }
 
 ResultCode ClientImpl::toResultCode(

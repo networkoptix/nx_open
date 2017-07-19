@@ -40,13 +40,7 @@ QnAudioStreamDisplay::~QnAudioStreamDisplay()
 int QnAudioStreamDisplay::msInBuffer() const
 {
     int internalBufferSize = (m_sound ? m_sound->playTimeElapsedUsec() / 1000.0 : 0);
-
-    //cl_log.log("internalBufferSize = ", internalBufferSize, cl_logALWAYS);
-    //cl_log.log("compressedBufferSize = ", msInQueue(), cl_logALWAYS);
-    //cl_log.log("tptalaudio = ", msInQueue() + internalBufferSize, cl_logALWAYS);
-
     int rez = msInQueue() + internalBufferSize;
-
     return rez;
 }
 
@@ -123,6 +117,9 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
 {
     QnMutexLocker lock(&m_audioQueueMutex);
 
+    if (!createDecoder(data))
+        return;
+
     m_lastAudioTime = data->timestamp;
     m_audioQueue.enqueue(data);
 
@@ -187,17 +184,22 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; //< conversion rule not found
 }
 
-bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+bool QnAudioStreamDisplay::createDecoder(const QnCompressedAudioDataPtr& data)
 {
-    QnMutexLocker lock(&m_audioQueueMutex);
-
     if (m_decoders[data->compressionType] == nullptr)
     {
         m_decoders[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
         if (m_decoders[data->compressionType] == nullptr)
             return false;
     }
+    return true;
+}
 
+bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+{
+    QnMutexLocker lock(&m_audioQueueMutex);
+    if (!createDecoder(data))
+        return false;
 
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
@@ -208,16 +210,15 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     // audio_device buffer); audio_device buffer is small, and we need to put the data from the
     // packets. To do it, we call this function with null pointer.
 
-    //cl_log.log("AUDIO_QUUE = ", m_audioQueue.size(), cl_logALWAYS);
-
-    int bufferSize = msInBuffer();
-    if (bufferSize < m_bufferMs / 10)
+    int bufferSizeMs = msInBuffer();
+    if (bufferSizeMs < m_bufferMs / 10)
     {
         m_tooFewDataDetected = true;
-        m_startBufferingTime = data->timestamp - bufferSize;
+        m_startBufferingTime = data->timestamp - bufferSizeMs * 1000;
     }
 
-    if (m_tooFewDataDetected && data && data->timestamp < minTime)
+    bool canDropLateAudio = !m_sound || m_sound->state() != QAudio::State::ActiveState;
+    if (canDropLateAudio && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
         m_startBufferingTime = data->timestamp;
@@ -227,20 +228,15 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     if (data != 0)
     {
         m_audioQueue.enqueue(data);
-        bufferSize = msInBuffer();
+        bufferSizeMs = msInBuffer();
     }
 
 
-    if (bufferSize >= m_tooFewDataDetected * m_prebufferMs
+    if (bufferSizeMs >= m_tooFewDataDetected * m_prebufferMs
         || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
         playCurrentBuffer();
     }
-
-    //qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-    //qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
-    //cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
-    //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
 
     return true;
 }
@@ -265,8 +261,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
         if (data->compressionType == AV_CODEC_ID_NONE)
         {
-            cl_log.log(QLatin1String("QnAudioStreamDisplay::putdata: unknown codec type..."),
-                cl_logERROR);
+            NX_ERROR(this, "putdata: unknown codec type...");
             return;
         }
         if (!m_decoders[data->compressionType]->decode(data, m_decodedAudioBuffer))

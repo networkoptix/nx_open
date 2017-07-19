@@ -114,9 +114,9 @@ private:
 private:
     struct PtzData
     {
-        bool hasCapabilities(Qn::PtzCapabilities value) const;
+        bool hasCapabilities(Ptz::Capabilities value) const;
 
-        Qn::PtzCapabilities capabilities = 0;
+        Ptz::Capabilities capabilities = 0;
         QnPtzAuxilaryTraitList traits;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
@@ -176,6 +176,9 @@ private:
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
+
+    class MovementFilter;
+    QScopedPointer<MovementFilter> m_movementFilter;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

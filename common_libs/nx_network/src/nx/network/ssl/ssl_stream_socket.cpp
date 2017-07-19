@@ -39,10 +39,10 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
     {
         case SystemError::timedOut:
         case SystemError::wouldBlock:
-            return utils::pipeline::StreamIoError::wouldBlock;
+            return utils::bstream::StreamIoError::wouldBlock;
 
         default:
-            return utils::pipeline::StreamIoError::osError;
+            return utils::bstream::StreamIoError::osError;
     }
 }
 

@@ -1,57 +1,73 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop::ui;
 
-QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent) :
+QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PopupBusinessActionWidget)
 {
     ui->setupUi(this);
 
-    connect(ui->adminsCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
-    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
+    connect(ui->settingsButton, &QPushButton::clicked,
+        this, &QnPopupBusinessActionWidget::at_settingsButton_clicked);
+    connect(ui->forceAcknoledgementCheckBox, &QCheckBox::toggled,
+        this, &QnPopupBusinessActionWidget::parametersChanged);
+
+    setSubjectsButton(ui->selectUsersButton);
 }
 
 QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
 {
 }
 
-void QnPopupBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->adminsCheckBox);
-    setTabOrder(ui->adminsCheckBox, ui->settingsButton);
-    setTabOrder(ui->settingsButton, after);
-}
-
-void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
-    if (!model())
-        return;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-
-    if (fields & QnBusiness::ActionParamsField)
-        ui->adminsCheckBox->setChecked(model()->actionParams().userGroup == QnBusiness::AdminOnly);
-}
-
-void QnPopupBusinessActionWidget::paramsChanged() {
+void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
+{
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
-    params.userGroup = ui->adminsCheckBox->isChecked()
-        ? QnBusiness::AdminOnly
-        : QnBusiness::EveryOne;
+    base_type::at_model_dataChanged(fields);
+
+    if (fields.testFlag(Field::eventType))
+    {
+        const auto sourceCameraRequired =
+            nx::vms::event::isSourceCameraRequired(model()->eventType());
+        ui->forceAcknoledgementCheckBox->setEnabled(sourceCameraRequired);
+    }
+
+    if (fields.testFlag(Field::actionParams))
+        ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);
+}
+
+void QnPopupBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
+{
+    setTabOrder(before, ui->selectUsersButton);
+    setTabOrder(ui->selectUsersButton, ui->settingsButton);
+    setTabOrder(ui->settingsButton, ui->forceAcknoledgementCheckBox);
+    setTabOrder(ui->forceAcknoledgementCheckBox, after);
+}
+
+void QnPopupBusinessActionWidget::at_settingsButton_clicked()
+{
+    menu()->trigger(action::PreferencesNotificationTabAction);
+}
+
+void QnPopupBusinessActionWidget::parametersChanged()
+{
+    if (!model() || m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    auto params = model()->actionParams();
+    params.needConfirmation = ui->forceAcknoledgementCheckBox->isChecked();
     model()->setActionParams(params);
 }
 
-void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(action::PreferencesNotificationTabAction);
-}

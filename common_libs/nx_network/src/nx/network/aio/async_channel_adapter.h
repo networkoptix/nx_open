@@ -12,24 +12,20 @@ namespace aio {
 
 /**
  * Adapts type Adaptee to AbstractAsyncChannel.
+ * @param AdapteePtr can be raw pointer or smart pointer. 
+ * In latter case AsyncChannelAdapter takes adaptee ownership.
  */
-template <typename Adaptee>
+template <typename AdapteePtr>
 class AsyncChannelAdapter:
     public AbstractAsyncChannel
 {
     using base_type = AbstractAsyncChannel;
 
 public:
-    AsyncChannelAdapter(Adaptee* adaptee):
-        m_adaptee(adaptee)
+    AsyncChannelAdapter(AdapteePtr adaptee):
+        m_adaptee(std::move(adaptee))
     {
         bindToAioThread(m_adaptee->getAioThread());
-    }
-
-    virtual ~AsyncChannelAdapter() override
-    {
-        if (isInSelfAioThread())
-            stopWhileInAioThread();
     }
 
     virtual void bindToAioThread(AbstractAioThread* aioThread) override
@@ -57,8 +53,13 @@ public:
         m_adaptee->cancelIOSync(eventType);
     }
 
+    const AdapteePtr& adaptee() const
+    {
+        return m_adaptee;
+    }
+
 private:
-    Adaptee* m_adaptee;
+    AdapteePtr m_adaptee;
 
     virtual void stopWhileInAioThread() override
     {
@@ -70,11 +71,11 @@ private:
     }
 };
 
-template <typename Adaptee>
-std::unique_ptr<AbstractAsyncChannel> makeAsyncChannelAdapter(Adaptee* adaptee)
+template <typename AdapteePtr>
+std::unique_ptr<AbstractAsyncChannel> makeAsyncChannelAdapter(AdapteePtr adaptee)
 {
-    using Adapter = AsyncChannelAdapter<Adaptee>;
-    return std::make_unique<Adapter>(adaptee);
+    using Adapter = AsyncChannelAdapter<AdapteePtr>;
+    return std::make_unique<Adapter>(std::move(adaptee));
 }
 
 } // namespace aio

@@ -1,0 +1,24 @@
+<div class="container auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>시스템에 액세스하지 못했습니다.</h1>
+        <p>이 링크가 끊어졌습니다. <br> 시스템이 {{PRODUCT_NAME}} 에서 연결이 끊어 졌저나,<br>이 시스템에 대한 액세스가 취소되거나 <br> 다른 계정으로 로그인 했을 수 있습니다.</p>
+        <p>
+            <a href="/systems" class="btn btn-default">사용 가능한 시스템 목록</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    시스템 정보에 액세스 할 수 없습니다.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

@@ -6,6 +6,8 @@
 #include <ui/utils/validators.h>
 #include <utils/common/connective.h>
 
+#include <nx/client/desktop/ui/common/detail/base_input_field.h>
+
 class QnPasswordStrengthIndicator;
 class QnInputFieldPrivate;
 class AbstractAccessor;
@@ -14,35 +16,23 @@ class AbstractAccessor;
  * Common class for various input fields.
  * Can check input for validity and display warning hint if something wrong.
  */
-class QnInputField : public Connective<QWidget>
+class QnInputField : public nx::client::desktop::ui::detail::BaseInputField
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)
-    Q_PROPERTY(QString hint READ hint WRITE setHint)
-    Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
     Q_PROPERTY(QLineEdit::EchoMode echoMode READ echoMode WRITE setEchoMode)
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     Q_PROPERTY(bool passwordIndicatorEnabled READ passwordIndicatorEnabled WRITE setPasswordIndicatorEnabled)
 
-    typedef Connective<QWidget> base_type;
+    using base_type = nx::client::desktop::ui::detail::BaseInputField;
 
 public:
+    static QnInputField* create(
+        const QString& text,
+        const Qn::TextValidateFunction& validator,
+        QWidget* parent = nullptr);
+
     explicit QnInputField(QWidget* parent = nullptr);
     virtual ~QnInputField();
-
-    QString title() const;
-    void setTitle(const QString& value);
-
-    QString hint() const;
-    void setHint(const QString& value);
-
-    QString text() const;
-    void setText(const QString& value);
-    void clear();
-
-    QString placeholderText() const;
-    void setPlaceholderText(const QString& value);
 
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
@@ -54,25 +44,11 @@ public:
     bool passwordIndicatorEnabled() const;
     void setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput = true, bool showImmediately = false);
 
-    bool isReadOnly() const;
-    void setReadOnly(bool value);
-
-    bool validate();
-
-    /* After a small delay calls validate if input is not being edited. */
-    void updateDisplayStateDelayed();
-
-    bool isValid() const;
-    QValidator::State lastValidationResult() const;
-
-    void setValidator(Qn::TextValidateFunction validator, bool validateImmediately = false);
-    void reset();
-
-    static AbstractAccessor* createLabelWidthAccessor();
-
 signals:
-    void textChanged(const QString& text);
     void editingFinished();
+
+protected:
+    virtual Qn::ValidationResult calculateValidationResult() const override;
 
 private:
     friend class LabelWidthAccessor;

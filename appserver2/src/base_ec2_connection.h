@@ -85,8 +85,8 @@ namespace ec2
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url) override;
-        virtual void deleteRemotePeer(const QUrl& url) override;
+        virtual void addRemotePeer(const QnUuid& id, const QUrl& url) override;
+        virtual void deleteRemotePeer(const QnUuid& id) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
         virtual ECConnectionNotificationManager* notificationManager() override;
@@ -94,7 +94,7 @@ namespace ec2
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
 
-        virtual QnTransactionMessageBus* messageBus() const override;
+        virtual QnTransactionMessageBusBase* messageBus() const override;
     protected:
         const AbstractECConnectionFactory* m_connectionFactory;
         QueryProcessorType* m_queryProcessor;

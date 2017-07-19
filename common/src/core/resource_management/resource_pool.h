@@ -11,7 +11,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
@@ -59,7 +58,7 @@ public:
 
     void addResource(const QnResourcePtr &resource);
     // TODO: We need to remove this function. Client should use separate instance of resource pool instead
-    void addIncompatibleResource(const QnResourcePtr &resource);
+    void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 
     void beginTran();
     void commit();
@@ -167,8 +166,10 @@ public:
     QnResourceList getResourcesWithParentId(QnUuid id) const;
     QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
-    QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
-    QnResourceList getAllIncompatibleResources() const;
+    QnMediaServerResourcePtr getIncompatibleServerById(const QnUuid& id,
+        bool useCompatible = false) const;
+
+    QnMediaServerResourceList getIncompatibleServers() const;
 
 
     QnUserResourcePtr getAdministrator() const;
@@ -223,6 +224,9 @@ signals:
 
     void aboutToBeDestroyed();
 private:
+signals:
+    void resourceAddedInternal(const QnResourcePtr &resource);
+private:
     /*!
         \note MUST be called with \a m_resourcesMtx locked
     */
@@ -230,10 +234,16 @@ private:
     void ensureCache() const;
 
 private:
-    mutable struct Cache {
-        bool valid;
-        bool containsIoModules;
-        QnMediaServerResourceList serversList;
+    mutable struct Cache
+    {
+        void resourceRemoved(const QnResourcePtr& res);
+        void resourceAdded(const QnResourcePtr& res);
+
+        int ioModulesCount = 0;
+        QMap<QnUuid, QnMediaServerResourcePtr> mediaServers;
+        QMap<QString, QnResourcePtr> resourcesByUniqueId;
+    private:
+        bool isIoModule(const QnResourcePtr& res) const;
     } m_cache;
 
     mutable QnMutex m_resourcesMtx;
@@ -241,11 +251,6 @@ private:
 
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
-    QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
+    QHash<QnUuid, QnMediaServerResourcePtr> m_incompatibleServers;
     mutable QnUserResourcePtr m_adminResource;
-
-    /*!
-        \return true, if \a resource has been inserted. false - if updated existing resource
-    */
-    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QnUuid, QnResourcePtr>* const resourcePool );
 };

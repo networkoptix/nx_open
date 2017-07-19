@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtOpenGL/QGLWidget>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -61,7 +61,6 @@ class QnCamDisplay;
 class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations
 {
     Q_OBJECT
-    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
 
     using base_type = Connective<QObject>;
 
@@ -207,11 +206,6 @@ public:
      */
     QRectF itemGeometry(QnWorkbenchItem *item, QRectF *enclosingGeometry = NULL) const;
 
-    /**
-     * \returns                         Bounding geometry of current layout.
-     */
-    QRectF layoutBoundingGeometry() const;
-
     QRectF fitInViewGeometry() const;
 
     /**
@@ -343,8 +337,7 @@ protected:
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
-    qreal widgetsFrameOpacity() const;
-    void setWidgetsFrameOpacity(qreal opacity);
+    void updateWidgetsFrameOpacity();
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
@@ -397,8 +390,8 @@ protected slots:
 
     void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
-    void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
-    void showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction);
+    void at_notificationsHandler_businessActionAdded(const nx::vms::event::AbstractActionPtr &businessAction);
+    void showSplashOnResource(const QnResourcePtr &resource, const nx::vms::event::AbstractActionPtr &businessAction);
 
     bool canShowLayoutBackground() const;
 private:
@@ -436,9 +429,6 @@ private:
 
     /** Grid background item. */
     QPointer<QnGridBackgroundItem> m_gridBackgroundItem;
-
-    /** Current frame opacity for widgets. */
-    qreal m_frameOpacity;
 
     Qn::MarginFlags m_zoomedMarginFlags, m_normalMarginFlags;
 

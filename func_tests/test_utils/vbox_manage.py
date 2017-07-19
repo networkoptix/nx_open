@@ -50,10 +50,12 @@ class VBoxManage(object):
         self._host = host
         self._dhcp_server_list, self._dhcp_net_index = self._load_dhcp_server_list()
 
-    def does_vms_exist(self, vms_name):
+    def get_vms_list(self):
         output = self._run_command(['list', 'vms'])
-        vms_list = [line.split()[0].strip('"') for line in output.splitlines()]
-        return vms_name in vms_list
+        return [line.split()[0].strip('"') for line in output.splitlines()]
+
+    def does_vms_exist(self, vms_name):
+        return vms_name in self.get_vms_list()
 
     def get_vms_state(self, vms_name):
         output = self._run_command(['showvminfo', vms_name, '--machinereadable'], log_output=False)
@@ -120,10 +122,10 @@ class VBoxManage(object):
     def _add_dhcp_server(self, dhcp_server):
         self._run_command(['dhcpserver', 'add',
                            '--netname', dhcp_server.name,
-                           '--ip', dhcp_server.ip.ip,
-                           '--netmask', dhcp_server.ip.netmask,
-                           '--lowerip', dhcp_server.lower_ip_address.ip,
-                           '--upperip', dhcp_server.upper_ip_address.ip,
+                           '--ip', str(dhcp_server.ip.ip),
+                           '--netmask', str(dhcp_server.ip.netmask),
+                           '--lowerip', str(dhcp_server.lower_ip_address.ip),
+                           '--upperip', str(dhcp_server.upper_ip_address.ip),
                            '--enable',
                            ])
 

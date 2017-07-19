@@ -76,8 +76,8 @@ const char* toString(AttributeType val)
             return "isPersistent";
         case isListening:
             return "isListening";
-        case trafficRelayEndpointList:
-            return "trafficRelayEndpointList";
+        case trafficRelayUrl:
+            return "trafficRelayUrl";
 
         case udpHolePunchingResultCode:
             return "udpHolePunchingResultCode";
@@ -106,6 +106,13 @@ const char* toString(AttributeType val)
         case tcpConnectionKeepAlive:
             return "tcpConnectionKeepAlive";
 
+        case udpHolePunchingStartDelay:
+            return "udpHolePunchingStartDelay";
+        case trafficRelayingStartDelay:
+            return "trafficRelayingStartDelay";
+        case directTcpConnectStartDelay:
+            return "directTcpConnectStartDelay";
+
         case systemErrorCode:
             return "systemErrorCode";
 
@@ -128,6 +135,20 @@ static String endpointsToString( const std::list< SocketAddress >& endpoints )
 
     return list.join( lit(",") ).toUtf8();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+Endpoint::Endpoint(int type, const SocketAddress& endpoint)
+    : BaseStringAttribute(type, endpoint.toString().toUtf8())
+{
+}
+
+SocketAddress Endpoint::get() const
+{
+    return SocketAddress(getString());
+}
+
+//-------------------------------------------------------------------------------------------------
 
 EndpointList::EndpointList( int type, const std::list< SocketAddress >& endpoints )
     : BaseStringAttribute( type, endpointsToString( endpoints ) )

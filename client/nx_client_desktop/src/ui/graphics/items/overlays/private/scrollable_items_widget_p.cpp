@@ -33,6 +33,11 @@ QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
         parent, &QnScrollableItemsWidget::updateGeometry);
     connect(parent, &QGraphicsWidget::geometryChanged,
         this, &QnScrollableItemsWidgetPrivate::updateContentPosition);
+
+    connect(contentWidget, &QGraphicsWidget::widthChanged,
+        parent, &QnScrollableItemsWidget::contentWidthChanged);
+    connect(contentWidget, &QGraphicsWidget::heightChanged,
+        parent, &QnScrollableItemsWidget::contentHeightChanged);
 }
 
 Qt::Alignment QnScrollableItemsWidgetPrivate::alignment() const
@@ -186,4 +191,14 @@ qreal QnScrollableItemsWidgetPrivate::spacing() const
 void QnScrollableItemsWidgetPrivate::setSpacing(qreal value)
 {
     m_contentLayout->setSpacing(value);
+}
+
+int QnScrollableItemsWidgetPrivate::lineHeight() const
+{
+    return m_scrollArea->lineHeight();
+}
+
+void QnScrollableItemsWidgetPrivate::setLineHeight(int value)
+{
+    m_scrollArea->setLineHeight(value);
 }

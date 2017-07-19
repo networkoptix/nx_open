@@ -52,7 +52,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnPresetPtzController::~QnPresetPtzController()
@@ -60,19 +60,19 @@ QnPresetPtzController::~QnPresetPtzController()
     return;
 }
 
-bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities)
+bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool disableNative)
 {
-    return
-        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-        !(capabilities & Qn::PresetsPtzCapability);
+    return (capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities
+        && (disableNative || !capabilities.testFlag(Ptz::PresetsPtzCapability))
+        && (capabilities.testFlag(Ptz::DevicePositioningPtzCapability)
+            || capabilities.testFlag(Ptz::LogicalPositioningPtzCapability));
 }
 
-Qn::PtzCapabilities QnPresetPtzController::getCapabilities()
+Ptz::Capabilities QnPresetPtzController::getCapabilities() const
 {
-    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::PresetsPtzCapability) : capabilities;
+    /* Note that this controller preserves both Ptz::AsynchronousPtzCapability and Ptz::SynchronizedPtzCapability. */
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::PresetsPtzCapability) : capabilities;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
@@ -83,7 +83,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
     auto createPresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
         QnPtzPresetData data;
-        data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ?
+        data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability) ?
             Qn::LogicalPtzCoordinateSpace :
             Qn::DevicePtzCoordinateSpace;
 
@@ -185,9 +185,10 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
     return doPresetsAction(activatePresetActionFunc, QnPtzPreset(presetId, QString()));
 }
 
-bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
+bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) const
 {
-    auto activatePresetActionFunc =
+    NX_EXPECT(presets);
+    auto getPresetActionFunc =
         [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
         {
             presets->clear();
@@ -199,9 +200,9 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
 
     {
         QnMutexLocker lock(&m_mutex);
-        return doPresetsAction(activatePresetActionFunc, QnPtzPreset());
+        const auto nonConstThis = const_cast<QnPresetPtzController*>(this);
+        return nonConstThis->doPresetsAction(getPresetActionFunc, QnPtzPreset());
     }
-
 }
 
 QString QnPresetPtzController::serializePresets(const QnPtzPresetRecordHash& presets)

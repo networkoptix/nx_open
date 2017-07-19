@@ -1,28 +1,18 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
 #include <memory>
 
-#include <nx/utils/thread/stoppable.h>
+#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
+#include <nx/network/public_ip_discovery.h>
+#include <nx/utils/service.h>
 
 #include "settings.h"
 #include "run_time_options.h"
 
-class QnCommandLineParser;
-
-namespace nx_http
-{
-    class MessageDispatcher;
-}
+namespace nx_http { class MessageDispatcher; }
 
 namespace nx {
 namespace cloud {
@@ -31,45 +21,45 @@ namespace gateway {
 class AuthorizationManager;
 
 class VmsGatewayProcess:
-    public QnStoppable
+    public nx::utils::Service
 {
+    using base_type = nx::utils::Service;
+
 public:
-    VmsGatewayProcess( int argc, char **argv );
-
-    //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+    VmsGatewayProcess(int argc, char **argv);
+    ~VmsGatewayProcess();
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
     void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
 
-    int exec();
+protected:
+    virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
+    virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
     conf::RunTimeOptions m_runTimeOptions;
 
     int m_argc;
     char** m_argv;
-    std::atomic<bool> m_terminated;
     int m_timerID;
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-    QnMutex m_mutex;
-    QnWaitCondition m_cond;
+    nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
+
+    void initializeCloudConnect(const conf::Settings& settings);
+
+    std::unique_ptr<nx::network::PublicIPDiscovery> initializePublicIpDiscovery(
+        const conf::Settings& settings);
+    void publicAddressFetched(
+        const conf::Settings& settings,
+        const QString& publicAddress);
 
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         nx_http::MessageDispatcher* const msgDispatcher);
-
-    void publicAddressFetched(
-        const conf::Settings& settings,
-        const QString& publicAddress);
 };
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace cloud
+} // namespace gateway
+} // namespace nx

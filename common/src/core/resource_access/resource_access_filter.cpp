@@ -44,6 +44,24 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
     return false;
 }
 
+bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
+{
+    NX_EXPECT(resource);
+    if (!resource)
+        return false;
+
+    return resource->hasFlags(Qn::layout) || isOpenableInLayout(resource);
+}
+
+bool QnResourceAccessFilter::isOpenableInLayout(const QnResourcePtr& resource)
+{
+    NX_EXPECT(resource);
+    if (!resource)
+        return false;
+
+    return isShareableMedia(resource) || resource->hasFlags(Qn::local_media);
+}
+
 QList<QnResourceAccessFilter::Filter> QnResourceAccessFilter::allFilters()
 {
     return kAllFilters;

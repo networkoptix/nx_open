@@ -12,7 +12,6 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-#include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 
 namespace nx {
@@ -184,7 +183,7 @@ TEST_F(StunClientServerTest, Connectivity)
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    while (server->totalConnectionsAccepted() == 0)
+    while (server->connectionCount() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     ASSERT_EQ(1U, server->connectionCount()) << 
         "Total connections accepted: " << server->totalConnectionsAccepted();
@@ -328,4 +327,4 @@ TEST_F(StunClientServerTest, cancellation)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

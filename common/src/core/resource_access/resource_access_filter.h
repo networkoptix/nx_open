@@ -32,6 +32,12 @@ public:
         return isShareable(LayoutsFilter, resource);
     }
 
+    // Resource can be opened in a common layout OR is a layout itself.
+    static bool isDroppable(const QnResourcePtr& resource);
+
+    // Resource can be opened in a common layout.
+    static bool isOpenableInLayout(const QnResourcePtr& resource);
+
     static QList<QnResourceAccessFilter::Filter> allFilters();
 
     static QnResourceList filteredResources(Filter filter, const QnResourceList& source);

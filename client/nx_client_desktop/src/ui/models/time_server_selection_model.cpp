@@ -6,7 +6,7 @@
 
 #include <common/common_module.h>
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 
@@ -24,9 +24,12 @@
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <algorithm>
+#include <api/model/time_reply.h>
 
 namespace {
+
     template<class T>
     QVector<T> sortedVector(const QVector<T>& unsorted)
     {
@@ -75,35 +78,14 @@ namespace {
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
+    m_hasInternetAccess(false),
     m_sameTimezone(false),
-    m_sameTimezoneValid(false)
+    m_sameTimezoneValid(false),
+    m_currentRequest(rest::Handle())
 {
     auto processor = qnCommonMessageProcessor;
 
-    /* Handle peer time updates. */
-    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this,
-        [this](const QnUuid& peerId, qint64 syncTime, qint64 peerTime)
-        {
-            /* Store received value to use it later. */
-            qint64 offset = peerTime - syncTime;
-            m_serverOffsetCache[peerId] = offset;
-            PRINT_DEBUG("get time for peer " + peerId.toByteArray());
-
-            /* Check if the server is already online. */
-            int idx = qnIndexOf(m_items,
-                [peerId](const Item& item)
-                {
-                    return item.peerId == peerId;
-                });
-
-            if (idx < 0)
-                return;
-
-            m_items[idx].offset = offset;
-            m_items[idx].ready = true;
-            PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
-            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
-        });
+    updateTimeOffset();
 
     connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this,
         [this](qint64 syncTime)
@@ -200,8 +182,55 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
             updateColumn(Columns::OffsetColumn);
         });
 
+    auto serverChangesListener = new QnResourceChangesListener(this);
+    serverChangesListener->connectToResources<QnMediaServerResource>(
+        &QnMediaServerResource::serverFlagsChanged,
+        this, &QnTimeServerSelectionModel::updateHasInternetAccess);
+
+    updateHasInternetAccess();
+
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnTimeServerSelectionModel::updateTimeOffset()
+{
+    if (m_currentRequest)
+        return;
+
+    const auto server = commonModule()->currentServer();
+    if (!server)
+        return;
+    auto apiConnection = server->restConnection();
+    m_currentRequest = apiConnection->getTimeOfServersAsync(
+        [this, apiConnection]
+        (bool success, int handle, rest::MultiServerTimeData data)
+        {
+            auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
+            for (const auto& record: data.data)
+            {
+                /* Store received value to use it later. */
+                qint64 offset = record.timeSinseEpochMs - syncTime;
+                m_serverOffsetCache[record.serverId] = offset;
+                PRINT_DEBUG("get time for peer " + peerId.toByteArray());
+
+                /* Check if the server is already online. */
+                int idx = qnIndexOf(m_items,
+                    [record](const Item& item)
+                    {
+                        return item.peerId == record.serverId;
+                    });
+
+                if (idx < 0)
+                    break;
+
+                m_items[idx].offset = offset;
+                m_items[idx].ready = true;
+                PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
+                emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
+            }
+            m_currentRequest = rest::Handle(); //< reset
+        });
 }
 
 void QnTimeServerSelectionModel::updateFirstItemCheckbox()
@@ -538,6 +567,11 @@ bool QnTimeServerSelectionModel::sameTimezone() const
     return m_sameTimezone;
 }
 
+bool QnTimeServerSelectionModel::hasInternetAccess() const
+{
+    return m_hasInternetAccess;
+}
+
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
     auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -569,12 +603,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
 void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
-    if (auto connection = commonModule()->ec2Connection())
-    {
-        auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-        for (const auto& info : timeManager->getPeerTimeInfoList())
-            m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
-    }
+    updateTimeOffset();
 
     /* Fill table with current data. */
     ScopedReset modelReset(this);
@@ -585,4 +614,15 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
             continue;
         addItem(runtimeInfo);
     }
+}
+
+void QnTimeServerSelectionModel::updateHasInternetAccess()
+{
+    const auto servers = resourcePool()->getResources<QnMediaServerResource>();
+    m_hasInternetAccess = boost::algorithm::any_of(servers,
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getStatus() == Qn::Online
+                && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+        });
 }

@@ -1,12 +1,13 @@
 #include "abstract_socket.h"
 
-#include <nx/network/aio/pollable.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 #include <nx/utils/unused.h>
 
-////////////////////////////////////////////////////////////
-//// class AbstractSocket
-////////////////////////////////////////////////////////////
+#include "aio/pollable.h"
+
+//-------------------------------------------------------------------------------------------------
+// class AbstractSocket.
+
 bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
 {
     return bind(SocketAddress(localAddress, localPort));
@@ -20,16 +21,15 @@ bool AbstractSocket::isInSelfAioThread() const
     return p->isInSelfAioThread();
 }
 
-////////////////////////////////////////////////////////////
-//// class AbstractCommunicatingSocket
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AbstractCommunicatingSocket.
 
 bool AbstractCommunicatingSocket::connect(
     const QString& foreignAddress,
     unsigned short foreignPort,
     unsigned int timeoutMillis)
 {
-    //TODO #ak this method MUST replace the previous one
+    // TODO: #ak this method MUST replace the previous one
     return connect(SocketAddress(foreignAddress, foreignPort), timeoutMillis);
 }
 
@@ -37,7 +37,7 @@ bool AbstractCommunicatingSocket::connect(
     const SocketAddress& remoteSocketAddress,
     std::chrono::milliseconds timeoutMillis)
 {
-    //TODO #ak this method MUST replace the previous one
+    // TODO: #ak this method MUST replace the previous one
     return connect(remoteSocketAddress, timeoutMillis.count());
 }
 
@@ -111,34 +111,36 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
         });
 }
 
-std::chrono::seconds KeepAliveOptions::maxDelay() const
-{
-    return time + interval * probeCount;
-}
+//-------------------------------------------------------------------------------------------------
 
 KeepAliveOptions::KeepAliveOptions(
-    std::chrono::seconds time, std::chrono::seconds interval, size_t probeCount)
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe,
+    std::chrono::seconds probeSendPeriod,
+    size_t probeCount)
 :
-    time(time),
-    interval(interval),
+    inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
+    probeSendPeriod(probeSendPeriod),
     probeCount(probeCount)
-{
-}
-
-KeepAliveOptions::KeepAliveOptions(size_t time, size_t interval, size_t count):
-    KeepAliveOptions(std::chrono::seconds(time), std::chrono::seconds(interval), count)
 {
 }
 
 bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
 {
-    return time == rhs.time && interval == rhs.interval && probeCount == rhs.probeCount;
+    return inactivityPeriodBeforeFirstProbe == rhs.inactivityPeriodBeforeFirstProbe
+        && probeSendPeriod == rhs.probeSendPeriod
+        && probeCount == rhs.probeCount;
+}
+
+std::chrono::seconds KeepAliveOptions::maxDelay() const
+{
+    return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
 }
 
 QString KeepAliveOptions::toString() const
 {
     // TODO: Use JSON serrialization instead?
-    return lm("{ %1, %2, %3 }").arg(time.count()).arg(interval.count()).arg(probeCount);
+    return lm("{ %1, %2, %3 }").arg(inactivityPeriodBeforeFirstProbe.count())
+        .arg(probeSendPeriod.count()).arg(probeCount);
 }
 
 boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
@@ -152,11 +154,15 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
         return boost::none;
 
     KeepAliveOptions options;
-    options.time = std::chrono::seconds((size_t) split[0].trimmed().toUInt());
-    options.interval = std::chrono::seconds((size_t) split[1].trimmed().toUInt());
+    options.inactivityPeriodBeforeFirstProbe = 
+        std::chrono::seconds((size_t) split[0].trimmed().toUInt());
+    options.probeSendPeriod = 
+        std::chrono::seconds((size_t) split[1].trimmed().toUInt());
     options.probeCount = (size_t) split[2].trimmed().toUInt();
     return options;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

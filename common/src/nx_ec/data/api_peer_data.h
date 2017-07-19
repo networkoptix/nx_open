@@ -3,12 +3,52 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "nx/utils/latin1_array.h"
+#include <nx_ec/ec_proto_version.h>
+#include <nx/network/app_info.h>
 
 namespace ec2 {
 
-struct ApiPeerData: ApiIdData
+struct ApiPersistentIdData: ApiIdData
+{
+    ApiPersistentIdData(): ApiIdData() {}
+
+    ApiPersistentIdData(
+        const QnUuid& id,
+        const QnUuid& persistentId)
+    :
+        ApiIdData(id),
+        persistentId(persistentId)
+    {
+    }
+
+    bool operator<(const ApiPersistentIdData& other) const
+    {
+        if (id != other.id)
+            return id < other.id;
+        return persistentId < other.persistentId;
+    }
+    bool operator>(const ApiPersistentIdData& other) const
+    {
+        return other < (*this);
+    }
+
+    bool isNull() const { return id.isNull();  }
+
+    /** Unique persistent Db ID of the peer. Empty for clients */
+    QnUuid persistentId;
+
+    bool operator==(const ApiPersistentIdData& other) const
+    {
+        return id == other.id && persistentId == other.persistentId;
+    }
+};
+
+#define ApiPersistentIdData_Fields ApiIdData_Fields (persistentId)
+
+struct ApiPeerData: ApiPersistentIdData
 {
     ApiPeerData():
+        peerType(Qn::PT_NotDefined),
         dataFormat(Qn::UbjsonFormat)
     {}
 
@@ -18,7 +58,30 @@ struct ApiPeerData: ApiIdData
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
         :
-        ApiIdData(id),
+        ApiPersistentIdData(id, QnUuid()),
+        instanceId(instanceId),
+        peerType(peerType),
+        dataFormat(dataFormat)
+    {}
+
+    ApiPeerData(
+        const ApiPersistentIdData& peer,
+        Qn::PeerType peerType,
+        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
+        :
+        ApiPersistentIdData(peer),
+        peerType(peerType),
+        dataFormat(dataFormat)
+    {}
+
+    ApiPeerData(
+        const QnUuid& id,
+        const QnUuid& instanceId,
+        const QnUuid& persistentId,
+        Qn::PeerType peerType,
+        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
+    :
+        ApiPersistentIdData(id, persistentId),
         instanceId(instanceId),
         peerType(peerType),
         dataFormat(dataFormat)
@@ -28,13 +91,17 @@ struct ApiPeerData: ApiIdData
     {
         return id == other.id
             && instanceId == other.instanceId
+            && persistentId == other.persistentId
             && peerType == other.peerType
             && dataFormat == other.dataFormat;
     }
 
     static bool isClient(Qn::PeerType peerType)
     {
-            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer && peerType != Qn::PT_OldServer;
+            return peerType != Qn::PT_NotDefined &&
+                peerType != Qn::PT_Server &&
+                peerType != Qn::PT_CloudServer &&
+                peerType != Qn::PT_OldServer;
     }
 
     bool isClient() const
@@ -75,6 +142,19 @@ struct ApiPeerData: ApiIdData
 };
 typedef QSet<QnUuid> QnPeerSet;
 
-#define ApiPeerData_Fields ApiIdData_Fields (instanceId)(peerType)(dataFormat)
+#define ApiPeerData_Fields ApiPersistentIdData_Fields (instanceId)(peerType)(dataFormat)
+
+struct ApiPeerDataEx: public ApiPeerData
+{
+    QnUuid systemId;
+    QString cloudHost = nx::network::AppInfo::defaultCloudHost();
+    qint64 identityTime = 0;
+    int keepAliveTimeout = 0;
+    int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+};
+
+#define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiPeerData);

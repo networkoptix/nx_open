@@ -1,0 +1,474 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Corpus development</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Prosody Walkthrough"
+HREF="x1991.html"><LINK
+REL="NEXT"
+TITLE="Waveform Synthesis"
+HREF="c2236.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1991.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c2236.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-CORPUS-CH"
+></A
+>Corpus development</H1
+><P
+>This chapter discusses the techniques used to design a good corpus for
+recording for use in general speech synthesis.  The basic requirements
+for a speech synthesis corpus are:
+
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Phonetically and prosodically balanced</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Targeted toward the intended domain(s)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Easy to say by voice talent without mistakes</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Short enough for the voice talent to be willing to say it.</P
+></LI
+></UL
+>
+
+To make life easier in designing prompt list we have included scripts
+which go some way to aid the process.  The general idea is to take a
+very large amount of text and automatically find "nice" utterances
+that match these criteria.</P
+><P
+>The CMU ARCTIC Database prompt list [<SPAN
+CLASS="CITATION"
+>kominek 2003</SPAN
+>]
+was created very much in this way, though with an earlier version of
+the scripts.</P
+><P
+>&#13;As with most of our work there is a single script, that does a number
+of basic stages.  The default is reasonable in many cases, but with
+prompt selection it is always worth hand checking and potentially
+modifying and refining the process.&#13;</P
+><P
+>&#13;The basic idea is to limit the chosen utterances to those of a
+reasonable length (5-15 words), only choose sentences with high
+frequency words (which should be easier to say and less ambiguous in
+pronunciation, also restrict to words that are in the lexicon
+(avoiding letter to sound issues).&#13;</P
+><P
+>&#13;The script <TT
+CLASS="FILENAME"
+>make_nice_prompts</TT
+> is set up for two
+classes of language, Latin script languages and non-Latin script
+languages.  Though as the non-Latin case is much more varied you may
+need to modify things.  We have successfully used it for UTF-8 encoded
+Hindi.&#13;</P
+><P
+>&#13;For the Latin-script languages (as opposed "asis" cases) we downcase
+the text when looking for variation.  Although some Latin based
+language make a significant case distinction, e.g. German, this is a
+reasonable route to avoid sentences with too many repeated words in
+them.&#13;</P
+><P
+>&#13;First gather lots of text data.  When we say lots we mean at least
+millions of words, or even 10s on millions of words.  This basic
+selection process is aimed at getting sentences for general voices and
+hence as large amount of starting data as possible is important.&#13;</P
+><P
+>&#13;Please also note the copyright of the data you are selecting from.  In
+CMU ARCTIC we used out-of-copyright texts from the Gutenberg project,
+so there would be no issue in distributing the data.  Copyright law in
+many countries allows for small subsets for copyright data, but this
+fair use is often argued by some.  There may note actually be a good
+solution to this, News stories, are typically copyright but the press
+agency releasing them.  Licenses on LDC data are often sufficient for
+using such texts to build prompts and then having no restriction on
+the voices generated, but the database itself may be under question.
+If you care about distribution (free or selling) you will need to
+address these issues.&#13;</P
+><P
+>&#13;The first stage once you have collected you data is check its
+encoding.  Make sure its all the same encoding.  Also check its
+reasonable.  For example the Europal data is nice and clean (as
+conditioned for Machine Translation models) but the punctuation has
+been separated from the words.  You may want to to de-htmlify your
+data before passing it to the selection routines.&#13;</P
+><P
+>&#13;Once you have a set of nice relatively clean data, you use the first
+stage of the script.  This finds the word frequencies of all the
+tokens in the text data.
+<A
+NAME="AEN2197"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_freq&nbsp;TEXT0&nbsp;TEXT1&nbsp;TEXT2</P
+></BLOCKQUOTE
+>
+
+Give all the text files as arguments to this script.  The working
+files will be created in the current directory, but the text file
+arguments may be pathnames.&#13;</P
+><P
+>&#13;The next stage is to build a Festival lexicon for the most frequent
+words.  By default we select the top 5000 words, which has proven a
+reasonable choice.  You can optionally override the 5000 with an
+argument.
+<A
+NAME="AEN2200"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;make_freq_lex</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>&#13;The next stage processes each sentence in the large text database to
+find those utterances that are "nice".  That of reasonable length, has
+only words in the frequency lexicon, no strange punctuation, capitals
+at the beginning, and punctuation at the end, and a few other
+heuristic rule conditions.  These seem to work well for the
+Latin-script languages (though it is possible the conditions are
+overly strict for some languages).  &#13;</P
+><P
+>&#13;Although Festival's text front end is used for processing the text,
+you do not need to build any language specific text front end (at
+least not normally).  Finding nice prompts is considered one of the
+very first parts of buildings support for a new language, so we are
+aware that there will be almost no resources available for the target
+language yet.&#13;</P
+><P
+>&#13;Because this process is using Festival's front end, it is not fast, as
+it needs to process the whole text database.  It is not unusual for
+this to take a number of hours to process.  While processing "nice"
+utterances are written to <TT
+CLASS="FILENAME"
+>data_nice.data</TT
+>.  You
+should check this regularly in case there is some inappropriate
+condition in the rules and you are getting the wrong type of data.
+
+<A
+NAME="AEN2206"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_nice&nbsp;TEXT0&nbsp;TEXT1&nbsp;...</P
+></BLOCKQUOTE
+>
+
+Note this will only search for the first 100,000 nice utterances, from
+the data set, you can change the number in the script if you want more
+(or less).  &#13;</P
+><P
+>&#13;Once the "nice" utterances are found you can now find those nice
+utterances that have the best phonetic coverage.  There are two
+mechanism available here.  Because this is often the very first stage
+in building support for a new language, no lexicon and phonetics are
+available, thus selecting based on phonetic is not an option.
+Therefore we provide a simpler technique that selections based on
+letter coverage (in fact di-letter coverage).  This is often a
+reasonable solution, but it will depend on the language whether this
+is reasonable solution or not.  Note that for English, in spite of its
+somewhat poor relationship between orthography and pronunciation, this
+is reasonable, so don't exclude this as a possibility without trying
+it.&#13;</P
+><P
+>&#13;Letter selection will find the subset of the nice utterances that has
+the best letter coverage.  It is a greedy algorithm, but this is
+usually sufficient.  This process also takes a number to define the
+number of utterances it is looking for.  The process will be applied
+multiple times to the remaining data until that number is reached.  If
+there isn't enough data to select from it might loop for ever.  By
+default it looks for 1000 utterance, which is not unreasonable for a
+unit selection voices, 500 is probably sufficient for a CLUSTERGEN
+voice.  But, as they say, your mileage may vary.
+
+<A
+NAME="AEN2210"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;select_letter_n&nbsp;</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>&#13;If you do have a pronunciation lexicon for you language, you can also do
+select based on segments rather than letters.  We have not done
+exhaustive comparisons of how valuable segment selection is over
+letter selection.  It is clear that although probably important, it is
+probably less important that selecting a good voice talent, or
+recording the prompts in a high quality manner.  Two stages are
+required for segment selection.  The first stage is to render the nice
+prompts from words to segments
+<A
+NAME="AEN2213"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;synth_seg</P
+></BLOCKQUOTE
+>
+Then greedily select the utterances with the best di-phone coverage.
+<A
+NAME="AEN2215"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;select_seg</P
+></BLOCKQUOTE
+>
+We do not yet support <TT
+CLASS="FILENAME"
+>select_seg_n</TT
+>.&#13;</P
+><P
+>&#13;After selection the nice prompts will me in
+<TT
+CLASS="FILENAME"
+>data.done.data</TT
+>.  Look at it.  Do not expect it to
+be perfect.  I have never done this for a new language, without having
+to do it multiple times until I get something reasonable.  Even once
+you have the result, it is worth while checking each utterance and
+correcting and/or rejecting it for other reasons, such as
+ungrammatical, hard to read, ambiguous words etc.  Be bold and get rid
+of weird sentences, it will save you trouble later.  The selection
+process is deliberately designed to have redundancy as speech is a
+variable medium and we can never be sure what exact the voice talent
+will say, or how the unit selection process will select the units from
+the database.&#13;</P
+><P
+>&#13;It is wise to first go through every sentence and attempt to record it
+and at that time decide if the sentence is actually a reasonable
+utterance to include in the prompt set for that language.&#13;</P
+><P
+>&#13;The final stage extracts the vocabulary of the selected prompt set.
+You can use this vocab list to start building your pronunciation
+lexicon as you will need that to build your speech databases (unless
+you are using an orthography based selection technique).
+<A
+NAME="AEN2222"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_vocab</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>You can also do the whole process with the command
+<A
+NAME="AEN2225"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;do_all&nbsp;TEXT0&nbsp;TEXT1&nbsp;...</P
+></BLOCKQUOTE
+>
+As really the <TT
+CLASS="FILENAME"
+>find_nice</TT
+> stage takes up about 98% of 
+processing time, redoing the other parts each time isn't unreasonable.&#13;</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2228"
+>Non-Latin-script languages</A
+></H1
+><P
+>&#13;For non-Latin-script languages there are options that seem to work
+well, if the language has spaces between words.  We have used this
+quite extensively for UTF-8 encoded languages (Arabic and Hindi).
+For these language use
+
+<A
+NAME="AEN2231"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;select_seg<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_freq_asis&nbsp;TEXT0&nbsp;TEXT1&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;make_freq_lex<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_nice_asis&nbsp;TEXT0&nbsp;TEXT1&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;select_letter_n<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;find_vocab_asis</P
+></BLOCKQUOTE
+>
+You can also do the whole process with the command
+<A
+NAME="AEN2233"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/promptselect/make_nice_prompts&nbsp;do_all_asis&nbsp;TEXT0&nbsp;TEXT1&nbsp;...</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>&#13;For languages that do not have spaces between the words (Chinese,
+Japanese, Thai etc), the above techniques will not work.  We have used
+the above techniques for Chinese, by first segmenting the data into
+words.  &#13;</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1991.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c2236.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Prosody Walkthrough</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Waveform Synthesis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

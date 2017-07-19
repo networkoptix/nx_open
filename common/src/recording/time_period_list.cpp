@@ -4,7 +4,7 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
-
+#include <nx/network/socket_common.h>
 #include <nx/utils/datetime.h>
 
 QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))

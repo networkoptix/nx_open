@@ -14,9 +14,8 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
 
 #include "libconnection_mediator_app_info.h"
 
@@ -32,7 +31,7 @@ const QLatin1String kDefaultDataDir("");
 const QLatin1String kCloudConnectOptions("general/cloudConnectOptions");
 const QLatin1String kDefaultCloudConnectOptions("");
 
-//CloudDB settings
+//CloudDb settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
 
@@ -50,6 +49,8 @@ const QLatin1String kDefaultCdbPassword("123456");
 
 const QLatin1String kCdbUpdateInterval("cloud_db/updateIntervalSec");
 const std::chrono::seconds kDefaultCdbUpdateInterval(std::chrono::minutes(10));
+
+const QLatin1String kCdbStartTimeout("cloud_db/startTimeout");
 
 //STUN
 const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
@@ -102,6 +103,20 @@ const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultW
 constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
     std::chrono::seconds(15);
 
+// Cloud connect methods start delays.
+
+const QLatin1String kUdpHolePunchingStartDelay("cloudConnect/udpHolePunchingStartDelay");
+constexpr const std::chrono::milliseconds kUdpHolePunchingStartDelayDefault =
+    nx::hpm::api::kUdpHolePunchingStartDelayDefault;
+
+const QLatin1String kTrafficRelayingStartDelay("cloudConnect/trafficRelayingStartDelay");
+constexpr const std::chrono::milliseconds kTrafficRelayingStartDelayDefault =
+    nx::hpm::api::kTrafficRelayingStartDelayDefault;
+
+const QLatin1String kDirectTcpConnectStartDelay("cloudConnect/directTcpConnectStartDelay");
+constexpr const std::chrono::milliseconds kDirectTcpConnectStartDelayDefault =
+    nx::hpm::api::kDirectTcpConnectStartDelayDefault;
+
 namespace tcp_reverse_retry_policy {
 
 const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
@@ -118,6 +133,11 @@ const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
 const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 } // namespace tcp_reverse_http_timeouts
+
+// Traffic Relay - related settings.
+
+const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+
 } // namespace 
 
 namespace nx {
@@ -132,7 +152,7 @@ ConnectionParameters::ConnectionParameters():
 
 Settings::Settings():
     base_type(
-        QnAppInfo::organizationNameForSettings(),
+        nx::utils::AppInfo::organizationNameForSettings(),
         QnLibConnectionMediatorAppInfo::applicationName(),
         kModuleName)
 {
@@ -154,7 +174,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const CloudDB& Settings::cloudDB() const
+const CloudDb& Settings::cloudDB() const
 {
     return m_cloudDB;
 }
@@ -174,7 +194,7 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
@@ -184,9 +204,14 @@ const Statistics& Settings::statistics() const
     return m_statistics;
 }
 
+const TrafficRelay& Settings::trafficRelay() const
+{
+    return m_trafficRelay;
+}
+
 void Settings::initializeWithDefaultValues()
 {
-    m_dbConnectionOptions.driverType = db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
     m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 
@@ -236,6 +261,10 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(settings().value(
             kCdbUpdateInterval,
             static_cast<qulonglong>(kDefaultCdbUpdateInterval.count())).toString()));
+    m_cloudDB.startTimeout = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(settings().value(
+            kCdbStartTimeout,
+            static_cast<qulonglong>((m_cloudDB.updateInterval * 5).count())).toString()));
 
     readEndpointList(
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
@@ -262,6 +291,27 @@ void Settings::loadSettings()
     //Statistics
     m_statistics.enabled = settings().value(kStatisticsEnabled, kDefaultStatisticsEnabled).toBool();
 
+    loadConnectionParameters();
+
+    loadTrafficRelay();
+
+    //analyzing values
+    if (m_general.dataDir.isEmpty())
+    {
+#ifdef Q_OS_LINUX
+        m_general.dataDir = QString("/opt/%1/%2/var")
+            .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
+#else
+        const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+        m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
+#endif
+    }
+}
+
+void Settings::loadConnectionParameters()
+{
+    using namespace std::chrono;
+
     m_connectionParameters.rendezvousConnectTimeout =
         nx::utils::parseTimerDuration(
             settings().value(kRendezvousConnectTimeout).toString(),
@@ -273,7 +323,7 @@ void Settings::loadSettings()
     m_connectionParameters.udpTunnelKeepAliveRetries = settings().value(
         kUdpTunnelKeepAliveRetries,
         kDefaultUdpTunnelKeepAliveRetries).toInt();
-    m_connectionParameters.tunnelInactivityTimeout = 
+    m_connectionParameters.tunnelInactivityTimeout =
         duration_cast<seconds>(
             nx::utils::parseTimerDuration(
                 settings().value(kTunnelInactivityTimeout).toString(),
@@ -283,10 +333,10 @@ void Settings::loadSettings()
         settings().value(
             tcp_reverse_retry_policy::kMaxCount,
             network::RetryPolicy::kDefaultMaxRetryCount).toInt();
-    m_connectionParameters.tcpReverseRetryPolicy.initialDelay = 
+    m_connectionParameters.tcpReverseRetryPolicy.initialDelay =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_retry_policy::kInitialDelay).toString(),
-        network::RetryPolicy::kDefaultInitialDelay);
+            network::RetryPolicy::kDefaultInitialDelay);
     m_connectionParameters.tcpReverseRetryPolicy.delayMultiplier =
         settings().value(
             tcp_reverse_retry_policy::kDelayMultiplier,
@@ -294,20 +344,20 @@ void Settings::loadSettings()
     m_connectionParameters.tcpReverseRetryPolicy.maxDelay =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_retry_policy::kMaxDelay).toString(),
-        network::RetryPolicy::kDefaultMaxDelay);
+            network::RetryPolicy::kDefaultMaxDelay);
 
     m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kSend).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+            nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kRead).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+            nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kBody).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+            nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     m_connectionParameters.connectionAckAwaitTimeout =
         nx::utils::parseTimerDuration(
@@ -319,17 +369,26 @@ void Settings::loadSettings()
             settings().value(kConnectionResultWaitTimeout).toString(),
             kDefaultConnectionResultWaitTimeout);
 
-    //analyzing values
-    if (m_general.dataDir.isEmpty())
-    {
-#ifdef Q_OS_LINUX
-        m_general.dataDir = QString("/opt/%1/%2/var")
-            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-#else
-        const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-        m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
-    }
+    // Connection methods start delays.
+    m_connectionParameters.udpHolePunchingStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kUdpHolePunchingStartDelay).toString(),
+            kUdpHolePunchingStartDelayDefault);
+
+    m_connectionParameters.trafficRelayingStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kTrafficRelayingStartDelay).toString(),
+            kTrafficRelayingStartDelayDefault);
+
+    m_connectionParameters.directTcpConnectStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kDirectTcpConnectStartDelay).toString(),
+            kDirectTcpConnectStartDelayDefault);
+}
+
+void Settings::loadTrafficRelay()
+{
+    m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
 }
 
 void Settings::readEndpointList(

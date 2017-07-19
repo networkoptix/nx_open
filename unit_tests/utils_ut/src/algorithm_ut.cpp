@@ -128,9 +128,9 @@ TEST(Algorithm_reverseWords, only_separators)
 }
 
 //-------------------------------------------------------------------------------------------------
-// countByPrefix
+// countElementsWithPrefix
 
-TEST(Algorithm_countByPrefix, all)
+TEST(Algorithm_countElementsWithPrefix, all)
 {
     std::map<std::string, int> m;
     m.emplace("a", 0);
@@ -139,21 +139,21 @@ TEST(Algorithm_countByPrefix, all)
     m.emplace("aaabbbeee", 0);
     m.emplace("aaafff", 0);
 
-    ASSERT_EQ(4U, countByPrefix(m, "aaa"));
-    ASSERT_EQ(5U, countByPrefix(m, "a"));
-    ASSERT_EQ(3U, countByPrefix(m, "aaab"));
-    ASSERT_EQ(1U, countByPrefix(m, "aaaf"));
-    ASSERT_EQ(1U, countByPrefix(m, "aaabbbddd"));
-    ASSERT_EQ(1U, countByPrefix(m, "aaabbbdd"));
-    ASSERT_EQ(0U, countByPrefix(m, "aaabbbddd111"));
-    ASSERT_EQ(1U, countByPrefix(m, "aaabbbe"));
-    ASSERT_EQ(1U, countByPrefix(m, "aaabbbc"));
+    ASSERT_EQ(4U, countElementsWithPrefix(m, "aaa"));
+    ASSERT_EQ(5U, countElementsWithPrefix(m, "a"));
+    ASSERT_EQ(3U, countElementsWithPrefix(m, "aaab"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaaf"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbddd"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbdd"));
+    ASSERT_EQ(0U, countElementsWithPrefix(m, "aaabbbddd111"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbe"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbc"));
 }
 
 //-------------------------------------------------------------------------------------------------
-// findAnyByPrefix
+// findFirstElementWithPrefix
 
-TEST(Algorithm_findAnyByPrefix, all)
+TEST(Algorithm_findFirstElementWithPrefix, all)
 {
     std::map<std::string, int> m;
     m.emplace("a", 1);
@@ -162,12 +162,12 @@ TEST(Algorithm_findAnyByPrefix, all)
     m.emplace("aaabbbeee", 4);
     m.emplace("aaafff", 5);
 
-    ASSERT_EQ(m.end(), findAnyByPrefix(m, "c"));
-    ASSERT_EQ(m.end(), findAnyByPrefix(m, "aaafff1"));
-    ASSERT_EQ(1, findAnyByPrefix(m, "a")->second);
-    ASSERT_EQ(2, findAnyByPrefix(m, "aa")->second);
-    ASSERT_EQ(4, findAnyByPrefix(m, "aaabbbe")->second);
-    ASSERT_EQ(5, findAnyByPrefix(m, "aaaff")->second);
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "c"));
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "aaafff1"));
+    ASSERT_EQ(1, findFirstElementWithPrefix(m, "a")->second);
+    ASSERT_EQ(2, findFirstElementWithPrefix(m, "aa")->second);
+    ASSERT_EQ(4, findFirstElementWithPrefix(m, "aaabbbe")->second);
+    ASSERT_EQ(5, findFirstElementWithPrefix(m, "aaaff")->second);
 }
 
 //-------------------------------------------------------------------------------------------------

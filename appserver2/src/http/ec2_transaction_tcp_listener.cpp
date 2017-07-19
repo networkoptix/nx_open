@@ -8,10 +8,10 @@
 #include "network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/api_full_info_data.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "audit/audit_manager.h"
 #include "settings.h"
 #include <core/resource/media_server_resource.h>
@@ -42,10 +42,10 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner->commonModule())
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
     Q_D(QnTransactionTcpProcessor);
-
+    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
@@ -98,7 +98,7 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
-    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
@@ -110,8 +110,8 @@ void QnTransactionTcpProcessor::run()
         nx_http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::POST ||
-        d->request.requestLine.method == nx_http::Method::PUT )
+    if( d->request.requestLine.method == nx_http::Method::post ||
+        d->request.requestLine.method == nx_http::Method::put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
@@ -341,4 +341,4 @@ void QnTransactionTcpProcessor::run()
 }
 
 
-}
+} // namespace ec2

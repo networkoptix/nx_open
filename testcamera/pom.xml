@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>testcamera</artifactId>
     <packaging>pom</packaging>
-	<name>Nx Witness Test Camera</name>	
+	<name>Nx Witness Test Camera</name>
 
     <dependencies>
         <dependency>
@@ -41,21 +41,12 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>
     </dependencies>
 
     <properties>
         <template>app</template>
 
-        <global.libs>-lnx_streaming -lcommon -lnx_network -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils</global.libs>
         <qt.libs>core network multimedia concurrent xml sql</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32</windows.oslibs>
         <linux.oslibs></linux.oslibs>

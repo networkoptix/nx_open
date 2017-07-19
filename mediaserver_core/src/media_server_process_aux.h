@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/common_module.h>
+#include <nx_ec/ec_api_fwd.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -97,6 +98,10 @@ bool setUpSystemIdentity(
         const BeforeRestoreDbData& restoreData,
         SettingsProxy* settings,
         SystemNameProxyPtr systemNameProxy);
-}
-}
+
+void makeFakeData(const QString& fakeDataString, 
+    const ec2::AbstractECConnectionPtr& connection, const QnUuid& moduleGuid);
+
+} // namespace mserver_aux
+} // namespace nx
 

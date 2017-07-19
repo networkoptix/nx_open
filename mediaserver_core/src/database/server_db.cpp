@@ -2,13 +2,14 @@
 
 #include <QtCore/QtEndian>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -23,6 +24,8 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+
+using namespace nx;
 
 namespace {
 
@@ -57,7 +60,7 @@ inline qint64 toInt64(const QByteArray& ba)
     return result;
 }
 
-QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
+vms::event::ActionParameters convertOldActionParameters(const QByteArray& value)
 {
     enum Param
     {
@@ -77,10 +80,13 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
         ParamCount
     };
 
-    QnBusinessActionParameters result;
+    vms::event::ActionParameters result;
 
     if (value.isEmpty())
         return result;
+
+    static const std::vector<QnUuid> kAdminRoles(
+        QnUserRolesManager::adminRoleIds().toVector().toStdVector());
 
     int i = 0;
     int prevPos = -1;
@@ -100,7 +106,11 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.userGroup = static_cast<QnBusiness::UserGroup>(toInt(field));
+                enum { kAdminOnly = 1 };
+                if (toInt(field) == kAdminOnly)
+                    result.additionalResources = kAdminRoles;
+                else
+                    result.additionalResources.clear();
                 break;
             case FpsParam:
                 result.fps = toInt(field);
@@ -109,7 +119,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.recordingDuration = toInt(field);
+                result.durationMs = toInt(field) * 1000;
                 break;
             case RecordBeforeParam:
                 break;
@@ -139,7 +149,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
     return result;
 }
 
-QnBusinessEventParameters convertOldEventParameters(
+vms::event::EventParameters convertOldEventParameters(
     const QByteArray& value, QnUuid* actionResourceId)
 {
     enum Param
@@ -156,7 +166,7 @@ QnBusinessEventParameters convertOldEventParameters(
         ParamCount
     };
 
-    QnBusinessEventParameters result;
+    vms::event::EventParameters result;
 
     if (value.isEmpty())
         return result;
@@ -176,7 +186,7 @@ QnBusinessEventParameters convertOldEventParameters(
             switch ((Param) i)
             {
                 case EventTypeParam:
-                    result.eventType = (QnBusiness::EventType) toInt(field);
+                    result.eventType = (vms::event::EventType) toInt(field);
                     break;
                 case EventTimestampParam:
                     result.eventTimestampUsec = toInt64(field);
@@ -191,7 +201,7 @@ QnBusinessEventParameters convertOldEventParameters(
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ReasonCodeParam:
-                    result.reasonCode = (QnBusiness::EventReason) toInt(field);
+                    result.reasonCode = (vms::event::EventReason) toInt(field);
                     break;
                 case ReasonParamsEncodedParam:
                 {
@@ -247,10 +257,14 @@ QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter
             return kOrderByTemplate.arg(lit("book.name"), order);
         case Qn::BookmarkStartTime:
             return kOrderByTemplate.arg(lit("startTimeMs"), order);
+        case Qn::BookmarkCreationTime:
+            return kOrderByTemplate.arg(lit("creationTimeStampMs"), order);
         case Qn::BookmarkDuration:
             return kOrderByTemplate.arg(lit("durationMs"), order);
         case Qn::BookmarkCameraName:
             return kOrderByTemplate.arg(lit("cameraId"), order);
+        case Qn::BookmarkCreator:
+            return kOrderByTemplate.arg(lit("creatorId"), order);
         case Qn::BookmarkTags:
             return lit(""); // No sort by db
         default:
@@ -271,6 +285,8 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
         case Qn::BookmarkDuration:
             return filter.limit;
 
+        case Qn::BookmarkCreationTime:
+        case Qn::BookmarkCreator:
         case Qn::BookmarkCameraName:
         case Qn::BookmarkTags:
             // No limit for manually sorted sequences.
@@ -546,7 +562,7 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
             // Check if data is in Ubjson already.
             if (!packed.isEmpty() && packed[0] == L'[')
                 return packed;
-            QnBusinessActionParameters ap = convertOldActionParameters(packed);
+            vms::event::ActionParameters ap = convertOldActionParameters(packed);
             ap.actionResourceId = actionResourceId;
             return QnUbjson::serialized(ap);
         };
@@ -557,7 +573,7 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
             // Check if data is in Ubjson already.
             if (!packed.isEmpty() && packed[0] == L'[')
                 return packed;
-            QnBusinessEventParameters rp = convertOldEventParameters(packed, actionResourceId);
+            vms::event::EventParameters rp = convertOldEventParameters(packed, actionResourceId);
             return QnUbjson::serialized(rp);
         };
 
@@ -712,7 +728,7 @@ bool QnServerDb::removeLogForRes(const QnUuid& resId)
     return rez;
 }
 
-bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
+bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -734,13 +750,13 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
 
-    QnBusinessActionParameters actionParams = action->getParams();
+    auto actionParams = action->getParams();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
     insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
-    insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
+    insQuery.bindValue(":business_rule_guid", action->getRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
@@ -764,8 +780,8 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 QString QnServerDb::getRequestStr(
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
@@ -796,13 +812,13 @@ QString QnServerDb::getRequestStr(
         request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
-    if (eventType != QnBusiness::UndefinedEvent && eventType != QnBusiness::AnyBusinessEvent)
+    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
     {
-        if (QnBusiness::hasChild(eventType))
+        if (vms::event::hasChild(eventType))
         {
-            QList<QnBusiness::EventType> events = QnBusiness::childEvents(eventType);
+            QList<vms::event::EventType> events = vms::event::childEvents(eventType);
             QString eventTypeStr;
-            for(QnBusiness::EventType evnt: events) {
+            for(vms::event::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
@@ -814,7 +830,7 @@ QString QnServerDb::getRequestStr(
             request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
         }
     }
-    if (actionType != QnBusiness::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
     if (!businessRuleId.isNull())
     {
@@ -825,14 +841,14 @@ QString QnServerDb::getRequestStr(
     return request;
 }
 
-QnBusinessActionDataList QnServerDb::getActions(
+vms::event::ActionDataList QnServerDb::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
-    QnBusinessActionDataList result;
+    vms::event::ActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
     QnWriteLocker lock(&m_mutex);
@@ -851,12 +867,12 @@ QnBusinessActionDataList QnServerDb::getActions(
 
     while (query.next())
     {
-        QnBusinessActionData actionData;
+        vms::event::ActionData actionData;
 
-        actionData.actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        actionData.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(
+        actionData.actionType = (vms::event::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionParams = QnUbjson::deserialized<vms::event::ActionParameters>(
             query.value(actionParamIdx).toByteArray());
-        actionData.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(
+        actionData.eventParams = QnUbjson::deserialized<vms::event::EventParameters>(
             query.value(runtimeParamIdx).toByteArray());
         actionData.businessRuleId = QnUuid::fromRfc4122(
             query.value(businessRuleIdx).toByteArray());
@@ -883,8 +899,8 @@ void QnServerDb::getAndSerializeActions(
     QByteArray& result,
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
@@ -913,10 +929,12 @@ void QnServerDb::getAndSerializeActions(
     while (actionsQuery.next())
     {
         int flags = 0;
-        QnBusiness::EventType eventType =
-            (QnBusiness::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        if (eventType == QnBusiness::CameraMotionEvent ||
-            eventType == QnBusiness::CameraInputEvent)
+        const auto eventType = (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
+        const auto actionType = (vms::event::ActionType) actionsQuery.value(actionTypeIdx).toInt();
+        if (eventType == vms::event::cameraMotionEvent
+            || eventType == vms::event::cameraInputEvent
+            || actionType == vms::event::ActionType::bookmarkAction
+            || actionType == vms::event::ActionType::acknowledgeAction)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
@@ -926,7 +944,7 @@ void QnServerDb::getAndSerializeActions(
                 if (QnStorageManager::isArchiveTimeExists(
                     camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt() * 1000ll))
                 {
-                    flags |= QnBusinessActionData::VideoLinkExists;
+                    flags |= vms::event::ActionData::VideoLinkExists;
                 }
             }
         }
@@ -1030,13 +1048,16 @@ bool QnServerDb::getBookmarks(
         book.description as description,
         book.timeout as timeout,
         book.camera_guid as cameraId,
+        book.creator_guid as creatorId,
+        book.created as creationTimeStampMs,
         group_concat(tag.name) as tags
         FROM bookmarks book
         LEFT JOIN bookmark_tags tag
         ON book.guid = tag.bookmark_guid
         %1 %2 %3
     )").arg(filterText,
-        "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout, cameraId",
+        "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout,"\
+        "creatorId, creationTimeStampMs, cameraId",
         createBookmarksFilterSortPart(filter));
 
     {
@@ -1176,25 +1197,37 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit)
     return result;
 }
 
-
 bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
     if (!bookmark.isValid())
         return false;
 
-    const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
-
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
-        insQuery.prepare(insertOrReplace + R"(
-            INTO bookmarks
-                (guid, camera_guid, start_time, duration, name, description, timeout)
-            VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout)
-        )");
+
+        static const auto kUpdateQueryText =
+            R"(
+                UPDATE bookmarks
+                SET camera_guid = :cameraId, start_time = :startTimeMs,
+                    duration = :durationMs, name = :name, description = :description,
+                    timeout = :timeout
+                WHERE guid = :guid)";
+
+        static const auto kAddQueryText =
+            R"(
+                INSERT
+                INTO bookmarks
+                    (guid, camera_guid, start_time, duration, name, description, timeout,
+                        creator_guid, created)
+                VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
+                    :creatorId, :creationTimeStampMs)
+            )";
+
+        insQuery.prepare(isUpdate ? kUpdateQueryText : kAddQueryText);
 
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
@@ -1243,6 +1276,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
 
     {
         QSqlQuery query(m_sdb);
+        const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
         query.prepare(insertOrReplace + R"(
             INTO fts_bookmarks
                 (docid, name, description, tags)

@@ -7,10 +7,10 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 namespace nx {
 namespace test {

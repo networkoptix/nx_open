@@ -1,13 +1,13 @@
-#ifndef QN_SERVER_MESSAGE_PROCESSOR_H
-#define QN_SERVER_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <api/common_message_processor.h>
 
 #include <core/resource/resource_fwd.h>
-#include "nx_ec/impl/ec_api_impl.h"
-#include "nx_ec/data/api_peer_alive_data.h"
-#include <nx/network/http/httptypes.h>
-#include "network/universal_tcp_listener.h"
+#include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/data/api_peer_alive_data.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/network/http/http_types.h>
+#include <network/universal_tcp_listener.h>
 
 
 class QHostAddress;
@@ -15,8 +15,8 @@ class QHostAddress;
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
+    using base_type = QnCommonMessageProcessor;
 
-    typedef QnCommonMessageProcessor base_type;
 public:
     QnServerMessageProcessor(QnCommonModule* commonModule);
 
@@ -28,12 +28,12 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
-    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
-    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
 
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus, ec2::NotificationSource source) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
-    void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
+    void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
 
     /**
@@ -68,5 +68,3 @@ private:
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;
 };
-
-#endif // QN_SERVER_MESSAGE_PROCESSOR_H

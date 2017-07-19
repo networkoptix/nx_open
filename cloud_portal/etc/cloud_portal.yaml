@@ -1,0 +1,54 @@
+customization: 'default'
+
+host: '$CLOUD_PORTAL_HOST'
+
+cloud_database:
+    host: 'localhost'
+    port: '3306'
+    username: 'root'
+    password: ''
+    database: 'cloudportal'
+
+cloud_db:
+    url: 'http://$CLOUD_DB_HOST/cdb'
+
+cloud_portal:
+    url: 'http://$CLOUD_PORTAL_HOST'
+
+
+cloud_gateway:
+    url: 'http://$CLOUD_DB_HOST:3347'
+
+mail_from: 'service@networkoptix.com'
+
+mail_prefix: '[CLOUD_PORTAL]'
+
+smtp:
+    host: 'email-smtp.us-east-1.amazonaws.com'
+    user: 'AKIAJ6MLW7ZT7WXXXOIA'
+    password: 'AlYDnddPk8mWorQFVogh8sqkQX6Nv01JwxxfMoYJAFeC'
+    port: 587
+    tls: on
+
+admins:
+    -
+        - 'Cloud Portal Admins'
+        - 'cloud-portal-admins@networkoptix.com'
+languages:
+    - en
+    - ru
+    - fr
+    - de
+    - es
+    - ja
+    - ko
+    - th
+    - zh_CN
+    - zh_TW
+    - vi_VN
+    - hu
+    - he
+    - pt_PT
+
+queue_name: '$INSTANCE_NAME'
+max_retries: 10

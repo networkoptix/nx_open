@@ -332,17 +332,6 @@ angular.module('webadminApp')
                     console.error(error);
                     dialogs.alert(L.settings.unexpectedError);
                 });
-
-                /*
-
-                 // Old code: request to cloud and to the system
-
-                 cloudAPI.disconnect(cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
-                 function () {
-                 //2. Save settings to local server
-                 mediaserver.clearCloudSystemCredentials().then(successHandler, errorHandler);
-                 }, cloudErrorHandler);
-                 */
             }
             dialogs.confirmWithPassword(
                 L.settings.confirmDisconnectFromCloudTitle.replace("{{CLOUD_NAME}}",Config.cloud.productName),

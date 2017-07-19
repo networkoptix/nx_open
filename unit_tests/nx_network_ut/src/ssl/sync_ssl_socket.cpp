@@ -158,7 +158,7 @@ SyncSslSocket::~SyncSslSocket()
     }
 }
 
-int SyncSslSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
+int SyncSslSocket::recv(void* buffer, unsigned int bytesToRead, int flags)
 {
     if (!SSL_is_init_finished(m_ssl))
     {
@@ -168,7 +168,27 @@ int SyncSslSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
             doClientHandshake();
     }
 
-    return SSL_read(m_ssl, (char*) buffer, bufferLen);
+    if (flags & MSG_WAITALL)
+    {
+        int totalBytesRead = 0;
+        for (;;)
+        {
+            const int bytesRead = SSL_read(m_ssl, (char*)buffer, bytesToRead);
+            if (bytesRead <= 0)
+                return totalBytesRead > 0 ? totalBytesRead : bytesRead;
+
+            totalBytesRead += bytesRead;
+            bytesToRead -= bytesRead;
+            buffer = (char*)buffer + bytesRead;
+
+            if (bytesToRead == 0)
+                return totalBytesRead;
+        }
+    }
+    else
+    {
+        return SSL_read(m_ssl, (char*) buffer, bytesToRead);
+    }
 }
 
 int SyncSslSocket::send(const void* buffer, unsigned int bufferLen)

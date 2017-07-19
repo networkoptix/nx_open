@@ -21,7 +21,7 @@ SystemSocketAddress::SystemSocketAddress(int ipVersion):
 SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
     SystemSocketAddress()
 {
-    if (SocketGlobals::config().isHostDisabled(endpoint.address))
+    if (SocketGlobals::ini().isHostDisabled(endpoint.address))
     {
         SystemError::setLastErrorCode(SystemError::noPermission);
         return;

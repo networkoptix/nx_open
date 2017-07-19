@@ -7,7 +7,7 @@
 #include "core/resource/media_server_resource.h"
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "network/router.h"
 #include "api/app_server_connection.h"
 
@@ -15,7 +15,7 @@ namespace {
     int HTTP_READ_TIMEOUT = 1000 * 10;
 }
 
-class QnMessageBodyParser: public nx::utils::bsf::AbstractByteStreamFilter
+class QnMessageBodyParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     QnMessageBodyParser(QnIOModuleMonitor* owner): m_owner(owner) {}
@@ -39,6 +39,16 @@ private:
 QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
     m_camera(camera)
 {
+}
+
+QnIOModuleMonitor::~QnIOModuleMonitor()
+{
+    if (m_httpClient)
+    {
+        m_httpClient->disconnect(this);
+        m_httpClient->pleaseStopSync();
+        m_httpClient.reset();
+    }
 }
 
 bool QnIOModuleMonitor::open()
@@ -76,7 +86,7 @@ bool QnIOModuleMonitor::open()
     QUrl requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;
-    query.addQueryItem(lit("physicalId"), m_camera->getUniqueId());
+    query.addQueryItem(QString::fromLatin1(Qn::PHYSICAL_ID_URL_QUERY_ITEM), m_camera->getUniqueId());
     requestUrl.setQuery(query);
 
     QnRoute route = commonModule()->router()->routeTo(server->getId());

@@ -4,6 +4,7 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/layout_tour_item.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -23,6 +24,7 @@
 namespace {
 
 static const int kTimerPrecisionMs = 500;
+static const int kHintTimeoutMs = 3000;
 
 } // namespace
 
@@ -50,22 +52,19 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
     if (!tour.isValid())
         return;
 
-    const auto items = QnLayoutTourItem::createList(tour.items, resourcePool());
-    if (items.empty())
+    NX_EXPECT(m_tour.items.empty());
+    resetTourItems(tour.items);
+    if (tour.items.empty())
         return;
 
     m_mode = Mode::MultipleLayouts;
     m_tour.id = tour.id;
-    m_tour.items = std::move(items);
     m_tour.currentIndex = -1;
     clearWorkbenchState();
 
     startTourInternal();
     if (!tour.settings.manual)
         startTimer();
-
-    //action(action::EffectiveMaximizeAction)->setChecked(false);
-    menu()->trigger(action::FreespaceAction);
 }
 
 void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
@@ -79,7 +78,7 @@ void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(tour.isValid());
 
     // Start/stop timer before items check.
-    bool isTourManual = !isTimerRunning();
+    const bool isTourManual = !isTimerRunning();
     if (isTourManual != tour.settings.manual)
     {
         if (tour.settings.manual)
@@ -88,7 +87,7 @@ void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
             startTimer();
     }
 
-    m_tour.items = QnLayoutTourItem::createList(tour.items, resourcePool());
+    resetTourItems(tour.items);
     if (m_tour.items.empty())
         stopCurrentTour();
     else if (m_tour.currentIndex >= tour.items.size())
@@ -115,55 +114,115 @@ QnUuid LayoutTourExecutor::runningTour() const
     return QnUuid();
 }
 
+void LayoutTourExecutor::prevTourStep()
+{
+    setHintVisible(false);
+    processTourStepInternal(false, true);
+}
+
+void LayoutTourExecutor::nextTourStep()
+{
+    setHintVisible(false);
+    processTourStepInternal(true, true);
+}
+
 void LayoutTourExecutor::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_tour.timerId)
-        processTourStep();
+        processTourStepInternal(true, false);
     base_type::timerEvent(event);
 }
 
 void LayoutTourExecutor::stopCurrentTour()
 {
-    switch (m_mode)
+    // We can recursively get here from restoreWorkbenchState() call
+    const auto mode = m_mode;
+    m_mode = Mode::Stopped;
+
+    switch (mode)
     {
         case Mode::SingleLayout:
         {
             stopTimer();
+            setHintVisible(false);
             workbench()->setItem(Qn::ZoomedRole, nullptr);
-
             break;
         }
 
         case Mode::MultipleLayouts:
         {
             stopTimer();
+            setHintVisible(false);
             m_tour.currentIndex = 0;
             NX_EXPECT(!m_tour.id.isNull());
+            QnUuid tourId = m_tour.id;
             m_tour.id = QnUuid();
-            m_tour.items.clear();
-
-            restoreWorkbenchState();
-            menu()->trigger(action::FreespaceAction);
+            resetTourItems({});
+            restoreWorkbenchState(tourId);
             break;
         }
 
         default:
             break;
     }
-
-    setHintVisible(false);
-    m_mode = Mode::Stopped;
 }
 
-void LayoutTourExecutor::processTourStep()
+void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
 {
+    m_tour.items.clear();
+
+    for (const auto& item: items)
+    {
+        auto existing = resourcePool()->getResourceById(item.resourceId);
+        if (!existing)
+            continue;
+
+        auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+
+        QnLayoutResourcePtr layout = existingLayout
+            ? existingLayout->clone()
+            : QnLayoutResource::createFromResource(existing);
+
+        NX_EXPECT(layout);
+        if (!layout)
+            continue;
+
+        layout->addFlags(Qn::local);
+        layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
+            | QnLayoutFlag::NoResize
+            | QnLayoutFlag::NoMove
+            | QnLayoutFlag::NoTimeline
+        ));
+        layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+
+        m_tour.items.push_back(QnLayoutTourItem(layout, item.delayMs));
+    }
+}
+
+void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
+{
+    auto nextIndex = [forward](int current, int size)
+        {
+            NX_EXPECT(size > 0);
+            if (current < 0 || size <= 0)
+                return 0;
+
+            // adding size to avoid negative modulo result
+            return (current + size + (forward ? 1 : -1)) % size;
+        };
+
     switch (m_mode)
     {
         case Mode::SingleLayout:
         {
-            auto item = workbench()->item(Qn::ZoomedRole);
-            if (item && isTimerRunning() && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+            const auto item = workbench()->item(Qn::ZoomedRole);
+            if (!force
+                && item
+                && isTimerRunning()
+                && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+            {
                 return;
+            }
 
             auto items = workbench()->currentLayout()->items().toList();
             if (items.empty())
@@ -173,11 +232,8 @@ void LayoutTourExecutor::processTourStep()
             }
 
             QnWorkbenchItem::sortByGeometry(&items);
-            if (item)
-                item = items[(items.indexOf(item) + 1) % items.size()];
-            else
-                item = items[0];
-            workbench()->setItem(Qn::ZoomedRole, item);
+            const int index = item ? items.indexOf(item) : -1;
+            workbench()->setItem(Qn::ZoomedRole, items[nextIndex(index, items.size())]);
             if (isTimerRunning())
                 m_tour.elapsed.restart();
             break;
@@ -196,7 +252,7 @@ void LayoutTourExecutor::processTourStep()
             const bool isRunning = isTimerRunning()
                 && qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
 
-            if (isRunning)
+            if (isRunning && !force)
             {
                 // No need to switch the only item.
                 if (m_tour.items.size() < 2)
@@ -207,7 +263,7 @@ void LayoutTourExecutor::processTourStep()
                     return;
             }
 
-            m_tour.currentIndex = (m_tour.currentIndex + 1) % m_tour.items.size();
+            m_tour.currentIndex = nextIndex(m_tour.currentIndex, (int) m_tour.items.size());
             const auto& next = m_tour.items[m_tour.currentIndex];
 
             auto layout = next.layout;
@@ -229,11 +285,7 @@ void LayoutTourExecutor::processTourStep()
             break;
         }
         default:
-        {
-            NX_EXPECT(false);
-            stopCurrentTour();
             break;
-        }
     }
 }
 
@@ -244,12 +296,21 @@ void LayoutTourExecutor::clearWorkbenchState()
     workbench()->clear();
 }
 
-void LayoutTourExecutor::restoreWorkbenchState()
+void LayoutTourExecutor::restoreWorkbenchState(const QnUuid& tourId)
 {
     workbench()->clear();
+
+    if (m_lastState.layoutUuids.isEmpty() && !tourId.isNull())
+    {
+        m_lastState.layoutUuids.push_back(tourId);
+        m_lastState.currentLayoutId = tourId;
+    }
     workbench()->update(m_lastState);
 
-    if (workbench()->layouts().empty() || !workbench()->currentLayout()->resource())
+    const bool validState = !workbench()->layouts().empty()
+        && workbench()->currentLayout()->resource();
+    NX_EXPECT(validState);
+    if (!validState)
         menu()->trigger(action::OpenNewTabAction);
 }
 
@@ -258,7 +319,8 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     if (visible)
     {
         m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Press any key to stop the tour."));
+            tr("Use keyboard arrows to switch layouts. To exit the tour press Esc."),
+            kHintTimeoutMs);
     }
     else if (m_hintLabel)
     {
@@ -291,7 +353,7 @@ void LayoutTourExecutor::stopTimer()
 void LayoutTourExecutor::startTourInternal()
 {
     setHintVisible(true);
-    processTourStep();
+    processTourStepInternal(true, true);
 }
 
 bool LayoutTourExecutor::isTimerRunning() const

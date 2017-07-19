@@ -1,11 +1,18 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtGui/QDragMoveEvent>
+
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
@@ -20,11 +27,12 @@
 #include <ui/widgets/common/tool_button.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/delayed.h>
+#include <nx/client/desktop/utils/mime_data.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -277,28 +285,15 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 
 void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 {
+    // Scene drop is working only for resources that are already in the pool.
+    MimeData data(event->mimeData());
+    const auto ids = data.getIds();
+
+    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resources = resourcePool->getResources(ids);
+
     Q_D(QnMainWindowTitleBarWidget);
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
-
-    QnResourceList media;
-    QnResourceList layouts;
-    QnResourceList servers;
-
-    for (auto res : resources)
-    {
-        if (dynamic_cast<QnMediaResource*>(res.data()))
-            media << res;
-
-        if (res.dynamicCast<QnLayoutResource>())
-            layouts << res;
-
-        if (res.dynamicCast<QnMediaServerResource>())
-            servers << res;
-    }
-
-    d->dropResources = media;
-    d->dropResources << layouts;
-    d->dropResources << servers;
+    d->dropResources = resources.filtered(QnResourceAccessFilter::isDroppable);
 
     if (d->dropResources.empty())
         return;
@@ -328,7 +323,7 @@ void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* event)
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    menu()->trigger(action::DropResourcesIntoNewLayoutAction, d->dropResources);
+    menu()->trigger(action::OpenInNewTabAction, d->dropResources);
     event->acceptProposedAction();
 }
 

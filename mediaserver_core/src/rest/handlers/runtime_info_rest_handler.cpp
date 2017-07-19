@@ -6,7 +6,7 @@
 
 #include <rest/server/rest_connection_processor.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 int QnRuntimeInfoRestHandler::executeGet(
     const QString& /*path*/,

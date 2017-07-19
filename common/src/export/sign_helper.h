@@ -8,12 +8,12 @@
 
 #include <licensing/license_fwd.h>
 
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
 
 #include <nx/streaming/video_data_packet.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
-static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographicHash::Md5;
+static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::utils::QnCryptographicHash::Md5;
 
 class SPSUnit;
 class PPSUnit;
@@ -44,8 +44,8 @@ public:
 
     //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
-    static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
-    static void updateDigest(const QnConstMediaContextPtr& context, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void updateDigest(AVCodecContext* srcCodec, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
+    static void updateDigest(const QnConstMediaContextPtr& context, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 
     /** Return initial signature as filler */
@@ -66,8 +66,8 @@ private:
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
-    static void doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size);
-    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigestNoCodec(nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
 
 private:
     QPixmap m_logo;

@@ -23,8 +23,8 @@ namespace ec2
 
         QnTransactionMessageBus* messageBus() const;
     signals:
-        void peerFound(ec2::ApiPeerAliveData data);
-        void peerLost(ec2::ApiPeerAliveData data);
+        void peerFound(QnUuid data, Qn::PeerType peerType);
+        void peerLost(QnUuid data, Qn::PeerType peerType);
     private:
         qint64 newTimestamp();
     private:

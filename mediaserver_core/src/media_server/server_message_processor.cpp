@@ -16,18 +16,18 @@
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
-#include "business/business_message_bus.h"
+#include <nx/mediaserver/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
 #include <nx_ec/managers/abstract_server_manager.h>
 #include "api/app_server_connection.h"
 #include "network/router.h"
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
 
@@ -127,45 +127,43 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
                   });
 }
 
-void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     base_type::disconnectFromConnection(connection);
     connection->getUpdatesNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemotePeerFound(data);
-    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
+void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
+{
+    base_type::handleRemotePeerFound(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res)
         res->setStatus(Qn::Online);
     else
-        m_delayedOnlineStatus << data.peer.id;
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(data.peer.id, Qn::Online);
+        m_delayedOnlineStatus << peer;
 }
 
-void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemotePeerLost(data);
-    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
+void QnServerMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
+{
+    base_type::handleRemotePeerLost(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res) {
         res->setStatus(Qn::Offline);
-        if (data.peer.peerType != Qn::PT_Server) {
+        if (peerType != Qn::PT_Server)
+        {
             // This server hasn't own DB
             for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
-    m_delayedOnlineStatus.remove(data.peer.id);
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
+    m_delayedOnlineStatus.remove(peer);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(
     const QnResourcePtr &resource,
     Qn::ResourceStatus status,
-    ec2::NotificationSource source)
+    ec2::NotificationSource /*source*/)
 {
     if (resource->getId() == commonModule()->moduleGUID() && status != Qn::Online)
     {
@@ -215,8 +213,8 @@ void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpLi
     m_universalTcpListener = tcpListener;
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
-    qnBusinessMessageBus->at_actionReceived(action);
+void QnServerMessageProcessor::execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& action) {
+    qnEventMessageBus->at_actionReceived(action);
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
@@ -243,9 +241,6 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
     QnResourcePtr mServer = resourcePool()->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(id, Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)

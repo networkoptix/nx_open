@@ -3,7 +3,7 @@
 #ifdef ENABLE_ONVIF
 
 #include <plugins/resource/onvif/onvif_resource.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 class QnHikvisionOnvifResource: public QnPlOnvifResource
 {
@@ -11,14 +11,11 @@ class QnHikvisionOnvifResource: public QnPlOnvifResource
 public:
     QnHikvisionOnvifResource();
     virtual ~QnHikvisionOnvifResource() override;
-    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 private:
     CameraDiagnostics::Result initialize2WayAudio();
     std::unique_ptr<nx_http::HttpClient> getHttpClient();
-private:
-    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 typedef QnSharedResourcePointer<QnHikvisionOnvifResource> QnHikvisionOnvifResourcePtr;

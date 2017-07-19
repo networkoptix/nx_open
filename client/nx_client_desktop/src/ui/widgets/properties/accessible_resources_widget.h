@@ -57,9 +57,6 @@ private:
     void handleResourceAdded(const QnResourcePtr& resource);
     void refreshModel();
 
-    void handleSelectionChanging(QItemSelectionModel::SelectionFlags selectionFlags,
-        const QModelIndex& index, const QEvent* event);
-
 signals:
     void controlsChanged(bool useAll);
 

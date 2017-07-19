@@ -1,0 +1,1640 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Unit selection databases</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Diphone check list"
+HREF="x2619.html"><LINK
+REL="NEXT"
+TITLE="Building a Unit Selection Cluster Voice"
+HREF="x3082.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2619.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3082.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-UNITSEL-CH"
+></A
+>Unit selection databases</H1
+><P
+>&#13;This chapter discusses some of the options for building waveform 
+synthesizers using unit selection techniques in Festival. This is still 
+very much an on-going research question and we are still adding new 
+techniques as well as improving existing ones often so the techniques 
+described here are not as mature as the techniques as described in 
+previous diphone chapter. </P
+><P
+>By "unit selection" we actually mean the selection of some unit of 
+speech which may be anything from whole phrase down to diphone (or even 
+smaller). Technically diphone selection is a simple case of this. 
+However typically what we mean is unlike diphone selection, in unit 
+selection there is more than one example of the unit and some mechanism 
+is used to select between them at run-time. </P
+><P
+>&#13;
+ATR's CHATR [<SPAN
+CLASS="CITATION"
+>hunt96</SPAN
+>] system and earlier work at that lab 
+[<SPAN
+CLASS="CITATION"
+>nuutalk92</SPAN
+>] is an excellent example of one particular method for 
+selecting between multiple examples of a phone within a database. For a 
+discussion of why a more generalized inventory of units is desired see 
+[<SPAN
+CLASS="CITATION"
+>campbell96</SPAN
+>] though we will reiterate some of the points here. 
+With diphones a fixed view of the possible space of speech units has 
+been made which we all know is not ideal. There are articulatory 
+effects which go over more than one phone, e.g. /s/ can take on 
+artifacts of the roundness of the following vowel even over an 
+intermediate stop, e.g. <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>spout</I
+>"</SPAN
+> vs <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>spit</I
+>"</SPAN
+>. But its not just 
+obvious segmental effects that cause variation in pronunciation, 
+syllable position, word/phrase initial and final position have typically 
+a different level of articulation from segments taken from word internal 
+position. Stressing and accents also cause differences. Rather than 
+try to explicitly list the desired inventory of all these phenomena and 
+then have to record all of them a potential alternative is to take a 
+natural distribution of speech and (semi-)automatically find the 
+distinctions that actually exist rather predefining them. </P
+><P
+>The theory is obvious but the design of such systems and finding the 
+appropriate selection criteria, weighting the costs of relative candidates 
+is a non-trivial problem. However techniques like this often produce 
+very high quality, very natural sounding synthesis. However they also 
+can produce some very bad synthesis too, when the database has unexpected 
+holes and/or the selection costs fail. </P
+><P
+>Two forms of unit selection will discussed here, not because we feel 
+they are the best but simply because they are the ones actually 
+implemented by us and hence can be distributed. These should still be 
+considered research systems. Unless you are specifically interested or 
+have the expertise in developing new selection techniques it is not 
+recommended that you try these, if you need a working voice within a 
+month and can't afford to miss that deadline then the diphone option is 
+safe, well tried and stable. In you need higher quality and know 
+something about what you need to say, then we recommend the limited 
+domain techniques discussed in the following chapter. The limited 
+domain synthesis offers the high quality of unit selection but 
+avoids much (all ?) of the bad selections. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2661"
+>Cluster unit selection</A
+></H1
+><P
+>This is a reimplementation of the techniques as described in 
+[<SPAN
+CLASS="CITATION"
+>black97c</SPAN
+>]. The idea is to take a database of general speech and 
+try to cluster each phone type into groups of acoustically similar units 
+based on the (non-acoustic) information available at synthesis time, 
+such as phonetic context, prosodic features (F0 and duration) and higher 
+level features such as stressing, word position, and accents. The 
+actually features used may easily be changed and experimented with as can 
+the definition of the definition of acoustic distance between the units 
+in a cluster. </P
+><P
+>In some sense this work builds on the results of both the CHATR 
+selection algorithm [<SPAN
+CLASS="CITATION"
+>hunt96</SPAN
+>] and the work of [<SPAN
+CLASS="CITATION"
+>donovan95</SPAN
+>], but 
+differs in some important and significant ways. Specifically in 
+contrast to [<SPAN
+CLASS="CITATION"
+>hunt96</SPAN
+>] this cluster algorithm pre-builds CART trees 
+to select the appropriate cluster of candidate phones thus avoiding the 
+computationally expensive function of calculating target costs (through 
+linear regression) at selection time. Secondly because the clusters are 
+built directly from the acoustic scores and target features, a target 
+estimation function isn't required removing the need to calculate 
+weights for each feature. This cluster method differs from the 
+clustering method in [<SPAN
+CLASS="CITATION"
+>donovan95</SPAN
+>] in that it can use more 
+generalized features in clustering and uses a different acoustic cost 
+function (Donovan uses HMMs), also his work is based on sub-phonetic 
+units (HMM states). Also Donovan selects one candidate while here we 
+select a group of candidates and finds the best overall selection by 
+finding the best path through each set of candidates for each target 
+phone, in a manner similar to [<SPAN
+CLASS="CITATION"
+>hunt96</SPAN
+>] and [<SPAN
+CLASS="CITATION"
+>iwahashi93</SPAN
+>] 
+before. </P
+><P
+>The basic processes involved in building a waveform synthesizer for 
+the clustering algorithm are as follows.   A high level walkthrough
+of the scripts to run is given after these lower level details.
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Collect the database of general speech. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Building utterance structures for your database using the techniques 
+discussed in <A
+HREF="x591.html"
+>the Section called <I
+>Utterance building</I
+> in the Chapter called <I
+>A Practical Speech Synthesis System</I
+></A
+>.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Building coefficients for acoustic distances, typically some 
+form of cepstrum plus F0, or some pitch synchronous analysis (e.g. 
+LPC). </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Build distances tables, precalculating the acoustic distance 
+between each unit of the same phone type. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Dump selection features (phone context, prosodic, positional and 
+whatever) for each unit type. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Build cluster trees using <TT
+CLASS="FILENAME"
+>wagon</TT
+> with the features
+and acoustic distances dumped by the previous two stages&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Building the voice description itself </P
+></LI
+></UL
+></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2690"
+>Choosing the right unit type</A
+></H2
+><P
+>before you start you must make a decision about what unit type you are
+going to use.  Note there are two dimensions here.  First is
+<I
+CLASS="EMPHASIS"
+>size</I
+>, such as phone, diphone, demi-syllable.  The
+second <I
+CLASS="EMPHASIS"
+>type</I
+> itself which may be simple phone,
+phone plus stress, phone plus word etc.  The code here and the related
+files basically assume unit <I
+CLASS="EMPHASIS"
+>size</I
+> is
+<I
+CLASS="EMPHASIS"
+>phone</I
+>.  However because you may also include a
+percentage of the previous unit in the acoustic distance measure this
+unit size is more effectively phone plus previous phone, thus it is
+somewhat diphone like.  The cluster method has actual restrictions on
+the unit size, it simply clusters the given acoustic units with the
+given feature, but the basic synthesis code is currently assuming
+phone sized units.</P
+><P
+>The second dimension, type, is very open and we expect that
+controlling this will be a good method to attained high quality
+general unit selection synthesis.  The parameter
+<CODE
+CLASS="VARNAME"
+>clunit_name_feat</CODE
+> may be used define the unit type.
+The simplest conceptual example is the one used in the limited domain
+synthesis.  There we distinguish each phone with the word it comes
+from, thus a <I
+CLASS="EMPHASIS"
+>d</I
+> from the word
+<I
+CLASS="EMPHASIS"
+>limited</I
+> is distinct from the
+<I
+CLASS="EMPHASIS"
+>d</I
+> in the word <I
+CLASS="EMPHASIS"
+>domain</I
+>.  Such
+distinctions can hard partition up the space of phones into types that
+can be more manageable.  </P
+><P
+>The decision of how to carve up that space depends largely on the
+intended use of the database.  The more distinctions you make less you
+depend on the clustering acoustic distance, but the more you depend on
+your labels (and the speech) being (absolutely) correct.  The
+mechanism to define the unit type is through a (typically) user
+defined feature function.  In the given setup scripts this feature
+function will be called
+<CODE
+CLASS="VARNAME"
+>lisp_INST_LANG_NAME::clunit_name</CODE
+>.  Thus the voice
+simply defines the function
+<CODE
+CLASS="VARNAME"
+>INST_LANG_NAME::clunit_name</CODE
+> to return the
+unit type for the given segment.  If you wanted to make
+a diphone unit selection voice this function could simply be
+<A
+NAME="AEN2706"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(INST_LANG_NAME::clunit_name&nbsp;i)<br>
+&nbsp;&nbsp;(string_append<br>
+&nbsp;&nbsp;&nbsp;(item.name&nbsp;i)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;"_"<br>
+&nbsp;&nbsp;&nbsp;(item.feat&nbsp;i&nbsp;"p.name")))</P
+></BLOCKQUOTE
+>
+
+This the unittype would be the phone plus its previous phone.  Note
+that the first part of a unit name is assumed to be the phone name in
+various parts of the code thus although you make think it would be neater
+to return <CODE
+CLASS="VARNAME"
+>previousphone_phone</CODE
+> that would mess
+up some other parts of the code.</P
+><P
+>In the limited domain case the word is attached to the phone.  You
+can also consider some demi-syllable information or more to differentiate
+between different instances of the same phone.</P
+><P
+>The important thing to remember is that at synthesis time the same
+function is called to identify the unittype which is used to select the
+appropriate cluster tree to select from.  Thus you need to ensure
+that if you use say diphones that the your database really does not have 
+<I
+CLASS="EMPHASIS"
+>all</I
+> diphones in it.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2712"
+>Collecting databases for unit selection</A
+></H2
+><P
+>Unlike diphone database which are carefully constructed to ensure 
+specific coverage, one of the advantages of unit selection is that 
+a much more general database is desired. However, although voices 
+may be built from existing data not specifically gathered for 
+synthesis there are still factors about the data that will help make 
+better synthesis. </P
+><P
+>Like diphone databases the more cleanly and carefully the speech is 
+recorded the better the synthesized voice will be. As we are going to 
+be selecting units from different parts of the database the more similar 
+the recordings are, the less likely bad joins will occur. However 
+unlike diphones database, prosodic variation is probably a good thing, 
+as it is those variations that can make synthesis from unit selection 
+sound more natural. Good phonetic coverage is also useful, at least 
+phone coverage if not complete diphone coverage. Also synthesis using 
+these techniques seems to retain aspects of the original database. If 
+the database is broadcast news stories, the synthesis from it will 
+typically sound like read news stories (or more importantly will sound 
+best when it is reading news stories). </P
+><P
+>&#13;
+
+Although it is too early to make definitive statements about what size 
+and type of data is best for unit selection we do have some rough 
+guides. A Timit like database of 460 phonetically balanced sentences 
+(around 14,000 phones) is not an unreasonable first choice. If the 
+text has not been specifically selected for phonetic coverage a larger 
+database is probably required, for example the Boston University Radio 
+News Corpus speaker <CODE
+CLASS="VARNAME"
+>f2b</CODE
+> [<SPAN
+CLASS="CITATION"
+>ostendorf95</SPAN
+>] has been used 
+relatively successfully. Of course all this depends on what use you 
+wish to make of the synthesizer, if its to be used in more restrictive 
+environments (as is often the case) tailoring the database for the task 
+is a very good idea. If you are going to be reading a lot of telephone 
+numbers, having a significant number of examples of read numbers will 
+make synthesis of numbers sound much better (see the following 
+chapter on making such design more explicit). </P
+><P
+>The database used as an example here is a TIMIT 460 sentence database 
+read by an American male speaker. </P
+><P
+>Again the notes about recording the database apply, though it will 
+sometimes be the case that the database is already recorded and beyond 
+your control, in that case you will always have something legitimate to 
+blame for poor quality synthesis. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2727"
+>Preliminaries</A
+></H2
+><P
+>&#13;Throughout our discussion we will assume the following database layout. 
+It is highly recommended that you follow this format otherwise scripts, 
+and examples will fail. There are many ways to organize databases and 
+many of such choices are arbitrary, here is our "arbitrary" layout. </P
+><P
+>The basic database directory should contain the following directories 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>bin/</CODE
+></DT
+><DD
+><P
+>Any database specific scripts for processing. Typically this 
+first contains a copy of standard scripts that are then customized 
+when necessary to the particular database </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>wav/</CODE
+></DT
+><DD
+><P
+>The waveform files. These should be headered, one utterances per file 
+with a standard name convention. They should have the extension 
+<TT
+CLASS="FILENAME"
+>.wav</TT
+> and the fileid consistent with all other files through 
+the database (labels, utterances, pitch marks etc). </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>lab/</CODE
+></DT
+><DD
+><P
+>The segmental labels. This is usually the master label files, 
+these may contain more information that the labels used by festival 
+which will be in <TT
+CLASS="FILENAME"
+>festival/relations/Segment/</TT
+>. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>lar/</CODE
+></DT
+><DD
+><P
+>The EGG files (larynograph files) if collected. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>pm/</CODE
+></DT
+><DD
+><P
+>Pitchmark files as generated from the lar files or from the signal 
+directly. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>festival/</CODE
+></DT
+><DD
+><P
+>Festival specific label files. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>festival/relations/</TT
+></DT
+><DD
+><P
+>The processed labeled files for building Festival utterances, 
+held in directories whose name reflects the relation they represent: 
+<TT
+CLASS="FILENAME"
+>Segment/</TT
+>, <TT
+CLASS="FILENAME"
+>Word/</TT
+>, <TT
+CLASS="FILENAME"
+>Syllable/</TT
+> etc. </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>festival/utts/</TT
+></DT
+><DD
+><P
+>The utterances files as generated from the <TT
+CLASS="FILENAME"
+>festival/relations/</TT
+> 
+label files. </P
+></DD
+></DL
+></DIV
+></P
+></DD
+></DL
+></DIV
+>
+Other directories will be created for various processing reasons. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2781"
+>Building utterance structures for unit selection</A
+></H2
+><P
+>&#13;In order to make access well defined you need to construct Festival 
+utterance structures for each of the utterances in your database. This 
+(in is basic form) requires labels for: segments, syllables, words, 
+phrases, F0 Targets, and intonation events. Ideally these should all be 
+carefully hand labeled but in most cases that's impractical. There are 
+ways to automatically obtain most of these labels but you should be 
+aware of the inherit errors in the labeling system you use (including 
+labeling systems that involve human labelers). Note that when a unit 
+selection method is to be used that fundamentally uses segment 
+boundaries its quality is going to be ultimately determined by the 
+quality of the segmental labels in the databases. </P
+><P
+>&#13;For the unit selection algorithm described below the segmental labels 
+should be using the same phoneset as used in the actual synthesis voice. 
+However a more detailed phonetic labeling may be more useful 
+(e.g. marking closures in stops) mapping that information back to the 
+phone labels before actual use. Autoaligned databases typically aren't 
+accurate enough for use in unit selection. Most autoaligners are built 
+using speech recognition technology where actual phone boundaries are 
+not the primary measure of success. General speech recognition systems 
+primarily measure words correct (or more usefully semantically correct) 
+and do not require phone boundaries to be accurate. If the database is 
+to be used for unit selection it is very important that the phone 
+boundaries are accurate. Having said this though, we have successfully 
+used the aligner described in the diphone chapter above to label general 
+utterance where we knew which phone string we were looking for, using 
+such an aligner may be a useful first pass, but the result should always 
+be checked by hand. </P
+><P
+>&#13;It has been suggested that aligning techniques and unit selection 
+training techniques can be used to judge the accuracy of the labels and 
+basically exclude any segments that appear to fall outside the typical 
+range for the segment type. Thus it, is believed that unit selection 
+algorithms should be able to deal with a certain amount of noise in the 
+labeling. This is the desire for researchers in the field, but we 
+are some way from that and the easiest way at present to improve the 
+quality of unit selection algorithms at present is to ensure that 
+segmental labeling is as accurate as possible. Once we have a better 
+handle on selection techniques themselves it will then be possible to 
+start experimenting with noisy labeling. </P
+><P
+> However
+it should be added that this unit selection technique (and many
+others) support what is termed "optimal coupling"
+[<SPAN
+CLASS="CITATION"
+>conkie96</SPAN
+>] where the acoustically most appropriate
+join point is found automatically at run time when two units are
+selected for concatenation.  This technique is inherently robust to at
+least a few tens of millisecond boundary labeling errors.</P
+><P
+>For the cluster method defined here it is best to construct more than 
+simply segments, durations and an F0 target. A whole syllabic structure 
+plus word boundaries, intonation events and phrasing allow a much richer 
+set of features to be used for clusters. See <A
+HREF="x591.html"
+>the Section called <I
+>Utterance building</I
+> in the Chapter called <I
+>A Practical Speech Synthesis System</I
+></A
+>
+for a more general discussion of how to build utterance structures 
+for a database. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2798"
+>Making cepstrum parameter files</A
+></H2
+><P
+>&#13;
+
+In order to cluster similar units in a database we build an 
+acoustic representation of them. This is is also still a research 
+issue but in the example here we will use Mel cepstrum.  Interestingly
+we do not generate these at fixed intervals, but at 
+pitch marks.  Thus have a parametric spectral representation
+of each pitch period.  We have found this a better method,
+though it does require that pitchmarks are reasonably identified.&#13;</P
+><P
+>&#13;Here is an example script which will generate these parameters for a
+database, it is included in
+<TT
+CLASS="FILENAME"
+>festvox/src/unitsel/make_mcep</TT
+>. 
+
+<A
+NAME="AEN2807"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;i&nbsp;in&nbsp;$*<br>
+do<br>
+&nbsp;&nbsp;fname=`basename&nbsp;$i&nbsp;.wav`<br>
+&nbsp;&nbsp;echo&nbsp;$fname&nbsp;MCEP<br>
+&nbsp;&nbsp;$SIG2FV&nbsp;$SIG2FVPARAMS&nbsp;-otype&nbsp;est_binary&nbsp;$i&nbsp;-o&nbsp;mcep/$fname.mcep&nbsp;-pm&nbsp;pm/$fname.pm&nbsp;-window_type&nbsp;hamming<br>
+done</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;
+The above builds coefficients at fixed frames. We have also 
+experimented with building parameters pitch synchronously and have 
+found a slight improvement in the usefulness of the measure based on 
+this. We do not pretend that this part is particularly neat in the 
+system but it does work. When pitch synchronous parameters are 
+build the clunits module will automatically put the local 
+F0 value in coefficient 0 at load time. This happens to be 
+appropriate from LPC coefficients. The script in 
+<TT
+CLASS="FILENAME"
+>festvox/src/general/make_lpc</TT
+> can be used to 
+generate the parameters, assuming you have already 
+generated pitch marks. </P
+><P
+>Note the secondary advantage of using LPC coefficients is that they are 
+required any way for LPC resynthesis thus this allows less information 
+about the database to be required at run time. We have not yet tried 
+pitch synchronous MEL frequency cepstrum coefficients but that should be 
+tried. Also a more general duration/number of pitch periods match 
+algorithm is worth defining. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2816"
+>Building the clusters</A
+></H2
+><P
+>&#13;
+Cluster building is mostly automatic. Of course you need the
+<CODE
+CLASS="VARNAME"
+>clunits</CODE
+> modules compiled into your version of
+Festival. Version 1.3.1 or later is required, the version of
+<CODE
+CLASS="VARNAME"
+>clunits</CODE
+> in 1.3.0 is buggy and incomplete and will
+not work. To compile in <CODE
+CLASS="VARNAME"
+>clunits</CODE
+>, add
+
+<A
+NAME="AEN2824"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>ALSO_INCLUDE&nbsp;+=&nbsp;clunits</P
+></BLOCKQUOTE
+>
+
+to the end of your <TT
+CLASS="FILENAME"
+>festival/config/config</TT
+> file,
+nad recompile.  To check if an installation already has support for
+<CODE
+CLASS="VARNAME"
+>clunits</CODE
+> check the value of the variable
+<CODE
+CLASS="VARNAME"
+>*modules*</CODE
+>.&#13;</P
+><P
+>&#13; 
+
+The file <TT
+CLASS="FILENAME"
+>festvox/src/unitsel/build_clunits.scm</TT
+>
+contains the basic parameters to build a cluster model for a databases
+that has utterance structures and acoustic parameters. The function
+<CODE
+CLASS="VARNAME"
+>build_clunits</CODE
+> will build the distance tables, dump
+the features and build the cluster trees. There are many parameters
+are set for the particular database (and instance of cluster building)
+through the Lisp variable <CODE
+CLASS="VARNAME"
+>clunits_params</CODE
+>. An
+reasonable set of defaults is given in that file, and reasonable
+run-time parameters will be copied into
+<TT
+CLASS="FILENAME"
+>festvox/INST_LANG_VOX_clunits.scm</TT
+> when a
+new voice is setup.&#13;</P
+><P
+>&#13;The function <CODE
+CLASS="VARNAME"
+>build_clunits</CODE
+> runs through all the
+steps but in order to better explain what is going on, we will go
+through each step and at that time explain which parameters affect the
+substep.&#13;</P
+><P
+>The first stage is to load in all the utterances in the database, sort
+them into segment type and name them with individual names (as
+<CODE
+CLASS="VARNAME"
+>TYPE_NUM</CODE
+>. This first stage is required for all
+other stages so that if you are not running <CODE
+CLASS="VARNAME"
+>build_clunits</CODE
+>
+you still need to run this stage first. This is done by the calls
+
+<A
+NAME="AEN2841"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Loading&nbsp;utterances&nbsp;and&nbsp;sorting&nbsp;types\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;utterances&nbsp;(acost:db_utts_load&nbsp;dt_params))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;unittypes&nbsp;(acost:find_same_types&nbsp;utterances))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:name_units&nbsp;unittypes)</P
+></BLOCKQUOTE
+>
+
+Though the function <CODE
+CLASS="VARNAME"
+>build_clunits_init</CODE
+> will do the
+same thing.&#13;</P
+><P
+>This uses the following parameters 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>name STRING</CODE
+></DT
+><DD
+><P
+>A name for this database. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>db_dir FILENAME</CODE
+></DT
+><DD
+><P
+>This pathname of the database, typically <TT
+CLASS="FILENAME"
+> . </TT
+> as
+in the current directory.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>utts_dir FILENAME</CODE
+></DT
+><DD
+><P
+>The directory contain the utterances. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>utts_ext FILENAME</CODE
+></DT
+><DD
+><P
+>The file extention for the utterance files </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>files</CODE
+></DT
+><DD
+><P
+>The list of file ids in the database. </P
+></DD
+></DL
+></DIV
+>
+For example for the KED example these parameters are 
+<A
+NAME="AEN2872"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(name&nbsp;'ked_timit)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(db_dir&nbsp;"/usr/awb/data/timit/ked/")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(utts_dir&nbsp;"festival/utts/")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(utts_ext&nbsp;".utt")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(files&nbsp;("kdt_001"&nbsp;"kdt_002"&nbsp;"kdt_003"&nbsp;...&nbsp;))</P
+></BLOCKQUOTE
+>
+In the examples below the list of fileids is extracted from
+the given prompt file at call time.</P
+><P
+>The next stage is to load the acoustic parameters and build 
+the distance tables. The acoustic distance between each segment 
+of the same type is calculated and saved in the distance table. 
+Precalculating this saves a lot of time as the cluster will require 
+this number many times. </P
+><P
+>This is done by the following two function calls 
+<A
+NAME="AEN2876"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Loading&nbsp;coefficients\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:utts_load_coeffs&nbsp;utterances)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Building&nbsp;distance&nbsp;tables\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:build_disttabs&nbsp;unittypes&nbsp;clunits_params)</P
+></BLOCKQUOTE
+>
+The following parameters influence the behaviour. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>coeffs_dir FILENAME</CODE
+></DT
+><DD
+><P
+>The directory (from db_dir) that contains the acoustic coefficients 
+as generated by the script <TT
+CLASS="FILENAME"
+>make_mcep</TT
+>. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>coeffs_ext FILENAME</CODE
+></DT
+><DD
+><P
+>The file extention for the coefficient files </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>get_std_per_unit </CODE
+></DT
+><DD
+><P
+>&#13;Takes the value <CODE
+CLASS="VARNAME"
+>t</CODE
+> or <CODE
+CLASS="VARNAME"
+>nil</CODE
+>. If
+<CODE
+CLASS="VARNAME"
+>t</CODE
+> the parameters for the type of segment are
+normalized by finding the means and standard deviations for the class
+are used. Thus a mean mahalanobis euclidean distance is found between
+units rather than simply a euclidean distance.  The recommended value
+is <CODE
+CLASS="VARNAME"
+>t</CODE
+>.&#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>ac_left_context FLOAT</CODE
+></DT
+><DD
+><P
+>&#13;The amount of the previous unit to be included in the the distance.
+1.0 means all, 0.0 means none. This parameter may be used to make the
+acoustic distance sensitive to the previous acoustic context.  The
+recommended value is <CODE
+CLASS="VARNAME"
+>0.8</CODE
+>.&#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>dur_pen_weight FLOAT</CODE
+></DT
+><DD
+><P
+>&#13;The penalty factor for duration mismatch between units. &#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>f0_pen_weight FLOAT</CODE
+></DT
+><DD
+><P
+>&#13;The penalty factor for F0 mismatch between units. &#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>ac_weights (FLOAT FLOAT ...)</CODE
+></DT
+><DD
+><P
+>The weights for each parameter in the coefficeint files used 
+while finding the acoustic distance between segments. There must 
+be the same number of weights as there are parameters in the 
+coefficient files.   The first parameter is (in normal operations) 
+F0.  Its is common to give proportionally more weight to F0 that
+to each individual other parameter.  The remaining parameters are
+typically MFCCs (and possibly delta MFCCs).  Finding the right
+parameters and weightings is one the key goals in unit selection 
+synthesis so its not easy to give concrete recommendations.  The
+following aren't bad, but there may be better ones too though we suspect
+that real human listening tests are probably the best way to find
+better values.</P
+></DD
+></DL
+></DIV
+>
+An example is 
+<A
+NAME="AEN2920"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(coeffs_dir&nbsp;"mcep/")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(coeffs_ext&nbsp;".mcep")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dur_pen_weight&nbsp;0.1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(get_stds_per_unit&nbsp;t)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ac_left_context&nbsp;0.8)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ac_weights<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5&nbsp;0.5))</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;The next stage is to dump the features that will be used to index the
+clusters. Remember the clusters are defined with respect to the
+acoustic distance between each unit in the cluster, but they are
+indexed by these features. These features are those which will be
+available at text-to-speech time when no acoustic information is
+available. Thus they include things like phonetic and prosodic context
+rather than spectral information. The name features may (and probably
+should) be over general allowing the decision tree building program
+<CODE
+CLASS="VARNAME"
+>wagon</CODE
+> to decide which of theses feature actual does
+have an acoustic distinction in the units.&#13;</P
+><P
+>The function to dump the features is 
+<A
+NAME="AEN2925"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Dumping&nbsp;features&nbsp;for&nbsp;clustering\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:dump_features&nbsp;unittypes&nbsp;utterances&nbsp;clunits_params)</P
+></BLOCKQUOTE
+>
+The parameters which affect this function are 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>fests_dir FILENAME</CODE
+></DT
+><DD
+><P
+>The directory when the features will be saved (by segment type). </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>feats  LIST</CODE
+></DT
+><DD
+><P
+>The list of features to be dumped. These are standard festival 
+feature names with respect to the Segment relation. </P
+></DD
+></DL
+></DIV
+>
+For our KED example these values are 
+<A
+NAME="AEN2938"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(feats_dir&nbsp;"festival/feats/")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(feats&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(occurid<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p.name&nbsp;p.ph_vc&nbsp;p.ph_ctype&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p.ph_vheight&nbsp;p.ph_vlng&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p.ph_vfront&nbsp;&nbsp;p.ph_vrnd&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p.ph_cplace&nbsp;&nbsp;p.ph_cvox&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n.name&nbsp;n.ph_vc&nbsp;n.ph_ctype&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n.ph_vheight&nbsp;n.ph_vlng&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n.ph_vfront&nbsp;&nbsp;n.ph_vrnd&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n.ph_cplace&nbsp;&nbsp;n.ph_cvox<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;segment_duration&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seg_pitch&nbsp;p.seg_pitch&nbsp;n.seg_pitch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R:SylStructure.parent.stress&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seg_onsetcoda&nbsp;n.seg_onsetcoda&nbsp;p.seg_onsetcoda<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R:SylStructure.parent.accented&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos_in_syl&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syl_initial<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syl_final<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R:SylStructure.parent.syl_break&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R:SylStructure.parent.R:Syllable.p.syl_break<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pp.name&nbsp;pp.ph_vc&nbsp;pp.ph_ctype&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pp.ph_vheight&nbsp;pp.ph_vlng&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pp.ph_vfront&nbsp;&nbsp;pp.ph_vrnd&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pp.ph_cplace&nbsp;pp.ph_cvox))</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;Now that we have the acoustic distances and the feature descriptions
+of each unit the next stage is to find a relationship between those
+features and the acoustic distances. This we do using the CART tree
+builder <CODE
+CLASS="VARNAME"
+>wagon</CODE
+>. It will find out questions about
+which features best minimize the acoustic distance between the units
+in that class.  <CODE
+CLASS="VARNAME"
+>wagon</CODE
+> has many options many of
+which are apposite to this task though it is interesting that this
+learning task is interestingly closed. That is we are trying to
+classify <I
+CLASS="EMPHASIS"
+>all</I
+> the units in the database, there is
+no test set as such. However in synthesis there will be desired units
+whose feature vector didn't exist in the training set.&#13;</P
+><P
+>The clusters are built by the following function 
+<A
+NAME="AEN2945"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Building&nbsp;cluster&nbsp;trees\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:find_clusters&nbsp;(mapcar&nbsp;car&nbsp;unittypes)&nbsp;clunits_params)</P
+></BLOCKQUOTE
+></P
+><P
+>The parameters that affect the tree building process are 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>tree_dir FILENAME</CODE
+></DT
+><DD
+><P
+>the directory where the decision tree for each segment type will 
+be saved </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>wagon_field_desc  LIST</CODE
+></DT
+><DD
+><P
+>A filename of a wagon field descriptor file. This is a standard 
+field description (field name plus field type) that is require for 
+wagon.  An example is given in <TT
+CLASS="FILENAME"
+>festival/clunits/all.desc</TT
+> which should be sufficient for the default feature
+list, though if you change the feature list (or the values
+those features can take you may need to change this file.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>wagon_progname FILENAME</CODE
+></DT
+><DD
+><P
+>The pathname for the <TT
+CLASS="FILENAME"
+>wagon</TT
+> CART building program. This 
+is a string and may also include any extra parameters you 
+wish to give to <TT
+CLASS="FILENAME"
+>wagon</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>wagon_cluster_size INT</CODE
+></DT
+><DD
+><P
+>The minimum cluster size (the wagon <CODE
+CLASS="VARNAME"
+>-stop</CODE
+> value). </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>prune_reduce INT</CODE
+></DT
+><DD
+><P
+>This number of elements in each cluster to remove in pruning. 
+This removes the units in the cluster that are furthest from the center. 
+This is down within the wagon training.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>cluster_prune_limit INT</CODE
+></DT
+><DD
+><P
+>&#13;This is a post wagon build operation on the generated trees (and
+perhaps a more reliably method of pruning).  This defines the maximum
+number of units that will be in a cluster at a tree leaf.  The wagon
+cluster size the minimum size.  This is usefully when there are some
+large numbers of some particular unit type which cannot be
+differentiated.  Format example silence segments without context of
+nothing other silence.  Another usage of this is to cause only
+the center example units to be used.  We have used this in
+building diphones databases from general databases but making the
+selection features only include phonetic context features and then
+restrict the number of diphones we take by making this number 5 or so.&#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>unittype_prune_threshold INT</CODE
+></DT
+><DD
+><P
+>&#13;When making complex unit types this defines the minimal number of
+units of that type required before building a tree.  When doing
+cascaded unit selection synthesizers its often not worth 
+excluding large stages if there is say only one example of a 
+particular demi-syllable.&#13;</P
+></DD
+></DL
+></DIV
+>&#13;</P
+><P
+>&#13;
+Note that as the distance tables can be large there is an alternative 
+function that does both the distance table and clustering in one, 
+deleting the distance table immediately after use, thus you only need 
+enough disk space for the largest number of phones in any type. 
+To do this 
+<A
+NAME="AEN2993"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(acost:disttabs_and_clusters&nbsp;unittypes&nbsp;clunits_params)</P
+></BLOCKQUOTE
+>
+Removing the calls to <CODE
+CLASS="VARNAME"
+>acost:build_disttabs</CODE
+> and 
+<CODE
+CLASS="VARNAME"
+>acost:find_clusters</CODE
+>. </P
+><P
+>In our KED example these have the values 
+<A
+NAME="AEN2998"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(trees_dir&nbsp;"festival/trees/")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wagon_field_desc&nbsp;"festival/clunits/all.desc")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wagon_progname&nbsp;"/usr/awb/projects/speech_tools/bin/wagon")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wagon_cluster_size&nbsp;10)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(prune_reduce&nbsp;0)</P
+></BLOCKQUOTE
+></P
+><P
+>The final stage in building a cluster model is collect the 
+generated trees into a single file and dumping the unit 
+catalogue, i.e. the list of unit names and their files and 
+position in them. This is done by the lisp function 
+<A
+NAME="AEN3001"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;(acost:collect_trees&nbsp;(mapcar&nbsp;car&nbsp;unittypes)&nbsp;clunits_params)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"Saving&nbsp;unit&nbsp;catalogue\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(acost:save_catalogue&nbsp;utterances&nbsp;clunits_params)</P
+></BLOCKQUOTE
+>
+The only parameter that affect this is 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>catalogue_dir FILENAME</CODE
+></DT
+><DD
+><P
+>the directory where the catalogue will be save (the <CODE
+CLASS="VARNAME"
+>name</CODE
+> 
+parameter is used to name the file). </P
+></DD
+></DL
+></DIV
+>
+Be default this is 
+<A
+NAME="AEN3010"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(catalogue_dir&nbsp;"festival/clunits/")</P
+></BLOCKQUOTE
+></P
+><P
+>There are a number of parameters that are specified with a cluster 
+voice. These are related to the run time aspects of the cluster 
+model. These are 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>join_weights FLOATLIST</CODE
+></DT
+><DD
+><P
+>This are a set of weights, in the same format as <CODE
+CLASS="VARNAME"
+>ac_weights</CODE
+> 
+that are used in optimal coupling to find the best join point between two 
+candidate units. This is different from <CODE
+CLASS="VARNAME"
+>ac_weights</CODE
+> as it 
+is likely different values are desired, particularly increasing the 
+F0 value (column 0). </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>continuity_weight FLOAT</CODE
+></DT
+><DD
+><P
+>The factor to multiply the join cost over the target cost. This 
+is probably not very relevant given the the target cost is merely 
+the position from the cluster center.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>log_scores 1</CODE
+></DT
+><DD
+><P
+>If specified the joins scores are converted to logs.  For databases
+that have a tendency to contain non-optimal joins (probably any 
+non-limited domain databases), this may be useful to stop failed 
+synthesis of longer sentences.  The problem is that the sum of
+very large number can lead to overflow.  This helps reduce this.
+You could alternatively change the continuity_weight to a number less
+that 1 which would also partially help.  However such overflows
+are often a pointer to some other problem (poor distribution of
+phones in the db), so this is probably just a hack.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>optimal_coupling INT</CODE
+></DT
+><DD
+><P
+>If <CODE
+CLASS="VARNAME"
+>1</CODE
+> this uses optimal coupling and searches the cepstrum 
+vectors at each join point to find the best possible join point. 
+This is computationally expensive (as well as having to load in lots 
+of cepstrum files), but does give better results.   If the 
+value is <CODE
+CLASS="VARNAME"
+>2</CODE
+> this only checks the coupling distance at the
+given boundary (and doesn't move it), this is often adequate in
+good databases (e.g. limited domain), and is certainly faster.</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>extend_selections INT</CODE
+></DT
+><DD
+><P
+>If <CODE
+CLASS="VARNAME"
+>1</CODE
+> then the selected cluster will be extended 
+to include any unit from the cluster of the previous segments 
+candidate units that has correct phone type (and isn't already included
+in the current cluster). This is experimental 
+but has shown its worth and hence is recommended. This means 
+that instead of selecting just units selection is effectively 
+selecting the beginnings of multiple segment units. This option 
+encourages far longer units. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>pm_coeffs_dir FILENAME</CODE
+></DT
+><DD
+><P
+>The directory (from <CODE
+CLASS="VARNAME"
+>db_dir</CODE
+> where the pitchmarks are </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>pm_coeffs_ext FILENAME</CODE
+></DT
+><DD
+><P
+>The file extension for the pitchmark files. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>sig_dir FILENAME</CODE
+></DT
+><DD
+><P
+>Directory containing waveforms of the units (or residuals if 
+Residual LPC is being used, PCM waveforms is PSOLA is being used) </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>sig_ext FILENAME</CODE
+></DT
+><DD
+><P
+>File extension for waveforms/residuals </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>join_method METHOD</CODE
+></DT
+><DD
+><P
+>&#13;Specify the method used for joining the selected units. Currently it
+supports <CODE
+CLASS="VARNAME"
+>simple</CODE
+>, a very naive joining mechanism,
+and <CODE
+CLASS="VARNAME"
+>windowed</CODE
+>, where the ends of the units are
+windowed using a hamming window then overlapped (no prosodic
+modification takes place though). The other two possible values for
+this feature are <CODE
+CLASS="VARNAME"
+>none</CODE
+> which does nothing, and
+<CODE
+CLASS="VARNAME"
+>modified_lpc</CODE
+> which uses the standard UniSyn module
+to modify the selected units to match the targets.&#13;</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>clunits_debug 1/2</CODE
+></DT
+><DD
+><P
+>With a value of <CODE
+CLASS="VARNAME"
+>1</CODE
+> some debugging information is
+printed during synthesis, particularly how many candidate phones
+are available at each stage (and any extended ones).  Also where
+each phone is coming from is printed.</P
+><P
+>With a value of <CODE
+CLASS="VARNAME"
+>2</CODE
+> more debugging information
+is given include the above plus joining costs (which are very readable
+by humans).</P
+></DD
+></DL
+></DIV
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2619.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3082.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Diphone check list</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building a Unit Selection Cluster Voice</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -30,12 +30,15 @@ public:
 
 private:
     void updateTime();
+    void updateDescription();
+    void updateAlert();
 
     QnUuid selectedServer() const;
 
 private:
     QScopedPointer<Ui::TimeServerSelectionWidget> ui;
     QnTimeServerSelectionModel* m_model;
+    int m_timeCounter = 0;
 };
 
 #endif // QN_TIME_SERVER_SELECTION_WIDGET_H

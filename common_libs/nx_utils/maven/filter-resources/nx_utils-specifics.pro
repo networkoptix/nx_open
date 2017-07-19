@@ -2,9 +2,9 @@ QT -= gui
 
 INCLUDEPATH -= $$ROOT_DIR/common/src \
                $$ROOT_DIR/common_libs/nx_network/src \
-               $$ROOT_DIR/common_libs/nx_streaming/src \
                $$ROOT_DIR/common_libs/nx_media/src \
-               $$ROOT_DIR/common_libs/nx_audio/src
+               $$ROOT_DIR/common_libs/nx_audio/src \
+               $$ROOT_DIR/common_libs/nx_fusion/src
 
 win* {
     DEFINES += NX_UTILS_API=__declspec(dllexport)

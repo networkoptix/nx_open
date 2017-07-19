@@ -89,6 +89,17 @@
                             <description>Text-search filter string.</description>
                             <optional>true</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -165,6 +176,17 @@
                             <description>Applied tag. Several tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -204,6 +226,17 @@
                             <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -241,6 +274,17 @@
                         <param>
                             <name>limit</name>
                             <description>Maximum number of tags to return.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -307,7 +351,7 @@
                         <param>
                             <name>startTime</name>
                             <description>Start time of the bookmark (in milliseconds since epoch).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>duration</name>
@@ -317,6 +361,155 @@
                         <param>
                             <name>tag</name>
                             <description>Applied tag. Serveral tag parameters could be used to specify multiple tags.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>XML data format.</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result/>
+                </function>
+                <function>
+                    <name>cameraThumbnail</name>
+                    <description>Get the static image from the camera.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                MAC address (not supported for certain cameras).</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>time</name>
+                            <description>
+                                Timestamp of the requested image (in milliseconds since epoch).
+                                The special value "latest", which is the default value, requires to
+                                retrieve the latest thumbnail. The special value "now" requires to
+                                retrieve the thumbnail corresponding to the current time.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotate</name>
+                            <description>
+                                Image orientation. Can be 0, 90, 180 or 270 degrees. If the
+                                parameter is absent or equals -1, the image will be rotated as
+                                defined in the camera settings.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>height</name>
+                            <description>
+                                Desired image height. Should be not less than 128, or equal to -1
+                                (the default value) which implies the original frame size, and in
+                                this case the width should also be omitted or set to -1.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>width</name>
+                            <description>
+                                Desired image width. Should be not less than 128, or equal to -1
+                                (the default value) which implies autosizing: if the height is
+                                specified, the width will be calculated based on the aspect ratio,
+                                otherwise, the original frame size will be used.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>imageFormat</name>
+                            <description>
+                                Format of the requested image. Default value is "JpgFormat".
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>PngFormat</name>
+                                    <description>PNG</description>
+                                </value>
+                                <value>
+                                    <name>JpgFormat</name>
+                                    <description>JPEG</description>
+                                </value>
+                                <value>
+                                    <name>TiffFormat</name>
+                                    <description>TIFF</description>
+                                </value>
+                                <value>
+                                    <name>RawFormat</name>
+                                    <description>Raw video frame. Makes the request much more lightweight for Edge servers.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>method</name>
+                            <description>
+                                Getting a thumbnail at the exact timestamp is costly, so, it can be
+                                rounded to the nearest keyframe, thus, the default value is
+                                "KeyFrameAfterMethod".
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>KeyFrameBeforeMethod</name>
+                                    <description>Get the thumbnail from the nearest keyframe before the given time.</description>
+                                </value>
+                                <value>
+                                    <name>PreciseMethod</name>
+                                    <description>Get the thumbnail as near to given time as possible.</description>
+                                </value>
+                                <value>
+                                    <name>KeyFrameAfterMethod</name>
+                                    <description>Get the thumbnail from the nearest keyframe after the given time.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -353,6 +546,17 @@
                     <description>Get free space available for downloading and extracting update files.</description>
                     <method>GET</method>
                     <params>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request should not be redirected to another server.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -742,7 +946,7 @@
                 <function>
                     <name>image</name>
                     <description>
-                        <b>Deprecated, support expires by 3.1.</b> Use /api/cameraThumbnail instead.
+                        <b>Deprecated, support expires by 3.1.</b> Use /ec2/cameraThumbnail instead.
                         The new method can get thumbnails from cameras located on other servers (the old one can't).
                         <br />
                         Return image from the camera.</description>
@@ -1040,7 +1244,7 @@
                             </param>
                             <param>
                                 <name>actionParams.recordAfter</name>
-                                <description>For bookmarks, extension to the recording time, in seconds.</description>
+                                <description>For Bookmark, extension to the recording time, in seconds.</description>
                             </param>
                             <param>
                                 <name>actionParams.relayOutputId</name>
@@ -1056,15 +1260,15 @@
                             </param>
                             <param>
                                 <name>actionParams.text</name>
-                                <description>Generic text: Show Text Overlay / exec HTTP action: message body.</description>
+                                <description>Text for Show Text Overlay, or message body for Exec HTTP Action.</description>
                             </param>
                             <param>
                                 <name>actionParams.durationMs</name>
-                                <description>Generic duration in milliseconds: Bookmark, Show Text Overlay.</description>
+                                <description>Duration in milliseconds for Bookmark and Show Text Overlay.</description>
                             </param>
                             <param>
                                 <name>actionParams.additionalResources</name>
-                                <description>JSON list of ids of Generic additional resources: Show On Alarm Layout - users.</description>
+                                <description>JSON list of ids of additional resources; user ids for Show On Alarm Layout.</description>
                             </param>
                             <param>
                                 <name>actionParams.forced</name>
@@ -1088,7 +1292,7 @@
                             </param>
                             <param>
                                 <name>actionParams.playToClient</name>
-                                <description>Say text.</description>
+                                <description>Text to be pronounced.</description>
                             </param>
                             <param>
                                 <name>actionParams.contentType</name>
@@ -1172,7 +1376,7 @@
                                     </value>
                                     <value>
                                         <name>UserDefinedEvent</name>
-                                        <description>Base index for the user defined events</description>
+                                        <description>Base index for the user-defined events.</description>
                                     </value>
                                 </values>
                             </param>
@@ -1187,7 +1391,7 @@
                             <param>
                                 <name>eventParams.resourceName</name>
                                 <description>Name of the resource which caused the event. Used if no resource is actually registered in
-the system. External custom event can provide some resource name with doesn't match
+the system. Generic event can provide some resource name which doesn't match any
 resourceId in the system. In this case resourceName is filled and resourceId remains empty.
                                 </description>
                             </param>
@@ -1227,14 +1431,14 @@ resourceId in the system. In this case resourceName is filled and resourceId rem
                             <param>
                                 <name>eventParams.caption</name>
                                 <description>Short event description. Used for camera/server
-                                    conflict as resource name which cause error. Used in custom
+                                    conflict as resource name which cause error. Used in generic
                                     events as a short description.</description>
                             </param>
                             <param>
                                 <name>eventParams.description</name>
                                 <description>Long event description. Used for camera/server
                                     conflict as a long description (conflict list). Used in
-                                    Reasoned Events as reason description. Used in custom events as
+                                    Reasoned Events as reason description. Used in generic events as
                                     a long description.</description>
                             </param>
                             <param>
@@ -2369,6 +2573,27 @@ the respective JSON fields can be empty.</description>
                   </params>
                 </result>
               </function>
+              <function>
+                  <name>getNonce</name>
+                  <description>
+                      Return authentication parameters: "nonce" and "realm".
+                  </description>
+                  <method>GET</method>
+                  <params />
+                  <result>
+                      <caption>A JSON object with an error code, error message, and the list of JSON objects in "reply" field:</caption>
+                      <params>
+                          <param>
+                              <name>realm</name>
+                              <description>A string token used in authentication methods as "realm".</description>
+                          </param>
+                          <param>
+                              <name>nonce</name>
+                              <description>A session key for the current user. The current server time is used as a nonce value, and the nonce is valid for about 5 minutes.</description>
+                          </param>
+                      </params>
+                  </result>
+              </function>
             </functions>
         </group>
         <group>
@@ -2408,7 +2633,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.
                                          Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
                             <optional>true</optional>
                         </param>
@@ -2499,12 +2724,12 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>sfd</name>
-                            <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
+                            <description>Stand Frame Duration. If the parameter is present, video speed is limited by real time.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2602,7 +2827,7 @@ the respective JSON fields can be empty.</description>
             <groupName>Proxy API</groupName>
             <urlPrefix>/proxy</urlPrefix>
             <groupDescription>
-                This group contains information requests proxy from one server to another
+                This group contains information requests proxy from one server to another.
             </groupDescription>
             <functions>
                 <function>
@@ -2624,45 +2849,45 @@ the respective JSON fields can be empty.</description>
             <groupName>Authentication</groupName>
             <urlPrefix/>
             <groupDescription>
-                Request authentication methods supported by server
+                Request authentication methods supported by server.
             </groupDescription>
             <functions>
                 <function>
-                    <name>HTTP Basic / Digest Authentication</name>
+                    <name>HTTP Basic/Digest authentication</name>
                     <description>
-                        Server is fully conformant with authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617)
+                        Server is fully conformant with the authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617).
                     </description>
                     <method/>
                     <params/>
                     <result/>
                 </function>
                 <function>
-                    <name>Cookie-based Authentication</name>
+                    <name>Cookie-based authentication</name>
                     <description>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
-                        It provides you a way to replace it with your own. <br/>
-                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
+                        It provides you a way to replace it with your own dialog.<br/>
+                        It works mostly like sessions, but is a bit more secure because it doesn't send user's password over HTTP.<br/>
                         <ul>
                         <li>To check authentication:
                             <ol>
-                                <li>Request <code>/api/getCurrentUser</code>(GET)</li>
-                                <li>You will get 401 (Unauthorised) in case if you need to authorise</li>
-                                <li>You will get user object otherwise</li>
+                                <li>Call <code>GET /api/getCurrentUser</code></li>
+                                <li>You will get 401 (Unauthorised) in case you need authorization</li>
+                                <li>You will get 200 (OK) and the user object otherwise</li>
                             </ol>
                         </li>
                         <li>To log in:
                             <ol>
-                                <li>Request <code>/api/getNonce</code></li>
-                                <li>In response you"ll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
-                                <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                                <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
-                                <li>Server will check authentification and will set session cookies</li>
+                                <li>Call <code>GET /api/getNonce</code></li>
+                                <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
+                                <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                                <li>Call <code>POST /api/cookieLogin</code> and pass the "auth" parameter in the request</li>
+                                <li>Server will check authentication and set session cookies</li>
                             </ol>
                         </li>
                         <li>To log out:
                             <ol>
-                                <li>Request <code>/api/cookieLogout</code> (POST)</li>
-                                <li>Server will clear session cookies</li>
+                                <li>Call <code>POST /api/cookieLogout</code></li>
+                                <li>Server will clear the session cookies</li>
                             </ol>
                         </li>
                         </ul>
@@ -2672,15 +2897,13 @@ the respective JSON fields can be empty.</description>
                     <result/>
                 </function>
                 <function>
-                    <name>URL-based Authentication</name>
+                    <name>URL-based authentication</name>
                     <description>
-                        You can add "auth" field to url query section. E.g., http://127.0.0.1:7001/ec2/getMediaServersEx?auth=auth_digest
-
+                        You can add the "auth" parameter to the URL query section.
                         <ul>
-                            <li>Call <i>/gettime</i> request to get <i>realm</i> and <i>nonce</i> from server (current server time MUST be used as a nonce value, nonce is valid for about 5 minutes)</li>
-                            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                            <li>Set authentification hash to url-parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i>
-                            </li>
+                            <li>Call <code>/api/getNonce</code> to get <i>realm</i> and <i>nonce</i> from the server (the current server time is used as a nonce value, and the nonce is valid for about 5 minutes)</li>
+                            <li>Calculate the authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                            <li>Specify the authentication hash in the URL parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i> </li>
                         </ul>
                     </description>
                     <method/>
@@ -2688,24 +2911,19 @@ the respective JSON fields can be empty.</description>
                     <result/>
                 </function>
                 <function>
-                    <name>Calculating authentification hash</name>
+                    <name>Calculating authentication hash</name>
                     <description>
-                        For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
+                        For URL-based authentication and cookie-based authentication you need to calculate the hash manually, using the following algorithm:
                         <ul>
-                            <li>Get <i>nonce</i> and <i>realm</i> from server</li>
-                            <li>Translate user's <i>username</i> to lower case</li>
-                            <li>Check required <i>method</i> ("GET" for http-requests, "PLAY" for rtsp)</li>
-                            <li>
-                                <i>ha1 = MD5(usename:realm:password)</i>
-                            </li>
-                            <li>
-                                <i>simplified_ha2 = MD5(ha1:nonce:MD5(method:))</i>
-                            </li>
-                            <li>
-                                <i>auth = base64(username:nonce:simplified_ha2)</i>
-                            </li>
-                            <li>
-                                <i>auth</i> is required authentification hash</li>
+                            <li>Call <code>GET /api/getNonce</code></li>
+                            <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i></li>
+                            <li>Translate user's <i>username</i> to the lower case</li>
+                            <li>Check the required <i>method</i> ("GET" for HTTP requests, "PLAY" for RTSP)</li>
+                            <li><code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code></li>
+                            <li><code>partial_ha2 = md5_hex(method + ":")</code></li>
+                            <li><code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code></li>
+                            <li><code>auth_digest = base64(user_name + ":" + nonce + ":" + simplified_ha2)</code></li>
+                            <li>Here <i>auth_digest</i> is the required authentication hash</li>
                         </ul>
                     </description>
                     <method/>

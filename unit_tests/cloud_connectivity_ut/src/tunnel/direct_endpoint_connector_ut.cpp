@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
+#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
+
+#include <network/cloud/cloud_media_server_endpoint_verificator.h>
 
 #include "cross_nat_connector_test.h"
 
@@ -19,6 +22,11 @@ public:
     TcpTunnelConnector():
         m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
     {
+        using namespace std::placeholders;
+
+        m_factoryBak = EndpointVerificatorFactory::instance().setCustomFunc(
+            std::bind(&TcpTunnelConnector::verificatorFactoryFunc, this, _1));
+
         // Disabling udp hole punching and enabling tcp port forwarding.
         ConnectorFactory::setEnabledCloudConnectMask(
             (int)CloudConnectType::forwardedTcpPort);
@@ -27,10 +35,19 @@ public:
     ~TcpTunnelConnector()
     {
         ConnectorFactory::setEnabledCloudConnectMask(m_cloudConnectMaskBak);
+
+        EndpointVerificatorFactory::instance().setCustomFunc(std::move(m_factoryBak));
     }
 
 private:
     int m_cloudConnectMaskBak;
+    EndpointVerificatorFactory::Function m_factoryBak;
+
+    std::unique_ptr<AbstractEndpointVerificator> verificatorFactoryFunc(
+        const nx::String& connectSessionId)
+    {
+        return std::make_unique<CloudMediaServerEndpointVerificator>(connectSessionId);
+    }
 };
 
 TEST_F(TcpTunnelConnector, general)
@@ -51,7 +68,7 @@ TEST_F(TcpTunnelConnector, failModuleInformation)
             server->setServerIdForModuleInformation(boost::none);
         });
 
-    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(SystemError::connectionRefused, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 

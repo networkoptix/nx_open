@@ -6,7 +6,7 @@
 
 #include <QByteArray>
 
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 
 namespace nx {
 namespace network {
@@ -16,7 +16,7 @@ namespace ssl {
  * @note Not thread-safe.
  */
 class NX_NETWORK_API Pipeline:
-    public utils::pipeline::Converter
+    public utils::bstream::Converter
 {
 public:
     /**

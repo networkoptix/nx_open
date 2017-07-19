@@ -7,7 +7,6 @@
 #include <client/client_color_types.h>
 
 #include <utils/common/connective.h>
-#include <ui/utils/viewport_scale_watcher.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -87,6 +86,16 @@ public:
         WithChannelLayout       = 0x02
     };
     Q_DECLARE_FLAGS(AspectRatioFlags, AspectRatioFlag)
+
+    enum class SelectionState
+    {
+        invalid,
+        notSelected,
+        inactiveFocused,
+        focused,
+        selected,
+        focusedAndSelected,
+    };
 
     /**
      * Constructor.
@@ -259,8 +268,11 @@ signals:
     void rotationStartRequested();
     void rotationStopRequested();
     void displayInfoChanged();
+    void selectionStateChanged(SelectionState state);
 
 protected:
+
+
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -328,6 +340,10 @@ protected:
 
     float defaultAspectRatio() const;
 
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
+    SelectionState selectionState() const;
+
 private:
     QColor calculateFrameColor() const;
     qreal calculateFrameWidth() const;
@@ -348,19 +364,7 @@ private:
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
 
 private:
-    enum class SelectionState
-    {
-        invalid,
-        notSelected,
-        inactiveFocused,
-        focused,
-        selected,
-        focusedAndSelected,
-    };
-
     void updateSelectedState();
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
 protected:
     QnHudOverlayWidget* m_hudOverlay;
@@ -420,8 +424,6 @@ private:
     qint64 m_lastNewFrameTimeMSec;
 
     SelectionState m_selectionState;
-
-    QnViewportScaleWatcher m_scaleWatcher;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

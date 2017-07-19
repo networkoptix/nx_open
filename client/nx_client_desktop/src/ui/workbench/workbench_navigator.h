@@ -202,7 +202,7 @@ protected slots:
 
     void updateCurrentWidgetFlags();
 
-    void setAutoPaused(bool autoPaused);
+    void updateAutoPaused();
 
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -293,6 +293,8 @@ private:
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
     bool m_preciseNextSeek;
+
+    bool m_ignoreScrollBarDblClick = false;
 
     /** This flag says that video was paused automatically due to user inactivity.
      *  It's used to make it possible to unpause video only in the user inactivity state handler.

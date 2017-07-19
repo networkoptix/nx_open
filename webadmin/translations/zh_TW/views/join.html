@@ -1,0 +1,70 @@
+<form class="form" role="form" novalidate name="form" id="mergeDialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">關閉</span></button>
+        <h3 class="modal-title">合併系統</h3>
+    </div>
+
+    <div class="col-sm-12">
+        <ng-form name="findSystemForm">
+            <div class="form-group">
+                <label for="otherSystemUrl" class="control-label">其他系統 URL</label>
+                <div class="">
+                    <div class="input-group" dropdown>
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="主機：埠" required />
+
+                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>找不到任何系統</a></li>
+                            <li ng-repeat="system in systems.discoveredUrls"
+                                ng-class="{disabled:!system.compatible}">
+                                <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
+                            </li>
+                        </ul>
+
+                        <span type="button" class="input-group-addon dropdown-toggle">
+                            <span class="caret"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="otherSystemLogin" class="control-label">其他系統登入</label>
+                <div class="">
+                    <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
+                           placeholder="登入帳號" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="otherSystemPassword" class="control-label">其他系統密碼</label>
+                <div class="">
+                    <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
+                           autocomplete="new-password"
+                           placeholder="密碼"/>
+                </div>
+            </div>
+        </ng-form>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <label for="currentSystemPassword" class="control-label">目前的密碼(本系統)</label>
+            <div class="">
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="密碼" required />
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <p>本系統即將被 <b>{{systems.systemName}}</b> 以下系統合併 <b>{{systems.joinSystemName}}</b></p>
+            <p>
+                新系統將使用以下系統的名稱與密碼:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer" >
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">搜尋系統</button>
+        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">與以下系統合併 {{systems.joinSystemName}}</button>
+    </div>
+</form>

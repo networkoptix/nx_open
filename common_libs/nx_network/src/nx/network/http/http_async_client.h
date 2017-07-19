@@ -13,23 +13,24 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
 
+#include "abstract_msg_body_source.h"
 #include "asynchttpclient.h"
 #include "auth_cache.h"
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 
 /**
- * Http client. All operations are done asynchronously.
+ * HTTP client. All operations are done asynchronously.
  *
- * To get new instance use AsyncClient::create
- * This class methods are not thread-safe
- * All signals are emitted from io::AIOService threads
- * State is changed just before emitting signal
- * @warning It is strongly recommended to listen for AsyncClient::someMessageBodyAvailable() signal and
- *  read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
- *  to avoid internal message body buffer to consume too much memory.
- * @warning It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
+ * All events (setOn...) are delivered within object's aio thread.
+ * State is changed just before delivering event.
+ * This class methods are not thread-safe.
+ * NOTE: This class is a replacement for nx_http::AsyncHttpClient.
+ *   As soon as it becomes ready, nx_http::AsyncHttpClient will be declared as deprecated.
+ * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
+ *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
+ *   to avoid internal message body buffer to consume too much memory.
  */
 class NX_NETWORK_API AsyncClient:
     public nx::network::aio::BasicPollable
@@ -114,7 +115,7 @@ public:
      *   can be read with AsyncClient::fetchMessageBodyBuffer() call.
      * Responsibility for preventing internal message body buffer 
      *   to grow beyond reasonable sizes lies on user of this class.
-     * @warning It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer() 
+     * WARNING: It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer() 
      *   every time on receiving this signal
     */
     void setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler);
@@ -127,6 +128,8 @@ public:
      *   To read it, call AsyncClient::fetchMessageBodyBuffer.
      */
     void setOnDone(nx::utils::MoveOnlyFunc<void()> handler);
+
+    void setRequestBody(std::unique_ptr<AbstractMsgBodySource> body);
 
     /**
      * Start GET request to url.
@@ -147,35 +150,21 @@ public:
 
     /**
      * Start POST request to url.
-     * @param includeContentLength TODO #ak this parameter is a hack. Replace it with AbstractMsgBodySource if future version
      * @return true, if socket is created and async connect is started. false otherwise
-     * @todo Infinite POST message body support
      */
+    void doPost(const QUrl& url);
     void doPost(
         const QUrl& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody,
-        bool includeContentLength = true);
-    void doPost(
-        const QUrl& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody,
-        bool includeContentLength,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doPut(const QUrl& url);
     void doPut(
         const QUrl& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody);
-    void doPut(
-        const QUrl& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doOptions(const QUrl& url);
-    void doOptions(
+    void doUpgrade(
         const QUrl& url,
+        const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     const nx_http::Request& request() const;
@@ -222,19 +211,19 @@ public:
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
-    void setSendTimeoutMs(unsigned int sendTimeoutMs);
+    void setSendTimeout(std::chrono::milliseconds sendTimeout);
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs);
+    void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /**
@@ -256,7 +245,7 @@ public:
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * @note May be invoked within someMessageBodyAvailable handler only.
-     * @warning It is a hack. Use it only if you strongly know what you are doing.
+     * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
 
@@ -284,6 +273,7 @@ private:
     QUrl m_contentLocationUrl;
     HttpStreamReader m_httpStreamReader;
     BufferType m_responseBuffer;
+    BufferType m_receivedBytesLeft;
     QString m_userAgent;
     QString m_userName;
     QString m_userPassword;
@@ -297,9 +287,9 @@ private:
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
     bool m_contentEncodingUsed;
-    unsigned int m_sendTimeoutMs;
-    unsigned int m_responseReadTimeoutMs;
-    unsigned int m_msgBodyReadTimeoutMs;
+    std::chrono::milliseconds m_sendTimeout;
+    std::chrono::milliseconds m_responseReadTimeout;
+    std::chrono::milliseconds m_msgBodyReadTimeout;
     AuthType m_authType;
     HttpHeaders m_additionalHeaders;
     int m_awaitedMessageNumber;
@@ -311,6 +301,7 @@ private:
     bool m_precalculatedAuthorizationDisabled;
     int m_numberOfRedirectsTried;
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
+    std::unique_ptr<AbstractMsgBodySource> m_requestBody;
 
     virtual void stopWhileInAioThread() override;
 
@@ -327,10 +318,12 @@ private:
     size_t parseReceivedBytes(size_t bytesRead);
     void processReceivedBytes(std::size_t bytesParsed);
     Result processResponseHeadersBytes(bool* const continueReceiving);
+    bool isMalformed(const nx_http::Response& response) const;
     bool repeatRequestIfNeeded(const Response& response);
     bool sendRequestToNewLocation(const Response& response);
     Result processResponseMessageBodyBytes(std::size_t bytesRead, bool* const continueReceiving);
     void composeRequest(const nx_http::StringType& httpMethod);
+    void addBodyToRequest();
     void serializeRequest();
     /**
      * @return true, if connected.

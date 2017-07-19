@@ -163,7 +163,7 @@ protected:
 
     template<class T>
     int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, T *reply) {
-        return sendSyncRequest(nx_http::Method::GET, object, headers, params, QByteArray(), reply);
+        return sendSyncRequest(nx_http::Method::get, object, headers, params, QByteArray(), reply);
     }
 
     template<class T>

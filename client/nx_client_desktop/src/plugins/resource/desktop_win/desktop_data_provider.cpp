@@ -126,9 +126,10 @@ void QnDesktopDataProvider::EncodedAudioInfo::clearBuffers()
 
 void QnDesktopDataProvider::EncodedAudioInfo::gotData()
 {
+    QnMutexLocker lock( &m_mtx );
     if (m_terminated)
         return;
-    QnMutexLocker lock( &m_mtx );
+
     if (m_buffers.isEmpty())
         return;
     WAVEHDR* data = m_buffers.front();
@@ -139,7 +140,6 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
         QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packetSize));
         outData->m_data.write(data->lpData, data->dwBytesRecorded);
         outData->timestamp = m_owner->currentTime(); // - m_startDelay;
-        //cl_log.log("got audio data. time=", outData->timestamp, cl_logALWAYS);
         m_audioQueue.push(outData);
 
         waveInUnprepareHeader(hWaveIn, data, sizeof(WAVEHDR));
@@ -171,18 +171,23 @@ bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
 
 void QnDesktopDataProvider::EncodedAudioInfo::stop()
 {
-    m_terminated = true;
-    QnMutexLocker lock( &m_mtx );
-    if (m_waveInOpened)
     {
-        waveInReset(hWaveIn);
-        waveInClose(hWaveIn);
-        clearBuffers();
+        QnMutexLocker lock( &m_mtx );
+        m_terminated = true;
+        if (!m_waveInOpened)
+            return;
     }
+
+    waveInReset(hWaveIn);
+    waveInClose(hWaveIn);
+    clearBuffers();
 }
 
 bool QnDesktopDataProvider::EncodedAudioInfo::start()
 {
+    QnMutexLocker lock(&m_mtx);
+    if (m_terminated)
+        return false;
     return waveInStart(hWaveIn) == S_OK;
 }
 
@@ -205,9 +210,11 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
-            if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
-                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device. "
-                    "Please select other audio device or \"none\" in the Screen Recording settings");
+            if (!m_audioDevice.isFormatSupported(m_audioFormat))
+            {
+                errMessage = tr("44.1khz and 48khz audio formats are not supported by the audio "
+                    "capturing device. Please select another audio device or \"none\" in the "
+                    "Screen Recording settings.");
                 return false;
             }
         }
@@ -218,6 +225,10 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
 
 bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
 {
+    QnMutexLocker lock(&m_mtx);
+    if (m_terminated)
+        return false;
+
     int devId = nameToWaveIndex();
     WAVEFORMATEX wfx;
     //HRESULT hr;
@@ -417,8 +428,6 @@ bool QnDesktopDataProvider::init()
         if (param.size()==2)
         {
             int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toLatin1().data(), param.at(1).trimmed().toLatin1().data(), 1, NULL);
-            if (res != 0)
-                cl_log.log(QLatin1String("Wrong option for video codec:"), param.at(0), cl_logWARNING);
         }
     }
     */
@@ -587,8 +596,6 @@ void QnDesktopDataProvider::putAudioData()
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
         int audioJitter = qAbs(audioPts - expectedAudioPts);
 
-        //cl_log.log("audio jitter=", audioJitter, cl_logALWAYS); // all in ms
-
         if (audioJitter < m_maxAudioJitter)
         {
             audioPts = expectedAudioPts;
@@ -746,10 +753,9 @@ void QnDesktopDataProvider::run()
                 m_frame->pts = m_encodedFrames;
                 if (processData(false) < 0)
                 {
-                    cl_log.log(QLatin1String("Video encoding error. Stop recording."), cl_logWARNING);
+                    NX_WARNING(this, "Video encoding error. Stop recording.");
                     break;
                 }
-                //cl_log.log(QLatin1String("encode pts="), m_encodedFrames, cl_logALWAYS);
 
                 m_encodedFrames++;
                 firstStep = false;
@@ -766,7 +772,7 @@ void QnDesktopDataProvider::run()
     if (!m_capturingStopped)
         stopCapturing();
 
-    cl_log.log(QLatin1String("flushing video buffer"), cl_logDEBUG2);
+    NX_VERBOSE(this, "flushing video buffer");
     if (needVideoData())
     {
         do {

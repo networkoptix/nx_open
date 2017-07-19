@@ -10,8 +10,11 @@
 #include <QtCore/QSettings>
 #include <QtCore/QFileInfo>
 
+#include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 #include <media_server/media_server_app_info.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 static QString templateConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf.template").arg(QnAppInfo::linuxOrganizationName());
@@ -79,6 +82,31 @@ QSettings* MSSettings::roSettings()
     return m_roSettings.get();
 }
 
+QSettings* MSSettings::runTimeSettings()
+{
+    return m_rwSettings.get();
+}
+
+std::chrono::milliseconds MSSettings::hlsTargetDuration() const
+{
+    const auto value =
+        std::chrono::milliseconds(m_roSettings->value(
+            nx_ms_conf::HLS_TARGET_DURATION_MS,
+            nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt());
+
+    return value > std::chrono::milliseconds::zero()
+        ? value
+        : std::chrono::milliseconds(nx_ms_conf::DEFAULT_TARGET_DURATION_MS);
+}
+
+std::chrono::milliseconds MSSettings::delayBeforeSettingMasterFlag() const
+{
+    return nx::utils::parseTimerDuration(
+        m_roSettings->value(
+            nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG,
+            nx_ms_conf::DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG).toString());
+}
+
 QString MSSettings::defaultRunTimeSettingsFilePath()
 {
 #ifdef _WIN32
@@ -103,9 +131,3 @@ void MSSettings::initializeRunTimeSettings()
 #endif
     ));
 }
-
-QSettings* MSSettings::runTimeSettings()
-{
-    return m_rwSettings.get();
-}
-

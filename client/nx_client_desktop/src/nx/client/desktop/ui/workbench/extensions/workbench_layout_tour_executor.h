@@ -48,14 +48,18 @@ public:
 
     QnUuid runningTour() const;
 
+    void prevTourStep();
+    void nextTourStep();
+
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    void processTourStep();
+    void resetTourItems(const ec2::ApiLayoutTourItemDataList& items);
+    void processTourStepInternal(bool forward, bool force);
 
     void clearWorkbenchState();
-    void restoreWorkbenchState();
+    void restoreWorkbenchState(const QnUuid& tourId);
 
     void setHintVisible(bool visible);
 

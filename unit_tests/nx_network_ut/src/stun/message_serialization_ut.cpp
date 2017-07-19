@@ -18,13 +18,13 @@ void partialParse( MessageParser& parser, const Buffer& message, size_t partSize
     for ( ; parsedTotal < message.size() - partSize; parsedTotal += partSize )
     {
         const Buffer part( message.data() + parsedTotal, partSize );
-        ASSERT_EQ( parser.parse(part, &parsedNow), nx_api::ParserState::inProgress );
+        ASSERT_EQ( parser.parse(part, &parsedNow), nx::network::server::ParserState::readingMessage );
         ASSERT_EQ( parsedNow, partSize );
     }
 
     const size_t lastPartSize = message.size() - parsedTotal;
     const Buffer lastPart(message.data() + parsedTotal, lastPartSize);
-    ASSERT_EQ( parser.parse(lastPart, &parsedNow), nx_api::ParserState::done );
+    ASSERT_EQ( parser.parse(lastPart, &parsedNow), nx::network::server::ParserState::done );
     ASSERT_EQ( parsedNow, lastPartSize );
 }
 
@@ -40,7 +40,7 @@ TEST( StunMessageSerialization, BindingRequest )
     MessageSerializer serializer;
     serializer.setMessage( &request );
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
-               nx_api::SerializerState::done );
+               nx::network::server::SerializerState::done );
 
     static const Buffer MESSAGE = Buffer(
             "0001" "0000" "2112A442"    // request: binding, length, magic cookie
@@ -72,7 +72,7 @@ TEST( StunMessageSerialization, BindingResponse )
     MessageSerializer serializer;
     serializer.setMessage( &response );
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
-               nx_api::SerializerState::done );
+               nx::network::server::SerializerState::done );
 
     static const Buffer MESSAGE = Buffer(
             "0101" "000C" "2112A442"    // reponse: binding, lenght=12, magic cookie
@@ -112,7 +112,7 @@ TEST( StunMessageSerialization, BindingError )
     MessageSerializer serializer;
     serializer.setMessage( &response );
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
-               nx_api::SerializerState::done );
+               nx::network::server::SerializerState::done );
 
     static const auto MESSAGE = Buffer(
             "0111" "0014" "2112A442"    // reponse: binding, lenght=20, magic cookie
@@ -155,7 +155,7 @@ TEST( StunMessageSerialization, CustomIndication )
     MessageSerializer serializer;
     serializer.setMessage( &response );
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
-               nx_api::SerializerState::done );
+               nx::network::server::SerializerState::done );
 
     static const auto MESSAGE = Buffer(
             "00B1" "0018" "2112A442"        // indication 3, lenght=12, magic cookie
@@ -210,14 +210,14 @@ TEST(StunMessageSerialization, serialization2)
         buffer.reserve(100);
         MessageSerializer serializer;
         serializer.setMessage(&message);
-        ASSERT_EQ(nx_api::SerializerState::done, serializer.serialize(&buffer, &bytesRead));
+        ASSERT_EQ(nx::network::server::SerializerState::done, serializer.serialize(&buffer, &bytesRead));
     }
 
     //deserializing message and checking that it equals to the one before serialization
     MessageParser parser;
     Message checkMessage;
     parser.setMessage(&checkMessage);
-    ASSERT_EQ(nx_api::ParserState::done, parser.parse(buffer, &bytesRead));
+    ASSERT_EQ(nx::network::server::ParserState::done, parser.parse(buffer, &bytesRead));
     const auto attr = checkMessage.getAttribute<stun::extension::attrs::ServerId>();
     ASSERT_EQ(testData, attr->getBuffer());
 
@@ -225,7 +225,7 @@ TEST(StunMessageSerialization, serialization2)
     buffer1.reserve(100);
     MessageSerializer serializer1;
     serializer1.setMessage(&checkMessage);
-    ASSERT_EQ(nx_api::SerializerState::done, serializer1.serialize(&buffer1, &bytesRead));
+    ASSERT_EQ(nx::network::server::SerializerState::done, serializer1.serialize(&buffer1, &bytesRead));
     ASSERT_EQ(buffer1, buffer);
 }
 
@@ -246,7 +246,7 @@ TEST(StunMessageSerialization, serialization3)
     serializer1.setMessage(&response);
     size_t bytesWritten = 0;
     ASSERT_EQ(
-        nx_api::SerializerState::done,
+        nx::network::server::SerializerState::done,
         serializer1.serialize(&serializedMessage, &bytesWritten));
 
 
@@ -255,7 +255,7 @@ TEST(StunMessageSerialization, serialization3)
     parser.setMessage(&checkMessage);
     size_t bytesRead = 0;
     ASSERT_EQ(
-        nx_api::ParserState::done,
+        nx::network::server::ParserState::done,
         parser.parse(serializedMessage, &bytesRead));
     /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorCode>();
     //ASSERT_EQ(testData, attr->getBuffer());
@@ -279,7 +279,7 @@ TEST( StunMessageSerialization, Authentification )
     serializer.setMessage(&request);
     ASSERT_EQ(
         serializer.serialize(&serializedMessage, &serializedSize),
-        nx_api::SerializerState::done);
+        nx::network::server::SerializerState::done);
 
     const auto miAttr = request.getAttribute< attrs::MessageIntegrity >();
     const auto nonceAttr = request.getAttribute< attrs::Nonce >();
@@ -309,5 +309,5 @@ TEST( StunMessageSerialization, Authentification )
 
 // TODO: add some more test when we support some
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

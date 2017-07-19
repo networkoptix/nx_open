@@ -4,8 +4,8 @@
 #include <QtWidgets/QLabel>
 
 #include <client_core/connection_context_aware.h>
-
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 
 class QnResourceTreeModelCustomColumnDelegate;
 
@@ -30,6 +30,7 @@ public:
      * @return                      True if selection is valid and OK button can be pressed.
      */
     virtual bool validate(const QSet<QnUuid>& selectedResources);
+    virtual QString validationMessage(const QSet<QnUuid>& selectedResources) const;
 
     virtual bool isValid(const QnUuid& resource) const;
 

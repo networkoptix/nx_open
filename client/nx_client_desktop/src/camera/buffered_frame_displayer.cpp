@@ -117,7 +117,6 @@ void QnBufferedFrameDisplayer::run()
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
             qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
 
-            //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
             // align to grid
             if (qAbs(expectedTime - currentTime) < 60000) {
                 currentTime = expectedTime;
@@ -146,7 +145,6 @@ void QnBufferedFrameDisplayer::run()
             {
                 if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0)
                 {
-                    cl_log.log("Late picture skipped at ", frame->pkt_dts/1000000.0, cl_logWARNING);
                     syncLock.relock();
                     m_queue.pop(frame);
                     syncLock.unlock();
@@ -172,7 +170,6 @@ void QnBufferedFrameDisplayer::run()
             if (m_queue.size() > 0)
                 m_queue.pop(frame); //< queue clear could be called from other thread
             syncLock.unlock();
-            //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
         }
         else {
             msleep(1);

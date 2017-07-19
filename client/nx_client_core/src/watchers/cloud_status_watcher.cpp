@@ -9,6 +9,7 @@
 #include <QtCore/QTimer>
 
 #include <api/global_settings.h>
+#include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
 
@@ -18,6 +19,7 @@
 #include <cloud/cloud_connection.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/app_info.h>
 
 #include <nx_ec/data/api_cloud_system_data.h>
 
@@ -43,13 +45,30 @@ const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
-QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
+bool isCustomizationCompatible(const QString& customization, bool isMobile)
+{
+    const auto currentCustomization = QnAppInfo::customizationName();
+
+    if (customization.isEmpty() || currentCustomization.isEmpty())
+        return true;
+
+    return currentCustomization == customization
+        || (isMobile
+            && currentCustomization.section(L'_', 0, 0) == customization.section(L'_', 0, 0));
+}
+
+QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, bool isMobile)
 {
     QnCloudSystemList result;
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
     {
         if (systemData.status != api::SystemStatus::ssActivated)
+            continue;
+
+        const auto customization = QString::fromStdString(systemData.customization);
+
+        if (!isCustomizationCompatible(customization, isMobile))
             continue;
 
         auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
@@ -104,6 +123,7 @@ public:
     QnCloudSystemList recentCloudSystems;
     QnCloudSystem currentSystem;
     api::TemporaryCredentials temporaryCredentials;
+    bool isMobile = false;
 
 public:
     void updateConnection(bool initial = false);
@@ -125,11 +145,12 @@ private:
     bool m_cloudIsEnabled;
 };
 
-QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
+QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     base_type(parent),
     QnCommonModuleAware(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
+    d_ptr->isMobile = isMobile;
     setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
 
     const auto correctOfflineState = [this]()
@@ -280,12 +301,14 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->passwordChanged();
 }
 
-QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
+QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
 {
-    Q_D(const QnCloudStatusWatcher);
-    return QnEncodedCredentials(
+    Q_D(QnCloudStatusWatcher);
+    const QnEncodedCredentials result(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
+    d->createTemporaryCredentials();
+    return result;
 }
 
 QnCloudStatusWatcher::ErrorCode QnCloudStatusWatcher::error() const
@@ -313,15 +336,17 @@ void QnCloudStatusWatcher::updateSystems()
     if (!d->cloudConnection)
         return;
 
+    const bool isMobile = d->isMobile;
+
     QPointer<QnCloudStatusWatcher> guard(this);
-    d->cloudConnection->systemManager()->getSystems(
-        [this, guard](api::ResultCode result, const api::SystemDataExList &systemsList)
+    d->cloudConnection->systemManager()->getSystemsFiltered(api::Filter(),
+        [this, guard, isMobile](api::ResultCode result, const api::SystemDataExList& systemsList)
         {
             if (!guard)
                 return;
 
             const auto handler =
-                [this, guard, result, systemsList]()
+                [this, guard, result, systemsList, isMobile]()
                 {
                     if (!guard)
                         return;
@@ -332,7 +357,7 @@ void QnCloudStatusWatcher::updateSystems()
 
                     QnCloudSystemList cloudSystems;
                     if (result == api::ResultCode::ok)
-                        cloudSystems = getCloudSystemList(systemsList);
+                        cloudSystems = getCloudSystemList(systemsList, isMobile);
 
                     d->setCloudEnabled((result != api::ResultCode::networkError)
                         && (result != api::ResultCode::serviceUnavailable));
@@ -632,7 +657,8 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
             if (result == api::ResultCode::ok)
                 return;
 
-            if (result == api::ResultCode::notAuthorized)
+            if (result == api::ResultCode::notAuthorized
+                || result == api::ResultCode::credentialsRemovedPermanently)
             {
                 TRACE("Temporary credentials are invalid, creating new");
                 createTemporaryCredentials();

@@ -60,7 +60,7 @@ class NX_NETWORK_API SerializableAttribute:
     public Attribute
 {
 public:
-    virtual nx_api::SerializerState::Type serialize(
+    virtual nx::network::server::SerializerState serialize(
         MessageSerializerBuffer* buffer,
         std::size_t* bytesWritten) const = 0;
     virtual bool deserialize(MessageParserBuffer* buffer) = 0;
@@ -82,7 +82,7 @@ public:
     MappedAddress(SocketAddress endpoint);
 
     virtual int getType() const override;
-    virtual nx_api::SerializerState::Type serialize(
+    virtual nx::network::server::SerializerState serialize(
         MessageSerializerBuffer* buffer,
         std::size_t* bytesWritten) const override;
     virtual bool deserialize(MessageParserBuffer* buffer) override;

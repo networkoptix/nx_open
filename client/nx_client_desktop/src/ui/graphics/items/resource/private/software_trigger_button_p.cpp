@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/geometry.h>
@@ -10,6 +11,7 @@
 #include <ui/processors/hover_processor.h>
 #include <ui/style/icon.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/software_trigger_pixmaps.h>
 #include <ui/widgets/common/busy_indicator.h>
@@ -24,7 +26,10 @@ namespace {
 /* Duration of success and failure notifications staying up: */
 static constexpr int kNotificationDurationMs = 1200;
 
-/* A short delay in kWaitingState before busy indicator appears: */
+/* Opacity for disabled button: */
+static const qreal kDisabledTriggerOpacity = style::Hints::kDisabledItemOpacity;
+
+/* A short delay in State::Waiting before busy indicator appears: */
 static constexpr int kBusyIndicatorDelayMs = 150;
 
 /* Geometric adjustments: */
@@ -39,10 +44,13 @@ static constexpr qreal kAnimationMinimumOpacity = 0.15;
 
 /* Tooltip adjustments: */
 static constexpr int kHoverEnterDelayMs = 0;
-static constexpr int kHoverLeaveDelayMs = 250;
-static constexpr qreal kToolTipAnimationSpeedFactor = 2.0;
+static constexpr int kHoverLeaveDelayMs = 25;
+static constexpr qreal kToolTipFadeTimeMs = 25;
 static constexpr qreal kToolTipRoundingRadius = 2.0;
 static constexpr qreal kToolTipPadding = 8.0;
+static constexpr qreal kToolTipShadowBlurRadius = 5.0;
+static constexpr qreal kToolTipShadowOpacity = 0.36;
+static const QPointF kToolTipShadowOffset(0.0, 3.0);
 
 static Qt::Edge invertEdge(Qt::Edge edge)
 {
@@ -86,7 +94,7 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
         this, &SoftwareTriggerButtonPrivate::updateToolTipPosition);
 
     connect(main, &SoftwareTriggerButton::pressed, this,
-        [this]() { setState(SoftwareTriggerButton::kDefaultState); });
+        [this]() { setState(SoftwareTriggerButton::State::Default); });
 
     installEventHandler(main, QEvent::PaletteChange, this,
         [this]()
@@ -96,8 +104,14 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
             q->update();
         });
 
+    connect(main, &SoftwareTriggerButton::enabledChanged, this,
+        [this]()
+        {
+            Q_Q(const SoftwareTriggerButton);
+            m_toolTip->setVisible(q->isEnabled());
+        });
+
     m_toolTipHoverProcessor->addTargetItem(main);
-    m_toolTipHoverProcessor->addTargetItem(m_toolTip);
     m_toolTipHoverProcessor->setHoverEnterDelay(kHoverEnterDelayMs);
     m_toolTipHoverProcessor->setHoverLeaveDelay(kHoverLeaveDelayMs);
 
@@ -110,11 +124,20 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
     m_toolTip->setRoundingRadius(kToolTipRoundingRadius);
     m_toolTip->setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
 
+    auto shadowEffect = new QGraphicsDropShadowEffect(m_toolTip);
+    auto shadowColor = QPalette().color(QPalette::Shadow);
+    shadowColor.setAlphaF(kToolTipShadowOpacity);
+    shadowEffect->setColor(shadowColor);
+    shadowEffect->setOffset(kToolTipShadowOffset);
+    shadowEffect->setBlurRadius(kToolTipShadowBlurRadius);
+    m_toolTip->setGraphicsEffect(shadowEffect);
+
     updateToolTipTailEdge();
 }
 
 SoftwareTriggerButtonPrivate::~SoftwareTriggerButtonPrivate()
 {
+    cancelScheduledChange();
 }
 
 QString SoftwareTriggerButtonPrivate::toolTip() const
@@ -124,7 +147,20 @@ QString SoftwareTriggerButtonPrivate::toolTip() const
 
 void SoftwareTriggerButtonPrivate::setToolTip(const QString& toolTip)
 {
-    m_toolTip->setText(toolTip);
+    if (m_toolTipText == toolTip)
+        return;
+
+    m_toolTipText = toolTip;
+    updateToolTipText();
+}
+
+void SoftwareTriggerButtonPrivate::updateToolTipText()
+{
+    m_toolTip->setText(m_live
+        ? m_toolTipText
+        : SoftwareTriggerButton::tr("Go to Live"));
+
+    updateToolTipPosition();
 }
 
 Qt::Edge SoftwareTriggerButtonPrivate::toolTipEdge() const
@@ -209,6 +245,8 @@ void SoftwareTriggerButtonPrivate::updateToolTipVisibility()
         && !m_toolTip->text().isEmpty()
         && !(m_prolonged && q->isPressed());
 
+    static constexpr qreal kToolTipAnimationSpeedFactor = 1000.0 / kToolTipFadeTimeMs;
+
     const qreal targetOpacity = showToolTip ? kOpaque : kTransparent;
     opacityAnimator(m_toolTip, kToolTipAnimationSpeedFactor)->animateTo(targetOpacity);
 }
@@ -247,6 +285,23 @@ void SoftwareTriggerButtonPrivate::updateToolTipPosition()
     }
 }
 
+bool SoftwareTriggerButtonPrivate::isLive() const
+{
+    return m_live;
+}
+
+void SoftwareTriggerButtonPrivate::setLive(bool value)
+{
+    if (m_live == value)
+        return;
+
+    m_live = value;
+    updateToolTipText();
+
+    Q_Q(SoftwareTriggerButton);
+    q->update();
+}
+
 SoftwareTriggerButton::State SoftwareTriggerButtonPrivate::state() const
 {
     return m_state;
@@ -259,13 +314,13 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
 
     m_state = state;
 
-    setStateTimer(nullptr);
+    cancelScheduledChange();
     m_busyIndicator.reset(nullptr);
 
     const auto setNormalState =
         [this]()
         {
-            setState(SoftwareTriggerButton::kDefaultState);
+            setState(SoftwareTriggerButton::State::Default);
         };
 
     Q_Q(SoftwareTriggerButton);
@@ -273,16 +328,16 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
 
     switch (m_state)
     {
-        case SoftwareTriggerButton::kDefaultState:
+        case SoftwareTriggerButton::State::Default:
             break;
 
-        case SoftwareTriggerButton::kWaitingState:
+        case SoftwareTriggerButton::State::Waiting:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for released prolonged triggers: */
                 if (!q->isPressed())
-                    m_state = SoftwareTriggerButton::kDefaultState;
+                    m_state = SoftwareTriggerButton::State::Default;
 
                 /* Don't show busy indicator for prolonged triggers. */
                 break;
@@ -298,24 +353,24 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                     m_busyIndicator->dots()->setDotSpacing(kBusyIndicatorDotSpacing);
                 };
 
-            setStateTimer(executeDelayedParented(showBusyIndicator, kBusyIndicatorDelayMs, this));
+            scheduleChange(showBusyIndicator, kBusyIndicatorDelayMs);
             break;
         }
 
-        case SoftwareTriggerButton::kSuccessState:
+        case SoftwareTriggerButton::State::Success:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for prolonged triggers: */
-                m_state = SoftwareTriggerButton::kDefaultState;
+                m_state = SoftwareTriggerButton::State::Default;
                 break;
             }
 
-            setStateTimer(executeDelayedParented(setNormalState, kNotificationDurationMs, this));
+            scheduleChange(setNormalState, kNotificationDurationMs);
             break;
         }
 
-        case SoftwareTriggerButton::kFailureState:
+        case SoftwareTriggerButton::State::Failure:
         {
             if (m_prolonged)
             {
@@ -334,7 +389,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                 }
             }
 
-            setStateTimer(executeDelayedParented(setNormalState, kNotificationDurationMs, this));
+            scheduleChange(setNormalState, kNotificationDurationMs);
             break;
         }
 
@@ -346,19 +401,25 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
     }
 
     /* Restart animation timer for active prolonged trigger: */
-    if (m_prolonged && q->isPressed() && m_state == SoftwareTriggerButton::kDefaultState)
+    if (m_prolonged && q->isPressed() && m_state == SoftwareTriggerButton::State::Default)
         m_animationTime.start();
 }
 
-void SoftwareTriggerButtonPrivate::setStateTimer(QTimer* timer)
+void SoftwareTriggerButtonPrivate::scheduleChange(std::function<void()> callback, int delayMs)
 {
-    if (m_stateTimer)
+    if (m_scheduledChangeTimer)
     {
-        m_stateTimer->stop();
-        m_stateTimer->deleteLater();
+        m_scheduledChangeTimer->stop();
+        m_scheduledChangeTimer->deleteLater();
     }
 
-    m_stateTimer = timer;
+    if (callback)
+        m_scheduledChangeTimer = executeDelayedParented(callback, delayMs, this);
+}
+
+void SoftwareTriggerButtonPrivate::cancelScheduledChange()
+{
+    scheduleChange(std::function<void()>(), 0);
 }
 
 void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
@@ -367,9 +428,17 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     ensureImages();
 
     Q_Q(SoftwareTriggerButton);
+    if (!m_live && (q->isHovered() || q->isPressed()))
+    {
+        paintPixmapSharp(painter, q->isPressed()
+            ? m_goToLivePixmapPressed
+            : m_goToLivePixmap);
+        return;
+    }
+
     const auto effectiveState =
-        m_prolonged && q->isPressed() && m_state != SoftwareTriggerButton::kFailureState
-            ? SoftwareTriggerButton::kDefaultState
+        m_prolonged && q->isPressed() && m_state != SoftwareTriggerButton::State::Failure
+            ? SoftwareTriggerButton::State::Default
             : m_state;
 
     const auto currentOpacity =
@@ -383,9 +452,12 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
+    if (q->isDisabled() || !m_live)
+        painter->setOpacity(painter->opacity() * kDisabledTriggerOpacity);
+
     switch (effectiveState)
     {
-        case SoftwareTriggerButton::kDefaultState:
+        case SoftwareTriggerButton::State::Default:
         {
             q->SoftwareTriggerButton::base_type::paint(painter, option, widget);
             if (m_prolonged && q->isPressed())
@@ -396,19 +468,19 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
             break;
         }
 
-        case SoftwareTriggerButton::kWaitingState:
+        case SoftwareTriggerButton::State::Waiting:
         {
             paintPixmapSharp(painter, m_waitingPixmap);
             break;
         }
 
-        case SoftwareTriggerButton::kSuccessState:
+        case SoftwareTriggerButton::State::Success:
         {
             paintPixmapSharp(painter, m_successPixmap); //< already with frame
             break;
         }
 
-        case SoftwareTriggerButton::kFailureState:
+        case SoftwareTriggerButton::State::Failure:
         {
             paintPixmapSharp(painter, m_failurePixmap);
             if (m_prolonged && !q->isPressed())
@@ -483,6 +555,9 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         };
 
     QIcon icon;
+    const auto normalPixmap = generateStatePixmap(QPalette::Window);
+    icon.addPixmap(normalPixmap, QIcon::Normal);
+    icon.addPixmap(normalPixmap, QIcon::Disabled);
     icon.addPixmap(generateStatePixmap(QPalette::Window), QIcon::Normal);
     icon.addPixmap(generateStatePixmap(QPalette::Midlight), QIcon::Active);
     icon.addPixmap(generateStatePixmap(QPalette::Dark), QnIcon::Pressed);
@@ -497,12 +572,12 @@ void SoftwareTriggerButtonPrivate::ensureImages()
     m_successPixmap = generatePixmap(
         q->palette().color(QPalette::Dark),
         q->palette().color(QPalette::Text),
-        qnSkin->pixmap(lit("soft_triggers/confirmation_success.png")));
+        qnSkin->pixmap("soft_triggers/confirmation_success.png"));
 
     m_failurePixmap = generatePixmap(
         q->palette().color(QPalette::Highlight),
         QColor(),
-        qnSkin->pixmap(lit("soft_triggers/confirmation_failure.png")));
+        qnSkin->pixmap("soft_triggers/confirmation_failure.png"));
 
     m_failureFramePixmap = generatePixmap(
         QColor(),
@@ -513,6 +588,18 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         QColor(),
         q->palette().color(QPalette::Text),
         QPixmap());
+
+    auto goToLivePixmap = qnSkin->pixmap("soft_triggers/go-to-live.png");
+
+    m_goToLivePixmap = generatePixmap(
+        q->palette().color(QPalette::Midlight),
+        QColor(),
+        goToLivePixmap);
+
+    m_goToLivePixmapPressed = generatePixmap(
+        q->palette().color(QPalette::Dark),
+        QColor(),
+        goToLivePixmap);
 }
 
 QRect SoftwareTriggerButtonPrivate::buttonRect() const

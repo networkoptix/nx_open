@@ -18,6 +18,10 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                     emit liveVideoPreviewsChanged();
                     break;
 
+                case QnMobileClientSettings::LastUsedQuality:
+                    emit lastUsedQualityChanged();
+                    break;
+
                 default:
                     break;
             }
@@ -32,6 +36,16 @@ bool QmlSettingsAdaptor::liveVideoPreviews() const
 void QmlSettingsAdaptor::setLiveVideoPreviews(bool enable)
 {
     qnSettings->setLiveVideoPreviews(enable);
+}
+
+int QmlSettingsAdaptor::lastUsedQuality() const
+{
+    return qnSettings->lastUsedQuality();
+}
+
+void QmlSettingsAdaptor::setLastUsedQuality(int quality)
+{
+    qnSettings->setLastUsedQuality(quality);
 }
 
 } // namespace mobile

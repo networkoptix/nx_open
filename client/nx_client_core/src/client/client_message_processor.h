@@ -25,6 +25,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
+    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour) override;
+
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
@@ -32,8 +34,8 @@ protected:
     virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
 
-    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
-    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
 private:
     QnClientConnectionStatus m_status;
     bool m_connected;
@@ -41,4 +43,4 @@ private:
 };
 
 #define qnClientMessageProcessor \
-    static_cast<QnClientMessageProcessor*>(commonModule()->messageProcessor())
+    static_cast<QnClientMessageProcessor*>(this->commonModule()->messageProcessor())

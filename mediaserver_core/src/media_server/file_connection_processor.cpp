@@ -7,7 +7,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 
 #include <media_server/serverutil.h>
@@ -98,8 +98,10 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner) :
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner->commonModule())
+QnFileConnectionProcessor::QnFileConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
 }
 
@@ -149,7 +151,7 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
     if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
             return "gzip";
         }
     }

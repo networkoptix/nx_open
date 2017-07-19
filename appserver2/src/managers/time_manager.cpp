@@ -19,8 +19,8 @@
 #include <common/common_globals.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
-#include <transaction/transaction_message_bus.h>
+#include <nx/network/http/custom_headers.h>
+#include <transaction/message_bus_selector.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
@@ -72,31 +72,6 @@ template<class Function>
 CustomRunnable<Function>* make_custom_runnable( Function&& function )
 {
     return new CustomRunnable<Function>( std::move( function ) );
-}
-
-/**
- * @param syncTimeToLocalDelta local_time - sync_time
- */
-bool saveSyncTime(
-    Ec2DirectConnectionPtr connection,
-    qint64 syncTimeToLocalDelta,
-    const TimePriorityKey& syncTimeKey)
-{
-    if (!connection)
-        return false;
-
-    ApiMiscData deltaData(
-        TIME_DELTA_PARAM_NAME,
-            QByteArray::number(syncTimeToLocalDelta));
-
-    ApiMiscData priorityData(
-        USED_TIME_PRIORITY_KEY_PARAM_NAME,
-        QByteArray::number(syncTimeKey.toUInt64()));
-
-    auto manager = connection->getMiscManager(Qn::kSystemAccess);
-    return
-        manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
-        manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
 }
 
 /**
@@ -285,7 +260,7 @@ static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
 static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10*60;
 #endif
 /**
- * If time synchronization with internet failes, period is multiplied on this value, 
+ * If time synchronization with internet failes, period is multiplied on this value,
  * but it cannot exceed MAX_PUBLIC_SYNC_TIME_PERIOD_SEC.
  */
 static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
@@ -320,10 +295,10 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBus* messageBus)
+    QnTransactionMessageBusBase* messageBus,
+    Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
-    m_broadcastSysTimeTaskID( 0 ),
     m_internetSynchronizationTaskID( 0 ),
     m_manualTimerServerSelectionCheckTaskID( 0 ),
     m_checkSystemTimeTaskID( 0 ),
@@ -333,7 +308,8 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_timerManager(timerManager),
     m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
     m_timeSynchronized( false ),
-    m_internetSynchronizationFailureCount( 0 )
+    m_internetSynchronizationFailureCount( 0 ),
+    m_settings(settings)
 {
 }
 
@@ -346,16 +322,12 @@ TimeSynchronizationManager::~TimeSynchronizationManager()
 
 void TimeSynchronizationManager::pleaseStop()
 {
-    quint64 broadcastSysTimeTaskID = 0;
     quint64 manualTimerServerSelectionCheckTaskID = 0;
     quint64 internetSynchronizationTaskID = 0;
     quint64 checkSystemTimeTaskID = 0;
     {
-        QnMutexLocker lk( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
         m_terminated = true;
-
-        broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
-        m_broadcastSysTimeTaskID = 0;
 
         manualTimerServerSelectionCheckTaskID = m_manualTimerServerSelectionCheckTaskID;
         m_manualTimerServerSelectionCheckTaskID = 0;
@@ -366,9 +338,6 @@ void TimeSynchronizationManager::pleaseStop()
         checkSystemTimeTaskID = m_checkSystemTimeTaskID;
         m_checkSystemTimeTaskID = 0;
     }
-
-    if( broadcastSysTimeTaskID )
-        m_timerManager->joinAndDeleteTimer( broadcastSysTimeTaskID );
 
     if( manualTimerServerSelectionCheckTaskID )
         m_timerManager->joinAndDeleteTimer( manualTimerServerSelectionCheckTaskID );
@@ -412,9 +381,10 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    connect(m_messageBus, &QnTransactionMessageBus::newDirectConnectionEstablished,
-                this, &TimeSynchronizationManager::onNewConnectionEstablished,
-                Qt::DirectConnection );
+    connect(m_messageBus, &QnTransactionMessageBusBase::newDirectConnectionEstablished,
+        this, &TimeSynchronizationManager::onNewConnectionEstablished,
+        Qt::DirectConnection);
+
     connect(m_messageBus, &QnTransactionMessageBus::peerLost,
                 this, &TimeSynchronizationManager::onPeerLost,
                 Qt::DirectConnection );
@@ -423,14 +393,12 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
         this, &TimeSynchronizationManager::onTimeSynchronizationSettingsChanged);
 
     {
-        QnMutexLocker lk( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
 
         using namespace std::placeholders;
         if( m_peerType == Qn::PT_Server )
         {
-            m_broadcastSysTimeTaskID = m_timerManager->addTimer(
-                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                std::chrono::milliseconds::zero());
+            initializeTimeFetcher();
             addInternetTimeSynchronizationTask();
 
             m_checkSystemTimeTaskID = m_timerManager->addTimer(
@@ -438,15 +406,17 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
                 std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
         }
         else
+        {
             m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
                 std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
                 std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
+        }
     }
 }
 
 qint64 TimeSynchronizationManager::getSyncTime() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return getSyncTimeNonSafe();
 }
 
@@ -454,7 +424,7 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
 {
     const auto& resPool = m_messageBus->commonModule()->resourcePool();
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     ApiTimeData result;
     result.value = getSyncTimeNonSafe();
     result.isPrimaryTimeServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
@@ -491,7 +461,7 @@ void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serve
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;
     {
-        QnMutexLocker lk( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
 
         localTimePriorityBak = m_localTimePriorityKey.toUInt64();
         const auto& commonModule = m_messageBus->commonModule();
@@ -502,7 +472,7 @@ void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serve
         if(serverId.id == commonModule->moduleGUID() )
         {
             m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
-            selectLocalTimeAsSynchronized(&lk, m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
+            selectLocalTimeAsSynchronized(&lock, m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
         }
         else
         {
@@ -510,7 +480,7 @@ void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serve
         }
         newLocalTimePriority = m_localTimePriorityKey.toUInt64();
         if (newLocalTimePriority != localTimePriorityBak)
-            handleLocalTimePriorityKeyChange(&lk);
+            handleLocalTimePriorityKeyChange(&lock);
     }
 
     /* Can cause signal, going out of mutex locker. */
@@ -519,14 +489,14 @@ void TimeSynchronizationManager::primaryTimeServerChanged(const ApiIdData& serve
 }
 
 void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
-    QnMutexLockerBase* const lk,
+    QnMutexLockerBase* const lock,
     quint16 newTimePriorityKeySequence)
 {
     const auto& commonModule = m_messageBus->commonModule();
 
     //local peer is selected by user as primary time server
     const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
-    //incrementing sequence 
+    //incrementing sequence
     m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
@@ -539,7 +509,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 
     //using current server time info
     const qint64 elapsed = m_monotonicClock.elapsed();
-    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
+    //selection of peer as primary time server means it's local system time is to be used as synchronized time
     //in case of internet connection absence
     m_usedTimeSyncInfo = TimeSyncInfo(
         elapsed,
@@ -552,121 +522,54 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     //saving synchronized time to DB
     if (m_connection)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-            &saveSyncTime,
-            m_connection,
+        saveSyncTimeAsync(
+            lock,
             0,
-            m_usedTimeSyncInfo.timePriorityKey)));
+            m_usedTimeSyncInfo.timePriorityKey);
     }
 
     if (!synchronizingByCurrentServer)
     {
         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
-        lk->unlock();
+        lock->unlock();
         WhileExecutingDirectCall callGuard(this);
         emit timeChanged(curSyncTime);
-        lk->relock();
+        lock->relock();
     }
 
     //reporting new sync time to everyone we know
-    syncTimeWithAllKnownServers(lk);
-}
-
-void TimeSynchronizationManager::peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran )
-{
-    QnMutexLocker lk( &m_mutex );
-
-    peerSystemTimeReceivedNonSafe( tran.params );
-
-    lk.unlock();
-    WhileExecutingDirectCall callGuard( this );
-    emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
-}
-
-void TimeSynchronizationManager::knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran )
-{
-    for( const ApiPeerSystemTimeData& data: tran.params )
-    {
-        {
-            QnMutexLocker lk( &m_mutex );
-            peerSystemTimeReceivedNonSafe( data );
-        }
-        WhileExecutingDirectCall callGuard( this );
-        emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
-    }
+    syncTimeWithAllKnownServers(*lock);
 }
 
 TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return getTimeSyncInfoNonSafe();
 }
 
 qint64 TimeSynchronizationManager::getMonotonicClock() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_monotonicClock.elapsed();
 }
 
 void TimeSynchronizationManager::forgetSynchronizedTime()
 {
-    QnMutexLocker lk( &m_mutex );
-    forgetSynchronizedTimeNonSafe(&lk);
+    QnMutexLocker lock( &m_mutex );
+    forgetSynchronizedTimeNonSafe(&lock);
 }
 
 void TimeSynchronizationManager::forceTimeResync()
 {
     {
-        QnMutexLocker lk(&m_mutex);
-        forgetSynchronizedTimeNonSafe(&lk);
-        syncTimeWithAllKnownServers(&lk);
+        QnMutexLocker lock(&m_mutex);
+        syncTimeWithAllKnownServers(lock);
+        forgetSynchronizedTimeNonSafe(&lock);
     }
 
     const auto curSyncTime = getSyncTime();
     WhileExecutingDirectCall callGuard(this);
     emit timeChanged(curSyncTime);
-
-    QnMutexLocker lk(&m_mutex);
-    //notifying everyone about local time change
-    if (!m_terminated)
-    {
-        if (m_broadcastSysTimeTaskID)
-            m_timerManager->modifyTimerDelay(
-                m_broadcastSysTimeTaskID, std::chrono::milliseconds::zero());
-    }
-}
-
-QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
-{
-    QnMutexLocker lk( &m_mutex );
-
-    //list<pair<peerid, time> >
-    QnPeerTimeInfoList peers;
-
-    const qint64 currentClock = m_monotonicClock.elapsed();
-    for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-        peers.push_back( QnPeerTimeInfo( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
-
-    return peers;
-}
-
-ApiPeerSystemTimeDataList TimeSynchronizationManager::getKnownPeersSystemTime() const
-{
-    QnMutexLocker lk( &m_mutex );
-
-    ApiPeerSystemTimeDataList result;
-    result.reserve( m_systemTimeByPeer.size() );
-    const qint64 currentClock = m_monotonicClock.elapsed();
-    for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-    {
-        ApiPeerSystemTimeData data;
-        data.peerID = it->first;
-        data.timePriorityKey = it->second.timePriorityKey.toUInt64();
-        data.peerSysTime = it->second.syncTime + (currentClock - it->second.monotonicClockValue);
-        result.push_back( std::move(data) );
-    }
-
-    return result;
 }
 
 void TimeSynchronizationManager::processTimeSyncInfoHeader(
@@ -680,17 +583,17 @@ void TimeSynchronizationManager::processTimeSyncInfoHeader(
 
     NX_ASSERT( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     const auto localTimePriorityBak = m_localTimePriorityKey.toUInt64();
     remotePeerTimeSyncUpdate(
-        &lk,
+        &lock,
         peerID,
         m_monotonicClock.elapsed(),
         remotePeerTimeSyncInfo.syncTime + (rttMillis ? (rttMillis.get() / 2) : 0),
         remotePeerTimeSyncInfo.timePriorityKey,
         rttMillis ? rttMillis.get() : MAX_DESIRED_TIME_DRIFT_MS);
     if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
-        handleLocalTimePriorityKeyChange(&lk);
+        handleLocalTimePriorityKeyChange(&lock);
 }
 
 void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
@@ -750,7 +653,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2). "
             "Accepting peer's synchronized time due to large drift (%3 ms, fault %4)").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logINFO);
+            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logDEBUG1);
     }
     else
     {
@@ -759,7 +662,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(commonModule->moduleGUID().toString()).
             arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
-            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
+            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG1);
     }
 
     //taking new synchronization data
@@ -780,11 +683,10 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     m_timeSynchronized = true;
     if (m_connection)
     {
-            Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-            &saveSyncTime,
-            m_connection,
+        saveSyncTimeAsync(
+            lock,
             QDateTime::currentMSecsSinceEpoch() - curSyncTime,
-                m_usedTimeSyncInfo.timePriorityKey) ) );
+            m_usedTimeSyncInfo.timePriorityKey);
     }
     lock->unlock();
     {
@@ -794,16 +696,16 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     lock->relock();
 
     //informing all servers we can about time change as soon as possible
-    syncTimeWithAllKnownServers(lock);
+    syncTimeWithAllKnownServers(*lock);
 }
 
-void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransportBase* transport )
+void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactionTransport* transport )
 {
     using namespace std::placeholders;
 
     if (transport->remotePeer().peerType != Qn::PT_Server)
         return;
-
+#if 0
     if( transport->isIncoming() )
     {
         //peer connected to us
@@ -816,7 +718,10 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
         //listening time change signals fom remote peer which cannot connect to us
         transport->setHttpChunkExtensonHandler(
             std::bind(&TimeSynchronizationManager::onTransactionReceived, this, _1, _2));
-
+    }
+#endif
+    if (!transport->isIncoming())
+    {
         //we can connect to the peer
         const QUrl remoteAddr = transport->remoteAddr();
         //saving credentials has been used to establish connection
@@ -827,12 +732,9 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
     }
 }
 
-void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
+void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
 {
-    stopSynchronizingTimeWithPeer( data.peer.id );
-
-    QnMutexLocker lk( &m_mutex );
-    m_systemTimeByPeer.erase( data.peer.id );
+    stopSynchronizingTimeWithPeer(peer);
 }
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
@@ -840,7 +742,7 @@ void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
     SocketAddress peerAddress,
     nx_http::AuthInfoCache::AuthorizationCacheItem authData )
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     auto iterResultPair = m_peersToSendTimeSyncTo.emplace(
         peerID,
         PeerContext( std::move(peerAddress), std::move(authData) ) );
@@ -860,7 +762,7 @@ void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& pe
     nx::utils::TimerManager::TimerGuard timerID;
     nx_http::AsyncHttpClientPtr httpClient;
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
     if( peerIter == m_peersToSendTimeSyncTo.end() )
         return;
@@ -876,7 +778,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     const auto& commonModule = m_messageBus->commonModule();
     nx_http::AsyncHttpClientPtr clientPtr;
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if( m_terminated )
         return;
 
@@ -890,7 +792,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 
     if (!commonModule->globalSettings()->isTimeSynchronizationEnabled())
     {
-            peerIter->second.syncTimerID = 
+            peerIter->second.syncTimerID =
             nx::utils::TimerManager::TimerGuard(
                 m_timerManager,
                 m_timerManager->addTimer(
@@ -919,7 +821,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
             const qint64 rtt = m_monotonicClock.elapsed() - requestSendClock;
             {
                 //saving rtt
-                QnMutexLocker lk(&m_mutex);
+                QnMutexLocker lock(&m_mutex);
                 auto peerIter = m_peersToSendTimeSyncTo.find(peerID);
                 if (peerIter != m_peersToSendTimeSyncTo.end())
                     peerIter->second.rttMillis = rtt;
@@ -989,7 +891,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
         }
     }
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
     if( peerIter == m_peersToSendTimeSyncTo.end() ||
         peerIter->second.httpClient != clientPtr )
@@ -1001,7 +903,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID = 
+        peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -1009,42 +911,10 @@ void TimeSynchronizationManager::timeSyncRequestDone(
                 std::chrono::milliseconds(TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC)));
 }
 
-void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
-{
-    {
-        QnMutexLocker lk( &m_mutex );
-        if( (taskID != m_broadcastSysTimeTaskID) || m_terminated )
-            return;
-
-        using namespace std::placeholders;
-        m_broadcastSysTimeTaskID = m_timerManager->addTimer(
-            std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-            std::chrono::milliseconds(LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS));
-    }
-
-    //TODO #ak if local time changes have to broadcast it as soon as possible
-    const auto& commonModule = m_messageBus->commonModule();
-    NX_LOGX( lit("TimeSynchronizationManager. Broadcasting local system time. peer %1, system time (%2), local time priority key 0x%3").
-        arg(commonModule->moduleGUID().toString() ).arg( QDateTime::fromMSecsSinceEpoch( currentMSecsSinceEpoch() ).toString( Qt::ISODate ) ).
-        arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
-
-    QnTransaction<ApiPeerSystemTimeData> tran(
-        ApiCommand::broadcastPeerSystemTime,
-        commonModule->moduleGUID());
-    tran.params.peerID = commonModule->moduleGUID();
-    tran.params.timePriorityKey = m_localTimePriorityKey.toUInt64();
-    {
-        QnMutexLocker lk( &m_mutex );
-        tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
-    }
-    peerSystemTimeReceived( tran ); //remembering own system time
-    m_messageBus->sendTransaction( tran );
-}
-
 void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )
 {
     //TODO #ak it is better to run this method on event, not by timeout
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     m_manualTimerServerSelectionCheckTaskID = 0;
     if( m_terminated )
@@ -1055,40 +925,27 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( qui
         std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
         std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
 
-    if( m_systemTimeByPeer.empty() ||
-        (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 ||
-        (m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 )
-    {
-        //we know nothing about other peers.
-        //Or we have time taken from the Internet, which means someone has connection to the Internet,
-            //so no sense to ask user to select primary time server
+    if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey)
         return;
-    }
+    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer)
+        return;
+    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
+        return;
 
-    //map<priority flags, m_systemTimeByPeer iterator>
-    std::multimap<unsigned int, std::map<QnUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
-    for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-        peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
-
-#ifndef TEST_PTS_SELECTION
-    if( (peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1) &&               //multiple servers have same priority
-        ((peersByTimePriorityFlags.cbegin()->first & Qn::TF_peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
-#endif
-    {
-        WhileExecutingDirectCall callGuard( this );
-        //multiple peers have same priority, user selection is required
-        emit primaryTimeServerSelectionRequired();
-    }
+    emit primaryTimeServerSelectionRequired();
 }
+
 
 void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 {
+    using namespace std::placeholders;
+
     NX_LOGX( lit( "TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
     const auto& commonModule = m_messageBus->commonModule();
     const bool isSynchronizingTimeWithInternet =
         commonModule->globalSettings()->isSynchronizingTimeWithInternet();
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     if( (taskID != m_internetSynchronizationTaskID) || m_terminated )
         return;
@@ -1097,28 +954,14 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     if (!isSynchronizingTimeWithInternet)
     {
         NX_LOG(lit("TimeSynchronizationManager. Not synchronizing time with internet"), cl_logDEBUG2);
-            m_internetTimeSynchronizationPeriod = 
-            Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_internetTimeSynchronizationPeriod =
+            m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
         addInternetTimeSynchronizationTask();
         return;
     }
 
     NX_LOGX( lit("TimeSynchronizationManager. Synchronizing time with internet"), cl_logDEBUG1 );
 
-    //synchronizing with some internet server
-    using namespace std::placeholders;
-    if (m_timeSynchronizer)
-    {
-        m_timeSynchronizer->pleaseStopSync(false);
-        m_timeSynchronizer.reset();
-    }
-
-    auto multiFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
-    for (const char* timeServer : RFC868_SERVERS)
-        multiFetcher->addTimeFetcher(
-            std::make_unique<nx::network::TimeProtocolClient>(
-                QLatin1String(timeServer)));
-    m_timeSynchronizer = std::move(multiFetcher);
     m_timeSynchronizer->getTimeAsync(
         std::bind(
             &TimeSynchronizationManager::onTimeFetchingDone,
@@ -1127,12 +970,10 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 
 void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
 {
-    m_timeSynchronizer.reset();
-
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;
     {
-        QnMutexLocker lk( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
 
         localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
@@ -1143,7 +984,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetSynchronizationFailureCount = 0;
 
-            m_internetTimeSynchronizationPeriod = Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_internetTimeSynchronizationPeriod = m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
 
             const qint64 curLocalTime = currentMSecsSinceEpoch();
 
@@ -1164,7 +1005,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
                 m_localSystemTimeDelta = millisFromEpoch - m_monotonicClock.elapsed();
 
                 remotePeerTimeSyncUpdate(
-                    &lk,
+                    &lock,
                     m_messageBus->commonModule()->moduleGUID(),
                     m_monotonicClock.elapsed(),
                     millisFromEpoch,
@@ -1179,7 +1020,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetTimeSynchronizationPeriod = std::min<>(
                 MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
+                m_settings->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
 
             ++m_internetSynchronizationFailureCount;
             if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )
@@ -1190,12 +1031,25 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
         newLocalTimePriority = m_localTimePriorityKey.toUInt64();
         if (newLocalTimePriority != localTimePriorityBak)
-            handleLocalTimePriorityKeyChange(&lk);
+            handleLocalTimePriorityKeyChange(&lock);
     }
 
     /* Can cause signal, going out of mutex locker. */
     if( newLocalTimePriority != localTimePriorityBak )
         updateRuntimeInfoPriority(newLocalTimePriority);
+}
+
+void TimeSynchronizationManager::initializeTimeFetcher()
+{
+    auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
+    for (const char* timeServer: RFC868_SERVERS)
+    {
+        meanTimerFetcher->addTimeFetcher(
+            std::make_unique<nx::network::TimeProtocolClient>(
+                QLatin1String(timeServer)));
+    }
+
+    m_timeSynchronizer = std::move(meanTimerFetcher);
 }
 
 void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
@@ -1257,7 +1111,7 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             &restoredTimeDelta,
             &restoredPriorityKey);
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     //restoring local time priority from DB
     if (timePriorityStrLoadResult)
@@ -1272,12 +1126,6 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             m_localTimePriorityKey.sequence = restoredPriorityKey.sequence;
         if( restoredPriorityKey.flags & Qn::TF_peerTimeSetByUser )
             m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
-
-        ApiPeerSystemTimeData peerSystemTimeData;
-        peerSystemTimeData.peerID = m_messageBus->commonModule()->moduleGUID();
-        peerSystemTimeData.timePriorityKey = m_localTimePriorityKey.toUInt64();
-        peerSystemTimeData.peerSysTime = QDateTime::currentMSecsSinceEpoch();
-        peerSystemTimeReceivedNonSafe( peerSystemTimeData );
 
         NX_LOGX( lit("Successfully restored time priority key 0x%1 from DB").arg(restoredPriorityKeyVal, 0, 16), cl_logWARNING );
     }
@@ -1308,29 +1156,14 @@ void TimeSynchronizationManager::onDbManagerInitialized()
     }
 
     auto localTimePriorityKey = m_localTimePriorityKey;
-    lk.unlock();
+    lock.unlock();
 
     if (syncTimeDataToSave)
-        saveSyncTime(
-            m_connection,
+        saveSyncTimeSync(
             syncTimeDataToSave->first,
             syncTimeDataToSave->second);
 
     updateRuntimeInfoPriority( localTimePriorityKey.toUInt64() );
-}
-
-void TimeSynchronizationManager::peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& data )
-{
-    NX_LOGX( lit("Received peer %1 system time (%2), peer time priority key 0x%3").
-        arg(data.peerID.toString()).arg( QDateTime::fromMSecsSinceEpoch(data.peerSysTime).toString( Qt::ISODate ) ).
-        arg(data.timePriorityKey, 0, 16), cl_logDEBUG2 );
-
-    TimePriorityKey peerPriorityKey;
-    peerPriorityKey.fromUInt64( data.timePriorityKey );
-    m_systemTimeByPeer[data.peerID] = TimeSyncInfo(
-        m_monotonicClock.elapsed(),
-        data.peerSysTime,
-        peerPriorityKey );
 }
 
 TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfoNonSafe() const
@@ -1342,7 +1175,8 @@ TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfoNonSafe() const
         m_usedTimeSyncInfo.timePriorityKey );
 }
 
-void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLockerBase* const /*lock*/)
+void TimeSynchronizationManager::syncTimeWithAllKnownServers(
+    const QnMutexLockerBase& /*lock*/)
 {
     for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
     {
@@ -1352,6 +1186,19 @@ void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLockerBase* 
             peerCtx.second.syncTimerID.get(),
             std::chrono::milliseconds::zero());
     }
+}
+
+void TimeSynchronizationManager::resyncTimeWithPeer(const QnUuid& peerId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto peerCtx = m_peersToSendTimeSyncTo.find(peerId);
+    if (peerCtx == m_peersToSendTimeSyncTo.end())
+        return;
+    NX_LOGX(lm("Scheduling time synchronization with peer %1")
+        .arg(peerCtx->first.toString()), cl_logDEBUG2);
+    m_timerManager->modifyTimerDelay(
+        peerCtx->second.syncTimerID.get(),
+        std::chrono::milliseconds::zero());
 }
 
 void TimeSynchronizationManager::onBeforeSendingTransaction(
@@ -1378,20 +1225,20 @@ void TimeSynchronizationManager::onTransactionReceived(
         if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
             continue;
 
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-            remotePeerTimeSyncInfo.timePriorityKey, 
+            remotePeerTimeSyncInfo.timePriorityKey,
             settings->isSynchronizingTimeWithInternet()))
         {
-            syncTimeWithAllKnownServers(&lk);
+            syncTimeWithAllKnownServers(lock);
         }
         return;
     }
 }
 
-void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const lock )
+void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe(
+    QnMutexLockerBase* const lock)
 {
-    m_systemTimeByPeer.clear();
     m_timeSynchronized = false;
     switchBackToLocalTime(lock);
 }
@@ -1411,7 +1258,7 @@ void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const 
 void TimeSynchronizationManager::checkSystemTimeForChange()
 {
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if (m_terminated)
             return;
     }
@@ -1422,7 +1269,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         NX_LOGX(lm("Local system time change has been detected"),
             cl_logDEBUG1);
 
-        //local OS time has been changed. If system time is set 
+        //local OS time has been changed. If system time is set
         //by local host time then updating system time
         const bool isSystemTimeSynchronizedWithInternet =
             settings->isSynchronizingTimeWithInternet() &&
@@ -1438,15 +1285,13 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
 
         if (m_connection)
         {
-            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-                &saveSyncTime,
-                m_connection,
+            saveSyncTimeAsync(
                 QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
-                m_usedTimeSyncInfo.timePriorityKey)));
+                m_usedTimeSyncInfo.timePriorityKey);
         }
     }
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     if (m_terminated)
         return;
     m_checkSystemTimeTaskID = m_timerManager->addTimer(
@@ -1454,20 +1299,26 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
 }
 
-void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
+void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
+    QnMutexLockerBase* const lock)
 {
     if (m_connection)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable([this]
-        {
-            ApiMiscData localTimeData(
-                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(m_localTimePriorityKey.toUInt64()));
-            auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
-            if (manager->saveMiscParamSync(localTimeData) != ec2::ErrorCode::ok)
-                qWarning() << "Failed to save misc param to the local DB";
-        }));
-}
+        ApiMiscData localTimeData(
+            LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+            QByteArray::number(m_localTimePriorityKey.toUInt64()));
+
+        auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+
+        QnMutexUnlocker unlocker(lock);
+
+        manager->saveMiscParam(localTimeData, this,
+            [](int /*reqID*/, ec2::ErrorCode errCode)
+            {
+                if (errCode != ec2::ErrorCode::ok)
+                    qWarning() << "Failed to save time data to the database";
+            });
+    }
 }
 
 void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
@@ -1493,9 +1344,72 @@ void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
     {
         // Forgetting Internet time.
         QnMutexLocker lock(&m_mutex);
+        syncTimeWithAllKnownServers(lock);
         switchBackToLocalTime(&lock);
-        syncTimeWithAllKnownServers(&lock);
     }
+}
+
+bool TimeSynchronizationManager::saveSyncTimeSync(
+    qint64 syncTimeToLocalDelta,
+    const TimePriorityKey& syncTimeKey)
+{
+    if (!m_connection)
+        return false;
+
+    ApiMiscData deltaData(
+        TIME_DELTA_PARAM_NAME,
+        QByteArray::number(syncTimeToLocalDelta));
+
+    ApiMiscData priorityData(
+        USED_TIME_PRIORITY_KEY_PARAM_NAME,
+        QByteArray::number(syncTimeKey.toUInt64()));
+
+    auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+    return
+        manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
+        manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
+}
+
+void TimeSynchronizationManager::saveSyncTimeAsync(
+    QnMutexLockerBase* const lock,
+    qint64 syncTimeToLocalDelta,
+    TimePriorityKey syncTimeKey)
+{
+    QnMutexUnlocker unlocker(lock);
+    saveSyncTimeAsync(syncTimeToLocalDelta, syncTimeKey);
+}
+
+/**
+* @param syncTimeToLocalDelta local_time - sync_time
+*/
+void TimeSynchronizationManager::saveSyncTimeAsync(
+    qint64 syncTimeToLocalDelta,
+    const TimePriorityKey& syncTimeKey)
+{
+    if (!m_connection)
+        return;
+
+    ApiMiscData deltaData(
+        TIME_DELTA_PARAM_NAME,
+        QByteArray::number(syncTimeToLocalDelta));
+
+    ApiMiscData priorityData(
+        USED_TIME_PRIORITY_KEY_PARAM_NAME,
+        QByteArray::number(syncTimeKey.toUInt64()));
+
+    auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+    manager->saveMiscParam(deltaData, this,
+        [](int /*reqID*/, ErrorCode errCode)
+    {
+        if (errCode != ec2::ErrorCode::ok)
+            NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+    });
+    manager->saveMiscParam(priorityData, this,
+        [](int /*reqID*/, ErrorCode errCode)
+    {
+        if (errCode != ec2::ErrorCode::ok)
+            NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+    });
 }
 
 } // namespace ec2

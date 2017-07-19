@@ -35,7 +35,7 @@ class Settings;
 class UDPHolePunchingConnectionInitiationFsm:
     public network::aio::BasicPollable
 {
-    using Parent = network::aio::BasicPollable;
+    using base_type = network::aio::BasicPollable;
 
 public:
     /** 
@@ -73,7 +73,7 @@ private:
         waitingServerPeerUDPAddress,
         /** reported server's UDP address to the client, waiting for result */
         waitingConnectionResult,
-        fini
+        fini,
     };
 
     State m_state;

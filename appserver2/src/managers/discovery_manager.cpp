@@ -1,29 +1,12 @@
 #include "discovery_manager.h"
 
-#include "network/module_finder.h"
-#include "network/direct_module_finder.h"
+#include <api/global_settings.h>
+#include <common/common_module.h>
+
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include <common/common_module.h>
-
-namespace {
-
-ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
-{
-    ec2::QnPeerSet result;
-
-    auto clients = messageBus->aliveClientPeers();
-    for (auto it = clients.begin(); it != clients.end(); ++it)
-    {
-        const auto& clientId = it.key();
-        if (it->routingInfo.contains(clientId))
-            result.insert(clientId);
-    }
-
-    return result;
-}
-
-} // namespace
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
 
@@ -50,9 +33,8 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
-    QnModuleFinder *moduleFinder = commonModule()->moduleFinder();
-    if (moduleFinder && moduleFinder->directModuleFinder())
-        moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
+    if (const auto manager = commonModule()->moduleDiscoveryManager())
+        manager->checkEndpoint(QUrl(transaction.params.url), transaction.params.id);
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
@@ -102,10 +84,11 @@ template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::~QnDiscoveryManager() {}
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler)
+int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
     ApiDiscoverPeerData params;
+    params.id = id;
     params.url = url.toString();
 
     using namespace std::placeholders;
@@ -181,55 +164,60 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
     return reqID;
 }
 
-template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
-    QnTransactionMessageBus* messageBus,
-    const ApiDiscoveredServerData &discoveredServer,
-    impl::SimpleHandlerPtr handler)
-{
-    const auto peers = getDirectClientPeers(messageBus);
-    if (peers.isEmpty())
-        return -1;
-
-    QnTransaction<ApiDiscoveredServerData> transaction(
-        ApiCommand::discoveredServerChanged,
-        messageBus->commonModule()->moduleGUID(),
-        discoveredServer);
-
-    const int reqId = generateRequestID();
-
-    messageBus->sendTransaction(transaction, peers);
-    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
-    QnTransactionMessageBus* messageBus,
-    const ApiDiscoveredServerDataList &discoveredServersList,
-    impl::SimpleHandlerPtr handler)
-{
-    const auto peers = getDirectClientPeers(messageBus);
-    if (peers.isEmpty())
-        return -1;
-
-    QnTransaction<ApiDiscoveredServerDataList> transaction(
-        ApiCommand::discoveredServersList,
-        messageBus->commonModule()->moduleGUID(),
-        discoveredServersList);
-
-    const int reqId = generateRequestID();
-
-    messageBus->sendTransaction(transaction, peers);
-    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
-
-    return reqId;
-}
-
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
+
+QnDiscoveryMonitor::QnDiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
+    QnCommonModuleAware(messageBus->commonModule()),
+    m_messageBus(messageBus)
+{
+    QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
+        this, &QnDiscoveryMonitor::clientFound);
+
+    commonModule()->moduleDiscoveryManager()->onSignals(this, &QnDiscoveryMonitor::serverFound,
+        &QnDiscoveryMonitor::serverFound, &QnDiscoveryMonitor::serverLost);
+}
+
+QnDiscoveryMonitor::~QnDiscoveryMonitor()
+{
+    m_messageBus->disconnect(this);
+    commonModule()->moduleDiscoveryManager()->disconnect(this);
+}
+
+void QnDiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
+{
+    if (!ApiPeerData::isClient(peerType))
+        return;
+
+    send(ApiCommand::discoveredServersList,
+        getServers(commonModule()->moduleDiscoveryManager()), peerId);
+}
+
+void QnDiscoveryMonitor::serverFound(nx::vms::discovery::ModuleEndpoint module)
+{
+    const auto s = makeServer(module, globalSettings()->localSystemId());
+    m_serverCache.emplace(s.id, s);
+    send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
+}
+
+void QnDiscoveryMonitor::serverLost(QnUuid id)
+{
+    const auto it = m_serverCache.find(id);
+    if (it == m_serverCache.end())
+        return;
+
+    auto s = it->second;
+    m_serverCache.erase(it);
+
+    s.status = Qn::ResourceStatus::Offline;
+    send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
+}
+
+template<typename Transaction, typename Target>
+void QnDiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
+{
+    QnTransaction<Transaction> t(command, commonModule()->moduleGUID(), std::move(data));
+    sendTransaction(m_messageBus, std::move(t), target);
+}
 
 } // namespace ec2

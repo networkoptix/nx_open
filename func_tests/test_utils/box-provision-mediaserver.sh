@@ -1,5 +1,11 @@
 #!/bin/bash -xe
 
+if [ -z "$1" ]; then
+	echo "Mediaserver distributive name is expected as parameter"
+	exit 1
+fi
+
+MEDIASERVER_DIST_FNAME="$1"
 MEDIASERVER_CONF=/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf
 MEDIASERVER_CONF_INITIAL=$MEDIASERVER_CONF.initial
 export DEBIAN_FRONTEND=noninteractive
@@ -17,10 +23,11 @@ apt-get -y install \
         syslinux \
         syslinux-common \
         nas \
-        floppyd
+        floppyd \
+        cifs-utils
 
 echo "Install mediaserver..."
-dpkg -i --force-depends /vagrant/mediaserver.deb
+dpkg -i --force-depends "/vagrant/$MEDIASERVER_DIST_FNAME"
 
 while ! nc -z localhost 7001; do
 	echo "Server is not started yet; waiting..."

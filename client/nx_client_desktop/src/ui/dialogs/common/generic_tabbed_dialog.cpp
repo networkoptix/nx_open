@@ -1,5 +1,6 @@
 #include "generic_tabbed_dialog.h"
 
+#include <QtWidgets/QTabBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QPushButton>
 
@@ -346,6 +347,21 @@ void QnGenericTabbedDialog::initializeButtonBox()
 {
     base_type::initializeButtonBox();
     updateButtonBox();
+
+    QWidget* last = buttonBox();
+    for (;;)
+    {
+        auto next = last->nextInFocusChain();
+        if (!next || next == buttonBox() || next->parentWidget() != buttonBox())
+            break;
+
+        last = next;
+    }
+
+    auto tabBar = m_tabWidget->tabBar();
+
+    setTabOrder(last, tabBar);
+    tabBar->setFocus();
 }
 
 void QnGenericTabbedDialog::updateButtonBox()
@@ -362,3 +378,4 @@ void QnGenericTabbedDialog::updateButtonBox()
     if (QPushButton *okButton = buttonBox()->button(QDialogButtonBox::Ok))
         okButton->setEnabled(isReadOnly() || canApply);
 }
+

@@ -7,7 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <client/client_settings.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 
 namespace {
 
@@ -34,19 +34,18 @@ QSet<QnUuid> QnUpdateUtils::getServersLinkedToCloud(const QSet<QnUuid>& peers)
 
     QSet<QnUuid> result;
 
-    const auto moduleFinder = commonModule->moduleFinder();
-    if (!moduleFinder)
+    const auto moduleManager = commonModule->moduleDiscoveryManager();
+    if (!moduleManager)
         return result;
 
     for (const auto& id: peers)
     {
-        const auto server =
-            commonModule->resourcePool()->getIncompatibleResourceById(id, false).dynamicCast<QnMediaServerResource>();
+        const auto server = commonModule->resourcePool()->getIncompatibleServerById(id);
         if (!server)
             continue;
 
-        const auto moduleInformation = moduleFinder->moduleInformation(server);
-        if (!moduleInformation.cloudSystemId.isEmpty())
+        const auto module = moduleManager->getModule(id);
+        if (module && !module->cloudSystemId.isEmpty())
             result.insert(id);
     }
 

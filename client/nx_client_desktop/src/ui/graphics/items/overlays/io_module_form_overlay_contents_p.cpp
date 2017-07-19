@@ -251,7 +251,7 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     auto labelRect = buttonRect.adjusted(kButtonMargin, 0.0, -kIndicatorWidth, 0.0);
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
-    //TODO: #vkutin #apats Icon for disabled state is required
+    // TODO: #vkutin #apats Icon for disabled state is required
     auto icon = qnSkin->icon(lit("io/button_indicator_off.png"), lit("io/button_indicator_on.png"));
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;
@@ -414,19 +414,13 @@ QSizeF QnIoModuleFormOverlayContentsPrivate::Layout::sizeHint(
     if (count() == 0)
         return QSizeF();
 
-    if (m_inputItems.empty() || m_outputItems.empty())
-    {
-        /* One-column layout: */
-        return withContentsMargins(this, QSizeF(kMinimumItemWidth, kItemHeight));
-    }
-    else
-    {
-        /* Two-column layout: */
-        int rowCount = qMax(m_inputItems.size(), m_outputItems.size());
-        return withContentsMargins(this, QSize(
-            kMinimumItemWidth * 2 + kHorizontalSpacing,
-            kItemHeight * rowCount + kVerticalSpacing * (rowCount - 1)));
-    }
+    const int rowCount = qMax(m_inputItems.size(), m_outputItems.size());
+    const int height = kItemHeight * rowCount + kVerticalSpacing * (rowCount - 1);
+    const int width = m_inputItems.empty() || m_outputItems.empty()
+        ? kMinimumItemWidth                           //< one-column layout
+        : kMinimumItemWidth * 2 + kHorizontalSpacing; //< two-column layout
+
+    return withContentsMargins(this, QSizeF(width, height));
 }
 
 /*

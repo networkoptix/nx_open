@@ -60,4 +60,4 @@ TEST_F(StatisticsApi, listening_peer_list)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

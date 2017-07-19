@@ -1,41 +1,15 @@
-project(traytool)
-set(PROJECT_SHORTNAME "traytool")
-set(PROJECT_LONGNAME "${short.company.name} Tray Utility")
-if(WIN32)
-    set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
-endif()
-include(default_project_properties)
+set(product.title "${traytool.name}")
 
-# Additional Include Directories
-include_directories (${include_directories} src)
+nx_configure_file(maven/filter-resources/traytool_app_info_impl.cpp
+    ${CMAKE_CURRENT_BINARY_DIR})
 
-# Configure Qt
-find_package(Qt5Gui REQUIRED)
-
-find_sources(src)
-add_qtsingleapplication()
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_rc()
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-  
-
-add_executable(${PROJECT_SHORTNAME} WIN32
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
-  ${WINDOWS_RES_FILE}
+nx_add_target(traytool EXECUTABLE
+    ADDITIONAL_SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/traytool_app_info_impl.cpp"
+    ADDITIONAL_RESOURCES
+        "${customization_dir}/icons/all/logo.png"
+    PUBLIC_LIBS
+        Qt5::Widgets
+        qtsingleapplication
+        common
 )
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Widgets quazip common nx_utils nx_network DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib
-)
-
-if (UNIX)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          RUNTIME DESTINATION bin)
-elseif (WIN32)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          DESTINATION .)
-endif()

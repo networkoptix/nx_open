@@ -8,49 +8,14 @@
 
 #include <nx/utils/scope_guard.h>
 
+#include "tunnel_connection_stub.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
 namespace test {
 
 namespace {
-
-class TestTunnelConnection:
-    public AbstractOutgoingTunnelConnection
-{
-public:
-    virtual ~TestTunnelConnection() override
-    {
-        stopWhileInAioThread();
-    }
-
-    virtual void start() override
-    {
-    }
-
-    virtual void stopWhileInAioThread() override
-    {
-        auto onClosedHandler = std::move(m_onClosedHandler);
-        if (onClosedHandler)
-            onClosedHandler(SystemError::interrupted);
-    }
-
-    virtual void establishNewConnection(
-        std::chrono::milliseconds /*timeout*/,
-        SocketAttributes /*socketAttributes*/,
-        OnNewConnectionHandler /*handler*/) override
-    {
-    }
-
-    virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
-    {
-        m_onClosedHandler = std::move(handler);
-    }
-
-private:
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
-};
 
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
 constexpr auto allowedTimerError = std::chrono::seconds(5);
@@ -78,7 +43,7 @@ protected:
     {
         m_tunnel = std::make_unique<cloud::OutgoingTunnelConnectionWatcher>(
             m_connectionParameters,
-            std::make_unique<TestTunnelConnection>());
+            std::make_unique<TunnelConnectionStub>());
 
         m_tunnelAioThread = network::SocketGlobals::aioService().getRandomAioThread();
         m_tunnel->bindToAioThread(m_tunnelAioThread);

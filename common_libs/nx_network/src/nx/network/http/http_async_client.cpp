@@ -3,9 +3,10 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
-#include <http/custom_headers.h>
+#include <nx/network/buffered_stream_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -13,9 +14,8 @@
 #include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
-
-static const int DEFAULT_SEND_TIMEOUT = 3000;
-static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
+#include "buffer_source.h"
+#include "custom_headers.h"
 
 using std::make_pair;
 
@@ -23,7 +23,7 @@ namespace {
 
 static bool logTraffic()
 {
-    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+    return nx::network::SocketGlobals::debugIni().httpClientTraffic;
 }
 
 } // namespace
@@ -68,9 +68,9 @@ AsyncClient::AsyncClient():
     m_totalBytesReadPerRequest(0),
     m_totalRequestsSentViaCurrentConnection(0),
     m_contentEncodingUsed(true),
-    m_sendTimeoutMs(DEFAULT_SEND_TIMEOUT),
-    m_responseReadTimeoutMs(DEFAULT_RESPONSE_READ_TIMEOUT),
-    m_msgBodyReadTimeoutMs(0),
+    m_sendTimeout(Timeouts::kDefaultSendTimeout),
+    m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
+    m_msgBodyReadTimeout(0),
     m_authType(authBasicAndDigest),
     m_awaitedMessageNumber(0),
     m_lastSysErrorCode(SystemError::noError),
@@ -97,10 +97,21 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
 
     m_terminated = true;
 
+    if (!m_socket)
+        return nullptr;
+
     std::unique_ptr<AbstractStreamSocket> result;
     result.swap(m_socket);
-    if (result)
-        result->cancelIOSync(nx::network::aio::etNone);
+    result->cancelIOSync(nx::network::aio::etNone);
+    if (!m_receivedBytesLeft.isEmpty())
+    {
+        auto bufferedStreamSocket = 
+            std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
+        BufferType buf;
+        buf.swap(m_receivedBytesLeft);
+        bufferedStreamSocket->injectRecvData(std::move(buf));
+        result = std::move(bufferedStreamSocket);
+    }
     return result;
 }
 
@@ -109,6 +120,8 @@ void AsyncClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread
     base_type::bindToAioThread(aioThread);
     if (m_socket)
         m_socket->bindToAioThread(aioThread);
+    if (m_requestBody)
+        m_requestBody->bindToAioThread(aioThread);
 }
 
 AsyncClient::State AsyncClient::state() const
@@ -151,6 +164,12 @@ void AsyncClient::setOnDone(nx::utils::MoveOnlyFunc<void()> handler)
     m_onDone = std::move(handler);
 }
 
+void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
+{
+    m_requestBody = std::move(body);
+    m_requestBody->bindToAioThread(getAioThread());
+}
+
 void AsyncClient::doGet(const QUrl& url)
 {
     NX_ASSERT(!url.host().isEmpty());
@@ -159,7 +178,7 @@ void AsyncClient::doGet(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::GET);
+    composeRequest(nx_http::Method::get);
     initiateHttpMessageDelivery();
 }
 
@@ -171,84 +190,64 @@ void AsyncClient::doGet(
     doGet(url);
 }
 
-void AsyncClient::doPost(
-    const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
-    bool includeContentLength)
+void AsyncClient::doPost(const QUrl& url)
 {
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::POST);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
-    if (includeContentLength)
-        m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
-    //TODO #ak support chunked encoding & compression
-    m_request.headers.insert(make_pair("Content-Encoding", "identity"));
-    m_request.messageBody = std::move(messageBody);
+    composeRequest(nx_http::Method::post);
+    addBodyToRequest();
+
     initiateHttpMessageDelivery();
 }
 
 void AsyncClient::doPost(
     const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
-    bool includeContentLength,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-    doPost(url, contentType, std::move(messageBody), includeContentLength);
+    doPost(url);
 }
 
-void AsyncClient::doPut(
-    const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody)
+void AsyncClient::doPut(const QUrl& url)
 {
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::PUT);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
-    m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
-    //TODO #ak support chunked encoding & compression
-    m_request.messageBody = std::move(messageBody);
+    composeRequest(nx_http::Method::put);
+    addBodyToRequest();
+
     initiateHttpMessageDelivery();
 }
 
 void AsyncClient::doPut(
     const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-    doPut(url, contentType, std::move(messageBody));
+    doPut(url);
 }
 
-void AsyncClient::doOptions(const QUrl& url)
+void AsyncClient::doUpgrade(
+    const QUrl& url,
+    const StringType& protocolToUpgradeTo,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    m_onDone = std::move(completionHandler);
+
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    m_contentLocationUrl.setPath(QLatin1String("*"));
-    composeRequest(nx_http::Method::OPTIONS);
+    m_additionalHeaders.emplace("Connection", "Upgrade");
+    m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
+    composeRequest(nx_http::Method::options);
     initiateHttpMessageDelivery();
-}
-
-void AsyncClient::doOptions(
-    const QUrl& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    m_onDone = std::move(completionHandler);
-    doOptions(url);
 }
 
 const nx_http::Request& AsyncClient::request() const
@@ -290,7 +289,7 @@ BufferType AsyncClient::fetchMessageBodyBuffer()
 {
     const auto buffer = m_httpStreamReader.fetchMessageBody();
     if (logTraffic())
-        NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+        NX_LOGX(lm("Response message body buffer:\n%1\n\n").arg(buffer), cl_logDEBUG2);
 
     return buffer;
 }
@@ -377,30 +376,33 @@ void AsyncClient::setDisablePrecalculatedAuthorization(bool val)
     m_precalculatedAuthorizationDisabled = val;
 }
 
-void AsyncClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
+void AsyncClient::setSendTimeout(std::chrono::milliseconds sendTimeout)
 {
-    m_sendTimeoutMs = sendTimeoutMs;
+    m_sendTimeout = sendTimeout;
 }
 
-void AsyncClient::setResponseReadTimeoutMs(unsigned int _responseReadTimeoutMs)
+void AsyncClient::setResponseReadTimeout(
+    std::chrono::milliseconds _responseReadTimeout)
 {
-    m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    m_responseReadTimeout = _responseReadTimeout;
 }
 
-void AsyncClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs)
+void AsyncClient::setMessageBodyReadTimeout(
+    std::chrono::milliseconds messageBodyReadTimeout)
 {
-    m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    m_msgBodyReadTimeout = messageBodyReadTimeout;
 }
 
 void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
+    m_requestBody.reset();
 }
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .arg(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
+        .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
 
     if (m_terminated)
         return;
@@ -476,7 +478,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
 
     NX_LOGX(lm("Request has been successfully sent to %1: %2")
         .arg(m_contentLocationUrl)
-        .strs(logTraffic() ? request().toString() : request().requestLine.toString()),
+        .args(logTraffic() ? request().toString() : request().requestLine.toString()),
         cl_logDEBUG2);
 
     const auto requestSequenceBak = m_requestSequence;
@@ -490,14 +492,14 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
 
     m_state = sReceivingResponse;
     m_responseBuffer.resize(0);
-    if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
+    if (!m_socket->setRecvTimeout(m_responseReadTimeout))
     {
         if (reconnectIfAppropriate())
             return;
 
         const auto sysErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
-            .arg(m_contentLocationUrl).arg(m_responseReadTimeoutMs)
+            .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
             .arg(SystemError::toString(sysErrorCode)),
             cl_logDEBUG1);
         m_state = sFailed;
@@ -631,13 +633,13 @@ void AsyncClient::initiateTcpConnection()
     m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
 
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
-        .str(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;
     if (!m_socket->setNonBlockingMode(true) ||
-        !m_socket->setSendTimeout(m_sendTimeoutMs) ||
-        !m_socket->setRecvTimeout(m_responseReadTimeoutMs))
+        !m_socket->setSendTimeout(m_sendTimeout) ||
+        !m_socket->setRecvTimeout(m_responseReadTimeout))
     {
         m_socket->post(
             std::bind(
@@ -718,9 +720,9 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
     {
         const auto stateBak = m_state;
         const size_t bytesParsed = parseReceivedBytes(bytesRead);
-        QByteArray receivedBytesLeft;
+        m_receivedBytesLeft.clear();
         if (bytesParsed != (std::size_t)-1)
-            receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
+            m_receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
         m_responseBuffer.resize(0);
 
         bool continueReceiving = false;
@@ -753,7 +755,7 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         if (!continueReceiving)
             break;
 
-        if (receivedBytesLeft.isEmpty())
+        if (m_receivedBytesLeft.isEmpty())
         {
             NX_ASSERT(m_responseBuffer.size() == 0);
             m_socket->readSomeAsync(
@@ -763,7 +765,10 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         }
 
         NX_CRITICAL(bytesParsed != 0 && bytesParsed != (std::size_t)-1);
-        m_responseBuffer = std::move(receivedBytesLeft);
+
+        m_responseBuffer.swap(m_receivedBytesLeft);
+        m_receivedBytesLeft.clear();
+
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
         bytesRead = m_responseBuffer.size();
     }
@@ -809,9 +814,15 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return emitDone();
     }
 
+    if (isMalformed(*m_httpStreamReader.message().response))
+    {
+        m_state = sFailed;
+        return emitDone();
+    }
+
     NX_LOGX(lm("Response from %1 has been successfully read: %2")
         .arg(m_contentLocationUrl)
-        .str(logTraffic() ? response()->toString() : response()->statusLine.toString()),
+        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()),
         cl_logDEBUG2);
 
     if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
@@ -863,7 +874,7 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
     {
         //reading more data
         m_responseBuffer.resize(0);
-        if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
+        if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
         {
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),
@@ -883,6 +894,23 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
 
     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
     return emitDone();
+}
+
+bool AsyncClient::isMalformed(const nx_http::Response& response) const
+{
+    if (response.statusLine.statusCode == StatusCode::switchingProtocols)
+    {
+        if (nx_http::getHeaderValue(response.headers, "Upgrade").isEmpty())
+        {
+            NX_LOGX(lm("Received malformed response from %1. "
+                "Status code is %2 and no Upgrade header present")
+                .arg(m_contentLocationUrl).arg(response.statusLine.statusCode),
+                cl_logDEBUG1);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool AsyncClient::repeatRequestIfNeeded(const Response& response)
@@ -992,7 +1020,10 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
     }
     else    //if no proxy specified then erasing http://host:port from request url
     {
-        m_request.requestLine.url = m_contentLocationUrl.path();
+        if (httpMethod == nx_http::Method::options && m_contentLocationUrl.path().isEmpty())
+            m_request.requestLine.url = "*";
+        else
+            m_request.requestLine.url = m_contentLocationUrl.path();
         m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
         m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
     }
@@ -1006,7 +1037,7 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
     if (useHttp11)
     {
-        if (httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD)
+        if (httpMethod == nx_http::Method::get || httpMethod == nx_http::Method::head)
         {
             //m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if (m_contentEncodingUsed)
@@ -1020,7 +1051,11 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
             m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
 
         if (m_additionalHeaders.count("Host") == 0)
-            m_request.headers.insert(std::make_pair("Host", m_contentLocationUrl.host().toLatin1()));
+        {
+            m_request.headers.emplace(
+                "Host",
+                nx::network::url::getEndpoint(m_contentLocationUrl).toString().toUtf8());
+        }
     }
 
     m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
@@ -1066,10 +1101,38 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
         }
         else
         {
-            //not using Basic authentication by default, since it is not secure
+            // Not using Basic authentication by default, since it is not secure.
             nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
         }
     }
+}
+
+void AsyncClient::addBodyToRequest()
+{
+    if (!m_requestBody)
+        return;
+
+    m_request.headers.emplace("Content-Type", m_requestBody->mimeType());
+    if (m_requestBody->contentLength())
+    {
+        m_request.headers.emplace(
+            "Content-Length",
+            StringType::number((qulonglong)*m_requestBody->contentLength()));
+    }
+    // TODO: #ak Support chunked encoding & compression.
+    m_request.headers.insert(make_pair("Content-Encoding", "identity"));
+
+    // TODO: #ak Add support for any body.
+    NX_CRITICAL(
+        dynamic_cast<BufferSource*>(m_requestBody.get()) != nullptr,
+        "Only fixed request body supported at the moment");
+    const auto contentLength = *m_requestBody->contentLength();
+    m_requestBody->readAsync(
+        [this](SystemError::ErrorCode /*sysErrorCode*/, nx_http::BufferType buffer)
+        {
+            m_request.messageBody = std::move(buffer);
+        });
+    NX_ASSERT(static_cast<std::size_t>(m_request.messageBody.size()) == contentLength);
 }
 
 void AsyncClient::addAdditionalHeader(const StringType& key, const StringType& value)

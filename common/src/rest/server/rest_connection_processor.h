@@ -3,7 +3,7 @@
 
 #include <QtCore/QVariantList>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
@@ -34,8 +34,6 @@ private:
     RedirectRules m_redirectRules;
 };
 
-class QnRestConnectionProcessorPrivate;
-
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
@@ -54,12 +52,12 @@ public:
     const nx_http::Request& request() const;
     nx_http::Response* response() const;
     QnTcpListener* owner() const;
+
 protected:
     virtual void run() override;
 
 private:
     bool m_noAuth;
-    Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 
 #endif // _REST_CONNECTION_PROCESSOR_H__

@@ -5,6 +5,7 @@
 #include <client_core/local_connection_data.h>
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <utils/common/encoded_credentials.h>
 
 class QSettings;
@@ -29,7 +30,11 @@ public:
         ForgottenSystems,
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
-        KnownServerUrls,    //< A list of the urls that were discovered by QnDirectModuleFinder.
+        KnownServerConnections,
+
+        // Obsolete values.
+
+        KnownServerUrls,
 
         PropertiesCount
     };
@@ -37,6 +42,7 @@ public:
     using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
     using RecentLocalConnectionsHash = QHash<QnUuid, nx::client::core::LocalConnectionData>;
     using WeightDataList = QList<nx::client::core::WeightData>;
+    using KnownServerConnection = nx::client::core::watchers::KnownServerConnections::Connection;
 
 public:
     QnClientCoreSettings(QObject* parent = nullptr);
@@ -87,11 +93,16 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,
             skipStartupTilesManagement, setSkipStartupTilesManagement,
             SkipStartupTilesManagement, false)
+        QN_DECLARE_RW_PROPERTY(QList<KnownServerConnection>,
+            knownServerConnections, setKnownServerConnections,
+            KnownServerConnections, QList<KnownServerConnection>())
+
+        // Obsolete values.
+
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,
             knownServerUrls, setKnownServerUrls,
             KnownServerUrls, QList<QUrl>())
     QN_END_PROPERTY_STORAGE()
-
 
 private:
     QSettings* m_settings;

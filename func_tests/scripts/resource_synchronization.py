@@ -3,12 +3,16 @@
 import sys
 sys.path.append('..')
 
+import uuid
 import logging
 import traceback
 import argparse
+import urllib
+import base64
+import time
 import resource_synchronization_test as test
 from ConfigParser import ConfigParser
-from test_utils.server_rest_api import ServerRestApi
+from test_utils.server import Server
 from test_utils.utils import SimpleNamespace
 
 DEFAULT_CONFIG_SECTION = 'General'
@@ -23,34 +27,14 @@ DEFAULT_MAX_LOG_WIDTH = 1000
 log = logging.getLogger(__name__)
 
 
-class RemoteServer(object):
-
-    def __init__(self, name, box, user, password):
-        self.title = name
-        self.box = box
-        self.url = 'http://%s/' % self.box
-        self.user = user
-        self.password = password
-        self.ecs_guid = None
-        self.settings = None
-        self.local_system_id = None
-        self.rest_api = ServerRestApi(self.title, self.url, self.user, self.password)
-        self.load_system_settings()
-
-    def load_system_settings(self):
-        self.settings = self.get_system_settings()
-        self.local_system_id = self.settings['localSystemId']
-        self.cloud_system_id = self.settings['cloudSystemID']
-        self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
-
-    def get_system_settings(self):
-        response = self.rest_api.api.systemSettings.GET()
-        return response['settings']
-
-
 def read_servers(config):
     server_list = config.get(DEFAULT_CONFIG_SECTION, 'serverList')
-    return server_list.split(",")
+
+    def endpoint_from_str(s):
+        endpoint_list = s.split(':') + [None]
+        return tuple(endpoint_list[0:2])
+
+    return map(endpoint_from_str, server_list.split(","))
 
 
 def run_test(test_name, env):
@@ -88,12 +72,14 @@ def main():
     password = config.get(DEFAULT_CONFIG_SECTION, CONFIG_PASSWORD)
     test_size = config.getint(DEFAULT_CONFIG_SECTION, CONFIG_TESTSIZE)
     thread_number = config.getint(DEFAULT_CONFIG_SECTION, CONFIG_THREADS)
-    servers = {'srv_%d' % idx:
-               RemoteServer('srv-%d' % idx,
-                            srv,
-                            username,
-                            password)
-               for idx, srv in enumerate(read_servers(config))}
+    servers = dict()
+    for idx, (host, port) in enumerate(read_servers(config)):
+        server_name = 'Server_%d' % idx
+        rest_api_url = 'http://%s:%s/' % (host, port)
+        server = Server('networkoptix', server_name, rest_api_url, internal_ip_port=port)
+        server._is_started = True
+        server.load_system_settings()
+        servers[server_name] = server
     env = SimpleNamespace(servers=servers,
                           test_size=test_size,
                           thread_number=thread_number,

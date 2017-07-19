@@ -7,6 +7,7 @@
 #include <nx/utils/unused.h>
 
 #if defined(Q_OS_LINUX)
+    #include <time.h>
     #include <sys/time.h>
     #include <QtCore/QFile>
     #include <QtCore/QProcess>
@@ -18,8 +19,12 @@ using namespace std::chrono;
 namespace nx {
 namespace utils {
 
+namespace {
+
 static milliseconds utcTimeShift(0);
 static milliseconds monotonicTimeShift(0);
+
+} // namespace
 
 /**
  * On Linux, get filename of a file which is used to set system time zone.
@@ -49,7 +54,7 @@ system_clock::time_point utcTime()
 
 seconds timeSinceEpoch()
 {
-    return duration_cast<seconds>(utcTime().time_since_epoch());
+    return seconds(system_clock::to_time_t(utcTime()));
 }
 
 steady_clock::time_point monotonicTime()
@@ -117,6 +122,24 @@ QString getCurrentTimeZoneId()
 {
     const QString id = QDateTime::currentDateTime().timeZone().id();
 
+    #if defined(Q_OS_LINUX)
+        if (id.isEmpty())
+        {
+            // Obtain time zone via POSIX functions (thread-safe).
+            NX_LOG(lit(
+                "getCurrentTimeZoneId(): QDateTime time zone id is empty, trying localtime_r()"),
+                cl_logDEBUG1);
+            constexpr int kMaxTimeZoneSize = 32;
+            struct timespec timespecTime;
+            struct tm tmTime;
+            time(&timespecTime.tv_sec);
+            localtime_r(&timespecTime.tv_sec, &tmTime);
+            char timeZone[kMaxTimeZoneSize];
+            strftime(timeZone, sizeof(timeZone), "%Z", &tmTime);
+            return QLatin1String(timeZone);
+        }
+    #endif
+
     // For certain values, return the equivalent known to be in the list of supported ids.
     if (id == "Etc/UTC" ||
         id == "Etc/GMT" ||
@@ -128,6 +151,7 @@ QString getCurrentTimeZoneId()
         id == "Etc/Universal" ||
         id == "Etc/Zulu")
     {
+        NX_LOG(lit("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id), cl_logDEBUG1);
         return "UTC";
     }
 

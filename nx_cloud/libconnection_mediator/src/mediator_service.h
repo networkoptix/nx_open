@@ -23,13 +23,10 @@ namespace hpm {
 
 class PeerRegistrator;
 
-namespace conf {
+namespace conf { class Settings; }
+namespace http { class Server; }
 
-class Settings;
-
-} // namespace conf
-
-class BusinessLogicComposite;
+class Controller;
 class ListeningPeerPool;
 class StunServer;
 
@@ -50,18 +47,12 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
-    std::vector<SocketAddress> m_httpEndpoints;
-    BusinessLogicComposite* m_businessLogicComposite;
-    StunServer* m_stunServerComposite;
+    Controller* m_controller;
+    StunServer* m_stunServer;
+    http::Server* m_httpServer;
 
     QString getDataDirectory();
     int printHelp();
-    bool launchHttpServerIfNeeded(
-        const conf::Settings& settings,
-        const PeerRegistrator& peerRegistrator,
-        std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
-        std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
-            multiAddressHttpServer);
 };
 
 } // namespace hpm

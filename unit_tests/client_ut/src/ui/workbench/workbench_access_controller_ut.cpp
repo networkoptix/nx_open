@@ -252,7 +252,6 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
-    Qn::Permissions actual = m_accessController->permissions(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;

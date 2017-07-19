@@ -7,12 +7,12 @@
 #include "workbench_grid_mapper.h"
 
 /**
- * Simple magnitude calculator for finding the best place for an item. 
+ * Simple magnitude calculator for finding the best place for an item.
  */
 class QnDistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
 public:
     /**
-     * \param origin                    Desired position for an item. 
+     * \param origin                    Desired position for an item.
      */
     QnDistanceMagnitudeCalculator(const QPointF &origin):
         m_origin(origin),
@@ -26,15 +26,15 @@ protected:
         return m_calculator->calculate(p - m_origin);
     }
 
-private:
+protected:
     QPointF m_origin;
     TypedMagnitudeCalculator<QPointF> *m_calculator;
 };
 
 
 /**
- * Magnitude calculator for finding the best place for an item. 
- * 
+ * Magnitude calculator for finding the best place for an item.
+ *
  * Takes viewport's aspect ratio and scene bounding rect into account.
  */
 class QnAspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {

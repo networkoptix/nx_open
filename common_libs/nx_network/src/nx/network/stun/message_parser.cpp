@@ -379,10 +379,10 @@ int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
     }
 }
 
-nx_api::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred )
+nx::network::server::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred )
 {
     if (user_buffer.isEmpty())  //end-of-file received
-        return nx_api::ParserState::inProgress;
+        return nx::network::server::ParserState::readingMessage;
 
     // Setting up the buffer environment variables
     MessageParserBuffer buffer(&m_tempBuffer,user_buffer);
@@ -432,7 +432,7 @@ nx_api::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::s
                 break;
             default:
                 NX_ASSERT(0);
-                return nx_api::ParserState::failed;
+                return nx::network::server::ParserState::failed;
         }
 
         switch(ret) {                                       
@@ -440,19 +440,19 @@ nx_api::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::s
                 break;  //continuing parsing
             case IN_PROGRESS:   
                 *bytes_transferred = buffer.position();
-                return nx_api::ParserState::inProgress;     
+                return nx::network::server::ParserState::readingMessage;
             case FAILED:
                 *bytes_transferred = buffer.position();
-                return nx_api::ParserState::failed;         
+                return nx::network::server::ParserState::failed;         
             case FINISH:
                 *bytes_transferred = buffer.position();
-                return nx_api::ParserState::done;           
+                return nx::network::server::ParserState::done;           
             default :                                       
                 NX_ASSERT(0);                                
-                return nx_api::ParserState::failed;                                      
+                return nx::network::server::ParserState::failed;                                      
         }                                                       
     } while( true );
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

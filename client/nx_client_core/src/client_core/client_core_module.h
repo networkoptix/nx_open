@@ -6,6 +6,8 @@
 #include <nx/utils/singleton.h>
 
 class QnCommonModule;
+class QnPtzControllerPool;
+class QnLayoutTourStateManager;
 
 class QnClientCoreModule: public QObject, public Singleton<QnClientCoreModule>
 {
@@ -17,6 +19,8 @@ public:
 
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnectionFactory* connectionFactory() const;
+    QnPtzControllerPool* ptzControllerPool() const;
+    QnLayoutTourStateManager* layoutTourStateManager() const;
 
 private:
     QnCommonModule* m_commonModule;

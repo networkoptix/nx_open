@@ -10,16 +10,16 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <common/common_module.h>
 
 QnRouter::QnRouter(
     QObject* parent,
-    QnModuleFinder *moduleFinder)
-    :
+    nx::vms::discovery::Manager* moduleManager)
+:
     QObject(parent),
     QnCommonModuleAware(parent),
-    m_moduleFinder(moduleFinder)
+    m_moduleManager(moduleManager)
 {
 }
 
@@ -29,9 +29,12 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 {
     QnRoute result;
     result.id = id;
-    result.addr = m_moduleFinder->primaryAddress(id);
-    if (!result.addr.isNull())
+    if (const auto endpoint = m_moduleManager->getEndpoint(id))
+    {
+        result.addr = *endpoint;
         return result; // direct access to peer
+    }
+
     auto connection = commonModule()->ec2Connection();
     if (!connection)
         return result; // no connection to the server, can't route
@@ -43,9 +46,12 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
             return result;
 
         result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
-        result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
-        NX_ASSERT(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
-		// todo: add distance for camera route
+        if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
+            result.addr = *endpoint;
+        else
+            NX_ASSERT(false, "No primary interface found for current EC.");
+
+        // todo: add distance for camera route
         return result;
     }
 
@@ -63,9 +69,11 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 
     // route gateway is found
     result.gatewayId = routeVia;
-    result.addr = m_moduleFinder->primaryAddress(routeVia);
-    if (result.addr.isNull())
+    if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
+        result.addr = *endpoint;
+    else
         result.reverseConnect = true;
+
     return result;
 }
 

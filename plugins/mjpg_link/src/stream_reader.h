@@ -13,7 +13,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
 #include <plugins/camera_plugin.h>
@@ -61,6 +61,7 @@ private:
     };
 
     nxpt::CommonRefManager m_refManager;
+    CyclicAllocator m_allocator;
     nxcip::CameraInfo m_cameraInfo;
     float m_fps;
     int m_encoderNumber;
@@ -74,7 +75,6 @@ private:
     bool m_terminated;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
-    CyclicAllocator m_allocator;
     std::atomic<int> m_isInGetNextData;
     nxpl::TimeProvider* const m_timeProvider;
  

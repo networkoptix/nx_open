@@ -1,6 +1,5 @@
 #include "messaging.h"
 
-#include "utils/memory/data_stream_helpers.h"
 #include <nx/utils/random.h>
 
 static const int NONCE_SIZE = 12;

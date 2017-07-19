@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 
 #include <nx/utils/singleton.h>
 

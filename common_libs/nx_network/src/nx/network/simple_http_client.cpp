@@ -5,9 +5,10 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrl>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-#include "http/httptypes.h"
+#include "http/http_types.h"
 
 //static const int MAX_LINE_LENGTH = 1024*16;
 
@@ -112,10 +113,19 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (m_host.isEmpty() || !m_sock->connect(m_host, m_port))
+            if (m_host.isEmpty())
+                return CL_TRANSPORT_ERROR;
+
+            NX_VERBOSE(this, lm("Connecting to %1:%2").arg(m_host).arg(m_port));
+            if (!m_sock->connect(m_host, m_port))
             {
+                const auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_VERBOSE(this, lm("Failed to connect. %1")
+                    .arg(SystemError::toString(systemErrorCode)));
                 return CL_TRANSPORT_ERROR;
             }
+
+            NX_VERBOSE(this, lm("Connect succeeded"));
         }
 
         QByteArray request;

@@ -13,7 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_listener.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <api/global_settings.h>
 #include <media_server/media_server_module.h>
 
@@ -54,7 +54,7 @@ void requestRemotePeers(
 
     auto servers = QSet<QnMediaServerResourcePtr>::fromList(commonModule->resourcePool()->getAllServers(Qn::Online));
 
-    for (const auto& moduleInformation: commonModule->moduleFinder()->foundModules())
+    for (const auto& moduleInformation: commonModule->moduleDiscoveryManager()->getAll())
     {
         if (moduleInformation.systemName != systemName)
             continue;

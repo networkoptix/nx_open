@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Number pronunciation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Text analysis"
+HREF="c1189.html"><LINK
+REL="PREVIOUS"
+TITLE="Token to word rules"
+HREF="x1207.html"><LINK
+REL="NEXT"
+TITLE="Homograph disambiguation"
+HREF="x1357.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1207.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Text analysis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1357.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1339"
+>Number pronunciation</A
+></H1
+><P
+>Almost every one will expect a synthesizer to be able to 
+speech numbers. As it is not feasible to list all possible 
+digit strings in your lexicon. You will need to provide a function 
+that returns a string of words for a given string of digits. </P
+><P
+>In its simplest form you should provide a function that 
+decodes the string of digits. The example <CODE
+CLASS="VARNAME"
+>spanish_number</CODE
+> 
+(and <CODE
+CLASS="VARNAME"
+>spanish_number_from_digits}</CODE
+> in the released Spanish 
+voice (<TT
+CLASS="FILENAME"
+>festvox_ellpc11k.tar.gz</TT
+> is a good general 
+example. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1346"
+>Multi-token numbers</A
+></H2
+><P
+>A number of languages uses spaces within numbers where English might use 
+commas. For example German, Polish and others text may contain 
+<A
+NAME="AEN1349"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>64&nbsp;000&nbsp;</P
+></BLOCKQUOTE
+>
+to denote sixty four thousand. As this will be multiple tokens in 
+Festival's basic analysis it is necessary to write multiple conditions 
+in your <CODE
+CLASS="VARNAME"
+>token_to_words</CODE
+> function. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1352"
+>Declensions</A
+></H2
+><P
+>In many languages, the pronunciation of a number depends on the thing 
+that is being counted. For example the digit '1' in Spanish has 
+multiple pronunciations depending on whether it is refering to a 
+masculine or feminine object. In some languages this becomes much more 
+complex where there are a number of possible declensions. In our Polish 
+synthesizer we solved this by adding an extra argument to number 
+generation function which then selected the actual number word 
+(typically the final word in a number) based in the desired declension. </P
+><A
+NAME="AEN1355"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>%%%%%%%%%%%%%%%%%%%<br>
+Example&nbsp;to&nbsp;be&nbsp;added&nbsp;<br>
+%%%%%%%%%%%%%%%%%%%</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1207.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1357.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Token to word rules</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1189.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Homograph disambiguation</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

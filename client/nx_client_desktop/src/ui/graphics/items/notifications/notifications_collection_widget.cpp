@@ -9,7 +9,9 @@
 
 #include <nx/utils/log/log.h>
 
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/strings_helper.h>
+
+#include <business/business_resource_validation.h>
 
 #include <camera/single_thumbnail_loader.h>
 
@@ -29,6 +31,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 
 //TODO: #gdm think about moving out pages enums
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -50,21 +53,26 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
 #include <nx/fusion/model_functions.h>
+#include <camera/camera_bookmarks_manager.h>
+#include <core/resource/security_cam_resource.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
 
-static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
+static const QSize kDefaultThumbnailSize(224, 0);
 
 /** We limit the maximal number of notification items to prevent crashes due
  * to reaching GDI resource limit. */
@@ -82,7 +90,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this)),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](action::IDType actionId, int helpTopicId)
@@ -131,13 +139,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     setLayout(layout);
 
     QnWorkbenchNotificationsHandler* handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler,    &QnWorkbenchNotificationsHandler::notificationAdded,        this,   &QnNotificationsCollectionWidget::showBusinessAction);
-    connect(handler,    &QnWorkbenchNotificationsHandler::notificationRemoved,      this,   &QnNotificationsCollectionWidget::hideBusinessAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::notificationAdded,        this,   &QnNotificationsCollectionWidget::showEventAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::notificationRemoved,      this,   &QnNotificationsCollectionWidget::hideEventAction);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventAdded,   this,   &QnNotificationsCollectionWidget::showSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -233,28 +240,87 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
-void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
+/*
+            {
+                // TODO: change this
+                for (const auto bookmark: bookmarks)
+                    qnCameraBookmarksManager->addCameraBookmark(bookmark);
+
+                static constexpr int kHintTimeoutMs = 5000;
+                const auto message = bookmarks.count() == 1
+                    ? tr("Bookmark created")
+                    : tr("%n bookmarks created", "", bookmarks.count());
+                QnGraphicsMessageBox::information(message, kHintTimeoutMs);
+
+                action(action::BookmarksModeAction)->setChecked(true);
+            });
+    */
+
+void QnNotificationsCollectionWidget::handleShowPopupAction(
+    const vms::event::AbstractActionPtr& action,
+    QnNotificationWidget* widget)
+{
+    if (action->actionType() != vms::event::ActionType::showPopupAction)
+    {
+        NX_ASSERT(false, "Invalid action type.");
+        return;
+    }
+
+    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
+        return;
+
+    const auto params = action->getParams();
+    if (!params.requireConfirmation(action->getRuntimeParams().eventType))
+        return;
+
+    widget->setCloseButtonUnavailable();
+    widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
+        [this, action]()
+        {
+            auto& actionParams = action->getParams();
+            actionParams.recordBeforeMs = 0;
+
+            static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
+            actionParams.durationMs = kDurationMs.count();
+
+            // Action will trigger additional event loop, which will cause problems here.
+            executeDelayedParented(
+                [this, action]
+                {
+                    menu()->trigger(action::AcknowledgeEventAction, {Qn::ActionDataRole, action});
+                }, kDefaultDelay, this);
+        });
+
+    m_customPopupItems.insert(action->getParams().actionId, widget);
+}
+
+void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
 {
     if (m_list->itemCount() >= kMaxNotificationItems)
         return; /* Just drop the notification if we already have too many of them in queue. */
 
-    QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QnBusiness::EventType eventType = params.eventType;
-    QnUuid ruleId = businessAction->getBusinessRuleId();
+    vms::event::EventParameters params = action->getRuntimeParams();
+    NX_ASSERT(QnBusiness::hasAccessToSource(params, context()->user())); //< Checked already.
+
+    vms::event::EventType eventType = params.eventType;
+    QnUuid ruleId = action->getRuleId();
     QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
-    auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
-    if (businessAction->getParams().useSource)
-        alarmCameras << resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+    auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+    if (action->getParams().useSource)
+        alarmCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto server = resource.dynamicCast<QnMediaServerResource>();
+    const bool hasViewPermission = accessController()->hasPermissions(resource,
+        Qn::ViewContentPermission);
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
             return;
@@ -262,7 +328,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         auto findItemPredicate =
             [timestampMs](QnNotificationWidget* item)
             {
-                return item->property(kItemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
+                return item->property(kItemActionTypePropertyName) == vms::event::showOnAlarmLayoutAction
                     && item->property(kItemTimeStampPropertyName) == timestampMs;
             };
 
@@ -271,30 +337,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
         title = tr("Alarm: %1").arg(title);
     }
-    else
-    {
-        if (QnBusiness::isSourceCameraRequired(eventType))
-        {
-            NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
-            if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
-                return;
-        }
 
-        if (QnBusiness::isSourceServerRequired(eventType))
-        {
-            NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
-            /* Only admins should see notifications with servers. */
-            if (!server || !accessController()->hasPermissions(server, Qn::ViewContentPermission))
-                return;
-        }
-    }
-
-    QStringList tooltip = m_helper->eventDescription(businessAction,
-        QnBusinessAggregationInfo(), qnSettings->extraInfoInTree());
+    QStringList tooltip = m_helper->eventDescription(action,
+        vms::event::AggregationInfo(), qnSettings->extraInfoInTree());
 
     //TODO: #GDM #3.1 move this code to ::eventDetails()
-    if (eventType == QnBusiness::LicenseIssueEvent
-        && params.reasonCode == QnBusiness::LicenseRemoved)
+    if (eventType == vms::event::licenseIssueEvent
+        && params.reasonCode == vms::event::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
         for (const QString& stringId : params.description.split(L';'))
@@ -310,22 +359,31 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnNotificationWidget* item = new QnNotificationWidget(m_list);
     item->setText(title);
     item->setTooltipText(tooltip.join(L'\n'));
-    item->setNotificationLevel(QnNotificationLevel::valueOf(businessAction));
+    item->setNotificationLevel(QnNotificationLevel::valueOf(action));
     item->setProperty(kItemResourcePropertyName,   QVariant::fromValue<QnResourcePtr>(resource));
-    item->setProperty(kItemActionTypePropertyName, businessAction->actionType());
+    item->setProperty(kItemActionTypePropertyName, action->actionType());
     item->setProperty(kItemTimeStampPropertyName,  timestampMs);
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
+    switch (action->actionType())
     {
-        QString soundUrl = businessAction->getParams().url;
-        m_itemsByLoadingSound.insert(soundUrl, item);
-        context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
-    }
+        case vms::event::playSoundAction:
+        {
+            QString soundUrl = action->getParams().url;
+            m_itemsByLoadingSound.insert(soundUrl, item);
+            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            break;
+        }
+        case vms::event::showPopupAction:
+            handleShowPopupAction(action, item);
+            break;
+        default:
+            break;
+    };
 
-    QIcon icon = iconForAction(businessAction);
+    QIcon icon = iconForAction(action);
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
         item->addActionButton(
             icon,
@@ -338,32 +396,35 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     {
         switch (eventType)
         {
-            case QnBusiness::CameraMotionEvent:
-            case QnBusiness::SoftwareTriggerEvent:
+            case vms::event::cameraMotionEvent:
+            case vms::event::softwareTriggerEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
-                    action::OpenInNewLayoutAction,
+                    action::OpenInNewTabAction,
                     action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
                 break;
             }
 
-            case QnBusiness::CameraInputEvent:
+            case vms::event::cameraInputEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
-                    action::OpenInNewLayoutAction,
+                    action::OpenInNewTabAction,
                     camera);
 
                 loadThumbnailForItem(item, camera);
                 break;
             }
 
-            case QnBusiness::CameraDisconnectEvent:
-            case QnBusiness::NetworkIssueEvent:
+            case vms::event::cameraDisconnectEvent:
+            case vms::event::networkIssueEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::CameraSettingsAction,
@@ -373,11 +434,12 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 break;
             }
 
-            case QnBusiness::StorageFailureEvent:
-            case QnBusiness::BackupFinishedEvent:
-            case QnBusiness::ServerStartEvent:
-            case QnBusiness::ServerFailureEvent:
+            case vms::event::storageFailureEvent:
+            case vms::event::backupFinishedEvent:
+            case vms::event::serverStartEvent:
+            case vms::event::serverFailureEvent:
             {
+                NX_ASSERT(hasViewPermission);
                 item->addActionButton(
                     icon,
                     action::ServerSettingsAction,
@@ -385,7 +447,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 break;
             }
 
-            case QnBusiness::CameraIpConflictEvent:
+            case vms::event::cameraIpConflictEvent:
             {
                 QString webPageAddress = params.caption;
                 item->addActionButton(
@@ -395,13 +457,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 break;
             }
 
-            case QnBusiness::ServerConflictEvent:
+            case vms::event::serverConflictEvent:
             {
                 item->addActionButton(icon);
                 break;
             }
 
-            case QnBusiness::LicenseIssueEvent:
+            case vms::event::licenseIssueEvent:
             {
                 item->addActionButton(
                     icon,
@@ -409,7 +471,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 break;
             }
 
-            case QnBusiness::UserDefinedEvent:
+            case vms::event::userDefinedEvent:
             {
                 auto sourceCameras = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
@@ -417,7 +479,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 {
                     item->addActionButton(
                         icon,
-                        action::OpenInNewLayoutAction,
+                        action::OpenInNewTabAction,
                         action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
@@ -430,32 +492,47 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         }
     }
 
-    m_itemsByBusinessRuleId.insert(ruleId, item);
+    m_itemsByEventRuleId.insert(ruleId, item);
 
-    connect(item, &QnNotificationWidget::buttonClicked, this, [this](const QString& alias)
-    {
-        context()->statisticsModule()->registerClick(alias);
-    });
+    connect(item, &QnNotificationWidget::buttonClicked, this,
+        [this](const QString& alias)
+        {
+            context()->statisticsModule()->registerClick(alias);
+        });
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
-    m_list->addItem(item, businessAction->actionType() == QnBusiness::PlaySoundAction);
+    connect(item, &QnNotificationWidget::actionTriggered, this,
+        &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+
+    const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
+    const bool isAcknowledgmentAction =
+        action->actionType() == vms::event::showPopupAction
+        && action->getParams().requireConfirmation(action->getRuntimeParams().eventType)
+        && context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
+
+    const bool isLockedItem = isPlaySoundAction || isAcknowledgmentAction;
+    m_list->addItem(item, isLockedItem);
 }
 
-void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
+void QnNotificationsCollectionWidget::hideEventAction(const vms::event::AbstractActionPtr& action)
 {
-    QnUuid ruleId = businessAction->getBusinessRuleId();
-
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
+    const auto customPopupId = action->getParams().actionId;
+    const auto it = m_customPopupItems.find(customPopupId);
+    if (it != m_customPopupItems.end())
     {
-        for (QnNotificationWidget* item: m_itemsByBusinessRuleId.values(ruleId))
-        {
-            m_list->removeItem(item);
-            cleanUpItem(item);
-        }
+        cleanUpItem(it.value());
+        return;
     }
 
-    QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getRuntimeParams().eventResourceId);
+    QnUuid ruleId = action->getRuleId();
+
+    if (action->actionType() == vms::event::playSoundAction)
+    {
+        for (QnNotificationWidget* item: m_itemsByEventRuleId.values(ruleId))
+            cleanUpItem(item);
+    }
+
+    QnResourcePtr resource = resourcePool()->getResourceById(action->getRuntimeParams().eventResourceId);
     if (!resource)
         return;
 
@@ -463,7 +540,6 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
     if (!item)
         return;
 
-    m_list->removeItem(item);
     cleanUpItem(item);
 }
 
@@ -476,36 +552,36 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return nullptr;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& businessRuleId, const QnResourcePtr& resource)
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& RuleId, const QnResourcePtr& resource)
 {
-    for (QnNotificationWidget* item: m_itemsByBusinessRuleId.values(businessRuleId))
+    for (QnNotificationWidget* item: m_itemsByEventRuleId.values(RuleId))
         if (resource == item->property(kItemResourcePropertyName).value<QnResourcePtr>())
             return item;
 
     return nullptr;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& businessRuleId, std::function<bool(QnNotificationWidget* item)> filter)
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& RuleId, std::function<bool(QnNotificationWidget* item)> filter)
 {
-    for (QnNotificationWidget* item : m_itemsByBusinessRuleId.values(businessRuleId))
+    for (QnNotificationWidget* item : m_itemsByEventRuleId.values(RuleId))
         if (filter(item))
             return item;
 
     return nullptr;
 }
 
-QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessActionPtr& businessAction) const
+QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractActionPtr& action) const
 {
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
+    if (action->actionType() == vms::event::playSoundAction)
         return qnSkin->icon("events/sound.png");
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
         return qnSkin->icon("events/alarm.png");
 
-    auto params = businessAction->getRuntimeParams();
-    QnBusiness::EventType eventType = params.eventType;
+    auto params = action->getRuntimeParams();
+    vms::event::EventType eventType = params.eventType;
 
-    if (eventType >= QnBusiness::UserDefinedEvent)
+    if (eventType >= vms::event::userDefinedEvent)
     {
         QnVirtualCameraResourceList camList = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         if (!camList.isEmpty())
@@ -516,11 +592,11 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
     switch (eventType)
     {
-        case QnBusiness::CameraMotionEvent:
-        case QnBusiness::CameraInputEvent:
-        case QnBusiness::CameraDisconnectEvent:
-        case QnBusiness::CameraIpConflictEvent:
-        case QnBusiness::NetworkIssueEvent:
+        case vms::event::cameraMotionEvent:
+        case vms::event::cameraInputEvent:
+        case vms::event::cameraDisconnectEvent:
+        case vms::event::cameraIpConflictEvent:
+        case vms::event::networkIssueEvent:
         {
             auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return resource
@@ -528,23 +604,23 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
                 : qnResIconCache->icon(QnResourceIconCache::Camera);
         }
 
-        case QnBusiness::SoftwareTriggerEvent:
+        case vms::event::softwareTriggerEvent:
         {
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
-                businessAction->getRuntimeParams().description,
+                action->getRuntimeParams().description,
                 palette().color(QPalette::WindowText));
         }
 
-        case QnBusiness::StorageFailureEvent:
+        case vms::event::storageFailureEvent:
             return qnSkin->icon("events/storage.png");
 
-        case QnBusiness::ServerStartEvent:
-        case QnBusiness::ServerFailureEvent:
-        case QnBusiness::ServerConflictEvent:
-        case QnBusiness::BackupFinishedEvent:
+        case vms::event::serverStartEvent:
+        case vms::event::serverFailureEvent:
+        case vms::event::serverConflictEvent:
+        case vms::event::backupFinishedEvent:
             return qnResIconCache->icon(QnResourceIconCache::Server);
 
-        case QnBusiness::LicenseIssueEvent:
+        case vms::event::licenseIssueEvent:
             return qnSkin->icon("events/license.png");
 
         default:
@@ -559,13 +635,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
-    QnAbstractBusinessActionPtr businessAction;
-    if (params.canConvert<QnAbstractBusinessActionPtr>())
+    vms::event::AbstractActionPtr action;
+    if (params.canConvert<vms::event::AbstractActionPtr>())
     {
-        businessAction = params.value<QnAbstractBusinessActionPtr>();
-        if (businessAction)
+        action = params.value<vms::event::AbstractActionPtr>();
+        if (action)
         {
-            auto resourceId = businessAction->getRuntimeParams().eventResourceId;
+            auto resourceId = action->getRuntimeParams().eventResourceId;
             resource = resourcePool()->getResourceById(resourceId);
         }
     }
@@ -620,12 +696,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 );
             break;
 
-        case QnSystemHealth::ConnectionLost:
-            item->addActionButton(
-                qnSkin->icon("events/connection.png"),
-                action::OpenLoginDialogAction);
-            break;
-
         case QnSystemHealth::NoPrimaryTimeServer:
             item->addActionButton(
                 qnSkin->icon("events/settings.png"),
@@ -672,7 +742,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             connect(item, &QnNotificationWidget::linkActivated, this,
                 [item](const QString& link)
                 {
-                    if (link.contains(lit("://"))) //< currently unused
+                    if (link.contains(lit("://")))
                         QDesktopServices::openUrl(link);
                     else
                         item->triggerDefaultAction();
@@ -685,7 +755,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
             break;
     }
-
 
     item->setText(messageText);
     item->setTooltipText(QnSystemHealthStringsHelper::messageTooltip(message, resourceName));
@@ -710,9 +779,8 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
     if (!resource)
     {
         for (QnNotificationWidget* item : m_itemsByMessageType.values(message))
-            m_list->removeItem(item);
+            cleanUpItem(item);
 
-        m_itemsByMessageType.remove(message);
         return;
     }
 
@@ -720,8 +788,7 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
     if (!target)
         return;
 
-    m_list->removeItem(target);
-    m_itemsByMessageType.remove(message, target);
+    cleanUpItem(target);
 }
 
 void QnNotificationsCollectionWidget::hideAll()
@@ -729,7 +796,7 @@ void QnNotificationsCollectionWidget::hideAll()
     m_list->clear();
     m_itemsByMessageType.clear();
     m_itemsByLoadingSound.clear();
-    m_itemsByBusinessRuleId.clear();
+    m_itemsByEventRuleId.clear();
 }
 
 void QnNotificationsCollectionWidget::updateBlinker()
@@ -764,14 +831,19 @@ void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const 
 
 void QnNotificationsCollectionWidget::cleanUpItem(QnNotificationWidget* item)
 {
+    m_list->removeItem(item);
+
     for (QnSystemHealth::MessageType messageType : m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    for (const QnUuid& ruleId : m_itemsByBusinessRuleId.keys(item))
-        m_itemsByBusinessRuleId.remove(ruleId, item);
+    for (const QnUuid& ruleId : m_itemsByEventRuleId.keys(item))
+        m_itemsByEventRuleId.remove(ruleId, item);
 
     for (QString soundPath : m_itemsByLoadingSound.keys(item))
         m_itemsByLoadingSound.remove(soundPath, item);
+
+    const auto key = m_customPopupItems.key(item);
+    m_customPopupItems.remove(key);
 }
 
 void QnNotificationsCollectionWidget::paint(QPainter* painter,

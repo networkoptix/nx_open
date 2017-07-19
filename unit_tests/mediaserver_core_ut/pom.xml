@@ -19,12 +19,12 @@
         <master.project.directory>mediaserver_core</master.project.directory>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_fusion -lnx_streaming -lappserver2 -lnx_email -ludt -lcloud_db_client -lcloud_db -lnx_speech_synthesizer -lnx_utils</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_fusion -lappserver2 -lnx_email -ludt -lcloud_db_client -lnx_speech_synthesizer -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-ldl -lldap -ltermcap</linux.oslibs>
+        <linux.oslibs>-ldl -lldap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10 WIN32_LEAN_AND_MEAN</windows.defines>
+        <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
         <rdep.packages>gtest gmock openssl ffmpeg onvif quazip sigar festival</rdep.packages>
@@ -39,6 +39,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libcloud_db</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libcloud_db/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

@@ -1,7 +1,7 @@
 #ifndef __SIGN_DIALOG_DISPLAY_H__
 #define __SIGN_DIALOG_DISPLAY_H__
 
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
 
 #include <camera/cam_display.h>
 
@@ -23,7 +23,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     void finilizeSign();
 private:
-    QnCryptographicHash m_mdctx;
+    nx::utils::QnCryptographicHash m_mdctx;
     QnAbstractMediaDataPtr m_prevFrame;
     QnCompressedVideoDataPtr m_lastKeyFrame;
     bool m_eofProcessed;

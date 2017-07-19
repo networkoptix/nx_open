@@ -9,12 +9,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8",
+            url: "https://itunes.apple.com/eg/app/hd-witness/id1227909757?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness",
+            url: "https://play.google.com/store/apps/details?id=jp.co.systemk.skvms",
             class:'googleplay',
             button: "Android Client"
         }
@@ -27,4 +27,4 @@ Config.allowDebugMode = false;
 Config.productName = 'SK_VMS';
 Config.cloud.productName = 'SK Cloud';
 
-Config.supportedLanguages = ['ja'];
+Config.supportedLanguages = ['ja_JP'];

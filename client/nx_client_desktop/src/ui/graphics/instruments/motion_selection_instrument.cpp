@@ -20,26 +20,32 @@
 
 namespace {
 
-auto motionSelectionEnabled =
-    [](QnMediaResourceWidget* widget)
-    {
-        NX_ASSERT(widget);
-        if (!widget)
-            return false;
+bool motionSelectionEnabled(QnMediaResourceWidget* widget)
+{
+    NX_ASSERT(widget);
+    if (!widget)
+        return false;
 
-        const auto options = widget->options();
-        return options.testFlag(QnMediaResourceWidget::DisplayMotion)
-            || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
-    };
+    const auto options = widget->options();
+    return options.testFlag(QnMediaResourceWidget::DisplayMotion)
+        || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
+};
 
 // This way we detect widget that can possibly have DisplayMotion enabled
-auto widgetWithMotion =
-    [](QGraphicsItem* item)
-    {
-        if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
-            return widget->resource()->toResource()->hasFlags(Qn::motion);
-        return false;
-    };
+bool widgetWithMotion(QGraphicsItem* item)
+{
+    if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
+        return widget->resource()->toResource()->hasFlags(Qn::motion);
+    return false;
+};
+
+// Some widgets (e.g. timeline) must block motion selection
+bool blocksMotionSelection(QGraphicsItem* item)
+{
+    if (auto object = dynamic_cast<QGraphicsObject*>(item))
+        return object->property(Qn::BlockMotionSelection).isValid();
+    return false;
+}
 
 } // namespace
 
@@ -138,6 +144,14 @@ void MotionSelectionInstrument::ensureSelectionItem() {
 void MotionSelectionInstrument::updateWidgetUnderCursor(QWidget *viewport, QMouseEvent* event)
 {
     auto view = this->view(viewport);
+
+    auto blocker = this->item(view, event->pos(), blocksMotionSelection);
+    if (blocker)
+    {
+        setWidget(nullptr);
+        return;
+    }
+
     auto widget = dynamic_cast<QnMediaResourceWidget*>(
         this->item(view, event->pos(), widgetWithMotion));
     setWidget(widget);

@@ -20,8 +20,6 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(action, IDType, )
 
-QN_DECLARE_TR_FUNCTIONS("action")
-
 /**
  * Enum of all menu actions.
  */
@@ -94,12 +92,6 @@ enum IDType
      * Drops provided resources on the workbench.
      */
     DropResourcesAction,
-
-    /**
-     * Drops provided resources on the workbench, opening them in a new
-     * layout if necessary.
-     */
-    DropResourcesIntoNewLayoutAction,
 
     /**
      * Drops provided serialized resources on the current layout after
@@ -197,7 +189,7 @@ enum IDType
      * Opens the Business Events Log dialog.
      * Supports cameras list in the resources field as a cameras filter.
      * Parameters:
-     * <tt>QnBusiness::EventType EventTypeRole</tt> --- filter by event type.
+     * <tt>nx::vms::event::EventType EventTypeRole</tt> --- filter by event type.
      */
     OpenBusinessLogAction,
 
@@ -437,9 +429,9 @@ enum IDType
     OpenInCurrentLayoutAction,
 
     /**
-     * Opens selected resources in a new layout.
+     * Opens selected resources in a new tab.
      */
-    OpenInNewLayoutAction,
+    OpenInNewTabAction,
 
     /**
      * Opens selected resources in the Alarm Layout.
@@ -452,34 +444,14 @@ enum IDType
     OpenInNewWindowAction,
 
     /**
-     * Opens a single layout.
+     * Opens given videowall in review mode.
      */
-    OpenSingleLayoutAction,
-
-    /**
-     * Opens multiple layouts.
-     */
-    OpenMultipleLayoutsAction,
-
-    /**
-     * Opens given layouts.
-     */
-    OpenAnyNumberOfLayoutsAction,
-
-    /**
-     * Opens given videowalls in review mode.
-     */
-    OpenVideoWallsReviewAction,
+    OpenVideoWallReviewAction,
 
     /**
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,
-
-    /**
-     * Opens selected layouts in a new window.
-     */
-    OpenLayoutsInNewWindowAction,
 
     /**
      * Opens current layout in a new window.
@@ -721,11 +693,6 @@ enum IDType
     RadassLowAction,
 
     /**
-     * Toggles next RADASS state.
-     */
-    ToggleRadassAction,
-
-    /**
      * Connect incompatible server to current system
      */
     ConnectToCurrentSystem,
@@ -775,11 +742,6 @@ enum IDType
      * Opens PTZ tours management dialog.
      */
     PtzManageAction,
-
-    /**
-     * Starts fisheye calibration for the given widget.
-     */
-    PtzCalibrateFisheyeAction,
 
     /**
      * Performs continuous move with given speed.
@@ -935,15 +897,18 @@ enum IDType
     ToggleLayoutTourModeAction,
 
     NewLayoutTourAction,
+    MakeLayoutTourAction,
     RenameLayoutTourAction,
     SaveLayoutTourAction,
     ReviewLayoutTourAction,
+    ReviewLayoutTourInNewWindowAction,
     RemoveLayoutTourAction,
 
     StartCurrentLayoutTourAction,
     SaveCurrentLayoutTourAction,
     RemoveCurrentLayoutTourAction,
 
+    LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
     /* Timeline actions. */
@@ -979,9 +944,9 @@ enum IDType
     ExportLayoutAction,
 
     /**
-     * Exports timelapse.
+     * Exports rapid review.
      */
-    ExportTimelapseAction,
+    ExportRapidReviewAction,
 
     /**
      * Bookmark selected range.
@@ -1002,6 +967,8 @@ enum IDType
      * Batch bookmarks deleting.
      */
     RemoveBookmarksAction,
+
+    AcknowledgeEventAction,
 
     /**
      * Opens new layout for Quick Search.
@@ -1121,6 +1088,11 @@ enum IDType
      * Opens cloud portal in the browser.
      */
     OpenCloudMainUrl,
+
+    /**
+     * Opens cloud system view in the browser.
+     */
+    OpenCloudViewSystemUrl,
 
     /**
      * Opens cloud account management page in the browser.

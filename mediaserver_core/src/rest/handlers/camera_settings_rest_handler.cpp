@@ -9,13 +9,13 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include <api/helpers/camera_id_helper.h>
 
 namespace {

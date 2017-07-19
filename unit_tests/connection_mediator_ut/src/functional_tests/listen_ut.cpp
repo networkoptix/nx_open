@@ -9,7 +9,7 @@
 #include <nx/network/socket_global.h>
 
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <listening_peer_pool.h>
 #include <mediator_service.h>
@@ -110,4 +110,4 @@ TEST_F(ListeningPeer, peer_disconnect)
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

@@ -189,10 +189,7 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);
     virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler);
+    virtual void acceptAsync(AcceptCompletionHandler handler);
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 

@@ -162,8 +162,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
     bool needUpdate = false;
     for (const auto& peerId: peers())
     {
-        const auto server = resourcePool()->getIncompatibleResourceById(peerId, true)
-            .dynamicCast<QnMediaServerResource>();
+        const auto server = resourcePool()->getIncompatibleServerById(peerId, true);
         if (!server)
             continue;
 
@@ -205,8 +204,7 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
         [targetVersion = m_target.version, this]
         (const QnUuid& serverId)
         {
-            const auto server = resourcePool()->getIncompatibleResourceById(serverId, true)
-                .dynamicCast<QnMediaServerResource>();
+            const auto server = resourcePool()->getIncompatibleServerById(serverId, true);
             if (!server)
                 return true;
 
@@ -329,7 +327,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     const auto latestVersion = customizationInfo.releases[currentRelease];
     const QString updatesPrefix = customizationInfo.updates_prefix;
 
-    if (latestVersion.isNull() || updatesPrefix.isEmpty())
+    if ((m_target.version.build() == 0 && latestVersion.isNull()) || updatesPrefix.isEmpty())
     {
         if (!tryNextServer())
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
@@ -414,7 +412,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         for (auto variant = variants.begin(); variant != variants.end(); ++variant)
         {
             // We suppose arch name does not contain '_' char.
-            // E.g. arm_isd_s2 will be split to "arm" and "isd_s2"
+            // E.g. arm_edge1_2 will be split to "arm" and "edge1_2".
             const auto arch = variant.key().section(L'_', 0, 0);
             const auto modification = variant.key().mid(arch.size() + 1);
 

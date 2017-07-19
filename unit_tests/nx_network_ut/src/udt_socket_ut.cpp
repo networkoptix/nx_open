@@ -107,17 +107,19 @@ private:
 
 
 namespace {
+
 void onAcceptedConnection(
     AbstractStreamServerSocket* serverSocket,
     SystemError::ErrorCode /*errCode*/,
-    AbstractStreamSocket* sock)
+    std::unique_ptr<AbstractStreamSocket> sock)
 {
-    delete sock;
+    sock.reset();
 
     using namespace std::placeholders;
     serverSocket->acceptAsync(std::bind(onAcceptedConnection, serverSocket, _1, _2));
 }
-}
+
+} // namespace
 
 TEST_F(SocketUdt, cancelConnect)
 {
@@ -372,10 +374,10 @@ TEST_F(SocketUdt, acceptingFirstConnection)
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* socket)
+                std::unique_ptr<AbstractStreamSocket> socket)
             {
                socketAcceptedPromise.set_value(
-                   std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(socket)));
+                   std::make_pair(errorCode, std::move(socket)));
             });
 
         UdtStreamSocket clientSock(AF_INET);
@@ -507,10 +509,10 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         server.acceptAsync(
             [&connectionAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* sock)
+                std::unique_ptr<AbstractStreamSocket> sock)
             {
                 connectionAcceptedPromise.set_value(
-                    std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(sock)));
+                    std::make_pair(errorCode, std::move(sock)));
             });
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -599,7 +601,7 @@ protected:
 
         address = server->getLocalAddress();
         NX_LOGX(lm("Server address=%1, transferSize=%2b")
-            .strs(address, nx::utils::bytesToString(kTransferSize)), cl_logINFO);
+            .args(address, nx::utils::bytesToString(kTransferSize)), cl_logINFO);
 
         ASSERT_TRUE(server->setRecvTimeout(100));
         ASSERT_EQ(nullptr, server->accept());
@@ -678,11 +680,11 @@ protected:
     {
         const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
         NX_LOGX(lm("Resieve ended (%1): %2")
-            .strs(lastRecv, SystemError::getLastOSErrorText()), cl_logINFO);
+            .args(lastRecv, SystemError::getLastOSErrorText()), cl_logINFO);
 
         const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
         NX_LOGX(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
-            .strs(nx::utils::bytesToString(transferSize), transferCount,
+            .args(nx::utils::bytesToString(transferSize), transferCount,
                 nx::utils::bytesToString(transferSize / transferCount),
                 durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
 

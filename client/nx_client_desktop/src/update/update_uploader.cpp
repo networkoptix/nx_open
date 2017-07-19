@@ -98,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 
     m_progressById.clear();
     foreach (const QnUuid &peerId, peers) {
-        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+        auto server = resourcePool()->getIncompatibleServerById(peerId, true);
         if (!server)
             return false;
 
@@ -158,7 +158,8 @@ void QnUpdateUploader::sendNextChunk() {
     }
 }
 
-void QnUpdateUploader::handleUploadProgress(const QnUuid &peerId, qint64 chunks) {
+void QnUpdateUploader::handleUploadProgress(const QnUuid& peerId, qint64 offset)
+{
     if (m_updateFile.isNull())
         return;
 
@@ -166,43 +167,67 @@ void QnUpdateUploader::handleUploadProgress(const QnUuid &peerId, qint64 chunks)
     if (it == m_progressById.end()) // it means we have already done upload for this peer
         return;
 
-    NX_LOG(lit("Update: QnUpdateUploader: Got chunk response [%1, %2].").arg(peerId.toString()).arg(chunks), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Got chunk response [%1, %2].").arg(peerId.toString()).arg(offset));
 
     int progress = 0;
 
-    if (chunks < 0) {
+    if (offset < 0)
+    {
         m_progressById.erase(it);
 
-        if (chunks != ec2::AbstractUpdatesManager::NoError) {
+        if (offset != ec2::AbstractUpdatesManager::NoError)
+        {
             cleanUp();
-            emit finished(chunks == ec2::AbstractUpdatesManager::NoFreeSpace ? NoFreeSpace : UnknownError, QSet<QnUuid>() << peerId);
+
+            emit finished(
+                offset == ec2::AbstractUpdatesManager::NoFreeSpace ? NoFreeSpace : UnknownError,
+                {peerId});
+
             return;
-        } else {
-            progress = 100;
         }
-    } else {
-        if (chunks == m_updateFile->size())
+
+        progress = 100;
+    }
+    else
+    {
+        if (offset > m_updateFile->size())
+        {
+            NX_WARNING(this,
+                lm("Got offset %1 exceeding file size %2. Resetting.")
+                    .arg(offset).arg(m_updateFile->size()));
+
+            *it = 0;
+        }
+        else if (offset == m_updateFile->size())
+        {
             *it = m_chunkCount;
+        }
         else
-            *it = chunks / chunkSize;
+        {
+            *it = static_cast<int>(offset / chunkSize);
+        }
+
         progress = *it * 100 / m_chunkCount;
     }
 
     emit peerProgressChanged(peerId, progress);
 
     qint64 wholeProgress = ((m_peers + m_restPeers).size() - m_progressById.size()) * 100;
-    foreach (int progress, m_progressById)
+    for (int progress: m_progressById)
         wholeProgress += progress * 100 / m_chunkCount;
-    emit progressChanged(wholeProgress / (m_peers + m_restPeers).size());
 
-    if (m_progressById.isEmpty()) {
+    emit progressChanged(static_cast<int>(wholeProgress / (m_peers + m_restPeers).size()));
+
+    if (m_progressById.isEmpty())
+    {
         cleanUp();
-        NX_LOG(lit("Update: QnUpdateUploader: Upload finished."), cl_logDEBUG1);
-        emit finished(NoError, QSet<QnUuid>());
+        NX_DEBUG(this, lm("Upload finished."));
+        emit finished(NoError, {});
     }
 
     m_pendingPeers.remove(peerId);
-    if (m_pendingPeers.isEmpty()) {
+    if (m_pendingPeers.isEmpty())
+    {
         m_chunkTimer->stop();
         sendNextChunk();
     }

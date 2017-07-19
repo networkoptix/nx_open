@@ -308,7 +308,7 @@ private:
 
     void onAcceptCompletion(
         SystemError::ErrorCode sysErrorCode,
-        AbstractStreamSocket* streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
     {
         using namespace std::placeholders;
 
@@ -318,7 +318,7 @@ private:
         m_acceptor->acceptAsync(
             std::bind(&SslSocketVerifySslIsActuallyUsed::onAcceptCompletion, this, _1, _2));
 
-        m_reflectorPoolInUse->add(std::unique_ptr<AbstractStreamSocket>(streamSocket));
+        m_reflectorPoolInUse->add(std::move(streamSocket));
     }
 
     void prepareTestData()

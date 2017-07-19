@@ -1,46 +1,99 @@
 #include "log_initializer.h"
 
-#include <QtCore/QDir>
+#include <nx/utils/app_info.h>
+#include <nx/utils/argument_parser.h>
+#include <nx/utils/std/cpp14.h>
 
-#include "log_settings.h"
-#include "../app_info.h"
+#include "log_main.h"
 
 namespace nx {
 namespace utils {
 namespace log {
 
+static std::atomic<bool> isInitializedGlobally(false);
+
 void initialize(
     const Settings& settings,
     const QString& dataDir,
     const QString& applicationName,
+    const QString& binaryPath,
     const QString& baseName,
-    int id)
+    std::shared_ptr<Logger> logger)
 {
-    if (settings.level == cl_logNONE)
+    if (!logger)
+        logger = mainLogger();
+
+    if (settings.level == Level::undefined)
         return;
 
-    const auto logDir = settings.directory.isEmpty()
-        ? (dataDir + QLatin1String("/log"))
-        : settings.directory;
-
-    QDir().mkpath(logDir);
-    const QString& fileName = logDir + lit("/") + baseName;
-    if (!QnLog::instance(id)->create(
-            fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
+    // Can not be reinitialized if initialized globally.
+    if (!isInitializedGlobally.load())
     {
-        std::cerr << "Failed to create log file " << fileName.toStdString() << std::endl;
+        logger->setDefaultLevel(settings.level);
+        logger->setExceptionFilters(settings.exceptionFilers);
+        if (baseName != QLatin1String("-"))
+        {
+            const auto logDir = settings.directory.isEmpty()
+                ? (dataDir + QLatin1String("/log"))
+                : settings.directory;
+
+            File::Settings fileSettings;
+            fileSettings.name = dataDir.isEmpty() ? baseName : (logDir + lit("/") + baseName);
+            fileSettings.size = settings.maxFileSize;
+            fileSettings.count = settings.maxBackupCount;
+
+            logger->setWriter(std::make_unique<File>(fileSettings));
+        }
+        else
+        {
+            logger->setWriter(std::make_unique<StdOut>());
+        }
     }
 
-    const auto logInfo = lm("Logging level: %1, maxFileSize: %2, maxBackupCount: %3, fileName: %4")
-        .strs(QnLog::logLevelToString(settings.level),
-            nx::utils::bytesToString(settings.maxFileSize),
-            settings.maxBackupCount, fileName);
+    const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
+    write(QByteArray(80, '='));
+    write(lm("%1 started, version: %2, revision: %3").args(
+        applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
 
-    NX_LOG(id, lm(QByteArray(80, '=')), cl_logALWAYS);
-    NX_LOG(id, lm("%1 started").arg(applicationName), cl_logALWAYS);
-    NX_LOG(id, lm("Software version: %1").arg(AppInfo::applicationVersion()), cl_logALWAYS);
-    NX_LOG(id, lm("Software revision: %1").arg(AppInfo::applicationRevision()), cl_logALWAYS);
-    NX_LOG(id, logInfo, cl_logALWAYS);
+    if (!binaryPath.isEmpty())
+        write(lm("Binary path: %1").arg(binaryPath));
+
+    const auto filePath = logger->filePath();
+    write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+        toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
+        settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+}
+
+void initializeGlobally(const nx::utils::ArgumentParser& arguments)
+{
+    const auto logger = mainLogger();
+    isInitializedGlobally = true;
+
+    if (const auto value = arguments.get("log-level", "ll"))
+    {
+        const auto level = levelFromString(*value);
+        NX_CRITICAL(level != Level::undefined);
+        logger->setDefaultLevel(level);
+    }
+
+    if (const auto value = arguments.get("log-exception-filters", "lef"))
+    {
+        std::set<QString> filters;
+        for (const auto f: value->split(QLatin1String(",")))
+            filters.insert(f);
+
+        logger->setExceptionFilters(filters);
+    }
+
+    if (const auto value = arguments.get("log-file", "lf"))
+    {
+        File::Settings fileSettings;
+        fileSettings.name = *value;
+        fileSettings.size = 1024 * 1024 * 10;
+        fileSettings.count = 5;
+
+        logger->setWriter(std::make_unique<File>(fileSettings));
+    }
 }
 
 } // namespace log

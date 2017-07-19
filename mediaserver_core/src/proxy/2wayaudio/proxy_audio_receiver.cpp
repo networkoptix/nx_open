@@ -38,18 +38,6 @@ namespace
     }
 }
 
-class QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
-{
-public:
-    QnAudioProxyReceiverPrivate():
-        QnTCPConnectionProcessorPrivate(),
-        takeSocketOwnership(false)
-    {
-    }
-
-    bool takeSocketOwnership;
-};
-
 class QnProxyDesktopDataProvider:
     public QnAbstractStreamDataProvider
 {
@@ -137,15 +125,14 @@ QnAudioProxyReceiver::QnAudioProxyReceiver(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket, owner->commonModule())
+    QnTCPConnectionProcessor(socket, owner)
 {
-    Q_D(QnAudioProxyReceiver);
-    setObjectName( lit("QnAudioProxyReceiver") );
+    setObjectName(::toString(this));
 }
 
 void QnAudioProxyReceiver::run()
 {
-    Q_D(QnAudioProxyReceiver);
+    Q_D(QnTCPConnectionProcessor);
 
     parseRequest();
 
@@ -185,13 +172,6 @@ void QnAudioProxyReceiver::run()
     }
     else
     {
-        d->socket.clear();
-        d->takeSocketOwnership = true;
+        takeSocket();
     }
-}
-
-bool QnAudioProxyReceiver::isTakeSockOwnership() const
-{
-    Q_D(const QnAudioProxyReceiver);
-    return d->takeSocketOwnership;
 }

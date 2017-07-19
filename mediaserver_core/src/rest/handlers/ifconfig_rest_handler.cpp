@@ -1,7 +1,7 @@
 #include <QFile>
 
 #include "ifconfig_rest_handler.h"
-#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/line_splitter.h>
 #include <network/tcp_connection_priv.h>
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"

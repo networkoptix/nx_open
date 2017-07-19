@@ -1,0 +1,29 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>귀하의 시스템</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}} </span>에서 연결 해제</button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>소유자</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            당신의 권한:
+<b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">내 계정에서 분리</button>
+    </div>
+</div>

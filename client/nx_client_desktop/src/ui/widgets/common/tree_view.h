@@ -31,6 +31,10 @@ public:
 
     virtual QRect visualRect(const QModelIndex& index) const override;
 
+    /** In some cases we do not want double click to expand the tree item. */
+    using ConfirmExpandDelegate = std::function<bool(const QModelIndex& index)>;
+    void setConfirmExpandDelegate(ConfirmExpandDelegate value);
+
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the
@@ -60,6 +64,7 @@ protected:
     virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
     virtual void timerEvent(QTimerEvent* event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
     virtual void scrollContentsBy(int dx, int dy) override;
     virtual QSize viewportSizeHint() const override;
     virtual QItemSelectionModel::SelectionFlags selectionCommand(
@@ -72,6 +77,8 @@ private:
     bool m_ignoreDefaultSpace;
     bool m_dropOnBranchesAllowed;
     bool m_inDragDropEvent;
+
+    ConfirmExpandDelegate m_confirmExpand;
 };
 
 

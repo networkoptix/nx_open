@@ -38,6 +38,9 @@ public:
     QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
     QnButtonDetections buttonDetection;
+    Qt::TextFormat informativeTextFormat = Qt::AutoText;
+
+public:
     QnMessageBoxPrivate(QnMessageBox* parent);
 
     void init();
@@ -492,8 +495,7 @@ QPixmap QnMessageBox::getPixmapByIconId(QnMessageBoxIcon icon)
         case QnMessageBoxIcon::Question:
             return standardPixmap(QStyle::SP_MessageBoxQuestion);
         case QnMessageBoxIcon::Success:
-            return qnSkin->pixmap("standard_icons/message_box_success.png",
-                QSize(), Qt::IgnoreAspectRatio, Qt::FastTransformation, true);
+            return qnSkin->pixmap("standard_icons/message_box_success.png");
         default:
             return QPixmap();
     }
@@ -521,6 +523,23 @@ Qt::TextFormat QnMessageBox::textFormat() const
 void QnMessageBox::setTextFormat(Qt::TextFormat format)
 {
     ui->mainLabel->setTextFormat(format);
+}
+
+Qt::TextFormat QnMessageBox::informativeTextFormat() const
+{
+    Q_D(const QnMessageBox);
+    return d->informativeTextFormat;
+}
+
+void QnMessageBox::setInformativeTextFormat(Qt::TextFormat format)
+{
+    Q_D(QnMessageBox);
+
+    if (d->informativeTextFormat == format)
+        return;
+
+    for (auto& label: d->informativeLabels)
+        label->setTextFormat(format);
 }
 
 QString QnMessageBox::informativeText() const
@@ -555,6 +574,9 @@ void QnMessageBox::setInformativeText(const QString &text, bool split)
         d->informativeLabels.append(label);
         ++index;
     }
+
+    for (auto& label: d->informativeLabels)
+        label->setTextFormat(d->informativeTextFormat);
 }
 
 void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,

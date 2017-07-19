@@ -22,11 +22,14 @@ QnStorageResource* QnDbStorageResource::instance(QnCommonModule* commonModule, c
     return new QnDbStorageResource(commonModule);
 }
 
-QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
+QIODevice* QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
 {
     m_filePath = removeProtocolPrefix(fileName);
 
-    auto connection = resourcePool()->commonModule()->ec2Connection();
+    auto resCommonModule = commonModule();
+    NX_ASSERT(resCommonModule, "Common module should be set");
+
+    auto connection = resCommonModule->ec2Connection();
 
     if (!connection)
         return nullptr;

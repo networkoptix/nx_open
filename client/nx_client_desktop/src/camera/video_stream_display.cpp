@@ -121,7 +121,7 @@ bool QnVideoStreamDisplay::allocScaleContext( const CLVideoDecoderOutput& outFra
                                     m_outputWidth, m_outputHeight, AV_PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
     if (!m_scaleContext)
-        cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
+        NX_ERROR(this, "Can't get swscale context");
     return m_scaleContext != 0;
 }
 
@@ -458,7 +458,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (data->compressionType == AV_CODEC_ID_NONE)
     {
-        cl_log.log(QLatin1String("QnVideoStreamDisplay::display: unknown codec type..."), cl_logERROR);
+        NX_ERROR(this, "display: unknown codec type...");
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
     }
 
@@ -473,8 +473,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);
         dec->setSpeed( m_speed );
-        if (dec == 0) {
-            cl_log.log(lit("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
+        if (dec == 0)
+        {
+            NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));
             return Status_Displayed;
         }
 
@@ -673,7 +674,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     calcSampleAR(outFrame, dec);
 
-    //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
@@ -762,7 +762,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
                 qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-                //cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
                 if (wasWaiting) {
                     dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
                     m_queueWasFilled = true;
@@ -961,6 +960,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
+    QnMutexLocker lock(&m_renderListMtx);
     if (m_renderList.isEmpty())
         return false;
     QnAbstractRenderer* renderer = *m_renderList.begin();
@@ -1078,7 +1078,7 @@ QSize QnVideoStreamDisplay::getImageSize() const
 bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const AVFrame* lastFrame = dec->lastFrame();
-    if( !lastFrame || dec->GetPixelFormat() == -1 || dec->getWidth() == 0 )
+    if (!lastFrame || !lastFrame->data[0] || dec->GetPixelFormat() == -1 || dec->getWidth() == 0)
         return false;
 
     (*outFrame)->setUseExternalData( false );
@@ -1101,7 +1101,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
         if( (*outFrame)->format == AV_PIX_FMT_YUV420P )
         {
             // optimization
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 3 && lastFrame->data[i]; ++i)
             {
                 int h = lastFrame->height >> (i > 0 ? 1 : 0);
                 memcpy( (*outFrame)->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );

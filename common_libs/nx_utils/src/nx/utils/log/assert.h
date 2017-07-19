@@ -21,11 +21,11 @@
 namespace nx {
 namespace utils {
 
-NX_UTILS_API void logAssert(const QnLogMessage& message);
-void NX_UTILS_API setOnAssertHandler(std::function<void(const QnLogMessage&)> handler);
+NX_UTILS_API void logAssert(const log::Message& message);
+void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 
 template<typename Reason>
-QnLogMessage assertLog(const char* file, int line, const char* condition, const Reason& message)
+log::Message assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
    #if defined(ANDROID) || defined(__ANDROID__)
        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
@@ -123,6 +123,8 @@ private:
 /** Useful to convert a single macro arg which has form (A, B, ...) to arg list: A, B, ... */
 #define NX_REMOVE_PARENTHESES(...) __VA_ARGS__
 
+#define NX_GET_2ND_ARG(a1, a2, ...) a2
+#define NX_GET_3RD_ARG(a1, a2, a3, ...) a3
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 
 #define NX_CRITICAL1(CONDITION) \

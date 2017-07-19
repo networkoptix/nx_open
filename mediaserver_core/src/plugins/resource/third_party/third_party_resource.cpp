@@ -309,7 +309,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !regions.isEmpty() )
     {
         //filling in motion mask
-        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::AV_PIX_FMT_MONOBLACK ) );
+        std::unique_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::AV_PIX_FMT_MONOBLACK ) );
 
         QRegion unitedRegion;
         for( QList<QRegion>::const_iterator
@@ -546,25 +546,25 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         {
             const int ptzCapabilities = ptzManager->getCapabilities();
             if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability )
-                setPtzCapability( Qn::ContinuousPanCapability, true );
+                setPtzCapability( Ptz::ContinuousPanCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability )
-                setPtzCapability( Qn::ContinuousTiltCapability, true );
+                setPtzCapability( Ptz::ContinuousTiltCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability )
-                setPtzCapability( Qn::ContinuousZoomCapability, true );
+                setPtzCapability( Ptz::ContinuousZoomCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability )
-                setPtzCapability( Qn::AbsolutePanCapability, true );
+                setPtzCapability( Ptz::AbsolutePanCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability )
-                setPtzCapability( Qn::AbsoluteTiltCapability, true );
+                setPtzCapability( Ptz::AbsoluteTiltCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability )
-                setPtzCapability( Qn::AbsoluteZoomCapability, true );
+                setPtzCapability( Ptz::AbsoluteZoomCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability )
-                setPtzCapability( Qn::FlipPtzCapability, true );
+                setPtzCapability( Ptz::FlipPtzCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability )
-                setPtzCapability( Qn::LimitsPtzCapability, true );
+                setPtzCapability( Ptz::LimitsPtzCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability )
-                setPtzCapability( Qn::DevicePositioningPtzCapability, true );
+                setPtzCapability( Ptz::DevicePositioningPtzCapability, true );
             if( ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability )
-                setPtzCapability( Qn::LogicalPositioningPtzCapability, true );
+                setPtzCapability( Ptz::LogicalPositioningPtzCapability, true );
         }
         ptzManager->releaseRef();
     }

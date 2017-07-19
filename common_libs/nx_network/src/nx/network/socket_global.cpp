@@ -6,13 +6,14 @@
 #include <nx/utils/std/future.h>
 
 #include "aio/pollset_factory.h"
+#include "ssl/ssl_static_data.h"
 
-const std::chrono::seconds kReloadDebugConfigInterval(10);
+const std::chrono::seconds kDebugIniReloadInterval(10);
 
 namespace nx {
 namespace network {
 
-bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
+bool SocketGlobals::Ini::isHostDisabled(const HostAddress& host) const
 {
     if (SocketGlobals::s_initState != InitState::done)
         return false;
@@ -67,13 +68,16 @@ aio::AIOService& SocketGlobals::AioServiceGuard::aioService()
 // SocketGlobals
 
 SocketGlobals::SocketGlobals(int initializationFlags):
-    m_initializationFlags(initializationFlags),
-    m_log(QnLog::logs())
+    m_initializationFlags(initializationFlags)
 {
     if (m_initializationFlags & InitializationFlags::disableUdt)
         m_pollSetFactory.disableUdt();
 
     m_aioServiceGuard.initialize();
+
+#ifdef ENABLE_SSL
+    ssl::initOpenSSLGlobalLock();
+#endif
 }
 
 SocketGlobals::~SocketGlobals()
@@ -83,7 +87,7 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > cloudServicesStoppedPromise;
     {
         utils::BarrierHandler barrier([&](){ cloudServicesStoppedPromise.set_value(); });
-        m_debugConfigTimer->pleaseStop(barrier.fork());
+        m_debugIniReloadTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         m_outgoingTunnelPool->pleaseStop(barrier.fork());
@@ -106,14 +110,14 @@ void SocketGlobals::init(int initializationFlags)
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals(initializationFlags);
-        
+
         // TODO: #ak disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
 
         s_initState = InitState::done;
 
         lock.unlock();
-        s_instance->setDebugConfigTimer();
+        s_instance->setDebugIniReloadTimer();
     }
 }
 
@@ -156,7 +160,7 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
         SocketFactory::enforceSsl();
 
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        mediatorConnector().mockupAddress(*value);
+        mediatorConnector().mockupMediatorUrl(*value);
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
@@ -166,14 +170,14 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
         init();
 }
 
-void SocketGlobals::setDebugConfigTimer()
+void SocketGlobals::setDebugIniReloadTimer()
 {
-    m_debugConfigTimer->start(
-        kReloadDebugConfigInterval,
+    m_debugIniReloadTimer->start(
+        kDebugIniReloadInterval,
         [this]()
         {
-            m_debugConfig.reload(utils::FlagConfig::OutputType::silent);
-            setDebugConfigTimer();
+            m_debugIni.reload();
+            setDebugIniReloadTimer();
         });
 }
 
@@ -187,7 +191,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_mediatorConnector->clientConnection());
     m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_mediatorConnector->clientConnection());
-    m_debugConfigTimer = std::make_unique<aio::Timer>();
+    m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 
 QnMutex SocketGlobals::s_mutex;

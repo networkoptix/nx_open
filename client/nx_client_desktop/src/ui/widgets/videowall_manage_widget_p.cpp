@@ -123,16 +123,20 @@ QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
     return path;
 }
 
-int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const {
+int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const
+{
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseFontSize * partScreenCoeff;
-    return baseFontSize;
+        return baseFontSize * partScreenCoeff * dpr;
+    return baseFontSize * dpr;
 }
 
-int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const {
+int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
+{
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseIconSize * partScreenCoeff;
-    return baseIconSize;
+        return baseIconSize * partScreenCoeff * dpr;
+    return baseIconSize * dpr;
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -461,11 +465,19 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
     q_ptr(q)
 {
     QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i) {
-        ModelScreen screen(i, desktop->screenGeometry(i), q);
-        m_screens << screen;
+    for (int i = 0; i < desktop->screenCount(); ++i)
+    {
+        auto screen = desktop->screen(i);
+        NX_ASSERT(screen);
+        if (!screen)
+            continue;
 
-        m_unitedGeometry = m_unitedGeometry.united(screen.geometry);
+        auto rect = screen->geometry();
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
+        m_unitedGeometry = m_unitedGeometry.united(rect);
+
+        m_screens.append({i, rect, q});
     }
 }
 
@@ -524,7 +536,18 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
     QList<QRect> screens;
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); ++i)
-        screens << desktop->screenGeometry(i);
+    {
+        auto screen = desktop->screen(i);
+        NX_ASSERT(screen);
+        if (!screen)
+            continue;
+
+        auto rect = screen->geometry();
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
+
+        screens << rect;
+    }
 
     QnUuid pcUuid = qnSettings->pcUuid();
 

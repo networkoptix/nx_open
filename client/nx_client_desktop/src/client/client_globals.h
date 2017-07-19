@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtGui/QValidator>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -99,9 +100,7 @@ namespace Qn
     {
         EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
-        RaisedConeBgLayer,          /**< Layer for origin cone when item is not raised anymore. */
         PinnedLayer,                /**< Layer for pinned items. */
-        RaisedConeLayer,            /**< Layer for origin cone for raised items. */
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
@@ -134,7 +133,6 @@ namespace Qn
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
@@ -150,6 +148,7 @@ namespace Qn
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
+        LayoutMinimalBoundingRectRole,              /**< Role for layout's minimal bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
         LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
@@ -204,6 +203,7 @@ namespace Qn
 
         IsSpecialLayoutRole,
         LayoutIconRole,
+        LayoutFlagsRole,                            //< Role for additional QnLayoutFlags value
         CustomPanelTitleRole,
         CustomPanelDescriptionRole,
         CustomPanelActionsRole,
@@ -222,8 +222,10 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
-        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
+        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+                                                        Used in action::ConnectAction. */
         CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
@@ -249,10 +251,11 @@ namespace Qn
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
+        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::event::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::event::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
+        ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
@@ -277,6 +280,8 @@ namespace Qn
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
+        ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
+
         RoleCount
     };
 
@@ -294,20 +299,7 @@ namespace Qn
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
-    /**
-     * Flags describing the differences between instances of the same resource
-     * on the client and on the Server.
-     */
-    enum ResourceSavingFlag
-    {
-        /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x1,
 
-        /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x2
-    };
-    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
     enum class CellSpacing
     {
@@ -481,6 +473,8 @@ namespace Qn
 
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),

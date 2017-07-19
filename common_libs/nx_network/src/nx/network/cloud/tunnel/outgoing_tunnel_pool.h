@@ -8,6 +8,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/async_stoppable.h>
 #include <nx/network/cloud/address_resolver.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/utils/subscription.h>
@@ -77,6 +78,7 @@ private:
     bool m_stopping;
     aio::Timer m_aioThreadBinder;
     OnTunnelClosedSubscription m_onTunnelClosedSubscription;
+    nx::utils::Counter m_counter;
 
     TunnelContext& getTunnel(const AddressEntry& targetHostAddress);
     void reportConnectionResult(

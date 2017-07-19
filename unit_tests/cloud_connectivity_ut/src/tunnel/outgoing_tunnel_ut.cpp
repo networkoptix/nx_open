@@ -315,7 +315,7 @@ public:
         }
     };
 
-    typedef nx::utils::promise<ConnectionResult> ConnectionCompletedPromise;
+    using ConnectionCompletedPromise = nx::utils::promise<ConnectionResult>;
 
     struct ConnectionContext
     {
@@ -337,15 +337,19 @@ public:
             m_tunnel->pleaseStopSync();
 
         if (m_oldFactoryFunc)
-            ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
+        {
+            CrossNatConnectorFactory::instance().setCustomFunc(
+                std::move(*m_oldFactoryFunc));
+        }
 
         NX_CRITICAL(DummyConnector::instanceCount == 0);
         NX_CRITICAL(DummyConnection::instanceCount == 0);
     }
 
-    void setConnectorFactoryFunc(ConnectorFactory::FactoryFunc newFactoryFunc)
+    void setConnectorFactoryFunc(CrossNatConnectorFactory::Function newFactoryFunc)
     {
-        auto oldFunc = ConnectorFactory::setFactoryFunc(std::move(newFactoryFunc));
+        auto oldFunc = CrossNatConnectorFactory::instance().setCustomFunc(
+            std::move(newFactoryFunc));
         if (!m_oldFactoryFunc)
             m_oldFactoryFunc = std::move(oldFunc);
     }
@@ -445,7 +449,7 @@ protected:
     }
 
 private:
-    boost::optional<ConnectorFactory::FactoryFunc> m_oldFactoryFunc;
+    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     AddressEntry m_addressEntry;
     std::chrono::milliseconds m_connectTimeout;
 

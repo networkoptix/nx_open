@@ -17,8 +17,7 @@
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/network/http/server/http_server_connection.h>
 
-#include <http/custom_headers.h>
-#include <utils/common/app_info.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>

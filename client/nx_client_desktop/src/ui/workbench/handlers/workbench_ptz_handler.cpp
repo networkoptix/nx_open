@@ -97,7 +97,7 @@ private:
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position)
 {
-    if (!controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
     {
         return controller->getPosition(Qn::DevicePtzCoordinateSpace, position);
     }
@@ -160,7 +160,7 @@ QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -184,14 +184,14 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     QString id = parameters.argument<QString>(Qn::PtzObjectIdRole);
 
     if (!widget || !widget->ptzController() || id.isEmpty())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    if (!widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability))
+    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
         //TODO: #GDM #PTZ show appropriate error message?
         return;
@@ -218,7 +218,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -267,7 +267,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
 
@@ -294,7 +294,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
 
     if (!widget || !widget->ptzController())
         return;
@@ -318,10 +318,10 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
-    QPointer<QnResourceWidget> guard(widget);
+    QPointer<const QnMediaResourceWidget> guard(widget);
     QnPtzControllerPtr controller = widget->ptzController();
 
     QVector3D position;
@@ -354,7 +354,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 
 void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
     QnPtzControllerPtr controller = widget->ptzController();
@@ -382,38 +382,48 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 
 void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 {
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-
+    auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
+        return;
+
+    // Joystick-controlled action must occur only if ptz is active.
+    const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    if (!ptzActive)
+        return;
+
+    const auto controller = widget->ptzController();
+    const auto item = widget->item();
+    NX_EXPECT(item && controller);
+    if (!item || !controller)
         return;
 
     auto speed = menu()->currentParameters(sender())
         .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
-    auto item = widget->item();
-
-    if (!item)
-        return;
-
-    auto rotation = item->rotation() + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
-    auto controller = widget->ptzController();
-
-    if (!controller)
-        return;
-
+    const auto rotation = item->rotation()
+        + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
     speed = applyRotation(speed, rotation);
-    widget->ptzController()->continuousMove(speed);
+    controller->continuousMove(speed);
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
 {
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-
+    auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
         return;
-    auto controller = widget->ptzController();
+
+    // Joystick-controlled action must occur only if ptz is active.
+    const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    if (!ptzActive)
+        return;
+
+    const auto controller = widget->ptzController();
+    NX_EXPECT(controller);
+    if (!controller)
+        return;
+
     auto presetIndex = menu()->currentParameters(sender())
-        .argument<uint>(Qn::ItemDataRole::PtzPresetIndexRole);
+        .argument(Qn::ItemDataRole::PtzPresetIndexRole).toInt();
 
     QnPtzPresetList presetList;
     controller->getPresets(&presetList);

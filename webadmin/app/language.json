@@ -1,5 +1,4 @@
 {
-    "language": "LANGUAGE_CODE",
     "language_name": "LANGUAGE_NAME",
     "dialogs":{
         "okButton": "Ok",
@@ -109,16 +108,13 @@
         "installationError": "Updating failed. Cannot execute installation script.",
         "selectFiles": "Select files"
     },
-    "cameraLinks":{
-        "highStream":"High stream",
-        "lowStream":"Low stream",
-        "transcoding": "Transcoding",
-        "unknown": "Unknown"
-    },
     "advanced":{
         "free": "Free",
         "total": "Total",
         "occupied": "Occupied",
         "reserved": "Reserved"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web interface"
     }
 }

@@ -1,5 +1,6 @@
 #include "add_default_webpages_migration.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QUrl>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
@@ -16,9 +17,9 @@ namespace ec2 {
 namespace database {
 namespace migrations {
 
-bool addDefaultWebpages(const QSqlDatabase& database)
+bool addDefaultWebpages(ec2::database::api::QueryContext* context)
 {
-    auto addWebPage = [&database](const QString& name, const QString& url)
+    auto addWebPage = [context](const QString& name, const QString& url)
         {
             NX_ASSERT(!name.isEmpty());
             NX_ASSERT(QUrl(url).isValid());
@@ -31,13 +32,13 @@ bool addDefaultWebpages(const QSqlDatabase& database)
             webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
             webPage.url = url;
             webPage.name = name;
-            return api::saveWebPage(database, webPage);
+            return api::saveWebPage(context, webPage);
         };
 
     QFile config(":/serverProperties.json");
     if (!config.open(QIODevice::ReadOnly))
     {
-        NX_LOG(lit("Could not read serverProperties.json"), cl_logERROR);
+        NX_LOG(lit("Could not read serverProperties.json"), cl_logWARNING);
         return true; // We don't want to crash if partner did not fill any of these
     }
 

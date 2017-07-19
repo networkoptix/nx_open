@@ -16,5 +16,6 @@
     <properties>
         <root.dir>${basedir}/../..</root.dir>
         <template>app</template>
+        <subdirectory.global.libs>-lnx_kit</subdirectory.global.libs>
     </properties>
 </project>

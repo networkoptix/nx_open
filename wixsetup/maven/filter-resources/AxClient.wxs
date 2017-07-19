@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <?include BuildVars.wxi ?>
+        <DirectoryRef Id="AxClientParentDir">
+            <Directory Id="$(var.paxtonDirId)" Name="${release.version}">
+                <Component Id="AxClass">
+                    <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
+                        <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
+                            <ProgId Id="axhdwitness.Ax${ax.className}.${nxec.ec2ProtoVersion}" Description="Ax${ax.className} Class">
+                                <ProgId Id="axhdwitness.Ax${ax.className}" Description="Ax${ax.className} Class" />
+                            </ProgId>
+                        </Class>
+                    </File>
+                </Component>
+                <Directory Id="ImageFormats" Name="imageformats">
+                </Directory>
+
+                <Directory Id="Plugins" Name="plugins">
+                </Directory>
+
+                <Directory Id="Platforms" Name="platforms">
+                </Directory>
+                
+                <Directory Id="Mediaservice" Name="mediaservice">
+                </Directory>
+
+                <Directory Id="Audio" Name="audio">
+                </Directory>
+
+                <Directory Id="ClientQml" Name="qml"/>
+                <Directory Id="ClientFontsDir" Name="fonts"/>
+
+                <Component Id="ClientSigar">
+                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
+                </Component>
+            </Directory>
+        </DirectoryRef>
+        <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
+            </Component>
+            <Component>
+                <File Id="avdevice.dll" Name="avdevice-57.dll" Source="$(var.SourceDir)/avdevice-57.dll" DiskId="2"/>
+            </Component>
+            <Component>
+                <File Id="avfilter.dll" Name="avfilter-6.dll" Source="$(var.SourceDir)/avfilter-6.dll" DiskId="2"/>
+            </Component>
+            <Component>
+                <File Id="avformat.dll" Name="avformat-57.dll" Source="$(var.SourceDir)/avformat-57.dll" DiskId="2"/>
+            </Component>
+            <Component>
+                <File Id="avutil.dll" Name="avutil-55.dll" Source="$(var.SourceDir)/avutil-55.dll" DiskId="2"/>
+            </Component>
+            <Component>
+                <File Id="swscale.dll" Name="swscale-4.dll" Source="$(var.SourceDir)/swscale-4.dll" DiskId="3"/>
+            </Component>
+            <Component>
+                <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
+            </Component>
+            <Component>
+                <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
+            </Component>
+            <Component>
+                <File Id="libvorbis.dll" Name="libvorbis.dll" Source="$(var.SourceDir)/libvorbis.dll" DiskId="3"/>
+            </Component>
+            <Component>
+                <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
+            </Component>
+        </ComponentGroup>
+        <ComponentGroup Id="ClientLibs" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
+            </Component>
+            <Component>
+                <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="13" />
+            </Component>
+            <Component>
+                <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />
+            </Component>
+            <Component>
+                <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientOpenAL" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="13"/>
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientQTLibraries" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
+            </Component>
+            <Component>
+                <File Id="Qt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.QtDir)\Qt5Gui.dll" DiskId="7"/>
+            </Component>
+            <Component>
+                <File Id="Qt5Multimedia.dll" Name="Qt5Multimedia.dll" Source="$(var.QtDir)\Qt5Multimedia.dll" DiskId="8" />
+            </Component>
+            <Component>
+                <File Id="Qt5Network.dll" Name="Qt5Network.dll" Source="$(var.QtDir)\Qt5Network.dll" DiskId="8" />
+            </Component>
+            <Component>
+                <File Id="Qt5Xml.dll" Name="Qt5Xml.dll" Source="$(var.QtDir)\Qt5Xml.dll" DiskId="8" />
+            </Component>
+            <Component>
+                <File Id="Qt5XmlPatterns.dll" Name="Qt5XmlPatterns.dll" Source="$(var.QtDir)\Qt5XmlPatterns.dll" DiskId="8" />
+            </Component>
+            <Component>
+                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8"  />
+            </Component>
+            <Component>
+                <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"  />
+            </Component>
+            <Component>
+                <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="9" />
+            </Component>
+            <Component>
+                <File Id="Qt5OpenGL.dll" Name="Qt5OpenGL.dll" Source="$(var.QtDir)\Qt5OpenGL.dll" DiskId="10" />
+            </Component>
+            <Component>
+                <File Id="Qt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5PrintSupport.dll" Name="Qt5PrintSupport.dll" Source="$(var.QtDir)\Qt5PrintSupport.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5MultimediaQuick_p.dll" Name="Qt5MultimediaQuick_p.dll" Source="$(var.QtDir)\Qt5MultimediaQuick_p.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5QuickWidgets.dll" Name="Qt5QuickWidgets.dll" Source="$(var.QtDir)\Qt5QuickWidgets.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5LabsTemplates.dll" Name="Qt5LabsTemplates.dll" Source="$(var.QtDir)\Qt5LabsTemplates.dll" DiskId="10"  />
+            </Component>
+            <Component>
+                <File Id="Qt5WebKit.dll" Name="Qt5WebKit.dll" Source="$(var.QtDir)\Qt5WebKit.dll" DiskId="11"  />
+            </Component>
+            <Component>
+                <File Id="Qt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="11"  />
+            </Component>
+            <Component>
+                <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5"  />
+            </Component>
+            <Component>
+                <File Id="icuin58.dll" Name="icuin58.dll" Source="$(var.QtDir)\icuin58.dll" DiskId="5"  />
+            </Component>
+            <Component>
+                <File Id="icuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5"  />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientQuazip" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ClientOpenSSL" Directory="$(var.paxtonDirId)">
+            <Component>
+                <File Id="ssl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
+            </Component>
+            <Component>
+                <File Id="ssl_ssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll" DiskId="6"/>
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
+            <Component>
+                <File Id="qgif.dll" Name="qgif.dll" Source="$(var.QtPluginsDir)\imageformats\qgif.dll" DiskId="12" />
+            </Component>
+            <Component>
+                <File Id="qjpeg.dll" Name="qjpeg.dll" Source="$(var.QtPluginsDir)\imageformats\qjpeg.dll" DiskId="12" />
+            </Component>
+            <Component>
+                <File Id="qtiff.dll" Name="qtiff.dll" Source="$(var.QtPluginsDir)\imageformats\qtiff.dll" DiskId="12" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="Mediaservice" Directory="Mediaservice">
+            <Component>
+                <File Id="dsengine.dll" Name="dsengine.dll" Source="$(var.QtPluginsDir)\mediaservice\dsengine.dll" DiskId="12" />
+            </Component>
+            <Component>
+                <File Id="qtmedia_audioengine.dll" Name="qtmedia_audioengine.dll" Source="$(var.QtPluginsDir)\mediaservice\qtmedia_audioengine.dll" DiskId="12" />
+            </Component>
+        </ComponentGroup>
+		
+        <ComponentGroup Id="AudioPlugins" Directory="Audio">
+            <Component>
+                <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="Platforms" Directory="Platforms">
+            <Component>
+                <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="9" />
+            </Component>
+        </ComponentGroup>
+
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="AxClientDirComponents">
+            <ComponentRef Id="AxClass"/>
+            <ComponentGroupRef Id="ClientFontsComponent"/>
+            <ComponentGroupRef Id="ClientQmlComponent"/>
+            <ComponentGroupRef Id="ClientLibs"/>
+            <ComponentGroupRef Id="ClientFFmpegLibraries"/>
+            <ComponentGroupRef Id="ClientQTLibraries" />
+            <ComponentGroupRef Id="ClientQuazip" />
+            <ComponentGroupRef Id="ImageFormats" />
+            <ComponentGroupRef Id="Mediaservice" />			
+            <ComponentGroupRef Id="Platforms" />
+            <ComponentGroupRef Id="AudioPlugins" />
+            <ComponentGroupRef Id="ClientOpenAL" />
+            <ComponentGroupRef Id="ClientOpenSSL" />
+            <ComponentRef Id="ClientSigar"/>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

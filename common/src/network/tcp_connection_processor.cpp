@@ -4,7 +4,7 @@
 
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>
@@ -18,7 +18,7 @@
 #   include <netinet/tcp.h>
 #endif
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
 
 // we need enough size for updates
@@ -31,14 +31,27 @@
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnCommonModule* commonModule)
+    QnTcpListener* owner)
 :
-    QnCommonModuleAware(commonModule),
+    QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->chunkedMode = false;
+    d->owner = owner;
+}
+
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QnTCPConnectionProcessorPrivate* dptr,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+:
+    QnCommonModuleAware(owner->commonModule()),
+    d_ptr(dptr)
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->socket = socket;
+    d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -51,9 +64,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->chunkedMode = false;
 }
-
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
@@ -130,8 +141,8 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
-
-    nx_http::HttpModManager::instance()->apply( &d->request );
+    if (d->owner)
+        d->owner->applyModToRequest(&d->request);
 }
 
 /*
@@ -460,7 +471,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
-            nx_http::HttpModManager::instance()->apply( &d->request );
+            if (d->owner)
+                d->owner->applyModToRequest(&d->request);
 
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
@@ -501,6 +513,22 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket ? d->socket->getForeignAddress() : SocketAddress();
+}
+
+bool QnTCPConnectionProcessor::isSocketTaken() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->isSocketTaken;
+}
+
+QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->isSocketTaken = true;
+
+    const auto socket = d->socket;
+    d->socket.clear();
+    return socket;
 }
 
 void QnTCPConnectionProcessor::releaseSocket()
@@ -592,8 +620,8 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
 {
     Q_D(QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.method == nx_http::Method::GET ||
-        d->request.requestLine.method == nx_http::Method::HEAD )
+    if( d->request.requestLine.method == nx_http::Method::get ||
+        d->request.requestLine.method == nx_http::Method::head )
     {
         d->response.messageBody = messageBody;
     }
@@ -613,7 +641,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {

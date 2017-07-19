@@ -1,13 +1,12 @@
-#ifndef QN_RESOURCE_BROWSER_WIDGET_H
-#define QN_RESOURCE_BROWSER_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/common/tool_tip_queryable.h>
+#include <ui/models/resource_search_proxy_model.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -30,10 +29,8 @@ class QnWorkbenchContext;
 
 class HoverFocusProcessor;
 
-class QnResourceCriterion;
 class QnResourcePreviewWidget;
 class QnResourceTreeModel;
-class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
 class QnTextEditLabel;
@@ -109,6 +106,9 @@ protected:
     virtual bool showOwnTooltip(const QPointF& pos) override;
 
 private:
+    QnResourceSearchQuery query() const;
+    void setQuery(const QnResourceSearchQuery& query);
+
     QnResourceTreeWidget* currentTreeWidget() const;
     QItemSelectionModel* currentSelectionModel() const;
     QModelIndex itemIndexAt(const QPoint& pos) const;
@@ -116,13 +116,9 @@ private:
     bool isLayoutSearchable(QnWorkbenchLayout* layout) const;
     QnResourceSearchProxyModel* layoutModel(QnWorkbenchLayout* layout, bool create) const;
     QnResourceSearchSynchronizer* layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const;
-    QString layoutFilter(QnWorkbenchLayout* layout) const;
-    void setLayoutFilter(QnWorkbenchLayout* layout, const QString& filter) const;
 
     void killSearchTimer();
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
-
-    void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
 
     void handleItemActivated(const QModelIndex& index, bool withMouse);
 
@@ -161,5 +157,3 @@ private:
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
     QnResourcePtr m_tooltipResource;
 };
-
-#endif // QN_RESOURCE_BROWSER_WIDGET_H

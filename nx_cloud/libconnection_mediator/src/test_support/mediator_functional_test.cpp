@@ -7,17 +7,17 @@
 #include <thread>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "http/get_listening_peer_list_handler.h"
@@ -56,7 +56,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     m_stunPort(0),
     m_httpPort(0)
 {
-    if (m_testFlags & initiailizeSocketGlobals)
+    if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
@@ -64,7 +64,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     QDir().mkpath(m_tmpDir);
 
     const auto stunAddress = findFreeTcpAndUdpLocalAddress();
-    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").str(stunAddress), cl_logINFO);
+    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(stunAddress), cl_logINFO);
 
     addArg("/path/to/bin");
     addArg("-e");
@@ -105,8 +105,12 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
     m_httpPort = httpEndpoints.front().port;
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
-    network::SocketGlobals::mediatorConnector().enable(true);
+    if (m_testFlags & MediatorTestFlags::initializeConnectivity)
+    {
+        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
+        network::SocketGlobals::mediatorConnector().enable(true);
+    }
 
     return true;
 }
@@ -142,7 +146,8 @@ void MediatorFunctionalTest::registerCloudDataProvider(
                 const boost::optional<QUrl>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
-                std::chrono::milliseconds /*updateInterval*/)
+                std::chrono::milliseconds /*updateInterval*/,
+                std::chrono::milliseconds /*startTimeout*/)
             {
                 return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
             });
@@ -179,7 +184,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
         && server->bind() != nx::hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
-            .arg(server->fullName()).str(server->endpoint()), cl_logERROR);
+            .arg(server->fullName()).arg(server->endpoint()), cl_logERROR);
         return nullptr;
     }
 
@@ -244,5 +249,5 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         QJson::deserialized<data::ListeningPeers>(responseBody));
 }
 
-}   // namespace hpm
-}   // namespace nx
+} // namespace hpm
+} // namespace nx

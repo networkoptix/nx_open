@@ -3,11 +3,12 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
+#include <nx/network/cloud/connection_mediator_url_fetcher.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
-
 #include <nx/utils/scope_guard.h>
 
 namespace nx {
@@ -30,7 +31,6 @@ class CloudModuleUrlFetcher:
 {
 public:
     CloudModuleUrlFetcher(const char* modulesXmlBody = nullptr):
-        m_fetcher(std::make_unique<nx::network::cloud::RandomEndpointSelector>()),
         m_modulesXmlBody(modulesXmlBody ? modulesXmlBody : modulesXmlWithUrls)
     {
         init();
@@ -46,9 +46,7 @@ protected:
 
     QUrl fetchModuleUrl(const char* moduleName)
     {
-        auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(
-            moduleName,
-            std::make_unique<nx::network::cloud::RandomEndpointSelector>());
+        auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(moduleName);
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 
@@ -248,9 +246,9 @@ TEST_F(FtCloudModuleUrlFetcher, no_response_from_cloud)
 
 TEST_F(FtCloudModuleUrlFetcher, cancellation)
 {
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 7; ++i)
     {
-        for (int j = 0; j < 10; ++j)
+        for (int j = 0; j < 3; ++j)
         {
             cloud::CloudModuleUrlFetcher::ScopedOperation operation(&m_fetcher);
 
@@ -260,7 +258,7 @@ TEST_F(FtCloudModuleUrlFetcher, cancellation)
                     nx_http::StatusCode::Value /*resCode*/,
                     QUrl endpoint)
                 {
-                    //if called after s desruction, will get segfault here
+                    //if called after destruction, will get segfault here
                     s = endpoint.toString().toStdString();
                 });
 
@@ -273,6 +271,107 @@ TEST_F(FtCloudModuleUrlFetcher, cancellation)
 
         m_fetcher.pleaseStopSync();
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static const char* kSingleMediatorUrlXml = R"xml(
+    <sequence>
+        <set resName="cdb" resValue="https://cloud-test.hdw.mx:443"/>
+        <set resName="hpm" resValue="stun://cloud-test.hdw.mx:3345"/>
+        <set resName="notification_module" resValue="https://cloud-test.hdw.mx:443"/>
+    </sequence>
+)xml";
+
+static const char* kMediatorHasDifferentAddressForTcpAndUdpXml = R"xml(
+    <sequence>
+        <set resName="cdb" resValue="https://cloud-test.hdw.mx:443"/>
+        <sequence>
+            <set resName="hpm.tcpUrl" resValue="http://cloud-test.hdw.mx:3345"/>
+            <set resName="hpm.udpUrl" resValue="stun://cloud-test.hdw.mx:3346"/>
+        </sequence>
+        <set resName="notification_module" resValue="https://cloud-test.hdw.mx:443"/>
+    </sequence>
+)xml";
+
+static const char* kConnectionMediatorXmlPath = "/mediator_test_modules.xml";
+
+class MediatorUrlFetcher:
+    public CloudModuleUrlFetcher
+{
+protected:
+    void givenXmlWithSingleMediatorUrl()
+    {
+        httpServer().registerStaticProcessor(
+            kConnectionMediatorXmlPath,
+            kSingleMediatorUrlXml,
+            "application/xml");
+        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.tcpUrl = "stun://cloud-test.hdw.mx:3345";
+        m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3345";
+    }
+
+    void givenXmlWithSeparateMediatorUrls()
+    {
+        httpServer().registerStaticProcessor(
+            kConnectionMediatorXmlPath,
+            kMediatorHasDifferentAddressForTcpAndUdpXml,
+            "application/xml");
+        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.tcpUrl = "http://cloud-test.hdw.mx:3345";
+        m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3346";
+    }
+
+    void whenParseXml()
+    {
+        m_urlFetcher.setModulesXmlUrl(url::Builder().setScheme("http")
+            .setEndpoint(httpServer().serverAddress()).setPath(kConnectionMediatorXmlPath));
+
+        nx::utils::promise<void> done;
+        m_urlFetcher.get(
+            [this, &done](
+                nx_http::StatusCode::Value statusCode, QUrl tcpUrl, QUrl udpUrl)
+            {
+                m_actualResult.statusCode = statusCode;
+                m_actualResult.tcpUrl = tcpUrl;
+                m_actualResult.udpUrl = udpUrl;
+                done.set_value();
+            });
+        done.get_future().wait();
+    }
+
+    void thenUrlsAreFound()
+    {
+        ASSERT_EQ(m_expectedResult.statusCode, m_actualResult.statusCode);
+        ASSERT_EQ(m_expectedResult.tcpUrl, m_actualResult.tcpUrl);
+        ASSERT_EQ(m_expectedResult.udpUrl, m_actualResult.udpUrl);
+    }
+
+private:
+    struct Result
+    {
+        nx_http::StatusCode::Value statusCode;
+        QUrl tcpUrl;
+        QUrl udpUrl;
+    };
+
+    Result m_expectedResult;
+    Result m_actualResult;
+    cloud::ConnectionMediatorUrlFetcher m_urlFetcher;
+};
+
+TEST_F(MediatorUrlFetcher, oldXmlIsAccepted)
+{
+    givenXmlWithSingleMediatorUrl();
+    whenParseXml();
+    thenUrlsAreFound();
+}
+
+TEST_F(MediatorUrlFetcher, xmlWithSeparateTcpAndUdpUrls)
+{
+    givenXmlWithSeparateMediatorUrls();
+    whenParseXml();
+    thenUrlsAreFound();
 }
 
 } // namespace test

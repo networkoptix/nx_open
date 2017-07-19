@@ -10,16 +10,17 @@
 #include <nx/utils/log/log.h>
 
 
-bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
-    QByteArray extensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-    QByteArray versionString = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-    QByteArray rendererString = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-    QByteArray vendorString = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
+{
+    QByteArray extensionsString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    QByteArray versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    QByteArray rendererString = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    QByteArray vendorString = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 
-    cl_log.log(lit("OpenGL extensions: %1.").arg(QLatin1String(extensionsString.constData())), cl_logINFO);
-    cl_log.log(lit("OpenGL version: %1.").arg(QLatin1String(versionString.constData())), cl_logINFO);
-    cl_log.log(lit("OpenGL renderer: %1.").arg(QLatin1String(rendererString.constData())), cl_logINFO);
-    cl_log.log(lit("OpenGL vendor: %1.").arg(QLatin1String(vendorString.constData())), cl_logINFO);
+    NX_INFO("OpenGL", lit("Extensions: %1.").arg(QLatin1String(extensionsString.constData())));
+    NX_INFO("OpenGL", lit("Version: %1.").arg(QLatin1String(versionString.constData())));
+    NX_INFO("OpenGL", lit("Renderer: %1.").arg(QLatin1String(rendererString.constData())));
+    NX_INFO("OpenGL", lit("Vendor: %1.").arg(QLatin1String(vendorString.constData())));
 
     bool contextIsValid = true;
 

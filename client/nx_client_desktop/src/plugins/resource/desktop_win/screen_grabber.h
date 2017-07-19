@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QObject>
 
 // TODO: #Elric move system includes into implementation
@@ -50,7 +52,7 @@ public:
     int height() const;
     qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
-    void restartTimer() { m_timer.restart(); }
+    void restart();
     void setLogo(const QPixmap& logo);
     int screenWidth() const;
     int screenHeight() const;
@@ -95,7 +97,7 @@ private:
     QWidget* m_widget;
     int m_tmpFrameWidth;
     int m_tmpFrameHeight;
-    mutable std::auto_ptr<quint8> m_colorBits;
+    mutable std::unique_ptr<quint8> m_colorBits;
     mutable size_t m_colorBitsCapacity;
 
     static QnMutex m_guiWaitMutex;

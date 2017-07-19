@@ -359,7 +359,16 @@ action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) c
         case action::TimelineScope:
             return navigator()->currentWidget();
         case action::SceneScope:
-            return action::ParameterTypes::widgets(display()->scene()->selectedItems());
+        {
+            auto selectedItems = display()->scene()->selectedItems();
+            if (selectedItems.empty())
+            {
+                auto focused = dynamic_cast<QnResourceWidget*>(display()->scene()->focusItem());
+                if (focused)
+                    selectedItems.append(focused);
+            }
+            return action::ParameterTypes::widgets(selectedItems);
+        }
         default:
             break;
     }
@@ -489,7 +498,12 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
             return QRectF();
         };
 
-    const bool timelineCanBeVisible = m_timeline && any_of(display()->widgets(),
+    const auto layout = workbench()->currentLayout();
+    const bool allowedByLayout = (layout
+        ? !layout->flags().testFlag(QnLayoutFlag::NoTimeline)
+        : true);
+
+    const bool timelineCanBeVisible = m_timeline && allowedByLayout && any_of(display()->widgets(),
         [this](QnResourceWidget* widget)
         {
             return calculateTimelineVisible(widget);
@@ -547,7 +561,7 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
         | (isTitleOpened() ? TitlePanel : NoPanel)
         | (isTimelineOpened() ? TimelinePanel : NoPanel)
         | (isNotificationsOpened() ? NotificationsPanel : NoPanel)
-        | (isLayoutPanelOpened() ? LayoutPanel : NoPanel);
+        ;
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
@@ -958,11 +972,6 @@ bool QnWorkbenchUi::isTitleOpened() const
     return m_title && m_title->isOpened();
 }
 
-bool QnWorkbenchUi::isLayoutPanelOpened() const
-{
-    return m_layoutPanel && m_layoutPanel->isOpened();
-}
-
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
     m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
@@ -1066,11 +1075,11 @@ void QnWorkbenchUi::updateLayoutPanelGeometry()
 
     const auto notificationsLeft = m_notifications && m_notifications->isVisible()
         ? m_notifications->item->geometry().left()
-        : m_controlsWidgetRect.left();
+        : m_controlsWidgetRect.right();
 
     const auto treeRight = m_tree && m_tree->isVisible()
         ? m_tree->item->geometry().right()
-        : 0;
+        : m_controlsWidgetRect.left();
 
     const auto topLeft = QPointF(treeRight, titleGeometry.bottom());
     const auto size = QSizeF(notificationsLeft - treeRight, 0); // TODO #ynikitenkov: add height handling
@@ -1410,8 +1419,8 @@ void QnWorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptHoverEvents(false);
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
+    display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
 
-    display()->view()->addAction(action(action::ShowFpsAction));
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
     setFpsVisible(false);

@@ -3,16 +3,22 @@
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <ui/common/geometry.h>
+#include <ui/style/helper.h>
 
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
+    base_type(),
     q_ptr(main),
-    title(new QnResourceTitleItem(main)),
-    details(new QnHudDetailsItem(QString(), QnHtmlTextItemOptions(), main)),
-    position(new QnHudPositionItem(QString(), QnHtmlTextItemOptions(), main)),
-    left(new QGraphicsWidget(main)),
-    right(new QGraphicsWidget(main))
+    titleHolder(new QnViewportBoundWidget(main)),
+    title(new QnResourceTitleItem(titleHolder)),
+    content(new QnViewportBoundWidget(main)),
+    details(new QnHudDetailsItem()),
+    position(new QnHudPositionItem()),
+    left(new QGraphicsWidget(content)),
+    right(new QGraphicsWidget(content))
 {
     auto leftLayout = new QGraphicsLinearLayout(Qt::Vertical);
     left->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
@@ -28,16 +34,23 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     rightLayout->addItem(position);
     rightLayout->setAlignment(position, Qt::AlignRight | Qt::AlignBottom);
 
-    auto columnsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    columnsLayout->addItem(leftLayout);
-    columnsLayout->addItem(rightLayout);
+    auto contentLayout = new QGraphicsLinearLayout(Qt::Horizontal, content);
+    contentLayout->addItem(leftLayout);
+    contentLayout->addItem(rightLayout);
 
-    static constexpr int kMargin = 2;
-    columnsLayout->setContentsMargins(kMargin, 0, kMargin, kMargin);
+    content->setAcceptedMouseButtons(Qt::NoButton);
+    titleHolder->setAcceptedMouseButtons(Qt::NoButton);
 
-    auto mainLayout = new QGraphicsLinearLayout(Qt::Vertical, main);
-    mainLayout->addItem(title);
-    mainLayout->addItem(columnsLayout);
+    auto titleLayout = new QGraphicsLinearLayout(Qt::Vertical, titleHolder);
+    titleLayout->addItem(title);
+    titleLayout->addStretch();
+
+    connect(main, &QGraphicsWidget::geometryChanged,
+        this, &QnHudOverlayWidgetPrivate::updateLayout);
+    connect(title, &QGraphicsWidget::geometryChanged,
+        this, &QnHudOverlayWidgetPrivate::updateLayout);
+    connect(titleHolder, &QnViewportBoundWidget::scaleChanged,
+        this, &QnHudOverlayWidgetPrivate::updateLayout);
 
     static constexpr int kBorderRadius = 2;
 
@@ -48,4 +61,15 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
 
     details->setOptions(options);
     position->setOptions(options);
+}
+
+void QnHudOverlayWidgetPrivate::updateLayout()
+{
+    Q_Q(const QnHudOverlayWidget);
+    titleHolder->setFixedSize(q->size());
+
+    static const auto kSpacing = style::Metrics::kDefaultLayoutSpacing.height();
+    const auto titleSpace = (title->size().height() + kSpacing) * titleHolder->scale();
+    content->setFixedSize(q->size() - QSizeF(0.0, titleSpace));
+    content->setPos(0.0, titleSpace);
 }

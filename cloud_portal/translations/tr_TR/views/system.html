@@ -1,0 +1,27 @@
+<div class="container auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>Sisteme erişim sağlanılamadı</h1>
+        <p>Bu bağlantı bozuk,<br>
+            Sistemin {{PRODUCT_NAME}} den bağlantısı kesilmiş olabilir<br>
+            Sisteme erişim engennemiş olabilir,<br>
+            Yada farklı bir hesap ile sisteme girilmiş olabilir</p>
+        <p>
+            <a href="/systems" class="btn btn-default">Kullanılabilir Sistem Listesi</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    Sistem bilgilerine erişime sahip değilsiniz.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

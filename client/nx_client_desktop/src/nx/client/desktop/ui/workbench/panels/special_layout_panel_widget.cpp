@@ -7,6 +7,8 @@
 
 #include <client/client_globals.h>
 
+#include <core/resource/layout_resource.h>
+
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
@@ -52,8 +54,10 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     connect(m_layoutResource, &QnLayoutResource::dataChanged,
         this, &SpecialLayoutPanelWidget::handleResourceDataChanged);
+    connect(m_layoutResource, &QnResource::nameChanged, this,
+        &SpecialLayoutPanelWidget::updateTitle);
 
-    handleResourceDataChanged(Qn::CustomPanelTitleRole);
+    updateTitle();
     handleResourceDataChanged(Qn::CustomPanelDescriptionRole);
     handleResourceDataChanged(Qn::CustomPanelActionsRole);
 }
@@ -68,7 +72,7 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
     {
         case Qn::CustomPanelTitleRole:
         {
-            ui->captionLabel->setText(getString(Qn::CustomPanelTitleRole, m_layoutResource));
+            updateTitle();
             break;
         }
         case Qn::CustomPanelDescriptionRole:
@@ -124,6 +128,12 @@ void SpecialLayoutPanelWidget::updateButtons()
                 break;
         }
     }
+}
+
+void SpecialLayoutPanelWidget::updateTitle()
+{
+    const auto customTitle = getString(Qn::CustomPanelTitleRole, m_layoutResource);
+    ui->captionLabel->setText(customTitle.isEmpty() ? m_layoutResource->getName() : customTitle);
 }
 
 } // namespace workbench

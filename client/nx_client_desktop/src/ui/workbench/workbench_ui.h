@@ -17,7 +17,6 @@
 
 #include "workbench_context_aware.h"
 
-class QGraphicsProxyWidget;
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
 
@@ -129,8 +128,6 @@ public:
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
-
-    bool isLayoutPanelOpened() const;
 
     /** Whether notification pane is opened. */
     bool isNotificationsOpened() const;

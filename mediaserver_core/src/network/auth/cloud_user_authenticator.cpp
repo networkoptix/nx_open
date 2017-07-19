@@ -10,11 +10,11 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
@@ -120,8 +120,23 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     }
 
     const auto nonce = authorizationHeader.digest->params["nonce"];
-
     bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(nonce);
+
+    if (isCloudUser && isCloudNonce)
+    {
+        auto userInfoPoolAuthResult =
+            m_cdbNonceFetcher.cloudUserInfoPool().authenticate(method, authorizationHeader);
+
+        if (userInfoPoolAuthResult == Qn::Auth_OK)
+            return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_OK, cloudUsers.first());
+
+        if (userInfoPoolAuthResult == Qn::Auth_WrongPassword)
+        {
+            return std::tuple<Qn::AuthResult, QnResourcePtr>(
+                Qn::Auth_WrongPassword,
+                QnResourcePtr());
+        }
+    }
 
     // Server has provided to the client non-cloud nonce
     // for cloud user due to no cloud connection so far.

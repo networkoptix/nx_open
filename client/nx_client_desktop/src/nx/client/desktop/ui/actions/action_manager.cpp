@@ -15,6 +15,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -51,21 +53,16 @@ protected:
 Action* checkSender(QObject* sender)
 {
     auto result = qobject_cast<Action*>(sender);
-    if (!result)
-        NX_EXPECT(false, "Cause cannot be determined for non-Action senders.");
+    NX_EXPECT(result, "Cause cannot be determined for non-Action senders.");
     return result;
 }
 
 bool checkType(const QVariant& items)
 {
     ActionParameterType type = ParameterTypes::type(items);
-    if (type == 0)
-    {
-        NX_EXPECT(false, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
-        return false;
-    }
-
-    return true;
+    const bool result = (type != OtherType);
+    NX_EXPECT(result, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
+    return result;
 }
 
 } // namespace
@@ -177,10 +174,9 @@ void Manager::trigger(IDType id, const Parameters& parameters)
     if (triggerIfPossible(id, parameters))
         return;
 
-    const auto action = m_actionById.value(id);
-    const QString text = action ? action->text() : QString();
-    qWarning() << "Action was triggered with a parameter that does not meet the action's requirements."
-        << id << text;
+    qWarning()
+        << "Action was triggered with a parameter that does not meet the action's requirements."
+        <<  QnLexical::serialized(id);
 }
 
 bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
@@ -197,6 +193,18 @@ bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
     QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
     action->trigger();
     return true;
+}
+
+void Manager::triggerForced(IDType id, const Parameters& parameters)
+{
+    Action* action = m_actionById.value(id);
+    NX_EXPECT(action);
+    if (!action)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    action->trigger();
 }
 
 QMenu* Manager::integrateMenu(QMenu* menu, const Parameters& parameters)
@@ -267,8 +275,10 @@ void Manager::copyAction(QAction* dst, Action* src, bool forwardSignals)
 
     if (forwardSignals)
     {
-        connect(dst, &QAction::triggered, src, &QAction::trigger);
-        connect(dst, &QAction::toggled, src, &QAction::setChecked);
+        if (src->isCheckable())
+            connect(dst, &QAction::toggled, src, &QAction::setChecked);
+        else
+            connect(dst, &QAction::triggered, src, &QAction::trigger);
     }
 }
 

@@ -427,9 +427,6 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
 
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
-//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
-//    cl_log.log(QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
-
     // simple data provider/streamer/streamreader has the same delay, but who cares ?
     // to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
     quint64 currentTime = vd->timestamp;
@@ -554,7 +551,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         displayedTime = newDisplayedTime;
                         firstWait = true;
                     }
-                    if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
+                    bool doDelayForAudio = m_playAudio && m_audioDisplay->isPlaying()
+                        && displayedTime > m_audioDisplay->getCurrentTime();
+                    if (ct != DATETIME_NOW && (speedSign *(displayedTime - ct) > 0) || doDelayForAudio)
                     {
                         if (firstWait)
                         {
@@ -692,7 +691,6 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
 
         //m_display[channel]->dispay(vd, sleep, scale_factor);
-        //cl_log.log(" video queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
     }
     return doProcessPacket;
 }
@@ -844,12 +842,6 @@ void QnCamDisplay::onBeforeJump(qint64 time)
 {
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, m_doNotChangeDisplayTime ? getDisplayedTime() : time);
-    /*
-    if (time < 1000000ll * 100000)
-        cl_log.log("before jump to ", time, cl_logWARNING);
-    else
-        cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-    */
 
     QnMutexLocker lock( &m_timeMutex );
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
@@ -897,12 +889,6 @@ void QnCamDisplay::onBeforeJump(qint64 time)
 
 void QnCamDisplay::onJumpOccured(qint64 time)
 {
-    /*
-    if (time < 1000000ll * 100000)
-        cl_log.log("after jump to ", time, cl_logWARNING);
-    else
-        cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-    */
     //if (m_extTimeSrc)
     //    m_extTimeSrc->onBufferingStarted(this, time);
 
@@ -930,7 +916,6 @@ void QnCamDisplay::onJumpCanceled(qint64 /*time*/)
 void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
-    //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
@@ -1261,7 +1246,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 m_afterJump = false;
         }
         afterJump(media);
-        //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
     else if (media->flags & QnAbstractMediaData::MediaFlags_NewServer)
     {
@@ -1366,7 +1350,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                if( m_display[i] )
+                if (isFillerPacket && m_display[i])
                     m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
@@ -1602,7 +1586,7 @@ void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     if (val == m_lightCpuMode)
         return;
 
-    cl_log.log("set CPUMode=", val, cl_logWARNING);
+    NX_WARNING(this, lit("set CPUMode=%1").arg(val));
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -1746,7 +1730,7 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
-        cl_log.log(lit("Video buffer overflow!"), cl_logWARNING);
+        NX_WARNING(this, "Video buffer overflow!");
         dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;

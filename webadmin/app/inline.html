@@ -67,17 +67,23 @@
 <!-- endbuild -->
 
 
+<!-- build:js({.tmp,app}) scripts/common-inline.js -->
+<script src="web_common/scripts/module.js"></script>
+<script src="web_common/scripts/services/systemAPI.js"></script>
+<script src="web_common/scripts/services/nativeClient.js"></script>
+<script src="web_common/scripts/services/poll.js"></script>
+<script src="web_common/scripts/services/page.js"></script>
+<!-- endbuild -->
+
 <!-- build:js({.tmp,app}) scripts/scripts-inline.js -->
 <script src="scripts/bootstrap.js"></script>
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app-inline.js"></script>
 
-<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/cloudAPI.js"></script>
-<script src="scripts/services/poll.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/dialogs.js"></script>
-<script src="scripts/services/nativeClient.js"></script>
 
 <script src="scripts/directives/autofocus.js"></script>
 <script src="scripts/directives/validateField.js"></script>

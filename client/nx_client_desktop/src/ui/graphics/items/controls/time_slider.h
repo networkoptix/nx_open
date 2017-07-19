@@ -1,7 +1,7 @@
-#ifndef QN_TIME_SLIDER_H
-#define QN_TIME_SLIDER_H
+#pragma once
 
 #include <QtCore/QLocale>
+#include <QtCore/QScopedPointer>
 
 #include <utils/math/functors.h>
 
@@ -33,7 +33,7 @@ class QnBookmarksViewer;
 class QnBookmarkMergeHelper;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
-    protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener
+    protected DragProcessHandler, protected AnimationTimerListener
 {
     Q_OBJECT
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
@@ -122,7 +122,12 @@ public:
         /**
         * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
         */
-        StillBookmarksViewer = 0x2000
+        StillBookmarksViewer = 0x2000,
+
+        /**
+        * Whether single click with mouse button immediately clears existing selection.
+        */
+        ClearSelectionOnClick = 0x4000
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -259,9 +264,6 @@ protected:
 
     virtual void tick(int deltaMSecs) override;
 
-    virtual void kineticMove(const QVariant& degrees) override;
-    virtual void finishKinetic() override;
-
     virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
     virtual void dragMove(DragInfo* info) override;
@@ -278,7 +280,8 @@ private:
         NoMarker,
         SelectionStartMarker,
         SelectionEndMarker,
-        CreateSelectionMarker
+        CreateSelectionMarker,
+        DragMarker
     };
 
     struct TimeStepData
@@ -326,6 +329,10 @@ private:
         bool hiding;
         bool selecting;
     };
+
+    class KineticHandlerBase;
+    class KineticZoomHandler;
+    class KineticScrollHandler;
 
 private:
     Marker markerFromPosition(const QPointF& pos, qreal maxDistance = 1.0) const;
@@ -411,6 +418,8 @@ private:
 
     QnBookmarksViewer* createBookmarksViewer();
 
+    bool isWindowBeingDragged() const;
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
@@ -493,8 +502,11 @@ private:
     GraphicsLabel* m_tooltipLine2;
 
     bool m_updatingValue;
+
+    qint64 m_dragWindowStart = 0;
+
+    const QScopedPointer<KineticZoomHandler> m_kineticZoomHandler;
+    const QScopedPointer<KineticScrollHandler> m_kineticScrollHandler;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
-
-#endif // QN_TIME_SLIDER_H

@@ -124,7 +124,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_NO_ERROR;
     }
 
-    std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
+    std::unique_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0,
         curTimestamp,
         nxcip::MediaDataPacket::fKeyPacket |

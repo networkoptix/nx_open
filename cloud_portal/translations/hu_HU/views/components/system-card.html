@@ -1,0 +1,30 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Az Ön rendszere</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}}</span>
+leválasztása</button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Tulajdonos</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Engedélyei:
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Leválasztás a fiókomról</button>
+    </div>
+</div>

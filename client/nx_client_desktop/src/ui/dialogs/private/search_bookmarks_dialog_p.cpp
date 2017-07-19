@@ -52,7 +52,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     , m_allCamerasChoosen(true)
 
-    , m_openInNewTabAction      (new QAction(action(action::OpenInNewLayoutAction)->text(), this))
+    , m_openInNewTabAction      (new QAction(action(action::OpenInNewTabAction)->text(), this))
     , m_editBookmarkAction      (new QAction(action(action::EditCameraBookmarkAction)->text(), this))
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(action::RemoveBookmarksAction)->text(), this))
@@ -117,7 +117,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         if (!fillActionParameters(params, window))
             return;
 
-        if (!menu()->canTrigger(action::OpenInNewLayoutAction, params))
+        if (!menu()->canTrigger(action::OpenInNewTabAction, params))
             return;
 
         openInNewLayout(params, window);
@@ -274,7 +274,7 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &p
         item->setData(role, window);
     };
 
-    menu()->trigger(action::OpenInNewLayoutAction, params);
+    menu()->trigger(action::OpenInNewTabAction, params);
 
     static const qint64 kMinOffset = 30 * 1000;
     const auto offset = std::max(window.durationMs, kMinOffset);
@@ -384,7 +384,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
             newMenu->addAction(action);
     };
 
-    addActionToMenu(action::OpenInNewLayoutAction, m_openInNewTabAction);
+    addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
     addActionToMenu(action::ExportTimeSelectionAction, m_exportBookmarkAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);

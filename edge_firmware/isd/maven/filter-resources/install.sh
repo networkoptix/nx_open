@@ -1,18 +1,20 @@
-#!/bin/bash
+#!/bin/sh
 
-COMPANY_NAME=${deb.customization.company.name}
+CUSTOMIZATION=${deb.customization.company.name}
 export DISTRIB=${artifact.name.server}
 
-update () {
-    /etc/init.d/S99$COMPANY_NAME-mediaserver stop
-    rm -Rf /usr/local/apps/${deb.customization.company.name}/mediaserver/lib
+INSTALL_DIR="/usr/local/apps/$CUSTOMIZATION"
+
+update()
+{
+    /etc/init.d/S99$CUSTOMIZATION-mediaserver stop
+    rm -rf "$INSTALL_DIR/mediaserver/lib"
     tar xfv $DISTRIB.tar.gz -C /
-    /etc/init.d/S99$COMPANY_NAME-mediaserver start
+    /etc/init.d/S99$CUSTOMIZATION-mediaserver start
 }
 
-if [ "$1" != "" ]
-then
-    update >> $1 2>&1
+if [ "$1" != "" ]; then
+    update >>"$1" 2>&1
 else
     update 2>&1
 fi

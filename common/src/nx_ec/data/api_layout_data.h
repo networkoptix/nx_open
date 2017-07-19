@@ -44,15 +44,15 @@ namespace ec2
             typeId = QnResourceTypePool::kLayoutTypeUuid;
         }
 
-        float cellAspectRatio;
-        float horizontalSpacing;
-        float verticalSpacing;
+        float cellAspectRatio = 0;
+        float horizontalSpacing = 0;
+        float verticalSpacing = 0;
         std::vector<ApiLayoutItemData> items;
-        bool   locked;
+        bool   locked = false;
         QString backgroundImageFilename;
-        qint32  backgroundWidth;
-        qint32  backgroundHeight;
-        float backgroundOpacity;
+        qint32  backgroundWidth = 0;
+        qint32  backgroundHeight = 0;
+        float backgroundOpacity = 0;
     };
 #define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)

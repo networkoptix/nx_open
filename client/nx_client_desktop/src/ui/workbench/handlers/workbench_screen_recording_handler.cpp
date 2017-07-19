@@ -236,7 +236,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     m_dataProvider->start();
 
     if (!m_dataProvider->isInitialized()) {
-        cl_log.log(m_dataProvider->lastErrorStr(), cl_logERROR);
+        NX_ERROR(this, m_dataProvider->lastErrorStr());
 
         onError(m_dataProvider->lastErrorStr());
         return;

@@ -14,26 +14,28 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+namespace nx {
+namespace network {
+namespace server {
+
 template<class _ConnectionType>
 class StreamConnectionHolder
 {
 public:
-    typedef _ConnectionType ConnectionType;
+    using ConnectionType = _ConnectionType;
 
-    virtual ~StreamConnectionHolder() {}
+    virtual ~StreamConnectionHolder() = default;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        ConnectionType* connection ) = 0;
+        ConnectionType* connection) = 0;
 };
 
-template<class _ConnectionType>
+template<class ConnectionType>
 class StreamServerConnectionHolder:
-    public StreamConnectionHolder<_ConnectionType>
+    public StreamConnectionHolder<ConnectionType>
 {
 public:
-    typedef _ConnectionType ConnectionType;
-
     StreamServerConnectionHolder():
         m_connectionsBeingClosedCount(0)
     {
@@ -41,17 +43,17 @@ public:
 
     virtual ~StreamServerConnectionHolder()
     {
-        //we MUST be sure to remove all connections
+        // We MUST be sure to remove all connections.
         std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
         {
             QnMutexLocker lk(&m_mutex);
-            connections.swap( m_connections );
+            connections.swap(m_connections);
         }
         for (auto& connection: connections)
             connection.first->pleaseStopSync();
         connections.clear();
 
-        //waiting connections being cancelled through closeConnection call to finish...
+        // Waiting connections being cancelled through closeConnection call to finish...
         QnMutexLocker lk(&m_mutex);
         while (m_connectionsBeingClosedCount > 0)
             m_cond.wait(lk.mutex());
@@ -59,7 +61,7 @@ public:
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
-        ConnectionType* connection ) override
+        ConnectionType* connection) override
     {
         QnMutexLocker lk(&m_mutex);
         auto connectionIter = m_connections.find(connection);
@@ -85,7 +87,6 @@ public:
         return m_connections.size();
     }
 
-protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
         QnMutexLocker lk(&m_mutex);
@@ -100,41 +101,46 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
-// TODO #ak It seems to make sense to decouple 
+// TODO: #ak It seems to make sense to decouple 
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
 /**
- * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
+ * Listens local tcp address, accepts incoming connections 
+ *   and forwards them to the specified handler.
  */
 template<class CustomServerType, class ConnectionType>
-    class StreamSocketServer
-:
+class StreamSocketServer:
     public StreamServerConnectionHolder<ConnectionType>,
-    public nx::network::aio::BasicPollable
+    public aio::BasicPollable
 {
-    typedef StreamServerConnectionHolder<ConnectionType> BaseType;
-    typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
+    using base_type = StreamServerConnectionHolder<ConnectionType>;
+    using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:
-    StreamSocketServer(
-        bool sslRequired,
-        nx::network::NatTraversalSupport natTraversalSupport)
-    :
-        m_socket(SocketFactory::createStreamServerSocket(
-            sslRequired,
-            natTraversalSupport))
+    StreamSocketServer(std::unique_ptr<AbstractStreamServerSocket> serverSocket):
+        m_socket(std::move(serverSocket))
     {
         bindToAioThread(getAioThread());
     }
 
-    ~StreamSocketServer()
+    StreamSocketServer(
+        bool sslRequired,
+        nx::network::NatTraversalSupport natTraversalSupport)
+        :
+        StreamSocketServer(SocketFactory::createStreamServerSocket(
+            sslRequired,
+            natTraversalSupport))
+    {
+    }
+
+    virtual ~StreamSocketServer()
     {
         pleaseStopSync(false);
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
-        nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+        aio::BasicPollable::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
     }
 
@@ -155,39 +161,14 @@ public:
         {
             return false;
         }
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
+        m_socket->acceptAsync(
+            std::bind(&StreamSocketServer::newConnectionAccepted, this, _1, _2));
         return true;
     }
 
     SocketAddress address() const
     {
         return m_socket->getLocalAddress();
-    }
-
-    void newConnectionAccepted(SystemError::ErrorCode code, AbstractStreamSocket* socket)
-    {
-        // TODO: #ak handle errorCode: try to call acceptAsync after some delay?
-        m_socket->acceptAsync(
-            [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-            {
-                newConnectionAccepted(code, socket);
-            });
-
-        if (code != SystemError::noError)
-        {
-            NX_LOGX(lm("Accept has failed: %1").arg(SystemError::toString(code)), cl_logWARNING);
-            return;
-        }
-
-        if (m_keepAliveOptions)
-        {
-            const auto isKeepAliveSet = socket->setKeepAlive(m_keepAliveOptions);
-            NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
-        }
-
-        auto connection = createConnection(std::unique_ptr<AbstractStreamSocket>(socket));
-        connection->startReadingConnection(m_connectionInactivityTimeout);
-        this->saveConnection(std::move(connection));
     }
 
     void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
@@ -202,7 +183,7 @@ public:
 
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
-        std::unique_ptr<AbstractStreamSocket> _socket) = 0;
+        std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
 
     virtual void stopWhileInAioThread() override
     {
@@ -214,6 +195,41 @@ private:
     boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
-    StreamSocketServer( StreamSocketServer& );
-    StreamSocketServer& operator=( const StreamSocketServer& );
+    StreamSocketServer(StreamSocketServer&);
+    StreamSocketServer& operator=(const StreamSocketServer&);
+
+    void newConnectionAccepted(
+        SystemError::ErrorCode code,
+        std::unique_ptr<AbstractStreamSocket> socket)
+    {
+        // TODO: #ak handle errorCode: try to call acceptAsync after some delay?
+        m_socket->acceptAsync(
+            [this](
+                SystemError::ErrorCode code,
+                std::unique_ptr<AbstractStreamSocket> socket)
+            {
+                newConnectionAccepted(code, std::move(socket));
+            });
+
+        if (code != SystemError::noError)
+        {
+            NX_LOGX(lm("Accept has failed: %1")
+                .arg(SystemError::toString(code)), cl_logWARNING);
+            return;
+        }
+
+        if (m_keepAliveOptions)
+        {
+            const auto isKeepAliveSet = socket->setKeepAlive(m_keepAliveOptions);
+            NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+        }
+
+        auto connection = createConnection(std::move(socket));
+        connection->startReadingConnection(m_connectionInactivityTimeout);
+        this->saveConnection(std::move(connection));
+    }
 };
+
+} // namespace server
+} // namespace network
+} // namespace nx

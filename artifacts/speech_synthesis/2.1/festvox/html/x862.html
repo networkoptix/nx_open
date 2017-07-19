@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Extracting pitchmarks from waveforms</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Basic Requirements"
+HREF="c714.html"><LINK
+REL="PREVIOUS"
+TITLE="Recording under Unix"
+HREF="x817.html"><LINK
+REL="NEXT"
+TITLE="Limited domain synthesis"
+HREF="c941.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x817.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Basic Requirements</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c941.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-PITCHMARKS-SECT"
+>Extracting pitchmarks from waveforms</A
+></H1
+><P
+>Although never as good as extracting pitchmarks from an EGG signal, 
+we have had a fair amount of success in extracting pitchmarks from 
+the raw waveform. This area is somewhat a research area but in 
+this section we'll give some general pointers about how to get 
+pitchmarks form waveforms, or if not at least be able to tell 
+if you are getting reasonable pitchmarks from waveforms or not. </P
+><P
+>The basic program which we use for the extraction is <TT
+CLASS="FILENAME"
+>pitchmark</TT
+> 
+which is part of the Speech Tools distribution. We include the 
+script <TT
+CLASS="FILENAME"
+>bin/make_pm_wave</TT
+> (which is copied by ldom and diphone 
+setup process). The key line in the script is 
+<A
+NAME="AEN868"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$ESTDIR/bin/pitchmark&nbsp;tmp$$.wav&nbsp;-o&nbsp;pm/$fname.pm&nbsp;-otype&nbsp;est&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-min&nbsp;0.005&nbsp;-max&nbsp;0.012&nbsp;-fill&nbsp;-def&nbsp;0.01&nbsp;-wave_end&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-lx_lf&nbsp;200&nbsp;-lx_lo&nbsp;51&nbsp;-lx_hf&nbsp;80&nbsp;-lx_ho&nbsp;51&nbsp;-med_o&nbsp;0</P
+></BLOCKQUOTE
+>
+This program filters in incoming waveform (with a low and a high band 
+filter, then uses autocorellation to find the pitch mark peaks with the 
+min and max specified. Finally it fills in the unvoiced section with 
+the default pitchmarks. </P
+><P
+>For debugging purposes you should remove the <TT
+CLASS="FILENAME"
+>-fill</TT
+> option 
+so you can see where it is finding pitchmarks. Next you should modify 
+the min and max values to fit the range of your speaker. The defaults 
+here (0.005 and 0.012) are for a male speaker in about the range 200 to 
+80 Hz. For a female you probably want values about 0.0033 and 0.7 
+(300Mhz to 140Hz). </P
+><P
+>Modify the script to your approximate needs, and run it on 
+a single file, then run the script that translates the pitchmark 
+file into a labeled file suitable for emulabel 
+<A
+NAME="AEN873"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_wave&nbsp;wav/awb_0001.wav<br>
+bin/make_pm_pmlab&nbsp;pm/awb_0001.pm</P
+></BLOCKQUOTE
+>
+You can the display the pitchmark with 
+<A
+NAME="AEN875"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>emulabel&nbsp;etc/emu_pm&nbsp;awb_0001</P
+></BLOCKQUOTE
+>
+This should should a number of pitchmarks over the voiced 
+sections of speech. If there are none, or very few it definitely 
+means the parameters are wrong. For example the above parameters 
+on this file <CODE
+CLASS="VARNAME"
+>taataataa</CODE
+> properly find pitchmarks in the three vowel 
+sections 
+<DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="figures/pm_raw_01.gif"><DIV
+CLASS="CAPTION"
+><P
+>Pitchmarks in waveform signal</P
+></DIV
+></P
+></DIV
+>
+It the high and low pass filter values <CODE
+CLASS="VARNAME"
+>-lx_lf 200 -lx_hf 80</CODE
+> 
+are in appropriate for the speakers pitch range you may get either 
+too many, or two few pitch marks. For example if we change the 
+200 to 60, we find only two pitch marks in the third vowel. 
+<DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="figures/pm_bad_01.gif"><DIV
+CLASS="CAPTION"
+><P
+>Bad pitchmarks in waveform signal</P
+></DIV
+></P
+></DIV
+>
+If we zoom in our first example we get the following 
+<DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="figures/pm_raw_zoom01.gif"><DIV
+CLASS="CAPTION"
+><P
+>Close-up of pitchmarks in waveform signal</P
+></DIV
+></P
+></DIV
+>
+The pitch marks should be aligned to the largest (above zero) 
+peak in each pitch period. Here we can see there are too many pitchmarks 
+(effectively twice as many). The pitchmarks at 0.617, 0.628, 0.639 and 
+0.650 are extraneous. This means our pitch range is too wide. If 
+we rerun changing the min size, and the low frequency filter 
+<A
+NAME="AEN906"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$ESTDIR/bin/pitchmark&nbsp;tmp$$.wav&nbsp;-o&nbsp;pm/$fname.pm&nbsp;-otype&nbsp;est&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-min&nbsp;0.007&nbsp;-max&nbsp;0.012&nbsp;-fill&nbsp;-def&nbsp;0.01&nbsp;-wave_end&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-lx_lf&nbsp;150&nbsp;-lx_lo&nbsp;51&nbsp;-lx_hf&nbsp;80&nbsp;-lx_ho&nbsp;51&nbsp;-med_o&nbsp;0</P
+></BLOCKQUOTE
+>
+We get the following 
+<DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="figures/pm_raw_zoom02.gif"><DIV
+CLASS="CAPTION"
+><P
+>Close-up of pitchmarks in waveform signal (2)</P
+></DIV
+></P
+></DIV
+>
+Which is better but its now missing pitchmarks towards the end of 
+the vowel, at 0.634, 0.644 and 0.656. Giving more range 
+for the min (0.005) gives slight better results, but still we 
+get bad pitchmarks. The double pitch mark problem can be lessened by 
+not only changing the range but also the amount order of the high 
+and low pass filters (effectively allowing more smoothing). Thus 
+when secondary pitchmarks appear increasing the <CODE
+CLASS="VARNAME"
+>-lx_lo</CODE
+> parameter 
+often helps 
+<A
+NAME="AEN918"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$ESTDIR/bin/pitchmark&nbsp;tmp$$.wav&nbsp;-o&nbsp;pm/$fname.pm&nbsp;-otype&nbsp;est&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-min&nbsp;0.005&nbsp;-max&nbsp;0.012&nbsp;-fill&nbsp;-def&nbsp;0.01&nbsp;-wave_end&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-lx_lf&nbsp;150&nbsp;-lx_lo&nbsp;91&nbsp;-lx_hf&nbsp;80&nbsp;-lx_ho&nbsp;51&nbsp;-med_o&nbsp;0</P
+></BLOCKQUOTE
+>
+We get the following 
+<DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="figures/pm_raw_zoom03.gif"><DIV
+CLASS="CAPTION"
+><P
+>Close-up of pitchmarks in waveform signal (3)</P
+></DIV
+></P
+></DIV
+>
+This is satisfactory this file and probably for the whole databases of 
+that speaker. Though it is worth checking a few other files to get he best 
+results. Note the by increasing the order of the filer the pitchmark 
+creep forward (which is bad). </P
+><P
+>If you feel brave (or are desperate) you can actually edit the 
+pitchmarks yourself with emulabel. We have done this occasionally 
+especially when we find persistent synthesis errors (spikes etc). 
+You can convert a pm_lab file back into its pitchmark format with 
+<A
+NAME="AEN930"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_pmlab&nbsp;pm_lab/*.lab</P
+></BLOCKQUOTE
+></P
+><P
+>An post-processing step is provided that moves the predicted 
+pitchmarks to the nearest waveform peak. We find this useful for 
+both EGG extracted pitchmarks and waveform extracted ones. A 
+simple script is provided for this 
+<A
+NAME="AEN933"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_fix&nbsp;pm/*.pm</P
+></BLOCKQUOTE
+></P
+><P
+>If you pitchmarks are aligning to the largest troughs rather than peaks 
+your signal is upside down (or you are erroneously using <CODE
+CLASS="VARNAME"
+>-inv</CODE
+>. 
+If you are using <CODE
+CLASS="VARNAME"
+>-inv</CODE
+>, don't, if you are not, then invert 
+the signal itself with 
+<A
+NAME="AEN938"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;i&nbsp;in&nbsp;wav/*.wav<br>
+do<br>
+&nbsp;&nbsp;&nbsp;ch_wave&nbsp;-scale&nbsp;-1.0&nbsp;$i&nbsp;-o&nbsp;$i<br>
+done</P
+></BLOCKQUOTE
+></P
+><P
+>Note the above are quick heuristic hacks we have used when trying to 
+get pitchmarks out of wave signals. These require more work to offer a 
+more reliable solution, which we know exists. Extracting (fixed 
+frame) LPC coefficients and extracting a residual, then extracting 
+pitchmarks could give a more reliable solution but although all these 
+tools are available we have not experimented with that yet. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x817.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Recording under Unix</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c714.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Limited domain synthesis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

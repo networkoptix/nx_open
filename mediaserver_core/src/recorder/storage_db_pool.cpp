@@ -1,21 +1,18 @@
 #include "storage_db_pool.h"
+
 #include "media_server/serverutil.h"
-#include "common/common_module.h"
 #include "utils/common/util.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
 
-QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnStorageDbPool::QnStorageDbPool(const QnUuid& moduleGuid):
+    m_moduleGuid(moduleGuid)
 {
 }
 
-QString QnStorageDbPool::getLocalGuid(QnCommonModule* commonModule)
+QString QnStorageDbPool::getLocalGuid(const QnUuid& moduleGuid)
 {
-    QString simplifiedGUID = commonModule->moduleGUID().toString();
-    simplifiedGUID = simplifiedGUID.replace("{", "");
-    simplifiedGUID = simplifiedGUID.replace("}", "");
-    return simplifiedGUID;
+   return moduleGuid.toSimpleString();
 }
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
@@ -32,7 +29,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                     .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
         }
-        QString simplifiedGUID = getLocalGuid(commonModule());
+        QString simplifiedGUID = getLocalGuid(m_moduleGuid);
         QString dbPath = storage->getUrl();
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 

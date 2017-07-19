@@ -1,21 +1,16 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MS_CLOUD_CONNECTION_MANAGER_H
-#define NX_MS_CLOUD_CONNECTION_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <cdb/connection.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/subscription.h>
+
+#include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
 class CloudConnectionManager:
@@ -34,7 +29,9 @@ public:
         getSystemCredentials() const override;
 
     bool boundToCloud() const;
-    /** Returns \a nullptr if not connected to the cloud */
+    /**
+     * @return null if not connected to the cloud.
+     */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
         const QString& cloudSystemId,
         const QString& cloudAuthKey) const;
@@ -46,7 +43,6 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     bool detachSystemFromCloud();
-    bool resetCloudData();
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
@@ -62,11 +58,8 @@ private:
 
     void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
     bool makeSystemLocal();
-    void startEventConnection();
-    void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
+    bool removeCloudUsers();
 
 private slots:
     void cloudSettingsChanged();
 };
-
-#endif  //NX_MS_CLOUD_CONNECTION_MANAGER_H

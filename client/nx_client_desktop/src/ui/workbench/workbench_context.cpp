@@ -40,6 +40,7 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <nx/utils/log/log.h>
+#include <client/client_module.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -226,7 +227,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         case SystemUri::ClientCommand::LoginToCloud:
         {
             NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
-            commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+            qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
             break;
         }
         case SystemUri::ClientCommand::Client:
@@ -245,12 +246,13 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             if (systemIsCloud)
             {
-                commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
                 NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
+            parameters.setArgument(Qn::StoreSessionRole, false);
             menu()->trigger(action::ConnectAction, parameters);
             return true;
 
@@ -281,11 +283,7 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 
     auto params = action::Parameters().withArgument(Qn::UrlRole, appServerUrl);
     params.setArgument(Qn::ForceRole, true);
-    if (qnSettings->autoLogin())
-    {
-        params.setArgument(Qn::AutoLoginRole, true);
-        params.setArgument(Qn::StorePasswordRole, true);
-    }
+    params.setArgument(Qn::StoreSessionRole, false);
     menu()->trigger(action::ConnectAction, params);
     return true;
 }

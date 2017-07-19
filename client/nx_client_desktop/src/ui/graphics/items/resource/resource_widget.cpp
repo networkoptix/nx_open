@@ -60,6 +60,8 @@
 namespace {
 const qreal kButtonsSize = 24.0;
 
+static const qreal kHudMargin = 4.0;
+
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
 const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -122,8 +124,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_mouseInWidget(false),
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0),
-    m_selectionState(SelectionState::invalid),
-    m_scaleWatcher()
+    m_selectionState(SelectionState::invalid)
 {
     updateSelectedState();
 
@@ -131,7 +132,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Initialize resource. */
-    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
+    m_resource = item->resource();
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     connect(m_resource, &QnResource::statusChanged, this,
         [this]
@@ -172,9 +173,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
     setOverlayWidgetVisible(m_statusOverlay, false, false);
 
-    /* Initialize resource. */
-    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     m_aspectRatio = defaultAspectRatio();
@@ -218,7 +216,9 @@ QnResourceWidget::~QnResourceWidget()
 //TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
-    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, true, InfoLayer));
+    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
+    m_hudOverlay->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);
@@ -530,10 +530,12 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     if (change == QGraphicsItem::ItemSelectedHasChanged)
         updateSelectedState();
 
-    if (change == QGraphicsItem::ItemSceneHasChanged)
-        m_scaleWatcher.initialize(scene());
-
     return base_type::itemChange(change, value);
+}
+
+QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
+{
+    return m_selectionState;
 }
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -940,6 +942,7 @@ void QnResourceWidget::updateSelectedState()
         return;
 
     m_selectionState = selectionState;
+    emit selectionStateChanged(m_selectionState);
 }
 
 qreal QnResourceWidget::calculateFrameWidth() const

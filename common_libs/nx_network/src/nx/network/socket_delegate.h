@@ -216,13 +216,6 @@ public:
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
-    void readAsyncAtLeast(
-        nx::Buffer* const buffer, size_t minimalSize,
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
-    {
-        return this->m_target->readAsyncAtLeast(buffer, minimalSize, std::move(handler));
-    }
-
     virtual void sendAsync(
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override
@@ -282,10 +275,7 @@ public:
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler);
+    virtual void acceptAsync(AcceptCompletionHandler handler);
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
     virtual void cancelIOSync();
 };

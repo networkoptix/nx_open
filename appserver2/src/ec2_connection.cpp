@@ -7,6 +7,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 #include "connection_factory.h"
+#include <database/db_manager.h>
 
 namespace ec2
 {
@@ -23,7 +24,7 @@ namespace ec2
         // todo: #singletone. Only one connection for each connection factory allowed now
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
-        connectionFactory->messageBus()->setHandler( notificationManager() );
+        connectionFactory->messageBus()->setHandler(notificationManager());
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
@@ -42,9 +43,9 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString Ec2DirectConnection::authInfo() const
+    void Ec2DirectConnection::updateConnectionUrl(const QUrl& /*url*/)
     {
-        return QString();
+        NX_EXPECT(false, "Should never get here");
     }
 
     bool Ec2DirectConnection::initialized() const
@@ -71,5 +72,6 @@ namespace ec2
         if (transactionLog)
             transactionLog->setTransactionLogTime(value);
     }
+
 
 }

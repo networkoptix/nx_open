@@ -117,37 +117,37 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         return;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousPan").arg(channel), false))
-        m_capabilities |= Qn::ContinuousPanCapability;
+        m_capabilities |= Ptz::ContinuousPanCapability;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousTilt").arg(channel), false))
-        m_capabilities |= Qn::ContinuousTiltCapability;
+        m_capabilities |= Ptz::ContinuousTiltCapability;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousZoom").arg(channel), false))
-        m_capabilities |= Qn::ContinuousZoomCapability;
+        m_capabilities |= Ptz::ContinuousZoomCapability;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsolutePan").arg(channel), false))
-        m_capabilities |= Qn::AbsolutePanCapability;
+        m_capabilities |= Ptz::AbsolutePanCapability;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteTilt").arg(channel), false))
-        m_capabilities |= Qn::AbsoluteTiltCapability;
+        m_capabilities |= Ptz::AbsoluteTiltCapability;
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteZoom").arg(channel), false))
-        m_capabilities |= Qn::AbsoluteZoomCapability;
+        m_capabilities |= Ptz::AbsoluteZoomCapability;
 
     if(!params.value<bool>(lit("root.PTZ.Various.V%1.PanEnabled").arg(channel), true))
-        m_capabilities &= ~(Qn::ContinuousPanCapability | Qn::AbsolutePanCapability);
+        m_capabilities &= ~(Ptz::ContinuousPanCapability | Ptz::AbsolutePanCapability);
 
     if(!params.value<bool>(lit("root.PTZ.Various.V%1.TiltEnabled").arg(channel), true))
-        m_capabilities &= ~(Qn::ContinuousTiltCapability | Qn::AbsoluteTiltCapability);
+        m_capabilities &= ~(Ptz::ContinuousTiltCapability | Ptz::AbsoluteTiltCapability);
 
     if(!params.value<bool>(lit("root.PTZ.Various.V%1.ZoomEnabled").arg(channel), true))
-        m_capabilities &= ~(Qn::ContinuousZoomCapability | Qn::AbsoluteZoomCapability);
+        m_capabilities &= ~(Ptz::ContinuousZoomCapability | Ptz::AbsoluteZoomCapability);
 
     /* Note that during continuous move axis takes care of image rotation automagically. */
     qreal rotation = params.value(lit("root.Image.I0.Appearance.Rotation"), 0.0); // TODO: #Elric I0? Not I%1?
     if(qFuzzyCompare(rotation, static_cast<qreal>(180.0)))
         m_flip = Qt::Vertical | Qt::Horizontal;
-    m_capabilities |= Qn::FlipPtzCapability;
+    m_capabilities |= Ptz::FlipPtzCapability;
 
     QnPtzLimits limits;
     if(
@@ -170,14 +170,14 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         limits.minTilt = qMax(limits.minTilt, -90.0);
 
         /* Logical space should work now that we know logical limits. */
-        m_capabilities |= Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability;
+        m_capabilities |= Ptz::LogicalPositioningPtzCapability | Ptz::LimitsPtzCapability;
         m_limits = limits;
 
         /* Axis's zoom scale is linear in 35mm-equiv space. */
         m_35mmEquivToCameraZoom = QnLinearFunction(qDegreesTo35mmEquiv(limits.minFov), 9999, qDegreesTo35mmEquiv(limits.maxFov), 1);
         m_cameraTo35mmEquivZoom = m_35mmEquivToCameraZoom.inversed();
     } else {
-        m_capabilities &= ~Qn::AbsolutePtzCapabilities;
+        m_capabilities &= ~Ptz::AbsolutePtzCapabilities;
     }
 
     QByteArray body;
@@ -186,7 +186,7 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         for (auto line: body.split('\n'))
         {
             if (line.trimmed().startsWith("gotoserverpresetno"))
-                m_capabilities |= Qn::PresetsPtzCapability;
+                m_capabilities |= (Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability);
         }
     }
 }
@@ -251,16 +251,19 @@ bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body
     return false;
 }
 
-bool QnAxisPtzController::query(const QString &request, QByteArray *body) {
-    int channel = this->channel();
-    if(channel < 0) {
-        return queryInternal(request, body);
-    } else {
-        return queryInternal(request + lit("&camera=%1").arg(channel), body);
-    }
+bool QnAxisPtzController::query(const QString &request, QByteArray *body) const
+{
+    const int channel = this->channel();
+    const auto targetRequest = channel < 0
+        ? request
+        : request + lit("&camera=%1").arg(channel);
+
+    auto nonConstThis = const_cast<QnAxisPtzController*>(this);
+    return nonConstThis->queryInternal(targetRequest, body);
 }
 
-bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params, QByteArray *body) {
+bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params, QByteArray *body) const
+{
     QByteArray localBody;
     if(!query(request, &localBody))
         return false;
@@ -286,7 +289,8 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParameterMap *params, QByteArray *body) {
+bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParameterMap *params, QByteArray *body) const
+{
     QByteArray localBody;
 
     for(int i = 0; i < retries; i++) {
@@ -304,16 +308,14 @@ bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParam
     return false;
 }
 
-int QnAxisPtzController::channel() {
+int QnAxisPtzController::channel() const
+{
     QString channelCount = m_resource->getProperty(lit("channelsAmount"));
-    if (channelCount.toInt() > 1) {
-        return m_resource->getChannelNumAxis();
-    } else {
-        return -1;
-    }
+    return channelCount.toInt() > 1 ? m_resource->getChannelNumAxis() : -1;
 }
 
-Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
+Ptz::Capabilities QnAxisPtzController::getCapabilities() const
+{
     return m_capabilities;
 }
 
@@ -328,7 +330,8 @@ bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.z()))).arg(speed * 100));
 }
 
-bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)  const
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -348,7 +351,8 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     }
 }
 
-bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -356,16 +360,15 @@ bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *l
     return true;
 }
 
-bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
+bool QnAxisPtzController::getFlip(Qt::Orientations *flip) const
+{
     *flip = m_flip;
     return true;
 }
 
-
-
-bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
+bool QnAxisPtzController::getPresets(QnPtzPresetList *presets) const
 {
-    if (!(m_capabilities & Qn::PresetsPtzCapability))
+    if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::getPresets(presets);
 
     if (!m_cacheUpdateTimer.isValid() || m_cacheUpdateTimer.elapsed() > CACHE_UPDATE_TIMEOUT)
@@ -405,7 +408,7 @@ int extractPresetNum(const QString& presetId)
 
 bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
 {
-    if (!(m_capabilities & Qn::PresetsPtzCapability))
+    if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::activatePreset(presetId, speed);
 
     return query(lit("com/ptz.cgi?gotoserverpresetno=%1").arg(extractPresetNum(presetId)));
@@ -414,7 +417,7 @@ bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
 
 bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
 {
-    if (!(m_capabilities & Qn::PresetsPtzCapability))
+    if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::createPreset(preset);
 
     m_cacheUpdateTimer.invalidate();
@@ -423,7 +426,7 @@ bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
 
 bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
 {
-    if (!(m_capabilities & Qn::PresetsPtzCapability))
+    if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::updatePreset(preset);
     m_cacheUpdateTimer.invalidate();
     return removePreset(preset.id) && createPreset(preset);
@@ -431,7 +434,7 @@ bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
 
 bool QnAxisPtzController::removePreset(const QString &presetId)
 {
-    if (!(m_capabilities & Qn::PresetsPtzCapability))
+    if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::removePreset(presetId);
     m_cacheUpdateTimer.invalidate();
     return query(lit("com/ptz.cgi?removeserverpresetno=%1").arg(extractPresetNum(presetId)));

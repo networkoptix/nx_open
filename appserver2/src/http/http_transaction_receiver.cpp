@@ -9,7 +9,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_connection_priv.h>
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "transaction/transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
 #include "settings.h"
@@ -46,7 +46,7 @@ namespace ec2
         QSharedPointer<AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner->commonModule())
+        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)
     {
         setObjectName( "QnHttpTransactionReceiver" );
         Q_D(QnHttpTransactionReceiver);
@@ -96,8 +96,8 @@ namespace ec2
                 break;
             }
 
-            if( d->request.requestLine.method != nx_http::Method::POST &&
-                d->request.requestLine.method != nx_http::Method::PUT )
+            if( d->request.requestLine.method != nx_http::Method::post &&
+                d->request.requestLine.method != nx_http::Method::put )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
                 break;

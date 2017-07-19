@@ -3,7 +3,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(library_type)
-if(WIN32)
+if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
@@ -11,14 +11,16 @@ nx_add_target(nx_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS
-        boost Qt5::Core)
+        boost openssl Qt5::Core Qt5::Xml Qt5::Sql
+        nx_kit
+)
 
 target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
-if(WIN32)
-    target_link_libraries(nx_utils PRIVATE DbgHelp)
+if(WINDOWS)
+    target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
     
 if(MACOSX)

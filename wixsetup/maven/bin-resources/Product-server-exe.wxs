@@ -28,15 +28,16 @@
                 SuppressOptionsUI="yes"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
+                SuppressDowngradeFailure="yes"
                 LicenseUrl="License.html" />
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleServerOnly)" />
+        <Variable Name="InstallerTitle" Value="!(loc.ServerOnly)" />
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
-        <Chain DisableSystemRestore="yes">
+        <Chain DisableSystemRestore="no">
             <PackageGroupRef Id="ServerPackageGroup"/>
         </Chain>
     </Bundle>

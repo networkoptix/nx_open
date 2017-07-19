@@ -40,14 +40,18 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(
     m_serverId(serverId),
     m_distributedMutexManager(distributedMutexManager)
 {
-    m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(commonModule);
-    m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);
+    if (m_distributedMutexManager)
+    {
+        m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(commonModule);
+        m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);
+    }
     readDefaultUserAttrs();
 }
 
 QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 {
-    m_distributedMutexManager->setUserDataHandler(0);
+    if (m_distributedMutexManager)
+        m_distributedMutexManager->setUserDataHandler(0);
     delete m_cameraDataHandler;
 }
 

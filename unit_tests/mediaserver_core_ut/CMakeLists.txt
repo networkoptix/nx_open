@@ -1,3 +1,8 @@
-nx_add_target(mediaserver_core_ut EXECUTABLE
+nx_add_test(mediaserver_core_ut
     PUBLIC_LIBS
-        mediaserver_core libcloud_db festival GTest GMock)
+        mediaserver_core
+        GTest GMock)
+
+if(TARGET festival_libs)
+    target_link_libraries(mediaserver_core_ut PRIVATE festival_libs)
+endif()

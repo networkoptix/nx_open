@@ -63,7 +63,7 @@ SystemError::ErrorCode SystemResolver::resolve(
         hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
-    NX_LOGX(lm("Resolving %1 on DNS").str(hostName), cl_logDEBUG2);
+    NX_LOGX(lm("Resolving %1 on DNS").arg(hostName), cl_logDEBUG2);
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)
@@ -75,7 +75,7 @@ SystemError::ErrorCode SystemResolver::resolve(
 
     if (status == 0)
     {
-        NX_LOGX(lm("Resolve of %1 on DNS completed successfully").str(hostName), cl_logDEBUG2);
+        NX_LOGX(lm("Resolve of %1 on DNS completed successfully").arg(hostName), cl_logDEBUG2);
     }
     else
     {
@@ -94,7 +94,7 @@ SystemError::ErrorCode SystemResolver::resolve(
         };
 
         NX_LOGX(lm("Resolve of %1 on DNS failed with result %2")
-            .str(hostName).str(SystemError::toString(resultCode)), cl_logDEBUG2);
+            .arg(hostName).arg(SystemError::toString(resultCode)), cl_logDEBUG2);
         return resultCode;
     }
 

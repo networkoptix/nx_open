@@ -12,16 +12,15 @@ namespace cloud {
 namespace relay {
 
 Connector::Connector(
-    SocketAddress relayEndpoint,
+    QUrl relayUrl,
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
     :
-    m_relayEndpoint(relayEndpoint),
+    m_relayUrl(std::move(relayUrl)),
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
     m_relayClient(
-        nx::cloud::relay::api::ClientFactory::create(
-            url::Builder().setScheme("http").setEndpoint(relayEndpoint)))
+        nx::cloud::relay::api::ClientFactory::create(m_relayUrl))
 {
     bindToAioThread(getAioThread());
 }
@@ -52,20 +51,24 @@ void Connector::connect(
 {
     m_handler = std::move(handler);
 
-    if (timeout > std::chrono::milliseconds::zero())
-        m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
-
-    m_relayClient->startSession(
-        m_connectSessionId,
-        m_targetHostAddress.host.toString().toUtf8(),
-        [this](
-            nx::cloud::relay::api::ResultCode resultCode,
-            nx::cloud::relay::api::CreateClientSessionResponse response)
+    dispatch(
+        [this, timeout]()
         {
-            onStartRelaySessionResponse(
-                resultCode,
-                m_relayClient->prevRequestSysErrorCode(),
-                std::move(response));
+            m_relayClient->startSession(
+                m_connectSessionId,
+                m_targetHostAddress.host.toString().toUtf8(),
+                [this](
+                    nx::cloud::relay::api::ResultCode resultCode,
+                    nx::cloud::relay::api::CreateClientSessionResponse response)
+                {
+                    onStartRelaySessionResponse(
+                        resultCode,
+                        m_relayClient->prevRequestSysErrorCode(),
+                        std::move(response));
+                });
+
+            if (timeout > std::chrono::milliseconds::zero())
+                m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
         });
 }
 
@@ -88,10 +91,11 @@ void Connector::onStartRelaySessionResponse(
     decltype(m_handler) handler;
     handler.swap(m_handler);
 
+    m_timer.pleaseStopSync();
+
     if (resultCode != nx::cloud::relay::api::ResultCode::ok)
     {
         m_relayClient.reset();
-        m_timer.pleaseStopSync();
         return handler(
             toNatTraversalResultCode(resultCode),
             sysErrorCode,
@@ -101,7 +105,7 @@ void Connector::onStartRelaySessionResponse(
     m_connectSessionId = response.sessionId.c_str();
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
-        m_relayEndpoint,
+        m_relayUrl,
         m_connectSessionId,
         std::move(m_relayClient));
     handler(

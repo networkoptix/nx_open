@@ -1,11 +1,17 @@
 #pragma once
 
+#include <chrono>
+#include <deque>
 #include <map>
 #include <memory>
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/abstract_socket.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
@@ -13,15 +19,18 @@
 namespace nx {
 namespace cloud {
 namespace relay {
+
+namespace conf { class Settings; }
+
 namespace model {
+
+using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
+    void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 class ListeningPeerPool
 {
 public:
-    using TakeIdleConnection = 
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
-
-    ListeningPeerPool();
+    ListeningPeerPool(const conf::Settings& settings);
     ~ListeningPeerPool();
 
     void addConnection(
@@ -30,7 +39,12 @@ public:
 
     std::size_t getConnectionCountByPeerName(const std::string& peerName) const;
 
-    bool isPeerListening(const std::string& peerName) const;
+    /**
+     * Peer is online if:
+     * - There are active connections.
+     * - Or emptyPoolTimeout has not passed since loss of the last connection.
+     */
+    bool isPeerOnline(const std::string& peerName) const;
     /**
      * E.g., if we have peers server1.nx.com and server2.nx.com then 
      * findListeningPeerByPrefix("nx.com") will return any of that peers.
@@ -41,27 +55,60 @@ public:
 
     void takeIdleConnection(
         const std::string& peerName,
-        TakeIdleConnection completionHandler);
+        TakeIdleConnectionHandler completionHandler);
 
 private:
+    /**
+     * Peer becomes "disconnected" when there are no idle connections.
+     */
+    using DisconnectedPeerExpirationTimers = 
+        std::multimap<std::chrono::steady_clock::time_point, std::string>;
+
+    using TakeIdleConnectionRequestTimers = 
+        std::multimap<std::chrono::steady_clock::time_point, std::string>;
+
     struct ConnectionContext
     {
         std::unique_ptr<AbstractStreamSocket> connection;
         nx::Buffer readBuffer;
     };
-    
-    /** multimap<full peer name, connection context> */
-    using PeerConnections = std::multimap<std::string, ConnectionContext>;
 
-    PeerConnections m_peerNameToConnection;
+    struct ConnectionAwaitContext
+    {
+        std::chrono::steady_clock::time_point expirationTime;
+        TakeIdleConnectionHandler handler;
+        TakeIdleConnectionRequestTimers::iterator expirationTimerIter;
+    };
+    
+    struct PeerContext
+    {
+        std::deque<std::unique_ptr<ConnectionContext>> connections;
+        boost::optional<DisconnectedPeerExpirationTimers::iterator> expirationTimer;
+        std::list<ConnectionAwaitContext> takeConnectionRequestQueue;
+    };
+
+    /** multimap<full peer name, connection context> */
+    using PeerConnections = std::map<std::string, PeerContext>;
+
+    const conf::Settings& m_settings;
+    PeerConnections m_peers;
     mutable QnMutex m_mutex;
     bool m_terminated;
     network::aio::BasicPollable m_unsuccessfulResultReporter;
     utils::Counter m_apiCallCounter;
+    DisconnectedPeerExpirationTimers m_peerExpirationTimers;
+    nx::network::aio::Timer m_periodicTasksTimer;
+    TakeIdleConnectionRequestTimers m_takeIdleConnectionRequestTimers;
+
+    void startWaitingForNewConnection(
+        const QnMutexLockerBase& lock,
+        const std::string& peerName,
+        PeerContext* peerContext,
+        TakeIdleConnectionHandler completionHandler);
 
     void giveAwayConnection(
-        ListeningPeerPool::ConnectionContext connectionContext,
-        ListeningPeerPool::TakeIdleConnection completionHandler);
+        std::unique_ptr<ConnectionContext> connectionContext,
+        TakeIdleConnectionHandler completionHandler);
 
     void monitoringConnectionForClosure(
         const std::string& peerName,
@@ -77,6 +124,17 @@ private:
         const std::string& peerName,
         ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode);
+
+    void startPeerExpirationTimer(
+        const QnMutexLockerBase& lock,
+        const std::string& peerName,
+        PeerContext* peerContext);
+    void processExpirationTimers(const QnMutexLockerBase& lock);
+
+    void doPeriodicTasks();
+    void handleTimedoutTakeConnectionRequests();
+    std::vector<TakeIdleConnectionHandler> findTimedoutTakeConnectionRequestHandlers(
+        const QnMutexLockerBase& lock);
 };
 
 } // namespace model

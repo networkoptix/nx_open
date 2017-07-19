@@ -18,7 +18,6 @@ namespace QnCompressedTime {
         return QnSerialization::deserialize(stream, target);
     }
 
-#ifndef QN_NO_QT
     template<class T>
     QByteArray serialized(const T &value, bool signedFormat) {
         QByteArray result;
@@ -36,7 +35,6 @@ namespace QnCompressedTime {
             *success = result;
         return result ? target : defaultValue;
     }
-#endif
 
 } // namespace QnCompressedTime
 

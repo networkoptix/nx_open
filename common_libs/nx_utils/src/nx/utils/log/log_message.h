@@ -3,105 +3,72 @@
 #include <string>
 #include <type_traits>
 
-#include <QtCore/QByteArray>
-#include <QtCore/QStringList>
-#include <QtCore/QUrl>
-#include <QtCore/QSize>
-
 #include <nx/utils/log/to_string.h>
-#include <nx/utils/uuid.h>
+
+namespace nx {
+namespace utils {
+namespace log {
 
 /**
- * Adds some useful overloads to QString::arg.
+ * Universal message formatter with QString::arg interface.
+ *
+ * @note: Do not add any function overloads for aditional types support. Rather implement a
+ * member function 'QString toString() const' or external function 'QString toString(const T&)'
+ * so it will be supported automatically.
  */
-class NX_UTILS_API QnLogMessage
+class NX_UTILS_API Message
 {
 public:
-    static constexpr wchar_t kSpace = u' ';
+    static const QChar kSpace;
 
-    QnLogMessage();
-    QnLogMessage(const char* text);
-    QnLogMessage(const QString& text);
-    QnLogMessage(const QByteArray& text);
+    Message(const QString& text = QString());
+    Message(const char* text);
+    Message(const QByteArray& text);
 
-    QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const std::string& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const char* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const wchar_t* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const QUrl& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(const QSize& size, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    operator QString() const { return m_str; }
+    QString toQString() const { return m_str; }
+    QByteArray toUtf8() const { return m_str.toUtf8(); }
+    std::string toStdString() const { return m_str.toStdString(); }
 
-    QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(std::chrono::milliseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-    QnLogMessage arg(std::chrono::microseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
-
-    template<typename T>
-    QnLogMessage arg(T* a,int fieldWidth = 0, wchar_t fillChar = kSpace) const
+    template<typename Value>
+    Message arg(const Value& value, int width = 0, const QChar& fill = kSpace) const
     {
-        return m_str.arg(QString::fromLatin1("0x%1").arg(
-            reinterpret_cast<qulonglong>(a), fieldWidth - 2, 16, QChar(fillChar)));
+        using ::toString;
+        return m_str.arg(toString(value), width, fill);
     }
 
-    template<typename T, typename ... Args>
-    QnLogMessage arg(const std::unique_ptr<T>& a, const Args& ... args) const
+    template<typename ... Values>
+    Message args(const Values& ... values) const
     {
-        return arg(a.get(), args ...);
+        using ::toString;
+        return m_str.arg(toString(values) ...);
     }
 
-    template<typename T, typename ... Args>
-    QnLogMessage arg(const std::shared_ptr<T>& a, const Args& ... args) const
+    template<typename ... Arguments>
+    Message container(const Arguments& ... arguments) const
     {
-        return arg(a.get(), args ...);
+        return m_str.arg(containerString(arguments ...));
     }
 
-    template<typename T, typename ... Args>
-    QnLogMessage arg(const boost::optional<T>& a, const Args& ... args) const
-    {
-        return arg(toString(a), args ...);
-    }
-
-    template<typename ... Args>
-    QnLogMessage arg(const Args& ... args) const
-    {
-        return m_str.arg(args ...);
-    }
-
-    template<typename T, typename ... Args>
-    QnLogMessage args(const T& a, const Args& ... args) const
-    {
-        return arg(a).args(args ...);
-    }
-
-    template<typename T>
-    QnLogMessage args(const T& a) const
-    {
-        return arg(a);
-    }
-
-    template<typename ... Args>
-    QnLogMessage str(const Args& ... args) const
-    {
-        return arg(toString(args ...));
-    }
-
-    template<typename ... Args>
-    QnLogMessage strs(const Args& ... args) const
-    {
-        return arg(toString(args) ...);
-    }
-
-    template<typename ... Args>
-    QnLogMessage container(const Args& ... args) const
-    {
-        return arg(containerString(args ...));
-    }
-
-    operator QString() const;
-    std::string toStdString() const;
+    // QString number format compatibility.
+    Message	arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(ulong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(qlonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(qulonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(short value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(ushort value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message	arg(double value, int width = 0, char format = 'g', int precision = -1,
+        const QChar& fill = kSpace) const;
 
 private:
     QString m_str;
 };
 
-typedef QnLogMessage lm;
+} // namespace log
+} // namespace utils
+} // namespace nx
+
+// TODO: Move to namespace nx (at least).
+typedef nx::utils::log::Message lm;

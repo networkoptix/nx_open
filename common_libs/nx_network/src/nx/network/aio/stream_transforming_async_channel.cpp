@@ -6,7 +6,7 @@ namespace aio {
 
 StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
     std::unique_ptr<AbstractAsyncChannel> rawDataChannel,
-    nx::utils::pipeline::Converter* converter)
+    nx::utils::bstream::Converter* converter)
     :
     m_rawDataChannel(std::move(rawDataChannel)),
     m_converter(converter),
@@ -16,9 +16,9 @@ StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
 {
     using namespace std::placeholders;
 
-    m_inputPipeline = utils::pipeline::makeCustomInputPipeline(
+    m_inputPipeline = utils::bstream::makeCustomInputPipeline(
         std::bind(&StreamTransformingAsyncChannel::readRawBytes, this, _1, _2));
-    m_outputPipeline = utils::pipeline::makeCustomOutputPipeline(
+    m_outputPipeline = utils::bstream::makeCustomOutputPipeline(
         std::bind(&StreamTransformingAsyncChannel::writeRawBytes, this, _1, _2));
     m_converter->setInput(m_inputPipeline.get());
     m_converter->setOutput(m_outputPipeline.get());
@@ -123,7 +123,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
     std::tie(sysErrorCode, bytesRead) = invokeConverter(
-        std::bind(&utils::pipeline::Converter::read, m_converter,
+        std::bind(&utils::bstream::Converter::read, m_converter,
             task->buffer->data() + task->buffer->size(),
             task->buffer->capacity() - task->buffer->size()));
     if (sysErrorCode == SystemError::wouldBlock)
@@ -141,7 +141,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
     std::tie(sysErrorCode, bytesWritten) = invokeConverter(
-        std::bind(&utils::pipeline::Converter::write, m_converter,
+        std::bind(&utils::bstream::Converter::write, m_converter,
             task->buffer.data(),
             task->buffer.size()));
     if (sysErrorCode == SystemError::wouldBlock)
@@ -174,7 +174,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
         return std::make_tuple(SystemError::noError, 0);
     }
 
-    NX_ASSERT(result == utils::pipeline::StreamIoError::wouldBlock);
+    NX_ASSERT(result == utils::bstream::StreamIoError::wouldBlock);
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 
@@ -190,7 +190,7 @@ int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
     if (!m_asyncReadInProgress)
         readRawChannelAsync();
 
-    return utils::pipeline::StreamIoError::wouldBlock;
+    return utils::bstream::StreamIoError::wouldBlock;
 }
 
 int StreamTransformingAsyncChannel::readRawDataFromCache(void* data, size_t count)

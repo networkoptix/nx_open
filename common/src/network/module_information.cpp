@@ -1,16 +1,12 @@
 #include "module_information.h"
 
 #include <QtNetwork/QNetworkInterface>
+#include <QtCore/QCryptographicHash>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 
-#include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
-#include <api/model/connection_info.h>
-#include <utils/common/app_info.h>
-#include <utils/common/software_version.h>
-#include <network/cloud_system_data.h>
 
 namespace {
 /*!

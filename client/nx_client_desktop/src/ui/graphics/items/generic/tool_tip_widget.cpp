@@ -232,23 +232,13 @@ void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
     ensureShape();
 
     /* Render background. */
-
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), frameWidth()));
-    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
-
-    bool corrected(false);
-    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
-
-    if (corrected)
-    {
-        QnScopedPainterTransformRollback xformRollback(painter, roundedTransform);
-        painter->drawPath(m_borderShape);
-    }
-    else
-    {
-        painter->drawPath(m_borderShape);
-    }
+    paintSharp(painter, [this](QPainter* painter)
+        {
+            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+            QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), frameWidth()));
+            QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
+            painter->drawPath(m_borderShape);
+        });
 }
 
 void QnToolTipWidget::updateGeometry() {

@@ -3,8 +3,8 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <utils/db/db_connection_holder.h>
-#include <utils/db/test_support/test_with_db_helper.h>
+#include <nx/utils/db/db_connection_holder.h>
+#include <nx/utils/db/test_support/test_with_db_helper.h>
 
 #include <statistics/dao/rdb/instance_controller.h>
 #include <statistics/dao/rdb/rdb_data_object.h>
@@ -17,12 +17,12 @@ namespace rdb {
 namespace test {
 
 class StatisticsRdbDataObject:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     StatisticsRdbDataObject():
-        db::test::TestWithDbHelper("hpm", QString())
+        nx::utils::db::test::TestWithDbHelper("hpm", QString())
     {
         init();
     }
@@ -34,9 +34,13 @@ protected:
         auto queryContext = m_dbConnection->begin();
         for (const auto& statsRecord: m_records)
         {
-            ASSERT_EQ(db::DBResult::ok, m_dao.save(queryContext.get(), statsRecord));
+            ASSERT_EQ(
+                nx::utils::db::DBResult::ok,
+                m_dao.save(queryContext.get(), statsRecord));
         }
-        ASSERT_EQ(nx::db::DBResult::ok, queryContext->transaction()->commit());
+        ASSERT_EQ(
+            nx::utils::db::DBResult::ok,
+            queryContext->transaction()->commit());
     }
 
     void havingReinitializedDao()
@@ -51,7 +55,9 @@ protected:
     {
         const auto queryContext = m_dbConnection->begin();
         std::deque<stats::ConnectSession> readRecords;
-        ASSERT_EQ(db::DBResult::ok, m_dao.readAllRecords(queryContext.get(), &readRecords));
+        ASSERT_EQ(
+            nx::utils::db::DBResult::ok,
+            m_dao.readAllRecords(queryContext.get(), &readRecords));
 
         auto comparator =
             [](const stats::ConnectSession& one, const stats::ConnectSession& two)
@@ -66,18 +72,18 @@ protected:
     }
 
 private:
-    std::unique_ptr<nx::db::DbConnectionHolder> m_dbConnection;
+    std::unique_ptr<nx::utils::db::DbConnectionHolder> m_dbConnection;
     std::unique_ptr<rdb::InstanceController> m_dbInstance;
     rdb::DataObject m_dao;
     std::deque<stats::ConnectSession> m_records;
 
     void init()
     {
-        m_dbConnection = std::make_unique<nx::db::DbConnectionHolder>(dbConnectionOptions());
+        m_dbConnection = std::make_unique<nx::utils::db::DbConnectionHolder>(dbConnectionOptions());
         ASSERT_TRUE(m_dbConnection->open());
 
-        m_dbInstance = std::make_unique<rdb::InstanceController>(dbConnectionOptions());
-        ASSERT_TRUE(m_dbInstance->initialize());
+        ASSERT_NO_THROW(
+            m_dbInstance = std::make_unique<rdb::InstanceController>(dbConnectionOptions()));
     }
 
     void generateRecords()

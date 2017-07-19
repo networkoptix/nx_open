@@ -7,8 +7,10 @@ tzlocal
 requests>=2.12.5
 python-vagrant
 Jinja2
+python-debian>=0.1.28
 netaddr
 hachoir-core
 hachoir-parser
 hachoir-metadata
 pytest-instafail
+pyyaml

@@ -1,30 +1,24 @@
 #pragma once 
 
-#include "httptypes.h"
+#include <nx/network/connection_server/base_protocol_message_types.h>
+
+#include "http_types.h"
 #include "../buffer.h"
 
 namespace nx_http {
 
-namespace SerializerState
-{
-    typedef int Type;
-
-    static const int needMoreBufferSpace = 1;
-    static const int done = 2;
-};
-
-class NX_NETWORK_API MessageSerializer
+class NX_NETWORK_API MessageSerializer:
+    public nx::network::server::AbstractMessageSerializer<Message>
 {
 public:
-    MessageSerializer();
-
-    //!Set message to serialize
-    void setMessage(const Message* message);
+    virtual void setMessage(const Message* message) override;
         
-    SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
+    virtual nx::network::server::SerializerState serialize(
+        nx::Buffer* const buffer,
+        size_t* bytesWritten) override;
 
 private:
-    const Message* m_message;
+    const Message* m_message = nullptr;
 };
 
 } // namespace nx_http

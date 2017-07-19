@@ -7,18 +7,23 @@
 #include <QtCore/QRegExp>
 #include <QtCore/QString>
 
+#include <nx/utils/thread/mutex.h>
+
 namespace nx_http {
 namespace server {
 namespace rest {
 
 /**
- * Given registered path: "/account/{accountId}/systems".
- * When matching path "/account/vpupkin/systems".
- * Then "/account/{accountId}/systems" is found and pathParams contains "vpupkin".
- * Parameter cannot be empty. In that case path is not matched.
+ * Usage example:
+ * - Register path "/account/{accountId}/systems".
+ * - PathMatcher::match("/account/vpupkin/systems") matches to the registered path 
+ *   and adds "vpupkin" to pathParams.
+ *
+ * NOTE: Empty parameter is not matched. 
+ *   E.g., PathMatcher::match("/account//systems") returns boost::none.
  */
 template<typename Mapped>
-class RestPathMatcher
+class PathMatcher
 {
 public:
     bool add(const nx_http::StringType& pathTemplate, Mapped mapped)
@@ -36,6 +41,8 @@ public:
         const nx_http::StringType& path,
         std::vector<nx_http::StringType>* pathParams) const
     {
+        QnMutexLocker lock(&m_mutex);
+
         for (auto& matchContext: m_restPathToMatchContext)
         {
             if (!matchContext.second.regex.exactMatch(QString::fromUtf8(path)))
@@ -59,6 +66,7 @@ private:
 
     /** REST path template, context */
     std::map<nx_http::StringType, MatchContext> m_restPathToMatchContext;
+    mutable QnMutex m_mutex;
 
     QRegExp convertToRegex(const QString& pathTemplate)
     {

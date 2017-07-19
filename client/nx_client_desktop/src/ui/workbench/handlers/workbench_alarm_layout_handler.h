@@ -51,4 +51,6 @@ private:
      * recently handled actions to avoid duplicated method calls. List is cleaned by timer.
      */
     QList<ActionKey> m_processingActions;
+
+    QnLayoutResourcePtr m_alarmLayout;
 };

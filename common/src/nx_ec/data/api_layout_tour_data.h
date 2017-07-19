@@ -10,17 +10,17 @@ namespace ec2 {
 
 struct ApiLayoutTourItemData: ApiData
 {
-    QnUuid layoutId;
+    QnUuid resourceId;
     int delayMs = 0;
 
     ApiLayoutTourItemData() = default;
-    ApiLayoutTourItemData(const QnUuid& layoutId, int delayMs):
-        layoutId(layoutId), delayMs(delayMs) {}
+    ApiLayoutTourItemData(const QnUuid& resourceId, int delayMs):
+        resourceId(resourceId), delayMs(delayMs) {}
 
     bool operator==(const ApiLayoutTourItemData& rhs) const;
 };
 
-#define ApiLayoutTourItemData_Fields (layoutId)(delayMs)
+#define ApiLayoutTourItemData_Fields (resourceId)(delayMs)
 
 struct ApiLayoutTourSettings: ApiData
 {

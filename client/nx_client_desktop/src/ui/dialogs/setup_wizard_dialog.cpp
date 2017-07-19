@@ -5,9 +5,7 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
 
-#include <common/common_module.h>
-
-#include <client/client_translation_manager.h>
+#include <client/client_runtime_settings.h>
 
 #include <ui/dialogs/private/setup_wizard_dialog_p.h>
 #include <ui/help/help_topic_accessor.h>
@@ -29,7 +27,7 @@ namespace
         url.setFragment(lit("/setup"));
 
         QUrlQuery q;
-        q.addQueryItem(lit("lang"), commonModule->instance<QnClientTranslationManager>()->getCurrentLanguage());
+        q.addQueryItem(lit("lang"), qnRuntime->locale());
         url.setQuery(q);
         return url;
     }

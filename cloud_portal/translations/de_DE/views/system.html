@@ -1,0 +1,27 @@
+<div class="container auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>Fehler beim Zugriff auf das System</h1>
+        <p>Dieser Link ist kaputt,<br>
+            System könnte von {{PRODUCT_NAME}} getrennt werden,<br>
+            Zugriff auf dieses System könnte widerrufen werden, <br>
+            oder Sie könnten in einem anderen Account angemeldet sein</p>
+        <p>
+            <a href="/systems" class="btn btn-default">Verfügbare Systemliste</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    Sie haben keinen Zugriff auf die Systeminformationen.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

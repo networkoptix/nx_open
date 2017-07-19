@@ -21,8 +21,7 @@
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
 #include "network/tcp_connection_priv.h"
-#include "network/module_finder.h"
-#include "network/direct_module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <network/connection_validator.h>
 
 #include "utils/common/app_info.h"
@@ -31,13 +30,13 @@
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <rest/helpers/permissions_helper.h>
 #include <network/authenticate_helper.h>
 #include <api/resource_property_adaptor.h>
 #include <api/global_settings.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include "system_settings_handler.h"
 #include <rest/server/json_rest_result.h>
 #include <api/model/system_settings_reply.h>
@@ -110,7 +109,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     MergeSystemData, (json),
     (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBus* messageBus):
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBusBase* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {}
@@ -145,7 +144,7 @@ int QnMergeSystemsRestHandler::execute(
 {
     using MergeStatus = utils::MergeSystemsStatus::Value;
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
@@ -315,7 +314,9 @@ int QnMergeSystemsRestHandler::execute(
 
     if (data.takeRemoteSettings)
     {
-        if (!applyRemoteSettings(data.url, remoteModuleInformation.localSystemId, data.getKey, data.postKey, owner))
+        if (!applyRemoteSettings(data.url,
+                remoteModuleInformation.localSystemId, remoteModuleInformation.systemName,
+                data.getKey, data.postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings), cl_logDEBUG1);
@@ -349,11 +350,14 @@ int QnMergeSystemsRestHandler::execute(
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
     }
-    owner->commonModule()->moduleFinder()->directModuleFinder()->checkUrl(url);
+
+    nx::vms::discovery::ModuleEndpoint module(
+        remoteModuleInformation, {url.host(), (uint16_t) remoteModuleInformation.port});
+    owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
 
     /* Connect to server if it is compatible */
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
+        QnServerConnector::instance()->addConnection(module);
 
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
     qnAuditManager->addAuditRecord(auditRecord);
@@ -498,6 +502,7 @@ bool executeRequest(
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
     const QUrl& remoteUrl,
     const QnUuid& systemId,
+    const QString& systemName,
     const QString& getKey,
     const QString& postKey,
     const QnRestConnectionProcessor* owner)
@@ -543,6 +548,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.wholeSystem = true;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
+    data.systemName = systemName;
 
     for (const auto& userData: users)
     {

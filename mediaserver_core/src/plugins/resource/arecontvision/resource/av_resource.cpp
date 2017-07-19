@@ -16,7 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>
 
@@ -156,7 +156,8 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         url.setScheme( lit("http") );
         url.setHost( urlStr );
     }
-    url.setPath( lit("/get?mac") );
+    url.setPath(lit("/get"));
+    url.setQuery(lit("mac"));
     QAuthenticator auth = getAuth();
     url.setUserName( auth.user() );
     url.setPassword( auth.password() );
@@ -306,7 +307,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
-    url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
+    url.setPath(lit("/set"));
+    url.setQuery(lit("auxout=%1").arg(activate ? lit("on") : lit("off")));
 
     QAuthenticator auth = getAuth();
 
@@ -329,7 +331,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
             nx::utils::TimerManager::instance()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
-                    resetOutputUrl.setPath(lit("/set?auxout=off"));
+                    resetOutputUrl.setPath(lit("/set"));
+                    resetOutputUrl.setQuery(lit("auxout=off"));
                     nx_http::downloadFileAsync(
                         resetOutputUrl,
                         [](SystemError::ErrorCode, int, nx_http::BufferType){});
@@ -677,7 +680,8 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
-    url.setPath(lit("/get?auxin"));
+    url.setPath(lit("/get"));
+    url.setQuery(lit("auxin"));
 
     QAuthenticator auth = getAuth();
 

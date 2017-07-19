@@ -1,0 +1,17 @@
+{
+  "activate_account":{
+    "emailSubject":"Hesabını onayla"
+  },
+  "restore_password":{
+    "emailSubject":"Parolanı sıfırla"
+  },
+  "system_invite":{
+    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+  },
+  "system_shared":{
+    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+  },
+  "review_version":{
+    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  }
+}

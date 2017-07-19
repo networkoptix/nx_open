@@ -1,0 +1,13 @@
+package: hdw.mx/cloud_modules
+import:
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/api/errors
+  - pkg/apis/meta/v1
+- package: k8s.io/client-go
+  version: v3.0.0-beta.0
+  subpackages:
+  - kubernetes
+  - rest
+- package: github.com/jteeuwen/go-bindata
+  version: ^3.0.7

@@ -14,7 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 namespace nx {
 namespace stun {

@@ -1,5 +1,8 @@
 #include "special_layout.h"
 
+#include <core/resource/layout_resource.h>
+
+#include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.h>
 
 namespace nx {

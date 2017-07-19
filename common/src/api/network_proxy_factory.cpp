@@ -8,7 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <network/router.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "utils/common/synctime.h"
 #include "network/authutil.h"
 #include <network/tcp_listener.h>
@@ -60,7 +60,7 @@ QUrl QnNetworkProxyFactory::urlToResource(
                     proxy.user(),
                     proxy.password(),
                     via->realm(),
-                    nx_http::Method::GET,
+                    nx_http::Method::get,
                     nonce)));
             url.setQuery(urlQuery);
         }
@@ -90,7 +90,8 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
-    return QList<QNetworkProxy>() << proxyToResource(commonModule()->resourcePool()->getIncompatibleResourceById(resourceGuid, true));
+    return QList<QNetworkProxy>() << proxyToResource(
+        commonModule()->resourcePool()->getIncompatibleServerById(resourceGuid, true));
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(

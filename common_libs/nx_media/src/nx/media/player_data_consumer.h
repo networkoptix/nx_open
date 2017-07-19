@@ -17,6 +17,7 @@ class QnArchiveStreamReader;
 namespace nx {
 namespace media {
 
+class AbstractVideoDecoder;
 class SeamlessVideoDecoder;
 class SeamlessAudioDecoder;
 
@@ -47,6 +48,8 @@ public:
 
     /** Can be AV_CODEC_ID_NONE if not available. */
     AVCodecID currentCodec() const;
+
+    std::vector<AbstractVideoDecoder*> currentVideoDecoders() const;
 
     /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
     void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
@@ -81,6 +84,7 @@ public:
 
     /** Turn on / off audio. It allowed to call from other thread. */
     void setAudioEnabled(bool value);
+    bool isAudioEnabled() const;
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -176,6 +180,7 @@ private:
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
     std::atomic<bool> m_audioEnabled;
+    std::atomic<bool> m_needToResetAudio;
 };
 
 } // namespace media

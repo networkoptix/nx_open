@@ -40,7 +40,8 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'static'
+            dist: 'static',
+            web_common: 'app/web_common'
         },
 
         // Automatically inject Bower components into the app
@@ -56,7 +57,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.web_common %>/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -67,7 +68,7 @@ module.exports = function (grunt) {
                 tasks: ['newer:jshint:test', 'karma']
             },
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}', '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
             gruntfile: {
@@ -79,13 +80,13 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.web_common %>/**',
                     '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
         },
-
         // The actual grunt server settings
         connect: {
             options: {
@@ -217,6 +218,7 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= yeoman.app %>/scripts/**/*.js',
+                '<%= yeoman.web_common %>/scripts/**/*.js',
                 '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
@@ -468,6 +470,18 @@ module.exports = function (grunt) {
                             'bower_components/mediaelement/build/flashmediaelement.swf',
                             'bower_components/locomote/dist/Player.swf']
 
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.web_common %>',
+                        dest: '<%= yeoman.dist %>/web_common',
+                        src: [
+                            '*.{ico,png,txt}',
+                            'views/**',
+                            '*.json',
+                            'images/**',
+                            'components/*.swf'
+                        ]
                     }
                 ]
             },
@@ -475,6 +489,12 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
+                src: '{,*/}*.css'
+            },
+            styles_common: {
+                expand: true,
+                cwd: '<%= yeoman.web_common %>/styles',
+                dest: '.tmp/web_common/styles/',
                 src: '{,*/}*.css'
             },
             zip:{
@@ -501,11 +521,11 @@ module.exports = function (grunt) {
                 command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;python ../../devtools/util/merge_dev.py -t default;hg push;'
             },
 
             pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;'
             },
             merge_release: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
@@ -515,9 +535,6 @@ module.exports = function (grunt) {
             },
             print_version:{
                 command: 'hg parent'
-            },
-            generate_translation:{
-                command: 'cd translation; ./language_pack.sh'
             },
             localize:{
                 command: 'cd translation; ./localize.sh'
@@ -807,7 +824,6 @@ module.exports = function (grunt) {
         'usemin',
         'htmlmin',
         'shell:version',
-        //'shell:generate_translation',
         'shell:localize'
     ]);
 

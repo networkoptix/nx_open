@@ -15,8 +15,9 @@
 
 #include <stdint.h>
 
-#include <QtCore/QObject>
+#include <QtCore/QtEndian>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 #ifndef Q_MOC_RUN
@@ -172,5 +173,17 @@ template <> struct hash<SocketAddress>
 };
 
 } // namespace std
+
+inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
+inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
+
+/* Note that we have to use #defines here so that these functions work even if
+ * they are also defined in system network headers. */
+#ifndef htonll
+#define htonll qn_htonll
+#endif
+#ifndef ntohll
+#define ntohll qn_ntohll
+#endif
 
 Q_DECLARE_METATYPE(SocketAddress)

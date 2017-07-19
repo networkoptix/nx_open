@@ -1,15 +1,14 @@
 #pragma once
 
-#include <QScopedPointer>
+#include <QtCore/QScopedPointer>
 #include <QtWidgets/QAbstractButton>
-#include <QtWidgets/QGraphicsProxyWidget>
 
+#include <core/resource/resource_fwd.h>
+
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <core/resource/layout_resource.h>
-#include <utils/common/connective.h>
 
-class QLabel;
-class QHBoxLayout;
+#include <utils/common/connective.h>
 
 namespace Ui{
 class SpecialLayoutPanelWidget;
@@ -22,11 +21,11 @@ namespace ui {
 namespace workbench {
 
 class SpecialLayoutPanelWidget:
-    public Connective<QGraphicsProxyWidget>,
+    public Connective<QnMaskedProxyWidget>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QGraphicsProxyWidget>;
+    using base_type = Connective<QnMaskedProxyWidget>;
 
 public:
     SpecialLayoutPanelWidget(const QnLayoutResourcePtr& layoutResource, QObject* parent = nullptr);
@@ -37,6 +36,7 @@ private:
     void handleResourceDataChanged(int role);
 
     void updateButtons();
+    void updateTitle();
 
 private:
     QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;

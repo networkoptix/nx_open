@@ -2,11 +2,11 @@
 
 #include <nx/fusion/serialization/json.h>
 
-#include <business/business_event_parameters.h>
-#include <business/business_action_parameters.h>
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
-#include <business/business_action_factory.h>
+#include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/action_factory.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
@@ -46,25 +46,27 @@
 
 #include <nx/utils/log/assert.h>
 
+using namespace nx;
+
 namespace ec2 {
 
 struct overload_tag {};
 
-void fromApiToResource(const ApiBusinessRuleData& src, QnBusinessEventRulePtr& dst)
+void fromApiToResource(const ApiBusinessRuleData& src, vms::event::RulePtr& dst)
 {
     dst->setId(src.id);
     dst->setEventType(src.eventType);
 
     dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
-    dst->setEventParams(QJson::deserialized<QnBusinessEventParameters>(src.eventCondition));
+    dst->setEventParams(QJson::deserialized<vms::event::EventParameters>(src.eventCondition));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
     dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
-    dst->setActionParams(QJson::deserialized<QnBusinessActionParameters>(src.actionParams));
+    dst->setActionParams(QJson::deserialized<vms::event::ActionParameters>(src.actionParams));
 
     dst->setAggregationPeriod(src.aggregationPeriod);
     dst->setDisabled(src.disabled);
@@ -73,7 +75,7 @@ void fromApiToResource(const ApiBusinessRuleData& src, QnBusinessEventRulePtr& d
     dst->setSystem(src.system);
 }
 
-void fromResourceToApi(const QnBusinessEventRulePtr& src, ApiBusinessRuleData& dst)
+void fromResourceToApi(const vms::event::RulePtr& src, ApiBusinessRuleData& dst)
 {
     dst.id = src->id();
     dst.eventType = src->eventType();
@@ -93,27 +95,27 @@ void fromResourceToApi(const QnBusinessEventRulePtr& src, ApiBusinessRuleData& d
     dst.system = src->isSystem();
 }
 
-void fromApiToResourceList(const ApiBusinessRuleDataList& src, QnBusinessEventRuleList& dst)
+void fromApiToResourceList(const ApiBusinessRuleDataList& src, vms::event::RuleList& dst)
 {
     dst.reserve(dst.size() + (int)src.size());
     for (const ApiBusinessRuleData& srcRule: src)
     {
-        dst.push_back(QnBusinessEventRulePtr(new QnBusinessEventRule()));
+        dst.push_back(vms::event::RulePtr(new vms::event::Rule()));
         fromApiToResource(srcRule, dst.back());
     }
 }
 
-void fromResourceListToApi(const QnBusinessEventRuleList& src, ApiBusinessRuleDataList& dst)
+void fromResourceListToApi(const vms::event::RuleList& src, ApiBusinessRuleDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
-    for (const QnBusinessEventRulePtr& srcRule: src)
+    for (const vms::event::RulePtr& srcRule: src)
     {
         dst.push_back(ApiBusinessRuleData());
         fromResourceToApi(srcRule, dst.back());
     }
 }
 
-void fromResourceToApi(const QnAbstractBusinessActionPtr& src, ApiBusinessActionData& dst)
+void fromResourceToApi(const vms::event::AbstractActionPtr& src, ApiBusinessActionData& dst)
 {
     dst.actionType = src->actionType();
     dst.toggleState = src->getToggleState();
@@ -123,22 +125,22 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr& src, ApiBusinessAction
     dst.params = QJson::serialized(src->getParams());
     dst.runtimeParams = QJson::serialized(src->getRuntimeParams());
 
-    dst.ruleId = src->getBusinessRuleId();
+    dst.ruleId = src->getRuleId();
     dst.aggregationCount = src->getAggregationCount();
 }
 
-void fromApiToResource(const ApiBusinessActionData& src, QnAbstractBusinessActionPtr& dst)
+void fromApiToResource(const ApiBusinessActionData& src, vms::event::AbstractActionPtr& dst)
 {
-    dst = QnBusinessActionFactory::createAction(src.actionType, QJson::deserialized<QnBusinessEventParameters>(src.runtimeParams));
+    dst = vms::event::ActionFactory::createAction(src.actionType, QJson::deserialized<vms::event::EventParameters>(src.runtimeParams));
 
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
     dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
-    dst->setParams(QJson::deserialized<QnBusinessActionParameters>(src.params));
+    dst->setParams(QJson::deserialized<vms::event::ActionParameters>(src.params));
 
-    dst->setBusinessRuleId(src.ruleId);
+    dst->setRuleId(src.ruleId);
     dst->setAggregationCount(src.aggregationCount);
 }
 
@@ -537,7 +539,7 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
 
 void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target)
 {
-    for (const auto& addr : source.split(L';'))
+    for (const auto& addr : source.split(L';', QString::SkipEmptyParts))
         target.push_back(addr);
 }
 

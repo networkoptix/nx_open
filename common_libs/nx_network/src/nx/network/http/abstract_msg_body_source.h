@@ -1,10 +1,6 @@
-/**********************************************************
-* 20 may 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef libcommon_abstract_msg_body_source_h
-#define libcommon_abstract_msg_body_source_h
+#include <cstdint>
 
 #include <boost/optional.hpp>
 
@@ -12,39 +8,41 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
 
-#include "httptypes.h"
+#include "http_types.h"
 
+namespace nx_http {
 
-namespace nx_http
-{
 /**
-    If \a AbstractMsgBodySource::contentLength returns existing value then exactly 
-        specified number of bytes is fetched using \a AbstractMsgBodySource::readAsync.
-    Otherwise, data is fetched until empty buffer is received or error occurs
-*/
-class NX_NETWORK_API AbstractMsgBodySource
-:
+ * If AbstractMsgBodySource::contentLength returns existing value then exactly 
+ * specified number of bytes is fetched using AbstractMsgBodySource::readAsync.
+ * Otherwise, data is fetched until empty buffer is received or error occurs.
+ */
+class NX_NETWORK_API AbstractMsgBodySource:
     public nx::network::aio::BasicPollable
 {
 public:
-    virtual ~AbstractMsgBodySource() {}
+    virtual ~AbstractMsgBodySource() = default;
 
-    //TODO #ak introduce convenient type for MIME type
-    /** Returns full MIME type of content. E.g., application/octet-stream */
-    virtual StringType mimeType() const = 0;
-    /** Returns length of content, provided by this data source.
-        MUST be non-blocking and have constant complexity!
-    */
-    virtual boost::optional<uint64_t> contentLength() const = 0;
+    // TODO: #ak Introduce convenient type for MIME type.
     /**
-        \note \a completionHandler can be invoked from within this call
-        \note End-of-data is signalled with (SystemError::noError, {empty buffer})
-    */
+     * Returns full MIME type of content. E.g., application/octet-stream.
+     */
+    virtual StringType mimeType() const = 0;
+
+    /**
+     * Returns length of content, provided by this data source.
+     * MUST be non-blocking and have constant complexity!
+     */
+    virtual boost::optional<uint64_t> contentLength() const = 0;
+
+    /**
+     * @param completionHandler can be invoked from within this call.
+     * NOTE: End-of-data is signalled with (SystemError::noError, {empty buffer}).
+     */
     virtual void readAsync(
         nx::utils::MoveOnlyFunc<
             void(SystemError::ErrorCode, BufferType)
         > completionHandler) = 0;
 };
-}
 
-#endif  //libcommon_abstract_msg_body_source_h
+} // namespace nx_http

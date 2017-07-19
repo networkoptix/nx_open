@@ -4,10 +4,13 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_access/resource_access_filter.h>
+
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
-#include "core/resource_management/resource_pool.h"
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -36,7 +39,7 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
 
 QnLayoutResourcePtr QnLayoutResource::clone() const
 {
-    QnLayoutResourcePtr result(new QnLayoutResource());
+    QnLayoutResourcePtr result(new QnLayoutResource(commonModule()));
 
     {
         QnMutexLocker locker(&m_mutex);
@@ -63,6 +66,39 @@ QnLayoutResourcePtr QnLayoutResource::clone() const
 
     result->setItems(items);
     return result;
+}
+
+QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& resource)
+{
+    NX_EXPECT(QnResourceAccessFilter::isOpenableInLayout(resource));
+    if (!resource)
+        return QnLayoutResourcePtr();
+
+    QnLayoutResourcePtr layout(new QnLayoutResource(resource->commonModule()));
+    layout->setCellSpacing(0);
+    layout->setName(resource->getName());
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        const auto ar = camera->aspectRatio();
+        if (ar.isValid())
+            layout->setCellAspectRatio(ar.toFloat());
+    }
+
+    QnLayoutItemData item;
+    item.flags = 0x1; // Layout data item flags is declared in client module. //TODO: #GDM move to api
+    item.uuid = QnUuid::createUuid();
+    item.combinedGeometry = QRect(0, 0, 1, 1);
+    item.resource.id = resource->getId();
+    if (resource->hasFlags(Qn::local_media))
+        item.resource.uniqueId = resource->getUniqueId();
+
+    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+    if (!forcedRotation.isEmpty())
+        item.rotation = forcedRotation.toInt();
+
+    layout->addItem(item);
+
+    return layout;
 }
 
 QString QnLayoutResource::toSearchString() const

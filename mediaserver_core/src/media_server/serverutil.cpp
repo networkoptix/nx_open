@@ -32,7 +32,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/transaction_message_bus_base.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -48,6 +48,8 @@
 #include "server_connector.h"
 #include "server/server_globals.h"
 #include <media_server/media_server_module.h>
+#include <utils/crypt/symmetrical.h>
+#include <api/model/password_data.h>
 
 namespace
 {
@@ -91,11 +93,6 @@ QString getDataDirectory()
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json),
-    _Fields)
 
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
@@ -203,7 +200,7 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
     return true;
 }
 
-void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBus* messageBus)
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBusBase* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
@@ -217,7 +214,7 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBus* messageBus)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBusBase* messageBus)
 {
     const auto& commonModule = messageBus->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
@@ -246,8 +243,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     }
 
     // add foreign resource params
-    ec2::ApiResourceParamWithRefDataList dummyData;
-    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
     {
         if (!data.wholeSystem)
             resumeConnectionsToRemotePeers();
@@ -272,6 +268,10 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
 
     if (data.localSystemId.isNull())
         commonModule->globalSettings()->resetCloudParams();
+
+    if (!data.systemName.isEmpty())
+        commonModule->globalSettings()->setSystemName(data.systemName);
+
     commonModule->globalSettings()->setLocalSystemId(data.localSystemId);
     commonModule->globalSettings()->synchronizeNowSync();
 
@@ -338,7 +338,7 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
     QByteArray prefix("SK_");
     if (authKey.startsWith(prefix)) {
         QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        QByteArray authKeyDecoded = nx::utils::encodeSimple(authKeyEncoded);
         return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
     }
     else {
@@ -366,7 +366,7 @@ void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
 {
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
-    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    QByteArray authKeyEncoded = nx::utils::encodeSimple(authKeyBin).toHex();
     qnServerModule->roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
 }
 

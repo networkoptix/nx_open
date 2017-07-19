@@ -468,8 +468,7 @@ QString bytesToString(uint64_t bytes, int precision)
     if (suffix == 0)
         return lm("%1").arg(number, 0, 'g', precision);
 
-    return lm("%1%2").arg(number, 0, 'g', precision).arg(
-        QChar::fromLatin1(kByteSuffexes[suffix - 1]));
+    return lm("%1%2").arg(number, 0, 'g', precision).arg(kByteSuffexes[suffix - 1]);
 }
 
 uint64_t stringToBytes(const QString& str, bool* isOk)

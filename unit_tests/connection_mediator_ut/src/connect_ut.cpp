@@ -13,8 +13,9 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/std/cpp14.h>
@@ -41,7 +42,7 @@ protected:
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
-        server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
+        server = std::make_unique<network::server::MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled);
@@ -51,7 +52,8 @@ protected:
 
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
-        network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
+        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(m_address));
     }
 
     nx::stun::MessageDispatcher stunMessageDispatcher;
@@ -60,7 +62,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
-    std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
+    std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
     SocketAddress address() const
     {
@@ -125,4 +127,4 @@ TEST_F( ConnectTest, BindConnect )
 
 } // namespace test
 } // namespace hpm
-} // namespase nx
+} // namespace nx

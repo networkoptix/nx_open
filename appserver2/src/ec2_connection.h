@@ -10,11 +10,11 @@
 
 #include "base_ec2_connection.h"
 #include "ec2_statictics_reporter.h"
-#include "database/db_manager.h"
 #include "server_query_processor.h"
 
 namespace ec2
 {
+
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
     class Ec2DirectConnection
     :
@@ -30,8 +30,7 @@ namespace ec2
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
-        //!Implementation of ec2::AbstractECConnection::authInfo
-        virtual QString authInfo() const override;
+        virtual void updateConnectionUrl(const QUrl& url) override;
 
         bool initialized() const;
 
@@ -39,7 +38,6 @@ namespace ec2
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
-
     private:
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;

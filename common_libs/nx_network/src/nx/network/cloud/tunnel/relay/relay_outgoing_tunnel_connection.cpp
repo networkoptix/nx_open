@@ -9,11 +9,11 @@ namespace cloud {
 namespace relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
-    SocketAddress relayEndpoint,
+    QUrl relayUrl,
     nx::String relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :
-    m_relayEndpoint(std::move(relayEndpoint)),
+    m_relayUrl(std::move(relayUrl)),
     m_relaySessionId(std::move(relaySessionId)),
     m_relayApiClient(std::move(relayApiClient)),
     m_usageCounter(std::make_shared<int>(0))
@@ -49,17 +49,19 @@ void OutgoingTunnelConnection::start()
 
 void OutgoingTunnelConnection::establishNewConnection(
     std::chrono::milliseconds timeout,
-    SocketAttributes /*socketAttributes*/,
+    SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
     using namespace std::placeholders;
 
     dispatch(
-        [this, timeout, handler = std::move(handler)]() mutable
+        [this, timeout, socketAttributes = std::move(socketAttributes),
+            handler = std::move(handler)]() mutable
         {
             stopInactivityTimer();
 
             m_activeRequests.push_back(std::make_unique<RequestContext>());
+            m_activeRequests.back()->socketAttributes = std::move(socketAttributes);
             m_activeRequests.back()->completionHandler = std::move(handler);
             m_activeRequests.back()->timer.bindToAioThread(getAioThread());
             auto requestIter = --m_activeRequests.end();
@@ -67,8 +69,7 @@ void OutgoingTunnelConnection::establishNewConnection(
             auto relayClient =
                 m_relayApiClient
                 ? std::move(m_relayApiClient)
-                : nx::cloud::relay::api::ClientFactory::create(
-                    url::Builder().setScheme("http").setEndpoint(m_relayEndpoint));
+                : nx::cloud::relay::api::ClientFactory::create(m_relayUrl);
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,
@@ -91,25 +92,6 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_tunnelClosedHandler = std::move(handler);
-}
-
-static SystemError::ErrorCode toSystemError(
-    nx::cloud::relay::api::ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case nx::cloud::relay::api::ResultCode::ok:
-            return SystemError::noError;
-
-        case nx::cloud::relay::api::ResultCode::timedOut:
-            return SystemError::timedOut;
-
-        case nx::cloud::relay::api::ResultCode::notFound:
-            return SystemError::hostNotFound;
-
-        default:
-            return SystemError::connectionReset;
-    }
 }
 
 void OutgoingTunnelConnection::setInactivityTimeout(std::chrono::milliseconds timeout)
@@ -138,12 +120,19 @@ void OutgoingTunnelConnection::onConnectionOpened(
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
     auto completionHandler = std::move(requestIter->get()->completionHandler);
+    auto socketAttributes = std::move(requestIter->get()->socketAttributes);
     m_activeRequests.erase(requestIter);
 
     const auto errorCodeToReport = toSystemError(resultCode);
+    if (resultCode != nx::cloud::relay::api::ResultCode::ok)
+        connection.reset(); //< Connection can be present in case of logic error.
 
     if (connection)
     {
+        NX_ASSERT(connection->isInSelfAioThread());
+        connection->cancelIOSync(aio::etNone);
+        socketAttributes.applyTo(connection.get());
+
         std::unique_ptr<AbstractStreamSocket> outgoingConnection =
             std::make_unique<OutgoingConnection>(
                 std::move(connection),

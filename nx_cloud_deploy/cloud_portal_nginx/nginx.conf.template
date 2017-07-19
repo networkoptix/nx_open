@@ -1,0 +1,124 @@
+include /etc/nginx/modules-enabled/*.conf;
+
+error_log /dev/stdout info;
+worker_processes 1;
+
+env CUSTOMIZATION;
+
+# user nobody nogroup;
+pid /tmp/nginx.pid;
+
+events {
+    worker_connections 1024;
+    accept_mutex off;
+}
+
+http {
+    include mime.types;
+    default_type application/octet-stream;
+    access_log /dev/stdout combined;
+    sendfile on;
+
+    upstream app_server {
+        # For a TCP configuration:
+        server $PORTAL_HOST:5000 fail_timeout=0;
+    }
+
+    server {
+        listen 80 default;
+
+        client_max_body_size 4G;
+        server_name _;
+
+        keepalive_timeout 5;
+
+        # path for static files
+        root /app/app/static/$CUSTOMIZATION;
+
+        location @proxy_to_app {
+            proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+            proxy_set_header Host ${DOLLAR}http_host;
+            proxy_redirect off;
+            proxy_read_timeout 300s;
+
+            proxy_pass   http://app_server;
+        }
+
+        location @proxy_to_app_no_auth {
+            proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+            proxy_set_header Host ${DOLLAR}http_host;
+            proxy_set_header Authorization  "";
+            proxy_redirect off;
+
+            proxy_pass   http://app_server;
+        }
+
+        location ~ ^/(|index.html)$ {
+            index static/index.html;
+
+            if (${DOLLAR}http_x_forwarded_proto != "https") {
+                return 301 https://${DOLLAR}host${DOLLAR}request_uri;
+            }
+
+            # checks for static file, if not found proxy to app
+            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
+ 
+            # Add HTTP Strict Transport Security for good measure.
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
+        }
+
+
+        location / {
+            index static/index.html;
+
+            # checks for static file, if not found proxy to app
+            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
+ 
+            # Add HTTP Strict Transport Security for good measure.
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
+        }
+
+        location /api/cloud_modules {
+            index static/index.html;
+
+            # checks for static file, if not found proxy to app
+            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
+        }
+
+        location /notifications {
+            index static/index.html;
+
+            auth_basic           "Cloud Portal Notification Module";
+            auth_basic_user_file /etc/nginx/notification.passwd;
+
+            # checks for static file, if not found proxy to app
+            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app_no_auth;
+        }
+
+        location /static/fonts/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
+        location /static/admin/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
+        location /fonts/ {
+            root /app/app/static/common/static;
+            error_page 404 /static/index.html;
+        }
+
+        location /preview/ {
+            root /app/app/static/$CUSTOMIZATION/;
+            error_page 404 /static/index.html;
+            expires -1;
+        }
+
+        location /static {
+            error_page 404 /static/index.html;
+        }
+
+    }
+}

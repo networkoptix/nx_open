@@ -1,0 +1,34 @@
+<div ng-controller="DisconnectCtrl">
+    <form name="disconnectForm" novalidate>
+        <div class="modal-body">
+            <p class="warning-label">
+                Se eliminarán todos los usuarios de la nube.
+            </p>
+            <p>
+                El sistema será accesible a través de la red local con la cuenta del administrador local.
+            </p>
+            <p>
+                Introduzca la contraseña para continuar.
+            </p>
+
+            <div class="form-group" validate-field>
+                <label for="password">Contraseña</label>
+                <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
+                       name="password" type="password" required autofocus>
+                <p class="help-block" >
+                    <span ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
+                        Se requiere contraseña
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button process="disconnecting"
+                            form="disconnectForm"
+                            action-type="'danger'"
+                            button-text="$root.L.system.confirmDisconnectAction"></process-button>
+
+            <button type="button" class="btn btn-default" ng-click="close()" >Cancelar</button>
+        </div>
+    </form>
+</div>

@@ -7,83 +7,16 @@ import pytest
 import time
 import itertools
 from multiprocessing.dummy import Pool as ThreadPool
-from functools import total_ordering
+from test_utils.utils import SimpleNamespace
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
 import server_api_data_generators as generator
-
+import transaction_log
 
 log = logging.getLogger(__name__)
 
 
-DEFAULT_CONFIG_SECTION = 'General'
 DEFAULT_TEST_SIZE = 10
 DEFAULT_THREAD_NUMBER = 8
-CONFIG_USERNAME = 'username'
-CONFIG_PASSWORD = 'password'
-CONFIG_TESTSIZE = 'testCaseSize'
-CONFIG_THREADS = 'threadNumber'
-
-
-@total_ordering
-class Timestamp(object):
-
-    def __init__(self, sequence, ticks):
-        self.sequence = sequence
-        self.ticks = ticks
-
-    def __eq__(self, other):
-        return ((self.sequence, self.ticks) ==
-                (other.sequence, other.ticks))
-
-    def __lt__(self, other):
-        return ((self.sequence, self.ticks) <
-                (other.sequence, other.ticks))
-
-    def __str__(self):
-        return "%s.%s" % (self.sequence, self.ticks)
-
-
-@total_ordering
-class Transaction(object):
-
-    @classmethod
-    def from_dict(cls, d):
-        return Transaction(
-            command=d['tran']['command'],
-            author=d['tran']['historyAttributes']['author'],
-            peer_id=d['tran']['peerID'],
-            db_id=d['tran']['persistentInfo']['dbID'],
-            sequence=d['tran']['persistentInfo']['sequence'],
-            timestamp=Timestamp(
-                sequence=d['tran']['persistentInfo']['timestamp']['sequence'],
-                ticks=d['tran']['persistentInfo']['timestamp']['ticks']),
-            transaction_type=d['tran']['transactionType'],
-            transaction_guid=d['tranGuid'])
-
-    def __init__(self, command, author, peer_id, db_id, sequence, timestamp,
-                 transaction_type, transaction_guid):
-        self.command = command
-        self.author = author
-        self.peer_id = peer_id
-        self.db_id = db_id
-        self.sequence = sequence
-        self.timestamp = timestamp
-        self.transaction_type = transaction_type
-        self.transaction_guid = transaction_guid
-
-    def __hash__(self):
-        return hash((self.peer_id, self.db_id, self.sequence))
-
-    def __eq__(self, other):
-        return ((self.peer_id, self.db_id, self.sequence) ==
-                (other.peer_id, other.db_id, other.sequence))
-
-    def __lt__(self, other):
-        return ((self.peer_id, self.db_id, self.sequence) <
-                (other.peer_id, other.db_id, other.sequence))
-
-    def __str__(self):
-        return "Transaction(from: %s, timestamp: %s, command: %s)" % (self.peer_id, self.timestamp, self.command)
 
 
 class ResourceGenerator(object):
@@ -97,10 +30,9 @@ class ResourceGenerator(object):
 
 class SeedResourceGenerator(ResourceGenerator):
 
-    _seed = 0
-
-    def __init__(self, gen_fn):
+    def __init__(self, gen_fn, initial=0):
         ResourceGenerator.__init__(self, gen_fn)
+        self._seed = initial
 
     def next(self):
         self._seed += 1
@@ -116,10 +48,20 @@ class SeedResourceWithParentGenerator(SeedResourceGenerator):
         return self.gen_fn(self.next(), parentId=generator.get_resource_id(val))
 
 
+class SeedResourceList(SeedResourceGenerator):
+
+    def __init__(self, gen_fn, list_size, initial=0):
+        SeedResourceGenerator.__init__(self,  gen_fn, initial)
+        self._list_size = list_size
+
+    def get(self, server, val):
+        return self.gen_fn(self.next(), val, self._list_size)
+
+
 class LayoutItemGenerator(SeedResourceGenerator):
 
-    def __init__(self):
-        ResourceGenerator.__init__(self, generator.generate_layout_item)
+    def __init__(self, initial=0):
+        SeedResourceGenerator.__init__(self, generator.generate_layout_item, initial)
         self.__resources = dict()
 
     def set_resources(self, resources):
@@ -145,9 +87,9 @@ class LayoutGenerator(SeedResourceGenerator):
 
     MAX_LAYOUT_ITEMS = 10
 
-    def __init__(self):
-        ResourceGenerator.__init__(self, generator.generate_layout_data)
-        self.items_generator = LayoutItemGenerator()
+    def __init__(self, initial=0):
+        SeedResourceGenerator.__init__(self, generator.generate_layout_data, initial)
+        self.items_generator = LayoutItemGenerator(initial * self.MAX_LAYOUT_ITEMS)
 
     def get(self, server, val):
         items = self.items_generator.get(server, self._seed % self.MAX_LAYOUT_ITEMS)
@@ -164,7 +106,7 @@ def resource_generators():
         saveCameraUserAttributes=ResourceGenerator(generator.generate_camera_user_attributes_data),
         saveMediaServerUserAttributes=ResourceGenerator(generator.generate_mediaserver_user_attributes_data),
         removeResource=ResourceGenerator(generator.generate_remove_resource_data),
-        setResourceParams=ResourceGenerator(generator.generate_resource_params_data),
+        setResourceParams=SeedResourceList(generator.generate_resource_params_data_list, 1),
         saveStorage=SeedResourceWithParentGenerator(generator.generate_storage_data),
         saveLayout=LayoutGenerator())
 
@@ -175,18 +117,20 @@ def merge_schema(request):
 
 
 @pytest.fixture
-def env(env_builder, server, merge_schema):
-    one = server()
-    two = server()
+def env(server_factory, merge_schema):
+    one = server_factory('one')
+    two = server_factory('two')
     if merge_schema == 'merged':
-        boxes_env = env_builder(merge_servers=[one, two],  one=one, two=two)
-    else:
-        boxes_env = env_builder(one=one, two=two)
-    boxes_env.test_size = DEFAULT_TEST_SIZE
-    boxes_env.thread_number = DEFAULT_THREAD_NUMBER
-    boxes_env.system_is_merged = merge_schema == 'merged'
-    boxes_env.resource_generators = resource_generators()
-    return boxes_env
+        one.merge([two])
+    return SimpleNamespace(
+        one=one,
+        two=two,
+        servers=[one, two],
+        test_size=DEFAULT_TEST_SIZE,
+        thread_number=DEFAULT_THREAD_NUMBER,
+        system_is_merged=merge_schema == 'merged',
+        resource_generators=resource_generators(),
+        )
 
 
 def get_response(server, method, api_object, api_method):
@@ -196,7 +140,6 @@ def get_response(server, method, api_object, api_method):
 def wait_entity_merge_done(servers, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method, api_object, api_method)
     start = time.time()
-    servers = servers.values()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
@@ -212,7 +155,7 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
             return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
             log.error("'%s' was not synchronized in %d seconds: '%r' and '%r'" % (
-                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0].box, result[0].box))
+                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0], result[0]))
             assert result[1] == result_expected
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
@@ -224,10 +167,9 @@ def check_api_calls(env, calls):
 
 def check_transaction_log(env):
     log.info('TEST for GET ec2.getTransactionLog:')
-    servers = env.servers.values()
 
     def servers_to_str(servers):
-        return ', '.join("%r" % s.box for s in servers)
+        return ', '.join("%r" % s for s in servers)
 
     def transactions_to_str(transactions):
         return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
@@ -235,12 +177,13 @@ def check_transaction_log(env):
     start = time.time()
     while True:
         srv_transactions = {}
-        for srv in servers:
-            transactions = map(Transaction.from_dict, srv.rest_api.ec2.getTransactionLog.GET())
+        for srv in env.servers:
+            transactions = transaction_log.transactions_from_json(
+                srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
-                                  if len(l) != len(servers)}
+                                  if len(l) != len(env.servers)}
         if not unmatched_transactions:
             return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
@@ -256,10 +199,9 @@ def server_api_post((server, api_method, data)):
 def merge_system_if_unmerged(env):
     if env.system_is_merged:
         return
-    servers = env.servers.values()
-    assert len(servers) >= 2
-    for i in range(len(servers) - 1):
-        servers[i+1].merge_systems(servers[i])
+    assert len(env.servers) >= 2
+    for i in range(len(env.servers) - 1):
+        env.servers[i+1].merge_systems(env.servers[i])
         env.system_is_merged = True
 
 
@@ -269,7 +211,7 @@ def get_servers_admins(env):
     Get admin users from all tested servers
     '''
     admins = []
-    for server in env.servers.values():
+    for server in env.servers:
         users = server.rest_api.ec2.getUsers.GET()
         admins += [(server, u) for u in users if u['isAdmin']]
     return admins
@@ -277,9 +219,8 @@ def get_servers_admins(env):
 
 def get_server_by_index(env, i):
     '''Return Server object.'''
-    servers = env.servers.values()
-    server_i = i % len(servers)
-    return servers[server_i]
+    server_i = i % len(env.servers)
+    return env.servers[server_i]
 
 
 def prepare_call_list(env, api_method, sequence=None):
@@ -307,7 +248,7 @@ def prepare_call_list(env, api_method, sequence=None):
         if not server or env.system_is_merged:
             # If the resource's server isn't specified or system is already merged,
             # get server for modification request by index
-            return get_server_by_index(env, i) 
+            return get_server_by_index(env, i)
         else:
             # Otherwise, get the resource's owner for modification.
             return server
@@ -376,7 +317,7 @@ def test_api_get_methods(env):
         ('GET', 'ec2', 'getFullInfo'),
         ('GET', 'ec2', 'getLicenses')
         ]
-    for srv in env.servers.values():
+    for srv in env.servers:
         for method, api_object, api_method in test_api_get_methods:
             srv.rest_api.get_api_fn(method, api_object, api_method)()
 
@@ -415,8 +356,7 @@ def test_mediaserver_data_syncronization(env):
 
 
 def test_storage_data_synchronization(env):
-    env_servers = env.servers.values()
-    servers = [env_servers[i % len(env_servers)] for i in range(env.test_size)]
+    servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
     server_with_guid_list = map(lambda s: (s, s.ecs_guid), servers)
     storages = prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
@@ -483,7 +423,6 @@ def test_layout_data_syncronization(env):
 
 @pytest.mark.parametrize('merge_schema', ['merged'])
 def test_resource_remove_update_conflict(env):
-    env_servers = env.servers.values()
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
     servers = prepare_and_make_async_post_calls(env, 'saveMediaServer')
@@ -503,8 +442,8 @@ def test_resource_remove_update_conflict(env):
         api_method = api_methods[i % 4]
         data = v[i % 4][1]
         data['name'] += '_changed'
-        server_1 = env_servers[i % len(env_servers)]
-        server_2 = env_servers[(i+1) % len(env_servers)]
+        server_1 = env.servers[i % len(env.servers)]
+        server_2 = env.servers[(i+1) % len(env.servers)]
         api_calls.append((server_1, api_method, data))
         api_calls.append((server_2, 'removeResource', dict(id=data['id'])))
     make_async_post_calls(env, api_calls)

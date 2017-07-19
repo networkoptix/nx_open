@@ -8,7 +8,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource/resource_fwd.h"
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
@@ -86,7 +86,6 @@ class QnRecordingManager:
     Q_OBJECT
 public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
-    static const int MIN_SECONDARY_FPS = 2;
 
     QnRecordingManager(
         QnCommonModule* commonModule,
@@ -99,13 +98,19 @@ public:
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
-    bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(
+        const QnSecurityCamResourcePtr& camRes,
+        Qn::StreamQuality quality,
+        int fps,
+        int beforeThresholdSec,
+        int afterThresholdSec,
+        int maxDurationSec);
 
     bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
 
     WriteBufferMultiplierManager& getBufferManager() { return m_writeBufferManager; }
 signals:
-    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
+    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonText);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

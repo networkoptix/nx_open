@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <?include BuildVars.wxi ?>
+
+    <Bundle
+            Name="$(var.productName) Paxton Plugin"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="favicon.ico"
+            UpgradeCode="$(var.axBundleUpgradeCode)"
+            DisableModify="yes">
+
+        <util:RegistrySearch
+          Id='PaxtonDirSearch' 
+          Variable="PaxtonDirExists" 
+          Result="exists"
+          Root="HKLM"
+          Key="SOFTWARE\Paxton Access\Common" 
+          Win64="no"/>
+
+        <bal:Condition Message="You need to have Paxton Access installed">
+            PaxtonDirExists
+        </bal:Condition>
+
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" />
+            <Payload SourceFile="installer_bg.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
+
+            <bal:WixExtendedBootstrapperApplication
+                SuppressOptionsUI="yes"
+                LicenseUrl="License.html"
+                ShowFilesInUse="yes"
+                SuppressRepair="yes" />
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="Paxton plugin" />
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
+
+        <Chain DisableSystemRestore="no">
+            <PackageGroupRef Id="VC14RedistPackageGroup"/>
+            <RollbackBoundary />
+            <PackageGroupRef Id="PaxtonPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

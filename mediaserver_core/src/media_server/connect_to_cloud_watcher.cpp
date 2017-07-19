@@ -4,11 +4,13 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <transaction/transaction_message_bus.h>
-#include <cdb/ec2_request_paths.h>
+#include <transaction/transaction_message_bus_base.h>
+#include <transaction/transaction_transport_base.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "settings.h"
 #include "media_server_module.h"
+#include <api/runtime_info_manager.h>
 
 namespace {
     static const int kUpdateIfFailIntervalMs = 1000 * 60;
@@ -16,9 +18,8 @@ namespace {
 
 using namespace nx::network::cloud;
 
-QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBus* messageBus):
-    m_cdbEndPointFetcher(
-        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>())),
+QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus):
+    m_cdbEndPointFetcher(new CloudDbUrlFetcher()),
     m_messageBus(messageBus)
 {
     m_timer.setSingleShot(true);
@@ -54,7 +55,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
-            m_messageBus->removeConnectionFromPeer(m_cloudUrl);
+            m_messageBus->removeOutgoingConnectionFromPeer(::ec2::kCloudPeerId);
         return;
     }
 
@@ -73,7 +74,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
                 if (statusCode != nx_http::StatusCode::ok)
                 {
                     NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
-                        .str(statusCode), cl_logWARNING);
+                        .arg(statusCode), cl_logWARNING);
                     // try once more later
                     metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                     return;
@@ -88,11 +89,11 @@ void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
 {
     const auto& commonModule = m_messageBus->commonModule();
     NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
-        .str(url), cl_logDEBUG1);
+        .arg(url), cl_logDEBUG1);
 
     m_cloudUrl = url;
     m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
     m_cloudUrl.setUserName(commonModule->globalSettings()->cloudSystemId());
     m_cloudUrl.setPassword(commonModule->globalSettings()->cloudAuthKey());
-    m_messageBus->addConnectionToPeer(m_cloudUrl);
+    m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, m_cloudUrl);
 }

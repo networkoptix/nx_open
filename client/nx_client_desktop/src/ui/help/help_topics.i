@@ -162,7 +162,6 @@ QN_HELP_TOPIC(EventsActions_ExecutePtzPreset_Help,              "execute_ptz_pre
 QN_HELP_TOPIC(EventsActions_ShowTextOverlay_Help,               "display_text_on_cameras.htm")
 QN_HELP_TOPIC(EventsActions_ExecHttpRequest_Help,               "perform_http_request.htm")
 
-QN_HELP_TOPIC(EventsActions_EcConnectionLost_Help,				"ec_connection_lost.htm")
 QN_HELP_TOPIC(EventsActions_NoLicenses_Help,					"licenses_are_not_configured.htm")
 QN_HELP_TOPIC(EventsActions_EmailNotSet_Help,					"e-mail_is_not_set_for_users.htm")
 QN_HELP_TOPIC(EventsActions_EmailServerNotSet_Help,				"e-mail_server_is_not_configure.htm")

@@ -6,7 +6,7 @@
 
 #include "api/common_message_processor.h"
 
-#include "business/business_strings_helper.h"
+#include <nx/vms/event/strings_helper.h>
 
 #include <client_core/client_core_module.h>
 
@@ -33,7 +33,9 @@
 #include <utils/common/qtimespan.h>
 #include <utils/math/math.h>
 
-typedef QnBusinessActionData* QnLightBusinessActionP;
+using namespace nx;
+
+typedef vms::event::ActionData* QnLightBusinessActionP;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
@@ -408,7 +410,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
     case Qn::AR_ViewLive:
     case Qn::AR_ExportVideo:
         result = lit("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
-        //fall-through
+        /*fallthrough*/
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
         result += QnDeviceDependentStrings::getNumericName(
@@ -484,7 +486,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
 }
 
 QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
-    //TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
+    // TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
     Column columnsToFilter[] =
     {
         TimestampColumn,

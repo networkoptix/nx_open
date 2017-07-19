@@ -9,7 +9,7 @@
 
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <recording/time_period.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
@@ -126,7 +126,7 @@ void QnClientVideoCamera::streamJump(qint64 time)
 
 void QnClientVideoCamera::startDisplay()
 {
-    CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnClientVideoCamera::startDisplay "), m_resource->toResource()->getUniqueId(), cl_logDEBUG1);
+    NX_DEBUG(this, lm("startDisplay %1").arg(m_resource->toResource()->getUniqueId()));
 
     m_camdispay.start();
     if (m_reader)
@@ -136,8 +136,6 @@ void QnClientVideoCamera::startDisplay()
 
 void QnClientVideoCamera::stopDisplay()
 {
-    //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnClientVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
-    //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnClientVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
     m_displayStarted = false;
     if (m_reader)
         m_reader->stop();

@@ -7,7 +7,7 @@
 #include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -56,17 +56,25 @@ protected:
     void startExchangingFiniteData()
     {
         initializeFixedDataInput();
-        createChannel();
+        createChannel(AsyncChannel::InputDepletionPolicy::ignore);
         m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
 
     void startExchangingInfiniteData()
     {
         initializeInfiniteDataInput();
-        createChannel();
+        createChannel(AsyncChannel::InputDepletionPolicy::ignore);
         m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
     
+    void givenIdleBridge()
+    {
+        initializeFixedDataInput();
+        createChannel(AsyncChannel::InputDepletionPolicy::retry);
+        m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
+        assertDataExchangeWasSuccessful();
+    }
+
     void pauseRightDestination()
     {
         m_rightFile->pauseSendingData();
@@ -114,7 +122,7 @@ protected:
         m_leftFile->setErrorState();
     }
     
-    void assertErrorHasBeenReported()
+    void assertBridgeIsDoneDueToError()
     {
         ASSERT_NE(SystemError::noError, m_bridgeDone.get_future().get());
     }
@@ -142,10 +150,10 @@ protected:
 
 private:
     QByteArray m_originalData;
-    std::unique_ptr<utils::pipeline::AbstractInput> m_leftSource;
-    utils::pipeline::test::NotifyingOutput m_leftDest;
-    std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
-    utils::pipeline::test::NotifyingOutput m_rightDest;
+    std::unique_ptr<utils::bstream::AbstractInput> m_leftSource;
+    utils::bstream::test::NotifyingOutput m_leftDest;
+    std::unique_ptr<utils::bstream::AbstractInput> m_rightSource;
+    utils::bstream::test::NotifyingOutput m_rightDest;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<AsyncChannel> m_leftFile;
     std::unique_ptr<AsyncChannel> m_rightFile;
@@ -153,12 +161,12 @@ private:
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
 
-    void createChannel()
+    void createChannel(AsyncChannel::InputDepletionPolicy inputDepletionPolicy)
     {
         m_leftFile = std::make_unique<AsyncChannel>(
-            m_leftSource.get(), &m_leftDest, AsyncChannel::InputDepletionPolicy::ignore);
+            m_leftSource.get(), &m_leftDest, inputDepletionPolicy);
         m_rightFile = std::make_unique<AsyncChannel>(
-            m_rightSource.get(), &m_rightDest, AsyncChannel::InputDepletionPolicy::ignore);
+            m_rightSource.get(), &m_rightDest, inputDepletionPolicy);
 
         m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
         if (m_inactivityTimeout)
@@ -167,14 +175,14 @@ private:
 
     void initializeFixedDataInput()
     {
-        m_leftSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
-        m_rightSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
+        m_leftSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
+        m_rightSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
     }
 
     void initializeInfiniteDataInput()
     {
-        m_leftSource = std::make_unique<utils::pipeline::RandomDataSource>();
-        m_rightSource = std::make_unique<utils::pipeline::RandomDataSource>();
+        m_leftSource = std::make_unique<utils::bstream::RandomDataSource>();
+        m_rightSource = std::make_unique<utils::bstream::RandomDataSource>();
     }
 
     void onBridgeDone(SystemError::ErrorCode sysErrorCode)
@@ -206,7 +214,7 @@ TEST_F(AioAsyncChannelBridge, reports_error_from_source)
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
     emulateErrorOnAnySource();
-    assertErrorHasBeenReported();
+    assertBridgeIsDoneDueToError();
 }
 
 TEST_F(AioAsyncChannelBridge, forwards_all_received_data_after_channel_closure)
@@ -218,6 +226,13 @@ TEST_F(AioAsyncChannelBridge, forwards_all_received_data_after_channel_closure)
     closeLeftSource();
     resumeRightDestination();
     assertAllDataFromLeftHasBeenTransferredToTheRight();
+}
+
+TEST_F(AioAsyncChannelBridge, bridge_is_done_after_either_channel_is_closed)
+{
+    givenIdleBridge();
+    closeLeftSource();
+    assertBridgeIsDoneDueToError();
 }
 
 TEST_F(AioAsyncChannelBridge, read_saturation)
@@ -247,6 +262,8 @@ TEST_F(AioAsyncChannelBridge, deleting_object_within_done_handler)
     startExchangingFiniteData();
     assertDataExchangeWasSuccessful();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 class DummyAsyncChannel:
     public AbstractAsyncChannel

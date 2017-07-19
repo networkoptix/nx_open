@@ -11,13 +11,18 @@ namespace cloud {
 namespace relay {
 
 RelayService::RelayService(int argc, char **argv):
-    base_type(argc, argv, TrafficRelayAppInfo::applicationDisplayName())
+    base_type(argc, argv, AppInfo::applicationDisplayName())
 {
 }
 
 std::vector<SocketAddress> RelayService::httpEndpoints() const
 {
     return m_view->httpEndpoints();
+}
+
+const model::ListeningPeerPool& RelayService::listeningPeerPool() const
+{
+    return m_model->listeningPeerPool();
 }
 
 std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
@@ -30,7 +35,10 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
+    m_model = &model;
+
     Controller controller(settings, &model);
+
     View view(settings, model, &controller);
     m_view = &view;
 

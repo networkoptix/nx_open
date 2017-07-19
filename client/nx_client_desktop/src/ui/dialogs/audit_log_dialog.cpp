@@ -690,7 +690,8 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
+        if (resource->hasFlags(Qn::local_media))
+            item.resource.uniqueId = resource->getUniqueId();
         qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, period.startTimeMs);
 
         QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
@@ -706,7 +707,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
 
 }
 

@@ -6,8 +6,8 @@ namespace aio {
 namespace test {
 
 AsyncChannel::AsyncChannel(
-    utils::pipeline::AbstractInput* input,
-    utils::pipeline::AbstractOutput* output,
+    utils::bstream::AbstractInput* input,
+    utils::bstream::AbstractOutput* output,
     InputDepletionPolicy inputDepletionPolicy)
     :
     m_input(input),
@@ -224,8 +224,8 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
 
             if (readErrorState)
             {
-                reportIoCompletion(&m_readHandler, *readErrorState, (size_t)-1);
                 ++m_readErrorsReported;
+                reportIoCompletion(&m_readHandler, *readErrorState, (size_t)-1);
                 return;
             }
 
@@ -242,14 +242,17 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
                 m_readBuffer->resize(m_readBuffer->size() + bytesRead);
                 m_readBuffer = nullptr;
 
+                nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
                 reportIoCompletion(&m_readHandler, SystemError::noError, bytesRead);
+                if (thisWatcher.objectDestroyed())
+                    return;
 
                 if (!m_readScheduled)
                     ++m_readSequence;
                 return;
             }
 
-            if (bytesRead == utils::pipeline::StreamIoError::osError)
+            if (bytesRead == utils::bstream::StreamIoError::osError)
             {
                 reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
                 return;
@@ -267,9 +270,7 @@ void AsyncChannel::reportIoCompletion(
     if (ioCompletionHandler == &m_readHandler)
         m_readScheduled = false;
 
-    IoCompletionHandler handler;
-    handler.swap(*ioCompletionHandler);
-    handler(sysErrorCode, bytesTransferred);
+    nx::utils::swapAndCall(*ioCompletionHandler, sysErrorCode, bytesTransferred);
 }
 
 void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)

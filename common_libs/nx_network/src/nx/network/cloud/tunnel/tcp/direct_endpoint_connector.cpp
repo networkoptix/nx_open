@@ -4,10 +4,8 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/log/log.h>
 
-#include <network/module_information.h>
-#include <rest/server/json_rest_result.h>
-
 #include "direct_endpoint_tunnel.h"
+#include "tunnel_tcp_endpoint_verificator_factory.h"
 
 namespace nx {
 namespace network {
@@ -17,25 +15,25 @@ namespace tcp {
 DirectEndpointConnector::DirectEndpointConnector(
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
-:
+    :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId))
 {
+    bindToAioThread(getAioThread());
 }
 
-DirectEndpointConnector::~DirectEndpointConnector()
+void DirectEndpointConnector::bindToAioThread(
+    aio::AbstractAioThread* aioThread)
 {
-    stopWhileInAioThread();
-}
+    base_type::bindToAioThread(aioThread);
 
-void DirectEndpointConnector::stopWhileInAioThread()
-{
-    m_connections.clear();
+    for (auto& verificator: m_verificators)
+        verificator->bindToAioThread(aioThread);
 }
 
 int DirectEndpointConnector::getPriority() const
 {
-    //TODO #ak
+    // TODO: #ak
     return 0;
 }
 
@@ -74,6 +72,11 @@ void DirectEndpointConnector::setVerificationRequirement(bool value)
     s_needVerification = value;
 }
 
+void DirectEndpointConnector::stopWhileInAioThread()
+{
+    m_verificators.clear();
+}
+
 bool DirectEndpointConnector::s_needVerification(true);
 
 void DirectEndpointConnector::performEndpointVerification(
@@ -81,29 +84,11 @@ void DirectEndpointConnector::performEndpointVerification(
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
-    using namespace std::placeholders;
-
-    // Performing /api/moduleInformation HTTP requests since
-    //  currently only mediaserver can be on remote side
-    for (const SocketAddress& endpoint: endpoints)
-    {
-        NX_LOGX(lm("cross-nat %1. Starting connection to %2")
-            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
-
-        auto httpClient = nx_http::AsyncHttpClient::create();
-        httpClient->bindToAioThread(getAioThread());
-        httpClient->setSendTimeoutMs(timeout.count());
-        httpClient->setResponseReadTimeoutMs(timeout.count());
-        httpClient->setMessageBodyReadTimeoutMs(timeout.count());
-        m_connections.push_back(ConnectionContext{ endpoint, std::move(httpClient) });
-    }
-
     post(
-        [this, handler = std::move(handler)]() mutable
+        [this, endpoints, timeout, handler = std::move(handler)]() mutable
         {
-            if (m_connections.empty())
+            if (endpoints.empty())
             {
-                //reporting error
                 handler(
                     nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
                     SystemError::connectionReset,
@@ -112,69 +97,69 @@ void DirectEndpointConnector::performEndpointVerification(
             }
 
             m_completionHandler = std::move(handler);
-            for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
-            {
-                it->httpClient->doGet(
-                    QUrl(lit("http://%1/api/moduleInformation").arg(it->endpoint.toString())),
-                    std::bind(&DirectEndpointConnector::onHttpRequestDone, this, _1, it));
-            }
+
+            launchVerificators(endpoints, timeout);
         });
 }
 
-void DirectEndpointConnector::onHttpRequestDone(
-    nx_http::AsyncHttpClientPtr httpClient,
-    std::list<ConnectionContext>::iterator socketIter)
+void DirectEndpointConnector::launchVerificators(
+    const std::list<SocketAddress>& endpoints,
+    std::chrono::milliseconds timeout)
 {
-    auto connectionContext = std::move(*socketIter);
-    m_connections.erase(socketIter);
+    using namespace std::placeholders;
 
-    NX_LOGX(lm("cross-nat %1. Finished probing %2")
-        .arg(m_connectSessionId).str(httpClient->url()), cl_logDEBUG2);
-
-    if (httpClient->failed() &&
-        (httpClient->lastSysErrorCode() != SystemError::noError ||
-         httpClient->response() == nullptr))
+    for (const SocketAddress& endpoint: endpoints)
     {
-        NX_LOGX(lm("cross-nat %1. Http connect to %2 has failed: %3")
-            .arg(m_connectSessionId).arg(connectionContext.endpoint.toString())
-            .arg(SystemError::toString(httpClient->lastSysErrorCode())),
-            cl_logDEBUG2);
-        return reportErrorOnEndpointVerificationFailure(
-            nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-            httpClient->lastSysErrorCode());
-    }
+        NX_LOGX(lm("cross-nat %1. Verifying host %2")
+            .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
 
-    if (!nx_http::StatusCode::isSuccessCode(
-            httpClient->response()->statusLine.statusCode))
+        m_verificators.push_back(
+            EndpointVerificatorFactory::instance().create(m_connectSessionId));
+        m_verificators.back()->setTimeout(timeout);
+        m_verificators.back()->verifyHost(
+            endpoint,
+            m_targetHostAddress,
+            std::bind(&DirectEndpointConnector::onVerificationDone, this,
+                endpoint, --m_verificators.end(), _1));
+    }
+}
+
+void DirectEndpointConnector::onVerificationDone(
+    const SocketAddress& endpoint,
+    Verificators::iterator verificatorIter,
+    AbstractEndpointVerificator::VerificationResult verificationResult)
+{
+    auto verificator = std::move(*verificatorIter);
+    m_verificators.erase(verificatorIter);
+
+    switch (verificationResult)
     {
-        NX_LOGX(lm("cross-nat %1. Http request to %2 has failed: %3")
-            .arg(m_connectSessionId).arg(connectionContext.endpoint.toString())
-            .arg(nx_http::StatusCode::toString(
-                httpClient->response()->statusLine.statusCode)),
-            cl_logDEBUG2);
-        return reportErrorOnEndpointVerificationFailure(
-            nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure,
-            SystemError::noError);
-    }
+        case AbstractEndpointVerificator::VerificationResult::passed:
+            reportSuccessfulVerificationResult(
+                endpoint,
+                verificator->takeSocket());
+            break;
 
-    if (!verifyHostResponse(httpClient))
-    {
-        return reportErrorOnEndpointVerificationFailure(
-            nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure,
-            SystemError::noError);
-    }
+        case AbstractEndpointVerificator::VerificationResult::ioError:
+            return reportErrorOnEndpointVerificationFailure(
+                nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
+                verificator->lastSystemErrorCode());
+            break;
 
-    reportSuccessfulVerificationResult(
-        std::move(connectionContext.endpoint),
-        httpClient->takeSocket());
+        case AbstractEndpointVerificator::VerificationResult::notPassed:
+            return reportErrorOnEndpointVerificationFailure(
+                nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure,
+                SystemError::noError);
+            break;
+    }
 }
 
 void DirectEndpointConnector::reportErrorOnEndpointVerificationFailure(
     nx::hpm::api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
-    if (!m_connections.empty())
-        return; //waiting for completion of other connections
+    if (!m_verificators.empty())
+        return;
     auto handler = std::move(m_completionHandler);
     m_completionHandler = nullptr;
     return handler(
@@ -183,48 +168,14 @@ void DirectEndpointConnector::reportErrorOnEndpointVerificationFailure(
         nullptr);
 }
 
-bool DirectEndpointConnector::verifyHostResponse(
-    nx_http::AsyncHttpClientPtr httpClient)
-{
-    const auto contentType = nx_http::getHeaderValue(
-        httpClient->response()->headers, "Content-Type");
-    if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
-    {
-        NX_LOGX(lm("cross-nat %1. Received unexpected Content-Type %2 from %3")
-            .strs(m_connectSessionId, contentType, httpClient->url()), cl_logDEBUG2);
-        return false;
-    }
-
-    QnJsonRestResult restResult;
-    if (!QJson::deserialize(httpClient->fetchMessageBodyBuffer(), &restResult)
-        || restResult.error != QnRestResult::Error::NoError)
-    {
-        NX_LOGX(lm("cross-nat %1. Error response '%2' from %3")
-            .strs(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
-        return false;
-    }
-
-    QnModuleInformation moduleInformation;
-    if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
-        || !moduleInformation.cloudId().endsWith(m_targetHostAddress.host.toString()))
-    {
-        NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
-            .strs(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host),
-            cl_logDEBUG2);
-        return false;
-    }
-
-    return true;
-}
-
 void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
     NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
-        .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+        .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
 
-    m_connections.clear();
+    m_verificators.clear();
 
     auto tunnel =
         std::make_unique<DirectTcpEndpointTunnel>(

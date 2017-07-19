@@ -99,7 +99,7 @@ HRESULT        QnScreenGrabber::InitD3D(HWND hWnd)
 
     if((m_pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
     {
-        cl_log.log(QLatin1String("Unable to Create Direct3D "), cl_logERROR);
+        NX_ERROR(this, "Unable to Create Direct3D");
         return E_FAIL;
     }
 
@@ -107,12 +107,12 @@ HRESULT        QnScreenGrabber::InitD3D(HWND hWnd)
     m_monInfo.cbSize = sizeof(m_monInfo);
     if (!GetMonitorInfo(m_pD3D->GetAdapterMonitor(m_displayNumber), &m_monInfo))
     {
-        cl_log.log(QLatin1String("Unable to determine monitor position. Use default"), cl_logWARNING);
+        NX_WARNING(this, "Unable to determine monitor position. Use default");
     }
 
-    if(FAILED(m_pD3D->GetAdapterDisplayMode(m_displayNumber,&m_ddm)))
+    if (FAILED(m_pD3D->GetAdapterDisplayMode(m_displayNumber,&m_ddm)))
     {
-        cl_log.log(QLatin1String("Unable to Get Adapter Display Mode"), cl_logERROR);
+        NX_ERROR(this, "Unable to Get Adapter Display Mode");
         return E_FAIL;
     }
 
@@ -276,9 +276,9 @@ CaptureInfoPtr QnScreenGrabber::captureFrame()
         if (!m_pd3dDevice)
             return rez;
         HRESULT r = m_pd3dDevice->GetFrontBufferData(0, m_pSurface[m_currentIndex]);
-        if(r != D3D_OK)
+        if (r != D3D_OK)
         {
-            cl_log.log(QLatin1String("Unable to capture frame"), cl_logWARNING);
+            NX_WARNING(this, "Unable to capture frame");
             return rez;
         }
         if (m_captureCursor)
@@ -589,7 +589,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
                 m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
-            cl_log.log("CPU does not support SSE3!", cl_logERROR);
+            NX_ERROR(this, "CPU does not support SSE3!");
         }
 #endif
         sws_scale(m_scaleContext,
@@ -605,7 +605,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
                              pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
-            cl_log.log("CPU does not support SSE3!", cl_logERROR);
+            NX_ERROR(this, "CPU does not support SSE3!");
         }
     }
    return true;
@@ -663,4 +663,10 @@ void QnScreenGrabber::pleaseStop()
     QnMutexLocker lock( &m_guiWaitMutex );
     m_needStop = true;
     m_waitCond.wakeAll();
+}
+
+void QnScreenGrabber::restart()
+{
+    m_timer.restart();
+    m_needStop = false;
 }

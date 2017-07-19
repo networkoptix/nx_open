@@ -20,9 +20,9 @@
         <template>app</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_network -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-lldap -ldl -ltermcap</linux.oslibs>
+        <linux.oslibs>-lldap -ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
@@ -55,7 +55,7 @@
 
     <profiles>
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -64,27 +64,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <linux.oslibs>-ldl -lldap</linux.oslibs>
-                <rdep.linux.arm.packages>sasl2 openldap libcreateprocess</rdep.linux.arm.packages>
-                <rdep.linux.packages/>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>

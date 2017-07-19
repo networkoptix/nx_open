@@ -6,6 +6,7 @@
 
 #include <common/common_module_aware.h>
 
+#include <nx/core/core_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/singleton.h>
@@ -18,7 +19,6 @@
 
 class QSettings;
 class QnSessionManager;
-class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
@@ -31,10 +31,12 @@ class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
+class QnServerAdditionalAddressesDictionary;
 
-namespace ec2 {
-    class AbstractECConnection;
-}
+namespace nx { namespace vms { namespace event { class RuleManager; }}}
+
+namespace ec2 { class AbstractECConnection; }
+namespace nx { namespace vms { namespace discovery { class Manager; }}}
 
 struct BeforeRestoreDbData
 {
@@ -69,7 +71,9 @@ class QnCommonModule: public QObject, public QnInstanceStorage
 {
     Q_OBJECT
 public:
-    explicit QnCommonModule(bool clientMode, QObject *parent = nullptr);
+    explicit QnCommonModule(bool clientMode,
+        nx::core::access::Mode resourceAccessMode,
+        QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
     //using Singleton<QnCommonModule>::instance;
@@ -98,9 +102,9 @@ public:
         return m_globalSettings;
     }
 
-    QnModuleFinder* moduleFinder() const
+    nx::vms::discovery::Manager* moduleDiscoveryManager() const
     {
-        return m_moduleFinder;
+        return m_moduleDiscoveryManager;
     }
 
     QnCameraHistoryPool* cameraHistoryPool() const
@@ -133,6 +137,11 @@ public:
         return m_resourceStatusDictionary;
     }
 
+    QnServerAdditionalAddressesDictionary* serverAdditionalAddressesDictionary() const
+    {
+        return m_serverAdditionalAddressesDictionary;
+    }
+
     QnCameraUserAttributePool* cameraUserAttributesPool() const
     {
         return m_cameraUserAttributesPool;
@@ -150,13 +159,23 @@ public:
         return m_resourceDiscoveryManager;
     }
 
+    QnLayoutTourManager* layoutTourManager() const
+    {
+        return m_layoutTourManager;
+    }
+
+    nx::vms::event::RuleManager* eventRuleManager() const
+    {
+        return m_eventRuleManager;
+    }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;
 
-    void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
+    void setModuleGUID(const QnUuid& guid);
     QnUuid moduleGUID() const{ return m_uuid; }
 
     QnUuid runningInstanceGUID() const;
@@ -164,6 +183,9 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
+
+    QnUuid dbId() const;
+    void setDbId(const QnUuid& uuid);
 
     /*
     * This timestamp is using for database backup/restore operation.
@@ -228,8 +250,6 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /** instanceCounter used for unit test purpose only */
-    void setInstanceCounter(int value);
-    int instanceCounter() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -247,12 +267,13 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
-    QnModuleFinder* m_moduleFinder = nullptr;
+    nx::vms::discovery::Manager* m_moduleDiscoveryManager = nullptr;
     QnRouter* m_router = nullptr;
 
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
+    QnUuid m_dbId;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
@@ -278,10 +299,12 @@ private:
     QnMediaServerUserAttributesPool* m_mediaServerUserAttributesPool = nullptr;
     QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
+    QnServerAdditionalAddressesDictionary* m_serverAdditionalAddressesDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
+    QnLayoutTourManager* m_layoutTourManager = nullptr;
+    nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
 
     QnUuid m_videowallGuid;
-    int m_instanceCounter = 0;
 };

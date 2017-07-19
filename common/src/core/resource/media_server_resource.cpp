@@ -182,33 +182,33 @@ QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->additionalUrls(id);
+    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
-    qnServerAdditionalAddressesDictionary->setAdditionalUrls(id, urls);
+    commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    return qnServerAdditionalAddressesDictionary->additionalUrls(getId());
+    return commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->ignoredUrls(id);
+    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
-    qnServerAdditionalAddressesDictionary->setIgnoredUrls(id, urls);
+    commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
+    return commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
 
 boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
@@ -527,8 +527,11 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == resourcePool()->commonModule()->moduleGUID())
-        return resourcePool()->commonModule()->moduleInformation();
+    if (auto module = commonModule())
+    {
+        if (getId() == module->moduleGUID())
+            return module->moduleInformation();
+    }
 
     // build module information for other server
 
@@ -547,17 +550,28 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
             getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     }
 
-    const auto& settings = resourcePool()->commonModule()->globalSettings();
-    moduleInformation.localSystemId = settings->localSystemId();
-    moduleInformation.systemName = settings->systemName();
+    if (auto module = commonModule())
+    {
+        const auto& settings = module->globalSettings();
+        moduleInformation.localSystemId = settings->localSystemId();
+        moduleInformation.systemName = settings->systemName();
+        moduleInformation.cloudSystemId = settings->cloudSystemId();
+    }
+
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
     moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
-    moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
+}
+
+QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+{
+    QnModuleInformationWithAddresses information = getModuleInformation();
+    information.setEndpoints(getAllAvailableAddresses());
+    return information;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
@@ -632,15 +646,19 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
 
     if (auto pool = this->resourcePool())
     {
-        connect(pool, &QnResourcePool::resourceAdded,
-            this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+        if (getServerFlags() & Qn::SF_Edge)
+        {
+            // watch to own camera to change default server name
+            connect(pool, &QnResourcePool::resourceAdded,
+                this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
 
-        connect(pool, &QnResourcePool::resourceRemoved,
-            this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+            connect(pool, &QnResourcePool::resourceRemoved,
+                this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 
-        QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
-        if (!resList.isEmpty())
-            m_firstCamera = resList.first();
+            QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+            if (!resList.isEmpty())
+                m_firstCamera = resList.first();
+        }
 
         const auto& settings = pool->commonModule()->globalSettings();
         connect(settings, &QnGlobalSettings::cloudSettingsChanged,

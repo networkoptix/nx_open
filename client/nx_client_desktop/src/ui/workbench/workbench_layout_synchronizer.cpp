@@ -181,11 +181,10 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
         if(item == NULL)
             continue;
 
-        QnResourcePtr resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-        if(!resource) {
-            qnWarning("Item '%1' has no corresponding resource in the pool.", item->resourceUid());
+        QnResourcePtr resource = item->resource();
+        NX_ASSERT(resource);
+        if(!resource)
             continue;
-        }
 
         m_resource->updateItem(item->data());
     }
@@ -309,11 +308,10 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     if(!m_submit)
         return;
 
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-    if(!resource) {
-        qnWarning("Item '%1' that was added to layout has no corresponding resource in the pool.", item->resourceUid());
+    QnResourcePtr resource = item->resource();
+    NX_ASSERT(resource);
+    if (!resource)
         return;
-    }
 
     QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
     m_resource->addItem(item->data());

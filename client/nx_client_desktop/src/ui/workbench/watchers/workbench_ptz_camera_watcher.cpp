@@ -25,7 +25,7 @@ const QSet<QnVirtualCameraResourcePtr> &QnWorkbenchPtzCameraWatcher::ptzCameras(
 }
 
 void QnWorkbenchPtzCameraWatcher::addPtzCamera(const QnVirtualCameraResourcePtr &camera) {
-    if(m_ptzCameras.contains(camera))
+    if (m_ptzCameras.contains(camera))
         return;
 
     m_ptzCameras.insert(camera);
@@ -33,7 +33,7 @@ void QnWorkbenchPtzCameraWatcher::addPtzCamera(const QnVirtualCameraResourcePtr 
 }
 
 void QnWorkbenchPtzCameraWatcher::removePtzCamera(const QnVirtualCameraResourcePtr &camera) {
-    if(m_ptzCameras.remove(camera))
+    if (m_ptzCameras.remove(camera))
         emit ptzCameraRemoved(camera);
 }
 
@@ -42,7 +42,7 @@ void QnWorkbenchPtzCameraWatcher::removePtzCamera(const QnVirtualCameraResourceP
 // -------------------------------------------------------------------------- //
 void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    if (!camera)
         return;
 
     connect(camera.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(at_resource_ptzCapabilitiesChanged(const QnResourcePtr &)));
@@ -51,7 +51,7 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceAdded(const QnResource
 
 void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    if (!camera)
         return;
 
     disconnect(resource.data(), NULL, this, NULL);
@@ -60,11 +60,11 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResour
 
 void QnWorkbenchPtzCameraWatcher::at_resource_ptzCapabilitiesChanged(const QnResourcePtr &resource)
 {
-    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-        if(resource->getPtzCapabilities() != Qn::NoPtzCapabilities) {
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if (resource->getPtzCapabilities())
             addPtzCamera(camera);
-        } else {
+        else
             removePtzCamera(camera);
-        }
     }
 }

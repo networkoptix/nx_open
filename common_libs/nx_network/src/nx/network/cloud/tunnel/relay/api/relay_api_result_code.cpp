@@ -74,6 +74,24 @@ ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode)
     }
 }
 
+SystemError::ErrorCode toSystemError(ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case ResultCode::ok:
+            return SystemError::noError;
+
+        case ResultCode::timedOut:
+            return SystemError::timedOut;
+
+        case ResultCode::notFound:
+            return SystemError::hostNotFound;
+
+        default:
+            return SystemError::connectionReset;
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // Support of nx_http::FusionRequestResult
 
@@ -82,7 +100,6 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(api::ResultCode res
     if (resultCode == ResultCode::ok)
         return nx_http::FusionRequestResult();
 
-    //setting correct error class
     nx_http::FusionRequestErrorClass requestResultCode = nx_http::FusionRequestErrorClass::noError;
     switch (resultCode)
     {

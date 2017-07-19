@@ -29,7 +29,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
@@ -68,6 +68,8 @@ StreamReader::~StreamReader()
 {
     NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
+
+    m_videoPacket.reset();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -127,7 +129,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         m_multipartContentParser = std::make_unique<nx_http::MultipartContentParser>();
         auto jpgFrameHandleFunc = std::bind(&StreamReader::gotJpegFrame, this, _1);
         m_multipartContentParser->setNextFilter(
-            std::make_shared<nx::utils::bsf::CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
+            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
                 jpgFrameHandleFunc));
 
         const int result = doRequest( localHttpClientPtr.get() );

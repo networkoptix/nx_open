@@ -1,0 +1,395 @@
+#!/bin/sh
+#####################################################-*-mode:shell-script-*-
+##                                                                       ##
+##                     Carnegie Mellon University                        ##
+##                      Copyright (c) 2005-2006                          ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Author: Alan W Black (awb@cs.cmu.edu) Nov 2005                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Build a clustergen voice (sortof HMM-generation synthesis).          ##
+##                                                                       ##
+##  With no arguments is does (mostly) the right thing                   ##
+##                                                                       ##
+##  Its assumes there is already a labeled voice with a set of           ##
+##  utterances.  It naively believes it was labeled with ehmm and the    ##
+##  state names are available from that (and voicing information)        ##
+##                                                                       ##
+##                                                                       ##
+###########################################################################
+
+if [ ! "$ESTDIR" ]
+then
+   echo "environment variable ESTDIR is unset"
+   echo "set it to your local speech tools directory e.g."
+   echo '   bash$ export ESTDIR=/home/awb/projects/speech_tools/'
+   echo or
+   echo '   csh% setenv ESTDIR /home/awb/projects/speech_tools/'
+   exit 1
+fi
+
+if [ ! "$FESTVOXDIR" ]
+then
+   echo "environment variable FESTVOXDIR is unset"
+   echo "set it to your local festvox directory e.g."
+   echo '   bash$ export FESTVOXDIR=/home/awb/projects/festvox/'
+   echo or
+   echo '   csh% setenv FESTVOXDIR /home/awb/projects/festvox/'
+   exit 1
+fi
+
+if [ $# = 0 ]
+then
+
+   $0 f0
+   $0 mcep
+   $0 combine_coeffs
+
+   $0 generate_statenames
+
+   $0 cluster
+
+   $0 dur
+
+   exit 0
+fi
+
+if [ "$CLUSTERGENDIR" = "" ]
+then
+    export CLUSTERGENDIR=$FESTVOXDIR/src/clustergen
+fi
+
+if [ "$PROMPTFILE" = "" ]
+then
+   if [ $# = 2 ]
+   then
+      PROMPTFILE=$2
+   else
+      PROMPTFILE=etc/txt.done.data
+   fi
+fi
+
+. ./etc/voice.defs
+
+if [ $1 = "f0" ]
+then
+
+    if [ ! -f etc/f0.params ]    
+    then
+       ./bin/find_f0_stats $PROMPTFILE
+    fi
+    ./bin/make_f0_pm $PROMPTFILE
+
+    exit 0
+fi
+
+if [ $1 = "mcep2" ]
+then
+   # Historically this was called mcep2 so we'll just map that
+   $0 mcep
+fi
+
+if [ $1 = "mcep" ]
+then
+   ORDER=24
+
+   cat $PROMPTFILE |
+   awk '{print $2}' |
+   while read i
+   do
+      fname=$i
+      echo $fname MCEP
+      $FESTVOXDIR/src/vc/src/analysis/analysis -mcep -pow -order $ORDER -npowfile ttt.npow wav/$i.wav ttt.mcep
+      cat ttt.mcep |
+      perl $CLUSTERGENDIR/d2a.pl |
+      awk '{printf("%s ",$1); if ((NR%(1+'$ORDER')) == 0) printf("\n")}' |
+      $ESTDIR/bin/ch_track -itype ascii -otype est_binary -s 0.005 -o mcep/$i.mcep
+#      cat ttt.npow |
+#      perl $CLUSTERGENDIR/d2a.pl |
+#      awk '{printf("%s\n",$1);}' |
+#      $ESTDIR/bin/ch_track -itype ascii -otype est_binary -s 0.005 -o mcep/$i.npow
+      rm -f ttt.mcep
+   done
+   exit 0
+fi
+
+if [ $1 = "combine_coeffs" ]
+then
+   if [ ! -d ccoefs ]
+   then
+      mkdir ccoefs 
+   fi
+   cat $PROMPTFILE |
+   awk '{print $2}' |
+   while read i
+   do
+      fname=$i
+      echo $fname COMBINE_COEFFS
+      $ESTDIR/bin/ch_track -otype ascii f0/$fname.f0 |
+      awk '{if (NR == 1) { print $1; print $1} print $1}' >ttt.f0
+#      cp -p tempo/$fname.f0 ttt.f0
+      if [ -f ehmm/feat/$fname.vp ]
+      then 
+         sed 1d ehmm/feat/$fname.vp >ttt.vu
+      fi
+      $ESTDIR/bin/ch_track -otype ascii mcep/$fname.mcep |
+      awk '{if (NR == 1) { print $0; } print $0}' >ttt.mcep
+
+#      $ESTDIR/bin/ch_track -otype ascii lsp/$fname.lsp > ttt.mcep
+#      awk '{if (NR == 1) { print $0; } print $0}' >ttt.mcep
+
+#      $ESTDIR/bin/ch_track -otype ascii mcep/$fname.npow >ttt.npow
+#      paste ttt.f0 ttt.npow ttt.mcep |
+#      paste ttt.f0 ttt.vu ttt.mcep |
+      paste ttt.f0 ttt.mcep |
+      awk '{if (l==0) 
+              l=NF;
+            else if (l == NF)
+              print $0}' |
+      awk '{if (NR == -1) print $0; print $0}' |
+      $ESTDIR/bin/ch_track -itype ascii -otype est_binary -s 0.005 -o ccoefs/$fname.mcep
+      rm -f ttt.f0 ttt.mcep ttt.vu ttt.npow
+   done
+   exit 0
+fi
+
+if [ $1 = "combine_coeffs_psync" ]
+then
+   if [ ! -d ccoefs ]
+   then
+      mkdir ccoefs 
+   fi
+
+   cat $PROMPTFILE |
+   awk '{print $2}' |
+   while read i
+   do
+      fname=$i
+      echo $fname COMBINE_COEFFS_PSYNC
+
+      $ESTDIR/bin/ch_track -otype ascii f0/$fname.f0 |
+      awk '{if (NR == 1) { print $1; print $1;} print $1}' >ttt.f0
+
+      $ESTDIR/bin/ch_track -otype ascii mcep/$fname.mcep |
+      awk '{if (NR == 1) { print $0; } print $0}' >ttt.mcep
+
+      sed 's/)/ )/g' sts/$i.sts | 
+      awk '{if (NR == 1)
+            {
+                lpcmin = $5;
+                lpcrange = $5;
+            }
+            else
+            {
+               printf("%f ",$2);
+               printf("%d ",$21); # put frame size first
+               for (i=4; i<=19; i++)
+                  printf("%f ",$i);
+               for (i=23; i<=256+23; i++)
+                  if (i > NF)
+                     printf("%d ",0);
+                  else
+                     printf("%d ",$i);
+               printf("\n")
+            }}' >ttt.lpc
+
+      # need to get time in there and smooth F0 at each pitch mark
+      $ESTDIR/bin/ch_track -otype ascii f0/$fname.f0 |
+      awk '{if (NR == 1) { print $1; print $1;} print $1}' |
+      awk 'BEGIN {printf("{\n");}
+           {printf("f0[%d]=%f;\n",NR,$1);}
+           END {printf("}\n")}' >ttt.awk.f0
+      echo '{ printf("%f 1 %f\n",$1,f0[int($1/0.005)]); }' >>ttt.awk.f0
+
+      awk -f ttt.awk.f0 ttt.lpc >ttt.time
+
+      paste ttt.time ttt.mcep ttt.lpc |
+      awk '{if (l==0) 
+              l=NF;
+            else if (l == NF)
+              print $0}' >ttt.all
+      echo EST_File Track >ttt.est
+      echo DataType ascii >>ttt.est
+      echo NumFrames `cat ttt.all | wc -l` >>ttt.est
+      echo NumChannels `head -1 ttt.all | awk '{print NF-2}'` >>ttt.est
+      echo NumAuxChannels 0 >>ttt.est
+      echo EqualSpace 0 >>ttt.est
+      echo BreaksPresent true >>ttt.est
+      head -1 ttt.all | 
+      awk '{for (i=1; i<=NF-2; i++)
+             printf("Channel_%d track_%d\n",i-1,i-1)}' >>ttt.est
+      echo ByteOrder 01 >>ttt.est
+      echo "CommentChar ;" >>ttt.est
+      echo file_type 13 >>ttt.est
+      echo name $fname.ccoeffs >>ttt.est
+      echo EST_Header_End >>ttt.est
+      cat ttt.all >>ttt.est
+
+      $ESTDIR/bin/ch_track -otype est_binary ttt.est -o ccoefs/$fname.mcep
+
+      rm -f ttt.*
+   done
+   exit 0
+fi
+
+if [ $1 = "do_coeffs" ]
+then
+   $0 f0
+   $0 mcep
+   $0 combine_coeffs
+   exit 0
+fi
+
+if [ $1 = "generate_statenames" ]
+then
+    if [ ! -f etc/silence ]
+    then
+       $ESTDIR/../festival/bin/festival -b festvox/build_clunits.scm "(find_silence_name)"
+    fi
+    SILENCE=`awk '{print $1}' etc/silence`
+    if [ ! -f etc/statenames ]
+    then
+       # Its possible for statenames come from Janus or Sphinx labeling
+       # but default is to assume it comes from ehmm
+       # This should be generated by the ehmm process already
+       cat ehmm/etc/ph_list.int_log |
+       awk '{if (NF > 1)
+             {
+                printf("%s ",$1);
+                for (i=4; i<(4+$2-2); i++)
+                   printf("%s_%s ",$1,$i);
+                printf("\n");
+             }}' |
+       sed 's/ ssil/ '$SILENCE'/g' >etc/statenames
+    fi   
+    # Lisp level names for mapping phones to statenames
+    echo ";; Autogenerated file from EHMM state labels" >festvox/$FV_VOICENAME"_statenames.scm"
+    echo "(set! "$FV_VOICENAME"::phone_to_states '(" >>festvox/$FV_VOICENAME"_statenames.scm"
+    cat etc/statenames |
+    awk '{printf("    ( %s )\n",$0)}' >>festvox/$FV_VOICENAME"_statenames.scm"
+    echo "))" >>festvox/$FV_VOICENAME"_statenames.scm"
+    echo "(provide '"$FV_VOICENAME"_statenames)" >>festvox/$FV_VOICENAME"_statenames.scm"
+    # Wagon .desc file
+    cat etc/statenames |
+    awk '{for (i=2; i<=NF; i++)
+                printf("%s___",$i);
+          }' >festival/clunits/statenames
+    cat etc/statenames |
+    awk '{ printf("%s___",$1);
+          }' >festival/clunits/phonenames
+    if grep -q "state names" festival/clunits/mcep.desc
+    then 
+       mv festival/clunits/mcep.desc festival/clunits/mcep.desc-old
+    fi
+    if grep -q "state names" festival/clunits/mcep.desc-old
+    then
+       /bin/true
+    else
+       cp -p $FESTVOXDIR/src/clustergen/mcep.desc festival/clunits/mcep.desc-old
+    fi
+    cat festival/clunits/mcep.desc-old |
+    sed 's/state names/'`cat festival/clunits/statenames`'/' |
+    sed 's/phone names/'`cat festival/clunits/phonenames`'/' |
+    sed 's/___/ /g' >festival/clunits/mcep.desc
+
+    if [ -f festival/clunits/mceptraj.desc ]
+    then
+       mv festival/clunits/mceptraj.desc festival/clunits/mceptraj.desc-old
+       cat festival/clunits/mceptraj.desc-old |
+       sed 's/state names/'`cat festival/clunits/statenames`'/' |
+       sed 's/phone names/'`cat festival/clunits/phonenames`'/' |
+       sed 's/___/ /g' >festival/clunits/mceptraj.desc
+    fi
+
+    exit 0
+fi
+
+if [ $1 = "cluster" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 4000000  -b $CLUSTERGENDIR/clustergen_build.scm festvox/build_clunits.scm festvox/${FV_VOICENAME}_cg.scm '(build_clustergen "'$PROMPTFILE'")'
+   exit 0
+fi
+
+if [ $1 = "trajectory" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 4000000  -b $CLUSTERGENDIR/clustergen_build.scm '(set! cluster_feature_filename "mceptraj.desc")' festvox/build_clunits.scm festvox/${FV_VOICENAME}_cg.scm '(build_clustergen_traj "'$PROMPTFILE'")'
+   exit 0
+fi
+
+if [ $1 = "trajectory_ola" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 4000000  -b \
+      $CLUSTERGENDIR/clustergen_build.scm \
+      '(set! cluster_feature_filename "mceptraj.desc")' \
+      '(set! cg::trajectory_ola t)' \
+      festvox/build_clunits.scm festvox/${FV_VOICENAME}_cg.scm \
+      '(build_clustergen_traj "'$PROMPTFILE'")'
+   exit 0
+fi
+
+if [ $1 = "dur" ]
+then
+   ./bin/make_dur_model_mcep
+   cp -p festvox/$FV_VOICENAME"_dur.scm" festvox/$FV_VOICENAME"_durdata_cg.scm"
+   exit 0
+fi
+
+if [ $1 = "relabel" ]
+then
+   if [ ! -d rlab ]
+   then
+      mkdir rlab
+   fi
+   $ESTDIR/../festival/bin/festival --heap 4000000  -b $CLUSTERGENDIR/clustergen_build.scm festvox/build_clunits.scm festvox/${FV_VOICENAME}_cg.scm '(begin (voice_'${FV_VOICENAME}'_cg) (relabel_clustergen "'$PROMPTFILE'" "rlab") ) '
+   exit 0
+fi
+
+if [ $1 = "festvox_dist" ]
+then
+    echo CG "Make festvox voice distribution"
+    mkdir -p festival/lib/voices/
+    mkdir -p festival/lib/voices/${FV_LANG}
+    ln -s ../../../.. festival/lib/voices/${FV_LANG}/${FV_VOICENAME}_cg
+
+    tar zcvf festvox_${FV_VOICENAME}_cg.tar.gz \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/festival/trees/${FV_VOICENAME}_f0.tree \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/festival/trees/${FV_VOICENAME}_mcep.tree \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/festival/trees/${FV_VOICENAME}_mcep.params \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/festvox/*.scm \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/README \
+         festival/lib/voices/$FV_LANG/${FV_VOICENAME}_cg/COPYING
+    rm -rf festival/lib
+    exit 0
+fi
+
+echo do_clustergen: unknown options $*
+exit 1
+

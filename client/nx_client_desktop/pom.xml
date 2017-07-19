@@ -13,7 +13,7 @@
     <artifactId>nx_client_desktop</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness Client Library</name>
-   
+
     <properties>
         <guid>${nx_client_desktop.guid}</guid>
         <product.title>${client.name}</product.title>
@@ -23,7 +23,7 @@
         <targetName>client</targetName>
 
         <qt.libs>core gui gui-private widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lnx_client_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_audio -lappserver2 -lnx_client_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
@@ -32,8 +32,10 @@
         <buildLib>sharedlib</buildLib>
         <rdep.packages>openssl ffmpeg quazip festival any/festival-vox any/roboto-ttf any/roboto-mono-ttf any/help</rdep.packages>
         <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
-    </properties>   
-   
+
+        <additionalQrcPaths>${basedir}/skins/${defaultSkin}</additionalQrcPaths>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -51,15 +53,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
 
         <dependency>
@@ -106,7 +99,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>libvms_gateway</artifactId>
@@ -114,7 +107,7 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <profiles>

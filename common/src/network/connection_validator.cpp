@@ -15,6 +15,7 @@
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
 #include <common/common_module_aware.h>
+#include <nx/network/app_info.h>
 
 namespace {
 
@@ -42,6 +43,15 @@ bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile
 
     const QChar kSeparator = L'_';
     return c1.left(c1.indexOf(kSeparator)) == c2.left(c2.indexOf(kSeparator));
+}
+
+bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
+{
+    if (cloudHost.isEmpty())
+        return true;
+
+    return cloudHost == nx::network::AppInfo::defaultCloudHost()
+        || (isMobile && nx::network::AppInfo::compatibleCloudHosts().contains(cloudHost));
 }
 
 } // namespace
@@ -74,6 +84,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::LdapTemporaryUnauthorizedConnectionResult;
     else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
         return Qn::CloudTemporaryUnauthorizedConnectionResult;
+    else if (networkError == ec2::ErrorCode::disabled_user_unauthorized)
+        return Qn::DisabledUserConnectionResult;
     else if (networkError == ec2::ErrorCode::forbidden)
         return Qn::ForbiddenConnectionResult;
 
@@ -111,8 +123,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    //if (!cloudHost.isEmpty() && cloudHost != nx::network::AppInfo::defaultCloudHost())
-    //    return Qn::IncompatibleCloudHostConnectionResult;
+    if (!compatibleCloudHost(cloudHost, isMobile))
+        return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
         return Qn::IncompatibleVersionConnectionResult;

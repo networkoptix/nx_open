@@ -6,21 +6,23 @@
 
 #include <common/common_module_aware.h>
 
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_misc_data.h"
-#include "utils/db/db_helper.h"
-#include "transaction/transaction_log.h"
+#include <utils/db/db_helper.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/unused.h>
 #include <nx/utils/singleton.h>
-#include "nx/utils/type_utils.h"
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <nx/fusion/serialization/sql.h>
+
+#include <database/api/db_resource_api.h>
+
+#include "transaction/transaction.h"
+#include "transaction/transaction_log.h"
 
 struct BeforeRestoreDbData;
 
@@ -47,6 +49,7 @@ enum ApiObjectType
     ApiObject_Storage,
     ApiObject_WebPage,
 };
+
 struct ApiObjectInfo
 {
     ApiObjectInfo() {}
@@ -55,6 +58,7 @@ struct ApiObjectInfo
     ApiObjectType type;
     QnUuid id;
 };
+
 class ApiObjectInfoList: public std::vector<ApiObjectInfo>
 {
 public:
@@ -72,6 +76,7 @@ class QnDbManagerAccess;
 
 namespace detail
 {
+
     class QnDbManager
     :
         public QObject,
@@ -142,6 +147,18 @@ namespace detail
             return doQueryNoLock(t1, t2);
         }
 
+        template <class OutputData>
+        ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
+        {
+            QnWriteLocker lock(&m_mutex);
+            QSqlQuery query(m_sdb);
+            query.setForwardOnly(true);
+            if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
+                return ErrorCode::dbError;
+            QnSql::fetch_many(query, outputData);
+            return ErrorCode::ok;
+        }
+
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
@@ -169,11 +186,11 @@ namespace detail
 
         //!Reads settings (properties of user 'admin')
 
-        virtual QnDbTransaction* getTransaction() override;
-
         void setTransactionLog(QnTransactionLog* tranLog);
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
+        virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
+        ec2::database::api::QueryCache::Pool* queryCachePool();
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -568,7 +585,7 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
-    private:
+    public:
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
@@ -578,16 +595,41 @@ namespace detail
                 QnReadWriteLock& mutex)
                 :
                 QnDbTransaction(database, mutex),
-                m_tranLog(tranLog)
+                m_tranLog(tranLog),
+                m_lazyTranInProgress(false)
             {
             }
 
             virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
+
+            bool beginLazyTran();
+            bool commitLazyTran();
         private:
+            void physicalCommitLazyData();
+        private:
+            friend class QnLazyTransactionLocker;
+            friend class QnDbManager; //< Owner
+
             QnTransactionLog* m_tranLog;
+            bool m_lazyTranInProgress;
         };
+
+        class QnLazyTransactionLocker: public QnAbstractTransactionLocker
+        {
+        public:
+            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            virtual ~QnLazyTransactionLocker();
+            virtual bool commit() override;
+
+        private:
+            bool m_committed;
+            QnDbTransactionExt* m_tran;
+        };
+
+        virtual QnDbTransactionExt* getTransaction() override;
+    private:
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
@@ -651,6 +693,7 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -676,7 +719,15 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
+
+        ec2::database::api::QueryCache::Pool m_queryCachePool;
+        ec2::database::api::QueryCache m_insertCameraQuery;
+        ec2::database::api::QueryCache m_insertCameraUserAttrQuery;
+        ec2::database::api::QueryCache m_insertCameraScheduleQuery;
+        ec2::database::api::QueryCache m_insertKvPairQuery;
+        ec2::database::api::QueryContext m_resourceQueries;
     };
+
 } // namespace detail
 
 class QnDbManagerAccess
@@ -725,29 +776,7 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
-    {
-        const ErrorCode errorCode =
-            m_dbManager->readApiFullInfoDataForMobileClient(data, userId);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-
-        filterData(data->servers);
-        filterData(data->serversUserAttributesList);
-        filterData(data->cameras);
-        filterData(data->cameraUserAttributesList);
-        filterData(data->users);
-        filterData(data->userRoles);
-        filterData(data->userRoles);
-        filterData(data->accessRights);
-        filterData(data->layouts);
-        filterData(data->cameraHistory);
-        filterData(data->discoveryData);
-        filterData(data->allProperties);
-        filterData(data->resStatusList);
-
-        return ErrorCode::ok;
-    }
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

@@ -40,17 +40,25 @@ const double minPtzZoomRectSize = 0.08;
 
 const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
 
-Qt::Orientations capabilitiesToMode(Qn::PtzCapabilities capabilities)
+QVector3D truncate(QVector3D value)
+{
+    return QVector3D(
+        trunc(value.x() * 100) / 100.0,
+        trunc(value.y() * 100) / 100.0,
+        trunc(value.z() * 100) / 100.0);
+}
+
+Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
 {
     Qt::Orientations result = 0;
-    bool isFisheye = capabilities.testFlag(Qn::VirtualPtzCapability);
+    bool isFisheye = capabilities.testFlag(Ptz::VirtualPtzCapability);
     if (isFisheye)
         return result;
 
-    if (capabilities.testFlag(Qn::ContinuousPanCapability))
+    if (capabilities.testFlag(Ptz::ContinuousPanCapability))
         result |= Qt::Horizontal;
 
-    if (capabilities.testFlag(Qn::ContinuousTiltCapability))
+    if (capabilities.testFlag(Ptz::ContinuousTiltCapability))
         result |= Qt::Vertical;
 
     return result;
@@ -58,6 +66,83 @@ Qt::Orientations capabilitiesToMode(Qn::PtzCapabilities capabilities)
 
 } // namespace
 
+class PtzInstrument::MovementFilter: public QObject
+{
+    using base_type = QObject;
+
+public:
+    MovementFilter(
+        QnMediaResourceWidget* widget,
+        PtzInstrument* parent);
+
+    virtual ~MovementFilter();
+
+    void updateFilteringSpeed(const QVector3D& speed);
+
+    void stopMovement();
+
+private:
+    void setMovementSpeed(const QVector3D& speed);
+
+    void onTimeout();
+
+private:
+    PtzInstrument * const m_parent = nullptr;
+    QnMediaResourceWidget * const m_widget = nullptr;
+    QTimer m_filteringTimer;
+    QVector3D m_targetSpeed;
+    QVector3D m_filteringSpeed;
+};
+
+PtzInstrument::MovementFilter::MovementFilter(
+    QnMediaResourceWidget* widget,
+    PtzInstrument* parent)
+    :
+    m_parent(parent),
+    m_widget(widget)
+{
+    static constexpr int kFilteringTimerIntervalMs = 150;
+    m_filteringTimer.setInterval(kFilteringTimerIntervalMs);
+    connect(&m_filteringTimer, &QTimer::timeout, this, &MovementFilter::onTimeout);
+}
+
+PtzInstrument::MovementFilter::~MovementFilter()
+{
+    m_filteringTimer.stop();
+    setMovementSpeed(QVector3D(0, 0, 0));
+}
+
+void PtzInstrument::MovementFilter::onTimeout()
+{
+    setMovementSpeed(m_filteringSpeed);
+}
+
+void PtzInstrument::MovementFilter::stopMovement()
+{
+    updateFilteringSpeed(QVector3D());
+}
+
+void PtzInstrument::MovementFilter::updateFilteringSpeed(const QVector3D& speed)
+{
+    if (speed.isNull())
+        setMovementSpeed(m_filteringSpeed);
+
+    const auto truncatedSpeed = truncate(speed);
+    if (m_filteringSpeed == truncatedSpeed)
+        return;
+
+    m_filteringSpeed = truncatedSpeed;
+    m_filteringTimer.start(); // Restarts in case of it's started already
+}
+
+void PtzInstrument::MovementFilter::setMovementSpeed(const QVector3D& speed)
+{
+    if (speed == m_targetSpeed)
+        return;
+
+    m_targetSpeed = speed;
+    m_parent->ptzMove(m_widget, m_targetSpeed);
+}
 
 // -------------------------------------------------------------------------- //
 // PtzInstrument
@@ -128,7 +213,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     if (data.overlayWidget)
         return data.overlayWidget;
 
-    bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+    bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
     bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
@@ -207,20 +292,20 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         m_movement = ContinuousMovement;
 
         m_movementOrientations = 0;
-        if (data.hasCapabilities(Qn::ContinuousPanCapability))
+        if (data.hasCapabilities(Ptz::ContinuousPanCapability))
             m_movementOrientations |= Qt::Horizontal;
-        if (data.hasCapabilities(Qn::ContinuousTiltCapability))
+        if (data.hasCapabilities(Ptz::ContinuousTiltCapability))
             m_movementOrientations |= Qt::Vertical;
     }
     else
     {
-        if (data.hasCapabilities(Qn::VirtualPtzCapability
-            | Qn::AbsolutePtzCapabilities
-            | Qn::LogicalPositioningPtzCapability))
+        if (data.hasCapabilities(Ptz::VirtualPtzCapability
+            | Ptz::AbsolutePtzCapabilities
+            | Ptz::LogicalPositioningPtzCapability))
         {
             m_movement = VirtualMovement;
         }
-        else if (data.hasCapabilities(Qn::ViewportPtzCapability))
+        else if (data.hasCapabilities(Ptz::ViewportPtzCapability))
         {
             m_movement = ViewportMovement;
         }
@@ -297,14 +382,14 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 
         const PtzData& data = m_dataByWidget[widget];
 
-        const bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+        const bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
         const bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-        const bool canMove = data.hasCapabilities(Qn::ContinuousPanCapability)
-            || data.hasCapabilities(Qn::ContinuousTiltCapability);
-        const bool hasZoom = data.hasCapabilities(Qn::ContinuousZoomCapability);
-        const bool hasFocus = data.hasCapabilities(Qn::ContinuousFocusCapability);
-        const bool hasAutoFocus = data.traits.contains(Qn::ManualAutoFocusPtzTrait);
+        const bool canMove = data.hasCapabilities(Ptz::ContinuousPanCapability)
+            || data.hasCapabilities(Ptz::ContinuousTiltCapability);
+        const bool hasZoom = data.hasCapabilities(Ptz::ContinuousZoomCapability);
+        const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
+        const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
 
         overlayWidget->manipulatorWidget()->setVisible(canMove);
         overlayWidget->zoomInButton()->setVisible(hasZoom);
@@ -329,11 +414,11 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
 
-    Qn::PtzCapabilities capabilities = widget->ptzController()->getCapabilities();
+    Ptz::Capabilities capabilities = widget->ptzController()->getCapabilities();
     if (data.capabilities == capabilities)
         return;
 
-    if ((data.capabilities ^ capabilities) & Qn::AuxilaryPtzCapability)
+    if ((data.capabilities ^ capabilities) & Ptz::AuxilaryPtzCapability)
         updateTraits(widget);
 
     data.capabilities = capabilities;
@@ -404,7 +489,7 @@ void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
 {
-    widget->ptzController()->runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
+    widget->ptzController()->runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
 }
 
 void PtzInstrument::processPtzClick(const QPointF& pos)
@@ -647,6 +732,10 @@ void PtzInstrument::startDrag(DragInfo* /*info*/)
     {
         case ContinuousMovement:
         case VirtualMovement:
+            m_movementFilter.reset(target()->dewarpingParams().enabled
+                ? nullptr
+                : new MovementFilter(target(), this));
+
             targetManipulator()->setCursor(Qt::BlankCursor);
             target()->setCursor(Qt::BlankCursor);
 
@@ -706,8 +795,12 @@ void PtzInstrument::dragMove(DragInfo* info)
                 elementsWidget()->mapFromItem(target(), mouseItemPos));
             arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
-            ptzMove(target(), QVector3D(speed));
-            break;
+            if (m_movementFilter)
+                m_movementFilter->updateFilteringSpeed(QVector3D(speed));
+            else
+                ptzMove(target(), QVector3D(speed));
+
+             break;
         }
 
         case ViewportMovement:
@@ -794,7 +887,10 @@ void PtzInstrument::finishDragProcess(DragInfo* info)
         switch (m_movement)
         {
             case ContinuousMovement:
-                ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
+                if (m_movementFilter)
+                    m_movementFilter->stopMovement();
+                else
+                    ptzMove(target(), QVector3D(0, 0, 0));
                 break;
 
             case ViewportMovement:
@@ -922,7 +1018,7 @@ void PtzInstrument::at_focusAutoButton_clicked()
         focusAuto(widget);
 }
 
-bool PtzInstrument::PtzData::hasCapabilities(Qn::PtzCapabilities value) const
+bool PtzInstrument::PtzData::hasCapabilities(Ptz::Capabilities value) const
 {
     return (capabilities & value) == value;
 }

@@ -7,58 +7,98 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
+#include <QtCore/QtDebug>
 #include <QtCore/QUrl>
-#include <QtNetwork/QAbstractSocket>
+
+// ------------------------------------------------------------------------------------------------
+// General.
 
 template<typename T>
-QString toStringSfinae(const T& t, decltype(&T::toString))
+QString toStringSfinae(const T& value, decltype(&T::toString))
 {
-    return t.toString();
+    return value.toString();
 }
 
 template<typename T>
-QString toStringSfinae(const T& t, ...)
+QString toStringSfinae(const T& value, ...)
 {
-    return QString(QLatin1String("%1")).arg(t);
+    QString result;
+    QDebug d(&result);
+    d.noquote().nospace() << value;
+    return result;
 }
 
 template<typename T>
-QString toString(const T& t)
+QString toString(const T& value)
 {
-    return toStringSfinae(t, 0);
+    return toStringSfinae(value, 0);
 }
 
-NX_UTILS_API QString toString(const char* s);
-NX_UTILS_API QString toString(void* p);
-NX_UTILS_API QString toString(const QByteArray& t);
-NX_UTILS_API QString toString(const QUrl& url);
-NX_UTILS_API QString toString(const std::string& t);
+NX_UTILS_API QString toString(char value);
+NX_UTILS_API QString toString(wchar_t value);
+NX_UTILS_API QString toString(const char* value);
+NX_UTILS_API QString toString(const wchar_t* value);
+NX_UTILS_API QString toString(const std::string& value);
+NX_UTILS_API QString toString(const std::wstring& value);
 
-NX_UTILS_API QString toString(const std::chrono::hours& t);
-NX_UTILS_API QString toString(const std::chrono::minutes& t);
-NX_UTILS_API QString toString(const std::chrono::seconds& t);
-NX_UTILS_API QString toString(const std::chrono::milliseconds& t);
-NX_UTILS_API QString toString(QAbstractSocket::SocketError error);
- 
+NX_UTILS_API QString toString(const QChar& value);
+NX_UTILS_API QString toString(const QByteArray& value);
+NX_UTILS_API QString toString(const QUrl& value);
+
+NX_UTILS_API QString toString(const std::chrono::hours& value);
+NX_UTILS_API QString toString(const std::chrono::minutes& value);
+NX_UTILS_API QString toString(const std::chrono::seconds& value);
+NX_UTILS_API QString toString(const std::chrono::milliseconds& value);
+NX_UTILS_API QString toString(const std::chrono::microseconds& value);
+
+// ------------------------------------------------------------------------------------------------
+// Pointers.
+
+NX_UTILS_API QString toString(const std::type_info& value);
+NX_UTILS_API QString demangleTypeName(const char* type);
+NX_UTILS_API QString pointerTypeName(const void* /*p*/);
+
 template<typename T>
-QString toString(const std::unique_ptr<T>& p)
+QString pointerTypeName(const T* /*p*/)
 {
-    return toString((void*) p.get());
+    return toString(typeid(T));
 }
 
 template<typename T>
-QString toString(const std::shared_ptr<T>& p)
+QString toString(const T* value)
 {
-    return toString((void*) p.get());
+    return QString(QLatin1String("%1(0x%2)"))
+        .arg(pointerTypeName(value)).arg(reinterpret_cast<qulonglong>(value), 0, 16);
 }
 
 template<typename T>
-QString toString(const boost::optional<T>& t)
+QString toString(T* value)
 {
-    if (t)
-        return toString(t.get());
+    return toString((const T*) value);
+}
+
+template<typename T>
+QString toString(const std::unique_ptr<T>& value)
+{
+    return toString(value.get());
+}
+
+template<typename T>
+QString toString(const std::shared_ptr<T>& value)
+{
+    return toString(value.get());
+}
+
+// ------------------------------------------------------------------------------------------------
+// Templates.
+
+template<typename T>
+QString toString(const boost::optional<T>& value)
+{
+    if (value)
+        return toString(value.get());
     else
-        return QLatin1String("boost::none");
+        return QLatin1String("none");
 }
 
 template<typename First, typename Second>

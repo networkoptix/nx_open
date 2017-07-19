@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
@@ -24,6 +25,10 @@ struct ListeningPeer
 {
     int recommendedPreemptiveConnectionCount;
     int maxPreemptiveConnectionCount;
+    std::chrono::milliseconds disconnectedPeerTimeout;
+    std::chrono::milliseconds takeIdleConnectionTimeout;
+    std::chrono::milliseconds internalTimerPeriod;
+    KeepAliveOptions tcpKeepAlive;
 
     ListeningPeer();
 };

@@ -12,29 +12,34 @@
 namespace nx {
 namespace stun {
 
-typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+using MessagePipeline = nx::network::server::BaseStreamProtocolConnectionEmbeddable<
     Message,
     MessageParser,
-    MessageSerializer> MessagePipeline;
+    MessageSerializer>;
 
 /**
- * Connects to STUN server, sends requests, receives responses and indications
+ * Connects to STUN server, sends requests, receives responses and indications.
  */
 class NX_NETWORK_API AsyncClient:
     public AbstractAsyncClient,
-    public StreamConnectionHolder<MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<MessagePipeline>
 {
 public:
-    typedef MessagePipeline BaseConnectionType;
-    typedef BaseConnectionType ConnectionType;
-    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
+    using BaseConnectionType = MessagePipeline;
+    using ConnectionType = BaseConnectionType;
+    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
     AsyncClient(Settings timeouts = Settings());
-    virtual ~AsyncClient() override;
+    /**
+     * @param tcpConnection Already-established connection to the target server.
+     */
+    AsyncClient(
+        std::unique_ptr<AbstractStreamSocket> tcpConnection,
+        Settings timeouts = Settings());
+
+    AsyncClient(const AsyncClient&) = delete;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
-
-    Q_DISABLE_COPY( AsyncClient );
 
     virtual void connect(
         SocketAddress endpoint,
@@ -42,10 +47,10 @@ public:
         ConnectHandler completionHandler = nullptr) override;
 
     virtual bool setIndicationHandler(
-        int method, IndicationHandler handler, void* client = 0) override;
+        int method, IndicationHandler handler, void* client = nullptr) override;
     
-    virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
-    virtual void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
+    virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = nullptr) override;
+    virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
     virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
     
@@ -73,6 +78,7 @@ private:
 
     void dispatchRequestsInQueue(const QnMutexLockerBase* lock);
     void onConnectionComplete(SystemError::ErrorCode code);
+    void initializeMessagePipeline(std::unique_ptr<AbstractStreamSocket> connection);
     void processMessage(Message message );
 
     typedef std::map<void*, std::unique_ptr<network::aio::Timer>> ConnectionTimers;
@@ -105,5 +111,5 @@ private:
     const char* toString(State state) const;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

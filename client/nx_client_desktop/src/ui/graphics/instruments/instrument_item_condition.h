@@ -1,5 +1,4 @@
-#ifndef QN_INSTRUMENT_ITEM_CONDITION_H
-#define QN_INSTRUMENT_ITEM_CONDITION_H
+#pragma once
 
 #include <functional>
 
@@ -23,37 +22,21 @@ public:
     virtual bool operator()(QGraphicsItem *item, Instrument *instrument) const = 0;
 };
 
-
-/**
- * Instrument item condition that adapts the given functor.
- * 
- * \tparam Functor                      Functor to adapt.
- * \tparam argc                         Number of arguments that the functor accepts.
- *                                      Valid values are 1 and 2.
- */
-template<class Functor, int argc = 1>
-class InstrumentItemConditionAdaptor: public InstrumentItemCondition {
+class InstrumentItemConditionAdaptor: public InstrumentItemCondition
+{
 public:
-    InstrumentItemConditionAdaptor(const Functor &functor = Functor()): m_functor(functor) {}
+    using Func1 = std::function<bool(QGraphicsItem* item)>;
 
-    virtual bool operator()(QGraphicsItem *item, Instrument *instrument) const override {
-        return invoke(item, instrument, Dummy<argc>());
+    InstrumentItemConditionAdaptor(Func1 functor):
+        m_func1(functor)
+    {
+    }
+
+    virtual bool operator()(QGraphicsItem* item, Instrument* /*instrument*/) const override
+    {
+        return m_func1(item);
     }
 
 private:
-    template<int> struct Dummy {};
-
-    bool invoke(QGraphicsItem *item, Instrument *, const Dummy<1> &) const {
-        return m_functor(item);
-    }
-
-    bool invoke(QGraphicsItem *item, Instrument *instrument, const Dummy<2> &) const {
-        return m_functor(item, instrument);
-    }
-
-private:
-    Functor m_functor;
+    Func1 m_func1;
 };
-
-
-#endif // QN_INSTRUMENT_ITEM_CONDITION_H

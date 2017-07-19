@@ -21,25 +21,24 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
     return m_delegatee->acceptAsync(
         [this, handler = std::move(handler)](
             SystemError::ErrorCode sysErrorCode,
-            AbstractStreamSocket* streamSocket) mutable
+            std::unique_ptr<AbstractStreamSocket> streamSocket) mutable
         {
-            onAcceptCompletion(std::move(handler), sysErrorCode, streamSocket);
+            onAcceptCompletion(
+                std::move(handler),
+                sysErrorCode,
+                std::move(streamSocket));
         });
 }
 
 void StreamServerSocket::onAcceptCompletion(
     AcceptCompletionHandler handler,
     SystemError::ErrorCode sysErrorCode,
-    AbstractStreamSocket* streamSocket)
+    std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
     if (streamSocket)
-    {
-        streamSocket = new StreamSocket(
-            std::unique_ptr<AbstractStreamSocket>(streamSocket),
-            true);
-    }
+        streamSocket = std::make_unique<StreamSocket>(std::move(streamSocket), true);
 
-    handler(sysErrorCode, streamSocket);
+    handler(sysErrorCode, std::move(streamSocket));
 }
 
 } // namespace ssl

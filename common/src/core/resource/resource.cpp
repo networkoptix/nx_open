@@ -32,6 +32,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
 
+#include <nx/utils/log/assert.h>
+
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
 
@@ -183,7 +185,6 @@ QnResource::QnResource(QnCommonModule* commonModule):
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_removedFromPool(false),
     m_initInProgress(false),
     m_commonModule(commonModule)
 {
@@ -207,7 +208,6 @@ QnResource::QnResource(const QnResource& right)
     m_lastMediaIssue(right.m_lastMediaIssue),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_removedFromPool(right.m_removedFromPool),
     m_initInProgress(right.m_initInProgress),
     m_commonModule(right.m_commonModule)
 {
@@ -609,9 +609,6 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
         }
     }
 
-    if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
-        init();
-
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
@@ -630,7 +627,11 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (newStatus == Qn::NotDefined)
         return;
 
-    if (m_removedFromPool)
+    if (hasFlags(Qn::removed))
+        return;
+
+    NX_ASSERT(commonModule());
+    if (!commonModule())
         return;
 
     QnUuid id = getId();
@@ -796,8 +797,8 @@ QnAbstractPtzController *QnResource::createPtzController()
         return result;
 
     /* Do some sanity checking. */
-    Qn::PtzCapabilities capabilities = result->getCapabilities();
-    if((capabilities & Qn::LogicalPositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+    Ptz::Capabilities capabilities = result->getCapabilities();
+    if((capabilities & Ptz::LogicalPositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
     {
         auto message =
             lit("Logical position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
@@ -808,7 +809,7 @@ QnAbstractPtzController *QnResource::createPtzController()
         NX_LOG(message, cl_logWARNING);
     }
 
-    if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+    if((capabilities & Ptz::DevicePositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
     {
         auto message =
             lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
@@ -1197,31 +1198,25 @@ void QnResource::setUniqId(const QString& value)
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 
-Qn::PtzCapabilities QnResource::getPtzCapabilities() const
+Ptz::Capabilities QnResource::getPtzCapabilities() const
 {
-    return Qn::PtzCapabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+    return Ptz::Capabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
 }
 
-bool QnResource::hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const
+bool QnResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
 {
     return getPtzCapabilities() & capabilities;
 }
 
-void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities)
+void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities)
 {
     if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
         setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
 }
 
-void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value)
+void QnResource::setPtzCapability(Ptz::Capabilities capability, bool value)
 {
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
-}
-
-void QnResource::setRemovedFromPool(bool value)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_removedFromPool = value;
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

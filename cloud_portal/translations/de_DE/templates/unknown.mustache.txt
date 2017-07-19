@@ -1,0 +1,6 @@
+Neue Nachricht
+
+Typ: {{message.type}}
+Daten: {{{message.data}}}
+
+Es gibt keine spezielle Vorlage für diese Art von Nachricht

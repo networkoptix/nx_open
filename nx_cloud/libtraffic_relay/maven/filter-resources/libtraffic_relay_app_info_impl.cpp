@@ -3,12 +3,20 @@
 //
 #include <libtraffic_relay_app_info.h>
 
-QString TrafficRelayAppInfo::applicationName()
+namespace nx {
+namespace cloud {
+namespace relay {
+
+QString AppInfo::applicationName()
 {
     return QStringLiteral("${product.title}");
 }
 
-QString TrafficRelayAppInfo::applicationDisplayName()
+QString AppInfo::applicationDisplayName()
 {
     return QStringLiteral("${product.display.title}");
 }
+
+} // namespace relay
+} // namespace cloud
+} // namespace nx

@@ -11,7 +11,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_controller_pool.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
@@ -25,6 +25,7 @@ namespace {
 
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResourceIdParam = lit("resourceId");
+static const QStringList kCameraIdParams{kCameraIdParam, kDeprecatedResourceIdParam};
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
@@ -146,6 +147,11 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
+QStringList QnPtzRestHandler::cameraIdUrlParams() const
+{
+    return kCameraIdParams;
+}
+
 int QnPtzRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
@@ -171,10 +177,7 @@ int QnPtzRestHandler::executePost(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        processor->owner()->resourcePool(),
-        &notFoundCameraId,
-        params,
-        {kCameraIdParam, kDeprecatedResourceIdParam});
+        processor->owner()->resourcePool(), &notFoundCameraId, params, kCameraIdParams);
     if (!camera)
     {
         QString errStr;

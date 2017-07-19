@@ -1,23 +1,30 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <QtGui/QPainter>
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/customization/customized.h>
+
 class QnCameraThumbnailManager;
+class QnBusyIndicator;
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 
-class LayoutPreviewPainter: public QObject
+class LayoutPreviewPainter: public Customized<QObject>
 {
     Q_OBJECT
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
+    Q_PROPERTY(QColor itemBackgroundColor READ itemBackgroundColor WRITE setItemBackgroundColor)
+    Q_PROPERTY(QColor fontColor READ fontColor WRITE setFontColor)
 
-    using base_type = QObject;
+    using base_type = Customized<QObject>;
 
 public:
     LayoutPreviewPainter(QnCameraThumbnailManager* thumbnailManager, QObject* parent = nullptr);
@@ -32,10 +39,28 @@ public:
     QColor backgroundColor() const;
     void setBackgroundColor(const QColor& value);
 
+    QColor itemBackgroundColor() const;
+    void setItemBackgroundColor(const QColor& value);
+
+    QColor fontColor() const;
+    void setFontColor(const QColor& value);
+
     void paint(QPainter* painter, const QRect& paintRect);
 
 private:
-    bool paintItem(QPainter* painter, const QRectF& itemRect, const QnLayoutItemData& item);
+    struct ThumbnailInfo
+    {
+        ThumbnailInfo();
+        ThumbnailInfo(const QPixmap& pixmap);
+        ThumbnailInfo(Qn::ThumbnailStatus status, bool ignoreTrasformation, const QPixmap& pixmap);
+
+        Qn::ThumbnailStatus status;
+        bool ignoreTrasformation;
+        QPixmap pixmap;
+    };
+
+    ThumbnailInfo thumbnailForItem(const QnLayoutItemData& item) const;
+    void paintItem(QPainter* painter, const QRectF& itemRect, const QnLayoutItemData& item);
 
 private:
     QnLayoutResourcePtr m_layout;
@@ -45,6 +70,9 @@ private:
 
     QColor m_frameColor;
     QColor m_backgroundColor;
+    QColor m_itemBackgroundColor;
+    QColor m_fontColor;
+    QScopedPointer<QnBusyIndicator> m_busyIndicator;
 };
 
 } // namespace ui

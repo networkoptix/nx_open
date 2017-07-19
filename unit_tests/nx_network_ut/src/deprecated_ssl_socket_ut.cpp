@@ -12,18 +12,18 @@ namespace test {
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, DeprecatedSslFreeTcpSockets,
-    [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), true); },
+    [](){ return std::make_unique<deprecated::SslServerSocket>(std::make_unique<TCPServerSocket>(AF_INET), true); },
     [](){ return std::make_unique<TCPSocket>(AF_INET); });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, DeprecatedSslEnabledTcpSockets,
-    [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), true); },
-    [](){ return std::make_unique<deprecated::SslSocket>(new TCPSocket(AF_INET), false); });
+    [](){ return std::make_unique<deprecated::SslServerSocket>(std::make_unique<TCPServerSocket>(AF_INET), true); },
+    [](){ return std::make_unique<deprecated::SslSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, DeprecatedSslEnforcedTcpSockets,
-    [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), false); },
-    [](){ return std::make_unique<deprecated::SslSocket>(new TCPSocket(AF_INET), false); });
+    [](){ return std::make_unique<deprecated::SslServerSocket>(std::make_unique<TCPServerSocket>(AF_INET), false); },
+    [](){ return std::make_unique<deprecated::SslSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
 
 } // namespace test
 } // namespace deprecated

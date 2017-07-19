@@ -8,6 +8,7 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
+#include <nx/network/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
@@ -18,7 +19,6 @@
 #include <core/resource/camera_resource.h>
 
 #include <media_server/settings.h>
-#include <streaming/hls/hls_types.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
@@ -473,6 +473,8 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
 void QnVideoCamera::startLiveCacheIfNeeded()
 {
+    using namespace std::chrono;
+
     QnMutexLocker lock(&m_getReaderMutex);
 
     if (!isSomeActivity())
@@ -485,9 +487,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                qnServerModule->roSettings()->value(
-                    nx_ms_conf::HLS_TARGET_DURATION_MS,
-                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -498,9 +498,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                qnServerModule->roSettings()->value(
-                    nx_ms_conf::HLS_TARGET_DURATION_MS,
-                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
         }
     }
 }

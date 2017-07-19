@@ -8,44 +8,33 @@
 
 namespace nx_http {
 
-class HttpStreamSocketServer:
-    public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
+class NX_NETWORK_API HttpStreamSocketServer:
+    public nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
 {
-    typedef StreamSocketServer<HttpStreamSocketServer, HttpServerConnection> base_type;
+    using base_type =
+        nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>;
 
 public:
-    typedef HttpServerConnection ConnectionType;
+    using ConnectionType = HttpServerConnection;
 
+    template<typename ... StreamServerArgs>
     HttpStreamSocketServer(
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,
         nx_http::AbstractMessageDispatcher* const httpMessageDispatcher,
-        bool sslRequired,
-        nx::network::NatTraversalSupport natTraversalSupport)
-	:
-		base_type(sslRequired, natTraversalSupport),
-		m_authenticationManager(authenticationManager),
-		m_httpMessageDispatcher(httpMessageDispatcher),
+        StreamServerArgs... streamServerArgs)
+        :
+        base_type(std::move(streamServerArgs)...),
+        m_authenticationManager(authenticationManager),
+        m_httpMessageDispatcher(httpMessageDispatcher),
         m_persistentConnectionEnabled(true)
-	{
-	}
-
-    void setPersistentConnectionEnabled(bool value)
     {
-        m_persistentConnectionEnabled = value;
     }
+
+    void setPersistentConnectionEnabled(bool value);
 
 protected:
     virtual std::shared_ptr<HttpServerConnection> createConnection(
-        std::unique_ptr<AbstractStreamSocket> _socket) override
-	{
-		auto result = std::make_shared<HttpServerConnection>(
-			this,
-			std::move(_socket),
-			m_authenticationManager,
-			m_httpMessageDispatcher);
-        result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
-        return result;
-	}
+        std::unique_ptr<AbstractStreamSocket> _socket) override;
 
 private:
     nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;

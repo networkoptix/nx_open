@@ -16,13 +16,14 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include <cdb/connection.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/cloud/cdb/api/connection.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
+#include "cloud_user_info_pool.h"
 
 class CloudConnectionManager;
 
@@ -55,6 +56,11 @@ public:
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
 
+    const CloudUserInfoPool& cloudUserInfoPool() const;
+
+protected:
+    static nx::Buffer generateNonceTrailer(std::function<short()> genFunc);
+
 private:
     struct NonceCtx
     {
@@ -78,6 +84,7 @@ private:
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
     nx::utils::TimerManager* m_timerManager;
+    CloudUserInfoPool m_cloudUserInfoPool;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
@@ -86,4 +93,5 @@ private:
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
     void cloudBindingStatusChanged(bool boundToCloud);
+    nx::Buffer generateNonceTrailer();
 };

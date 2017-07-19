@@ -1,7 +1,7 @@
 #include "audit_log_rest_handler.h"
 
 #include <common/common_module.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include "api/model/audit/audit_record.h"
 #include <database/server_db.h>
 #include "recording/time_period.h"
@@ -9,6 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
 #include <rest/server/rest_connection_processor.h>
+#include <nx/utils/string.h>
 
 int QnAuditLogRestHandler::executeGet(
     const QString& path,

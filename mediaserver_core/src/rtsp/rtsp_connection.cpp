@@ -23,7 +23,7 @@ extern "C"
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
 
 #include <network/tcp_connection_priv.h>
@@ -48,7 +48,7 @@ extern "C"
 #include <network/authenticate_helper.h>
 #include <media_server/settings.h>
 #include <nx/fusion/model_functions.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <audit/audit_manager.h>
 #include <media_server/settings.h>
 #include <streaming/streaming_params.h>
@@ -256,8 +256,8 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->commonModule())
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
 {
 }
 
@@ -1119,8 +1119,8 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
-
-            if (cameraRes->hasDualStreaming2())
+            int fps = d->liveDpHi->getLiveParams().fps;
+            if (cameraRes->hasDualStreaming2() && cameraRes->isEnoughFpsToRunSecondStream(fps))
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
         }
         if (d->liveDpLow) {

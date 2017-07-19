@@ -7,7 +7,7 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 #include "motion/motion_helper.h"
 

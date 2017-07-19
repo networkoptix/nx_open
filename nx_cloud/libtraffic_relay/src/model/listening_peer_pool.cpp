@@ -2,15 +2,22 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/time.h>
+
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {
 namespace relay {
 namespace model {
 
-ListeningPeerPool::ListeningPeerPool():
+ListeningPeerPool::ListeningPeerPool(const conf::Settings& settings):
+    m_settings(settings),
     m_terminated(false)
 {
+    m_periodicTasksTimer.start(
+        m_settings.listeningPeer().internalTimerPeriod,
+        std::bind(&ListeningPeerPool::doPeriodicTasks, this));
 }
 
 ListeningPeerPool::~ListeningPeerPool()
@@ -18,14 +25,18 @@ ListeningPeerPool::~ListeningPeerPool()
     m_apiCallCounter.wait();
 
     m_unsuccessfulResultReporter.pleaseStopSync();
+    m_periodicTasksTimer.pleaseStopSync();
 
     {
         QnMutexLocker lock(&m_mutex);
         m_terminated = true;
     }
 
-    for (auto& connectionContext: m_peerNameToConnection)
-        connectionContext.second.connection->pleaseStopSync();
+    for (auto& peerContext: m_peers)
+    {
+        for (auto& connectionContext: peerContext.second.connections)
+            connectionContext->connection->pleaseStopSync();
+    }
 }
 
 void ListeningPeerPool::addConnection(
@@ -35,25 +46,79 @@ void ListeningPeerPool::addConnection(
     auto peerName = utils::reverseWords(peerNameOriginal, ".");
 
     QnMutexLocker lock(&m_mutex);
-    ConnectionContext connectionContext;
-    connectionContext.connection = std::move(connection);
-    auto it = m_peerNameToConnection.emplace(
-        std::move(peerName), std::move(connectionContext));
-    monitoringConnectionForClosure(it->first, &it->second);
+
+    processExpirationTimers(lock);
+
+    PeerContext& peerContext = m_peers[peerName];
+
+    if (peerContext.expirationTimer)
+    {
+        m_peerExpirationTimers.erase(*peerContext.expirationTimer);
+        peerContext.expirationTimer = boost::none;
+    }
+
+    if (!connection->setKeepAlive(m_settings.listeningPeer().tcpKeepAlive))
+    {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        NX_DEBUG(this, lm("Could not enable keep alive on connection from host %1 (%2). %3")
+            .arg(peerName).arg(connection->getForeignAddress())
+            .arg(SystemError::toString(sysErrorCode)));
+    }
+    
+    auto connectionContext = std::make_unique<ConnectionContext>();
+    connectionContext->connection = std::move(connection);
+
+    if (!peerContext.takeConnectionRequestQueue.empty())
+    {
+        NX_ASSERT(peerContext.connections.empty());
+
+        auto awaitContext = std::move(peerContext.takeConnectionRequestQueue.front());
+        peerContext.takeConnectionRequestQueue.pop_front();
+
+        m_takeIdleConnectionRequestTimers.erase(awaitContext.expirationTimerIter);
+
+        startPeerExpirationTimer(lock, peerName, &peerContext);
+
+        giveAwayConnection(
+            std::move(connectionContext),
+            std::move(awaitContext.handler));
+    }
+    else
+    {
+        peerContext.connections.push_back(std::move(connectionContext));
+        monitoringConnectionForClosure(peerName, peerContext.connections.back().get());
+    }
 }
 
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
     const std::string& peerNameOriginal) const
 {
+    const auto peerName = utils::reverseWords(peerNameOriginal, ".");
+
+    QnMutexLocker lock(&m_mutex);
+
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
+
+    // Returning total number of connections of all matching peers.
+
+    std::size_t totalConnectionCount = 0;
+    auto iterRange = nx::utils::equalRangeByPrefix(m_peers, peerName);
+    for (auto it = iterRange.first; it != iterRange.second; ++it)
+        totalConnectionCount += it->second.connections.size();
+
+    return totalConnectionCount;
+}
+
+bool ListeningPeerPool::isPeerOnline(const std::string& peerNameOriginal) const
+{
     auto peerName = utils::reverseWords(peerNameOriginal, ".");
 
     QnMutexLocker lock(&m_mutex);
-    return utils::countByPrefix(m_peerNameToConnection, peerName);
-}
 
-bool ListeningPeerPool::isPeerListening(const std::string& peerNameOriginal) const
-{
-    return getConnectionCountByPeerName(peerNameOriginal) > 0;
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
+
+    auto peerContextIter = utils::findFirstElementWithPrefix(m_peers, peerName);
+    return peerContextIter != m_peers.end();
 }
 
 std::string ListeningPeerPool::findListeningPeerByDomain(
@@ -62,22 +127,27 @@ std::string ListeningPeerPool::findListeningPeerByDomain(
     auto domainNameReversed = utils::reverseWords(domainName, ".");
 
     QnMutexLocker lock(&m_mutex);
-    auto it = utils::findAnyByPrefix(m_peerNameToConnection, domainNameReversed);
-    if (it == m_peerNameToConnection.end())
+
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
+
+    auto it = utils::findFirstElementWithPrefix(m_peers, domainNameReversed);
+    if (it == m_peers.end())
         return std::string();
     return utils::reverseWords(it->first, ".");
 }
 
 void ListeningPeerPool::takeIdleConnection(
     const std::string& peerNameOriginal,
-    ListeningPeerPool::TakeIdleConnection completionHandler)
+    TakeIdleConnectionHandler completionHandler)
 {
+    const auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    
     QnMutexLocker lock(&m_mutex);
 
-    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    processExpirationTimers(lock);
 
-    auto peerConnectionIter = utils::findAnyByPrefix(m_peerNameToConnection, peerName);
-    if (peerConnectionIter == m_peerNameToConnection.end())
+    auto peerContextIter = utils::findFirstElementWithPrefix(m_peers, peerName);
+    if (peerContextIter == m_peers.end())
     {
         m_unsuccessfulResultReporter.post(
             [completionHandler = std::move(completionHandler)]()
@@ -87,29 +157,61 @@ void ListeningPeerPool::takeIdleConnection(
         return;
     }
 
-    auto connectionContext = std::move(peerConnectionIter->second);
-    m_peerNameToConnection.erase(peerConnectionIter);
+    PeerContext& peerContext = peerContextIter->second;
 
-    auto connectionPtr = connectionContext.connection.get();
+    if (peerContext.connections.empty())
+    {
+        startWaitingForNewConnection(
+            lock,
+            peerName,
+            &peerContext,
+            std::move(completionHandler));
+        return;
+    }
+
+    auto connectionContext = std::move(peerContext.connections.front());
+    peerContext.connections.pop_front();
+
+    if (peerContext.connections.empty())
+        startPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
+
+    giveAwayConnection(
+        std::move(connectionContext),
+        std::move(completionHandler));
+}
+
+void ListeningPeerPool::startWaitingForNewConnection(
+    const QnMutexLockerBase& /*lock*/,
+    const std::string& peerName,
+    PeerContext* peerContext,
+    TakeIdleConnectionHandler completionHandler)
+{
+    const auto expirationTime = 
+        nx::utils::monotonicTime() + m_settings.listeningPeer().takeIdleConnectionTimeout;
+
+    ConnectionAwaitContext connectionAwaitContext;
+    connectionAwaitContext.handler = std::move(completionHandler);
+    connectionAwaitContext.expirationTime = expirationTime;
+    peerContext->takeConnectionRequestQueue.push_back(
+        std::move(connectionAwaitContext));
+
+    peerContext->takeConnectionRequestQueue.back().expirationTimerIter = 
+        m_takeIdleConnectionRequestTimers.emplace(expirationTime, peerName);
+}
+
+void ListeningPeerPool::giveAwayConnection(
+    std::unique_ptr<ConnectionContext> connectionContext,
+    TakeIdleConnectionHandler completionHandler)
+{
+    auto connectionPtr = connectionContext->connection.get();
     connectionPtr->post(
         [this, connectionContext = std::move(connectionContext),
             completionHandler = std::move(completionHandler),
             scopedCallGuard = m_apiCallCounter.getScopedIncrement()]() mutable
         {
-            giveAwayConnection(
-                std::move(connectionContext),
-                std::move(completionHandler));
+            connectionContext->connection->cancelIOSync(network::aio::etNone);
+            completionHandler(api::ResultCode::ok, std::move(connectionContext->connection));
         });
-}
-
-void ListeningPeerPool::giveAwayConnection(
-    ListeningPeerPool::ConnectionContext connectionContext,
-    ListeningPeerPool::TakeIdleConnection completionHandler)
-{
-    connectionContext.connection->cancelIOSync(network::aio::etNone);
-    completionHandler(
-        api::ResultCode::ok,
-        std::move(connectionContext.connection));
 }
 
 void ListeningPeerPool::monitoringConnectionForClosure(
@@ -151,7 +253,7 @@ void ListeningPeerPool::onConnectionReadCompletion(
 
 void ListeningPeerPool::closeConnection(
     const std::string& peerName,
-    ConnectionContext* connectionContext,
+    ConnectionContext* connectionContextToErase,
     SystemError::ErrorCode /*sysErrorCode*/)
 {
     QnMutexLocker lock(&m_mutex);
@@ -159,17 +261,113 @@ void ListeningPeerPool::closeConnection(
     if (m_terminated)
         return;
 
-    auto peerConnectionRange = utils::equalRangeByPrefix(m_peerNameToConnection, peerName);
-    for (auto connectionIter = peerConnectionRange.first;
-        connectionIter != peerConnectionRange.second;
-        ++connectionIter)
-    {
-        if (connectionContext == &connectionIter->second)
+    auto peerIter = m_peers.find(peerName);
+    if (peerIter == m_peers.end())
+        return;
+
+    PeerContext& peerContext = peerIter->second;
+    auto connectionContextIter = std::find_if(
+        peerContext.connections.begin(), peerContext.connections.end(),
+        [connectionContextToErase](const std::unique_ptr<ConnectionContext>& context)
         {
-            m_peerNameToConnection.erase(connectionIter);
-            break;
+            return context.get() == connectionContextToErase;
+        });
+    if (connectionContextIter != peerContext.connections.end())
+    {
+        NX_ASSERT((*connectionContextIter)->connection->isInSelfAioThread());
+        peerContext.connections.erase(connectionContextIter);
+        if (peerContext.connections.empty())
+            startPeerExpirationTimer(lock, peerName, &peerContext);
+    }
+}
+
+void ListeningPeerPool::startPeerExpirationTimer(
+    const QnMutexLockerBase& /*lock*/,
+    const std::string& peerName,
+    ListeningPeerPool::PeerContext* peerContext)
+{
+    NX_ASSERT(!static_cast<bool>(peerContext->expirationTimer));
+
+    auto timerIter = m_peerExpirationTimers.emplace(
+        nx::utils::monotonicTime() + m_settings.listeningPeer().disconnectedPeerTimeout,
+        peerName);
+    peerContext->expirationTimer = timerIter;
+}
+
+void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& /*lock*/)
+{
+    const auto currentTime = nx::utils::monotonicTime();
+    while (!m_peerExpirationTimers.empty() && 
+        m_peerExpirationTimers.begin()->first <= currentTime)
+    {
+        const std::string& peerName = m_peerExpirationTimers.begin()->second;
+
+        auto peerIter = m_peers.find(peerName);
+        NX_ASSERT(peerIter != m_peers.end());
+        NX_ASSERT(peerIter->second.takeConnectionRequestQueue.empty());
+        NX_ASSERT(peerIter->second.connections.empty());
+        m_peers.erase(peerIter);
+        m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
+    }
+}
+
+void ListeningPeerPool::doPeriodicTasks()
+{
+    handleTimedoutTakeConnectionRequests();
+
+    m_periodicTasksTimer.start(
+        m_settings.listeningPeer().internalTimerPeriod,
+        std::bind(&ListeningPeerPool::doPeriodicTasks, this));
+}
+
+void ListeningPeerPool::handleTimedoutTakeConnectionRequests()
+{
+    std::vector<TakeIdleConnectionHandler> timedoutRequestHandlers;
+    {
+        QnMutexLocker lock(&m_mutex);
+        timedoutRequestHandlers = findTimedoutTakeConnectionRequestHandlers(lock);
+    }
+
+    for (auto& handler: timedoutRequestHandlers)
+        handler(api::ResultCode::timedOut, nullptr);
+}
+
+std::vector<TakeIdleConnectionHandler> 
+    ListeningPeerPool::findTimedoutTakeConnectionRequestHandlers(
+        const QnMutexLockerBase& /*lock*/)
+{
+    std::vector<TakeIdleConnectionHandler> requestHandlers;
+
+    const auto currentTime = nx::utils::monotonicTime();
+
+    while (!m_takeIdleConnectionRequestTimers.empty() &&
+        m_takeIdleConnectionRequestTimers.begin()->first <= currentTime)
+    {
+        auto peerName = std::move(m_takeIdleConnectionRequestTimers.begin()->second);
+        m_takeIdleConnectionRequestTimers.erase(
+            m_takeIdleConnectionRequestTimers.begin());
+
+        auto peerIter = m_peers.find(peerName);
+        if (peerIter == m_peers.end())
+            continue;
+
+        PeerContext& peerContext = peerIter->second;
+        for (auto it = peerContext.takeConnectionRequestQueue.begin();
+            it != peerContext.takeConnectionRequestQueue.end();
+            )
+        {
+            if (it->expirationTime > currentTime)
+            {
+                ++it;
+                continue;
+            }
+
+            requestHandlers.push_back(std::move(it->handler));
+            it = peerContext.takeConnectionRequestQueue.erase(it);
         }
     }
+
+    return requestHandlers;
 }
 
 } // namespace model

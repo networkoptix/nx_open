@@ -19,7 +19,7 @@
     <properties>
         <guid>${nx_network_ut.guid}</guid>
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -ludt -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -35,15 +35,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
- 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_fusion</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency> 
     </dependencies>
 
 </project>

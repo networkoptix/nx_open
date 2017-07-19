@@ -1,12 +1,16 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/acceptor_stub.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
@@ -16,6 +20,8 @@
 #include <libconnection_mediator/src/mediator_service.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
+#include "predefined_mediator_connector.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -24,10 +30,11 @@ namespace test {
 /**
  * Accepts usual TCP connections
  */
-class FakeTcpTunnelConnection
-:
+class FakeTcpTunnelConnection:
     public AbstractIncomingTunnelConnection
 {
+    using base_type = AbstractIncomingTunnelConnection;
+
 public:
     FakeTcpTunnelConnection(
         aio::AbstractAioThread* aioThread,
@@ -38,6 +45,7 @@ public:
         m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
+        bindToAioThread(getAioThread());
         init(aioThread);
     }
 
@@ -45,6 +53,12 @@ public:
     {
         m_addressManager.remove(m_server->getLocalAddress());
         NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+        m_server->bindToAioThread(aioThread);
     }
 
     void accept(AcceptHandler handler) override
@@ -57,24 +71,24 @@ public:
 
         m_server->acceptAsync(
             [this, handler](
-                SystemError::ErrorCode c, AbstractStreamSocket* s)
+                SystemError::ErrorCode c, std::unique_ptr<AbstractStreamSocket> s)
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_clientsLimit;
                 NX_LOGX(lm("accepted, %1 left").arg(m_clientsLimit), cl_logDEBUG2);
-                handler(c, std::unique_ptr<AbstractStreamSocket>(s));
+                handler(c, std::move(s));
             });
-    }
-
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_server->pleaseStop(std::move(handler));
     }
 
 private:
     size_t m_clientsLimit;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     network::test::AddressBinder::Manager m_addressManager;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_server.reset();
+    }
 
     void init(aio::AbstractAioThread* aioThread)
     {
@@ -90,7 +104,7 @@ private:
 
         auto address = m_server->getLocalAddress();
         NX_LOGX(lm("listening %1 for %2 sockets")
-            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+            .arg(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
         m_addressManager.add(std::move(address));
     }
 };
@@ -117,13 +131,13 @@ struct FakeTcpTunnelAcceptor:
             m_ioThreadSocket->bindToAioThread(designatedAioThread);
 
         NX_LOGX(lm("prepare to listen '%1', c=%2, lim=%3, thread=%4")
-            .str(addressManager.key).arg(hasConnection).arg(clientsLimit)
+            .arg(addressManager.key).arg(hasConnection).arg(clientsLimit)
             .arg(designatedAioThread), cl_logDEBUG1);
     }
 
     ~FakeTcpTunnelAcceptor()
     {
-        NX_LOGX(lm("removed, c=%1").str(m_hasConnection), cl_logDEBUG1);
+        NX_LOGX(lm("removed, c=%1").arg(m_hasConnection), cl_logDEBUG1);
     }
 
     void accept(AcceptHandler handler) override
@@ -134,18 +148,19 @@ struct FakeTcpTunnelAcceptor:
             m_ioThreadSocket->bindToAioThread(m_designatedAioThread);
         }
 
-        m_ioThreadSocket->dispatch([this, handler = std::move(handler)]()
-        {
-            if (!m_hasConnection)
-                return m_ioThreadSocket->registerTimer(
-                    100, [handler](){ handler(SystemError::timedOut, nullptr); });
+        m_ioThreadSocket->dispatch(
+            [this, handler = std::move(handler)]()
+            {
+                if (!m_hasConnection)
+                    return m_ioThreadSocket->registerTimer(
+                        100, [handler](){ handler(SystemError::timedOut, nullptr); });
 
-            auto connection = std::make_unique<FakeTcpTunnelConnection>(
-                m_ioThreadSocket->getAioThread(), m_addressManager, m_clientsLimit);
+                auto connection = std::make_unique<FakeTcpTunnelConnection>(
+                    m_ioThreadSocket->getAioThread(), m_addressManager, m_clientsLimit);
 
-            m_hasConnection = false;
-            handler(SystemError::noError, std::move(connection));
-        });
+                m_hasConnection = false;
+                handler(SystemError::noError, std::move(connection));
+            });
     }
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
@@ -165,8 +180,7 @@ class CloudServerSocketTcpTester:
 {
 public:
     CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder):
-        CloudServerSocket(
-            nx::network::SocketGlobals::mediatorConnector().systemConnection()),
+        CloudServerSocket(&nx::network::SocketGlobals::mediatorConnector()),
         m_addressManager(addressBinder)
     {
     }
@@ -240,8 +254,8 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
 TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester().release(), false); },
-        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester().release(), false); });
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester(), false); },
+        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester(), false); });
 }
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
@@ -255,19 +269,33 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         ::testing::_, ::testing::_)).Times(1);
     EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
-    std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
-    acceptorMakers.push_back(
-        [&](hpm::api::ConnectionRequestedEvent)
+    auto tunnelAcceptorFactoryFuncBak =
+        TunnelAcceptorFactory::instance().setCustomFunc(
+            [&addressManager](
+                const SocketAddress& mediatorUdpEndpoint,
+                hpm::api::ConnectionRequestedEvent)
+            {
+                std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
+                acceptors.push_back(std::make_unique<FakeTcpTunnelAcceptor>(addressManager));
+                return acceptors;
+            });
+    auto tunnelAcceptorFactoryGuard = makeScopeGuard(
+        [tunnelAcceptorFactoryFuncBak = std::move(tunnelAcceptorFactoryFuncBak)]() mutable
         {
-            return std::make_unique<FakeTcpTunnelAcceptor>(addressManager);
+            TunnelAcceptorFactory::instance().setCustomFunc(
+                std::move(tunnelAcceptorFactoryFuncBak));
         });
 
-    auto server = std::make_unique<CloudServerSocket>(
+    PredefinedMediatorConnector mediatorConnector(
+        *nx::network::SocketGlobals::mediatorConnector().udpEndpoint(),
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
-            &nx::network::SocketGlobals::mediatorConnector()),
-        nx::network::RetryPolicy(),
-        std::move(acceptorMakers));
+            &nx::network::SocketGlobals::mediatorConnector()));
+
+    auto server = std::make_unique<CloudServerSocket>(
+        &mediatorConnector,
+        nx::network::RetryPolicy());
+    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
     server->moveToListeningState();
@@ -292,6 +320,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     ASSERT_EQ(1U, list.size());
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
     nx::utils::promise<SystemError::ErrorCode> result;
@@ -300,8 +329,6 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         [&](SystemError::ErrorCode c){ result.set_value(c); });
 
     ASSERT_EQ(SystemError::noError, result.get_future().get());
-    client->pleaseStopSync();
-    server->pleaseStopSync();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -334,21 +361,31 @@ protected:
             ::testing::_, ::testing::_)).Times(1);
         EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
-        std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
-        acceptorMakers.push_back(
-            [this](hpm::api::ConnectionRequestedEvent event)
-            {
-                SocketAddress address(QLatin1String(event.originatingPeerID));
-                return std::make_unique<FakeTcpTunnelAcceptor>(
-                    network::test::AddressBinder::Manager(
-                        &m_addressBinder, std::move(address)));
-            });
+        m_tunnelAcceptorFactoryFuncBak =
+            TunnelAcceptorFactory::instance().setCustomFunc(
+                [this](
+                    const SocketAddress& /*mediatorUdpEndpoint*/,
+                    hpm::api::ConnectionRequestedEvent event)
+                {
+                    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
+            
+                    SocketAddress address(QLatin1String(event.originatingPeerID));
+                    auto acceptor = std::make_unique<FakeTcpTunnelAcceptor>(
+                        network::test::AddressBinder::Manager(
+                            &m_addressBinder, std::move(address)));
+                    acceptors.push_back(std::move(acceptor));
+                    return acceptors;
+                });
+
+        m_mediatorConnector = std::make_unique<PredefinedMediatorConnector>(
+            *SocketGlobals::mediatorConnector().udpEndpoint(),
+            std::make_unique<hpm::api::MediatorServerTcpConnection>(
+                m_stunClient,
+                &SocketGlobals::mediatorConnector()));
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-            std::make_unique<hpm::api::MediatorServerTcpConnection>(
-                m_stunClient, &SocketGlobals::mediatorConnector()),
-            nx::network::RetryPolicy(),
-            std::move(acceptorMakers));
+            m_mediatorConnector.get(),
+            nx::network::RetryPolicy());
         ASSERT_TRUE(cloudServerSocket->setNonBlockingMode(true));
         ASSERT_TRUE(cloudServerSocket->listen(10));
         cloudServerSocket->moveToListeningState();
@@ -359,16 +396,16 @@ protected:
     void acceptServerForever()
     {
         m_server->acceptAsync(
-            [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+            [this](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
                 ASSERT_TRUE(socket->setNonBlockingMode(true));
                 socket->sendAsync(
                     network::test::kTestMessage,
-                    [this, socket](SystemError::ErrorCode code, size_t size)
+                    [this, socketPtr = socket.get()](SystemError::ErrorCode code, size_t size)
                     {
-                        NX_LOGX(lm("test message is sent to %1").arg(socket),
+                        NX_LOGX(lm("test message is sent to %1").arg(socketPtr),
                             cl_logDEBUG2);
 
                         ASSERT_EQ(code, SystemError::noError);
@@ -377,8 +414,7 @@ protected:
 
                 {
                     QnMutexLocker lock(&m_mutex);
-                    m_acceptedSockets.push_back(
-                        std::unique_ptr<AbstractStreamSocket>(socket));
+                    m_acceptedSockets.push_back(std::move(socket));
                 }
             });
     }
@@ -413,7 +449,7 @@ protected:
         }
 
         NX_LOGX(lm("client %1 -> %2 (timeout=%3)")
-            .arg(socket).str(peer).arg(timeout), cl_logDEBUG1);
+            .arg(socket).arg(peer).arg(timeout), cl_logDEBUG1);
 
         connectClient(socket, peer);
     }
@@ -423,7 +459,7 @@ protected:
         const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
-            NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
+            NX_LOGX(lm("connect %1 -> %2").arg(socket).arg(*address), cl_logDEBUG2);
             socket->connectAsync(
                 address.get(),
                 [=](SystemError::ErrorCode code)
@@ -444,7 +480,7 @@ protected:
                     if (auto address = m_addressBinder.random(peer))
                         return connectClient(socket, peer);
 
-                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).str(peer), cl_logDEBUG2);
+                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).arg(peer), cl_logDEBUG2);
                     emitIndication(peer);
                     socket->registerTimer(
                         delay, [=](){ connectClient(socket, peer); });
@@ -497,7 +533,7 @@ protected:
             });
     }
 
-    void TearDown() override
+    virtual void TearDown() override
     {
         const auto kTotalConnects = kThreadCount * kClientCount * kPeerCount;
         for (size_t i = 0; i < kTotalConnects; ++i)
@@ -507,14 +543,21 @@ protected:
         for (auto& thread : m_threads)
             thread.join();
 
+        for (auto& socket: m_connectSockets)
+            socket.second->pleaseStopSync();
+
         EXPECT_GE(m_acceptedSockets.size(), kTotalConnects);
         for (auto& socket : m_acceptedSockets)
             socket->pleaseStopSync();
+
+        TunnelAcceptorFactory::instance().setCustomFunc(
+            std::move(m_tunnelAcceptorFactoryFuncBak));
     }
 
     network::test::AddressBinder m_addressBinder;
     std::set<SocketAddress> m_boundPeers;
 
+    std::unique_ptr<hpm::api::AbstractMediatorConnector> m_mediatorConnector;
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     utils::TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
@@ -523,6 +566,7 @@ protected:
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
     std::map<void*, std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
+    TunnelAcceptorFactory::Function m_tunnelAcceptorFactoryFuncBak;
 };
 
 TEST_F(CloudServerSocketStressTcpTest, SingleThread)
@@ -538,11 +582,11 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
 
 //-------------------------------------------------------------------------------------------------
 
-class CloudServerSocketTest:
+class CloudServerSocket:
     public ::testing::Test
 {
 public:
-    CloudServerSocketTest()
+    CloudServerSocket()
     {
         stun::AbstractAsyncClient::Settings stunClientSettings;
         stunClientSettings.reconnectPolicy =
@@ -556,6 +600,12 @@ public:
         SocketGlobalsHolder::instance()->reinitialize();
     }
 
+    ~CloudServerSocket()
+    {
+        if (m_cloudServerSocket)
+            destroyServerSocket();
+    }
+
 protected:
     hpm::MediatorFunctionalTest m_mediator;
     hpm::AbstractCloudDataProvider::System system;
@@ -566,7 +616,7 @@ protected:
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
         system = m_mediator.addRandomSystem();
         server = m_mediator.addRandomServer(
-                system, boost::none, hpm::ServerTweak::noBindEndpoint);
+            system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
         ASSERT_NE(nullptr, server);
         SocketGlobals::mediatorConnector().setSystemCredentials(
@@ -575,12 +625,46 @@ protected:
                 server->serverId(),
                 system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
+
+    void givenInitializedServerSocket()
+    {
+        m_cloudServerSocket = std::make_unique<cloud::CloudServerSocket>(
+            &nx::network::SocketGlobals::mediatorConnector());
+        ASSERT_EQ(
+            hpm::api::ResultCode::ok,
+            m_cloudServerSocket->registerOnMediatorSync());
+        ASSERT_TRUE(m_cloudServerSocket->listen(128));
+        m_cloudServerSocket->moveToListeningState();
+    }
+
+    void whenMediatorIsRestarted()
+    {
+        ASSERT_TRUE(m_mediator.restart());
+    }
+
+    void destroyServerSocket()
+    {
+        if (!m_cloudServerSocket)
+            return;
+        m_cloudServerSocket->pleaseStopSync();
+        m_cloudServerSocket.reset();
+    }
+
+    cloud::CloudServerSocket& cloudServerSocket()
+    {
+        return *m_cloudServerSocket;
+    }
+
+private:
+    std::unique_ptr<cloud::CloudServerSocket> m_cloudServerSocket;
 };
 
-TEST_F(CloudServerSocketTest, reconnect)
+TEST_F(CloudServerSocket, reconnect)
 {
     startMediatorAndRegister();
     hpm::api::SystemCredentials currentCredentials =
@@ -597,13 +681,8 @@ TEST_F(CloudServerSocketTest, reconnect)
 
     for (int i = 0; i < 17; ++i)
     {
-        CloudServerSocket cloudServerSocket(
-            nx::network::SocketGlobals::mediatorConnector().systemConnection());
-        ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
-        ASSERT_TRUE(cloudServerSocket.listen(128));
-        cloudServerSocket.moveToListeningState();
-
-        cloudServerSocket.pleaseStopSync();
+        givenInitializedServerSocket();
+        destroyServerSocket();
 
         // Breaking connection to mediator.
         nx::utils::promise<void> cloudCredentialsModified;
@@ -619,18 +698,16 @@ TEST_F(CloudServerSocketTest, reconnect)
     }
 }
 
-TEST_F(CloudServerSocketTest, serverChecksConnectionState)
+TEST_F(CloudServerSocket, serverChecksConnectionState)
 {
-    const KeepAliveOptions kKeepAliveOptions(1, 1, 1);
-    m_mediator.addArg("-general/cloudConnectOptions", "serverChecksConnectionState");
-    m_mediator.addArg("-stun/keepAliveOptions", kKeepAliveOptions.toString().toStdString().c_str());
+    const KeepAliveOptions kKeepAliveOptions(std::chrono::seconds(1), std::chrono::seconds(1), 1);
+    m_mediator.addArg(
+        "-general/cloudConnectOptions", "serverChecksConnectionState");
+    m_mediator.addArg(
+        "-stun/keepAliveOptions", kKeepAliveOptions.toString().toStdString().c_str());
     startMediatorAndRegister();
 
-    CloudServerSocket cloudServerSocket(
-        nx::network::SocketGlobals::mediatorConnector().systemConnection());
-    ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
-    ASSERT_TRUE(cloudServerSocket.listen(128));
-    cloudServerSocket.moveToListeningState();
+    givenInitializedServerSocket();
 
     const auto peerPool = m_mediator.moduleInstance()->impl()->listeningPeerPool();
     {
@@ -650,6 +727,151 @@ TEST_F(CloudServerSocketTest, serverChecksConnectionState)
         ASSERT_TRUE((bool) peer);
         ASSERT_TRUE(peer->value().isListening);
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+// CloudServerSocketMultipleAcceptors
+
+class CloudServerSocketMultipleAcceptors:
+    public CloudServerSocket
+{
+public:
+    CloudServerSocketMultipleAcceptors()
+    {
+        using namespace std::placeholders;
+
+        startMediatorAndRegister();
+        m_factoryFuncBak = cloud::CustomAcceptorFactory::instance().setCustomFunc(
+            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this,
+                _1, _2));
+    }
+
+    ~CloudServerSocketMultipleAcceptors()
+    {
+        destroyServerSocket();
+
+        cloud::CustomAcceptorFactory::instance().setCustomFunc(
+            std::move(m_factoryFuncBak));
+    }
+
+protected:
+    void givenAcceptingServerSocket()
+    {
+        givenInitializedServerSocket();
+        whenAcceptIsInvoked();
+        thenEveryAcceptorIsInvoked();
+    }
+
+    void whenAcceptIsInvoked()
+    {
+        using namespace std::placeholders;
+
+        cloudServerSocket().acceptAsync(
+            std::bind(&CloudServerSocketMultipleAcceptors::onAcceptCompletion, this, _1, _2));
+    }
+    
+    void whenOneAcceptorReturnsSocket()
+    {
+        auto acceptor = nx::utils::random::choice(m_acceptorsCreated);
+        acceptor->addReadyConnection(std::make_unique<network::TCPSocket>(AF_INET));
+    }
+
+    void thenCustomAcceptorsAreRemoved()
+    {
+        m_removedAcceptorsQueue.pop();
+    }
+
+    void thenEveryAcceptorIsInvoked()
+    {
+        for (;;)
+        {
+            bool isEveryAcceptorInvoked = true;
+            for (const auto& acceptor: m_acceptorsCreated)
+                isEveryAcceptorInvoked &= acceptor->isAsyncAcceptInProgress();
+            if (isEveryAcceptorInvoked)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    void thenEveryAcceptorIsCancelled()
+    {
+        for (;;)
+        {
+            bool isAnyAcceptorNotInvoked = false;
+            for (const auto& acceptor: m_acceptorsCreated)
+                isAnyAcceptorNotInvoked |= acceptor->isAsyncAcceptInProgress();
+            if (!isAnyAcceptorNotInvoked)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    void assertCloudCredentialsHaveBeenProvidedToCustomAcceptors()
+    {
+        ASSERT_TRUE(static_cast<bool>(m_providedCloudCredentials));
+        ASSERT_EQ(
+            SocketGlobals::mediatorConnector().getSystemCredentials(),
+            *m_providedCloudCredentials);
+    }
+
+private:
+    cloud::CustomAcceptorFactory::Function m_factoryFuncBak;
+    utils::SyncQueue<network::test::AcceptorStub*> m_removedAcceptorsQueue;
+    std::vector<network::test::AcceptorStub*> m_acceptorsCreated;
+    boost::optional<hpm::api::SystemCredentials> m_providedCloudCredentials;
+
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> customAcceptorFactoryFunc(
+        const hpm::api::SystemCredentials& credentials,
+        const hpm::api::ListenResponse& /*response*/)
+    {
+        const int acceptorCount = 7;
+
+        m_providedCloudCredentials = credentials;
+
+        std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
+        for (int i = 0; i < acceptorCount; ++i)
+        {
+            auto acceptor = std::make_unique<network::test::AcceptorStub>();
+            acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
+            m_acceptorsCreated.push_back(acceptor.get());
+            acceptors.push_back(std::move(acceptor));
+        }
+        return acceptors;
+    }
+
+    void onAcceptCompletion(
+        SystemError::ErrorCode /*sysErrorCode*/,
+        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+    {
+    }
+};
+
+TEST_F(CloudServerSocketMultipleAcceptors, restoring_connection_to_the_cloud)
+{
+    givenInitializedServerSocket();
+    whenMediatorIsRestarted();
+    thenCustomAcceptorsAreRemoved();
+}
+
+TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_used)
+{
+    givenInitializedServerSocket();
+    whenAcceptIsInvoked();
+    thenEveryAcceptorIsInvoked();
+}
+
+TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_cancelled)
+{
+    givenAcceptingServerSocket();
+    whenOneAcceptorReturnsSocket();
+    thenEveryAcceptorIsCancelled();
+}
+
+TEST_F(CloudServerSocketMultipleAcceptors, provides_cloud_credentials_to_all_acceptors)
+{
+    givenInitializedServerSocket();
+    assertCloudCredentialsHaveBeenProvidedToCustomAcceptors();
 }
 
 } // namespace test

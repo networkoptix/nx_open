@@ -29,7 +29,7 @@ static size_t testClientCount() { return nx::utils::TestOptions::applyLoadMode<s
 static std::string lastError() { return SystemError::getLastOSErrorText().toStdString(); }
 
 const bool kEnableTestDebugOutput = false;
-static void testDebugOutput(const QnLogMessage& message)
+static void testDebugOutput(const utils::log::Message& message)
 {
     if (kEnableTestDebugOutput)
         NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);
@@ -129,7 +129,7 @@ private:
 
         ASSERT_TRUE(m_server->setReuseAddrFlag(true)) << lastError();
         ASSERT_TRUE(m_server->bind(m_endpointToBindTo)) << lastError();
-        ASSERT_TRUE(m_server->listen(testClientCount())) << lastError();
+        ASSERT_TRUE(m_server->listen((int)testClientCount())) << lastError();
 
         ASSERT_TRUE(m_server->setRecvTimeout(100)) << lastError();
         std::unique_ptr<AbstractStreamSocket> client(m_server->accept());
@@ -270,7 +270,7 @@ void socketTransferSyncFlags(
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))<< lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
     if (!endpointToConnectTo)
         endpointToConnectTo = server->getLocalAddress();
 
@@ -361,7 +361,7 @@ void socketTransferAsync(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     //ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
@@ -370,55 +370,55 @@ void socketTransferAsync(
 
     QByteArray serverBuffer;
     serverBuffer.reserve(128);
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor
-        = [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-    {
-        testDebugOutput(lm("Server accept: %1").arg(code));
-        EXPECT_EQ(SystemError::noError, code);
-        if (code != SystemError::noError)
-            return serverResults.push(code);
-
-        acceptedClients.emplace_back(socket);
-        auto& client = acceptedClients.back();
-        if (/*!client->setSendTimeout(kTestTimeout) ||
-            !client->setSendTimeout(kTestTimeout) ||*/
-            !client->setNonBlockingMode(true))
+    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor =
+        [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            EXPECT_TRUE(false) << lastError();
-            return serverResults.push(SystemError::notImplemented);
-        }
+            testDebugOutput(lm("Server accept: %1").arg(code));
+            EXPECT_EQ(SystemError::noError, code);
+            if (code != SystemError::noError)
+                return serverResults.push(code);
 
-        client->readAsyncAtLeast(
-            &serverBuffer, testMessage.size(),
-            [&](SystemError::ErrorCode code, size_t size)
+            acceptedClients.emplace_back(std::move(socket));
+            auto& client = acceptedClients.back();
+            if (/*!client->setSendTimeout(kTestTimeout) ||
+                !client->setSendTimeout(kTestTimeout) ||*/
+                !client->setNonBlockingMode(true))
             {
-                testDebugOutput(lm("Server read: %1").arg(size));
-                EXPECT_EQ(SystemError::noError, code);
-                if (code != SystemError::noError)
-                    return serverResults.push(code);
+                EXPECT_TRUE(false) << lastError();
+                return serverResults.push(SystemError::notImplemented);
+            }
 
-                EXPECT_STREQ(serverBuffer.data(), testMessage.data());
-                if (size < (size_t)testMessage.size())
-                    return serverResults.push(SystemError::connectionReset);
+            client->readAsyncAtLeast(
+                &serverBuffer, testMessage.size(),
+                [&](SystemError::ErrorCode code, size_t size)
+                {
+                    testDebugOutput(lm("Server read: %1").arg(size));
+                    EXPECT_EQ(SystemError::noError, code);
+                    if (code != SystemError::noError)
+                        return serverResults.push(code);
 
-                serverBuffer.resize(0);
-                client->sendAsync(
-                    testMessage,
-                    [&](SystemError::ErrorCode code, size_t size)
-                    {
-                        testDebugOutput(lm("Server sent: %1").arg(size));
-                        if (code == SystemError::noError)
-                            EXPECT_GT(size, (size_t)0);
+                    EXPECT_STREQ(serverBuffer.data(), testMessage.data());
+                    if (size < (size_t)testMessage.size())
+                        return serverResults.push(SystemError::connectionReset);
 
-                        client->pleaseStopSync();
-                        client->close();
-                        testDebugOutput(lm("Server stopped"));
-                        serverResults.push(code);
-                    });
-            });
+                    serverBuffer.resize(0);
+                    client->sendAsync(
+                        testMessage,
+                        [&](SystemError::ErrorCode code, size_t size)
+                        {
+                            testDebugOutput(lm("Server sent: %1").arg(size));
+                            if (code == SystemError::noError)
+                                EXPECT_GT(size, (size_t)0);
 
-        server->acceptAsync(acceptor);
-    };
+                            client->pleaseStopSync();
+                            client->close();
+                            testDebugOutput(lm("Server stopped"));
+                            serverResults.push(code);
+                        });
+                });
+
+            server->acceptAsync(acceptor);
+        };
 
     server->acceptAsync(acceptor);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -638,7 +638,7 @@ void socketTransferFragmentation(
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
@@ -679,51 +679,24 @@ void socketMultiConnect(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    auto server = serverMaker();
-    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
-    ASSERT_TRUE(server->setNonBlockingMode(true));
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
-
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
-
     QnMutex connectedSocketsMutex;
     bool terminated = false;
-
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
-    auto connectedSocketsGuard = makeScopeGuard(
-        [&connectedSockets, &connectedSocketsMutex, &terminated]()
-        {
-            {
-                QnMutexLocker lock(&connectedSocketsMutex);
-                terminated = true;
-            }
+    decltype(serverMaker()) server;
 
-            for (auto& socket: connectedSockets)
-                socket->pleaseStopSync();
-        });
-
-    auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (!endpointToConnectTo)
-        endpointToConnectTo = std::move(serverAddress);
-
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor = 
-        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor = 
+        [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
         {
             acceptResults.push(code);
             if (code != SystemError::noError)
                 return;
 
-            acceptedSockets.emplace_back(socket);
+            acceptedSockets.emplace_back(std::move(socket));
             server->acceptAsync(acceptor);
         };
-
-    server->acceptAsync(acceptor);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // for UDT only
 
     std::function<void(int)> connectNewClients =
         [&](int clientsToConnect)
@@ -748,8 +721,35 @@ void socketMultiConnect(
                 });
         };
 
+    server = serverMaker();
+    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
+    ASSERT_TRUE(server->setNonBlockingMode(true));
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
+
+    auto connectedSocketsGuard = makeScopeGuard(
+        [&connectedSockets, &connectedSocketsMutex, &terminated]()
+        {
+            {
+                QnMutexLocker lock(&connectedSocketsMutex);
+                terminated = true;
+            }
+
+            for (auto& socket: connectedSockets)
+                socket->pleaseStopSync();
+        });
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    server->acceptAsync(acceptor);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // for UDT only
+
     const auto kClientCount = testClientCount();
-    connectNewClients(kClientCount);
+    connectNewClients((int)kClientCount);
     for (size_t i = 0; i < kClientCount; ++i)
     {
         ASSERT_EQ(acceptResults.pop(), SystemError::noError);
@@ -890,7 +890,7 @@ void socketAcceptMixed(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(testClientCount()));
+    ASSERT_TRUE(server->listen((int)testClientCount()));
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
@@ -937,7 +937,7 @@ void acceptedSocketOptionsInheritance(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(10 * 1000));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(testClientCount()));
+    ASSERT_TRUE(server->listen((int)testClientCount()));
     auto serverAddress = server->getLocalAddress();
 
     auto client = clientMaker();
@@ -1106,7 +1106,7 @@ void socketIsUsefulAfterCancelIo(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(100));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
@@ -1187,14 +1187,16 @@ void socketAcceptTimeoutAsync(
 
     nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
     const auto start = std::chrono::steady_clock::now();
-    server->acceptAsync([&](SystemError::ErrorCode /*code*/,
-                            AbstractStreamSocket* /*socket*/)
-    {
-        if (deleteInIoThread)
-            server.reset();
+    server->acceptAsync(
+        [&](
+            SystemError::ErrorCode /*code*/,
+            std::unique_ptr<AbstractStreamSocket> /*socket*/)
+        {
+            if (deleteInIoThread)
+                server.reset();
 
-        serverResults.push(SystemError::timedOut);
-    });
+            serverResults.push(SystemError::timedOut);
+        });
 
     EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
     EXPECT_TRUE(std::chrono::steady_clock::now() - start < timeout * 2);
@@ -1215,7 +1217,8 @@ void socketAcceptCancelSync(
     const auto serverCount = testClientCount();
     for (size_t i = 0; i < serverCount; ++i)
     {
-        server->acceptAsync([&](SystemError::ErrorCode, AbstractStreamSocket*) { /*pass*/ });
+        server->acceptAsync(
+            [&](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) { /*pass*/ });
         if (i)
             std::this_thread::sleep_for(std::chrono::milliseconds(100 * i));
 
@@ -1253,7 +1256,7 @@ void socketAcceptCancelAsync(
             << SystemError::getLastOSErrorText().toStdString();
 
         server->acceptAsync(
-            [&](SystemError::ErrorCode, AbstractStreamSocket*) { NX_CRITICAL(false); });
+            [&](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) { NX_CRITICAL(false); });
 
         if (i)
             std::this_thread::sleep_for(std::chrono::milliseconds(10 * i));

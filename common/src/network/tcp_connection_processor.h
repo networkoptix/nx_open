@@ -9,7 +9,7 @@
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnTcpListener;
@@ -22,7 +22,13 @@ class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAwar
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnCommonModule* commonModule);
+    /**
+     * Called from templates. In derived classes, redefine to return true if the last path
+     * component carries camera id.
+     */
+    static bool doesPathEndWithCameraId() { return false; }
+
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -60,13 +66,13 @@ public:
     bool readSingleRequest();
     virtual void parseRequest();
 
-    virtual bool isTakeSockOwnership() const { return false; }
+    bool isSocketTaken() const;
+    QSharedPointer<AbstractStreamSocket> takeSocket();
     void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
-
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -90,6 +96,11 @@ protected:
 
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner);
+    // For inherited classes without TCP server socket only
+    QnTCPConnectionProcessor(
+        QnTCPConnectionProcessorPrivate* dptr,
         QSharedPointer<AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 

@@ -6,33 +6,6 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
-#if defined (Q_OS_WIN32)
-
-struct WinDriveInfo
-{
-    enum Access
-    {
-        NoAccess = 0,
-        Readable = 1,
-        Writable = 2,
-    };
-
-    QString path;
-    unsigned long type;
-    int access;
-
-    WinDriveInfo():
-        type(0),
-        access(NoAccess)
-    {
-    }
-};
-
-using WinDriveInfoList = QList<WinDriveInfo>;
-
-WinDriveInfoList getWinDrivesInfo();
-#endif
-
 /**
  * Remove directory recursively.
  *
@@ -85,7 +58,6 @@ qint64 getDiskTotalSpace(const QString &root);
 #define DEFAULT_APPSERVER_PORT 7001
 
 //#define MAX_RTSP_DATA_LEN (65535 - 16)
-#define MAX_RTSP_DATA_LEN (16*1024 - 16)
 
 #define BACKWARD_SEEK_STEP (1000ll * 1000)
 
@@ -101,11 +73,12 @@ qint64 getDiskTotalSpace(const QString &root);
 
 quint64 getUsecTimer();
 
+// TODO: #Elric move to time.h
+// TODO: Rename to reflect that result is in seconds.
 /*
  * \returns                             Current time zone offset in seconds.
  */
-int currentTimeZone(); // TODO: #Elric move to time.h
-
+int currentTimeZone();
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 

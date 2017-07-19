@@ -6,7 +6,7 @@
 #pragma once
 
 #include <nx/utils/stree/resourcecontainer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 
 namespace nx {

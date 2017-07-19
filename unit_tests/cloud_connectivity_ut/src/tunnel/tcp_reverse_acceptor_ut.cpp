@@ -34,12 +34,12 @@ protected:
         std::chrono::milliseconds waitBeforeUse)
     {
         NX_LOGX(lm("Test hostName=%1, poolSize=%2, keepAlive=%3, messageSize=%4, wait=%5")
-            .strs(hostName, poolSize, kaOptions, testMessage.size(), waitBeforeUse), cl_logDEBUG1);
+            .args(hostName, poolSize, kaOptions, testMessage.size(), waitBeforeUse), cl_logDEBUG1);
 
         m_acceptor.setPoolSize(poolSize);
         m_acceptor.setKeepAliveOptions(kaOptions);
 
-        auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName, nullptr);
+        auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName);
         utils::promise<void> connectorDone;
         connector->connect(
             m_acceptorAddress,
@@ -99,7 +99,10 @@ TEST_F(TcpReverseAcceptorTest, Connect)
         for (const OptSize& poolSize: {OptSize(), OptSize(3), OptSize(5)})
         {
             typedef boost::optional<KeepAliveOptions> OptKa;
-            for (const OptKa& keepAlive: {OptKa(), OptKa(KeepAliveOptions(3, 2, 1))})
+            const auto keepAliveOptionsArray = {
+                OptKa(),
+                OptKa(KeepAliveOptions(std::chrono::seconds(3), std::chrono::seconds(2), 1))};
+            for (const OptKa& keepAlive: keepAliveOptionsArray)
             {
                 for (const auto& message: {Buffer(""), nx::utils::random::generate(1024)})
                 {

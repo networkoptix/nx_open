@@ -19,7 +19,10 @@ namespace api {
 // Client
 
 using BeginListeningHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, BeginListeningResponse)>;
+    nx::utils::MoveOnlyFunc<void(
+        ResultCode,
+        BeginListeningResponse,
+        std::unique_ptr<AbstractStreamSocket>)>;
 
 using StartClientConnectSessionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
@@ -34,6 +37,10 @@ public:
     virtual void beginListening(
         const nx::String& peerName,
         BeginListeningHandler completionHandler) = 0;
+    /**
+     * @param desiredSessionId Can be empty. 
+     *   In this case server will generate unique session id itself.
+     */
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& targetPeerName,
@@ -100,6 +107,19 @@ private:
 
     template<
         typename Request,
+        typename RequestPathArgument,
+        typename CompletionHandler,
+        typename ... Response
+    >
+    void issueUpgradeRequest(
+        const nx_http::StringType& protocolToUpgradeTo,
+        Request request,
+        const char* requestPathTemplate,
+        std::initializer_list<RequestPathArgument> requestPathArguments,
+        CompletionHandler completionHandler);
+
+    template<
+        typename Request,
         typename Response,
         typename RequestPathArgument,
         typename CompletionHandler
@@ -110,30 +130,27 @@ private:
         std::initializer_list<RequestPathArgument> requestPathArguments,
         CompletionHandler completionHandler);
 
-    template<
-        typename Request,
-        typename Response,
-        typename RequestPathArgument
-    >
+    template<typename Request, typename Response, typename RequestPathArgument>
     std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
-        prepareHttpClient(
+        prepareHttpRequest(
             Request request,
             const char* requestPathTemplate,
             std::initializer_list<RequestPathArgument> requestPathArguments);
 
-    template<
-        typename Response,
-        typename HttpClient,
-        typename CompletionHandler
-    >
+    template<typename HttpClient, typename CompletionHandler, typename ... Response>
+    void executeUpgradeRequest(
+        const nx_http::StringType& protocolToUpgradeTo,
+        HttpClient httpClient,
+        CompletionHandler completionHandler);
+
+    template<typename Response, typename HttpClient, typename CompletionHandler>
     void executeRequest(
         HttpClient httpClient,
         CompletionHandler completionHandler);
 
-    template<typename HttpClient, typename CompletionHandler>
-    void executeOpenConnectionRequest(
-        HttpClient httpClient,
-        CompletionHandler completionHandler);
+    ResultCode toUpgradeResultCode(
+        SystemError::ErrorCode sysErrorCode,
+        const nx_http::Response* httpResponse);
 
     ResultCode toResultCode(
         SystemError::ErrorCode sysErrorCode,

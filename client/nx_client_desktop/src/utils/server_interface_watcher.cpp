@@ -7,23 +7,30 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
-#include <network/module_finder.h>
 
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(qnModuleFinder,     &QnModuleFinder::moduleAddressFound,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(qnModuleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(resourcePool(),  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
-    connect(resourcePool(),  &QnResourcePool::resourceAdded, this,   &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
+        &QnServerInterfaceWatcher::at_connectionChanged,
+        &QnServerInterfaceWatcher::at_connectionChanged,
+        &QnServerInterfaceWatcher::at_connectionChangedById);
+
+    connect(resourcePool(), &QnResourcePool::statusChanged,
+        this, &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
+        this, &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
 }
 
-void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &moduleInformation) 
+void QnServerInterfaceWatcher::at_connectionChanged(nx::vms::discovery::ModuleEndpoint module)
 {
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
-    if (!server)
-        return;
-    updatePrimaryInterface(server);
+    at_connectionChangedById(module.id);
+}
+
+void QnServerInterfaceWatcher::at_connectionChangedById(QnUuid id)
+{
+    if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id))
+        updatePrimaryInterface(server);
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -59,17 +66,17 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
 {
     const auto serverId = server->getId();
-    const auto newAddress = qnModuleFinder->primaryAddress(serverId);
-    const bool sslAllowed = qnModuleFinder->moduleInformation(serverId).sslAllowed;
+    const auto module = commonModule()->moduleDiscoveryManager()->getModule(serverId);
+    if (!module)
+        return;
 
-    if (sslAllowed != server->isSslAllowed())
-        server->setSslAllowed(sslAllowed);
+    if (module->sslAllowed != server->isSslAllowed())
+        server->setSslAllowed(module->sslAllowed);
 
-    if (!newAddress.isNull() && newAddress != server->getPrimaryAddress())
+    if (module->endpoint != server->getPrimaryAddress())
     {
-        server->setPrimaryAddress(newAddress);
-        NX_LOG(lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
-            .arg(server->getName()).arg(server->getId().toString()).arg(newAddress.toString()),
-            cl_logDEBUG1);
+        server->setPrimaryAddress(module->endpoint);
+        NX_LOG(lm("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
+            .args(server->getName(), server->getId(), module->endpoint), cl_logDEBUG1);
     }
 }

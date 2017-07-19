@@ -39,7 +39,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QnSelectUsersButton" name="usersButton">
+      <widget class="QPushButton" name="usersButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -103,11 +103,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QnSelectUsersButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">ui/widgets/select_resources_button.h</header>
-  </customwidget>
   <customwidget>
    <class>QnIconSelectionComboBox</class>
    <extends>QComboBox</extends>

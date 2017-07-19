@@ -3,7 +3,7 @@
 #include <network/tcp_connection_priv.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
@@ -21,22 +21,13 @@ int QnLogLevelRestHandler::executeGet(
 {
     QN_UNUSED(path, processor);
 
-    auto _nx_logs = QnLog::logs();
-    if (!_nx_logs)
-    {
-        result.setError(
-            QnJsonRestResult::InvalidParameter,
-            lit("Logging subsystem is not initialized"));
-        return CODE_OK;
-    }
-
-    int logID = QnLog::MAIN_LOG_ID;
-    requireParameter(params, idParam, result, &logID, true);
-
-    if (!_nx_logs->exists(logID))
+    int logId = 0;
+    requireParameter(params, idParam, result, &logId, true);
+    const auto logger = QnLogs::logger(logId);
+    if (!logger)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
-            lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logID));
+            lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logId));
         return CODE_OK;
     }
 
@@ -52,19 +43,18 @@ int QnLogLevelRestHandler::executeGet(
         }
 
         QString level = *setValue;
-        QnLogLevel logLevel = QnLog::logLevelFromString(level);
-
+        QnLogLevel logLevel = nx::utils::log::levelFromString(level);
         if (logLevel == cl_logUNKNOWN)
         {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Parameter '%1' has invalid value '%2'").arg(valueParam).arg(level));
             return CODE_OK;
         }
-        QnLog::instance(logID)->setLogLevel(logLevel);
+
+        logger->setDefaultLevel(logLevel);
     }
 
-    const QnLogLevel resultLevel = QnLog::instance(logID)->logLevel();
-    result.setReply(QnLog::logLevelToString(resultLevel));
-
+    const auto level = logger->defaultLevel();
+    result.setReply(level == nx::utils::log::Level::verbose ? lit("DEBUG2") : toString(level).toUpper());
     return CODE_OK;
 }

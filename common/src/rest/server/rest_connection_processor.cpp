@@ -1,12 +1,13 @@
+#include "rest_connection_processor.h"
 
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QRegExp>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 
-#include "rest_connection_processor.h"
 #include "network/tcp_connection_priv.h"
 #include "network/tcp_listener.h"
 #include "request_handler.h"
@@ -76,21 +77,13 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
         return boost::none;
 }
 
-class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
-{
-public:
-    QnHttpConnectionListener* owner = nullptr;
-};
-
 QnRestConnectionProcessor::QnRestConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnHttpConnectionListener* _owner)
+    QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->commonModule()),
+    QnTCPConnectionProcessor(socket, owner),
     m_noAuth(false)
 {
-    Q_D(QnRestConnectionProcessor);
-    d->owner = _owner;
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
@@ -100,13 +93,13 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
 
 QnTcpListener* QnRestConnectionProcessor::owner() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->owner;
 }
 
 void QnRestConnectionProcessor::run()
 {
-    Q_D(QnRestConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
 
     initSystemThreadId();
 
@@ -124,7 +117,8 @@ void QnRestConnectionProcessor::run()
     QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded);
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
-    QnRestRequestHandlerPtr handler = d->owner->processorPool()->findHandler(url.path());
+    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
+    QnRestRequestHandlerPtr handler = owner->processorPool()->findHandler(url.path());
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
@@ -142,29 +136,47 @@ void QnRestConnectionProcessor::run()
             }
         }
 
-        if (d->request.requestLine.method.toUpper() == "GET") {
-            rez = handler->executeGet(url.path(), params, d->response.messageBody, contentType, this);
+        if (d->request.requestLine.method.toUpper() == "GET")
+        {
+            rez = handler->executeGet(url.path(), params,
+                d->response.messageBody, contentType, this);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST" ||
-                 d->request.requestLine.method.toUpper() == "PUT") {
-            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->response.messageBody, contentType, this);
+        else if (d->request.requestLine.method.toUpper() == "POST")
+        {
+            rez = handler->executePost(url.path(), params, d->requestBody,
+                nx_http::getHeaderValue(d->request.headers, "Content-Type"),
+                d->response.messageBody, contentType, this);
         }
-        else {
-            qWarning() << "Unknown REST method " << d->request.requestLine.method;
+        else if (d->request.requestLine.method.toUpper() == "PUT")
+        {
+            rez = handler->executePut(url.path(), params, d->requestBody,
+                nx_http::getHeaderValue(d->request.headers, "Content-Type"),
+                d->response.messageBody, contentType, this);
+        }
+        else if (d->request.requestLine.method.toUpper() == "DELETE")
+        {
+            rez = handler->executeDelete(url.path(), params,
+                d->response.messageBody, contentType, this);
+        }
+        else
+        {
+            NX_WARNING(this, lm("Unknown REST method %1").arg(d->request.requestLine.method));
             contentType = "text/plain";
             d->response.messageBody = "Invalid HTTP method";
-            rez = CODE_NOT_FOUND;
+            rez = nx_http::StatusCode::notFound;
         }
     }
-    else {
+    else
+    {
         rez = redirectTo(QnTcpListener::defaultPage(), contentType);
     }
+
     QByteArray contentEncoding;
     QByteArray uncompressedResponse = d->response.messageBody;
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK)
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
             contentEncoding = "gzip";
         }
     }
@@ -178,13 +190,13 @@ void QnRestConnectionProcessor::run()
 
 Qn::UserAccessData QnRestConnectionProcessor::accessRights() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->accessRights;
 }
 
 void QnRestConnectionProcessor::setAccessRights(const Qn::UserAccessData& accessRights)
 {
-    Q_D(QnRestConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
     d->accessRights = accessRights;
 }
 
@@ -195,13 +207,13 @@ void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
 
 const nx_http::Request& QnRestConnectionProcessor::request() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->request;
 }
 
 nx_http::Response* QnRestConnectionProcessor::response() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     //TODO #ak remove following const_cast in 2.3.1 (requires change in QnRestRequestHandler API)
     return const_cast<nx_http::Response*>(&d->response);
 }

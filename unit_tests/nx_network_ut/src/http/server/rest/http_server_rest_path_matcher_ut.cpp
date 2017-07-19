@@ -29,7 +29,7 @@ protected:
         std::vector<nx_http::StringType> params;
         const auto& result = m_dictionary.match(path, &params);
 
-        ASSERT_TRUE(result);
+        ASSERT_TRUE(static_cast<bool>(result));
         ASSERT_EQ(expectedValue, *result);
         ASSERT_EQ(expectedParams, params);
     }
@@ -41,7 +41,7 @@ protected:
     }
 
 private:
-    rest::RestPathMatcher<int> m_dictionary;
+    rest::PathMatcher<int> m_dictionary;
 };
 
 TEST_F(RestPathMatcher, find_handler)

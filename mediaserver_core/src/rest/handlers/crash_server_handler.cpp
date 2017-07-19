@@ -7,7 +7,7 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 int QnCrashServerHandler::executeGet(
     const QString& /*path*/,

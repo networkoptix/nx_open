@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/buffer_output_stream.h>
+#include <nx/utils/byte_stream/buffer_output_stream.h>
 #include <nx/network/http/multipart_body_serializer.h>
 
 
@@ -17,7 +17,7 @@ TEST(HttpMultipartBodySerializer, general)
     {
         const bool closeMultipartBody = i == 1;
 
-        auto bufferOutputStream = std::make_shared<nx::utils::bsf::BufferOutputStream>();
+        auto bufferOutputStream = std::make_shared<nx::utils::bstream::BufferOutputStream>();
         MultipartBodySerializer serializer(
             "boundary",
             bufferOutputStream);
@@ -58,7 +58,7 @@ TEST(HttpMultipartBodySerializer, general)
 
 TEST(HttpMultipartBodySerializer, onlyEpilogue)
 {
-    auto bufferOutputStream = std::make_shared<nx::utils::bsf::BufferOutputStream>();
+    auto bufferOutputStream = std::make_shared<nx::utils::bstream::BufferOutputStream>();
     MultipartBodySerializer serializer(
         "boundary",
         bufferOutputStream);

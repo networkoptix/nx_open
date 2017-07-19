@@ -43,9 +43,9 @@ namespace {
     class QnNetworkSpeedStrings {
         Q_DECLARE_TR_FUNCTIONS(QnNetworkSpeedStrings)
     public:
-        static QString bytesPerSecond() { return tr("b/s"); }
-        static QString kiloBytesPerSecond() { return tr("Kb/s"); }
-        static QString megaBytesPerSecond() { return tr("Mb/s"); }
+        static QString bytesPerSecond() { return tr("B/s"); }
+        static QString kiloBytesPerSecond() { return tr("kB/s"); }
+        static QString megaBytesPerSecond() { return tr("MB/s"); }
     };
 
     /** Convert angle from radians to degrees */
@@ -781,7 +781,7 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper(commonModule()).isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     auto status = m_resource->getStatus();

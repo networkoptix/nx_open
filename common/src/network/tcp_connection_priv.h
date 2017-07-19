@@ -7,44 +7,23 @@
 #include "tcp_connection_processor.h"
 
 #include "utils/common/byte_array.h"
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <core/resource_access/user_access_data.h>
 
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
-static const QByteArray STATIC_UNAUTHORIZED_HTML("\
-    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
-    <HTML>\
-    <HEAD>\
-    <TITLE>Error</TITLE>\
-    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
-    </HEAD>\
-    <BODY><H1>401 Unauthorized.</H1></BODY>\
-    </HTML>"
+static const QByteArray STATIC_UNAUTHORIZED_HTML(
+    "<!DOCTYPE html><HTML><BODY><H1>401 Unauthorized.</H1></BODY></HTML>"
 );
 
-static const QByteArray STATIC_FORBIDDEN_HTML("\
-    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
-    <HTML>\
-    <HEAD>\
-    <TITLE>Error</TITLE>\
-    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
-    </HEAD>\
-    <BODY><H1>403 Forbidden.</H1></BODY>\
-    </HTML>"
-    );
+static const QByteArray STATIC_FORBIDDEN_HTML(
+    "<!DOCTYPE html><HTML><BODY><H1>403 Forbidden.</H1></BODY></HTML>"
+);
 
-static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
-    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
-    <HTML>\
-    <HEAD>\
-    <TITLE>Error</TITLE>\
-    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
-    </HEAD>\
-    <BODY><H1>407 Proxy Unauthorized.</H1></BODY>\
-    </HTML>"
+static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML(
+    "<!DOCTYPE html><HTML><BODY><H1>407 Proxy Unauthorized.</H1></BODY></HTML>"
 );
 
 
@@ -76,6 +55,8 @@ public:
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
+        owner(nullptr),
+        isSocketTaken(false),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -106,6 +87,9 @@ public:
     Qn::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
+    QnTcpListener* owner;
+    bool isSocketTaken;
+
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;

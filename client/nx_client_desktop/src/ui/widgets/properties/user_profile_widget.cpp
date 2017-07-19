@@ -11,7 +11,6 @@
 #include <core/resource/user_resource.h>
 
 #include <common/common_module.h>
-#include <network/system_helpers.h>
 #include <helpers/system_helpers.h>
 
 #include <ui/common/read_only.h>
@@ -28,6 +27,8 @@
 #include <utils/email/email.h>
 
 #include <utils/common/url.h>
+
+#include <api/global_settings.h>
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
     base_type(parent),
@@ -168,12 +169,12 @@ void QnUserProfileWidget::applyChanges()
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
             QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
-            //TODO: #GDM #FIXME #3.1 Restore functionality
-            //QnAppServerConnectionFactory::setUrl(url);
+
+            if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+                connection->updateConnectionUrl(url);
 
             using namespace nx::client::core::helpers;
-
-            const auto localSystemId = helpers::getLocalSystemId(commonModule()->moduleInformation());
+            const auto localSystemId = commonModule()->globalSettings()->localSystemId();
             if (getCredentials(localSystemId, url.userName()).isValid())
                 storeCredentials(localSystemId, QnEncodedCredentials(url));
             qnClientCoreSettings->save();
@@ -185,7 +186,6 @@ void QnUserProfileWidget::applyChanges()
                 qnSettings->setLastUsedConnection(lastUsed);
                 qnSettings->save();
             }
-
         }
     }
 

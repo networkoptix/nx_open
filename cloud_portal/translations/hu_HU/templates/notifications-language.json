@@ -1,0 +1,17 @@
+{
+  "activate_account":{
+    "emailSubject":"Fiók nyugtásása"
+  },
+  "restore_password":{
+    "emailSubject":"Jelszó visszaállítása"
+  },
+  "system_invite":{
+    "emailSubject":"Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+  },
+  "system_shared":{
+    "emailSubject":"Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+  },
+  "review_version":{
+    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  }
+}

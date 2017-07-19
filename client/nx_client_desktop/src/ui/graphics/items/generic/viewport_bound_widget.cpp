@@ -6,29 +6,30 @@
 
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
-
 #include <ui/utils/viewport_scale_watcher.h>
 
-
-QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
+QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem* parent):
     base_type(parent),
     m_fixedSize(QSizeF(0.0, 0.0)),
+    m_scale(new QGraphicsScale(this)),
     m_scaleWatcher(new QnViewportScaleWatcher(this))
 {
-    m_scale = new QGraphicsScale(this);
-    QList<QGraphicsTransform *> transformations = this->transformations();
+    QList<QGraphicsTransform*> transformations = this->transformations();
     transformations.push_back(m_scale);
     setTransformations(transformations);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     itemChange(ItemSceneHasChanged, QVariant::fromValue(scene()));
 
     connect(m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
         &QnViewportBoundWidget::updateScale);
+
+    connect(m_scale, &QGraphicsScale::xScaleChanged, this,
+        &QnViewportBoundWidget::scaleChanged);
 }
 
 QnViewportBoundWidget::~QnViewportBoundWidget()
 {
-    return;
 }
 
 const QSizeF& QnViewportBoundWidget::fixedSize()
@@ -42,7 +43,6 @@ void QnViewportBoundWidget::setFixedSize(const QSizeF& fixedSize)
         return;
 
     m_fixedSize = fixedSize;
-
     updateScale();
 }
 
@@ -59,15 +59,9 @@ void QnViewportBoundWidget::updateScale()
     QSizeF resultingSize = size();
     if (resultingSize.width() > geometry.width() || resultingSize.height() > geometry.height())
     {
-        qreal k;
-        if (qFuzzyIsNull(geometry.width()) || qFuzzyIsNull(geometry.height()))
-        {
-            k = 1.0e6;
-        }
-        else
-        {
-            k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
-        }
+        const qreal k = (qFuzzyIsNull(geometry.width()) || qFuzzyIsNull(geometry.height()))
+            ? 1.0e6
+            : qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
 
         geometry.setSize(geometry.size() * k);
         scale /= k;
@@ -75,14 +69,29 @@ void QnViewportBoundWidget::updateScale()
     }
 
     /* Assume affine transform that does not change x/y scale separately. */
-    m_scale->setXScale(scale);
     m_scale->setYScale(scale);
+    m_scale->setXScale(scale);
+}
+
+qreal QnViewportBoundWidget::scale() const
+{
+    return m_scale->xScale();
+}
+
+qreal QnViewportBoundWidget::sceneScale() const
+{
+    return m_scaleWatcher->scale();
+}
+
+qreal QnViewportBoundWidget::relativeScale() const
+{
+    return scale() / sceneScale();
 }
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVariant& value)
 {
     if (change == ItemSceneHasChanged)
     {
@@ -93,11 +102,10 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
     return base_type::itemChange(change, value);
 }
 
-void QnViewportBoundWidget::setGeometry(const QRectF &geometry)
+void QnViewportBoundWidget::setGeometry(const QRectF& geometry)
 {
     QSizeF oldSize = size();
     base_type::setGeometry(geometry);
     if (!qFuzzyEquals(size(), oldSize))
         updateScale();
 }
-

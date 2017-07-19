@@ -34,6 +34,9 @@ public:
 
     QnLayoutResourcePtr clone() const;
 
+    /** Create a new layout with a given resource on it. */
+    static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
+
     virtual QString toSearchString() const override;
 
     void setItems(const QnLayoutItemDataList &items);
@@ -107,7 +110,6 @@ public:
      * * videowalls (videowall as a parent)
      * * videowall reviews (videowall as a parent)
      * * lite client control (server as a parent)
-     * * layout tours review (tour id as a parent id)
      */
     bool isServiceLayout() const;
 

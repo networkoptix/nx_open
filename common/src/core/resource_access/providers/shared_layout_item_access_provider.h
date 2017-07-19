@@ -12,7 +12,7 @@ class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnSharedLayoutItemAccessProvider(QObject* parent = nullptr);
+    QnSharedLayoutItemAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnSharedLayoutItemAccessProvider();
 
 protected:

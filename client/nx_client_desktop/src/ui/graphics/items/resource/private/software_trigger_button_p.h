@@ -49,6 +49,9 @@ public:
     SoftwareTriggerButton::State state() const;
     void setState(SoftwareTriggerButton::State state);
 
+    bool isLive() const;
+    void setLive(bool value);
+
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);
 
@@ -62,10 +65,13 @@ private:
 
     void paintPixmap(QPainter* painter, const QPixmap& pixmap);
 
-    void setStateTimer(QTimer* timer);
+    void scheduleChange(std::function<void()> callback, int delayMs);
+    void cancelScheduledChange();
 
     QPixmap generatePixmap(const QColor& background, const QColor& frame, const QPixmap& icon);
     void ensureImages();
+
+    void updateToolTipText();
 
     QRect buttonRect() const;
 
@@ -73,13 +79,15 @@ private:
     QString m_iconName;
     QSize m_buttonSize;
     Qt::Edge m_toolTipEdge = Qt::LeftEdge;
+    QString m_toolTipText;
     bool m_prolonged = false;
+    bool m_live = true;
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
-    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::kDefaultState;
+    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::State::Default;
     QScopedPointer<QnBusyIndicatorGraphicsWidget> m_busyIndicator;
-    QPointer<QTimer> m_stateTimer = nullptr;
+    QPointer<QTimer> m_scheduledChangeTimer = nullptr;
     bool m_imagesDirty = false;
 
     QElapsedTimer m_animationTime;
@@ -88,6 +96,8 @@ private:
     QPixmap m_failurePixmap;
     QPixmap m_failureFramePixmap;
     QPixmap m_activityFramePixmap;
+    QPixmap m_goToLivePixmap;
+    QPixmap m_goToLivePixmapPressed;
 };
 
 } // namespace graphics

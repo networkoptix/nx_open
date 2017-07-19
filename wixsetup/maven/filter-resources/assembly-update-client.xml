@@ -11,11 +11,11 @@
             <includes>
                 <include>audio/qtaudio_windows.dll</include>
                 <include>fonts/*.ttf</include>
-                <include>help/**</include>
                 <include>imageformats/qgif.dll</include>
                 <include>imageformats/qjpeg.dll</include>
                 <include>imageformats/qtiff.dll</include>
                 <include>platforms/qwindows.dll</include>
+                <include>mediaservice/*.dll</include>
                 <include>vox/**</include>
                 <include>av*.dll</include>
                 <include>${applauncher.binary.name}</include>
@@ -34,11 +34,19 @@
             </includes>
             <excludes>
                 <exclude>libvorbisfile.dll</exclude>
+                <exclude>mediaservice/*d.dll</exclude>
             </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/clientqml</directory>
             <outputDirectory>../qml</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet> 
+        <fileSet>
+            <directory>${ClientHelpSourceDir}</directory>
+            <outputDirectory>../help</outputDirectory>
             <includes>
                 <include>**</include>
             </includes>

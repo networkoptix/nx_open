@@ -19,7 +19,7 @@ namespace hpm {
 
 class MediaServerEmulator:
     public network::aio::BasicPollable,
-    public StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     enum class ActionToTake
@@ -73,6 +73,7 @@ public:
         boost::optional<nx::String> serverId);
 
     nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
+    hpm::api::MediatorConnector& mediatorConnector();
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 
 private:
@@ -102,7 +103,7 @@ private:
     void onUdtConnectDone(SystemError::ErrorCode errorCode);
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* acceptedSocket);
+        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
     void onMessageReceived(nx::stun::Message message);
 
     virtual void closeConnection(

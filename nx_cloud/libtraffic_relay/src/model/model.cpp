@@ -5,7 +5,8 @@ namespace cloud {
 namespace relay {
 
 Model::Model(const conf::Settings& settings):
-    m_clientSessionPool(settings)
+    m_clientSessionPool(settings),
+    m_listeningPeerPool(settings)
 {
 }
 

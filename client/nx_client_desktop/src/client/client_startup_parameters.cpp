@@ -1,9 +1,11 @@
-
 #include "client_startup_parameters.h"
+
+#include <QtCore/QFile>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
+#include <utils/common/util.h>
 #include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
@@ -11,13 +13,6 @@
 
 namespace
 {
-    const bool kDefaultNoFullScreen =
-#ifdef Q_OS_MAC
-        true;
-#else
-        false;
-#endif
-
     template<typename ValueType>
     void addParserParam(QnCommandLineParser &parser
         , ValueType *valuePtr
@@ -52,12 +47,13 @@ const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
 const QString QnStartupParameters::kSelfUpdateKey(lit("--self-update"));
 
-QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
-    , char **argv)
+QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** argv)
 {
     QnStartupParameters result;
 
     QnCommandLineParser commandLineParser;
+    QStringList unparsed;
+    commandLineParser.storeUnparsed(&unparsed);
 
     /* Options used to open new client window. */
     addParserParam(commandLineParser, &result.allowMultipleClientInstances, kAllowMultipleClientInstancesKey);
@@ -67,10 +63,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
 
     /* Development options */
-#ifdef ENABLE_DYNAMIC_TRANSLATION
-    addParserParam(commandLineParser, &result.dynamicTranslationPath, "--translation");
-#endif
-
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
     addParserParam(commandLineParser, &result.devModeKey,           "--dev-mode-key");
     addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
@@ -80,6 +72,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
     addParserParam(commandLineParser, &result.exportedMode,         "--exported");
+    addParserParam(commandLineParser, &result.hiDpiDisabled,        "--no-hidpi");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
     addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
 
@@ -118,6 +111,15 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
+    // First unparsed entry is the application path.
+    NX_EXPECT(!unparsed.empty());
+    for (int i = 1; i < unparsed.size(); ++i)
+    {
+        const auto source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion
+        QString fileName = QFile::decodeName(source);
+        result.files.append(fromNativePath(fileName));
+    }
+
     return result;
 }
 
@@ -151,36 +153,6 @@ QUrl QnStartupParameters::parseAuthenticationString() const
 bool QnStartupParameters::isDevMode() const
 {
     /* MD5("razrazraz") */
-    return QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5)
+    return nx::utils::QnCryptographicHash::hash(devModeKey.toLatin1(), nx::utils::QnCryptographicHash::Md5)
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
-}
-
-QnStartupParameters::QnStartupParameters():
-    screen(kInvalidScreen),
-
-    allowMultipleClientInstances(false),
-    skipMediaFolderScan(false),
-    ignoreVersionMismatch(false),
-    vsyncDisabled(false),
-    clientUpdateDisabled(false),
-    softwareYuv(false),
-    forceLocalSettings(false),
-    fullScreenDisabled(kDefaultNoFullScreen),
-    showFullInfo(false),
-    exportedMode(false),
-    selfUpdateMode(false),
-
-    devModeKey(),
-    authenticationString(),
-    delayedDrop(),
-    instantDrop(),
-    logLevel(),
-    ec2TranLogLevel(),
-    dynamicTranslationPath(),
-    lightMode(),
-    videoWallGuid(),
-    videoWallItemGuid(),
-    engineVersion(),
-    dynamicCustomizationPath()
-{
 }

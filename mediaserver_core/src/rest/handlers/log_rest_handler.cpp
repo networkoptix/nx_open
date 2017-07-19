@@ -6,7 +6,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource_access/resource_access_manager.h>
 
@@ -49,7 +49,11 @@ int QnLogRestHandler::executeGet(
     if (idIter != params.end())
         logId = idIter->second.toInt();
 
-    if (!QnLog::logs()->exists(logId))
+    boost::optional<QString> logFilePath;
+    if (const auto logger = QnLogs::logger(logId))
+        logFilePath = logger->filePath();
+
+    if (!logFilePath)
     {
         result.append(QString("<root>Bad log file id</root>\n"));
         return nx_http::StatusCode::badRequest;
@@ -58,8 +62,7 @@ int QnLogRestHandler::executeGet(
     if (linesToRead == 0ll)
         linesToRead = 1000000ll;
 
-    QString fileName = QnLog::logFileName(logId);
-    QFile f(fileName);
+    QFile f(*logFilePath);
     if (!f.open(QFile::ReadOnly))
     {
         result.append(QString("<root>Can't open log file</root>\n"));

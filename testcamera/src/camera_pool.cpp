@@ -24,7 +24,7 @@ public:
 protected:
     virtual void run() override
     {
-        std::auto_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
+        std::unique_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
         if( m_localInterfacesToListen.isEmpty() )
             discoverySock->bind( SocketAddress( HostAddress::anyHost, TestCamConst::DISCOVERY_PORT ) );
         else
@@ -133,7 +133,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, commonModule());
+    return new QnTestCameraProcessor(clientSocket, this);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

@@ -5,6 +5,7 @@
 #include <QtWidgets/QDialog>
 
 #include <nx_ec/ec_api.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <client/client_settings.h>
 #include <ui/dialogs/common/button_box_dialog.h>
@@ -70,8 +71,8 @@ private:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
-    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
+    void at_moduleChanged(nx::vms::discovery::ModuleEndpoint data);
+    void at_moduleLost(QnUuid id);
 
     QUrl currentUrl() const;
     bool isValid() const;

@@ -14,11 +14,11 @@ function upload() {
 
     mkdir -p "$PACKAGE_DIR"/bin
     cp -f ${basedir}/external.dat "$PACKAGE_DIR"/bin
-    cp -f ${basedir}/server-external.cmake "$PACKAGE_DIR"
     ${root.dir}/build_utils/python/rdep.py -u -f -t any $PACKAGE --root $ROOT
 }
 
 upload "server-external-${branch}"
-if [[ "${branch}" == "prod_${release.version}" ]]; then
-    upload "server-external-${release.version}"
+if [[ "${branch}" == "vms_${parsedVersion.majorVersion}.${parsedVersion.minorVersion}_web" ]]
+then
+    upload "server-external-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"
 fi
