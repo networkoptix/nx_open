@@ -514,12 +514,12 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, Qn
 //------------------------------------ QnCompressedMetadata --------------------------------------
 
 QnCompressedMetadata::QnCompressedMetadata(MetadataType type):
-    QnAbstractCompressedMetadata(MetadataType::ObjectDetection)
+    QnAbstractCompressedMetadata(type)
 {
 }
 
 QnCompressedMetadata::QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
-    QnAbstractCompressedMetadata(MetadataType::ObjectDetection, allocator)
+    QnAbstractCompressedMetadata(type, allocator)
 {
 }
 
