@@ -180,9 +180,7 @@ struct QnAbstractCompressedMetadata: public QnAbstractMediaData
 public:
     QnAbstractCompressedMetadata(MetadataType type);
 
-    QnAbstractCompressedMetadata(
-        MetadataType type,
-        QnAbstractAllocator* allocator);
+    QnAbstractCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator);
 
     bool containTime(const qint64 timeUsec) const;
 
@@ -239,7 +237,7 @@ public:
 bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs);
 bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data);
 
-struct QnMetaDataV1 : public QnAbstractMediaData
+struct QnMetaDataV1: public QnAbstractCompressedMetadata
 {
 
 public:
@@ -306,8 +304,6 @@ public:
 
 public:
     quint8 m_input;
-    qint64 m_duration;
-    QnByteArray m_data;
 
 protected:
     void assign(const QnMetaDataV1* other);

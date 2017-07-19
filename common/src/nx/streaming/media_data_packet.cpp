@@ -104,8 +104,7 @@ size_t QnEmptyMediaData::dataSize() const
 
 //TODO #ak delegate constructor
 QnMetaDataV1::QnMetaDataV1(int initialValue):
-    QnAbstractMediaData(META_V1),
-    m_data(CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
+    QnAbstractCompressedMetadata(MetadataType::Motion)
 {
     flags = 0;
     m_input = 0;
@@ -119,8 +118,7 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
 }
 
 QnMetaDataV1::QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue):
-    QnAbstractMediaData(META_V1),
-    m_data(allocator, CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
+    QnAbstractCompressedMetadata(MetadataType::Motion, allocator)
 {
     flags = 0;
     m_input = 0;
