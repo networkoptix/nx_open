@@ -11,6 +11,7 @@
 
 typedef QVector<QnUuid> IDList;
 class QnBusinessTypesComparator;
+class QnSubjectValidationPolicy;
 
 namespace nx { namespace vms { namespace event { class QnBusinessStringsHelper; }}}
 
@@ -31,6 +32,8 @@ public:
     QnResourceSelectionDialog::Filter selectionTarget() const;
     void setSelectionTarget(QnResourceSelectionDialog::Filter target);
 
+    void setSubjectValidationPolicy(QnSubjectValidationPolicy* policy); //< Takes ownership.
+
 signals:
     void commit();
 
@@ -45,6 +48,7 @@ private:
     QSet<QnUuid> m_resources;
     QnResourceSelectionDialogDelegate* m_dialogDelegate;
     QnResourceSelectionDialog::Filter m_target;
+    QScopedPointer<QnSubjectValidationPolicy> m_subjectValidation;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware

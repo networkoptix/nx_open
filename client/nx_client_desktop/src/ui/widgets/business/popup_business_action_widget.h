@@ -30,6 +30,8 @@ private slots:
 
 private:
     void parametersChanged();
+    bool isRoleValid(const QnUuid& roleId) const;
+    void updateValidationPolicy();
 
 private:
     QScopedPointer<Ui::PopupBusinessActionWidget> ui;
