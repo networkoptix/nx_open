@@ -70,6 +70,9 @@ class VagrantBoxServerCtl(ServerCtl):
     def set_state(self, is_started):
         self._run_service_action('start' if is_started else 'stop')
 
+    def make_core_dump(self):
+        self.host.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
+
     def _run_service_action(self, action):
         return self.host.run_command([action, self._service_name])
 
@@ -98,6 +101,9 @@ class PhysicalHostServerCtl(ServerCtl):
 
     def set_state(self, is_started):
         self._run_service_action('start' if is_started else 'stop')
+
+    def make_core_dump(self):
+        self._run_service_action('make_core_dump')
 
     def _run_service_action(self, action):
         server_ctl_path = os.path.join(self._dir, 'server_ctl.sh')
