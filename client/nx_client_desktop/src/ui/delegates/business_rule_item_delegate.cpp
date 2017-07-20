@@ -324,10 +324,15 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             else if (actionType == vms::event::showPopupAction)
             {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
-                btn->setSubjectValidationPolicy(model->actionParams().needConfirmation
-                    ? new QnRequiredPermissionSubjectPolicy(
-                        Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks"))
-                    : new QnDefaultSubjectValidationPolicy());
+                if (model->actionParams().needConfirmation)
+                {
+                    btn->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
+                        Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+                }
+                else
+                {
+                    btn->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
+                }
             }
             else if (actionType == vms::event::playSoundAction ||
                 actionType == vms::event::playSoundOnceAction ||

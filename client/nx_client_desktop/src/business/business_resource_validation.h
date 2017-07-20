@@ -198,6 +198,7 @@ class QnSubjectValidationPolicy: public QnConnectionContextAware
 {
 public:
     QnSubjectValidationPolicy(bool allowEmptySelection = false);
+    virtual ~QnSubjectValidationPolicy();
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const = 0;
     virtual bool userValidity(const QnUserResourcePtr& user) const = 0;
@@ -229,10 +230,10 @@ public:
 };
 
 // Subject validation policy when one global permission is required.
-class QnRequiredPermissionSubjectPolicy: public QnDefaultSubjectValidationPolicy
+class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
 {
     Q_DECLARE_TR_FUNCTIONS(QnRequiredPermissionSubjectPolicy)
-    using base_type = QnDefaultSubjectValidationPolicy;
+    using base_type = QnSubjectValidationPolicy;
 
 public:
     QnRequiredPermissionSubjectPolicy(Qn::GlobalPermission requiredPermission,

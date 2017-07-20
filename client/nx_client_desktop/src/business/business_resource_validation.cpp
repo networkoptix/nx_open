@@ -443,6 +443,10 @@ QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
 {
 }
 
+QnSubjectValidationPolicy::~QnSubjectValidationPolicy()
+{
+}
+
 void QnSubjectValidationPolicy::analyze(
     bool allUsers,
     const QSet<QnUuid>& subjects,
