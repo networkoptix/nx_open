@@ -658,7 +658,6 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
     {
-        const auto stringKey = QString::fromLatin1(it.key().begin());
         const auto license = findLicense(it.key(), licenses);
         const auto licenseDescription = getLicenseDescription(license);
         const auto error = setWarningStyleHtml(Deactivator::errorDescription(it.value()));
@@ -681,12 +680,15 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 {
     const auto filteredErrors = filterDeactivationErrors(errors);
     const int errorsCount = filteredErrors.size();
+    const auto icon = errorsCount < licenses.size()
+        ? QnMessageBoxIcon::Information
+        : QnMessageBoxIcon::Critical;
     const auto text = getDeactivationErrorCaption(licenses.size(), errorsCount);
     const auto extras = getDeactivationErrorMessage(licenses, filteredErrors);
 
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
-    QnMessageBox dialog(QnMessageBoxIcon::Information, text, QString(),
+    QnMessageBox dialog(icon, text, QString(),
         standardButton, QDialogButtonBox::NoButton);
 
     const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
