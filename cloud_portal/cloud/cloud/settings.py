@@ -251,7 +251,7 @@ IP_WHITELISTS = {
 }
 
 AUTH_USER_MODEL = 'api.Account'
-AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend',)
+AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', 'django.contrib.auth.backends.ModelBackend')
 
 
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
