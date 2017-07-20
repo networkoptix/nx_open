@@ -13,6 +13,7 @@
 #include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
+#include "tunnel_attributes.h"
 
 namespace nx {
 namespace network {
@@ -44,6 +45,7 @@ public:
 
     typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
+        TunnelAttributes tunnelAttributes,
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 
     OutgoingTunnel(AddressEntry targetPeerAddress);
@@ -98,6 +100,7 @@ private:
     QnMutex m_mutex;
     State m_state;
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
+    TunnelAttributes m_attributes;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
