@@ -44,7 +44,6 @@ case "$1" in
 
         yes "yes" | /app/env/bin/python manage.py migrate
         yes "yes" | /app/env/bin/python manage.py createcachetable
-        yes "yes" | /app/env/bin/python manage.py collectstatic
         /app/env/bin/python manage.py initdb
         /app/env/bin/python manage.py readstructure
         /app/env/bin/python manage.py initbranding

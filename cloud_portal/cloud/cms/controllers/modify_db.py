@@ -5,7 +5,7 @@ from notifications.engines.email_engine import send
 from PIL import Image
 import base64, ast
 
-from .filldata import fill_content, make_dir
+from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
@@ -194,23 +194,4 @@ def check_image_dimensions(data_structure_name, meta_dimensions, image_dimension
 	   	size_error_msgs.append((data_structure_name, error_msg))
 
 	return size_error_msgs
-
-
-#date is a string var can be either 'created_date' or 'accepted_date'
-def convert_latest_b64_images_to_png(customization, date='created_date'):
-	latest_version = ContentVersion.objects.filter(customization=customization).latest(date)
-	
-	#todo find out where to save it currently its going into /app/app/static/custom/static/images
-	image_directory = '{}{}'.format(settings.STATIC_ROOT,'/images/')
-	make_dir(image_directory)
-
-	for record in latest_version.datarecord_set.filter(data_structure__type=DataStructure.get_type('Image')):
-		file_name = "{}{}.png".format(image_directory, record.data_structure.name)
-		#if the images is empty do not overwrite old image
-		if not record.value:
-			continue
-
-		image_png = base64.b64decode(record.value)
-		with open(file_name, 'wb') as f:
-			f.write(image_png)
 
