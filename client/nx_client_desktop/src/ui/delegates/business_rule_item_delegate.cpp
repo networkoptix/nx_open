@@ -113,7 +113,7 @@ void QnSelectResourcesDialogButton::at_clicked()
                 if (m_dialogDelegate)
                 {
                     dialog.showAlert(m_dialogDelegate->validationMessage(
-                        dialog.totalCheckedUsers()));
+                        dialog.checkedSubjects()));
                 }
                 else
                 {
