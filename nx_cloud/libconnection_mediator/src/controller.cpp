@@ -14,7 +14,8 @@ Controller::Controller(
             settings.cloudDB().url,
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),
-            settings.cloudDB().updateInterval)
+            settings.cloudDB().updateInterval,
+            settings.cloudDB().startTimeout)
         : nullptr),
     m_mediaserverApi(m_cloudDataProvider.get(), stunMessageDispatcher),
     m_listeningPeerRegistrator(

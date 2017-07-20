@@ -233,8 +233,9 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
     if (params.eventType >= vms::event::userDefinedEvent)
     {
-        if (!check(params.resourceName.isEmpty() && params.caption.isEmpty()
-                && params.description.isEmpty(),
+        if (!check(!params.resourceName.isEmpty()
+                || !params.caption.isEmpty()
+                || !params.description.isEmpty(),
             lit("At least one of values 'source', 'caption' or 'description' should be filled")))
         {
             return false;

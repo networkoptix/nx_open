@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -484,22 +492,6 @@
         <numerusform>%n %2 sẽ được sử dụng trong tổng số %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Có một vấn đề kích hoạt key bản quyền của bạn. xảy ra một lỗi cơ sở dữ liệu.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Có một vấn đề kích hoạt key bản quyền của bạn. dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation type="unfinished">
@@ -512,21 +504,12 @@
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation type="unfinished">This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>chữ ký không hợp lệ</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>máy chủ với phù hợp với phần cứng của bạn không tìm thấy</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -551,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>lỗi không xác định</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -662,16 +649,16 @@
       <translation>miễn phí bản quyền</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation type="unfinished">Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1032,10 +1019,6 @@
       <translation>video khẩn cấp</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>Ghi vào kỷ lục</translation>
     </message>
@@ -1132,10 +1115,6 @@
     <message>
       <source>Any Event</source>
       <translation>bất kỳ tổ chức sự kiện</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1248,16 +1227,8 @@
       <translation>Sự kiện Generic %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>Một sự kiện chưa biết</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1474,6 +1445,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>Chọn ít nhất một người dùng</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

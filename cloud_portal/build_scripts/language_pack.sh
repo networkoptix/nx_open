@@ -4,7 +4,6 @@ CURRENTDIR=$(pwd)
 PARENTDIR=$(dirname -- "$CURRENTDIR")
 CROWDIN_OPERATION=$1
 DIRECTORY=language_pack
-. ../env/bin/activate
 
 rm -rf $DIRECTORY || true
 mkdir $DIRECTORY

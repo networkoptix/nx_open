@@ -353,6 +353,7 @@ void QnUserManagementWidget::applyChanges()
 
                 emit hasChangesChanged();
             });
+        emit hasChangesChanged();
     }
     else
     {
@@ -362,6 +363,9 @@ void QnUserManagementWidget::applyChanges()
 
 bool QnUserManagementWidget::hasChanges() const
 {
+    if (!isEnabled())
+        return false;
+
     using boost::algorithm::any_of;
     return any_of(resourcePool()->getResources<QnUserResource>(),
         [this, users = m_usersModel->users()](const QnUserResourcePtr& user)

@@ -47,7 +47,7 @@ static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
 
 static const QSize kCellSize{1, 1};
 
-QRect createItemGrid(const QPoint& topLeft, int itemCount)
+QRect createItemGrid(int itemCount)
 {
     static const QSize kMinMatrixSize(2, 2);
     QSize size(kMinMatrixSize);
@@ -61,7 +61,7 @@ QRect createItemGrid(const QPoint& topLeft, int itemCount)
     if (itemCount > 8)
         size.setHeight(std::max(4, root));
 
-    return QRect(topLeft, size);
+    return QRect({0, 0}, size);
 }
 
 struct GridWalker
@@ -335,7 +335,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
     const int itemCount = layout->items().size();
 
-    QRect boundingRect = createItemGrid(layout->boundingRect().topLeft(), itemCount);
+    QRect boundingRect = createItemGrid(itemCount);
 
     static const int kMaxSize = 4;
     if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
@@ -393,9 +393,6 @@ void LayoutTourReviewController::updateItemsLayout()
 
     auto layoutItems = wbLayout->items().toList();
     QnWorkbenchItem::sortByGeometry(&layoutItems);
-    const auto topLeft = layoutItems.empty()
-        ? QPoint(0, 0)
-        : layoutItems.first()->geometry().topLeft();
 
     for (auto layoutItem : layoutItems)
     {
@@ -403,7 +400,7 @@ void LayoutTourReviewController::updateItemsLayout()
         NX_EXPECT(unpinned);
     }
 
-    const auto itemGrid = createItemGrid(topLeft, (int)tour.items.size());
+    const auto itemGrid = createItemGrid((int)tour.items.size());
     GridWalker walker(itemGrid);
 
     // Dynamically reorder existing items to match new order (if something was added or removed).
@@ -454,7 +451,7 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
 
     const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
 
-    const auto grid = createItemGrid({0, 0}, gridSize);
+    const auto grid = createItemGrid(gridSize);
     GridWalker walker(grid);
 
     for (const auto& item: items)

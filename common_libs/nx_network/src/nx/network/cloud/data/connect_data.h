@@ -55,6 +55,11 @@ public:
     std::list<SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
     boost::optional<nx::String> trafficRelayUrl;
+    /**
+     * May differ from ConnectRequest::destinationHostName 
+     * if connect by domain name (e.g., cloud system id) has been requested.
+     */
+    nx::String destinationHostFullName;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
 

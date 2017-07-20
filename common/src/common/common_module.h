@@ -175,7 +175,7 @@ public:
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;
 
-    void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
+    void setModuleGUID(const QnUuid& guid);
     QnUuid moduleGUID() const{ return m_uuid; }
 
     QnUuid runningInstanceGUID() const;

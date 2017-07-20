@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <unordered_map>
+#include <unordered_set>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -82,6 +83,7 @@ private:
     QnMutex m_timerManagerMutex;
     std::unordered_map<QnUuid, nx::utils::TimerId> m_taskToTimer;
     std::unordered_map<QnUuid, std::unordered_map<QnUuid, ScheduleParams>> m_functorToTaskToParams;
+    std::unordered_set<QnUuid> m_delayed;
 };
 
 }

@@ -86,7 +86,7 @@ ExportRapidReview::ExportRapidReview(QWidget *parent, Qt::WindowFlags windowFlag
 
             QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
             Q_D(ExportRapidReview);
-            d->setResultLengthUnits(value);
+            d->setResultLengthInSelectedUnits(value);
             updateRanges();
             updateControls();
         });
@@ -167,7 +167,8 @@ void ExportRapidReview::updateRanges()
 
     ui->speedSpinBox->setRange(d->minAbsoluteSpeed(), d->maxAbsoluteSpeed());
     ui->speedSlider->setRange(d->minSliderSpeed(), d->maxSliderSpeed());
-    ui->resultLengthSpinBox->setRange(d->minResultLengthUnits(), d->maxResultLengthUnits());
+    ui->resultLengthSpinBox->setRange(d->minResultLengthInSelectedUnits(),
+        d->maxResultLengthInSelectedUnits());
 }
 
 void ExportRapidReview::updateControls()
@@ -177,8 +178,8 @@ void ExportRapidReview::updateControls()
 
     ui->speedSpinBox->setValue(d->absoluteSpeed());
     ui->speedSlider->setValue(d->sliderSpeed());
-    ui->resultLengthUnitsComboBox->setCurrentIndex(d->selectedLengthUnit());
-    ui->resultLengthSpinBox->setValue(d->resultLengthUnits());
+    ui->resultLengthUnitsComboBox->setCurrentIndex(d->selectedLengthUnitIndex());
+    ui->resultLengthSpinBox->setValue(d->resultLengthInSelectedUnits());
     ui->framesLabel->setText(durationMsToString(d->frameStepMs()));
 }
 

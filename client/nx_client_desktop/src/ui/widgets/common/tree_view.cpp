@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimerEvent>
 #include <QtCore/QScopedValueRollback>
-
 #include <QtGui/QDragMoveEvent>
 
 #include <utils/common/variant.h>

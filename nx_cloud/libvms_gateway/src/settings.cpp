@@ -78,6 +78,9 @@ const size_t kDefaultPoolSize(1);
 const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
 const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
 
+const QLatin1String kStartTimeout("cloudConnect/tcpReverseStartTimeout");
+const std::chrono::minutes kDefaultStartTimeout(5);
+
 } // namespace tcp_reverse
 
 const QLatin1String kPreferedSslMode("cloudConnect/preferedSslMode");
@@ -238,6 +241,12 @@ void Settings::loadSettings()
     m_cloudConnect.tcpReverse.keepAlive =
         KeepAliveOptions::fromString(settings().value(
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
+    m_cloudConnect.tcpReverse.startTimeout =
+        std::chrono::duration_cast<std::chrono::seconds>(
+            nx::utils::parseTimerDuration(
+                settings().value(
+                    tcp_reverse::kStartTimeout).toString(), 
+                    tcp_reverse::kDefaultStartTimeout));
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")

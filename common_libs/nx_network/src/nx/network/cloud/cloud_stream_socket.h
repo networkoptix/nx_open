@@ -12,6 +12,7 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
+#include "tunnel/tunnel_attributes.h"
 
 namespace nx {
 namespace network {
@@ -84,6 +85,8 @@ public:
 
     virtual bool isInSelfAioThread() const override;
 
+    virtual QString getForeignHostFullCloudName() const;
+
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
         SocketResultPrimisePtr;
@@ -100,6 +103,7 @@ private:
     void onDirectConnectDone(SystemError::ErrorCode errorCode);
     void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
+        TunnelAttributes cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
     void cancelIoWhileInAioThread(aio::EventType eventType);
@@ -114,6 +118,7 @@ private:
     aio::BasicPollable m_readIoBinder;
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
+    TunnelAttributes m_cloudTunnelAttributes;
 
     QnMutex m_mutex;
     bool m_terminated;

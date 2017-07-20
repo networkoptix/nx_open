@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -490,22 +498,6 @@
         <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>מפתח הרשיון שהכנסת שגוי. אנא בדוק שהזנת את המפתח כראוי. במידה והבעיה נמשכת, אנא צור קשר עם קבוצת התמיכה על מנת לוודא את תקינות המפתח או להשיג מפתח תקין.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>אתה מנסה להפעיל רשיון שאיננו תואם לתוכנה. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -524,21 +516,12 @@
         <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>מפתח רישיון זה הופעל בעבר על ידי מזהה החומרה %1 ב- %2. צור קשר עם צוות התמיכה כדי לקבל מפתח רישיון חוקי.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>החתימה איננה תקינה</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -563,6 +546,10 @@
     <message>
       <source>Unknown error</source>
       <translation>שגיאה לא מוגדרת</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -692,16 +679,16 @@
       <translation>רשיון חינמי</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>מזהה חומרה: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>מורשה ל: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>סימן מים: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1086,10 +1073,6 @@
       <translation>הקלטת מצוקה</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation>שלח דוא"ל</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation>כתוב לתיעוד</translation>
     </message>
@@ -1189,10 +1172,6 @@
     <message>
       <source>Any Event</source>
       <translation>כל אירוע</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation>מיתוג תוכנתי</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1323,16 +1302,8 @@
       <translation>אירוע כללי ב %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation>מיתוג תוכנתי %1 ב %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation>אירוע לא מוגדר אירע</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation>מיתוג תוכנתי %1 הופעל מספר פעמים</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1529,7 +1500,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>שם מיתוג</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1564,6 +1535,26 @@
     <message>
       <source>Select at least one user</source>
       <translation>בחר לפחות משתמש אחד</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation>מיתוג תוכנתי</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation>מיתוג תוכנתי %1 ב %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation>מיתוג תוכנתי %1 הופעל מספר פעמים</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation>שלח דוא"ל</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>אשר</translation>
     </message>
   </context>
   <context>

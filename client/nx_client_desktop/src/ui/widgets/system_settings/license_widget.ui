@@ -181,7 +181,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="hardwareIdLabel">
          <property name="text">
-          <string>Hardware ID</string>
+          <string>Hardware Id</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -298,15 +298,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnBusyIndicatorButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">ui/widgets/common/busy_indicator_button.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnBusyIndicatorButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">ui/widgets/common/busy_indicator_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

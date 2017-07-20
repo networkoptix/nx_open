@@ -84,6 +84,14 @@
     </message>
   </context>
   <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -494,22 +502,6 @@
         <numerusform>%n %2 will be used out of %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation type="unfinished">The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation type="unfinished">You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation type="unfinished">There was a problem activating your license key. A database error occurred.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation type="unfinished">There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation type="unfinished">
@@ -532,21 +524,12 @@
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation type="unfinished">This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation type="unfinished">Invalid signature</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation type="unfinished">Server with matching hardware ID not found</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -571,6 +554,10 @@
     <message>
       <source>Unknown error</source>
       <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -712,16 +699,16 @@
       <translation type="unfinished">FREE License</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation type="unfinished">Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1122,10 +1109,6 @@
       <translation type="unfinished">Panic recording</translation>
     </message>
     <message>
-      <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
-    </message>
-    <message>
       <source>Write to log</source>
       <translation type="unfinished">Write to log</translation>
     </message>
@@ -1227,10 +1210,6 @@
     <message>
       <source>Any Event</source>
       <translation type="unfinished">Any Event</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1373,16 +1352,8 @@
       <translation type="unfinished">Generic Event at %1</translation>
     </message>
     <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>An unknown event has occurred</source>
       <translation type="unfinished">An unknown event has occurred</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1624,6 +1595,26 @@
     <message>
       <source>Select at least one user</source>
       <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

@@ -80,8 +80,8 @@
       <translation>Вход</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>Неверный Email / пароль</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>

@@ -63,6 +63,9 @@ private:
     const int m_proxyingId;
     static std::atomic<int> m_proxyingIdSequence;
 
+    void replaceTargetHostWithFullCloudNameIfAppropriate(
+        const AbstractStreamSocket* connectionToTheTargetPeer);
+
     void onMessageFromTargetHost(nx_http::Message message);
     bool messageBodyNeedsConvertion(const nx_http::Response& response);
     void startMessageBodyStreaming(nx_http::Message message);
