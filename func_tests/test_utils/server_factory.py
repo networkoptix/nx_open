@@ -66,7 +66,7 @@ class ServerFactory(object):
         for server in self._allocated_servers:
             self._save_server_artifacts(server)
         if self._physical_installation_ctl:
-            self._physical_installation_ctl.release_all()
+            self._physical_installation_ctl.release_all_servers()
         self._allocated_servers = []
 
     def _save_server_artifacts(self, server):
