@@ -47,6 +47,8 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (fields.testFlag(Field::actionParams))
         ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);
 
+    ui->acknowledgementLabel->setVisible(ui->forceAcknoledgementCheckBox->isEnabled());
+
     updateValidationPolicy();
     base_type::at_model_dataChanged(fields);
 }
