@@ -23,7 +23,7 @@ public:
     RemoteRelayPeerPool(const char* cassandraHost);
 
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
-    cf::future<bool> addPeer(const std::string& domainName);
+    cf::future<bool> addPeer(const std::string& domainName, const std::string& relayHost);
 
 protected:
     cassandra::AsyncConnection* getConnection();
@@ -36,7 +36,10 @@ private:
 
     void prepareDbStructure();
     std::string whereStringForFind(const std::string& domainName) const;
-    bool bindInsertParameters(cassandra::Query* query, const std::string& domainName) const;
+    bool bindInsertParameters(
+        cassandra::Query* query,
+        const std::string& domainName,
+        const std::string& relayHost) const;
     cf::future<int> getLocalHostId() const;
 };
 
