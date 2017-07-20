@@ -4,7 +4,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <transaction/transaction_message_bus_base.h>
+#include <transaction/message_bus_selector.h>
 #include <transaction/transaction_transport_base.h>
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 
@@ -18,7 +18,7 @@ namespace {
 
 using namespace nx::network::cloud;
 
-QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus):
+QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::TransactionMessageBusSelector* messageBus):
     m_cdbEndPointFetcher(new CloudDbUrlFetcher()),
     m_messageBus(messageBus)
 {

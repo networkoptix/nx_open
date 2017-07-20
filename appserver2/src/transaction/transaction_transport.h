@@ -15,7 +15,7 @@ class QnTransactionTransport
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
-        QnTransactionMessageBusBase* bus,
+        TransactionMessageBusBase* bus,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -27,7 +27,7 @@ public:
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
     QnTransactionTransport(
-        QnTransactionMessageBusBase* bus,
+        TransactionMessageBusBase* bus,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer);
     ~QnTransactionTransport();
@@ -141,7 +141,7 @@ protected:
         bool authByKey) override;
 
 private:
-    QnTransactionMessageBusBase* m_bus;
+    TransactionMessageBusBase* m_bus;
     const Qn::UserAccessData m_userAccessData;
     std::function<void()> m_beforeDestructionHandler;
 };

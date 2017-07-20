@@ -50,12 +50,13 @@ TEST(ExecActionAccessRightsTest, main)
 
         ec2::QnJsonTransactionSerializer jsonTranSerializer;
         ec2::QnUbjsonTransactionSerializer ubjsonTranSerializer;
-        ec2::QnTransactionMessageBus messageBus(
+        ec2::TransactionMessageBusSelector messageBus(
             nullptr/*QnDbManager*/,
             Qn::PT_Server,
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
+        messageBus.init(ec2::MessageBusType::LegacyMode);
         ec2::ServerQueryProcessorAccess(nullptr/*QnDbManager*/, &messageBus)
             .getAccess(userAccess).processUpdateAsync(
             actionTran,

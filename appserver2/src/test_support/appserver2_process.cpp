@@ -39,7 +39,7 @@
 #include <api/global_settings.h>
 #include <api/model/ping_reply.h>
 #include <core/resource/media_server_resource.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_selector.h>
 #include <rest/helper/ping_rest_helper.h>
 #include <rest/helper/p2p_stats_rest_helper.h>
 

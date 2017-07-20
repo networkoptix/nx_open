@@ -25,7 +25,7 @@ namespace detail {
 
 struct ServerQueryProcessorAccess
 {
-    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBusBase* messageBus) :
+    ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusSelector* messageBus):
         m_db(db),
         m_messageBus(messageBus)
     {
@@ -34,13 +34,13 @@ struct ServerQueryProcessorAccess
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
-    QnTransactionMessageBusBase* messageBus() { return m_messageBus; }
+    TransactionMessageBusSelector* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
 private:
     detail::QnDbManager* m_db;
-    QnTransactionMessageBusBase* m_messageBus;
+    TransactionMessageBusSelector* m_messageBus;
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
 };
@@ -122,7 +122,7 @@ struct PostProcessTransactionFunction
 {
     template<class T>
     void operator()(
-        QnTransactionMessageBusBase* messageBus,
+        TransactionMessageBusSelector* messageBus,
         const aux::AuditData& auditData,
         const QnTransaction<T>& tran) const;
 };
@@ -799,11 +799,11 @@ private:
 
 template<class T>
 void PostProcessTransactionFunction::operator()(
-    QnTransactionMessageBusBase* messageBus,
+    TransactionMessageBusSelector* messageBus,
     const aux::AuditData& auditData,
     const QnTransaction<T>& tran) const
 {
-    sendTransaction(messageBus, tran);
+    messageBus->sendTransaction(tran);
     aux::triggerNotification(auditData, tran);
 }
 

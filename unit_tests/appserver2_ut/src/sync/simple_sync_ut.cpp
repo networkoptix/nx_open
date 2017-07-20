@@ -7,7 +7,7 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_selector.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/test_support/test_options.h>

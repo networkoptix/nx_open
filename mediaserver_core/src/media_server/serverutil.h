@@ -1,5 +1,4 @@
-#ifndef _SERVER_UTIL_H
-#define _SERVER_UTIL_H
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
@@ -20,7 +19,7 @@ void setUseAlternativeGuid(bool value);
 class QnCommonModule;
 
 namespace ec2 {
-    class QnTransactionMessageBusBase;
+    class TransactionMessageBusSelector;
     class AbstractECConnection;
 }
 
@@ -90,7 +89,7 @@ bool isLocalAppServer(const QString &host);
 */
 bool changeLocalSystemId(
     const ConfigureSystemData& data,
-    ec2::QnTransactionMessageBusBase* messageBus);
+    ec2::TransactionMessageBusSelector* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body
@@ -101,6 +100,3 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
  * @return false if failed to save some data.
  */
 bool resetSystemToStateNew(QnCommonModule* commonModule);
-
-
-#endif // _SERVER_UTIL_H

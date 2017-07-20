@@ -43,7 +43,7 @@ namespace
 
 }
 
-QnConfigureRestHandler::QnConfigureRestHandler(ec2::QnTransactionMessageBusBase* messageBus):
+QnConfigureRestHandler::QnConfigureRestHandler(ec2::TransactionMessageBusSelector* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {

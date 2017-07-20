@@ -34,7 +34,7 @@ namespace ec2 {
         QnUpdatesManager(
             QueryProcessorType * const queryProcessor,
             const Qn::UserAccessData &userAccessData,
-            QnTransactionMessageBusBase* messageBus);
+            TransactionMessageBusSelector* messageBus);
         virtual ~QnUpdatesManager();
 
     protected:
@@ -44,7 +44,7 @@ namespace ec2 {
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-        QnTransactionMessageBusBase* m_messageBus;
+        TransactionMessageBusSelector* m_messageBus;
     };
 
 } // namespace ec2
