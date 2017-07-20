@@ -21,7 +21,8 @@ class QnSelectResourcesDialogButton: public QPushButton
     typedef QPushButton base_type;
 
 public:
-    explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
+    explicit QnSelectResourcesDialogButton(QWidget* parent = nullptr);
+    virtual ~QnSelectResourcesDialogButton();
 
     QSet<QnUuid> resources() const;
     void setResources(QSet<QnUuid> resources);

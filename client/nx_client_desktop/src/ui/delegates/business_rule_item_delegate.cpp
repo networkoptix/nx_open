@@ -51,6 +51,10 @@ QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
+QnSelectResourcesDialogButton::~QnSelectResourcesDialogButton()
+{
+}
+
 QSet<QnUuid> QnSelectResourcesDialogButton::resources() const
 {
     return m_resources;

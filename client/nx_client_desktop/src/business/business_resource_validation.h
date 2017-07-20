@@ -197,7 +197,7 @@ private:
 class QnSubjectValidationPolicy: public QnConnectionContextAware
 {
 public:
-    QnSubjectValidationPolicy(bool allowEmptySelection = false);
+    explicit QnSubjectValidationPolicy(bool allowEmptySelection = false);
     virtual ~QnSubjectValidationPolicy();
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const = 0;
@@ -236,7 +236,7 @@ class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    QnRequiredPermissionSubjectPolicy(Qn::GlobalPermission requiredPermission,
+    explicit QnRequiredPermissionSubjectPolicy(Qn::GlobalPermission requiredPermission,
         const QString& permissionName = QString(), bool allowEmptySelection = false);
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
