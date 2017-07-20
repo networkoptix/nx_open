@@ -70,9 +70,9 @@ MessageBus::MessageBus(
     m_miscData(this)
 {
     qRegisterMetaType<MessageType>();
-    qRegisterMetaType<Connection::State>("Connection::State");
+    qRegisterMetaType<ConnectionBase::State>("ConnectionBase::State");
     qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
-    qRegisterMetaType<QWeakPointer<Connection>>("QWeakPointer<Connection>");
+    qRegisterMetaType<QWeakPointer<ConnectionBase>>("QWeakPointer<ConnectionBase>");
 
     m_thread->setObjectName("P2pMessageBus");
     connect(m_thread, &QThread::started,
@@ -263,7 +263,9 @@ void MessageBus::connectSignals(const P2pConnectionPtr& connection)
     connect(connection.data(), &Connection::allDataSent, this, &MessageBus::at_allDataSent);
 }
 
-void MessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
+void MessageBus::createOutgoingConnections(
+    const QMap<ApiPersistentIdData,
+    P2pConnectionPtr>& currentSubscription)
 {
     if (hasStartingConnections())
         return;
@@ -284,7 +286,8 @@ void MessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2pCo
         ++m_lastOutgoingIndex;
 
         const RemoteConnection& remoteConnection = m_remoteUrls[pos];
-        if (!m_connections.contains(remoteConnection.peerId) && !m_outgoingConnections.contains(remoteConnection.peerId))
+        if (!m_connections.contains(remoteConnection.peerId) &&
+            !m_outgoingConnections.contains(remoteConnection.peerId))
         {
             if (!needStartConnection(remoteConnection.peerId, currentSubscription))
             {
@@ -786,7 +789,7 @@ void MessageBus::startReading(P2pConnectionPtr connection)
 }
 
 void MessageBus::at_stateChanged(
-    QWeakPointer<Connection> weakRef,
+    QWeakPointer<ConnectionBase> weakRef,
     Connection::State /*state*/)
 {
     P2pConnectionPtr connection = weakRef.toStrongRef();
@@ -842,7 +845,7 @@ void MessageBus::at_stateChanged(
     }
 }
 
-void MessageBus::at_allDataSent(QWeakPointer<Connection> weakRef)
+void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
 {
     P2pConnectionPtr connection = weakRef.toStrongRef();
     if (!connection)
@@ -856,7 +859,7 @@ void MessageBus::at_allDataSent(QWeakPointer<Connection> weakRef)
 }
 
 void MessageBus::at_gotMessage(
-    QWeakPointer<Connection> weakRef,
+    QWeakPointer<ConnectionBase> weakRef,
     MessageType messageType,
     const nx::Buffer& payload)
 {
