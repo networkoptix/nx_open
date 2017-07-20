@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/6edfa407-8e99-4f64-bde7-2986668bc87a';
+    this.systemLink = '/98e40c07-a6d1-433f-b798-9065e3be96e5';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -52,6 +52,10 @@ var Helper = function () {
 
     this.getParentOf = function(field) {
         return field.element(by.xpath('..'));
+    };
+
+    this.getGrandParentOf = function (field) {
+      return h.getParentOf(h.getParentOf(field));
     };
 
     this.forms = {
@@ -93,8 +97,8 @@ var Helper = function () {
         logout: {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: h.getParentOf(element(by.css('span.glyphicon-user'))),
-            // dropdownToggle: element(by.css('header')).element(by.css('.navbar')).all(by.css('.dropdown-toggle')).get(1),
-            dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
+            dropdownMenu: h.getGrandParentOf(element(by.css('span.glyphicon-user'))).element(by.css('[uib-dropdown-menu]')),
+            //dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
             logoutLink: element(by.css('header')).element(by.css('.navbar')).all(by.css('a[ng-click="logout()"]')).first(),
             alreadyLoggedIn: element(by.css('.authorized.modal-open')),
             logOut: element(by.css('button[ng-click="cancel()"]'))
