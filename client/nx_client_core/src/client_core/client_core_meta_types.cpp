@@ -8,7 +8,6 @@
 #include <ui/video/video_output.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/filtering_systems_model.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/model_data_accessor.h>
 #include <client/forgotten_systems_manager.h>
