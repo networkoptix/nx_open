@@ -50,6 +50,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     m_thumbnailManager(context->instance<QnCameraThumbnailManager>())
 {
     NX_ASSERT(m_videowall, "QnVideowallScreenWidget was created with a non-videowall resource.");
+    m_thumbnailManager->setAutoRotate(false); //< TODO: VMS-6759
 
     setAcceptDrops(true);
     setOption(QnResourceWidget::WindowRotationForbidden, true);

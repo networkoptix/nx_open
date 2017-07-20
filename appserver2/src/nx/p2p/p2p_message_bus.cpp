@@ -66,7 +66,7 @@ MessageBus::MessageBus(
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 :
-    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
+    TransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
     qRegisterMetaType<MessageType>();
@@ -75,19 +75,26 @@ MessageBus::MessageBus(
     qRegisterMetaType<QWeakPointer<Connection>>("QWeakPointer<Connection>");
 
     m_thread->setObjectName("P2pMessageBus");
-    m_timer = new QTimer();
-    if (ApiPeerData::isServer(peerType))
-        connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForServer);
-    else
-        connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForClient);
-    m_timer->start(500);
+    connect(m_thread, &QThread::started,
+        [this, peerType]()
+        {
+            if (!m_timer)
+            {
+                m_timer = new QTimer(this);
+                if (ApiPeerData::isServer(peerType))
+                    connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForServer);
+                else
+                    connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForClient);
+            }
+            m_timer->start(500);
+        });
+    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
     m_dbCommitTimer.restart();
 }
 
 MessageBus::~MessageBus()
 {
     stop();
-    delete m_timer;
 }
 
 void MessageBus::dropConnections()

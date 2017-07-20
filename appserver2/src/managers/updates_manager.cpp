@@ -49,7 +49,7 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(
         QueryProcessorType * const queryProcessor,
         const Qn::UserAccessData &userAccessData,
-        QnTransactionMessageBusBase* messageBus)
+        TransactionMessageBusSelector* messageBus)
     :
         m_queryProcessor(queryProcessor),
         m_userAccessData(userAccessData),
@@ -72,7 +72,7 @@ namespace ec2 {
         transaction.params.data = data;
         transaction.params.offset = offset;
 
-        sendTransaction(m_messageBus, transaction, peers);
+        m_messageBus->sendTransaction(transaction, peers);
         nx::utils::concurrent::run(
             Ec2ThreadPool::instance(),
             [handler, reqId]() { handler->done(reqId, ErrorCode::ok); });

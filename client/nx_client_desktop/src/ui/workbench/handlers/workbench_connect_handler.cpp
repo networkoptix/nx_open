@@ -1102,6 +1102,8 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     {
         case Qn::IncompatibleProtocolConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
+        // This code is also returned if we are downloading compatibility version
+        case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
             if (!applauncher::checkOnline(false))
                 break;

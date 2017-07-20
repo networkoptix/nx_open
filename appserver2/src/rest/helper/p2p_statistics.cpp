@@ -1,4 +1,4 @@
-#include "p2p_stats_rest_helper.h"
+#include "p2p_statistics.h"
 
 #include <nx/network/system_socket.h>
 #include <common/common_module.h>

@@ -40,10 +40,15 @@ public:
     void markBeingSaved(const QnUuid& id, bool saved);
     void markChanged(const QnUuid& id, bool changed);
 
+    bool hasSaveRequests(const QnUuid& id) const;
+    void addSaveRequest(const QnUuid& id, int reqId);
+    void removeSaveRequest(const QnUuid& id, int reqId);
+
 signals:
     void flagsChanged(const QnUuid& id, SaveStateFlags flags);
 
 private:
     mutable QnMutex m_mutex;
     QHash<QnUuid, SaveStateFlags> m_flags;
+    QHash<QnUuid, QSet<int>> m_saveRequests;
 };

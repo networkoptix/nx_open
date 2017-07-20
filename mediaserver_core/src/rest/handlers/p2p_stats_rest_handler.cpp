@@ -1,7 +1,7 @@
 #include "p2p_stats_rest_handler.h"
 
 #include <rest/server/rest_connection_processor.h>
-#include <rest/helper/p2p_stats_rest_helper.h>
+#include <rest/helper/p2p_statistics.h>
 
 int QnP2pStatsRestHandler::executeGet(
     const QString& /*path*/,

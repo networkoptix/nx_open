@@ -60,7 +60,7 @@ namespace nx { namespace vms { namespace discovery { class Manager; } } }
 namespace ec2
 {
     class ECConnectionNotificationManager;
-    class QnTransactionMessageBusBase;
+    class TransactionMessageBusSelector;
     class P2pMessageBus;
     class QnDistributedMutexManager;
     class TimeSynchronizationManager;
@@ -740,7 +740,7 @@ namespace ec2
         virtual QnCommonModule* commonModule() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+        virtual TransactionMessageBusSelector* messageBus() const = 0;
 
         virtual ECConnectionNotificationManager* notificationManager()
         {
@@ -845,7 +845,7 @@ namespace ec2
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+        virtual TransactionMessageBusSelector* messageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:

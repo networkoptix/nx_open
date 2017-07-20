@@ -44,10 +44,10 @@ struct SubscribeForDataUpdateRecord
 };
 using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
 
-class MessageBus: public ec2::QnTransactionMessageBusBase
+class MessageBus: public ec2::TransactionMessageBusBase
 {
     Q_OBJECT;
-    using base_type = ec2::QnTransactionMessageBusBase;
+    using base_type = ec2::TransactionMessageBusBase;
 public:
     MessageBus(
         ec2::detail::QnDbManager* db,

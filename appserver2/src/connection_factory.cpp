@@ -33,6 +33,7 @@
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
 #include <http/p2p_connection_listener.h>
+#include <transaction/message_bus_selector.h>
 
 #include <ini.h>
 
@@ -61,26 +62,13 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
     }
 
-    if (ini().isP2pMode)
-    {
-        m_bus.reset(new nx::p2p::MessageBus(
-            m_dbManager.get(),
-            peerType,
-            commonModule,
-            m_jsonTranSerializer.get(),
-            m_ubjsonTranSerializer.get()));
-    }
-    else
-    {
-        QnTransactionMessageBus* messageBus = new QnTransactionMessageBus(
-            m_dbManager.get(),
-            peerType,
-            commonModule,
-            m_jsonTranSerializer.get(),
-            m_ubjsonTranSerializer.get());
-        m_bus.reset(messageBus);
-        m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
-    }
+    m_bus.reset(new TransactionMessageBusSelector(
+        m_dbManager.get(),
+        peerType,
+        commonModule,
+        m_jsonTranSerializer.get(),
+        m_ubjsonTranSerializer.get()));
+
 
     m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
         peerType,
@@ -89,7 +77,12 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         &m_settingsInstance));
 
     if (peerType == Qn::PT_Server)
+    {
+        m_bus->init(ini().isP2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
+        if (auto messageBus = dynamic_cast<QnTransactionMessageBus*>(m_bus->impl()))
+            m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+    }
 
     if (m_dbManager)
     {
@@ -175,14 +168,14 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus.get()))
+    if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus->impl()))
     {
         httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus*>(
             "HTTP", "ec2/events", bus);
         httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus*>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
-    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus.get()))
+    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus->impl()))
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
             "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
@@ -1717,6 +1710,8 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
+    m_bus->init(connectionInfo.p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
+
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         this,
         connectionInfo.serverId(),
@@ -1781,6 +1776,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
     connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
+    connectionInfo->p2pMode = ini().isP2pMode;
     if (response)
     {
         connectionInfo->effectiveUserName =
@@ -1950,7 +1946,7 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
         permission);
 }
 
-QnTransactionMessageBusBase* Ec2DirectConnectionFactory::messageBus() const
+TransactionMessageBusSelector* Ec2DirectConnectionFactory::messageBus() const
 {
     return m_bus.get();
 }

@@ -19,7 +19,7 @@
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
-#include <nx/p2p/p2p_message_bus.h>
+#include <transaction/message_bus_selector.h>
 
 namespace nx {
 namespace p2p {
@@ -205,8 +205,9 @@ void ConnectionProcessor::run()
         return;
     }
 
-    const auto& commonModule = d->owner->commonModule();
-    auto messageBus = dynamic_cast<MessageBus*> (commonModule->ec2Connection()->messageBus());
+    const auto commonModule = d->owner->commonModule();
+    const auto connection = commonModule->ec2Connection();
+    auto messageBus = dynamic_cast<MessageBus*> (connection->messageBus()->impl());
     if (!messageBus)
     {
         sendResponse(

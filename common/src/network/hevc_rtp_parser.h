@@ -26,8 +26,12 @@ struct HevcContext
     int height = -1;
 };
 
+/**
+ * Implements RTP payload parsing for HEVC according to RFC 7798
+ */
 class HevcParser: public QnRtpVideoStreamParser
 {
+    // Decoding order number field type.
     enum class DonType
     {
         Donl,
@@ -35,6 +39,8 @@ class HevcParser: public QnRtpVideoStreamParser
     };
 
 public:
+
+    // Implementation of QnRtpStreamParser::processData
     virtual bool processData(
         quint8* rtpBufferBase,
         int bufferOffset,
@@ -42,13 +48,15 @@ public:
         const QnRtspStatistic& statistics,
         bool& gotData) override;
 
+    // Implementation of QnRtpStreamParser::setSDPInfo
     virtual void setSDPInfo(QByteArrayList lines) override;
 
 private:
     
-    // Returns true if RTP header is correct. In this case value of outIsFatalError is undefined
-    // If this function has returned false and value of outIsFatalError is false 
-    // we can just skip the data otherwise we must reset the parser.
+    // Returns true if RTP header is correct. In this case value of outIsFatalError
+    // is undefined and we can ignore it. If this method has returned false and
+    // value of outIsFatalError is false we can just skip the data,
+    // otherwise we must reset the parser.
     bool processRtpHeader(
         uint8_t** outPayload,
         int* outPayloadLength,

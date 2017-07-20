@@ -295,7 +295,7 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBusBase* messageBus,
+    TransactionMessageBusSelector* messageBus,
     Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
@@ -381,7 +381,7 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    connect(m_messageBus, &QnTransactionMessageBusBase::newDirectConnectionEstablished,
+    connect(m_messageBus, &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &TimeSynchronizationManager::onNewConnectionEstablished,
         Qt::DirectConnection);
 
