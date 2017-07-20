@@ -94,8 +94,7 @@ void CrossNatConnector::connect(
 
 QString CrossNatConnector::getRemotePeerName() const
 {
-    // TODO
-    return QString();
+    return m_remotePeerFullName;
 }
 
 SocketAddress CrossNatConnector::localAddress() const
@@ -216,6 +215,7 @@ void CrossNatConnector::onConnectResponse(
 
     const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_connectionParameters = response.params;
+    m_remotePeerFullName = response.destinationHostFullName;
 
     m_cloudConnectorExecutor = std::make_unique<ConnectorExecutor>(
         m_targetPeerAddress,
