@@ -393,7 +393,7 @@ void QnSystemTilesTestCase::vms6515and6519(CompletionHandler completionHandler)
       * 1. after step #3 - all visible tiles should be from the second page
       * 2. after step #4 - no empty tiles at the first page
       */
-    const auto systems = createSeveralSystems(9 , m_finder);
+    const auto systems = createSeveralSystems(kTilesCountForTowPages , m_finder);
     const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
         QnTileTest::Vms6515And6519, completionHandler, systems.guard, this);
 
