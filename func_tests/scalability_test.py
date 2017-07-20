@@ -98,9 +98,8 @@ def wait_merge_done(servers, method, api_object, api_method, start_time, merge_t
 
         if result_expected is None:
             if utils.datetime_utc_now() - start_time >= merge_timeout:
-                pytest.fail("%r can't get response for '%s' during %s" % (
-                    servers[0], api_method,
-                    merge_timeout - (api_call_start_time - start_time)))
+                pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                    merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
             continue
 
         def check(servers, result_expected):
