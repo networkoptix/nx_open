@@ -1208,7 +1208,7 @@ void QnMediaResourceWidget::updateDisplay()
 void QnMediaResourceWidget::updateIconButton()
 {
     auto buttonsBar = titleBar()->leftButtonsBar();
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
     {
         auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
@@ -1524,7 +1524,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
         return Qn::MainWindow_MediaItem_Ptz_Help;
     }
 
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
 
     if (options().testFlag(DisplayMotionSensitivity))
@@ -1718,7 +1718,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!rgbImage && hasVideo)
         result |= Qn::EnhancementButton;
 
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
         return result;
 
     if (hasVideo && base_type::resource()->hasFlags(Qn::motion))

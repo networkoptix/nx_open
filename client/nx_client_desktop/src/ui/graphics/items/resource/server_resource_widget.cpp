@@ -44,7 +44,7 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnNetworkSpeedStrings)
     public:
         static QString bytesPerSecond() { return tr("B/s"); }
-        static QString kiloBytesPerSecond() { return tr("kB/s"); }
+        static QString kiloBytesPerSecond() { return tr("KB/s"); }
         static QString megaBytesPerSecond() { return tr("MB/s"); }
     };
 
