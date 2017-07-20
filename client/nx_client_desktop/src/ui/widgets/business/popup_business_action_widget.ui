@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>85</height>
+    <height>79</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,13 +56,6 @@
     <widget class="QCheckBox" name="forceAcknoledgementCheckBox">
      <property name="text">
       <string>Force Acknowledgment</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="acknowledgementLabel">
-     <property name="text">
-      <string>Force acknowledgement makes sense only if source camera is recording when event occurs</string>
      </property>
     </widget>
    </item>
