@@ -295,7 +295,8 @@ var Helper = function () {
 
         // Log out if logged in
         h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
-            h.forms.logout.logOut.click()
+            h.forms.logout.logOut.click();
+            browser.sleep(3000);
         }, function () {});
 
         h.forms.register.firstNameInput.sendKeys(userFistName);

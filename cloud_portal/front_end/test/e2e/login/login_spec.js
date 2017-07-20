@@ -1,6 +1,6 @@
 'use strict';
 var LoginPage = require('./po.js');
-fdescribe('Login dialog', function () {
+describe('Login dialog', function () {
 
     var p = new LoginPage();
 
