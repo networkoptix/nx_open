@@ -9,6 +9,8 @@ import logging
 import time
 import requests
 import datetime
+import traceback
+from functools import wraps
 import test_utils.utils as utils
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
@@ -165,6 +167,18 @@ def get_server_admin(server):
     return admins[0]
 
 
+def with_traceback(fn):
+    @wraps(fn)  # critical for Pool.map to work
+    def wrapper(*args, **kw):
+        try:
+            return fn(*args, **kw)
+        except:
+            for line in traceback.format_exc().splitlines():
+                log.error(line)
+            raise
+    return wrapper
+
+@with_traceback
 def create_test_data_on_server((config, server, index)):
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * config.CAMERAS_PER_SERVER),
