@@ -93,7 +93,7 @@ void HevcParser::parseRtpMap(const nx::Buffer& rtpMapLine)
 
     auto values2 = codecName.split('/');
     if (values2.size() < 2)
-        return;;
+        return;
 
     bool success = false;
     auto frequency = values2[1].toInt(&success);
@@ -187,7 +187,6 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
     }
 }
 
-//-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
 bool HevcParser::processRtpHeader(
@@ -301,14 +300,12 @@ bool HevcParser::handlePacketLoss(
     int currentSequenceNumber)
 {
     NX_LOGX("Packet loss detected.", cl_logWARNING);
-    qDebug() << "Packet loss" << previousSequenceNumber << currentSequenceNumber; //< TODO: #dmishin remove
     emit packetLostDetected(previousSequenceNumber, currentSequenceNumber);
     return reset();
 }
 
 bool HevcParser::isApropriatePayloadType(const RtpHeader* rtpHeader) const
 {
-    // TODO: #dmishin implement
     return rtpHeader->payloadType == m_context.rtpChannel;
 }
 
@@ -567,7 +564,7 @@ void HevcParser::createVideoDataIfNeeded(bool* outGotData, const QnRtspStatistic
     {
         m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTime, statistic);
         *outGotData = !!m_mediaData;
-        reset(/*softReset*/true);
+        reset(/*softReset*/ true);
     }
 }
 
