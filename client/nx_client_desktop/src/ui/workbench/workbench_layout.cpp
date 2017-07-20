@@ -797,7 +797,7 @@ qreal QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing spacing)
     return 0.0;
 }
 
-const qreal QnWorkbenchLayout::cellSpacing() const
+qreal QnWorkbenchLayout::cellSpacing() const
 {
     return m_cellSpacing;
 }
