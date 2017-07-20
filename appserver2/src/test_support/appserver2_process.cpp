@@ -41,7 +41,7 @@
 #include <core/resource/media_server_resource.h>
 #include <transaction/message_bus_selector.h>
 #include <rest/helper/ping_rest_helper.h>
-#include <rest/helper/p2p_stats_rest_helper.h>
+#include <rest/helper/p2p_statistics.h>
 
 static int registerQtResources()
 {

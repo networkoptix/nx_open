@@ -21,12 +21,11 @@ namespace p2p {
 
 SendCounters Connection::m_sendCounters = {};
 
-#ifdef CHECK_SEQUENCE
-const int kMessageOffset = 8;
+#if defined(CHECK_SEQUENCE)
+    const int kMessageOffset = 8;
 #else
-const int kMessageOffset = 0;
+    const int kMessageOffset = 0;
 #endif
-
 
 QString toString(Connection::State value)
 {
