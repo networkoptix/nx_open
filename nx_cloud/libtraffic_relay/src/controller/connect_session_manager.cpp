@@ -86,10 +86,57 @@ void ConnectSessionManager::beginListening(
         std::bind(&ConnectSessionManager::saveServerConnection, this,
             request.peerName, _1);
 
-    completionHandler(
-        api::ResultCode::ok,
+    struct Context
+    {
+        api::BeginListeningRequest request;
+        api::BeginListeningResponse response;
+        nx_http::ConnectionEvents connectionEvents;
+        BeginListeningHandler completionHandler;
+
+        Context(
+            const api::BeginListeningRequest request,
+            api::BeginListeningResponse response,
+            nx_http::ConnectionEvents connectionEvents,
+            BeginListeningHandler completionHandler)
+            :
+            request(request),
+            response(std::move(response)),
+            connectionEvents(std::move(connectionEvents)),
+            completionHandler(std::move(completionHandler))
+        {}
+    };
+
+    auto sharedContext = std::make_shared<Context>(
+        request,
         std::move(response),
-        std::move(connectionEvents));
+        std::move(connectionEvents),
+        std::move(completionHandler));
+
+    cf::async(m_asyncExecutor,
+        [this, sharedContext]() mutable
+        {
+            return m_remoteRelayPool->addPeer(sharedContext->request.peerName, "thisRelayHost")
+                .then(
+                    [this, sharedContext] (
+                        cf::future<bool> addPeerFuture) mutable
+                    {
+                        if (!addPeerFuture.get())
+                        {
+                            sharedContext->completionHandler(
+                                api::ResultCode::unknownError,
+                                api::BeginListeningResponse(),
+                                nx_http::ConnectionEvents());
+                            return cf::unit();
+                        }
+
+                        sharedContext->completionHandler(
+                            api::ResultCode::ok,
+                            std::move(sharedContext->response),
+                            std::move(sharedContext->connectionEvents));
+
+                        return cf::unit();
+                    });
+        });
 }
 
 void ConnectSessionManager::createClientSession(
