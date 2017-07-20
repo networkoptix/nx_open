@@ -9,7 +9,7 @@ enum class QnTileTest
 {
     First,
 
-    VMS_6515_FirstPageIsEmpty = First,
+    Vms6515And6519 = First,
     ChangeWeightOnCollapse,
     ChangeVersion,
     MaximizeAppOnCollapse,

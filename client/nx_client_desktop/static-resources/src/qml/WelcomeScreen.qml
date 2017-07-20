@@ -108,7 +108,7 @@ Rectangle
                     {
                         target: grid;
                         property: "opacity";
-                        duration: 220;
+                        duration: 200;
                         easing.type: Easing.Linear;
                         to: 0;
                     }
@@ -122,7 +122,7 @@ Rectangle
                     {
                         target: grid;
                         property: "opacity";
-                        duration: 220;
+                        duration: 200;
                         easing.type: Easing.Linear;
                         to: 1;
                     }

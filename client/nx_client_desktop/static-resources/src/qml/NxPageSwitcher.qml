@@ -15,10 +15,9 @@ Row
 
     signal currentPageChanged(int index, bool byClick);
 
-    function setPage(index, byClick)
+    function setPage(index)
     {
-        console.log("------- index:", index)
-        impl.updateCurrentPage(index, byClick);
+        impl.updateCurrentPage(index, false);
     }
 
     onPagesCountChanged:
