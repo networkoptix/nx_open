@@ -19,7 +19,7 @@ void setUseAlternativeGuid(bool value);
 class QnCommonModule;
 
 namespace ec2 {
-    class TransactionMessageBusSelector;
+    class AbstractTransactionMessageBus;
     class AbstractECConnection;
 }
 
@@ -89,7 +89,7 @@ bool isLocalAppServer(const QString &host);
 */
 bool changeLocalSystemId(
     const ConfigureSystemData& data,
-    ec2::TransactionMessageBusSelector* messageBus);
+    ec2::AbstractTransactionMessageBus* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body

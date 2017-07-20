@@ -49,7 +49,7 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(
         QueryProcessorType * const queryProcessor,
         const Qn::UserAccessData &userAccessData,
-        TransactionMessageBusSelector* messageBus)
+        TransactionMessageBusAdapter* messageBus)
     :
         m_queryProcessor(queryProcessor),
         m_userAccessData(userAccessData),

@@ -2,7 +2,7 @@
 
 #include <QtCore/QThread>
 
-#include "transaction_message_bus_base.h"
+#include "abstract_transaction_message_bus.h"
 #include <transaction/transaction_message_bus.h>
 #include <nx/p2p/p2p_message_bus.h>
 
@@ -15,11 +15,11 @@ namespace ec2
         P2pMode
     };
 
-    class TransactionMessageBusSelector: public AbstractTransactionMessageBus
+    class TransactionMessageBusAdapter: public AbstractTransactionMessageBus
     {
         Q_OBJECT
     public:
-        TransactionMessageBusSelector(
+        TransactionMessageBusAdapter(
             detail::QnDbManager* db,
             Qn::PeerType peerType,
             QnCommonModule* commonModule,
@@ -28,9 +28,10 @@ namespace ec2
         );
 
         void init(MessageBusType value);
-        AbstractTransactionMessageBus* impl();
 
-        virtual ~TransactionMessageBusSelector() {}
+        template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
+
+        virtual ~TransactionMessageBusAdapter() {}
 
         virtual void start() override;
         virtual void stop() override;
@@ -62,9 +63,9 @@ namespace ec2
         void sendTransaction(
             const QnTransaction<T>& tran)
         {
-            if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(impl()))
+            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran);
-            else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(impl()))
+            else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
                 msgBus->sendTransaction(tran);
         }
 
@@ -73,9 +74,9 @@ namespace ec2
             const QnTransaction<T>& tran,
             const QnPeerSet& dstPeers)
         {
-            if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(impl()))
+            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran, dstPeers);
-            else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(impl()))
+            else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
                 msgBus->sendTransaction(tran, dstPeers);
         }
 
@@ -84,9 +85,9 @@ namespace ec2
             const QnTransaction<T>& tran,
             const QnUuid& peer)
         {
-            if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(impl()))
+            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran, QnPeerSet() << peer);
-            else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(impl()))
+            else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
                 msgBus->sendTransaction(tran, QnPeerSet() << peer);
             else
                 NX_CRITICAL(false, "Not implemented");

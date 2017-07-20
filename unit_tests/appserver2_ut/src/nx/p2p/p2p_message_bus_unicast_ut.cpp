@@ -28,7 +28,7 @@ public:
         if (!m_servers.empty())
         {
             const auto connection = m_servers[0]->moduleInstance()->ecConnection();
-            auto bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
+            auto bus = connection->messageBus()->dynamicCast<MessageBus*>();
             QObject::disconnect(bus, nullptr, nullptr, nullptr);
         }
     }
@@ -57,7 +57,7 @@ protected:
         {
             createData(server, 0, 0);
             const auto connection = server->moduleInstance()->ecConnection();
-            MessageBus* bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
+            MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
             auto intervals = bus->delayIntervals();
             intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
             intervals.outConnectionsInterval = std::chrono::milliseconds(1);
@@ -72,7 +72,7 @@ protected:
         }
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
-        MessageBus* bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
+        MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
         QObject::connect(
             bus,
             &ec2::TransactionMessageBusBase::peerFound,
@@ -91,7 +91,7 @@ protected:
         waitForCondition(std::bind(&MessageBusUnicast::isAllServersOnlineCond, this));
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
-        MessageBus* bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
+        MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
         QnTransaction<ApiBusinessActionData> transaction(
             m_servers[0]->moduleInstance()->commonModule()->moduleGUID());
         transaction.command = ec2::ApiCommand::broadcastAction;

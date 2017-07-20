@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "utils/common/delete_later.h"

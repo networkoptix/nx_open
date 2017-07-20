@@ -13,7 +13,7 @@
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
 #include "utils/common/threadqueue.h"
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 
@@ -25,7 +25,7 @@ namespace detail {
 
 struct ServerQueryProcessorAccess
 {
-    ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusSelector* messageBus):
+    ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusAdapter* messageBus):
         m_db(db),
         m_messageBus(messageBus)
     {
@@ -34,13 +34,13 @@ struct ServerQueryProcessorAccess
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
-    TransactionMessageBusSelector* messageBus() { return m_messageBus; }
+    TransactionMessageBusAdapter* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
 private:
     detail::QnDbManager* m_db;
-    TransactionMessageBusSelector* m_messageBus;
+    TransactionMessageBusAdapter* m_messageBus;
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
 };
@@ -122,7 +122,7 @@ struct PostProcessTransactionFunction
 {
     template<class T>
     void operator()(
-        TransactionMessageBusSelector* messageBus,
+        TransactionMessageBusAdapter* messageBus,
         const aux::AuditData& auditData,
         const QnTransaction<T>& tran) const;
 };
@@ -799,7 +799,7 @@ private:
 
 template<class T>
 void PostProcessTransactionFunction::operator()(
-    TransactionMessageBusSelector* messageBus,
+    TransactionMessageBusAdapter* messageBus,
     const aux::AuditData& auditData,
     const QnTransaction<T>& tran) const
 {
