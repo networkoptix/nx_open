@@ -223,7 +223,7 @@ class QnDefaultSubjectValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    using base_type::base_type; //< Forward constructors.
+    QnDefaultSubjectValidationPolicy(bool allowEmptySelection = false);
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;

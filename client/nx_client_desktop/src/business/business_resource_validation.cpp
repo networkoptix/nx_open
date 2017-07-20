@@ -571,6 +571,11 @@ QString QnSubjectValidationPolicy::calculateAlert(
 // ------------------------------------------------------------------------------------------------
 // QnDefaultSubjectValidationPolicy
 
+QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
+    base_type(allowEmptySelection)
+{
+}
+
 QValidator::State QnDefaultSubjectValidationPolicy::roleValidity(const QnUuid& /*roleId*/) const
 {
     return QValidator::Acceptable;
