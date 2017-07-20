@@ -17,7 +17,7 @@
         ["{{IOS_APP_LINK}}","disabled","Link for iOS application in Apple AppStore"],
         ["{{ANDROID_APP_LINK}}","disabled","Link for Android application in Google Play"],
         ["{{COMPANY_NAME}}", "Network Optix", "The name of the company itself"],
-        ["images/logo.png", "N/A", "Logo for branding", "Image"]
+        ["static/images/logo.png", "N/A", "Logo for branding", "Image"]
       ]
     },
     {

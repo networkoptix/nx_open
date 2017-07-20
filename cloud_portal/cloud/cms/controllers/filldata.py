@@ -52,8 +52,6 @@ def process_context_structure(customization, context, content, language, version
     for record in context.datastructure_set.all():
         content_record = None
         content_value = None
-        if record.type == DataStructure.get_type('Image'):
-            continue
         # try to get translated content
         if language:
             content_record = DataRecord.objects.filter(language_id=language.id,
@@ -83,7 +81,11 @@ def process_context_structure(customization, context, content, language, version
             content_value = record.default
 
         # replace marker with value
-        content = content.replace(record.name, content_value)
+        if record.type != DataStructure.get_type('Image'):
+            content = content.replace(record.name, content_value)
+        elif content_record.exists():
+            image_storage = os.path.join('static', customization.name)
+            convert_b64_image_to_png(content_record.latest('version_id'), image_storage)
     return content
 
 
@@ -156,11 +158,6 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
         else:
             version_id = 0
 
-    # here we use version_id if specified, or latest data records otherwise
-    if not preview:
-        image_storage = os.path.join('static', customization.name, 'static')
-        convert_b64_images_to_png(customization, image_storage, version_id)
-
     # iterate all files (same way we fill structure)
     for source_file in iterate_cms_files(customization_name, False):
         process_file(source_file, customization, product_id, preview, version_id)
@@ -168,24 +165,10 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
     generate_languages_json(customization_name, preview)
 
 
-def convert_b64_images_to_png(customization, storage_location, version_id):
-    for data_structure in DataStructure.objects.filter(type=DataStructure.get_type('Image')):
-        image_record = data_structure.datarecord_set.filter(customization=customization)
-        image_b64 = ""
-        if not image_record.exists():
-            continue
+def convert_b64_image_to_png(record, storage_location):
+    file_name = os.path.join(storage_location, record.data_structure.name)
+    make_dir(file_name)
 
-        file_name = os.path.join(storage_location, data_structure.name)
-        image_record = image_record.filter(version_id__lte=version_id)
-         
-        if image_record.exists():
-            image_b64 = image_record.latest('created_date').value
-        
-        if not image_b64:
-            continue
-        
-        make_dir(file_name)
-
-        image_png = base64.b64decode(image_b64)
-        with open(file_name, 'wb') as f:
-            f.write(image_png)
+    image_png = base64.b64decode(record.value)
+    with open(file_name, 'wb') as f:
+        f.write(image_png)
