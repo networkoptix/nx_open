@@ -83,7 +83,7 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
-    std::list<SocketAddress> m_directTcpAddresses;
+    ListeningPeerData m_serverPeerData;
     stats::ConnectSession m_sessionStatisticsInfo;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
 
