@@ -154,7 +154,7 @@ var Helper = function () {
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
 
-    this.userPassword = this.basePassword;
+    this.userPassword = h.basePassword;
     this.userPasswordNew = 'qweasd123qwe';
     this.userPasswordWrong = 'qweqwe123';
 
@@ -716,7 +716,8 @@ var Helper = function () {
 
         // Log out if logged in
         h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
-            h.forms.logout.logOut.click()
+            h.forms.logout.logOut.click();
+            browser.sleep(3000);
         }, function () {});
 
         expect(here.passwordInput.isPresent()).toBe(true);
