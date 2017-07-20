@@ -680,7 +680,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 {
     const auto filteredErrors = filterDeactivationErrors(errors);
     const int errorsCount = filteredErrors.size();
-    const auto icon = errorsCount < licenses.size()
+    const auto icon = licenses.size() > 1
         ? QnMessageBoxIcon::Information
         : QnMessageBoxIcon::Critical;
     const auto text = getDeactivationErrorCaption(licenses.size(), errorsCount);
