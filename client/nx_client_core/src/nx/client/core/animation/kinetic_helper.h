@@ -13,6 +13,8 @@ namespace client {
 namespace core {
 namespace animation {
 
+// TODO: #dklychkov #vkutin Add an option to use external time source instead of m_timer.
+
 template<class T>
 class KineticHelper
 {

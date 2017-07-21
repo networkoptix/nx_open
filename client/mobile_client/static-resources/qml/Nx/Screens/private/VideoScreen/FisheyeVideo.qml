@@ -187,7 +187,7 @@ Item
             readonly property real pixelRadius: Math.min(width, height) / 2.0
             readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
 
-            KineticAnimation 
+            KineticAnimation
             {
                 id: kinetics
 
