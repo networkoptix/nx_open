@@ -528,7 +528,7 @@ module.exports = function (grunt) {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
             },
             merge_release: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
             version: {
                 command: 'hg parent > static/version.txt'

@@ -28,7 +28,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
     m_settings(settings),
     m_serverConnectionWeakRef(serverPeerData.peerConnection),
-    m_directTcpAddresses(serverPeerData.endpoints)
+    m_serverPeerData(serverPeerData)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -274,7 +274,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
 
     auto tcpEndpoints = std::move(request.forwardedTcpEndpointList);
     tcpEndpoints.insert(
-        tcpEndpoints.begin(), m_directTcpAddresses.begin(), m_directTcpAddresses.end());
+        tcpEndpoints.begin(),
+        m_serverPeerData.endpoints.begin(), m_serverPeerData.endpoints.end());
 
     m_state = State::waitingConnectionResult;
 
@@ -301,6 +302,7 @@ api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectRespo
     connectResponse.udpEndpointList = std::move(connectionAckRequest.udpEndpointList);
     connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
     connectResponse.cloudConnectVersion = connectionAckRequest.cloudConnectVersion;
+    connectResponse.destinationHostFullName = m_serverPeerData.hostName;
     if (!m_settings.trafficRelay().url.isEmpty())
         connectResponse.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
 

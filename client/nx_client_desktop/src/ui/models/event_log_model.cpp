@@ -431,6 +431,9 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 case vms::event::showOnAlarmLayoutAction:
                     return getResourceNameString(action.actionParams.actionResourceId);
 
+                // TODO: #future Rework code to use bookmark.description field for bookmark action.
+                case vms::event::acknowledgeAction:
+                    /*fallthrough*/
                 case vms::event::showTextOverlayAction:
                 {
                     const auto text = action.actionParams.text.trimmed();

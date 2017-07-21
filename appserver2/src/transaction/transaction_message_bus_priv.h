@@ -8,7 +8,7 @@ typedef std::function<bool(Qn::SerializationFormat, const QByteArray&)> FastFunc
 //Overload for ubjson transactions
 template<typename Function, typename Param>
 bool handleTransactionParams(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     const QByteArray &serializedTransaction,
     QnUbjsonReader<QByteArray> *stream,
     const QnAbstractTransaction &abstractTransaction,
@@ -35,7 +35,7 @@ bool handleTransactionParams(
 //Overload for json transactions
 template<typename Function, typename Param>
 bool handleTransactionParams(
-    QnTransactionMessageBusBase* /*bus*/,
+    TransactionMessageBusBase* /*bus*/,
     const QByteArray &serializedTransaction,
     const QJsonObject& jsonData,
     const QnAbstractTransaction &abstractTransaction,
@@ -62,7 +62,7 @@ bool handleTransactionParams(
 
 template<typename SerializationSupport, typename Function>
 bool handleTransaction2(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     const QnAbstractTransaction& transaction,
     const SerializationSupport& serializationSupport,
     const QByteArray& serializedTransaction,
@@ -82,7 +82,7 @@ bool handleTransaction2(
 
 template<class Function>
 bool handleTransaction(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     Qn::SerializationFormat tranFormat,
     const QByteArray &serializedTransaction,
     const Function &function,

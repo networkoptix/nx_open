@@ -207,7 +207,7 @@ class Server(object):
         wait_time_sec = MEDIASERVER_START_TIMEOUT_SEC
         start_time = time.time()
         while time.time() < start_time + wait_time_sec:
-            if self._is_server_online():
+            if self.is_server_online():
                 log.info('Server is online now.')
                 return
             else:
@@ -216,7 +216,7 @@ class Server(object):
         else:
             raise RuntimeError('Server %s has not went online in %d seconds' % (self, wait_time_sec))
 
-    def _is_server_online(self):
+    def is_server_online(self):
         try:
             self.rest_api.api.ping.GET(timeout_sec=10)
             return True
@@ -276,6 +276,9 @@ class Server(object):
             log.debug('Server did not restart yet, waiting...')
             time.sleep(0.5)
         assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
+
+    def make_core_dump(self):
+        self._server_ctl.make_core_dump()
 
     def get_uptime(self):
         response = self.rest_api.api.statistics.GET()

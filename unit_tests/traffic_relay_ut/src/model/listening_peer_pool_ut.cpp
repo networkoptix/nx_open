@@ -7,6 +7,7 @@
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -14,7 +15,6 @@
 #include <settings.h>
 
 #include "../settings_loader.h"
-#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
@@ -52,7 +52,7 @@ protected:
 
     void addConnection(const std::string& peerName)
     {
-        auto connection = std::make_unique<relay::test::StreamSocketStub>();
+        auto connection = std::make_unique<network::test::StreamSocketStub>();
         connection->setPostDelay(m_connectionPostDelay);
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
@@ -215,8 +215,8 @@ private:
     std::unique_ptr<model::ListeningPeerPool> m_pool;
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
-    relay::test::StreamSocketStub* m_peerConnection;
-    std::vector<relay::test::StreamSocketStub*> m_peerConnections;
+    network::test::StreamSocketStub* m_peerConnection;
+    std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     SettingsLoader m_settingsLoader;
     boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
