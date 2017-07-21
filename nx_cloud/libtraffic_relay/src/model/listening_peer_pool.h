@@ -105,6 +105,14 @@ private:
     TakeIdleConnectionRequestTimers m_takeIdleConnectionRequestTimers;
     nx::utils::Subscription<std::string> m_peerConnectedSubscription;
     nx::utils::Subscription<std::string> m_peerDisconnectedSubscription;
+    std::deque<nx::utils::MoveOnlyFunc<void()>> m_scheduledEvents;
+
+    bool someoneIsWaitingForPeerConnection(const PeerContext& peerContext) const;
+    void provideConnectionToTheClient(
+        const QnMutexLockerBase& lock,
+        const std::string& peerName,
+        PeerContext* peerContext,
+        std::unique_ptr<ConnectionContext> connectionContext);
 
     void startWaitingForNewConnection(
         const QnMutexLockerBase& lock,
@@ -135,12 +143,17 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);
-    void processExpirationTimers(QnMutexLockerBase* lock);
+    void processExpirationTimers(const QnMutexLockerBase& lock);
+    void processExpirationTimers();
 
     void doPeriodicTasks();
     void handleTimedoutTakeConnectionRequests();
     std::vector<TakeIdleConnectionHandler> findTimedoutTakeConnectionRequestHandlers(
         const QnMutexLockerBase& lock);
+
+    void scheduleEvent(nx::utils::MoveOnlyFunc<void()> raiseEventFunc);
+    void forcePeriodicTasksProcessing();
+    void raiseScheduledEvents();
 };
 
 } // namespace model

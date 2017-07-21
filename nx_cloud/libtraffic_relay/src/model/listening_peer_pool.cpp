@@ -47,7 +47,7 @@ void ListeningPeerPool::addConnection(
 
     QnMutexLocker lock(&m_mutex);
 
-    processExpirationTimers(&lock);
+    processExpirationTimers(lock);
 
     auto insertionPair = m_peers.emplace(peerName, PeerContext());
     PeerContext& peerContext = insertionPair.first->second;
@@ -69,31 +69,29 @@ void ListeningPeerPool::addConnection(
     auto connectionContext = std::make_unique<ConnectionContext>();
     connectionContext->connection = std::move(connection);
 
-    if (!peerContext.takeConnectionRequestQueue.empty())
+    if (someoneIsWaitingForPeerConnection(peerContext))
     {
-        NX_ASSERT(peerContext.connections.empty());
-
-        auto awaitContext = std::move(peerContext.takeConnectionRequestQueue.front());
-        peerContext.takeConnectionRequestQueue.pop_front();
-
-        m_takeIdleConnectionRequestTimers.erase(awaitContext.expirationTimerIter);
-
-        startPeerExpirationTimer(lock, peerName, &peerContext);
-
-        giveAwayConnection(
-            std::move(connectionContext),
-            std::move(awaitContext.handler));
+        provideConnectionToTheClient(
+            lock,
+            peerName,
+            &peerContext,
+            std::move(connectionContext));
     }
     else
     {
         peerContext.connections.push_back(std::move(connectionContext));
-        monitoringConnectionForClosure(peerName, peerContext.connections.back().get());
+        monitoringConnectionForClosure(
+            peerName,
+            peerContext.connections.back().get());
     }
 
-    lock.unlock();
-
     if (insertionPair.second)
-        m_peerConnectedSubscription.notify(peerNameOriginal);
+    {
+        scheduleEvent(std::bind(
+            &nx::utils::Subscription<std::string>::notify,
+            &m_peerConnectedSubscription,
+            peerNameOriginal));
+    }
 }
 
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
@@ -103,7 +101,7 @@ std::size_t ListeningPeerPool::getConnectionCountByPeerName(
 
     QnMutexLocker lock(&m_mutex);
 
-    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(&lock);
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
 
     // Returning total number of connections of all matching peers.
 
@@ -121,7 +119,7 @@ bool ListeningPeerPool::isPeerOnline(const std::string& peerNameOriginal) const
 
     QnMutexLocker lock(&m_mutex);
 
-    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(&lock);
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
 
     auto peerContextIter = utils::findFirstElementWithPrefix(m_peers, peerName);
     return peerContextIter != m_peers.end();
@@ -134,7 +132,7 @@ std::string ListeningPeerPool::findListeningPeerByDomain(
 
     QnMutexLocker lock(&m_mutex);
 
-    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(&lock);
+    const_cast<ListeningPeerPool*>(this)->processExpirationTimers(lock);
 
     auto it = utils::findFirstElementWithPrefix(m_peers, domainNameReversed);
     if (it == m_peers.end())
@@ -150,7 +148,7 @@ void ListeningPeerPool::takeIdleConnection(
     
     QnMutexLocker lock(&m_mutex);
 
-    processExpirationTimers(&lock);
+    processExpirationTimers(lock);
 
     auto peerContextIter = utils::findFirstElementWithPrefix(m_peers, peerName);
     if (peerContextIter == m_peers.end())
@@ -194,6 +192,32 @@ nx::utils::Subscription<std::string>& ListeningPeerPool::peerConnectedSubscripti
 nx::utils::Subscription<std::string>& ListeningPeerPool::peerDisconnectedSubscription()
 {
     return m_peerDisconnectedSubscription;
+}
+
+bool ListeningPeerPool::someoneIsWaitingForPeerConnection(
+    const PeerContext& peerContext) const
+{
+    return !peerContext.takeConnectionRequestQueue.empty();
+}
+
+void ListeningPeerPool::provideConnectionToTheClient(
+    const QnMutexLockerBase& lock,
+    const std::string& peerName,
+    PeerContext* peerContext,
+    std::unique_ptr<ConnectionContext> connectionContext)
+{
+    NX_ASSERT(peerContext->connections.empty());
+
+    auto awaitContext = std::move(peerContext->takeConnectionRequestQueue.front());
+    peerContext->takeConnectionRequestQueue.pop_front();
+
+    m_takeIdleConnectionRequestTimers.erase(awaitContext.expirationTimerIter);
+
+    startPeerExpirationTimer(lock, peerName, peerContext);
+
+    giveAwayConnection(
+        std::move(connectionContext),
+        std::move(awaitContext.handler));
 }
 
 void ListeningPeerPool::startWaitingForNewConnection(
@@ -310,7 +334,7 @@ void ListeningPeerPool::startPeerExpirationTimer(
     peerContext->expirationTimer = timerIter;
 }
 
-void ListeningPeerPool::processExpirationTimers(QnMutexLockerBase* lock)
+void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& /*lock*/)
 {
     std::vector<std::string> disconnectedPeers;
 
@@ -326,25 +350,30 @@ void ListeningPeerPool::processExpirationTimers(QnMutexLockerBase* lock)
         NX_ASSERT(peerIter->second.connections.empty());
         m_peers.erase(peerIter);
 
-        // NOTE: peerName is domainName.peerName.
-        disconnectedPeers.push_back(utils::reverseWords(peerName, "."));
+        scheduleEvent(std::bind(
+            &nx::utils::Subscription<std::string>::notify,
+            &m_peerDisconnectedSubscription,
+            utils::reverseWords(peerName, "."))); //< NOTE: peerName is actually "domainName.peerName".
 
         m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
     }
+}
 
-    QnMutexUnlocker unlocker(lock);
-    for (const auto& disconnectedPeerName: disconnectedPeers)
-        m_peerDisconnectedSubscription.notify(disconnectedPeerName);
+void ListeningPeerPool::processExpirationTimers()
+{
+    QnMutexLocker lock(&m_mutex);
+    processExpirationTimers(lock);
 }
 
 void ListeningPeerPool::doPeriodicTasks()
 {
     handleTimedoutTakeConnectionRequests();
-    {
-        QnMutexLocker lock(&m_mutex);
-        processExpirationTimers(&lock);
-    }
 
+    processExpirationTimers();
+
+    raiseScheduledEvents();
+
+    m_periodicTasksTimer.cancelSync();
     m_periodicTasksTimer.start(
         m_settings.listeningPeer().internalTimerPeriod,
         std::bind(&ListeningPeerPool::doPeriodicTasks, this));
@@ -398,6 +427,28 @@ std::vector<TakeIdleConnectionHandler>
     }
 
     return requestHandlers;
+}
+
+void ListeningPeerPool::scheduleEvent(nx::utils::MoveOnlyFunc<void()> raiseEventFunc)
+{
+    m_scheduledEvents.push_back(std::move(raiseEventFunc));
+    forcePeriodicTasksProcessing();
+}
+
+void ListeningPeerPool::forcePeriodicTasksProcessing()
+{
+    m_periodicTasksTimer.post(std::bind(&ListeningPeerPool::doPeriodicTasks, this));
+}
+
+void ListeningPeerPool::raiseScheduledEvents()
+{
+    decltype (m_scheduledEvents) scheduledEvents;
+    {
+        QnMutexLocker lock(&m_mutex);
+        scheduledEvents.swap(m_scheduledEvents);
+    }
+    for (auto& raiseEventFunc: scheduledEvents)
+        raiseEventFunc();
 }
 
 } // namespace model
