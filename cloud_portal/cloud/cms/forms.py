@@ -1,12 +1,8 @@
 from django import forms
 from .models import *
 
-class CustomContextForm(forms.ModelForm):
+class CustomContextForm(forms.Form):
 	language = forms.ModelChoiceField(widget=forms.Select, label="Language", queryset=Language.objects.all())
-
-	class Meta():
-		fields = "__all__"
-		model = Blank
 
 	def remove_langauge(self):
 		super(CustomContextForm, self)

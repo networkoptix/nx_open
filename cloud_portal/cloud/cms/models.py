@@ -119,9 +119,3 @@ class DataRecord(models.Model):
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
-
-
-class Blank(models.Model):
-
-    def get_fields(self):
-        return None
