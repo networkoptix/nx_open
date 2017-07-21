@@ -29,5 +29,5 @@ def process_file(cmake_file_name, properties_file_name)
 def root = project.properties["root.dir"]
 
 process_file("${root}/cmake/ec_protocol.cmake", "${root}/.ec_protocol.properties")
-process_file("${root}/customization/${customization}/customization.cmake",
+process_file("${root}/customization/${project.properties.customization}/customization.cmake",
     "${root}/.customization.properties")

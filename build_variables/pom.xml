@@ -148,12 +148,12 @@
                 <executions>
                     <execution>
                         <id>get_properties_from_cmake</id>
-                        <phase>process-sources</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <source>${project.build.directory}/get_properties_from_cmake.groovy</source>
+                            <source>${project.basedir}/get_properties_from_cmake.groovy</source>
                         </configuration>
                     </execution>
                     <execution>
