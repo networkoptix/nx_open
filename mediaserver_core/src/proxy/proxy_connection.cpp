@@ -10,12 +10,11 @@
 #include <core/resource/media_server_resource.h>
 #include "core/resource/network_resource.h"
 #include <nx/network/http/custom_headers.h>
-#include "media_server/server_message_processor.h"
+#include <transaction/message_bus_adapter.h>
 #include "network/router.h"
 #include "network/tcp_listener.h"
 #include "network/universal_tcp_listener.h"
 #include "proxy_connection_processor_p.h"
-#include <transaction/message_bus_selector.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -45,7 +44,7 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-    ec2::QnTransactionMessageBusBase* messageBus,
+    ec2::TransactionMessageBusAdapter* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
@@ -146,7 +145,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
                     commonModule()->moduleGUID());
                 tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
-                sendTransaction(d->messageBus, tran, target);
+                d->messageBus->sendTransaction(tran, target);
             });
     } else {
         d->dstSocket.clear();

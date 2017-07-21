@@ -7,7 +7,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include "common/common_module.h"
 #include "managers/time_manager.h"

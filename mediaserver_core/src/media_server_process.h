@@ -156,14 +156,14 @@ private:
     void registerRestHandlers(
         CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
-        ec2::QnTransactionMessageBusBase* messageBus);
+        ec2::TransactionMessageBusAdapter* messageBus);
 
     template<class TcpConnectionProcessor, typename... ExtraParam>
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
-        ec2::QnTransactionMessageBusBase* messageBus);
+        ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();

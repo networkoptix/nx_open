@@ -38,7 +38,8 @@ struct QnConnectionInfo
     QString cloudHost;
     QString customization;
     QString cloudSystemId;
-	QnUuid localSystemId;
+    QnUuid localSystemId;
+    bool p2pMode;
 
     QnUuid serverId() const;
 
@@ -48,7 +49,7 @@ struct QnConnectionInfo
 
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\
     (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)\
-    (cloudHost)(customization)(cloudSystemId)(localSystemId)
+    (cloudHost)(customization)(cloudSystemId)(localSystemId)(p2pMode)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo),

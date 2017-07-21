@@ -143,12 +143,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
         m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         *streamUrl = m_streamUrl;
-        return CameraDiagnostics::NoErrorResult();
+        return m_onvifRes->customStreamConfiguration(getRole());
     }
 
-    m_onvifRes->beforeConfigureStream();
+    m_onvifRes->beforeConfigureStream(getRole());
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired, params);
-    m_onvifRes->afterConfigureStream();
+    m_onvifRes->customStreamConfiguration(getRole());
+    m_onvifRes->afterConfigureStream(getRole());
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
         // cache value

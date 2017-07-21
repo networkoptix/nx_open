@@ -6,14 +6,14 @@
 
 namespace ec2 {
 
-QnTransactionMessageBusBase::QnTransactionMessageBusBase(
+TransactionMessageBusBase::TransactionMessageBusBase(
     detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 :
-    QnCommonModuleAware(commonModule),
+    AbstractTransactionMessageBus(commonModule),
     m_db(db),
     m_thread(new QThread()),
     m_jsonTranSerializer(jsonTranSerializer),
@@ -25,20 +25,20 @@ QnTransactionMessageBusBase::QnTransactionMessageBusBase(
     moveToThread(m_thread);
 }
 
-QnTransactionMessageBusBase::~QnTransactionMessageBusBase()
+TransactionMessageBusBase::~TransactionMessageBusBase()
 {
     stop();
     delete m_thread;
 }
 
-void QnTransactionMessageBusBase::start()
+void TransactionMessageBusBase::start()
 {
     NX_ASSERT(!m_thread->isRunning());
     if (!m_thread->isRunning())
         m_thread->start();
 }
 
-void QnTransactionMessageBusBase::stop()
+void TransactionMessageBusBase::stop()
 {
     if (m_thread->isRunning())
     {
@@ -51,7 +51,7 @@ void QnTransactionMessageBusBase::stop()
     }
 }
 
-void QnTransactionMessageBusBase::setHandler(ECConnectionNotificationManager* handler)
+void TransactionMessageBusBase::setHandler(ECConnectionNotificationManager* handler)
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(!m_thread->isRunning());
@@ -59,31 +59,34 @@ void QnTransactionMessageBusBase::setHandler(ECConnectionNotificationManager* ha
     m_handler = handler;
 }
 
-void QnTransactionMessageBusBase::removeHandler(ECConnectionNotificationManager* handler)
+void TransactionMessageBusBase::removeHandler(ECConnectionNotificationManager* handler)
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(!m_thread->isRunning());
-    NX_ASSERT(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
-    if (m_handler == handler)
-        m_handler = nullptr;
+    if (m_handler)
+    {
+        NX_ASSERT(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+        if (m_handler == handler)
+            m_handler = nullptr;
+    }
 }
 
-QnJsonTransactionSerializer* QnTransactionMessageBusBase::jsonTranSerializer() const
+QnJsonTransactionSerializer* TransactionMessageBusBase::jsonTranSerializer() const
 {
     return m_jsonTranSerializer;
 }
 
-QnUbjsonTransactionSerializer* QnTransactionMessageBusBase::ubjsonTranSerializer() const
+QnUbjsonTransactionSerializer* TransactionMessageBusBase::ubjsonTranSerializer() const
 {
     return m_ubjsonTranSerializer;
 }
 
-ConnectionGuardSharedState* QnTransactionMessageBusBase::connectionGuardSharedState()
+ConnectionGuardSharedState* TransactionMessageBusBase::connectionGuardSharedState()
 {
     return &m_connectionGuardSharedState;
 }
 
-void QnTransactionMessageBusBase::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
+void TransactionMessageBusBase::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
 {
     m_timeSyncManager = timeSyncManager;
 }

@@ -43,7 +43,8 @@ class QnStreamRecorder:
     public QnCommonModuleAware
 {
     Q_OBJECT
-
+    
+    using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
 
@@ -86,6 +87,13 @@ public:
     void setNeedCalcSignature(bool value);
 
     virtual void disconnectFromResource() override;
+
+    void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
+
+    void disableRegisterFile(bool disable);
+
+    void setSaveMotionHandler(MotionHandler handler);
+
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
 #endif
@@ -206,6 +214,10 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+
+    QnResourceAudioLayoutPtr m_forcedAudioLayout;
+    bool m_disableRegisterFile;
+    MotionHandler m_motionHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
