@@ -7,7 +7,7 @@
 
 namespace {
 
-static constexpr bool kFisheyeDewarpingFeatureEnabled = false;
+static constexpr bool kFisheyeDewarpingFeatureEnabled = true;
 
 } // namespace
 

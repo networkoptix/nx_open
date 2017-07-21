@@ -89,6 +89,11 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
+QString AbstractCommunicatingSocket::idForToStringFromPtr() const
+{
+    return lm("%1->%2").args(getLocalAddress(), getForeignAddress());
+}
+
 void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
     nx::Buffer* const buffer, size_t minimalSize,
     std::function<void(SystemError::ErrorCode, size_t)> handler,
@@ -163,6 +168,11 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 }
 
 //-------------------------------------------------------------------------------------------------
+
+QString AbstractStreamServerSocket::idForToStringFromPtr() const
+{
+    return lm("%1").args(getLocalAddress());
+}
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

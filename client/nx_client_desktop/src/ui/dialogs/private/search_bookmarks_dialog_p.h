@@ -28,6 +28,8 @@ public:
         , qint64 utcStartTimeMs
         , qint64 utcFinishTimeMs);
 
+    void cancelUpdateOperation();
+
 private:
     QnVirtualCameraResourceList availableCameras() const;
 
@@ -65,7 +67,7 @@ private:
     QAction * const m_editBookmarkAction;
     QAction * const m_exportBookmarkAction;
     QAction * const m_removeBookmarksAction;
-    bool m_updatingNow;
+    bool m_updatingParametersNow;
 
     const qint64 utcRangeStartMs;
     const qint64 utcRangeEndMs;

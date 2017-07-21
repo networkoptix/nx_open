@@ -17,10 +17,12 @@
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
-#include "kinetic_helper.h"
 #include "camera/camera_chunk_provider.h"
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/animation/kinetic_helper.h>
+
+using KineticHelper = nx::client::core::animation::KineticHelper<qreal>;
 
 namespace {
 
@@ -138,10 +140,10 @@ public:
     qreal textOpacity = 1.0;
 
     qint64 stickyTime = -1;
-    QnKineticHelper<qreal> stickyPointKineticHelper;
+    KineticHelper stickyPointKineticHelper;
     qreal startZoom = 1.0;
     qint64 startWindowSize = 0;
-    QnKineticHelper<qreal> zoomKineticHelper;
+    KineticHelper zoomKineticHelper;
     bool dragWasInterruptedByZoom = false;
 
     QVector<QnTimelineZoomLevel> zoomLevels;

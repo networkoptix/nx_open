@@ -81,7 +81,7 @@ int QnStartLiteClientRestHandler::executeGet(
     QStringList args{
         "--url", url.toString(),
         "--videowall-instance-guid", videowallInstanceGuid.toString(),
-        "--log-level", toString(nx::utils::log::Settings::kDefaultLevel)};
+        "--log-level", toString(nx::utils::log::kDefaultLevel)};
 
     if (startCamerasMode)
         args.append(QStringList{"--auto-login", "enabled"});

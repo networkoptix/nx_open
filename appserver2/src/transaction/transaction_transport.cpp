@@ -13,7 +13,7 @@
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -42,7 +42,7 @@ QnTransactionTransport::QnTransactionTransport(
 }
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :

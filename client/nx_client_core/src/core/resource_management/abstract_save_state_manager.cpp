@@ -29,6 +29,7 @@ void QnAbstractSaveStateManager::clean(const QnUuid& id)
 {
     QnMutexLocker lk(&m_mutex);
     m_flags.remove(id);
+    m_saveRequests.remove(id);
 }
 
 bool QnAbstractSaveStateManager::isBeingSaved(const QnUuid& id) const
@@ -60,4 +61,27 @@ void QnAbstractSaveStateManager::markChanged(const QnUuid& id, bool changed)
         setFlags(id, flags(id) | IsChanged);
     else
         setFlags(id, flags(id) & ~IsChanged);
+}
+
+bool QnAbstractSaveStateManager::hasSaveRequests(const QnUuid& id) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return !m_saveRequests.value(id).empty();
+}
+
+void QnAbstractSaveStateManager::addSaveRequest(const QnUuid& id, int reqId)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_saveRequests[id].insert(reqId);
+}
+
+void QnAbstractSaveStateManager::removeSaveRequest(const QnUuid& id, int reqId)
+{
+    QnMutexLocker lk(&m_mutex);
+    if (!m_saveRequests.contains(id))
+        return;
+    auto& ids = m_saveRequests[id];
+    ids.remove(reqId);
+    if (ids.empty())
+        m_saveRequests.remove(id);
 }

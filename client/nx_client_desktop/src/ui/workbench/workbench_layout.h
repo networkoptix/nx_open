@@ -250,7 +250,7 @@ public:
      * @return Spacing between cells of this layout,
      * relative to cell size.
      */
-    const qreal cellSpacing() const;
+    qreal cellSpacing() const;
 
     /**
      * @param cellSpacing New spacing between cells for this layout,

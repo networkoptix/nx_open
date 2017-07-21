@@ -34,6 +34,7 @@
 #include <nx/mobile_client/controllers/resource_ptz_controller.h>
 #include <nx/mobile_client/models/ptz_preset_model.h>
 #include <nx/client/core/resource/layout_accessor.h>
+#include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
 
 using namespace nx::client::mobile;
@@ -65,6 +66,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
     qmlRegisterType<QnMediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
     qmlRegisterType<nx::client::core::resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
+    qmlRegisterType<nx::client::core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");

@@ -54,7 +54,7 @@ TEST(LogLogger, Filters)
     const auto buffer = new Buffer();
 
     Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
-    ASSERT_EQ((size_t) 0, logger.exceptionFilters().size());
+    ASSERT_EQ((size_t) 0, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));
@@ -67,8 +67,8 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 2, buffer->takeMessages().size());
 
-    logger.setExceptionFilters({QLatin1String("nx::first")});
-    ASSERT_EQ((size_t) 1, logger.exceptionFilters().size());
+    logger.setLevelFilters(LevelFilters{{"nx::first", Level::verbose}});
+    ASSERT_EQ((size_t) 1, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));
@@ -81,18 +81,23 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
-    logger.setExceptionFilters({QLatin1String("nx::second"), QLatin1String("nx::third")});
-    ASSERT_EQ((size_t) 2, logger.exceptionFilters().size());
+    logger.setLevelFilters(LevelFilters{
+        {"nx::second", Level::verbose}, {"nx::third", Level::none}});
+    ASSERT_EQ((size_t) 2, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));
-    EXPECT_FALSE(logger.isToBeLogged(Level::debug, QLatin1String("nx::first::className3")));
-    EXPECT_TRUE(logger.isToBeLogged(Level::debug, QLatin1String("nx::second::className4")));
+    EXPECT_FALSE(logger.isToBeLogged(Level::warning, QLatin1String("nx::third::className3")));
+    EXPECT_FALSE(logger.isToBeLogged(Level::debug, QLatin1String("nx::first::className4")));
+    EXPECT_TRUE(logger.isToBeLogged(Level::debug, QLatin1String("nx::second::className5")));
+    EXPECT_FALSE(logger.isToBeLogged(Level::debug, QLatin1String("nx::third::className6")));
 
     logger.log(Level::warning, QLatin1String("nx::first::className1"), "aaa");
     logger.log(Level::warning, QLatin1String("nx::second::className2"), "bbb");
-    logger.log(Level::debug, QLatin1String("nx::first::className3"), "ccc");
-    logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
+    logger.log(Level::warning, QLatin1String("nx::third::className3"), "ccc");
+    logger.log(Level::debug, QLatin1String("nx::first::className4"), "ddd");
+    logger.log(Level::debug, QLatin1String("nx::second::className5"), "eee");
+    logger.log(Level::debug, QLatin1String("nx::third::className6"), "fff");
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 }
 

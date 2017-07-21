@@ -106,7 +106,7 @@ QString demangleTypeName(const char* type)
     return QString::fromStdString(typeName);
 }
 
-QString pointerTypeName(const void* /*p*/)
+QString pointerTypeName(const void* /*value*/)
 {
     return QLatin1String("void");
 }

@@ -27,10 +27,10 @@ class ECConnectionNotificationManager;
 class TimeSynchronizationManager;
 
 class QnTransactionMessageBus:
-    public QnTransactionMessageBusBase
+    public TransactionMessageBusBase
 {
     Q_OBJECT;
-    using base_type = QnTransactionMessageBusBase;
+    using base_type = TransactionMessageBusBase;
 public:
     QnTransactionMessageBus(
         detail::QnDbManager* db,
