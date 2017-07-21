@@ -8,85 +8,81 @@
 #include <QtCore/QtMath>
 #include <QDebug>
 
-static const int maxMoves = 8;
+namespace nx {
+namespace client {
+namespace core {
+namespace animation {
+
+// TODO: #dklychkov #vkutin Add an option to use external time source instead of m_timer.
 
 template<class T>
-class QnKineticHelper {
+class KineticHelper
+{
 public:
-    enum State {
+    enum State
+    {
         Stopped,
         Measuring,
         Moving
     };
 
-    typedef QPair<T, int> Move;
-
-    QElapsedTimer m_timer;
-    QLinkedList<Move> m_moves;
-    T m_startValue;
-    T m_value;
-    qreal m_startSpeed;
-    qreal m_deceleration;
-    State m_state;
-    qreal m_minSpeed;
-    qreal m_maxSpeed;
-    qreal m_epsilonSpeed;
-
-    T m_minValue;
-    T m_maxValue;
+    static const int maxMoves = 8; // TODO: Refactor.
 
 public:
-    QnKineticHelper() :
-        m_deceleration(0.01),
-        m_state(Stopped),
-        m_maxSpeed(std::numeric_limits<qreal>::max()),
-        m_epsilonSpeed(0.3)
-    {
-        m_minValue = std::numeric_limits<T>::lowest();
-        m_maxValue = std::numeric_limits<T>::max();
-    }
+    KineticHelper() = default;
 
-    qreal minSpeed() const {
+    qreal minSpeed() const
+    {
         return m_minSpeed;
     }
 
-    void setMinSpeed(qreal speed) {
+    void setMinSpeed(qreal speed)
+    {
         m_minSpeed = speed;
     }
 
-    qreal maxSpeed() const {
+    qreal maxSpeed() const
+    {
         return m_maxSpeed;
     }
 
-    void setMaxSpeed(qreal speed) {
+    void setMaxSpeed(qreal speed)
+    {
         m_maxSpeed = speed;
     }
 
-    qreal epsilonSpeed() const {
+    qreal epsilonSpeed() const
+    {
         return m_epsilonSpeed;
     }
 
-    void setEpsilonSpeed(qreal speed) {
+    void setEpsilonSpeed(qreal speed)
+    {
         m_epsilonSpeed = speed;
     }
 
-    void setMinimum(T minValue) {
+    void setMinimum(T minValue)
+    {
         m_minValue = minValue;
     }
 
-    void setMaximum(T maxValue) {
+    void setMaximum(T maxValue)
+    {
         m_maxValue = maxValue;
     }
 
-    qreal deceleration() const {
+    qreal deceleration() const
+    {
         return m_deceleration;
     }
 
-    void setDeceleration(qreal deceleration) {
+    void setDeceleration(qreal deceleration)
+    {
         m_deceleration = deceleration;
     }
 
-    void start(T startValue) {
+    void start(T startValue)
+    {
         stop();
         m_moves.append(Move(startValue, 0));
         m_value = startValue;
@@ -94,7 +90,8 @@ public:
         m_state = Measuring;
     }
 
-    void move(T targetValue) {
+    void move(T targetValue)
+    {
         if (m_state != Measuring)
             return;
 
@@ -104,7 +101,8 @@ public:
             m_moves.removeFirst();
     }
 
-    void finish(T targetValue, int fakeTimeShift = 0) {
+    void finish(T targetValue, int fakeTimeShift = 0)
+    {
         if (m_state != Measuring)
             return;
 
@@ -121,7 +119,8 @@ public:
         m_timer.restart();
     }
 
-    void flick(T targetValue, qreal speed) {
+    void flick(T targetValue, qreal speed)
+    {
         stop();
 
         m_startSpeed = qBound(m_minSpeed, speed, m_maxSpeed);
@@ -131,23 +130,27 @@ public:
         m_timer.restart();
     }
 
-    void stop() {
+    void stop()
+    {
         m_moves.clear();
         m_state = Stopped;
     }
 
-    T value() const {
+    T value() const
+    {
         return m_value;
     }
 
-    T finalPos() const {
+    T finalPos() const
+    {
         qreal dir = m_startSpeed >=0 ? -1.0 : 1.0;
         qreal dt = -dir * m_startSpeed / m_deceleration;
         qreal speedDelta = m_deceleration * dt;
         return qBound<qreal>(m_minValue, m_startValue + (m_startSpeed + dir * speedDelta / 2) * dt, m_maxValue);
     }
 
-    void update() {
+    void update()
+    {
         if (m_state != Moving)
             return;
 
@@ -155,7 +158,8 @@ public:
         qreal dir = m_startSpeed >=0 ? -1.0 : 1.0;
         qreal speedDelta = m_deceleration * dt;
 
-        if (qAbs(m_startSpeed) <= speedDelta) {
+        if (qAbs(m_startSpeed) <= speedDelta)
+        {
             speedDelta = qAbs(m_startSpeed);
             dt = speedDelta / m_deceleration;
             m_state = Stopped;
@@ -169,11 +173,40 @@ public:
         }
     }
 
-    bool isStopped() const {
+    bool isStopped() const
+    {
         return m_state == Stopped;
     }
 
-    bool isMeasuring() const {
+    bool isMeasuring() const
+    {
         return m_state == Measuring;
     }
+
+    bool isMoving() const
+    {
+        return m_state == Moving;
+    }
+
+private:
+    typedef QPair<T, int> Move;
+
+    QElapsedTimer m_timer;
+    QLinkedList<Move> m_moves;
+    T m_startValue = T();
+    T m_value = T();
+    qreal m_startSpeed = 0.0;
+    qreal m_deceleration = 0.01;
+    State m_state = Stopped;
+    qreal m_minSpeed = std::numeric_limits<qreal>::lowest();
+    qreal m_maxSpeed = std::numeric_limits<qreal>::max();
+    qreal m_epsilonSpeed = 0.3;
+
+    T m_minValue = std::numeric_limits<T>::lowest();
+    T m_maxValue = std::numeric_limits<T>::max();
 };
+
+} // namespace animation
+} // namespace core
+} // namespace client
+} // namespace nx
