@@ -26,7 +26,8 @@ public:
     {
         if (!m_servers.empty())
         {
-            auto bus = dynamic_cast<MessageBus*>(m_servers[0]->moduleInstance()->ecConnection()->messageBus());
+            const auto connection = m_servers[0]->moduleInstance()->ecConnection();
+            auto bus = connection->messageBus()->dynamicCast<MessageBus*>();
             QObject::disconnect(bus, nullptr, nullptr, nullptr);
         }
     }
@@ -41,7 +42,8 @@ protected:
 
     bool isPeerLost(int index)
     {
-        auto bus = dynamic_cast<MessageBus*>(m_servers[index]->moduleInstance()->ecConnection()->messageBus());
+        const auto connection = m_servers[index]->moduleInstance()->ecConnection();
+        auto bus = connection->messageBus()->dynamicCast<MessageBus*>();
         ApiPersistentIdData lostPeer = bus->localPeer();
         return m_alivePeers.find(lostPeer.id) == m_alivePeers.end();
     }
@@ -66,17 +68,19 @@ protected:
         for (const auto& server : m_servers)
         {
             createData(server, 0, 0);
-            MessageBus* bus = dynamic_cast<MessageBus*>(server->moduleInstance()->ecConnection()->messageBus());
+            const auto connection = server->moduleInstance()->ecConnection();
+            MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
             auto intervals = bus->delayIntervals();
             intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
             intervals.outConnectionsInterval = std::chrono::milliseconds(1);
             bus->setDelayIntervals(intervals);
         }
 
-        MessageBus* bus = dynamic_cast<MessageBus*>(m_servers[0]->moduleInstance()->ecConnection()->messageBus());
+        const auto connection = m_servers[0]->moduleInstance()->ecConnection();
+        MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
         QObject::connect(
             bus,
-            &ec2::QnTransactionMessageBusBase::peerFound,
+            &ec2::TransactionMessageBusBase::peerFound,
             [this](QnUuid peer, Qn::PeerType)
             {
                 auto result = m_alivePeers.insert(peer);
@@ -85,7 +89,7 @@ protected:
         );
         QObject::connect(
             bus,
-            &ec2::QnTransactionMessageBusBase::peerLost,
+            &ec2::TransactionMessageBusBase::peerLost,
             [this](QnUuid peer, Qn::PeerType)
             {
                 auto oldSize = m_alivePeers.size();

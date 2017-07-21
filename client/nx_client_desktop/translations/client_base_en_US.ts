@@ -1810,10 +1810,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reset all rules to default?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to retrieve rules</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1831,6 +1827,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This action cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore all rules to default?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2974,7 +2974,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+        <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4301,11 +4301,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You will be reconnected</source>
+        <source>Systems will be merged shortly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Systems will be merged shortly</source>
+        <source>You will be reconnected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4397,7 +4397,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>kB/s</source>
+        <source>KB/s</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

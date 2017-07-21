@@ -16,6 +16,8 @@ struct RtpHeader
 {
     static const int RTP_HEADER_SIZE = 12;
     static const int RTP_VERSION = 2;
+    static const int CSRC_SIZE = 4;
+    static const int EXTENSION_HEADER_SIZE = 4;
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     unsigned short   version:2;     /* packet type                */
     unsigned short   padding:1;     /* padding flag               */
@@ -36,6 +38,14 @@ struct RtpHeader
     quint32 ssrc;                   // synchronization source
     //quint32 csrc;                 // synchronization source
     //quint32 csrc[1];              // optional CSRC list
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct RtpHeaderExtension
+{
+    uint16_t definedByProfile;
+    uint16_t length;
 };
 #pragma pack(pop)
 

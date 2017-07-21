@@ -48,11 +48,7 @@ LoginPage = function () {
     this.loginSuccessElement = p.helper.loginSuccessElement;
     this.loginDialogBackground = element(by.css('.modal')); // login dialog overlay
 
-    this.navbar = element(by.css('header')).element(by.css('.navbar'));
-    this.userAccountDropdownToggle = this.navbar.element(by.css('a[uib-dropdown-toggle]'));
-    this.userAccountDropdownMenu = this.navbar.element(by.css('[uib-dropdown-menu]'));
-    this.accountLink = this.userAccountDropdownMenu.element(by.linkText('Account Settings'));
-    this.changePassLink = this.userAccountDropdownMenu.element(by.linkText('Change Password'));
+    this.navbar = this.helper.forms.logout.navbar;
 
     this.rememberCheckbox = element(by.model('auth.remember'));
     this.iForgotPasswordLink = element(by.linkText('Forgot password?'));

@@ -156,12 +156,19 @@ bool QnWorkbenchAccessController::canCreateWebPage() const
     return resourceAccessManager()->canCreateWebPage(m_user);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr& resource) const
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
+    const QnResourcePtr& resource) const
 {
     NX_ASSERT(resource);
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
-        return Qn::ReadPermission | Qn::ViewContentPermission | Qn::ExportPermission;
+    {
+        return Qn::ReadPermission
+            | Qn::ViewContentPermission
+            | Qn::ExportPermission
+            | Qn::WritePermission
+            | Qn::WriteNamePermission;
+    }
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return calculatePermissionsInternal(layout);
@@ -177,51 +184,79 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     {
         /* Check if we are creating new user */
         if (user->flags().testFlag(Qn::local))
-            return hasGlobalPermission(Qn::GlobalAdminPermission) ? Qn::FullUserPermissions : Qn::NoPermissions;
+        {
+            return hasGlobalPermission(Qn::GlobalAdminPermission)
+                ? Qn::FullUserPermissions
+                : Qn::NoPermissions;
+        }
     }
 
     return resourceAccessManager()->permissions(m_user, resource);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const
+Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(
+    const QnLayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
 
     //TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
-    auto checkReadOnly = [this](Qn::Permissions permissions)
-    {
-        if (!commonModule()->isReadOnly())
-            return permissions;
-        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
-    };
+    auto checkReadOnly =
+        [this](Qn::Permissions permissions)
+        {
+            if (!commonModule()->isReadOnly())
+                return permissions;
 
-    auto checkLoggedIn = [this](Qn::Permissions permissions)
-    {
-        if (m_user)
-            return permissions;
-        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
-    };
+            return permissions &~ (Qn::RemovePermission
+                | Qn::SavePermission
+                | Qn::WriteNamePermission
+                | Qn::EditLayoutSettingsPermission);
+        };
 
-    auto checkLocked = [this, layout](Qn::Permissions permissions)
+    auto checkLoggedIn =
+        [this](Qn::Permissions permissions)
+        {
+            if (m_user)
+                return permissions;
+
+            return permissions &~ (Qn::RemovePermission
+                | Qn::SavePermission
+                | Qn::WriteNamePermission
+                | Qn::EditLayoutSettingsPermission);
+        };
+
+    auto checkLocked =
+        [this, layout](Qn::Permissions permissions)
         {
             // Removable layouts must be checked via main pipeline
             NX_ASSERT(!permissions.testFlag(Qn::RemovePermission));
             if (!layout->locked())
                 return permissions;
+
+            if (layout->isFile()) //< Local files can be renamed even if locked.
+                return permissions &~ Qn::AddRemoveItemsPermission;
+
             return permissions &~ (Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
         };
 
-    /* Some layouts are created with predefined permissions. */
+    // Some layouts are created with predefined permissions which are never changed.
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if (permissions.isValid() && permissions.canConvert<int>())
-        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ReadPermission); // TODO: #Elric listen to changes
+        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ReadPermission);
 
     if (layout->isFile())
-        return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
+    {
+        return checkLocked(Qn::ReadWriteSavePermission
+            | Qn::AddRemoveItemsPermission
+            | Qn::EditLayoutSettingsPermission
+            | Qn::WriteNamePermission);
+    }
 
     /* User can do everything with local layouts except removing from server. */
     if (layout->hasFlags(Qn::local))
-        return checkLocked(checkLoggedIn(checkReadOnly(static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~Qn::RemovePermission))));
+    {
+        return checkLocked(checkLoggedIn(checkReadOnly(
+            static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~ Qn::RemovePermission))));
+    }
 
     if (qnRuntime->isVideoWallMode())
         return Qn::VideoWallLayoutPermissions;

@@ -212,7 +212,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
             if (!m_audioDevice.isFormatSupported(m_audioFormat))
             {
-                errMessage = tr("44.1khz and 48khz audio formats are not supported by the audio "
+                errMessage = tr("44.1 kHz and 48 kHz audio formats are not supported by the audio "
                     "capturing device. Please select another audio device or \"none\" in the "
                     "Screen Recording settings.");
                 return false;

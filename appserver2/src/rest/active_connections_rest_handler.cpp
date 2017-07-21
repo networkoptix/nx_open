@@ -1,10 +1,10 @@
 #include "active_connections_rest_handler.h"
 
-#include "transaction/transaction_message_bus.h"
+#include <transaction/message_bus_adapter.h>
 #include <nx/fusion/model_functions.h>
 
 QnActiveConnectionsRestHandler::QnActiveConnectionsRestHandler(
-    const ec2::QnTransactionMessageBusBase* messageBus):
+    const ec2::AbstractTransactionMessageBus* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {

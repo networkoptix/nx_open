@@ -39,8 +39,9 @@
 #include <api/global_settings.h>
 #include <api/model/ping_reply.h>
 #include <core/resource/media_server_resource.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_adapter.h>
 #include <rest/helper/ping_rest_helper.h>
+#include <rest/helper/p2p_statistics.h>
 
 static int registerQtResources()
 {
@@ -382,6 +383,12 @@ int Appserver2Process::exec()
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
+        });
+
+    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
+        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            result->setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
         });
 
     tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",
