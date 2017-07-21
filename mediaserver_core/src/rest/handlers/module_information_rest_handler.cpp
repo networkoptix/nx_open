@@ -93,6 +93,7 @@ void QnModuleInformationRestHandler::afterExecute(
 
     // TODO: Probably owner is supposed to be passed as mutable.
     auto socket = const_cast<QnRestConnectionProcessor*>(owner)->takeSocket();
+    socket->bindToAioThread(m_pollable.getAioThread());
     if (!socket->setNonBlockingMode(true)
         || !socket->setRecvTimeout(kConnectionTimeout)
         || !socket->setKeepAlive(kKeepAliveOptions))
