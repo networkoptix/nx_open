@@ -1,5 +1,7 @@
 #include "hevc_common.h"
 
+#include <QtGlobal>
+
 namespace nx {
 namespace media_utils {
 namespace hevc {
@@ -8,7 +10,7 @@ namespace {
 
 static const uint8_t kPayloadHeaderForbiddenZeroBitMask = 0x80;
 static const uint8_t kPayloadHeaderNalUnitTypeMask = 0x7e;
-#if defined(Q_BIGENDIAN)
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN
     static const uint16_t kPayloadHeaderLayerIdMask = 0x1f8;
 #else
     static const uint16_t kPayloadHeaderLayerIdMask = 0xf801;
@@ -54,46 +56,46 @@ PacketType fromNalUnitTypeToPacketType(NalUnitType unitType)
 {
     switch (unitType)
     {
-        case NalUnitType::Unspec48:
-            return PacketType::AggregationPacket;
-        case NalUnitType::Unspec49:
-            return PacketType::FragmentationPacket;
-        case NalUnitType::Unspec50:
-            return PacketType::PaciPacket;
+        case NalUnitType::unspec48:
+            return PacketType::aggregationPacket;
+        case NalUnitType::unspec49:
+            return PacketType::fragmentationPacket;
+        case NalUnitType::unspec50:
+            return PacketType::paciPacket;
         default:
-            return PacketType::SingleNalUnitPacket;
+            return PacketType::singleNalUnitPacket;
     }
 }
 
 bool isValidUnitType(int unitType)
 {
-    return unitType >= (int)NalUnitType::TrailN
-        && unitType <= (int)NalUnitType::Unspec63;
+    return unitType >= (int)NalUnitType::trailN
+        && unitType <= (int)NalUnitType::unspec63;
 }
 
 bool isRandomAccessPoint(NalUnitType unitType)
 {
-    return unitType >= NalUnitType::BlaWLp
-        && unitType <= NalUnitType::CraNut;
+    return unitType >= NalUnitType::blaWLp
+        && unitType <= NalUnitType::craNut;
 }
 
 bool isLeadingPicture(NalUnitType unitType)
 {
-    return unitType >= NalUnitType::RadlN
-        && unitType <= NalUnitType::RaslR;
+    return unitType >= NalUnitType::radlN
+        && unitType <= NalUnitType::raslR;
 }
 
 bool isTrailingPicture(NalUnitType unitType)
 {
-    return unitType == NalUnitType::TrailN
-        || unitType == NalUnitType::TrailR;
+    return unitType == NalUnitType::trailN
+        || unitType == NalUnitType::trailR;
 }
 
 bool isParameterSet(NalUnitType unitType)
 {
-    return unitType == NalUnitType::VpsNut
-        || unitType == NalUnitType::SpsNut
-        || unitType == NalUnitType::PpsNut;
+    return unitType == NalUnitType::vpsNut
+        || unitType == NalUnitType::spsNut
+        || unitType == NalUnitType::ppsNut;
 }
 
 } // namespace hevc
