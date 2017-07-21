@@ -7,15 +7,6 @@ describe('User activation', function () {
         p.helper.get(p.url);
     });
 
-    it("should open register page from register success page by clicking Register button on top right corner", function () {
-        p.helper.register();
-
-        p.openRegisterButton.click();
-
-        expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
-    });
-
     it("should activate registration with a registration code sent to an email", function () {
         var userEmail = p.helper.getRandomEmail();
 
@@ -143,6 +134,7 @@ describe('User activation', function () {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
             p.helper.forms.logout.logOut.click(); // log out
+            browser.sleep(3000);
 
             expect(p.helper.forms.logout.dropdownToggle.isDisplayed()).toBe(false);
             expect(p.messageLoginLink.isDisplayed()).toBe(true);

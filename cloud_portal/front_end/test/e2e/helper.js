@@ -621,7 +621,8 @@ var Helper = function () {
         function onPrevMail(mail) {
             console.log("Open email to: " + mail.headers.to);
             deferred.fulfill(mail);
-            notifier.stop();
+            // Commented out because it was causing "ReferenceError: self is not defined"
+            // notifier.stop();
             notifier.removeListener("mail", onPrevMail);
         }
         notifier.on("mail", onPrevMail);
