@@ -5,17 +5,24 @@
 
 #include <atomic>
 #include <map>
+#include <queue>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
 #include <motion/motion_estimation.h>
+
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
-#include <core/resource/resource_fwd.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <core/resource/resource_media_layout.h>
+
 #include <nx/utils/safe_direct_connection.h>
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
+
+#include <analytics/common/video_metadata_plugin.h>
+#include <analytics/plugins/detection/naive_detection_smoother.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -105,6 +112,24 @@ protected:
     mutable QnMutex m_livemutex;
 private:
     float getDefaultFps() const;
+    bool needAnalyzeStream(Qn::ConnectionRole role);
+
+    void updateStreamResolution(int channelNumber, const QSize& newResolution);
+    void extractMediaStreamParams(
+        const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
+        std::map<QString, QString>* const customStreamParams = nullptr);
+
+    void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
+    void saveBitrateIfNeeded(
+        const QnCompressedVideoDataPtr& videoData,
+        const QnLiveStreamParams& liveParams,
+        bool isCameraConfigured);
+
+#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+    void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
+#endif
+
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopend
     // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)
@@ -122,6 +147,8 @@ private:
     QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+    std::unique_ptr<nx::analytics::VideoMetadataPlugin> m_videoMetadataPlugin;
+    nx::analytics::NaiveDetectionSmoother m_detectionSmoother;
 #endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
@@ -131,19 +158,8 @@ private:
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QElapsedTimer m_resolutionCheckTimer;
     int m_framesSincePrevMediaStreamCheck;
-
-    void updateStreamResolution( int channelNumber, const QSize& newResolution );
-    void extractMediaStreamParams(
-        const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution,
-        std::map<QString, QString>* const customStreamParams = nullptr );
-    void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
-    void saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
-                              const QnLiveStreamParams& liveParams,
-                              bool isCameraConfigured );
-
-private:
     QWeakPointer<QnAbstractVideoCamera> m_owner;
+    std::queue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

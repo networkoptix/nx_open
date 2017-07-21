@@ -63,6 +63,20 @@ public slots:
     void at_cameraInput(const QnResourcePtr& resource, const QString& inputPortID,
         bool value, qint64 timeStampUsec);
 
+    /** Some objects have been detected on the scene */
+    void at_analyticsEventStart(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
+    /** No objects detected on the scene */
+    void at_analyticsEventEnd(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
     void at_customEvent(const QString& resourceName, const QString& caption,
         const QString& description, const vms::event::EventMetaData& metadata,
         vms::event::EventState eventState, qint64 timeStamp);

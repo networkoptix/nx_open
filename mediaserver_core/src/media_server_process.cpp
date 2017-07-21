@@ -260,7 +260,7 @@
 #include <recorder/storage_db_pool.h>
 #include <transaction/message_bus_selector.h>
 #include <managers/discovery_manager.h>
-#include "rest/helper/p2p_stats_rest_helper.h"
+#include <rest/helper/p2p_statistics.h>
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
 

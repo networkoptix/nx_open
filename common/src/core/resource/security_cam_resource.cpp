@@ -23,6 +23,7 @@
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
 #include <common/static_common_module.h>
+#include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
 
@@ -1120,4 +1121,22 @@ QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteArchiveManager()
 {
     return nullptr;
+}
+
+void QnSecurityCamResource::analyticsEventStarted(const QString& caption, const QString& description)
+{
+    emit analyticsEventStart(
+        toSharedPointer(),
+        caption,
+        description,
+        qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QString& description)
+{
+    emit analyticsEventEnd(
+        toSharedPointer(),
+        caption,
+        description,
+        qnSyncTime->currentMSecsSinceEpoch());
 }

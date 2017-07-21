@@ -18,7 +18,7 @@ private:
     {
         QnUuid id;
         QnRect rect;
-        int lifetime = kDefaultObjectLifetime;
+        int lifetime = 1;
         QVector2D speed; //< relative units per frame
         bool found = false;
     };
@@ -30,13 +30,13 @@ private:
     void updateObjectInCache(const QnUuid& id, const QnRect& boundingBox);
     void removeExpiredObjectsFromCache();
 
-    void addNonExpiredObjectsFromCache(std::vector<QnObjectDetectionInfo>& objects) const;
-    QnRect applySpeedToRectangle(const QnRect& rectangle, const QVector2D& speed) const;
-    QVector2D calculateSpeed(const QnRect& previousPosition, const QnRect& currentPosition) const;
-    double distance(const QnRect& first, const QnRect& second) const;
-    QPointF rectangleCenter(const QnRect& rect) const;
-    QnRect correctRectangle(const QnRect& rect) const;
-    double predictXSpeedForRectangle(const QnRect& rect) const;
+    void addNonExpiredObjectsFromCache(std::vector<QnObjectDetectionInfo>& objects);
+    QnRect applySpeedToRectangle(const QnRect& rectangle, const QVector2D& speed);
+    QVector2D calculateSpeed(const QnRect& previousPosition, const QnRect& currentPosition);
+    double distance(const QnRect& first, const QnRect& second);
+    QPointF rectangleCenter(const QnRect& rect);
+    QnRect correctRectangle(const QnRect& rect);
+    double predictXSpeedForRectangle(const QnRect& rect);
 
 private:
     std::map<QnUuid, CachedObject> m_cachedObjects;

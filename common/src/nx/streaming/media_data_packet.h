@@ -174,6 +174,8 @@ enum class MetadataType
     ObjectDetection
 };
 
+// TODO: #dmishin get rid of implementations and members in this class
+// It should be an interface not a base implementation.
 struct QnAbstractCompressedMetadata: public QnAbstractMediaData
 {
 
@@ -182,7 +184,7 @@ public:
 
     QnAbstractCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator);
 
-    bool containTime(const qint64 timeUsec) const;
+    virtual bool containTime(const qint64 timeUsec) const;
 
 public:
     MetadataType metadataType;

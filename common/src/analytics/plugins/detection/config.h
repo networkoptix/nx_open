@@ -29,6 +29,9 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_STRING(NX_ANALYTICS_PATH "/ped100_snapshot_iter_70800.caffemodel", modelFile, "");
     NX_INI_STRING(NX_VAR_PATH "/var/cuda_engine.cache", cacheFile, "");
 
+    NX_INI_FLAG(0, enableDetectionPlugin, "");
+    NX_INI_FLAG(1, enableMotionDetection, "");
+
     // Rectangles filtering parameters
     NX_INI_INT(
         0,
@@ -59,7 +62,7 @@ struct IniConfig: public nx::kit::IniConfig
         similarityThreshold,
         "Minimal distance between detected objects to consider them as the same object.");
 
-    NX_INI_INT(1, defaultObjectLifetime, "Number of frames to keep rectangle for lost object.");
+    NX_INI_INT(1, objectLifetime, "Number of frames to keep rectangle for lost object.");
 
     NX_INI_FLAG(1, applySpeedToCachedRectangles, "");
     NX_INI_FLAG(1, applySpeedForDistanceCalculation, "");
@@ -83,6 +86,11 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_STRING("pednet", netType, "Network type. Available types are 'pednet' and 'carnet'");
 
     // Common inference parameters
+    NX_INI_STRING("Person detected", detectionStartCaption, "");
+    NX_INI_STRING("Person left", detectionEndCaption, "");
+    NX_INI_STRING("There are men nearby", detectionStartDescription, "");
+    NX_INI_STRING("There are no men nearby", detectionEndDescription, "");
+
     NX_INI_FLAG(1, useKeyFramesOnly, "Decode and perform inference for key frames only.");
 
     NX_INI_STRING(
@@ -92,32 +100,36 @@ struct IniConfig: public nx::kit::IniConfig
         "Available values are 'primary' and 'secondary'");
 
     NX_INI_STRING(
-        "slidingWindow",
+        "activationSequence",
         smoothingFilterType,
         "Type of smoothing filter. "
         "Available values are 'slidingWindow' and 'continuousSequence'");
 
     NX_INI_INT(
-        4,
+        1,
         slidingWindowSize,
         "Length of sequence of frames to decide "
         "if there are people on the scene (slidingWindow filter)");
 
     NX_INI_INT(
-        4,
+        1,
         activationSequenceLength,
         "Length of sequence of frames to state that there are men on the scene");
 
     NX_INI_INT(
-        4,
+        1,
         deactivationSequenceLength,
         "Length of sequence of frames to state that there are no men on the scene");
 };
 
+inline IniConfig& ini()
+{
+    static IniConfig ini;
+    return ini;
+}
+
 #undef NX_VAR_PATH
 #undef NX_ANALYTICS_PATH
-
-extern IniConfig conf;
 
 } // namespace analytics
 } // namespace nx

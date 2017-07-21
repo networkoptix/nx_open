@@ -3,6 +3,9 @@
 
 #include <boost/optional/optional.hpp>
 
+#define NX_OUTPUT_PREFIX "[nx::analytics::NaiveObjectTracker] "
+#include <nx/kit/debug.h>
+
 #include <analytics/common/object_detection_metadata.h>
 
 namespace nx {
@@ -11,27 +14,29 @@ namespace analytics {
 void NaiveObjectTracker::filterAndTrack(QnObjectDetectionMetadataPtr outMetadata)
 {
     std::vector<QnObjectDetectionInfo> filtered;
-    for (const auto& info: outMetadata->detectedObjects)
+    for (auto& info: outMetadata->detectedObjects)
     {
         const auto& rect = info.boundingBox;
+        auto width = rect.bottomRight.x - rect.topLeft.x;
+        auto height = rect.bottomRight.y - rect.topLeft.y;
 
-        bool rectangleIsTooSmall = (conf.minObjectWidth != 0
-            && rect.width < conf.minObjectWidth)
-            || ( conf.minObjectHeight != 0
-            && rect.height < conf.minObjectHeight);
+        bool rectangleIsTooSmall = (ini().minObjectWidth != 0
+            && width < ini().minObjectWidth / 100)
+            || ( ini().minObjectHeight != 0
+            && height < ini().minObjectHeight / 100);
 
         if (rectangleIsTooSmall)
             continue;
 
-        bool rectangleIsTooBig = (conf.maxObjectWidth != 0
-            && rect.width < conf.maxObjectWidth)
-            || (conf.maxObjectHeight != 0
-            && rect.height < conf.maxObjectHeight);
+        bool rectangleIsTooBig = (ini().maxObjectWidth != 0
+            && width > ini().maxObjectWidth / 100)
+            || (ini().maxObjectHeight != 0
+            && height > ini().maxObjectHeight / 100);
 
         if (rectangleIsTooBig)
             continue;
 
-        if (conf.enableNaiveObjectTracking)
+        if (ini().enableNaiveObjectTracking)
         {
             if (auto sameObject = findAndMarkSameObjectInCache(info.boundingBox))
             {
@@ -48,17 +53,17 @@ void NaiveObjectTracker::filterAndTrack(QnObjectDetectionMetadataPtr outMetadata
         filtered.push_back(info);
     }
 
-    if (conf.enableNaiveObjectTracking)
+    if (ini().enableNaiveObjectTracking)
     {
         removeExpiredObjectsFromCache();
         addNonExpiredObjectsFromCache(filtered);
         unmarkFoundObjectsInCache();
     }
 
-    std::swap(metadata->detectedObjects, filtered);
+    std::swap(outMetadata->detectedObjects, filtered);
 }
 
-void NaiveObjectTracker::unmarkFoundObjectsInCache() const
+void NaiveObjectTracker::unmarkFoundObjectsInCache()
 {
     for (auto& item: m_cachedObjects)
         item.second.found = false;
@@ -78,14 +83,14 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const QnRect& boundingBox)
         auto& rect = itr->second.rect;
         auto speed = itr->second.speed;
         double currentDistance = std::numeric_limits<double>::max();
-        if (conf.applySpeedForDistanceCalculation)
+        if (ini().applySpeedForDistanceCalculation)
         {
             QVector2D speed = itr->second.speed;
             if (speed.isNull())
             {
                 speed = QVector2D(
                     predictXSpeedForRectangle(itr->second.rect),
-                    (double) conf.defaultYSpeed / 1000);
+                    (double) ini().defaultYSpeed / 1000);
             }
 
             currentDistance = distance(
@@ -103,7 +108,7 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const QnRect& boundingBox)
         }
     }
 
-    auto minimalSimilarityDistance = (double) conf.similarityThreshold / 1000;
+    auto minimalSimilarityDistance = (double) ini().similarityThreshold / 1000;
     bool sameObjectWasFound = closestRect != m_cachedObjects.end()
         && minDistance < minimalSimilarityDistance;
 
@@ -121,7 +126,7 @@ void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const QnRect& boundi
     CachedObject object;
     object.id = id;
     object.rect = boundingBox;
-    object.lifetime = conf.defaultObjectLifetime;
+    object.lifetime = ini().objectLifetime;
     object.found = true;
 
     m_cachedObjects[id] = object;
@@ -137,16 +142,16 @@ void NaiveObjectTracker::updateObjectInCache(const QnUuid& id, const QnRect& bou
         cached.speed = calculateSpeed(cached.rect, boundingBox);
         cached.rect = boundingBox;
 
-        auto borderThreshold = (double)conf.bottomBorderBound / 100;
+        auto borderThreshold = (double)ini().bottomBorderBound / 100;
         if (cached.rect.bottomRight.y > borderThreshold ||
             cached.rect.bottomRight.x > borderThreshold ||
             cached.rect.topLeft.x < 1 - borderThreshold)
         {
-            cached.lifetime = conf.bottomBorderLifetime;
+            cached.lifetime = ini().bottomBorderLifetime;
         }
         else
         {
-            cached.lifetime = conf.defaultObjectLifetime;
+            cached.lifetime = ini().objectLifetime;
         }
     }
 }
@@ -168,7 +173,8 @@ void NaiveObjectTracker::removeExpiredObjectsFromCache()
     }
 }
 
-void NaiveObjectTracker::addNonExpiredObjectsFromCache(std::vector<QnObjectDetectionInfo>& objects) const
+void NaiveObjectTracker::addNonExpiredObjectsFromCache(
+    std::vector<QnObjectDetectionInfo>& objects)
 {
     for (auto& item: m_cachedObjects)
     {
@@ -177,15 +183,17 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(std::vector<QnObjectDetec
             QnObjectDetectionInfo info;
             auto& cached = item.second;
 
-            if (conf.applySpeedToCachedRectangles)
+            if (ini().applySpeedToCachedRectangles)
             {
                 if (cached.speed.x() < cached.speed.y() || cached.speed.isNull())
                 {
                     cached.rect = applySpeedToRectangle(cached.rect, QVector2D(
                         predictXSpeedForRectangle(cached.rect),
-                        (double)conf.defaultYSpeed / 1000));
+                        (double)ini().defaultYSpeed / 1000));
 
-                    OUTPUT << "(addNonExpiredObjects) " << cached.id << " ("
+                    //TODO: #dmishin ask #mshevchenko about NX_OUTPUT
+                    qDebug() << "(addNonExpiredObjects) "
+                        << cached.id << " ("
                         << cached.rect.topLeft.x << " "
                         << cached.rect.topLeft.y << ") ("
                         << cached.rect.bottomRight.x << " "
@@ -200,7 +208,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(std::vector<QnObjectDetec
     }
 }
 
-QnRect NaiveObjectTracker::applySpeedToRectangle(const QnRect& rectangle, const QVector2D& speed) const
+QnRect NaiveObjectTracker::applySpeedToRectangle(const QnRect& rectangle, const QVector2D& speed)
 {
     QnRect result = rectangle;
     auto xOffset = speed.x();
@@ -216,7 +224,7 @@ QnRect NaiveObjectTracker::applySpeedToRectangle(const QnRect& rectangle, const 
 
 QVector2D NaiveObjectTracker::calculateSpeed(
     const QnRect& previousPosition,
-    const QnRect& currentPosition) const
+    const QnRect& currentPosition)
 {
     auto firstCenterX = (previousPosition.topLeft.x + previousPosition.bottomRight.x) / 2;
     auto firstCenterY = (previousPosition.topLeft.y + previousPosition.bottomRight.y) / 2;
@@ -231,7 +239,7 @@ QVector2D NaiveObjectTracker::calculateSpeed(
     return speed;
 }
 
-double NaiveObjectTracker::distance(const QnRect& first, const QnRect& second) const
+double NaiveObjectTracker::distance(const QnRect& first, const QnRect& second)
 {
     auto firstCenterX = (first.topLeft.x + first.bottomRight.x) / 2;
     auto firstCenterY = (first.topLeft.y + first.bottomRight.y) / 2;
@@ -252,13 +260,13 @@ double NaiveObjectTracker::distance(const QnRect& first, const QnRect& second) c
         QVector2D(0.0, 1.0),
         centerVector);
 
-    if (dotProduct < 0 && rectCenterDistance > conf.maxBackVectorLength)
+    if (dotProduct < 0 && rectCenterDistance > ini().maxBackVectorLength)
         return std::numeric_limits<double>::max();
 
     return rectCenterDistance - dotProduct;
 }
 
-QPointF NaiveObjectTracker::rectangleCenter(const QnRect& rect) const
+QPointF NaiveObjectTracker::rectangleCenter(const QnRect& rect)
 {
     QPointF center;
     center.setX((rect.topLeft.x + rect.bottomRight.x) / 2);
@@ -267,7 +275,7 @@ QPointF NaiveObjectTracker::rectangleCenter(const QnRect& rect) const
     return center;
 }
 
-QnRect NaiveObjectTracker::correctRectangle(const QnRect& rect) const
+QnRect NaiveObjectTracker::correctRectangle(const QnRect& rect)
 {
     double xCorrection = 0;
     double yCorrection = 0;
@@ -276,17 +284,17 @@ QnRect NaiveObjectTracker::correctRectangle(const QnRect& rect) const
     auto x = center.x();
     auto y = center.y();
 
-    double xFirstZoneCorrection = (double) conf.xFirstZoneCorrection / 1000;
-    double yFirstZoneCorrection = (double) conf.yFirstZoneCorrection / 1000;
+    double xFirstZoneCorrection = (double) ini().xFirstZoneCorrection / 1000;
+    double yFirstZoneCorrection = (double) ini().yFirstZoneCorrection / 1000;
 
-    double xSecondZoneCorrection = (double) conf.xSecondZoneCorrection / 1000;
-    double ySecondZoneCorrection = (double) conf.ySecondZoneCorrection / 1000;
+    double xSecondZoneCorrection = (double) ini().xSecondZoneCorrection / 1000;
+    double ySecondZoneCorrection = (double) ini().ySecondZoneCorrection / 1000;
 
-    double xThirdZoneCorrection = (double) conf.xThirdZoneCorrection / 1000;
-    double yThirdZoneCorrection = (double) conf.yThirdZoneCorrection / 1000;
+    double xThirdZoneCorrection = (double) ini().xThirdZoneCorrection / 1000;
+    double yThirdZoneCorrection = (double) ini().yThirdZoneCorrection / 1000;
 
-    double firstZoneBound = (double) conf.firstZoneBound / 100;
-    double secondZoneBound = (double) conf.secondZoneBound / 100;
+    double firstZoneBound = (double) ini().firstZoneBound / 100;
+    double secondZoneBound = (double) ini().secondZoneBound / 100;
 
     if (x < firstZoneBound)
     {
@@ -309,16 +317,16 @@ QnRect NaiveObjectTracker::correctRectangle(const QnRect& rect) const
     return applySpeedToRectangle(rect, speed);
 }
 
-double NaiveObjectTracker::predictXSpeedForRectangle(const QnRect& rect) const
+double NaiveObjectTracker::predictXSpeedForRectangle(const QnRect& rect)
 {
     auto x = rectangleCenter(rect).x();
 
-    if (x < (double) conf.firstZoneBound / 100)
-        return (double) conf.xFirstZoneCorrection / 1000;
-    else if (x > (double) conf.secondZoneBound / 100)
-        return (double) conf.xThirdZoneCorrection / 1000;
+    if (x < (double) ini().firstZoneBound / 100)
+        return (double) ini().xFirstZoneCorrection / 1000;
+    else if (x > (double) ini().secondZoneBound / 100)
+        return (double) ini().xThirdZoneCorrection / 1000;
     else
-        return (double) conf.xSecondZoneCorrection / 1000;
+        return (double) ini().xSecondZoneCorrection / 1000;
 }
 
 

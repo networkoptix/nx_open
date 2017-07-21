@@ -509,6 +509,16 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, Qn
 {
 }
 
+bool QnAbstractCompressedMetadata::containTime(const qint64 timeUsec) const
+{
+    if (m_duration == 0)
+        return timestamp == timeUsec;
+    else if( timestamp <= timeUsec && timestamp + m_duration > timeUsec )
+        return true;
+
+    return false;
+}
+
 //------------------------------------ QnCompressedMetadata --------------------------------------
 
 QnCompressedMetadata::QnCompressedMetadata(MetadataType type):

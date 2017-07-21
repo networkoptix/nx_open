@@ -36,6 +36,12 @@ void EventConnector::onNewResource(const QnResourcePtr& resource)
 
         connect(camera.data(), &QnSecurityCamResource::cameraInput,
             this, &EventConnector::at_cameraInput);
+
+        connect(camera.data(), &QnSecurityCamResource::analyticsEventStart,
+            this, &EventConnector::at_analyticsEventStart);
+
+        connect(camera.data(), &QnSecurityCamResource::analyticsEventEnd,
+            this, &EventConnector::at_analyticsEventEnd);
     }
 }
 
@@ -148,6 +154,48 @@ void EventConnector::at_cameraInput(const QnResourcePtr& resource,
         inputPortID));
 
     qnEventRuleProcessor->processEvent(event);
+}
+
+void EventConnector::at_analyticsEventStart(
+    const QnResourcePtr& resource,
+    const QString& caption,
+    const QString& description,
+    qint64 timestamp)
+{
+    auto secCam = resource.dynamicCast<QnSecurityCamResource>();
+    if (!secCam)
+        return;
+
+    nx::vms::event::EventMetaData metadata;
+    metadata.cameraRefs.push_back(secCam->getId());
+    at_customEvent(
+        secCam->getUserDefinedName(),
+        caption,
+        description,
+        metadata,
+        nx::vms::event::EventState::active,
+        timestamp);
+}
+
+void EventConnector::at_analyticsEventEnd(
+    const QnResourcePtr& resource,
+    const QString& caption,
+    const QString& description,
+    qint64 timestamp)
+{
+    auto secCam = resource.dynamicCast<QnSecurityCamResource>();
+    if (!secCam)
+        return;
+
+    nx::vms::event::EventMetaData metadata;
+    metadata.cameraRefs.push_back(secCam->getId());
+    at_customEvent(
+        secCam->getUserDefinedName(),
+        caption,
+        description,
+        metadata,
+        nx::vms::event::EventState::inactive,
+        timestamp);
 }
 
 void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,

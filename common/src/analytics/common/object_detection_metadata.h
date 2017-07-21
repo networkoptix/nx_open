@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include <analytics/abstract_metadata.h>
+#include <analytics/common/abstract_metadata.h>
 
 #include <nx/utils/uuid.h>
 

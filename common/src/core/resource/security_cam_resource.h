@@ -282,6 +282,9 @@ public:
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 
+    virtual void analyticsEventStarted(const QString& caption, const QString& description);
+    virtual void analyticsEventEnded(const QString& caption, const QString& description);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -319,6 +322,18 @@ signals:
         const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
+        qint64 timestamp );
+
+    void analyticsEventStart(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
+    void analyticsEventEnd(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
         qint64 timestamp );
 
 protected slots:
