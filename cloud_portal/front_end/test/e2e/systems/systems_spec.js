@@ -92,9 +92,8 @@ describe('Systems list suite', function () {
         p.helper.logout();
         p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
 
-        // TODO: use systemName to identify system here
-        expect(p.systemOwner(p.helper.allSystems.first()).getText()).toContain(newFirstName);
-        expect(p.systemOwner(p.helper.allSystems.first()).getText()).toContain(newLastName);
+        expect(p.systemOwner(p.helper.onlineSystemsWithCurrentName.first()).getText()).toContain(newFirstName);
+        expect(p.systemOwner(p.helper.onlineSystemsWithCurrentName.first()).getText()).toContain(newLastName);
 
         p.helper.logout();
         p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
