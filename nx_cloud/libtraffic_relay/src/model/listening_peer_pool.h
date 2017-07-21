@@ -14,8 +14,9 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/subscription.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace cloud {
@@ -143,13 +144,17 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);
-    void processExpirationTimers(const QnMutexLockerBase& lock);
-    void processExpirationTimers();
+    void processExpirationTimers(
+        const QnMutexLockerBase& lock,
+        std::chrono::steady_clock::time_point currentTime = nx::utils::monotonicTime());
+    void processExpirationTimers(std::chrono::steady_clock::time_point currentTime);
 
     void doPeriodicTasks();
-    void handleTimedoutTakeConnectionRequests();
+    void handleTimedoutTakeConnectionRequests(
+        std::chrono::steady_clock::time_point currentTime);
     std::vector<TakeIdleConnectionHandler> findTimedoutTakeConnectionRequestHandlers(
-        const QnMutexLockerBase& lock);
+        const QnMutexLockerBase& lock,
+        std::chrono::steady_clock::time_point currentTime);
 
     void scheduleEvent(nx::utils::MoveOnlyFunc<void()> raiseEventFunc);
     void forcePeriodicTasksProcessing();
