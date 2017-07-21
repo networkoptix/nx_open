@@ -39,6 +39,11 @@ public:
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
     }
 
+    ~ListeningPeerPool()
+    {
+        m_pool.reset();
+    }
+
 protected:
     void addArg(const std::string& name, const std::string& value)
     {
