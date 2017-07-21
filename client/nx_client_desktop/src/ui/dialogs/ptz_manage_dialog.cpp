@@ -37,6 +37,7 @@
 #include <ui/workbench/workbench_item.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
@@ -448,7 +449,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToGetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -467,7 +468,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToSetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -508,7 +509,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToSetPosition(this, m_resource->getName());
+        messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -563,7 +564,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse && !ui::ptz::deletePresetInUse(this))
+            if (presetIsInUse && !messages::Ptz::deletePresetInUse(this))
                 break;
 
             m_model->removePreset(data.presetModel.preset.id);

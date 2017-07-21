@@ -17,11 +17,18 @@ static const KeepAliveOptions kKeepAliveOptions(
 
 QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
 {
-    closeAllSockets();
+    nx::utils::promise<void> stopPromise;
+    m_pollable.pleaseStop(
+        [this, &stopPromise]()
+        {
+            NX_DEBUG(this, lm("Close all %1 connections on destruction")
+                .arg(m_savedSockets.size()));
 
-    QnMutexLocker lock(&m_mutex);
-    while (!m_savedSockets.empty())
-        m_condition.wait(&m_mutex);
+            m_savedSockets.clear();
+            stopPromise.set_value();
+        });
+
+    stopPromise.get_future().wait();
 }
 
 int QnModuleInformationRestHandler::executeGet(
@@ -85,7 +92,8 @@ void QnModuleInformationRestHandler::afterExecute(
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
-    const auto socket = const_cast<QnRestConnectionProcessor*>(owner)->takeSocket();
+    auto socket = const_cast<QnRestConnectionProcessor*>(owner)->takeSocket();
+    socket->bindToAioThread(m_pollable.getAioThread());
     if (!socket->setNonBlockingMode(true)
         || !socket->setRecvTimeout(kConnectionTimeout)
         || !socket->setKeepAlive(kKeepAliveOptions))
@@ -96,43 +104,36 @@ void QnModuleInformationRestHandler::afterExecute(
         return;
     }
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_savedSockets.insert(socket);
-        NX_DEBUG(this, lm("Connection from %1 asks to keep connection open, %2 total")
-            .args(socket->getForeignAddress(), m_savedSockets.size()));
-    }
-
     connect(owner->commonModule(), &QnCommonModule::moduleInformationChanged,
-        this, &QnModuleInformationRestHandler::closeAllSockets, Qt::UniqueConnection);
+        this, &QnModuleInformationRestHandler::changeModuleInformation, Qt::UniqueConnection);
 
-    auto buffer = std::make_shared<QByteArray>();
-    buffer->reserve(100);
-    socket->readSomeAsync(buffer.get(),
-        [this, socket, buffer](SystemError::ErrorCode code, size_t size)
+    m_pollable.post(
+        [this, socket = std::move(socket)]()
         {
-            NX_DEBUG(this, lm("Unexpected event on connection from %1 (size=%2): %3")
-                .args(socket->getForeignAddress(), size, SystemError::toString(code)));
-            removeSocket(socket);
+            m_savedSockets.insert(socket);
+            NX_VERBOSE(this, lm("Connection from %1 asks to keep connection open, %2 total")
+                .args(socket->getForeignAddress(), m_savedSockets.size()));
+
+            auto buffer = std::make_shared<QByteArray>();
+            buffer->reserve(100);
+            socket->readSomeAsync(buffer.get(),
+                [this, socket, buffer](SystemError::ErrorCode code, size_t size)
+                {
+                    m_savedSockets.erase(socket);
+                    NX_VERBOSE(this, lm("Unexpected event on connection from %1 (size=%2): %3")
+                        .args(socket->getForeignAddress(), size, SystemError::toString(code)));
+                });
         });
 }
 
-void QnModuleInformationRestHandler::closeAllSockets()
+void QnModuleInformationRestHandler::changeModuleInformation()
 {
-    std::set<QSharedPointer<AbstractStreamSocket>> savedSockets;
-    {
-        QnMutexLocker lock(&m_mutex);
-        savedSockets = m_savedSockets;
-    }
+    m_pollable.cancelPostedCalls(
+        [this]()
+        {
+            NX_DEBUG(this, lm("Close all %1 connections on moduleInformation change")
+                .arg(m_savedSockets.size()));
 
-    NX_DEBUG(this, lm("Close all %1 sockets").arg(savedSockets.size()));
-    for (const auto& socket: savedSockets)
-        socket->pleaseStop([this, socket]() { removeSocket(socket); });
-}
-
-void QnModuleInformationRestHandler::removeSocket(const QSharedPointer<AbstractStreamSocket>& socket)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_savedSockets.erase(socket);
-    m_condition.wakeAll();
+            m_savedSockets.clear();
+        });
 }

@@ -131,6 +131,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/p2p_stats_rest_handler.h>
 #include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
@@ -217,7 +218,6 @@
 #include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
-#include "transaction/transaction_message_bus_base.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
@@ -258,8 +258,11 @@
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 #include <managers/discovery_manager.h>
+#include <rest/helper/p2p_statistics.h>
+#include <recorder/remote_archive_synchronizer.h>
+#include <nx/utils/std/cpp14.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1040,8 +1043,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
-    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
-    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
@@ -1098,8 +1100,8 @@ void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
         m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
 
-    if (m_cmdLineArguments.msgLogLevel.isEmpty())
-        m_cmdLineArguments.msgLogLevel = settings->roSettings()->value(
+    if (m_cmdLineArguments.httpLogLevel.isEmpty())
+        m_cmdLineArguments.httpLogLevel = settings->roSettings()->value(
             nx_ms_conf::HTTP_MSG_LOG_LEVEL,
             nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
 
@@ -1788,7 +1790,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
 	auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
@@ -1836,6 +1838,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
     reg("api/ping", new QnPingRestHandler());
+    reg(rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
@@ -1917,7 +1920,7 @@ void MediaServerProcess::regTcp(
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
@@ -2305,43 +2308,32 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
-
-    // TODO: Generalize nx::utils::log::Settings parsing from QSetting and cmdLineArguments
-    // for mediaserver and all clients.
-    const auto makeLevel =
-        [&](const QString& agrValue, const QString& settingsKey)
-        {
-            const auto settingsValue = settings->value(settingsKey);
-            const auto settingsLevel = nx::utils::log::levelFromString(settingsValue.toString());
-            if (settingsLevel != nx::utils::log::Level::undefined)
-                return settingsLevel;
-
-            const auto argLevel = nx::utils::log::levelFromString(agrValue);
-            if (argLevel != nx::utils::log::Level::undefined)
-                return argLevel;
-
-            return nx::utils::log::Settings::kDefaultLevel;
-        };
-
-    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
-
-    for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
-        logSettings.exceptionFilers.insert(filter);
+    logSettings.level.parse(
+        cmdLineArguments().logLevel, settings->value("logLevel").toString());
 
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
-    logSettings.level = makeLevel(cmdLineArguments().msgLogLevel, "http-log-level");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
@@ -2519,6 +2511,8 @@ void MediaServerProcess::run()
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
+    auto remoteArchiveSynchronizer =
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -2682,7 +2676,7 @@ void MediaServerProcess::run()
                 commonModule()->moduleGUID());
             tran.params.syncTimeMs = newTime;
             if (auto connection = commonModule()->ec2Connection())
-                sendTransaction(connection->messageBus(), tran);
+                connection->messageBus()->sendTransaction(tran);
         }
         );
 
@@ -3170,6 +3164,7 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
+    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3232,7 +3227,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
             ec2::ApiCommand::runtimeInfoChanged,
             commonModule()->moduleGUID());
         tran.params = runtimeInfo.data;
-        sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+        commonModule()->ec2Connection()->messageBus()->sendTransaction(tran);
     }
 }
 

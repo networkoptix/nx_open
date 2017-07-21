@@ -291,6 +291,11 @@ QnResourceWidget *QnResourceWidget::zoomTargetWidget() const
     return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
+bool QnResourceWidget::isZoomWindow() const
+{
+    return !m_zoomRect.isNull();
+}
+
 qreal QnResourceWidget::frameOpacity() const
 {
     return m_frameOpacity;

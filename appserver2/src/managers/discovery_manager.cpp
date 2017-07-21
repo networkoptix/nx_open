@@ -6,7 +6,7 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include <common/common_module.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 
@@ -167,7 +167,7 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
 
-QnDiscoveryMonitor::QnDiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
+QnDiscoveryMonitor::QnDiscoveryMonitor(TransactionMessageBusAdapter* messageBus):
     QnCommonModuleAware(messageBus->commonModule()),
     m_messageBus(messageBus)
 {
@@ -217,7 +217,7 @@ template<typename Transaction, typename Target>
 void QnDiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
 {
     QnTransaction<Transaction> t(command, commonModule()->moduleGUID(), std::move(data));
-    sendTransaction(m_messageBus, std::move(t), target);
+    m_messageBus->sendTransaction(std::move(t), target);
 }
 
 } // namespace ec2

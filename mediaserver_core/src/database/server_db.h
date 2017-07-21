@@ -71,6 +71,9 @@ public:
 
     void setBookmarkCountController(std::function<void(size_t)> handler);
 
+    qint64 getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource);
+    bool updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource, qint64 lastSyncTime);
+
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
 

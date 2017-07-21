@@ -273,7 +273,10 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
         nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
 
     action->setRuleId(context.request().businessRuleId);
-    action->getParams().actionResourceId = authorityUser;
+
+    auto& actionParams = action->getParams();
+    actionParams.actionResourceId = authorityUser;
+    actionParams.text = bookmark.description;
 
     qnServerDb->saveActionToDB(action);
 

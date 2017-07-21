@@ -443,7 +443,7 @@ ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets
         if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
-        if (!widget->zoomRect().isNull())
+        if (widget->isZoomWindow())
             continue;
 
         if (pureIoModule(widget->resource()))
@@ -1231,7 +1231,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
         if (!check(mediaWidget->ptzController()))
             return InvisibleAction;
 
-        if (!mediaWidget->zoomRect().isNull())
+        if (mediaWidget->isZoomWindow())
             return InvisibleAction;
     }
 

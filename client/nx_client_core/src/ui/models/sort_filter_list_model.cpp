@@ -21,6 +21,17 @@ public:
 
     int rowCount() const;
 
+    int sourceRowsCount() const;
+
+    int filterRole() const;
+    void setFilterRole(int value);
+
+    int filterCaseSensitivity() const;
+    void setFilterCaseSensitivity(int value);
+
+    QString filterWildcard() const;
+    void setFilterWildcard(const QString& value);
+
 private:
     void resetTargetModel();
 
@@ -53,12 +64,16 @@ private:
 
     void handleResetSourceModel();
 
+    void updateSourceRowsCount();
+
 private:
     void insertSourceRow(int sourceRow);
 
     void removeSourceRow(int sourceRow);
 
     bool isFilteredOut(int sourceRow) const;
+
+    bool isFilteredByWildcard(int sourceRow) const;
 
     using RowsList = QList<int>;
     int indexToInsert(int sourceRow, const RowsList& list);
@@ -71,6 +86,12 @@ private:
     const LessPred m_lessPred;
     RowsList m_mapped;
     QnSortFilterListModel::RolesSet m_triggeringRoles;
+
+    int m_filterRole = -1;
+    Qt::CaseSensitivity m_filterCaseSensiticity = Qt::CaseSensitive;
+    QString m_filterWildcard;
+
+    int m_sourceRowsCount = 0;
 };
 
 QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
@@ -160,10 +181,68 @@ int QnSortFilterListModelPrivate::rowCount() const
     return m_mapped.size();
 }
 
+int QnSortFilterListModelPrivate::sourceRowsCount() const
+{
+    return m_sourceRowsCount;
+}
+
+int QnSortFilterListModelPrivate::filterRole() const
+{
+    return m_filterRole;
+}
+
+void QnSortFilterListModelPrivate::setFilterRole(int value)
+{
+    if (m_filterRole == value)
+        return;
+
+    m_filterRole = value;
+    refresh();
+}
+
+int QnSortFilterListModelPrivate::filterCaseSensitivity() const
+{
+    return m_filterCaseSensiticity;
+}
+
+void QnSortFilterListModelPrivate::setFilterCaseSensitivity(int value)
+{
+    if (m_filterCaseSensiticity == value)
+        return;
+
+    m_filterCaseSensiticity = static_cast<Qt::CaseSensitivity>(value);
+    refresh();
+}
+
+QString QnSortFilterListModelPrivate::filterWildcard() const
+{
+    return m_filterWildcard;
+}
+
+void QnSortFilterListModelPrivate::setFilterWildcard(const QString& value)
+{
+    if (m_filterWildcard == value)
+        return;
+
+    m_filterWildcard = value;
+    refresh();
+}
+
 bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
 {
     Q_Q(const QnSortFilterListModel);
-    return !q->filterAcceptsRow(sourceRow, QModelIndex());
+    return isFilteredByWildcard(sourceRow) || !q->filterAcceptsRow(sourceRow, QModelIndex());
+}
+
+bool QnSortFilterListModelPrivate::isFilteredByWildcard(int sourceRow) const
+{
+    Q_Q(const QnSortFilterListModel);
+    const auto sourceModel = q->sourceModel();
+    if (!sourceModel || m_filterWildcard.isEmpty() || m_filterRole < 0)
+        return false;
+
+    const auto fieldData = sourceModel->index(sourceRow, 0).data(m_filterRole).toString();
+    return !fieldData.contains(m_filterWildcard, m_filterCaseSensiticity);
 }
 
 int QnSortFilterListModelPrivate::indexToInsert(int sourceRow, const RowsList& mapped)
@@ -217,6 +296,8 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     int first,
     int last)
 {
+    updateSourceRowsCount();
+
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid())
         return;
@@ -250,6 +331,8 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     int first,
     int last)
 {
+    updateSourceRowsCount();
+
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid())
         return;
@@ -265,13 +348,13 @@ void QnSortFilterListModelPrivate::handleSourceRowsMoved(
     const QModelIndex& destination,
     int /* row */)
 {
+    // TODO: #ynikitenkov support handling of moving items
+    NX_ASSERT(false, "QnSortFilterListModel does not handle moves yet");
     NX_ASSERT(!parent.isValid() && !destination.isValid(),
         "QnSortFilterListModel works only with flat lists models");
     if (parent.isValid() || destination.isValid())
         return;
 
-    // TODO: #ynikitenkov support handling of moving items
-    NX_ASSERT(false, "QnSortFilterListModel does not handle moves yet");
 }
 
 void QnSortFilterListModelPrivate::handleSourceDataChanged(
@@ -307,8 +390,10 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
             emit q->dataChanged(targetIndex, targetIndex, roles);
     }
 
+    const auto targetRoles = roles.toList().toSet();
     if (m_triggeringRoles.isEmpty()
-        || m_triggeringRoles.intersects(roles.toList().toSet()))
+        || targetRoles.contains(m_filterRole)
+        || m_triggeringRoles.intersects(targetRoles))
     {
         refresh();
     }
@@ -317,7 +402,20 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
 void QnSortFilterListModelPrivate::handleResetSourceModel()
 {
     resetTargetModel();
+    updateSourceRowsCount();
     refresh();
+}
+
+void QnSortFilterListModelPrivate::updateSourceRowsCount()
+{
+    Q_Q(QnSortFilterListModel);
+    const auto source = q->sourceModel();
+    const auto newCount = source ? source->rowCount() : 0;
+    if (m_sourceRowsCount == newCount)
+        return;
+
+    m_sourceRowsCount = newCount;
+    emit q->sourceRowsCountChanged();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -352,7 +450,6 @@ void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
 
     connect(model, &QAbstractListModel::rowsInserted,
         d, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
-
     connect(model, &QAbstractListModel::rowsAboutToBeRemoved,
         d, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
     connect(model, &QAbstractListModel::rowsRemoved,
@@ -364,6 +461,7 @@ void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
     connect(model, &QAbstractListModel::modelReset,
         d, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
+    d->updateSourceRowsCount();
     //TODO: #ynikitenkov Make filling of model with data in reset model mode.
     d->refresh();
 }
@@ -378,6 +476,48 @@ void QnSortFilterListModel::forceUpdate()
 {
     Q_D(QnSortFilterListModel);
     d->refresh();
+}
+
+int QnSortFilterListModel::sourceRowsCount() const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->sourceRowsCount();
+}
+
+int QnSortFilterListModel::filterRole() const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->filterRole();
+}
+
+void QnSortFilterListModel::setFilterRole(int value)
+{
+    Q_D(QnSortFilterListModel);
+    d->setFilterRole(value);
+}
+
+int QnSortFilterListModel::filterCaseSensitivity() const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->filterCaseSensitivity();
+}
+
+void QnSortFilterListModel::setFilterCaseSensitivity(int value)
+{
+    Q_D(QnSortFilterListModel);
+    d->setFilterCaseSensitivity(value);
+}
+
+QString QnSortFilterListModel::filterWildcard() const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->filterWildcard();
+}
+
+void QnSortFilterListModel::setFilterWildcard(const QString& value)
+{
+    Q_D(QnSortFilterListModel);
+    d->setFilterWildcard(value);
 }
 
 bool QnSortFilterListModel::lessThan(

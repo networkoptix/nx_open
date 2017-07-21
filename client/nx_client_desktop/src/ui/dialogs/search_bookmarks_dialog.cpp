@@ -39,3 +39,11 @@ void QnSearchBookmarksDialog::showEvent(QShowEvent* event)
     Q_D(QnSearchBookmarksDialog);
     d->refresh();
 }
+
+void QnSearchBookmarksDialog::closeEvent(QCloseEvent* event)
+{
+    base_type::closeEvent(event);
+
+    Q_D(QnSearchBookmarksDialog);
+    d->cancelUpdateOperation();
+}

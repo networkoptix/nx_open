@@ -46,7 +46,11 @@ struct ActionParameters
     // Bookmark
     QString tags;
 
-    // Generic text: Show Text Overlay / exec HTTP action: message body
+    /**
+      * For "Show Text Overlay" action: generic text.
+      * For "Exec HTTP" action: message body.
+      * For "Acknowledge" action: bookmark description.
+      */
     QString text;
 
     // Generic duration: Bookmark, Show Text Overlay

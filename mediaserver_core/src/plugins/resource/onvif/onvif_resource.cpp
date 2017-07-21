@@ -561,15 +561,58 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (!result)
         return result;
 
-    setCodec(H264, true);
-    setCodec(H264, false);
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
 
-	auto deviceOnvifUrl = getDeviceOnvifUrl();
+    CapabilitiesResp capabilitiesResponse;
+    DeviceSoapWrapper* soapWrapper = nullptr;
 
-    if (deviceOnvifUrl.isEmpty()) {
-#ifdef PL_ONVIF_DEBUG
-        qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
-#endif
+    result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
+    if(!checkResultAndSetStatus(result))
+        return result;
+
+    std::unique_ptr<DeviceSoapWrapper> guard(soapWrapper);
+
+    result = initializeMedia(capabilitiesResponse);
+    if (!checkResultAndSetStatus(result))
+        return result;
+
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+    initializeAdvancedParameters(capabilitiesResponse);
+
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+    initializeIo(capabilitiesResponse);
+
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+    initializePtz(capabilitiesResponse);
+    
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+    result = customInitialization(capabilitiesResponse);
+    if (!checkResultAndSetStatus(result))
+        return result;
+
+    saveParams();
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
+    CapabilitiesResp* outCapabilitiesResponse,
+    DeviceSoapWrapper** outDeviceSoapWrapper)
+{
+    *outDeviceSoapWrapper = nullptr;
+
+    auto deviceOnvifUrl = getDeviceOnvifUrl();
+    if (deviceOnvifUrl.isEmpty())
+    {
         return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
             ? m_prevOnvifResultCode
             : CameraDiagnostics::RequestFailedResult(lit("getDeviceOnvifUrl"), QString());
@@ -582,30 +625,38 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     QAuthenticator auth = getAuth();
 
-    DeviceSoapWrapper deviceSoapWrapper(deviceOnvifUrl.toStdString(), auth.user(), auth.password(), m_timeDrift);
-    CapabilitiesResp capabilitiesResponse;
-    result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
-    if( !result )
+    std::unique_ptr<DeviceSoapWrapper> deviceSoapWrapper = 
+        std::make_unique<DeviceSoapWrapper>(
+            deviceOnvifUrl.toStdString(),
+            auth.user(),
+            auth.password(),
+            m_timeDrift);
+
+    auto result = fetchOnvifCapabilities(deviceSoapWrapper.get(), outCapabilitiesResponse);
+    if (!result)
         return result;
+    
+    updateFirmware();
+    fillFullUrlInfo(*outCapabilitiesResponse);
 
-    //if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
+    if (getMediaUrl().isEmpty())
     {
-        updateFirmware();
-        fillFullUrlInfo( capabilitiesResponse );
-
-        if( getMediaUrl().isEmpty() )
-        {
-#ifdef PL_ONVIF_DEBUG
-            qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
-#endif
-            return CameraDiagnostics::CameraInvalidParams(lit("ONVIF media URL is not filled by camera"));
-        }
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("ONVIF media URL is not filled by camera"));
     }
 
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
+    *outDeviceSoapWrapper = deviceSoapWrapper.release();
 
-    result = fetchAndSetVideoSource();
+    return result;
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
+    const CapabilitiesResp& /*onvifCapabilities*/)
+{
+    setCodec(H264, true);
+    setCodec(H264, false);
+
+    auto result = fetchAndSetVideoSource();
     if (!result)
         return result;
 
@@ -621,49 +672,82 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (!result)
         return result;
 
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
-
-    //if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized)
-    //    setStatus(Qn::Online, true); // to avoid infinit status loop in this version
-
-    //Additional camera settings
-    fetchAndSetAdvancedParameters();
-
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
-
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
-    if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION && !m_primaryResolution.isEmpty())
+    int resolutionArea = m_primaryResolution.width() * m_primaryResolution.height();
+    bool gotPrimaryStreamSoftMotionCapability = !m_primaryResolution.isEmpty()
+        && resolutionArea <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
+
+    if (gotPrimaryStreamSoftMotionCapability)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
 
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
 
+
+    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
+    {
+        bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
+        if (forcedAR && m_primaryResolution.height() > 0)
+        {
+            qreal ar = m_primaryResolution.width() / (qreal)m_primaryResolution.height();
+            setCustomAspectRatio(ar);
+        }
+
+        QString defaultAR = resourceData.value<QString>(QString("defaultAR"));
+        QStringList parts = defaultAR.split(L'x');
+        if (parts.size() == 2)
+        {
+            qreal ar = parts[0].toFloat() / parts[1].toFloat();
+            setCustomAspectRatio(ar);
+        }
+    }
+
+	if (initializeTwoWayAudio())
+        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+
+    return result;
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::initializePtz(const CapabilitiesResp& onvifCapabilities)
+{
+    bool result = fetchPtzInfo();
+    if (!result)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("Fetch Onvif PTZ configurations."),
+            lit("Can not fetch Onvif PTZ configurations."));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp& onvifCapabilities)
+{
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
-    fetchRelayOutputs( &relayOutputs );
-    if( !relayOutputs.empty() )
+    fetchRelayOutputs(&relayOutputs);
+    if (!relayOutputs.empty())
     {
-        setCameraCapability( Qn::RelayOutputCapability, true );
+        setCameraCapability(Qn::RelayOutputCapability, true);
         //TODO #ak it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
-            //but all cameras i've seen have either both input & output or none
-        setCameraCapability( Qn::RelayInputCapability, true );
+        //but all cameras I've seen have either both input & output or none
+        setCameraCapability(Qn::RelayInputCapability, true);
 
         //resetting all ports states to inactive
-        for( std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
+        for (std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
             i = 0;
             i < relayOutputs.size();
-            ++i )
+            ++i)
         {
-            setRelayOutputStateNonSafe( 0, QString::fromStdString(relayOutputs[i].token), false, 0 );
+            setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
         }
     }
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fetchRelayInputInfo( capabilitiesResponse );
+    fetchRelayInputInfo(onvifCapabilities);
 
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.contains(QString("relayInputCountForced")))
@@ -684,25 +768,23 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             QString("clearInputsTimeoutSec"), 0) * 1000 * 1000;
     }
 
-    qWarning() << "QnPlOnvifResource::initInternal() m_clearInputsTimeoutUSec =" << m_clearInputsTimeoutUSec;
-
     QnIOPortDataList allPorts = getRelayOutputList();
 
-    if (capabilitiesResponse.Capabilities &&
-        capabilitiesResponse.Capabilities->Device &&
-        capabilitiesResponse.Capabilities->Device->IO &&
-        capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
-        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0)
+    if (onvifCapabilities.Capabilities &&
+        onvifCapabilities.Capabilities->Device &&
+        onvifCapabilities.Capabilities->Device->IO &&
+        onvifCapabilities.Capabilities->Device->IO->InputConnectors &&
+        *onvifCapabilities.Capabilities->Device->IO->InputConnectors > 0)
     {
 
-        const auto portsCount = *capabilitiesResponse.Capabilities
+        const auto portsCount = *onvifCapabilities.Capabilities
             ->Device
             ->IO
             ->InputConnectors;
 
         m_inputPortCount = portsCount;
 
-        if (portsCount <= (int) MAX_IO_PORTS_PER_DEVICE)
+        if (portsCount <= (int)MAX_IO_PORTS_PER_DEVICE)
         {
             for (int i = 1; i <= portsCount; ++i)
             {
@@ -715,53 +797,25 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         }
         else
         {
-            NX_LOG( lit("Device has too many input ports. Url: %1")
-                .arg(getUrl()), cl_logDEBUG1 );
+            NX_LOG(lit("Device has too many input ports. Url: %1")
+                .arg(getUrl()), cl_logDEBUG1);
         }
-
-
     }
 
     setIOPorts(std::move(allPorts));
 
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
+    m_portNamePrefixToIgnore = resourceData.value<QString>(
+        lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>(
+        lit("portNamePrefixToIgnore"), QString());
 
-    fetchPtzInfo();
+    return CameraDiagnostics::NoErrorResult();
+}
 
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
-
-    if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
-    {
-        bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
-        if (forcedAR && m_primaryResolution.height() > 0)
-        {
-            qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-            setCustomAspectRatio(ar);
-        }
-
-        QString defaultAR = resourceData.value<QString>(QString("defaultAR"));
-        QStringList parts = defaultAR.split(L'x');
-        if (parts.size() == 2) {
-            qreal ar = parts[0].toFloat() / parts[1].toFloat();
-            setCustomAspectRatio(ar);
-        }
-    }
-
-    const auto customInitResult = customInitialization(capabilitiesResponse);
-    if (customInitResult.errorCode != CameraDiagnostics::ErrorCode::noError)
-        return customInitResult;
-
-    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
-
-    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
-
-    if (initializeTwoWayAudio())
-        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
-
-    saveParams();
-
+CameraDiagnostics::Result QnPlOnvifResource::initializeAdvancedParameters(
+    const CapabilitiesResp& /*onvifCapabilities*/)
+{
+    fetchAndSetAdvancedParameters();
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1957,6 +2011,15 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
     else {
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getProfiles"), soapWrapper.getLastError());
     }
+}
+
+bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result& result)
+{
+    bool notAuthorized = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised;
+    if (notAuthorized && getStatus() != Qn::Unauthorized)
+        setStatus(Qn::Unauthorized);
+        
+    return !!result;
 }
 
 bool QnPlOnvifResource::trustMaxFPS()
@@ -3956,7 +4019,7 @@ QnMutex* QnPlOnvifResource::getStreamConfMutex()
     return &m_streamConfMutex;
 }
 
-void QnPlOnvifResource::beforeConfigureStream()
+void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock( &m_streamConfMutex );
     ++m_streamConfCounter;
@@ -3964,13 +4027,18 @@ void QnPlOnvifResource::beforeConfigureStream()
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
-void QnPlOnvifResource::afterConfigureStream()
+void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock( &m_streamConfMutex );
     --m_streamConfCounter;
     m_streamConfCond.wakeAll();
     while (m_streamConfCounter > 0)
         m_streamConfCond.wait(&m_streamConfMutex);
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole role)
+{
+    return CameraDiagnostics::NoErrorResult();
 }
 
 double QnPlOnvifResource::getClosestAvailableFps(double desiredFps)
@@ -4056,7 +4124,7 @@ void QnPlOnvifResource::updateOnvifUrls(const QnPlOnvifResourcePtr& other)
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
     DeviceSoapWrapper* const soapWrapper,
-    CapabilitiesResp* const response )
+    CapabilitiesResp* const response)
 {
     QAuthenticator auth = getAuth();
 

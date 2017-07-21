@@ -357,6 +357,11 @@ bool CloudStreamSocket::isInSelfAioThread() const
     return m_aioThreadBinder.isInSelfAioThread();
 }
 
+QString CloudStreamSocket::idForToStringFromPtr() const
+{
+    return m_socketDelegate ? m_socketDelegate->idForToStringFromPtr() : QString();
+}
+
 QString CloudStreamSocket::getForeignHostFullCloudName() const
 {
     return m_cloudTunnelAttributes.remotePeerName;

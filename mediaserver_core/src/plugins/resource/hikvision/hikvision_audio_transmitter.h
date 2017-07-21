@@ -5,6 +5,10 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
 class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
 {
     using base_type = BaseHttpAudioTransmitter;
@@ -35,3 +39,7 @@ private:
 private:
     QString m_channelId;
 };
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx

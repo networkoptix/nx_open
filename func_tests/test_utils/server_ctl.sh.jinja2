@@ -38,14 +38,41 @@ function stop() {
 	PID=$(cat "$PID_PATH")
 	if kill -0 $PID 2> /dev/null; then
 		echo "Sending SIGTERM to server PID $PID..."
-		kill -TERM $PID
-		if ! wait_until_process_is_dead $PID 10; then
+		kill -SIGTERM $PID
+		if wait_until_process_is_dead $PID 10; then
+			echo "Server is dead now"
+		else
 			echo "Server still alive after 10 seconds, sending SIGKILL..."
-			kill -KILL $PID
-			if ! wait_until_process_is_dead $PID 10; then
+			kill -SIGKILL $PID
+			if wait_until_process_is_dead $PID 10; then
+				echo "Server is dead now"
+			else
 				echo "Unable to kill server, bailing out."
 				return 1;
 			fi
+		fi
+	else
+		echo "Server with PID $PID is already dead."
+	fi
+	echo "Removing PID file: $PID_PATH"
+	rm $PID_PATH
+	return 0
+}
+
+function make_core_dump() {
+	if [ ! -f "$PID_PATH" ]; then
+		echo "PID file $PID_PATH does not exist, looks like server is not running"
+	    return 0
+	fi
+	PID=$(cat "$PID_PATH")
+	if kill -0 $PID 2> /dev/null; then
+		echo "Sending SIGTRAP to server PID $PID..."
+		kill -SIGTRAP $PID
+		if wait_until_process_is_dead $PID 30; then
+			echo "Server is dead now."
+		else
+			echo "Server still alive, bailing out."
+			return 1;
 		fi
 	else
 		echo "Server with PID $PID is already dead."
@@ -74,10 +101,13 @@ case "$1" in
   stop)
     stop
     ;;
+  make_core_dump)
+    make_core_dump
+    ;;
   is_active)
     is_active
     ;;
   *)
-    echo "Usage: $0 start|stop|is_active"
+    echo "Usage: $0 start|stop|make_core_dump|is_active"
 	exit 1
 esac
