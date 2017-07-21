@@ -102,6 +102,10 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
     TunnelAttributes m_attributes;
 
+    void postponeConnectTask(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        NewConnectionHandler handler);
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
         QnMutexLockerBase* const /*lock*/,

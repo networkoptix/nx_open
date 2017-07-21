@@ -217,7 +217,9 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, result.code);
         ASSERT_FALSE(result.response.sessionId.empty());
         if (!m_expectedSessionId.empty())
+        {
             ASSERT_EQ(m_expectedSessionId, result.response.sessionId);
+        }
         ASSERT_EQ(kConnectSessionIdleTimeout, result.response.sessionTimeout);
         ASSERT_TRUE(boost::ends_with(
             clientSessionPool().getPeerNameBySessionId(result.response.sessionId),

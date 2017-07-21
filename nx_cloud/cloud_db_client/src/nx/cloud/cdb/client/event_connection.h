@@ -69,6 +69,7 @@ private:
         QUrl url);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
+    void retryToConnect();
 
     virtual void setCredentials(const std::string& login, const std::string& password) override;
     virtual void setProxyCredentials(const std::string& login, const std::string& password) override;

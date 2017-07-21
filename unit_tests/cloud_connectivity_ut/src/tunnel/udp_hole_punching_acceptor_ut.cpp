@@ -327,7 +327,9 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
         tunnelAcceptor.reset();
 
         if (!acceptResults.isEmpty())
+        {
             ASSERT_NE(acceptResults.pop(), SystemError::noError);
+        }
         ASSERT_TRUE(acceptResults.isEmpty());
     }
 }
