@@ -223,7 +223,6 @@
 #include "proxy/proxy_connection.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
-#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -2670,7 +2669,8 @@ void MediaServerProcess::run()
                 ApiCommand::broadcastPeerSyncTime,
                 commonModule()->moduleGUID());
             tran.params.syncTimeMs = newTime;
-            sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+            if (auto connection = commonModule()->ec2Connection())
+                sendTransaction(connection->messageBus(), tran);
         }
         );
 
@@ -2716,11 +2716,6 @@ void MediaServerProcess::run()
 
     QnResource::startCommandProc();
 
-
-    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
-        new StreamingChunkTranscoder(
-            commonModule()->resourcePool(),
-            StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
@@ -2849,17 +2844,14 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
-    selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    QnModuleInformation selfInformation = commonModule()->moduleInformation();
+    if (compatibilityMode)
+    {
+        selfInformation.brand = QString();
+        selfInformation.customization = QString();
+    }
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
@@ -3140,7 +3132,6 @@ void MediaServerProcess::run()
     nx::utils::TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
-    streamingChunkTranscoder.reset();
 
     recordingManager.reset();
 

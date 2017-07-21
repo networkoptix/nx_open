@@ -374,7 +374,6 @@ public:
 
     void updateOfflineDistance(
         const ApiPersistentIdData& to,
-        const ApiPersistentIdData& via,
         int sequence);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list

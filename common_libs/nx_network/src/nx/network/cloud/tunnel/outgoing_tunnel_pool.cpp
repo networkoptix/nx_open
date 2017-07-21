@@ -72,10 +72,12 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(socketAttributes),
         [this, tunnelContextPtr = &tunnelContext, handlerIter = --tunnelContext.handlers.end()](
             SystemError::ErrorCode sysErrorCode,
+            TunnelAttributes tunnelAttributes,
             std::unique_ptr<AbstractStreamSocket> connection)
         {
             reportConnectionResult(
                 sysErrorCode,
+                std::move(tunnelAttributes),
                 std::move(connection),
                 tunnelContextPtr,
                 handlerIter);
@@ -151,6 +153,7 @@ OutgoingTunnelPool::TunnelContext&
 
 void OutgoingTunnelPool::reportConnectionResult(
     SystemError::ErrorCode sysErrorCode,
+    TunnelAttributes tunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection,
     TunnelContext* tunnelContext,
     std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter)
@@ -163,7 +166,10 @@ void OutgoingTunnelPool::reportConnectionResult(
         tunnelContext->handlers.erase(handlerIter);
     }
 
-    userHandler(sysErrorCode, std::move(connection));
+    userHandler(
+        sysErrorCode,
+        std::move(tunnelAttributes),
+        std::move(connection));
 }
 
 void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
@@ -201,7 +207,7 @@ void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 
     // Reporting error to awaiting users.
     for (auto& handler: userHandlers)
-        handler(SystemError::interrupted, nullptr);
+        handler(SystemError::interrupted, TunnelAttributes(), nullptr);
 
     m_onTunnelClosedSubscription.notify(std::move(remoteHostName));
 }

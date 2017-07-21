@@ -899,11 +899,11 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
     m_nextData.reset();
     m_afterMotionData.reset();
     qint64 seekRez = 0;
-    if (mksec > 0) {
+    if (mksec > 0 || m_resource->hasFlags(Qn::live_cam)) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
     }
     else {
-        // some files can't correctly jump to 0
+        // some local files can't correctly jump to 0
         m_delegate->close();
         init();
         m_delegate->open(m_resource);

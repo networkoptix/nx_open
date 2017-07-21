@@ -10,7 +10,7 @@
 namespace {
 
 const std::size_t kBufferCapacity = 32 * 1024;
-const std::chrono::milliseconds kReceiveTimeout(3000);
+const std::chrono::milliseconds kReceiveTimeout(5000);
 const int kFixedRtpHeaderLength = 12;
 const char kRtpHeaderMask = 0b01000000;
 const char kRtpExtensionMask = 0b00010000;
@@ -55,10 +55,10 @@ qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
     if (!m_cutRtpHeaderOff)
     {
         auto received = m_socket->recv(buf, maxlen);
-        if (received < 0)
+        if (received <= 0)
         {
-            initSocket(m_url);
-            return 0;
+            QIODevice::close();
+            return -1;
         }
 
         return received;
@@ -68,10 +68,10 @@ qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
         m_buffer.resize(maxlen);
         auto received = m_socket->recv(m_buffer.data(), maxlen);
 
-        if (received < 0)
+        if (received <= 0)
         {
-            initSocket(m_url);
-            return 0;
+            QIODevice::close();
+            return -1;
         }
         auto payloadLength = cutRtpHeaderOff(m_buffer.constData(), received, buf, maxlen);
         return payloadLength;
