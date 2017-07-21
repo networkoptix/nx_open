@@ -9,10 +9,10 @@ namespace nx {
 namespace utils {
 namespace log {
 
-bool operator<=(Level left, Level right)
-{
-    return static_cast<int>(left) <= static_cast<int>(right);
-}
+//bool operator<=(Level left, Level right)
+//{
+//    return static_cast<int>(left) <= static_cast<int>(right);
+//}
 
 Level levelFromString(const QString& levelString)
 {

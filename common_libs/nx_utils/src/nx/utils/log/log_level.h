@@ -20,7 +20,7 @@ enum class Level
     verbose
 };
 
-bool NX_UTILS_API operator<=(Level left, Level right);
+//bool NX_UTILS_API operator<=(Level left, Level right);
 Level NX_UTILS_API levelFromString(const QString& levelString);
 QString NX_UTILS_API toString(Level level);
 
@@ -32,7 +32,7 @@ QString NX_UTILS_API toString(Level level);
 
 using LevelFilters = std::map<QString, Level>;
 
-NX_UTILS_API struct LevelSettings
+struct NX_UTILS_API LevelSettings
 {
     Level primary = kDefaultLevel;
     LevelFilters filters;
