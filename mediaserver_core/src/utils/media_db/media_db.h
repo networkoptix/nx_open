@@ -8,10 +8,11 @@
 #include <QtCore>
 
 #include "nx/utils/thread/mutex.h"
+#include <nx/utils/log/log.h>
 #include "nx/utils/thread/wait_condition.h"
 #include "utils/common/long_runnable.h"
 
-// Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format 
+// Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format
 // for DB records format details.
 
 namespace nx
@@ -48,7 +49,7 @@ inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
 struct RecordBase
 {
     quint64 part1;
-    
+
     RecordBase(quint64 i = 0) : part1(i) {}
     RecordType getRecordType() const { return static_cast<RecordType>(part1 & 0x3); }
     void setRecordType(RecordType recordType) { part1 |= (quint64)recordType & 0x3; }
@@ -62,17 +63,17 @@ struct MediaFileOperation : RecordBase
     int getCameraId() const { return (part1 >> 0x2) & 0xffff; }
     void setCameraId(int cameraId) { part1 |= ((quint64)cameraId & 0xffff) << 0x2; }
 
-    qint64 getStartTime() const 
+    qint64 getStartTime() const
     {   // -1 is a special value which designates that this operation
         // should be done with entire catalog instead of one chunk.
-        qint64 ret = (part1 >> 0x12) & getBitMask(0x2all); 
+        qint64 ret = (part1 >> 0x12) & getBitMask(0x2all);
         return ret == 1 ? -1 : ret;
     }
 
-    void setStartTime(qint64 startTime) 
-    { 
+    void setStartTime(qint64 startTime)
+    {
         startTime = startTime == -1 ? 1 : startTime;
-        part1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; 
+        part1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12;
     }
 
     int getDuration() const
@@ -88,8 +89,8 @@ struct MediaFileOperation : RecordBase
         part2 |= (quint64)duration & getBitMask(0x10);
     }
 
-    int getTimeZone() const 
-    { 
+    int getTimeZone() const
+    {
         bool isPositive = ((part2 >> 0x10) & 0x1) == 0;
 
         int intPart = (part2 >> 0x11) & getBitMask(0x4);
@@ -111,8 +112,8 @@ struct MediaFileOperation : RecordBase
         return result * (isPositive ? 1 : -1);
     }
 
-    void setTimeZone(int timeZone) 
-    { 
+    void setTimeZone(int timeZone)
+    {
         if (timeZone < 0)
             part2 |= 0x1ll << 0x10;
 
@@ -139,7 +140,7 @@ struct CameraOperation : RecordBase
 {
     QByteArray cameraUniqueId;
 
-    CameraOperation(quint64 i1 = 0, const QByteArray &ar = QByteArray()) 
+    CameraOperation(quint64 i1 = 0, const QByteArray &ar = QByteArray())
         : RecordBase(i1),
           cameraUniqueId(ar)
     {}
@@ -178,6 +179,85 @@ public:
     virtual void handleRecordWrite(Error error) = 0;
 };
 
+class FaultTolerantDataStream
+{
+public:
+    FaultTolerantDataStream(QIODevice* device):
+        m_stream(device)
+    {}
+
+    template<typename T>
+    FaultTolerantDataStream& operator<<(T t)
+    {
+        if (m_stream.device())
+            m_stream << t;
+        else
+            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+
+        return *this;
+    }
+
+    template<typename T>
+    FaultTolerantDataStream& operator>>(T& t)
+    {
+        if (m_stream.device())
+            m_stream >> t;
+        else
+            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+
+        return *this;
+    }
+
+    void setDevice(QIODevice* device)
+    {
+        m_stream.setDevice(device);
+    }
+
+    QDataStream::Status status() const
+    {
+        return m_stream.status();
+    }
+
+    int writeRawData(const char* s, int len)
+    {
+        if (m_stream.device())
+            return m_stream.writeRawData(s, len);
+
+        NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+        return -1;
+    }
+
+    void setByteOrder(QDataStream::ByteOrder order)
+    {
+        m_stream.setByteOrder(order);
+    }
+
+    void resetStatus()
+    {
+        m_stream.resetStatus();
+    }
+
+    bool atEnd() const
+    {
+        if (!m_stream.device())
+            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+
+        return m_stream.atEnd();
+    }
+
+    int readRawData(char* s, int len)
+    {
+        if (m_stream.device())
+            return m_stream.readRawData(s, len);
+
+        NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+        return -1;
+    }
+
+private:
+    QDataStream m_stream;
+};
+
 class DbHelper : public QnLongRunnable
 {
     typedef std::deque<WriteRecordType> WriteQueue;
@@ -212,7 +292,7 @@ private:
     QIODevice *m_device;
     DbHelperHandler *m_handler;
     WriteQueue m_writeQueue;
-    QDataStream m_stream;
+    FaultTolerantDataStream m_stream;
 
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
