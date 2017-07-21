@@ -15,6 +15,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/subscription.h>
 
 namespace nx {
 namespace cloud {
@@ -56,6 +57,9 @@ public:
     void takeIdleConnection(
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler);
+
+    nx::utils::Subscription<std::string /*peer full name*/>& peerConnectedSubscription();
+    nx::utils::Subscription<std::string /*peer full name*/>& peerDisconnectedSubscription();
 
 private:
     /**
@@ -99,6 +103,8 @@ private:
     DisconnectedPeerExpirationTimers m_peerExpirationTimers;
     nx::network::aio::Timer m_periodicTasksTimer;
     TakeIdleConnectionRequestTimers m_takeIdleConnectionRequestTimers;
+    nx::utils::Subscription<std::string> m_peerConnectedSubscription;
+    nx::utils::Subscription<std::string> m_peerDisconnectedSubscription;
 
     void startWaitingForNewConnection(
         const QnMutexLockerBase& lock,
@@ -129,7 +135,7 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);
-    void processExpirationTimers(const QnMutexLockerBase& lock);
+    void processExpirationTimers(QnMutexLockerBase* lock);
 
     void doPeriodicTasks();
     void handleTimedoutTakeConnectionRequests();
