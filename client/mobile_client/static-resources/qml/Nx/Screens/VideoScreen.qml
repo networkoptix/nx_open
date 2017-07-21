@@ -179,7 +179,9 @@ PageBase
                         "activeQuality": player.videoQuality,
                         "customQualities": customQualities,
                         "availableVideoQualities":
-                            player.availableVideoQualities(allVideoQualities)
+                            player.availableVideoQualities(allVideoQualities),
+                        "transcodingSupportStatus":
+                            player.transcodingStatus()
                     }
                 )
 
