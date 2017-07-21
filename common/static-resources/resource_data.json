@@ -1828,6 +1828,40 @@
         },
         {
             "keys": [
+                "Winic|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "12345"
+                }
+            ]
+        },
+        {
+            "keys": [
+                "Samsung Techwin|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "root",
+                    "password": "4321"
+                },
+                {
+                    "user": "root",
+                    "password": "admin"
+                },
+                {
+                    "user": "admin",
+                    "password": "4321"
+                },
+                {
+                    "user": "admin",
+                    "password": "1111111"
+                }
+            ]
+        },
+        {
+            "keys": [
                 "Cellinx|STH795"
             ],
 			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
