@@ -7,9 +7,10 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_adapter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_client.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace {
 
@@ -29,9 +30,8 @@ static void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 static Appserver2Ptr createAppserver()
 {
     static int instanceCounter = 0;
-
-    const auto tmpDir =
-        (QDir::homePath() + "/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
+    const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
+        lit("/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
     QDir(tmpDir).removeRecursively();
 
     Appserver2Ptr result(new Appserver2());

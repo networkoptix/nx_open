@@ -5,6 +5,7 @@
 
 #include <network/module_information.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/retry_timer.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
@@ -23,7 +24,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
-    void setReconnectInterval(std::chrono::milliseconds interval);
+    void setReconnectPolicy(network::RetryPolicy value);
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
@@ -46,6 +47,7 @@ private:
         void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnection();
         void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
+        QString idForToStringFromPtr() const;
 
     private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
@@ -63,16 +65,17 @@ private:
         const QnUuid m_id;
         Endpoints m_endpoints;
         std::set<SocketAddress> m_forbiddenEndpoints;
-        network::aio::Timer m_timer;
+        network::RetryTimer m_timer;
         std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
         std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::unique_ptr<network::aio::Timer> m_disconnectTimer;
     };
 
     Module* getModule(const QnUuid& id);
 
 private:
     bool m_isPassiveMode = true;
-    std::chrono::milliseconds m_reconnectInterval;
+    network::RetryPolicy m_retryPolicy;
     ConnectedHandler m_connectedHandler;
     DisconnectedHandler m_disconnectedHandler;
     std::map<QnUuid, std::unique_ptr<Module>> m_modules;

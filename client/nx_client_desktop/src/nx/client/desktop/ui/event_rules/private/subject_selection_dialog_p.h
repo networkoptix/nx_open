@@ -36,6 +36,7 @@ class SubjectSelectionDialog::RoleListModel:
 public:
     explicit RoleListModel(QObject* parent);
 
+    void setRoleValidator(Qn::RoleValidator roleValidator);
     void setUserValidator(Qn::UserValidator userValidator);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -53,7 +54,8 @@ private:
     void emitDataChanged();
 
 private:
-    Qn::UserValidator m_userValidator;
+    Qn::RoleValidator m_roleValidator;
+    Qn::UserValidator m_userValidator; //< Not used if m_roleValidator is set.
     bool m_allUsers = false; //< All users are considered checked.
     mutable QHash<QnUuid, QValidator::State> m_validationStates;
 };
@@ -98,6 +100,7 @@ public:
 
     bool isValid(const QModelIndex& index) const;
     bool isChecked(const QModelIndex& index) const;
+    bool isIndirectlyChecked(const QModelIndex& index) const;
 
     bool allUsers() const;
     void setAllUsers(bool value);
@@ -153,6 +156,8 @@ public:
 protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
+
+    virtual ItemState itemState(const QModelIndex& index) const;
 };
 
 //-------------------------------------------------------------------------------------------------

@@ -80,8 +80,8 @@
       <translation type="unfinished">Log in</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Apagar Ligações</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -146,19 +146,19 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Sim</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Não</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Abortar</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Tentar Novamente</translation>
     </message>
   </context>
   <context>
@@ -284,6 +284,17 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
+    </message>
+  </context>
+  <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
@@ -406,7 +417,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Utilizadores</translation>
     </message>
   </context>
   <context>
@@ -444,11 +455,11 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Ligar a um Servidor...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Ligar a outro servidor...</translation>
     </message>
     <message>
       <source>No Systems found</source>
@@ -533,19 +544,19 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Colar</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar todos</translation>
     </message>
   </context>
   <context>
@@ -598,7 +609,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informação</translation>
     </message>
     <message>
       <source>Select camera</source>

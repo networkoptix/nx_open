@@ -40,7 +40,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
-        AudioTransmitCapability             = 0x040
+        AudioTransmitCapability             = 0x040,
+        RemoteArchiveCapability             = 0x100
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -243,8 +244,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+        local_video = local_media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = local_media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
         fake_server = remote_server | fake
@@ -308,6 +309,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
         SF_SupportsTranscoding = 0x200,
         SF_HasLiteClient = 0x400,
+        SF_P2pSyncDone = 0x1000000, //< For UT purpose only
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -510,11 +512,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
     {
-        BookmarkName
-        , BookmarkStartTime
-        , BookmarkDuration
-        , BookmarkTags          // Sorted manually!
-        , BookmarkCameraName    // Sorted manually!
+        BookmarkName,
+        BookmarkStartTime,
+        BookmarkDuration,
+        BookmarkCreationTime,   //< Sorted manually!
+                                // TODO: #ynikitenkov add migration from older version to prevent
+                                // empty/zero creation time. It would allow as to sort bookmarks
+                                // by database, not manually, which is faster.
+        BookmarkCreator,        //< Sorted manually!
+        BookmarkTags,           //< Sorted manually!
+        BookmarkCameraName      //< Sorted manually!
     };
 
     /**

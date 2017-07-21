@@ -3,16 +3,13 @@
 #include <QtSql/QtSql>
 
 #include <api/model/audit/audit_record.h>
-
-#include <business/business_fwd.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-
 #include <utils/db/db_helper.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
-#include "server/server_globals.h"
+#include <nx/vms/event/event_fwd.h>
+#include <server/server_globals.h>
 #include <common/common_module_aware.h>
 
 class QnTimePeriod;
@@ -20,7 +17,6 @@ class QnTimePeriod;
 namespace pb {
     class BusinessActionList;
 }
-
 
 /** Per-server database. Stores event log, audit data and bookmarks. */
 class QnServerDb :
@@ -36,22 +32,22 @@ public:
     virtual QnDbTransaction* getTransaction() override;
 
     void setEventLogPeriod(qint64 periodUsec);
-    bool saveActionToDB(const QnAbstractBusinessActionPtr& action);
+    bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
     bool removeLogForRes(const QnUuid& resId);
 
-    QnBusinessActionDataList getActions(
+    nx::vms::event::ActionDataList getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent,
-        const QnBusiness::ActionType& actionType = QnBusiness::UndefinedAction,
+        const nx::vms::event::EventType& eventType = nx::vms::event::undefinedEvent,
+        const nx::vms::event::ActionType& actionType = nx::vms::event::undefinedAction,
         const QnUuid& businessRuleId = QnUuid()) const;
 
     void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const QnBusiness::EventType& eventType,
-        const QnBusiness::ActionType& actionType,
+        const nx::vms::event::EventType& eventType,
+        const nx::vms::event::ActionType& actionType,
         const QnUuid& businessRuleId) const;
 
 
@@ -75,11 +71,15 @@ public:
 
     void setBookmarkCountController(std::function<void(size_t)> handler);
 
+    qint64 getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource);
+    bool updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource, qint64 lastSyncTime);
+
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
 
-    bool addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate);
+    bool addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUpdate);
     void updateBookmarkCount();
+
 private:
     bool createDatabase();
     bool cleanupEvents();
@@ -91,8 +91,8 @@ private:
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
-        const QnBusiness::EventType& eventType,
-        const QnBusiness::ActionType& actionType,
+        const nx::vms::event::EventType& eventType,
+        const nx::vms::event::ActionType& actionType,
         const QnUuid& businessRuleId) const;
 private:
     qint64 m_lastCleanuptime;

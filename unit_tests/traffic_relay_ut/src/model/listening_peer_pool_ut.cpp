@@ -7,6 +7,7 @@
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -14,7 +15,6 @@
 #include <settings.h>
 
 #include "../settings_loader.h"
-#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
@@ -52,10 +52,12 @@ protected:
 
     void addConnection(const std::string& peerName)
     {
-        auto connection = std::make_unique<relay::test::StreamSocketStub>();
+        auto connection = std::make_unique<network::test::StreamSocketStub>();
+        connection->setPostDelay(m_connectionPostDelay);
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
+        m_peerConnections.push_back(connection.get());
         pool().addConnection(peerName, std::move(connection));
     }
 
@@ -105,6 +107,12 @@ protected:
     void whenAddedConnectionToThePool()
     {
         addConnection(m_peerName);
+    }
+
+    void whenCloseAllConnections()
+    {
+        for (int i = 0; i < m_peerConnections.size(); ++i)
+            m_peerConnections[i]->setConnectionToClosedState();
     }
 
     void assertConnectionHasBeenAdded()
@@ -192,6 +200,11 @@ protected:
         m_peerName = peerName;
     }
 
+    void setConnectionPostDelay(std::chrono::milliseconds postDelay)
+    {
+        m_connectionPostDelay = postDelay;
+    }
+
 private:
     struct TakeIdleConnectionResult
     {
@@ -202,9 +215,11 @@ private:
     std::unique_ptr<model::ListeningPeerPool> m_pool;
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
-    relay::test::StreamSocketStub* m_peerConnection;
+    network::test::StreamSocketStub* m_peerConnection;
+    std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     SettingsLoader m_settingsLoader;
+    boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -325,6 +340,18 @@ TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
 {
     whenAddedConnectionToThePool();
     thenKeepAliveHasBeenEnabledOnConnection();
+}
+
+TEST_F(ListeningPeerPool, connection_closed_simultaneously_with_take_request)
+{
+    setConnectionPostDelay(std::chrono::milliseconds(17));
+
+    givenConnectionFromPeer();
+
+    whenRequestedConnection();
+    whenCloseAllConnections();
+
+    thenConnectRequestHasCompleted();
 }
 
 //-------------------------------------------------------------------------------------------------

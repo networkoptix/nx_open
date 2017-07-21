@@ -24,7 +24,7 @@ QnTCPConnectionProcessor* handlerInstance(
 
 template <class T, class ExtraParam>
 QnTCPConnectionProcessor* handlerInstance(
-    ExtraParam* extraParam,
+    ExtraParam extraParam,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
@@ -56,7 +56,7 @@ public:
     virtual ~QnHttpConnectionListener();
 
     template<class T, class ExtraParam>
-    void addHandler(const QByteArray& protocol, const QString& path, ExtraParam* extraParam)
+    void addHandler(const QByteArray& protocol, const QString& path, ExtraParam extraParam)
     {
         using namespace std::placeholders;
         doAddHandler(protocol, path,
@@ -87,7 +87,7 @@ public:
     }
 
     template <class T, class ExtraParam>
-    void setProxyHandler(const ProxyCond& cond, ExtraParam* extraParam)
+    void setProxyHandler(const ProxyCond& cond, ExtraParam extraParam)
     {
         using namespace std::placeholders;
         m_proxyInfo.proxyHandler = std::bind(&handlerInstance<T, ExtraParam>, extraParam, _1, _2);

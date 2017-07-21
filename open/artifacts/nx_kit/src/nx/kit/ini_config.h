@@ -11,18 +11,23 @@ namespace nx {
 namespace kit {
 
 /**
- * Mechanism for configuration variables with initial values defined in the code, which can be
- * overridden creating .ini files in the system temp directory (or /sdcard on Android), with
- * name=value lines. When the file is empty, it is filled with defaults.
+ * Mechanism for configuration variables that can alter the behavior of the code for the purpose of
+ * debugging and experimenting, with very little performance overhead. The default (initial) values
+ * are defined in the code and lead to the nominal behavior, which can be overridden by creating
+ * .ini files (with name=value lines) in the system temp directory (or /sdcard on Android).
  *
  * This unit can be compiled in the context of any C++ project.
  *
- * To use, define a derived class and its instance as follows:
+ * Each derived class represents a dedicated .ini file. If, on attempt to load a file, it is found
+ * empty, the file is filled with default values and descriptions. The names of .ini files and
+ * their values are printed to stderr (configurable), overridden values marked with "*".
+ *
+ * Usage example:
  * <pre><code>
  *
  *     struct Ini: nx::kit::IniConfig
  *     {
- *         // NOTE: Omit the call to reload() if no load-on-start if needed..
+ *         // NOTE: Omit "reload();" if load-on-start is not needed.
  *         Ini(): IniConfig("my_module.ini") { reload(); }
  *
  *         NX_INI_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
@@ -45,33 +50,42 @@ class NX_KIT_API IniConfig
 {
 public:
     /**
-     * If needed, reading .ini files can be disabled defining a project-level macro:
+     * If needed, reading .ini files can be disabled defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DISABLED - minimizes performance overhead and freezes values at defaults.
-     * @ereturn Whether the macro NX_INI_CONFIG_DISABLED is defined.
+     * @return Whether the macro NX_INI_CONFIG_DISABLED was defined.
      */
     static bool isEnabled();
 
     /**
      * Change the output stream, affecting all instances, null means silent. Before this call, all
-     * output goes to std::cerr, which can be changed defining a project-level macro:
+     * output goes to std::cerr, which can be changed defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_OUTPUT=<stream-address>, where <stream-address> can be e.g.
      * '&std::cout', or 'nullptr' for no output.
      */
     static void setOutput(std::ostream* output);
 
     /**
-     * @param iniFile Name of .ini file without a path but including ".ini" suffix.
+     * Use the specified directory for .ini files. If iniFileDir is null or empty, and also before
+     * this call, a platform-dependent system temp directory is used, which can be changed defining
+     * a macro at compiling ini_config.cpp:
+     * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
      */
-    IniConfig(const char* iniFile);
+    static void setIniFilesDir(const char* iniFilesDir);
+
+    /** @param iniFile Name of .ini file without a path but including ".ini" suffix. */
+    explicit IniConfig(const char* iniFile);
 
     virtual ~IniConfig();
+
+    IniConfig(const IniConfig& /*other*/) = delete; //< Disable the copy constructor.
+    IniConfig& operator=(const IniConfig& /*other*/) = delete; //< Disable the assignment operator.
 
     /** Reload values from .ini file, logging the values first time, or if changed. */
     void reload();
 
-    const char* iniFile() const;
-    const char* iniFileDir() const; /**< Includes trailing slash or backslash. */
-    const char* iniFilePath() const; /**< @return iniFileDir + iniFile. */
+    const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
+    const char* iniFileDir() const; /**< @return Path including the trailing slash or backslash. */
+    const char* iniFilePath() const; /**< @return iniFileDir() + iniFile(). */
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \

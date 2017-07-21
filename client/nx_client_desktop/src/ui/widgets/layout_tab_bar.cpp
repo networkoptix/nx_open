@@ -70,7 +70,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
         &QnLayoutTabBar::at_workbench_layoutsChanged);
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &QnLayoutTabBar::at_workbench_currentLayoutChanged);
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
         &QnLayoutTabBar::at_snapshotManager_flagsChanged);
 
     m_submit = m_update = true;

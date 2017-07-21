@@ -5,15 +5,15 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnEventLogModel;
-class QnBusinessStringsHelper;
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
 
 namespace Ui {
     class EventLogDialog;
@@ -33,8 +33,8 @@ public:
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
     void setCameraList(const QSet<QnUuid>& ids);
-    void setActionType(QnBusiness::ActionType value);
-    void setEventType(QnBusiness::EventType value);
+    void setActionType(nx::vms::event::ActionType value);
+    void setEventType(nx::vms::event::EventType value);
 
 protected:
     void setVisible(bool value) override;
@@ -43,7 +43,7 @@ protected:
 private slots:
     void reset();
     void updateData();
-    void at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum);
+    void at_gotEvents(int httpStatus, const nx::vms::event::ActionDataListPtr& events, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButton_clicked();
@@ -53,7 +53,7 @@ private slots:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
 private:
-    QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
+    QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::event::EventType value);
 
     bool isFilterExist() const;
     void requestFinished();
@@ -65,7 +65,7 @@ private:
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
-    void query(qint64 fromMsec, qint64 toMsec, QnBusiness::EventType eventType, QnBusiness::ActionType actionType);
+    void query(qint64 fromMsec, qint64 toMsec, nx::vms::event::EventType eventType, nx::vms::event::ActionType actionType);
 
 
 private:
@@ -77,7 +77,7 @@ private:
 
     QSet<int> m_requests;
 
-    QVector <QnBusinessActionDataListPtr> m_allEvents;
+    QVector <nx::vms::event::ActionDataListPtr> m_allEvents;
     QSet<QnUuid> m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
@@ -89,5 +89,5 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
 
-    std::unique_ptr<QnBusinessStringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
 };

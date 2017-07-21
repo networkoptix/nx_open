@@ -24,7 +24,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&lt;Some Caption&gt;</string>
+        <string notr="true">&lt;Some Caption&gt;</string>
        </property>
       </widget>
      </item>
@@ -46,7 +46,7 @@
    <item>
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
-      <string>&lt;Some description&gt;</string>
+      <string notr="true">&lt;Some description&gt;</string>
      </property>
     </widget>
    </item>

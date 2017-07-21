@@ -7,6 +7,19 @@
 
 #include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/kit/ini_config.h>
+
+namespace  {
+
+struct Ini: public nx::kit::IniConfig
+{
+    Ini(): IniConfig("db_helper.ini") { reload(); }
+
+    NX_INI_STRING("", tuneDb, "SQL stataments ceparated by ';' to execute after DB open.");
+}
+config;
+
+} // namespace
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
     //and no concurrent transactions supported. Maybe QnDbConnection?
@@ -42,6 +55,14 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         return false;
     }
 
+    QSqlQuery limitWalQuery(*sqlDb);
+    limitWalQuery.prepare(lit("PRAGMA journal_size_limit = 16777216")); //< 16 MB
+    if( !limitWalQuery.exec() )
+    {
+        qWarning() << "Failed to limit WAL mode on sqlLite database!" << limitWalQuery.lastError().text();
+        return false;
+    }
+
     QSqlQuery enableFKQuery(*sqlDb);
     enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
     if( !enableFKQuery.exec() )
@@ -49,6 +70,7 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
         return false;
     }
+
 #if 0
     QSqlQuery additionTuningQuery(*sqlDb);
     additionTuningQuery.prepare(lit("PRAGMA synchronous=OFF"));
@@ -58,6 +80,20 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         return false;
     }
 #endif
+
+    const auto tuneQueries = QString::fromLatin1(config.tuneDb)
+        .split(QChar::fromLatin1(';'), QString::SkipEmptyParts);
+    for (const auto& queryLine: tuneQueries)
+    {
+        QSqlQuery query(*sqlDb);
+        query.prepare(queryLine);
+        if (!query.exec())
+        {
+            qWarning() << "Failed to execute" << queryLine << "on sqlLite database!" << query.lastError().text();
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -71,20 +107,30 @@ void QnDbHelper::QnDbTransaction::rollback()
 
 bool QnDbHelper::QnDbTransaction::commit()
 {
-    bool rez = m_database.commit();
+    bool rez = dbCommit(QString());
     if (rez)
     {
+        // Commit only on success, otherwise rollback is expected.
         m_mutex.unlock();
-    }
-    else
-    {
-        // do not unlock mutex. Rollback is expected
-        NX_LOG(lit("%1. Commit failed: %2").
-            arg(m_database.databaseName()).
-            arg(m_database.lastError().text()), cl_logERROR);
     }
 
     return rez;
+}
+
+bool QnDbHelper::QnDbTransaction::dbCommit(const QString& event)
+{
+    if (m_database.commit())
+    {
+        NX_VERBOSE(this, lm("Successful commit in %1 on (%2)").args(
+            m_database.databaseName(), event));
+        return true;
+    }
+    else
+    {
+        NX_WARNING(this, lm("Failed commit in %1 on (%2): %3").args(
+            m_database.databaseName(), event, m_database.lastError()));
+        return false;
+    }
 }
 
 QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran):

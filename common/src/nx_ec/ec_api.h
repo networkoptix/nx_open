@@ -60,7 +60,7 @@ namespace nx { namespace vms { namespace discovery { class Manager; } } }
 namespace ec2
 {
     class ECConnectionNotificationManager;
-    class QnTransactionMessageBusBase;
+    class TransactionMessageBusAdapter;
     class P2pMessageBus;
     class QnDistributedMutexManager;
     class TimeSynchronizationManager;
@@ -282,12 +282,12 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated( QnBusinessEventRulePtr businessRule, NotificationSource source);
+        void addedOrUpdated( nx::vms::event::RulePtr businessRule, NotificationSource source);
         void removed( QnUuid id );
-        void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
+        void businessActionBroadcasted( const nx::vms::event::AbstractActionPtr& businessAction );
         void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
-        void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
-        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
+        void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
+        void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     };
 
     typedef std::shared_ptr<AbstractBusinessEventNotificationManager> AbstractBusinessEventNotificationManagerPtr;
@@ -301,14 +301,14 @@ namespace ec2
         virtual ~AbstractBusinessEventManager() {}
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnBusinessEventRuleList&)
+            \param handler Functor with params: (ErrorCode, const nx::vms::event::RuleList&)
         */
         template<class TargetType, class HandlerType> int getBusinessRules( TargetType* target, HandlerType handler ) {
             return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRulesHandler>(
                 std::make_shared<impl::CustomGetBusinessRulesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getBusinessRulesSync(QnBusinessEventRuleList* const businessEventList ) {
+        ErrorCode getBusinessRulesSync(nx::vms::event::RuleList* const businessEventList ) {
             int(AbstractBusinessEventManager::*fn)(impl::GetBusinessRulesHandlerPtr) = &AbstractBusinessEventManager::getBusinessRules;
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, std::placeholders::_1), businessEventList );
         }
@@ -316,7 +316,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int save( const QnBusinessEventRulePtr& rule, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int save( const nx::vms::event::RulePtr& rule, TargetType* target, HandlerType handler ) {
             return save( rule, std::static_pointer_cast<impl::SaveBusinessRuleHandler>(
                 std::make_shared<impl::CustomSaveBusinessRuleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -330,11 +330,11 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int broadcastBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, TargetType* target, HandlerType handler ) {
             return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int sendBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, const QnUuid& dstPeer, TargetType* target, HandlerType handler ) {
             return sendBusinessAction( businessAction, dstPeer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -350,10 +350,10 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
+        virtual int save( const nx::vms::event::RulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int broadcastBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
@@ -522,8 +522,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        virtual void monitorServerDiscovery() = 0;
-
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
@@ -547,13 +545,6 @@ namespace ec2
         void timeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
-        //!Emitted when peer \a peerId local time has changed
-        /*!
-            \param peerId
-            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
-            \param peerLocalTime Peer local time (UTC, millis from epoch)
-        */
-        void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
     };
 
     typedef std::shared_ptr<AbstractTimeNotificationManager> AbstractTimeNotificationManagerPtr;
@@ -587,7 +578,6 @@ namespace ec2
         }
 
         //!Returns list of peers whose local system time is known
-        virtual QnPeerTimeInfoList getPeerTimeInfoList() const = 0;
         virtual void forceTimeResync() = 0;
 
     protected:
@@ -750,7 +740,7 @@ namespace ec2
         virtual QnCommonModule* commonModule() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+        virtual TransactionMessageBusAdapter* messageBus() const = 0;
 
         virtual ECConnectionNotificationManager* notificationManager()
         {
@@ -855,7 +845,7 @@ namespace ec2
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+        virtual TransactionMessageBusAdapter* messageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:

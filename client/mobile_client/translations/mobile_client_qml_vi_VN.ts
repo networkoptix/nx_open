@@ -49,7 +49,7 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Password</source>
@@ -80,8 +80,8 @@
       <translation type="unfinished">Log in</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>xóa kết nối</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -134,7 +134,7 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>xác định</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -154,11 +154,11 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>về</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>thử lại</translation>
     </message>
   </context>
   <context>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>độ phân giải cao</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -273,7 +273,7 @@
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>trực tiếp</translation>
     </message>
   </context>
   <context>
@@ -281,6 +281,17 @@
     <message>
       <source>Connect</source>
       <translation>Kết nối</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>
@@ -406,7 +417,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>người sử dụng</translation>
     </message>
   </context>
   <context>
@@ -444,11 +455,11 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Kết nối đến máy chủ...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Kết nối đến các máy chủ khác...</translation>
     </message>
     <message>
       <source>No Systems found</source>
@@ -545,7 +556,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>chọn tất cả</translation>
     </message>
   </context>
   <context>
@@ -582,7 +593,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>trực tiếp</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -598,7 +609,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>tin tức</translation>
     </message>
     <message>
       <source>Select camera</source>

@@ -154,18 +154,20 @@ TEST(P2pSerialization, UnicastTransaction)
 {
     using namespace nx::p2p;
 
-    UnicastTransactionRecords records;
+    TransportHeader heasder;
     for (int i = 0; i < 100; ++i)
-        records.push_back(UnicastTransactionRecord(QnUuid::createUuid(), i));
+        heasder.via.insert(QnUuid::createUuid());
+    for (int i = 0; i < 50; ++i)
+        heasder.dstPeers.push_back(QnUuid::createUuid());
 
-    QByteArray expectedData = serializeUnicastHeader(records);
+    QByteArray expectedData = serializeTransportHeader(heasder);
     int size = 0;
-    auto deserializedRecords = deserializeUnicastHeader(expectedData, &size);
+    auto deserializedRecords = deserializeTransportHeader(expectedData, &size);
     ASSERT_TRUE(size > 0);
-    QByteArray actualData = serializeUnicastHeader(deserializedRecords);
+    QByteArray actualData = serializeTransportHeader(deserializedRecords);
     ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 
-    deserializeUnicastHeader(QByteArray("1"), &size);
+    deserializeTransportHeader(QByteArray("1"), &size);
     ASSERT_EQ(-1, size); //< Deserialization error.
 }
 

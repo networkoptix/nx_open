@@ -25,15 +25,16 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
-#include <business/business_message_bus.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
+#include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+#include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 
 #include <nx/core/access/access_types.h>
@@ -107,7 +108,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -116,13 +117,24 @@ QnMediaServerModule::QnMediaServerModule(
         m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
 
-    store(new QnBusinessMessageBus(commonModule()));
+    store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
     store(new QnServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()->moduleGUID()));
 
-    m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
+    auto streamingChunkTranscoder = store(
+        new StreamingChunkTranscoder(
+            commonModule()->resourcePool(),
+            StreamingChunkTranscoder::fBeginOfRangeInclusive));
+
+    m_streamingChunkCache = store(new StreamingChunkCache(
+        commonModule()->resourcePool(),
+        streamingChunkTranscoder,
+        std::chrono::seconds(
+            m_settings->roSettings()->value(
+                nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
+                nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt())));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 

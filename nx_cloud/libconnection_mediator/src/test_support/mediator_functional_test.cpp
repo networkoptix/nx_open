@@ -13,6 +13,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
@@ -55,7 +56,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     m_stunPort(0),
     m_httpPort(0)
 {
-    if (m_testFlags & initiailizeSocketGlobals)
+    if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
@@ -104,8 +105,12 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
     m_httpPort = httpEndpoints.front().port;
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
-    network::SocketGlobals::mediatorConnector().enable(true);
+    if (m_testFlags & MediatorTestFlags::initializeConnectivity)
+    {
+        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
+        network::SocketGlobals::mediatorConnector().enable(true);
+    }
 
     return true;
 }
@@ -141,7 +146,8 @@ void MediatorFunctionalTest::registerCloudDataProvider(
                 const boost::optional<QUrl>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
-                std::chrono::milliseconds /*updateInterval*/)
+                std::chrono::milliseconds /*updateInterval*/,
+                std::chrono::milliseconds /*startTimeout*/)
             {
                 return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
             });
@@ -243,5 +249,5 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         QJson::deserialized<data::ListeningPeers>(responseBody));
 }
 
-}   // namespace hpm
-}   // namespace nx
+} // namespace hpm
+} // namespace nx

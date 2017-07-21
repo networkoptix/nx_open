@@ -32,7 +32,10 @@ project(vms VERSION 3.1.0)
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
+set(releaseVersion.full ${releaseVersion}.${buildNumber})
+
+set(mobileClientVersion 17.2)
+set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -41,11 +44,13 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
+include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
+include(strip_target)
 include(mercurial)
 include(project_utils)
 include(test_utils)
@@ -53,6 +58,7 @@ include(test_utils)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+set(static_customization_dir "$ENV{environment}/customization/${customization}")
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
@@ -92,7 +98,6 @@ if(LINUX)
 endif()
 
 if(ANDROID)
-    include(android-ndk-workaround)
     include(android-apk)
 endif()
 

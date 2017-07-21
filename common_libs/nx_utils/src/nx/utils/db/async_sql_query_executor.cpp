@@ -6,10 +6,25 @@
 
 #include "request_executor_factory.h"
 #include "sql_query_execution_helper.h"
+#include "query.h"
 
 namespace nx {
 namespace utils {
 namespace db {
+
+void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
+{
+    executeUpdateQuerySync(
+        [&sqlStatement](QueryContext* queryContext)
+        {
+            SqlQuery query(*queryContext->connection());
+            query.prepare(sqlStatement);
+            query.exec();
+        });
+}
+
+
+//-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 

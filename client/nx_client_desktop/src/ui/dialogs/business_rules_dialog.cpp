@@ -13,6 +13,7 @@
 
 #include <api/app_server_connection.h>
 
+// TODO: #vkutin Think of a better location and namespace.
 #include <business/business_types_comparator.h>
 
 #include <client/client_settings.h>
@@ -48,61 +49,74 @@
 #include <utils/common/delayed.h>
 
 using boost::algorithm::any_of;
+
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
 
-    class SortRulesProxyModel: public QSortFilterProxyModel,
+    class SortRulesProxyModel:
+        public QSortFilterProxyModel,
         public QnConnectionContextAware
     {
     public:
-        explicit SortRulesProxyModel(QObject *parent = 0)
-            : QSortFilterProxyModel(parent)
-            , m_filterText()
-            , m_lexComparator(new QnBusinessTypesComparator())
-        {}
+        explicit SortRulesProxyModel(QObject* parent = nullptr):
+            QSortFilterProxyModel(parent),
+            m_filterText(),
+            m_lexComparator(new QnBusinessTypesComparator(true))
+        {
+        }
 
-        void setText(const QString &text) {
+        void setText(const QString& text)
+        {
             if (m_filterText == text.trimmed())
                 return;
+
             m_filterText = text.trimmed();
             invalidateFilter();
         }
 
     protected:
+        using Column = QnBusinessRuleViewModel::Column;
 
+        virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
+        {
+            switch (Column(sortColumn()))
+            {
+                case Column::modified:
+                    return lessThanByRole<bool>(left, right, Qn::ModifiedRole);
 
-        virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+                case Column::disabled:
+                    return lessThanByRole<bool>(left, right, Qn::DisabledRole);
 
-            switch (sortColumn()) {
-            case QnBusiness::ModifiedColumn:
-                return lessThanByRole<bool>(left, right, Qn::ModifiedRole);
-            case QnBusiness::DisabledColumn:
-                return lessThanByRole<bool>(left, right, Qn::DisabledRole);
+                case Column::event:
+                    return lessThanByRole<vms::event::EventType>(left, right, Qn::EventTypeRole,
+                        [this](vms::event::EventType left, vms::event::EventType right)
+                        {
+                            return m_lexComparator->lexicographicalLessThan(left, right);
+                        });
 
-            case QnBusiness::EventColumn:
-                return lessThanByRole<QnBusiness::EventType>(left, right, Qn::EventTypeRole, [this](QnBusiness::EventType left, QnBusiness::EventType right) {
-                    return m_lexComparator->lexicographicalLessThan(left, right);
-                });
+                case Column::action:
+                    return lessThanByRole<vms::event::ActionType>(left, right, Qn::ActionTypeRole,
+                        [this](vms::event::ActionType left, vms::event::ActionType right)
+                        {
+                            return m_lexComparator->lexicographicalLessThan(left, right);
+                        });
 
-            case QnBusiness::ActionColumn:
-                return lessThanByRole<QnBusiness::ActionType>(left, right, Qn::ActionTypeRole, [this](QnBusiness::ActionType left, QnBusiness::ActionType right) {
-                    return m_lexComparator->lexicographicalLessThan(left, right);
-                });
-
-            case QnBusiness::SourceColumn:
-            case QnBusiness::TargetColumn:
-            case QnBusiness::AggregationColumn:
-                return lessThanByRole<QString>(left, right, Qt::DisplayRole);
-            default:
-                break;
+                case Column::source:
+                case Column::target:
+                case Column::aggregation:
+                    return lessThanByRole<QString>(left, right, Qt::DisplayRole);
+                default:
+                    break;
             }
+
             return defaultLessThan(left, right);
         }
 
 
-        virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
-
+        virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
+        {
             // all rules should be visible if filter is empty
             if (m_filterText.isEmpty())
                 return true;
@@ -130,8 +144,8 @@ namespace {
 
 
             bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
-            QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
-            if (QnBusiness::requiresCameraResource(eventType)) {
+            vms::event::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::event::EventType>();
+            if (vms::event::requiresCameraResource(eventType)) {
                 auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
 
                 // rule supports any camera (assuming there is any camera that passing filter)
@@ -143,8 +157,9 @@ namespace {
                     return true;
             }
 
-            QnBusiness::ActionType actionType = idx.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
-            if (QnBusiness::requiresCameraResource(actionType)) {
+            vms::event::ActionType actionType = idx.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
+            if (vms::event::requiresCameraResource(actionType))
+            {
                 auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>();
                 if (any_of(actionResources, passText))
                     return true;
@@ -207,18 +222,23 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
 
     /* Force column width must be set before table initializing because header options are not updated. */
-    QList<QnBusiness::Columns> forcedColumns;
-    forcedColumns << QnBusiness::EventColumn << QnBusiness::ActionColumn << QnBusiness::AggregationColumn;
-    for (QnBusiness::Columns column: forcedColumns) {
-        m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
+    static const QList<Column> forcedColumns {
+        Column::event,
+        Column::action,
+        Column::aggregation };
+
+    for (auto column: forcedColumns)
+    {
+        m_rulesViewModel->forceColumnMinWidth(column,
+            QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
     }
 
-    const int kSortColumn = QnBusiness::EventColumn;
+    const auto kSortColumn = Column::event;
 
     SortRulesProxyModel* sortModel = new SortRulesProxyModel(this);
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
-    sortModel->sort(kSortColumn);
+    sortModel->sort(int(kSortColumn));
     connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
 
     enum { kUpdateFilterDelayMs = 200 };
@@ -231,10 +251,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->resizeColumnsToContents();
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
-    for (QnBusiness::Columns column: forcedColumns)
-        ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(int(Column::source), QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(int(Column::target), QHeaderView::Interactive);
+
+    for (auto column: forcedColumns)
+        ui->tableView->horizontalHeader()->setSectionResizeMode(int(column), QHeaderView::Fixed);
 
     ui->tableView->installEventFilter(this);
 
@@ -246,7 +267,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
 
-    ui->tableView->horizontalHeader()->setSortIndicator(kSortColumn, Qt::AscendingOrder);
+    ui->tableView->horizontalHeader()->setSortIndicator(int(kSortColumn), Qt::AscendingOrder);
 
     installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
         &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
@@ -408,7 +429,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Reset all rules to default?"),
+        tr("Restore all rules to default?"),
         tr("This action cannot be undone."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
@@ -490,10 +511,12 @@ void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {
     ui->tableView->scrollTo(selectedIndices.front());
 }
 
-void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
     Q_UNUSED(bottomRight)
-    if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
+    if (topLeft.column() <= int(Column::modified) && bottomRight.column() >= int(Column::modified))
         updateControlButtons();
+
     updateFilter();
 }
 

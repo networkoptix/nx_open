@@ -30,14 +30,18 @@ public:
     void pleaseStop();
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doGet(const QUrl& url);
+    /**
+     * @return true if response has been received.
+     */
+    bool doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doPost(
         const QUrl& url,
@@ -45,8 +49,7 @@ public:
         nx_http::StringType messageBody);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doPut(
         const QUrl& url,
@@ -54,8 +57,7 @@ public:
         nx_http::StringType messageBody);
 
     /**
-     * Return on receiving response.
-     * @return True if response has been received.
+     * @return true if response has been received.
      */
     bool doDelete(const QUrl& url);
 
@@ -97,6 +99,8 @@ public:
     void setAuthType(AsyncHttpClient::AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
+    void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
+
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
     /** @return Socket in blocking mode. */
@@ -124,6 +128,8 @@ private:
     std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
     boost::optional<AsyncHttpClient::AuthType> m_authType;
+
+    bool m_expectOnlyBody;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

@@ -84,454 +84,11 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>ブックマーク</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>パニック録画</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>ログ書込み</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>通知を表示</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>サウンド繰返し</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>サウンド再生</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>スピーク</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>ストレージ不良</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>ネットワーク障害</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>サーバー不良</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>サーバー重複</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>サーバー開始</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>ライセンス障害</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>全サーバー障害</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>全イベント</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>%1で定義していないイベント発生</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>入力ON %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>動体検知ON %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>ストレージ不良 %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>ネットワーク問題発生 %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>イベント: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>ソース:.%1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>理由:・%1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>時間: %1 時分 %2・月日</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>最初の発生: %1 時分 %2 月日(%n 時間トータル)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2.・迄で検知されました.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTPパケットロス検知.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O エラーが発生しました %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD・%1.・への書き込み速度が不十分です</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>開始</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>停止</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1の間</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>不明なイベント</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>サーバーとの接続ロスト.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>%n 秒間データを受信していません.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>一般的イベント</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>キャプション: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>カメラ(プライマリーストリーム)との接続は閉じられました.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>カメラ(セコンダリーストリーム)との接続は閉じられました.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>デバイス出力</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>カメラ出力</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>デバイス録画</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>カメラ録画</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>全デバイス障害</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>全カメラ障害</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 切断</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 切断</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>デバイスIPが %1 と重複</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>カメラIPが %1 と重複</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>デバイスとの通信が予期せずに閉じられました.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZプリセット</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>アラームレイアウト表示</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>アーカイブバックアップ終了</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>一般的イベント %1</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>入力ポート %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>アーカイブバックアップは正常に終了しました</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>重複アドレス %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>アーカイブバックアップ失敗　空き容量が足りません</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>アーカイブバックアップ失敗　ターゲットストレージエラー</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>アーカイブバックアップ失敗　ソースファイルの読込みエラー</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>アーカイブバックアップ失敗　ターゲットファイル書き込みエラー</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>アーカイブバックアップ失敗　ファイルカタログエラー</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>アーカイブバックアップはユーザーによってキャンセルされました　データは %1 にバックアップされます</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTPリクエスト</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>サーバーが予期せず停止しました</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています　記録は次のデバイスで無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています　記録は次のカメラで無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています　記録は次のI/Oモジュールで無効になっています:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>カメラのモーション</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>デバイスの入力</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>カメラの入力</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>デバイス切断</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>カメラ切断</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>デバイスの IPの競合</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>カメラのIPの競合</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>アーカイブのバックアップは完了しましたがバックアップ時間を超過したので完全ではありません　%1 にデータをバックアップします</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>メールを送信</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
@@ -862,7 +419,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>開始</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -935,22 +492,6 @@
         <numerusform>%1.ライセンス中の %n %2 を使用.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>ライセンスアクティベートエラー　データベースエラー発生.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問い合わせください.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -963,21 +504,12 @@
         <numerusform>%n より多くの %1 が使用されます</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>このライセン スキーは前に %2 のハードウェア ID %1 にアクティベートされていました　有効なライセンス キーを取得するにはサポート チームに連絡してください</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>無効な署名</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -1002,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>不明なエラー</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -1113,16 +649,16 @@
       <translation>無償ライセンス</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>ハードウェア ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>ライセンス: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>透かし: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1470,6 +1006,465 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>システム全体にアクセスでき管理することができます　ユーザーを作成することができます</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>ブックマーク</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>パニック録画</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>ログ書込み</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>通知を表示</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>サウンド繰返し</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>サウンド再生</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>スピーク</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>PTZプリセット</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>テキストオーバーレイ表示</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>アラームレイアウト表示</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>HTTPリクエスト</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>デバイス出力</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>カメラ出力</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>デバイス録画</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>カメラ録画</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>一般的イベント</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>カメラのモーション</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>ストレージ不良</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>ネットワーク障害</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>サーバー不良</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>サーバの競合</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>サーバー開始</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>ライセンス障害</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>アーカイブバックアップ終了</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>全サーバー障害</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>デバイスの入力</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>カメラの入力</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>デバイス切断</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>カメラ切断</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>デバイスの IPの競合</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>カメラのIPの競合</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>全デバイス障害</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>%1で定義していないイベント発生</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>デバイス %1 切断</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>カメラ %1 切断</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>IOモジュール %1 切断</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>入力ON %1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>動体検知ON %1</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>ストレージ不良 %1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>ネットワーク問題発生 %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>デバイスIPが %1 と重複</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>カメラIPが %1 と重複</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>一般的イベント %1</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>不明なイベント</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>イベント: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>ソース:.%1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>キャプション: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>入力ポート %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>理由:・%1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>重複アドレス %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>重複サーバー #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>重複サーバー: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>時間: %1 時分 %2・月日</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>最初の発生: %1 時分 %2 月日(%n 時間トータル)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>%n 秒間データを受信していません.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>デバイスとの通信が予期せずに閉じられました.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>カメラ(プライマリーストリーム)との接続は閉じられました.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>カメラ(セコンダリーストリーム)との接続は閉じられました.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2.・迄で検知されました.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTPパケットロス検知.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>デバイスがネットワーク要求に応答しません</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>サーバーとの接続ロスト.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>サーバーが予期せず停止しました</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O エラーが発生しました %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>HDD/SSD・%1.・への書き込み速度が不十分です</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>アーカイブバックアップ失敗　空き容量が足りません</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>アーカイブバックアップ失敗　ターゲットストレージエラー</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>アーカイブバックアップ失敗　ソースファイルの読込みエラー</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>アーカイブバックアップ失敗　ターゲットファイル書き込みエラー</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>アーカイブバックアップ失敗　ファイルカタログエラー</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>アーカイブのバックアップは完了しましたがバックアップ時間を超過したので完全ではありません　%1 にデータをバックアップします</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>アーカイブバックアップは正常に終了しました</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>アーカイブバックアップはユーザーによってキャンセルされました　データは %1 にバックアップされます</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>ライセンスが不足しています　記録は次のデバイスで無効になっています:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>ライセンスが不足しています　記録は次のカメラで無効になっています:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>ライセンスが不足しています　記録は次のI/Oモジュールで無効になっています:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>開始</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>停止</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>%1の間</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>%1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>役割</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>ユーザー %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n 役割</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>全てのユーザー</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>最低1人のユーザーを選択してください</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

@@ -312,32 +312,30 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
     return result;
 }
 
-QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records)
+QByteArray serializeTransportHeader(const TransportHeader& header)
 {
     QByteArray result;
-    result.reserve(UnicastTransactionRecord::kRecordSize * (int) records.size());
-    {
-        QBuffer buffer(&result);
-        buffer.open(QIODevice::WriteOnly);
-        QDataStream out(&buffer);
-        out << (quint32) records.size();
-        for (const auto& record: records)
-        {
-            out << record.ttl;
-            out.writeRawData(record.dstPeer.toRfc4122().data(), kGuidSize);
-        }
-    }
+    QBuffer buffer(&result);
+    buffer.open(QIODevice::WriteOnly);
+    QDataStream out(&buffer);
+
+    out << (quint32) header.via.size();
+    for (const auto& value: header.via)
+        out.writeRawData(value.toRfc4122().data(), kGuidSize);
+
+    out << (quint32) header.dstPeers.size();
+    for (const auto& value : header.dstPeers)
+        out.writeRawData(value.toRfc4122().data(), kGuidSize);
+
     return result;
 }
 
-UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& response, int* bytesRead)
+TransportHeader deserializeTransportHeader(const QByteArray& response, int* bytesRead)
 {
     QByteArray responseCopy(response);
-    UnicastTransactionRecords result;
+    TransportHeader result;
 
     *bytesRead = -1;
-    if (responseCopy.size() < 4)
-        return result; //< error
 
     QBuffer buffer(&responseCopy);
     buffer.open(QIODevice::ReadOnly);
@@ -346,17 +344,29 @@ UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& response, i
     tmpBuffer.resize(kGuidSize);
     ApiPersistentIdData fullId;
     quint32 size;
+
+    if (in.atEnd())
+        return result; //< error
     in >> size;
     while (!in.atEnd() && size > 0)
     {
-        UnicastTransactionRecord record;
-        in >> record.ttl;
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error
-        record.dstPeer = QnUuid::fromRfc4122(tmpBuffer);
-        result.push_back(std::move(record));
+        result.via.insert(QnUuid::fromRfc4122(tmpBuffer));
         --size;
     }
+
+    if (in.atEnd())
+        return result; //< error
+    in >> size;
+    while (!in.atEnd() && size > 0)
+    {
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result; //< Error
+        result.dstPeers.push_back(QnUuid::fromRfc4122(tmpBuffer));
+        --size;
+    }
+
     *bytesRead = buffer.pos();
     return result;
 }

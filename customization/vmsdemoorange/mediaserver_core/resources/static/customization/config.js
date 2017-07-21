@@ -38,4 +38,4 @@ Config.allowDebugMode = false;
 Config.productName = 'VMS Demo';
 Config.cloud.productName = 'VMS Demo Cloud';
 
-Config.supportedLanguages = ['en_US', 'fr', 'es'];
+Config.supportedLanguages = ['en_US', 'fr_FR', 'es_ES'];

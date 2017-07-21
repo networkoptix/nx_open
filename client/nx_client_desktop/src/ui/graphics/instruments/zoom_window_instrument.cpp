@@ -114,7 +114,7 @@ public:
         updateInteractivity();
     }
 
-    virtual ~ZoomWindowWidget();
+    virtual ~ZoomWindowWidget() override;
 
     QPointer<ZoomOverlayWidget> overlay() const
     {
@@ -261,7 +261,7 @@ public:
         setAcceptedMouseButtons(Qt::NoButton);
     }
 
-    ~ZoomOverlayWidget()
+    virtual ~ZoomOverlayWidget() override
     {
         auto widgets = m_rectByWidget.keys();
         for (auto widget: widgets)
@@ -585,7 +585,7 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 
     /* Initialize frame color if zoom window was loaded from a layout and
      * not created through this instrument. */
-    if (!widget->zoomRect().isNull() && !widget->frameDistinctionColor().isValid())
+    if (widget->isZoomWindow() && !widget->frameDistinctionColor().isValid())
         widget->setFrameDistinctionColor(nextZoomWindowColor());
 }
 

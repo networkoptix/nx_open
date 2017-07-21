@@ -12,6 +12,7 @@
 
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 
 #include <text/time_strings.h>
 
@@ -88,12 +89,23 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     base_type(context, item, parent),
     m_previewPainter(new LayoutPreviewPainter(context->instance<QnCameraThumbnailManager>()))
 {
+    context->instance<QnCameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
+
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
     QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
     if (!layout)
+    {
         layout = QnLayoutResource::createFromResource(resource());
+        connect(resource(), &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& key)
+            {
+                NX_EXPECT(resource == this->resource());
+                if (key == QnMediaResource::rotationKey())
+                    m_previewPainter->setLayout(QnLayoutResource::createFromResource(resource));
+            });
+    }
 
     m_previewPainter->setLayout(layout);
 
@@ -131,8 +143,9 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateIcon = [this, icon]
         {
-            const auto pixmap = qnResIconCache->icon(resource())
+            auto pixmap = qnResIconCache->icon(resource())
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
+            pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
             icon->setPixmap(pixmap);
         };
     updateIcon();

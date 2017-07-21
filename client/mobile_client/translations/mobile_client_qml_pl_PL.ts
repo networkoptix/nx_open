@@ -80,15 +80,15 @@
       <translation type="unfinished">Log in</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>Connect to Server</source>
@@ -138,27 +138,27 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Tak</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nie</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Przerwij</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Ponów</translation>
     </message>
   </context>
   <context>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Pobrane</translation>
     </message>
   </context>
   <context>
@@ -209,14 +209,14 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -284,6 +284,17 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
+    </message>
+  </context>
+  <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
@@ -326,7 +337,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -519,7 +530,7 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
   </context>
   <context>
@@ -533,26 +544,26 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Wytnij</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Skopiuj</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Wklej</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
   </context>
   <context>

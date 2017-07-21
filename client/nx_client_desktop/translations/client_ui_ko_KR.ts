@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>알람 후</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -739,13 +729,28 @@
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation>주위: 시스템에 영향을 줄 수있으므로 정확한 내용 숙지되지 않은 상태에서 변경하지 마세요</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -760,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation>출력 ID:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation>기간 고정</translation>
     </message>
@@ -772,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation>초</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -904,8 +909,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>잘못 된 전자 메일 또는 암호</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1055,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>빠른검토 내보내기</translation>
     </message>
@@ -1068,13 +1073,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>빠른 검토 속도</translation>
+      <source>Frames Interval</source>
+      <translation>프레임 간격</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>프레임 간격</translation>
+      <source>Rapid Review speed</source>
+      <translation>빠른 검토 속도</translation>
     </message>
   </context>
   <context>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>하드웨어 ID 잠금:</translation>
+      <source>Features</source>
+      <translation>기능</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation>기능</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1519,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation>하드웨어 ID:</translation>
+      <source>Activation Key File</source>
+      <translation>인증키 파일:</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation>인증키 파일:</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1741,11 @@
       <source>for</source>
       <translation>for</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1918,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>잘못 된 전자 메일 또는 암호</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1941,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation>확인</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation>재 연결 됩니다.</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2276,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>소스</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>화면</translation>
     </message>
   </context>
   <context>
@@ -2671,19 +2676,6 @@
     </message>
   </context>
   <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2794,11 +2786,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2793,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>

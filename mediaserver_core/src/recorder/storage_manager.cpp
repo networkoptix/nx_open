@@ -1502,11 +1502,13 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive();
+    NX_VERBOSE(this, lm("Got %1 cameras with archive").arg(archivedListNew.size()));
 
     std::vector<QnUuid> archivedListOld =
         cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
+    NX_VERBOSE(this, lm("Got %1 old cameras with archive").arg(archivedListOld.size()));
     if (archivedListOld == archivedListNew)
         return;
 
@@ -1519,6 +1521,11 @@ void QnStorageManager::updateCameraHistory() const
                     << ec2::toString(errCode);
         return;
     }
+    else
+    {
+        NX_VERBOSE(this, "addCameraHistoryItem success");
+    }
+
     cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
@@ -1536,7 +1543,7 @@ void QnStorageManager::checkSystemStorageSpace()
                 && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
             {
                 m_lowSysStorageSpaceWarnShown = true;
-                emit storageFailure(storage, QnBusiness::SystemStorageFullReason);
+                emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
             }
             else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
             {
@@ -2004,7 +2011,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
-            emit storageFailure(storage, QnBusiness::StorageFullReason);
+            emit storageFailure(storage, nx::vms::event::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -2132,7 +2139,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
-        emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+        emit storageFailure(fileStorage, nx::vms::event::EventReason::storageIoError);
 }
 
 void QnStorageManager::startAuxTimerTasks()

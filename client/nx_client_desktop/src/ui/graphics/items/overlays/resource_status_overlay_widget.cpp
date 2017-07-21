@@ -19,10 +19,21 @@
 
 namespace {
 
+
+void disableFocus(QGraphicsItem* item)
+{
+    if (item->isWidget())
+    {
+        auto widget = static_cast<QGraphicsWidget*>(item);
+        widget->setFocusPolicy(Qt::NoFocus);
+    }
+}
+
 void makeTransparentForMouse(QGraphicsItem* item)
 {
     item->setAcceptedMouseButtons(Qt::NoButton);
     item->setAcceptHoverEvents(false);
+    disableFocus(item);
 }
 
 QnMaskedProxyWidget* makeMaskedProxy(
@@ -37,6 +48,8 @@ QnMaskedProxyWidget* makeMaskedProxy(
 
     if (transparent)
         makeTransparentForMouse(result);
+
+    disableFocus(result);
 
     return result;
 }
@@ -263,6 +276,7 @@ void QnStatusOverlayWidget::setupPreloader()
     m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
     m_preloader->dots()->setDotRadius(8);
     m_preloader->dots()->setDotSpacing(8);
+    m_preloader->setMinimumSize(200, 200); //< For correct downscaling in small items.
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->addItem(m_preloader);
@@ -375,7 +389,7 @@ void QnStatusOverlayWidget::updateAreasSizes()
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    //TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
+    // TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
     bool showExtras = m_visibleControls.testFlag(Control::kButton);
 
     const qreal minHeight = 95 * scale; // TODO: #ynikitenkov Change for description

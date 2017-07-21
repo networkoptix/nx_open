@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
     QnLongRunnablePool runnablePool;
 
-    QString logLevel = "WARN";
+    QString logLevel = "warning";
     QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
     if (!QDir(installationsDir).exists())
         QDir().mkpath(installationsDir);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     if (!logFilePath.isEmpty() && !logLevel.isEmpty())
     {
         nx::utils::log::Settings settings;
-        settings.level = nx::utils::log::Level::warning;
+        settings.level.parse(logLevel);
         settings.maxFileSize = 1024 * 1024 * 10;
         settings.maxBackupCount = 5;
 

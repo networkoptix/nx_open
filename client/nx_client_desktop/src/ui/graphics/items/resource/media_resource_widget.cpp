@@ -10,9 +10,9 @@
 #include <api/app_server_connection.h>
 #include <api/server_rest_connection.h>
 
-#include <business/business_event_rule.h>
-#include <business/business_strings_helper.h>
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -99,11 +99,12 @@
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
 #include <api/common_message_processor.h>
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx;
+using namespace client::desktop::ui;
 
 namespace {
 
@@ -321,9 +322,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const QnAbstractBusinessActionPtr &businessAction)
+        [this](const vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
+            if (businessAction->actionType() != vms::event::executePtzPresetAction)
                 return;
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != m_resource->toResource()->getId())
@@ -485,13 +486,13 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     auto eventRuleManager = commonModule()->eventRuleManager();
 
-    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
+    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
         this, &QnMediaResourceWidget::resetTriggers);
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
         this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
@@ -791,6 +792,25 @@ void QnMediaResourceWidget::setupHud()
     m_compositeOverlay->stackBefore(m_triggersContainer);
 
     setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+
+    const auto updateTriggersMinHeight =
+        [this]()
+        {
+            // Calculate minimum height for downscaling no more than kMaxDownscaleFactor times.
+            static const qreal kMaxDownscaleFactor = 2.0;
+            const auto content = m_hudOverlay->content();
+            const qreal available = content->fixedSize().height() / content->sceneScale();
+            const qreal desired = m_triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
+            const qreal extra = content->size().height() - m_triggersContainer->size().height();
+            const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
+            m_triggersContainer->setMinimumHeight(min);
+        };
+
+    connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
+        this, updateTriggersMinHeight);
+
+    connect(m_triggersContainer, &QnScrollableItemsWidget::contentHeightChanged,
+        this, updateTriggersMinHeight);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
@@ -1188,7 +1208,7 @@ void QnMediaResourceWidget::updateDisplay()
 void QnMediaResourceWidget::updateIconButton()
 {
     auto buttonsBar = titleBar()->leftButtonsBar();
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
     {
         auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
@@ -1504,7 +1524,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
         return Qn::MainWindow_MediaItem_Ptz_Help;
     }
 
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
 
     if (options().testFlag(DisplayMotionSensitivity))
@@ -1698,7 +1718,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!rgbImage && hasVideo)
         result |= Qn::EnhancementButton;
 
-    if (!zoomRect().isNull())
+    if (isZoomWindow())
         return result;
 
     if (hasVideo && base_type::resource()->hasFlags(Qn::motion))
@@ -2318,11 +2338,11 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 }
 
 /*
-* Software Triggers
+* Soft Triggers
 */
 
 QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
-    const QnBusinessEventRulePtr& rule)
+    const vms::event::RulePtr& rule)
 {
     NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
 
@@ -2337,8 +2357,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
     std::function<void()> clientSideHandler;
 
-    if (rule->actionType() == QnBusiness::BookmarkAction
-        && !rule->actionParams().needConfirmation)
+    if (rule->actionType() == nx::vms::event::bookmarkAction)
     {
         clientSideHandler =
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
@@ -2355,9 +2374,9 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
     return &trigger;
 }
 
-bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const
+bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
 {
-    if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != vms::event::softwareTriggerEvent)
         return false;
 
     const auto resourceId = m_resource->toResource()->getId();
@@ -2381,11 +2400,11 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
 {
     NX_EXPECT(button);
 
-    const auto name = QnBusinessStringsHelper::getSoftwareTriggerName(info.name);
+    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
     button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
+        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
         : name);
 
     const auto resultHandler =
@@ -2412,7 +2431,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (!button->isLive())
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::active);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2433,7 +2452,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::inactive);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2513,7 +2532,7 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
     m_softwareTriggers.erase(iter);
 };
 
-void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const QnBusinessEventRulePtr& rule)
+void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     const auto iter = m_softwareTriggers.find(rule->id());
     if (iter == m_softwareTriggers.end())
@@ -2534,7 +2553,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const QnBusinessEventRule
 rest::Handle QnMediaResourceWidget::invokeTrigger(
     const QString& id,
     std::function<void(bool, rest::Handle)> resultHandler,
-    QnBusiness::EventState toggleState)
+    vms::event::EventState toggleState)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
         return rest::Handle();

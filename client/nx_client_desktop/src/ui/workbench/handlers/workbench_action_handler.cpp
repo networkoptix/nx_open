@@ -20,7 +20,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -62,6 +62,7 @@
 
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
+#include <nx/client/desktop/ui/messages/local_files_messages.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -93,6 +94,7 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
@@ -145,6 +147,7 @@
 #include <nx/client/desktop/utils/mime_data.h>
 #include <utils/common/event_processors.h>
 #include <nx/utils/string.h>
+#include <utils/common/delayed.h>
 #include <utils/common/time.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -281,7 +284,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenInFolderAction), SIGNAL(triggered()), this, SLOT(at_openInFolderAction_triggered()));
     connect(action(action::DeleteFromDiskAction), SIGNAL(triggered()), this, SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(action::RemoveFromServerAction), SIGNAL(triggered()), this, SLOT(at_removeFromServerAction_triggered()));
-    connect(action(action::RenameResourceAction), SIGNAL(triggered()), this, SLOT(at_renameAction_triggered()));
+    connect(action(action::RenameResourceAction), &QAction::triggered, this,
+        &ActionHandler::at_renameAction_triggered);
     connect(action(action::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
     connect(action(action::DelayedDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_delayedDropResourcesAction_triggered()));
     connect(action(action::InstantDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_instantDropResourcesAction_triggered()));
@@ -361,13 +365,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
-
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
-
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -377,7 +376,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
 
     QnLayoutItemData data;
     data.resource.id = resource->getId();
-    data.resource.uniqueId = resource->getUniqueId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -668,9 +668,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
@@ -785,7 +783,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
-        if (!ui::videowall::checkLocalFiles(mainWindow(), index, resources, true))
+        if (!messages::Videowall::checkLocalFiles(mainWindow(), index, resources, true))
             return;
     }
 
@@ -1137,18 +1135,25 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
 
 void ActionHandler::at_webClientAction_triggered()
 {
-    static const auto kPath = lit("/static/index.html");
-    static const auto kFragment = lit("/view");
-
     const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
 #ifdef WEB_CLIENT_SUPPORTS_PROXY
+#error Reimplement VMS-6586
     openInBrowser(server, kPath, kFragment);
-#else
-    openInBrowserDirectly(server, kPath, kFragment);
 #endif
+
+    if (nx::network::isCloudServer(server))
+    {
+        menu()->trigger(action::OpenCloudViewSystemUrl);
+    }
+    else
+    {
+        static const auto kPath = lit("/static/index.html");
+        static const auto kFragment = lit("/view");
+        openInBrowserDirectly(server, kPath, kFragment);
+    }
 }
 
 void ActionHandler::at_webAdminAction_triggered()
@@ -1177,6 +1182,56 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
     const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+}
+
+void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
+{
+    QFileInfo fi(resource->getUrl());
+    QString filePath = fi.absolutePath() + L'/' + newName;
+
+    if (QFileInfo::exists(filePath))
+    {
+        messages::LocalFiles::fileExists(mainWindow(), filePath);
+        return;
+    }
+
+    QString targetPath = QFileInfo(filePath).absolutePath();
+    if (!QDir().mkpath(targetPath))
+    {
+        messages::LocalFiles::pathInvalid(mainWindow(), targetPath);
+        return;
+    }
+
+    // If video is opened right now, it is quite hard to close it synchronously.
+    static const int kTimeToCloseResourceMs = 300;
+
+    resourcePool()->removeResource(resource);
+    executeDelayedParented(
+        [this, resource, filePath]()
+        {
+            QnResourcePtr result = resource;
+
+            if (!QFile::rename(resource->getUrl(), filePath))
+            {
+                messages::LocalFiles::fileIsBusy(mainWindow(), filePath);
+            }
+            else
+            {
+                if (resource->hasFlags(Qn::layout))
+                {
+                    result = QnResourceDirectoryBrowser::layoutFromFile(filePath, resourcePool());
+                }
+                else
+                {
+                    QString targetName = QFileInfo(filePath).fileName();
+                    result->setName(targetName);
+                    result->setUrl(filePath);
+                }
+            }
+            resourcePool()->addResource(result);
+        },
+        kTimeToCloseResourceMs,
+        this);
 }
 
 void ActionHandler::at_openBookmarksSearchAction_triggered()
@@ -1213,18 +1268,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
+    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != QnBusiness::AnyBusinessEvent || !ids.isEmpty())
+    if (eventType != vms::event::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1424,7 +1479,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
+        if (resource->hasFlags(Qn::local_media))
+            item.resource.uniqueId = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
@@ -1483,7 +1539,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1541,7 +1597,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, QnBusiness::AnyServerEvent});
+        {Qn::EventTypeRole, vms::event::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()
@@ -1599,25 +1655,41 @@ void ActionHandler::at_deleteFromDiskAction_triggered()
     QnFileProcessor::deleteLocalResources(resources);
 }
 
-bool ActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
-    /* Only users and videowall should be checked. Layouts are checked separately, servers and cameras can have the same name. */
-    Qn::ResourceFlags checkedFlags = resource->flags() & (Qn::user | Qn::videowall);
+bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QString& newName) const
+{
+    /*
+     * Users, videowalls and local files should be checked to avoid names collisions.
+     * Layouts are checked separately, servers and cameras can have the same name.
+     */
+    auto checkedFlags = resource->flags() & (Qn::user | Qn::videowall | Qn::local_media);
     if (!checkedFlags)
         return true;
 
     /* Resource cannot have both of these flags at once. */
-    NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
+    NX_ASSERT(checkedFlags == Qn::user
+        || checkedFlags == Qn::videowall
+        || checkedFlags == Qn::local_media);
 
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources()) {
+    for (const auto& resource: resourcePool()->getResources())
+    {
         if (!resource->hasFlags(checkedFlags))
             continue;
+
         if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
         if (checkedFlags == Qn::user)
+        {
             QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
-        else
-            ui::videowall::anotherVideoWall(mainWindow());
+        }
+        else if (checkedFlags == Qn::videowall)
+        {
+            messages::Videowall::anotherVideoWall(mainWindow());
+        }
+        else if (checkedFlags == Qn::local_media)
+        {
+            // Silently skip. Should never get here really, leaving branch for safety.
+        }
 
         return false;
     }
@@ -1683,7 +1755,10 @@ void ActionHandler::at_renameAction_triggered()
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
     {
-        context()->instance<LayoutsHandler>()->renameLayout(layout, name);
+        if (layout->isFile())
+            renameLocalFile(layout, name);
+        else
+            context()->instance<LayoutsHandler>()->renameLayout(layout, name);
     }
     else if (nodeType == Qn::RecorderNode)
     {
@@ -1715,6 +1790,10 @@ void ActionHandler::at_renameAction_triggered()
     {
         qnResourcesChangesManager->saveWebPage(webPage, [name](const QnWebPageResourcePtr &webPage) {  webPage->setName(name); });
     }
+    else if (auto archive = resource.dynamicCast<QnAbstractArchiveResource>())
+    {
+        renameLocalFile(archive, name);
+    }
     else
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
@@ -1733,7 +1812,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (ui::resources::deleteResources(mainWindow(), resources))
+    if (ui::messages::Resources::deleteResources(mainWindow(), resources))
         qnResourcesChangesManager->deleteResources(resources);
 }
 
@@ -2198,7 +2277,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::Get, auth.nonce.toUtf8());
+            auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
 
         QUrl targetUrl(request.url);
         QUrlQuery urlQuery(targetUrl);

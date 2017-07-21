@@ -17,6 +17,8 @@
 
 #include <numeric>
 
+using namespace nx;
+
 QnScheduleSync::QnScheduleSync(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_syncing(false),
@@ -370,12 +372,12 @@ void QnScheduleSync::initSyncData()
 }
 
 template<typename NeedMoveOnCB>
-QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
+vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
     if (!qnBackupStorageMan->getOptimalStorageRoot()) {
         NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
-        return QnBusiness::BackupFailedNoBackupStorageError;
+        return vms::event::EventReason::backupFailedNoBackupStorageError;
     }
 
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
@@ -411,15 +413,15 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 switch (err) {
                 case CopyError::NoBackupStorageError:
                 case CopyError::GetCatalogError:
-                    return QnBusiness::BackupFailedNoBackupStorageError;
+                    return vms::event::EventReason::backupFailedNoBackupStorageError;
                 case CopyError::FromStorageError:
-                    return QnBusiness::BackupFailedSourceStorageError;
+                    return vms::event::EventReason::backupFailedSourceStorageError;
                 case CopyError::TargetFileError:
-                    return QnBusiness::BackupFailedTargetFileError;
+                    return vms::event::EventReason::backupFailedTargetFileError;
                 case CopyError::ChunkError:
-                    return QnBusiness::BackupFailedChunkError;
+                    return vms::event::EventReason::backupFailedChunkError;
                 case CopyError::Interrupted:
-                    return QnBusiness::BackupCancelled;
+                    return vms::event::EventReason::backupCancelled;
                 }
             }
         }
@@ -427,16 +429,16 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         bool needStop = needMoveOnCode != SyncCode::Ok;
         if (needStop) {
             if (needMoveOnCode == SyncCode::OutOfTime) {
-                return QnBusiness::BackupEndOfPeriod;
+                return vms::event::EventReason::backupEndOfPeriod;
             } else if (needMoveOnCode == SyncCode::WrongBackupType ||
                        needMoveOnCode == SyncCode::Interrupted) {
-                return QnBusiness::BackupCancelled;
+                return vms::event::EventReason::backupCancelled;
             }
             break;
         }
     }
     m_interrupted = true; // we are done till the next backup period
-    return QnBusiness::BackupDone;
+    return vms::event::EventReason::backupDone;
 }
 
 void QnScheduleSync::stop()
@@ -631,9 +633,9 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            bool backupFailed = result != QnBusiness::BackupDone &&
-                                result != QnBusiness::BackupCancelled &&
-                                result != QnBusiness::BackupEndOfPeriod;
+            bool backupFailed = result != vms::event::EventReason::backupDone &&
+                                result != vms::event::EventReason::backupCancelled &&
+                                result != vms::event::EventReason::backupEndOfPeriod;
 
             if (backupFailed && !m_failReported) {
                 emit backupFinished(syncEndTimePointLocal, result);

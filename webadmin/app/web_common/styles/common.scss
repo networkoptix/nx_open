@@ -3,6 +3,7 @@
 @import "volumecontrols";
 @import "webclient";
 @import "icons";
+@import "languages";
 
 $preloader_circle_color: $light;
 $preloader_circle_size: 16px;
@@ -90,7 +91,6 @@ placeholder{ /* Hack to have full-screen */
         line-height:30px;
         color: $light;
         &>*{
-            width: 400px;
             text-align: center;
             margin: auto;
         }
@@ -125,7 +125,7 @@ placeholder{ /* Hack to have full-screen */
     }
 }
 
-.placeholder.preloader-small>.placeholder-content>.placeholder-preloader{
+.preloader-small .placeholder>.placeholder-content>.placeholder-preloader{
     @include preloader($preloader_circle_color, $preloader_small_circle_size, $preloader_small_circle_distance);
 }
 

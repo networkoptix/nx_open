@@ -13,8 +13,7 @@ angular.module('nxCommon')
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '=',
-                serverTime: '='
+                volumeLevel: '='
             },
             templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -77,7 +76,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.webclient.useServerTime,
+                    timelineConfig.minScrollBarWidth,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -117,9 +116,9 @@ angular.module('nxCommon')
                     });
                 }
                 function initTimeline(){
-                    var now = (new Date()).getTime();
+                    var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(now);
+                    scope.scaleManager.setEnd(timeManager.nowToDisplay());
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }
@@ -132,10 +131,6 @@ angular.module('nxCommon')
 
                     timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
-
-                    if(scope.loading){
-                        scope.loading = false;
-                    }
                 }
 
 
@@ -201,9 +196,6 @@ angular.module('nxCommon')
                 // High-level Handlers
                 function scrollbarClickOrHold(left){
                     timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
-                }
-                function scrollbarDblClick(mouseX){
-                    timelineActions.animateScroll(mouseX / scope.viewportWidth);
                 }
 
                 function scrollButtonClickOrHold(left){
@@ -317,14 +309,6 @@ angular.module('nxCommon')
                         scrollButtonDblClick(false);
                         return;
                     }
-                    if(mouseOverElements.timeline){
-                        timelineActions.zoomInToPoint(mouseX);
-                        return;
-                    }
-
-                    if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        scrollbarDblClick(mouseXOverTimeline);
-                    }
                 }
                 function viewportMouseDown(event){
                     updateMouseCoordinate(event);
@@ -342,8 +326,9 @@ angular.module('nxCommon')
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         var scrollLeft = true;
                         //checking if mouse is to the left or right of the scrollbar
-                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline)
+                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline){
                             scrollLeft = false;
+                        }
                         scrollbarClickOrHold(scrollLeft);
                     }
                 }
@@ -432,6 +417,7 @@ angular.module('nxCommon')
 
                 scope.$watch('positionProvider',function(){
                     timelineActions.setPositionProvider(scope.positionProvider);
+                    $timeout(updateTimelineWidth);
                 });
 
                 // !!! Subscribe for different events which affect timeline
@@ -441,19 +427,16 @@ angular.module('nxCommon')
                     }
                 });
 
-                scope.$watch('serverTime.timeZoneOffset', function(){
-                    scope.scaleManager.updateServerOffset(scope.serverTime);
-                });
-
                 if(scope.positionProvider) {
                     scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
+                        scope.loading = true;
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                         scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
-                            scope.loading = hasArchive;
+                            scope.loading = false;
                         });
 
                         timelineRender.setRecordsProvider(scope.recordsProvider);
@@ -462,7 +445,8 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                $timeout(updateTimelineWidth); // Adjust width
+                //We need a delay for the timeline to fully load then we can calculate the width of the timeline
+                $timeout(updateTimelineWidth); // Adjust width.
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing

@@ -26,6 +26,7 @@
                 SuppressOptionsUI="no"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
+                SuppressDowngradeFailure="yes"
                 LicenseUrl="License.html"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
@@ -43,7 +44,7 @@
         <util:RegistrySearch Condition="ServerInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallClientOnly" />
         <util:RegistrySearch Condition="ClientInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallServerOnly" />
 
-        <Chain DisableSystemRestore="yes">
+        <Chain DisableSystemRestore="no">
             <PackageGroupRef Id="ClientPackageGroup"/>
             <PackageGroupRef Id="ServerPackageGroup"/>
         </Chain>

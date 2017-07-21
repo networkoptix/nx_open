@@ -80,8 +80,8 @@
       <translation>Bejelentkezés</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>Hibás Email cím vagy jelszó</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>&quot;%1&quot; login törlése?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -284,6 +284,17 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation>A kamera mozgatásához érintse meg a kijelzőt</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation>MÉGSE</translation>
+    </message>
+  </context>
+  <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
@@ -308,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>PRESETEK</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ presetek</translation>
     </message>
   </context>
   <context>
@@ -436,7 +447,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Ellenőrizze a hálózati kapcsolatot, vagy nyomja meg a &quot;%1&quot; gombot egy ismert szerver cím megadásához.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -456,7 +467,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>Nem lehet &quot;%1&quot; szerverhez csatlakozni</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -587,7 +598,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>n HHHH éééé</translation>
     </message>
   </context>
   <context>

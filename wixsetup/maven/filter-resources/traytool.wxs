@@ -53,6 +53,10 @@
                 <File Id="TrayToolQt5Xml.dll" Name="Qt5Xml.dll" Source="$(var.QtDir)\Qt5Xml.dll" DiskId="8" />
             </Component>
             <Component>
+                <File Id="TrayToolQt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8" />
+            </Component>
+            <Component>
+                <!-->This file is not used in server so prefix is not needed. But it also used in the client (bundle). </!-->
                 <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="9" />
             </Component>
         </ComponentGroup>

@@ -3,24 +3,29 @@
 #include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
-static const KeepAliveOptions kKeepAliveOptions(
-    std::chrono::seconds(60), std::chrono::seconds(10), 3);
+static const auto kUrl =
+    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+
+std::chrono::seconds kDisconnectTimeout(10);
+static const network::RetryPolicy kDefaultRetryPolicy(
+    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_reconnectInterval(std::chrono::minutes(1))
+    m_retryPolicy(kDefaultRetryPolicy)
 {
 }
 
-void ModuleConnector::setReconnectInterval(std::chrono::milliseconds interval)
+void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
 {
-    m_reconnectInterval = interval;
+    NX_ASSERT(m_modules.size() == 0);
+    m_retryPolicy = value;
 }
 
 void ModuleConnector::setConnectHandler(ConnectedHandler handler)
@@ -101,15 +106,15 @@ void ModuleConnector::stopWhileInAioThread()
 
 ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
-    m_id(id)
+    m_id(id),
+    m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    m_timer.bindToAioThread(parent->getAioThread());
-    NX_DEBUG(this, lm("New %1").args(m_id));
+    NX_DEBUG(this) "New";
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this, lm("Delete %1").args(m_id));
+    NX_DEBUG(this) "Delete";
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_socket.reset();
     for (const auto& client: m_httpClients)
@@ -156,6 +161,11 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
+QString ModuleConnector::Module::idForToStringFromPtr() const
+{
+    return m_id.toSimpleString();
+}
+
 boost::optional<ModuleConnector::Module::Endpoints::iterator>
     ModuleConnector::Module::saveEndpoint(SocketAddress endpoint)
 {
@@ -184,10 +194,13 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
     else
         group = getGroup(kOther);
 
-    if (insertIntoGroup(group, std::move(endpoint)))
+    if (insertIntoGroup(group, endpoint))
+    {
+        NX_DEBUG(this, lm("Save endpoint %1 to %2").args(endpoint, group->first));
         return group;
-    else
-        return boost::none;
+    }
+
+    return boost::none;
 }
 
 void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
@@ -204,18 +217,20 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
-            const auto reconnectInterval = m_parent->m_reconnectInterval;
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(reconnectInterval));
-            m_timer.start(reconnectInterval, [this](){ connectToGroup(m_endpoints.begin()); });
+            const auto reconnectInterval = m_parent->m_retryPolicy;
+            m_timer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_timer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
         }
 
         return;
     }
 
+    if (m_timer.timeToEvent())
+        m_timer.cancelSync();
+
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
-    m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))
@@ -233,7 +248,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connectToEndpoint(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").args(m_id, endpoint));
+    NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_timer.getAioThread());
@@ -323,14 +338,12 @@ bool ModuleConnector::Module::saveConnection(
 
     for (const auto& client: m_httpClients)
         client->pleaseStopSync();
-    m_httpClients.clear();
 
-    // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
-    // for reconnect attempt every timeout. It looks like we do not have any options for
-    // old servers.
-    // For new servers we could use WebSocket streams to reduce traffic to WebSocket keep alives.
+    m_httpClients.clear();
+    m_disconnectTimer.reset();
+
     auto socket = client->takeSocket();
-    if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
+    if (!socket->setRecvTimeout(kDisconnectTimeout))
     {
         NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
             m_id, SystemError::getLastOSErrorText()));
@@ -345,16 +358,22 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").args(
-                size, SystemError::toString(code)));
+            NX_VERBOSE(this, lm("Unexpected connection to %1 read size=%2: %3").args(
+                m_id, size, SystemError::toString(code)));
 
             m_socket.reset();
             connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
+
+            // Make sure we report disconnect in a limited time.
+            m_disconnectTimer.reset(new network::aio::Timer(m_timer.getAioThread()));
+            m_disconnectTimer->start(kDisconnectTimeout,
+                [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
     auto ip = m_socket->getForeignAddress().address;
-    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
+    NX_VERBOSE(this, lm("Connected by %1 (ip %2)").args(endpoint, ip));
     m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
+    m_timer.reset();
     return true;
 }
 

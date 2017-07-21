@@ -20,15 +20,19 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
 #include <core/resource/media_server_resource.h>
 
 #include <client_core/client_core_settings.h>
@@ -96,6 +100,7 @@ namespace {
 
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
+static constexpr int kReconnectDelayMs = 3000;
 
 bool isConnectionToCloud(const QUrl& url)
 {
@@ -330,6 +335,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [this]
         {
             disconnectFromServer(DisconnectFlag::Force);
+            action(action::ResourcesModeAction)->setChecked(true);
         });
 
     connect(action(action::LogoutFromCloud), &QAction::triggered, this,
@@ -385,6 +391,10 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(resourceModeAction, &QAction::toggled, this,
         [this, welcomeScreen](bool checked)
         {
+            // Check if action state was changed during queued connection.
+            if (action(action::ResourcesModeAction)->isChecked() != checked)
+                return;
+
             if (welcomeScreen)
                 welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
@@ -395,7 +405,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                                   // windowed/welcomescreen/fullscreen state
                                   // BETWEEN their slots processing MainMenuAction.
                                   //
-                                  //TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the future
+                                  // TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the future
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
@@ -536,10 +546,10 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
 
     switch (status)
     {
+        // Server database was cleaned up during restart, e.g. merge to other system.
         case Qn::UnauthorizedConnectionResult:
-            /* Server database was cleaned up during restart, e.g. merge to other system. */
-            m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
-            break;
+
+        // Server was updated.
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
@@ -550,23 +560,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
             break;
     }
 
-    /* Find next valid server for reconnect. */
-    QnMediaServerResourceList allServers = m_reconnectHelper->servers();
-    bool found = true;
-    do
-    {
-        m_reconnectHelper->next();
-        /* We have found at least one correct interface for the server. */
-        found = m_reconnectHelper->currentUrl().isValid();
-        if (!found) /* Do not try to connect to invalid servers. */
-            allServers.removeOne(m_reconnectHelper->currentServer());
-    } while (!found && !allServers.isEmpty());
-
-    /* Break cycle if we cannot find any valid server. */
-    if (found)
-        connectToServer(m_reconnectHelper->currentUrl());
-    else
-        disconnectFromServer(DisconnectFlag::Force);
+    reconnectStep();
 }
 
 void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr connection)
@@ -611,7 +605,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
      */
 
     const bool autoLogin = options.testFlag(AutoLogin);
-    const bool storePassword = options.testFlag(StorePassword) | autoLogin;
+    const bool storePassword = options.testFlag(StorePassword) || autoLogin;
     if (!storePassword && helpers::isNewSystem(info))
         return;
 
@@ -621,8 +615,15 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const bool cloudConnection = isConnectionToCloud(url);
 
     // Stores local credentials for successful connection
-    if (helpers::isLocalUser(url.userName()) && !cloudConnection)
+    if (helpers::isLocalUser(url.userName()) && !cloudConnection && options.testFlag(StoreSession))
     {
+        NX_DEBUG("CredentialsManager", lm("Store connection record of %1 to the system %2")
+            .arg(url.userName()).arg(localId));
+        NX_ASSERT(!url.password().isEmpty());
+        NX_DEBUG("CredentialsManager", storePassword
+            ? "Password is set"
+            : "Password must be cleared");
+
         const auto credentials = (storePassword
             ? QnEncodedCredentials(url)
             : QnEncodedCredentials(url.userName(), QString()));
@@ -633,23 +634,27 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
 
     if (autoLogin)
     {
+        NX_ASSERT(!url.password().isEmpty());
+        NX_DEBUG("CredentialsManager", lm("Saving last used connection of %1 to the system %2")
+            .arg(url.userName()).arg(url.host()));
+
         const auto lastUsed = QnConnectionData(info.systemName, url, localId);
         qnSettings->setLastUsedConnection(lastUsed);
-        qnSettings->setAutoLogin(autoLogin);
+        qnSettings->setAutoLogin(true);
         qnSettings->save();
     }
 
     if (cloudConnection)
     {
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
-        return;
     }
+    else
+    {
+        NX_ASSERT(!url.host().isEmpty(), "Wrong host is going to be saved to the recent connections list");
 
-    const bool correctHost = (!cloudConnection && !url.host().isEmpty());
-    NX_ASSERT(correctHost, "Wrong host is going to be saved to the recent connections list");
-
-    // Stores connection if it is local
-    storeLocalSystemConnection(info.systemName, localId, url, storePassword);
+        // Stores connection if it is local
+        storeLocalSystemConnection(info.systemName, localId, url, storePassword);
+    }
 }
 
 void QnWorkbenchConnectHandler::showWarnMessagesOnce()
@@ -721,7 +726,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
+    NX_DEBUG(this) "State changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:
@@ -749,6 +754,31 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
         default:
             break;
     }
+}
+
+void QnWorkbenchConnectHandler::reconnectStep()
+{
+    if (m_reconnectHelper->servers().empty())
+    {
+        disconnectFromServer(DisconnectFlag::Force);
+        return;
+    }
+
+    m_reconnectHelper->next();
+    NX_EXPECT(m_reconnectDialog);
+    if (m_reconnectDialog)
+        m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
+
+    if (m_reconnectHelper->currentUrl().isValid())
+    {
+        connectToServer(m_reconnectHelper->currentUrl());
+    }
+    else
+    {
+        executeDelayedParented(
+            [this] { reconnectStep(); }, kReconnectDelayMs, m_reconnectHelper.data());
+    }
+    return;
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
@@ -899,6 +929,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     commonModule()->updateRunningInstanceGuid();
 
     const auto parameters = menu()->currentParameters(sender());
+    NX_ASSERT(parameters.hasArgument(Qn::StoreSessionRole));
+    const bool storeSession = parameters.argument(Qn::StoreSessionRole, true);
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (directConnection)
@@ -912,6 +944,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     {
         const auto forceConnection = parameters.argument(Qn::ForceRole, false);
         ConnectionOptions options;
+        if (storeSession)
+            options |= StoreSession;
         if (parameters.argument(Qn::StorePasswordRole, false))
             options |= StorePassword;
         if (parameters.argument(Qn::AutoLoginRole, false))
@@ -924,7 +958,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
 
-        /* Try to connect with saved password. */
+        // Try to connect with saved password. No need to store session once more.
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
             testConnectionToServer(url, AutoLogin, true);
@@ -961,7 +995,9 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
 
-    menu()->trigger(action::ConnectAction, {Qn::UrlRole, url});
+    action::Parameters connectParams{Qn::UrlRole, url};
+    connectParams.setArgument(Qn::StoreSessionRole, true);
+    menu()->trigger(action::ConnectAction, connectParams);
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
@@ -1066,6 +1102,8 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     {
         case Qn::IncompatibleProtocolConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
+        // This code is also returned if we are downloading compatibility version
+        case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
             if (!applauncher::checkOnline(false))
                 break;
@@ -1130,13 +1168,15 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+    resourceAccessManager()->beginUpdate();
+    resourceAccessProvider()->beginUpdate();
+
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
     resourcePool()->removeResources(resourcesToRemove);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     cameraUserAttributesPool()->clear();
     mediaServerUserAttributesPool()->clear();
@@ -1145,6 +1185,9 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     licensePool()->reset();
     commonModule()->setReadOnly(false);
+
+    resourceAccessProvider()->endUpdate();
+    resourceAccessManager()->endUpdate();
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
@@ -1189,8 +1232,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
             disconnectFromServer(DisconnectFlag::Force);
         });
     m_reconnectDialog->setServers(m_reconnectHelper->servers());
-    m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
     QnDialog::show(m_reconnectDialog);
-    connectToServer(m_reconnectHelper->currentUrl());
+
+    reconnectStep();
     return true;
 }

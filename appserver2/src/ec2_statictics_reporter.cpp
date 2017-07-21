@@ -94,7 +94,7 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        QnBusinessEventRuleList bRules;
+        nx::vms::event::RuleList bRules;
         errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
         if (errCode != ErrorCode::ok)
             return errCode;

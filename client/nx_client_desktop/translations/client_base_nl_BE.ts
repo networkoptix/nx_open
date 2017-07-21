@@ -278,10 +278,6 @@ to view more bookmarks</source>
       <translation>Systeemrapportage...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>Bookmarks doorzoeken...</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>Meld u aan bij %1...</translation>
@@ -746,7 +742,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Instellingen</translation>
     </message>
     <message>
       <source>Close</source>
@@ -868,6 +864,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>Notificaties vastzetten</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -923,40 +923,40 @@ to view more bookmarks</source>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <source>Unknown error.</source>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation type="unfinished">License does not exist</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation type="unfinished">License is disabled</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation type="unfinished">License is inactive</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation type="unfinished">Invalid license</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation type="unfinished">License is trial</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation type="unfinished">License is in deactivation process</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation type="unfinished">Invalid hardware id</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation type="unfinished">Limit exceeded</translation>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1080,27 +1080,27 @@ to view more bookmarks</source>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Inzoomen</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Uitzoomen</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Focus veraf</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Focus dichtbij</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Autofocus</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Dewarping modus wijzigen</translation>
     </message>
   </context>
   <context>
@@ -1453,7 +1453,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tijd</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1513,6 +1513,10 @@ to view more bookmarks</source>
     <message>
       <source>Select Cameras to Backup...</source>
       <translation type="unfinished">Select Cameras to Backup...</translation>
+    </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
     </message>
   </context>
   <context>
@@ -1597,6 +1601,10 @@ to view more bookmarks</source>
       <source>Name cannot be empty.</source>
       <translation type="unfinished">Name cannot be empty.</translation>
     </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation type="unfinished">Description cannot be empty</translation>
+    </message>
   </context>
   <context>
     <name>QnBuildNumberDialog</name>
@@ -1610,7 +1618,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1654,11 +1662,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Elk apparaat</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Elke Camera</translation>
     </message>
   </context>
   <context>
@@ -1692,7 +1700,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecteer tenminste één camera</translation>
     </message>
     <message>
       <source>Occurs</source>
@@ -1719,7 +1727,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -1727,11 +1735,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Elk apparaat</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Elke Camera</translation>
     </message>
   </context>
   <context>
@@ -1752,7 +1760,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecteer tenminste één camera</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -1992,10 +2000,6 @@ to view more bookmarks</source>
       <translation>Laden...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>Camera ID</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>Hoofd stream</translation>
     </message>
@@ -2006,10 +2010,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>Camera heeft geen secundaire stream</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O Module ID</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2034,6 +2034,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>I/O module heeft geen audio stream</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2425,31 +2433,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Gebeurtenissenlog...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Apparaat regels...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation type="unfinished">Devices Rules...</translation>
+      <translation>Apparaat regels...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Camera regels...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation type="unfinished">Cameras Rules...</translation>
+      <translation>Camera regels...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>I/O module regels...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation type="unfinished">I/O Modules Rules...</translation>
+      <translation>I/O module regels...</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -2593,7 +2601,7 @@ to %1</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Verbinden met server...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -2612,11 +2620,11 @@ to %1</translation>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -2751,7 +2759,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Herstarten</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -2810,6 +2818,10 @@ to %1</translation>
       <source>Connection to Server could not be established.</source>
       <translation type="unfinished">Connection to Server could not be established.</translation>
     </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -2834,7 +2846,7 @@ to %1</translation>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>Server API</source>
-      <translation type="unfinished">Server API</translation>
+      <translation>Server API</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
@@ -2966,15 +2978,15 @@ to %1</translation>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Volgende</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
@@ -2986,11 +2998,11 @@ to %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3010,7 +3022,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Verbinding verbreken</translation>
     </message>
     <message>
       <source>All cloud users will be deleted.</source>
@@ -3044,15 +3056,15 @@ to %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Selectie kopiëren naar Klembord</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exporteer de geselecteerde gegevens naar bestand...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3097,19 +3109,19 @@ to %1</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Bron</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Actie</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Doel</translation>
     </message>
     <message>
       <source>Description</source>
@@ -3161,7 +3173,7 @@ to %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatisch</translation>
     </message>
   </context>
   <context>
@@ -3208,17 +3220,17 @@ to %1</translation>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Low</translation>
+      <translation>Lage</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Medium</translation>
+      <translation>Middelgroot</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">High</translation>
+      <translation>Hoog</translation>
     </message>
   </context>
   <context>
@@ -3366,12 +3378,12 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3404,16 +3416,12 @@ to %1</translation>
       <translation type="unfinished">Invalid state</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation type="unfinished">ID</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation type="unfinished">On click</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Duur</translation>
     </message>
     <message>
       <source>Open circuit</source>
@@ -3430,6 +3438,10 @@ to %1</translation>
       <comment>IO Output Port Action</comment>
       <translation type="unfinished">Impulse</translation>
     </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
+    </message>
   </context>
   <context>
     <name>QnImageControlWidget</name>
@@ -3439,7 +3451,7 @@ to %1</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatisch</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -3565,11 +3577,11 @@ to %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3577,7 +3589,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
   </context>
   <context>
@@ -3627,7 +3639,7 @@ to %1</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Kopiëren naar klembord</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -3642,12 +3654,12 @@ to %1</translation>
       <translation type="unfinished">License Key</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation type="unfinished">Features:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3662,11 +3674,11 @@ to %1</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3678,7 +3690,7 @@ to %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Oké</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3759,10 +3771,6 @@ to %1</translation>
       <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation type="unfinished">Please contact Customer Support to get a valid license key.</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation type="unfinished">You already activated this license</translation>
     </message>
@@ -3795,24 +3803,12 @@ to %1</translation>
       <translation type="unfinished">Invalid data received. Please contact Customer Support to report the issue.</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation type="unfinished">Invalid license key</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation type="unfinished">Failed to activate license</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation type="unfinished">Please contact Customer Support to obtain a valid license key.</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation type="unfinished">Network error</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation type="unfinished">Please contact Customer Support to activate license key manually.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3840,21 +3836,6 @@ to %1</translation>
       <source>Please make sure it is entered correctly.</source>
       <translation type="unfinished">Please make sure it is entered correctly.</translation>
     </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to hardware ID %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to hardware ID %1 on %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels</source>
-      <translation type="unfinished">
-        <numerusform>%n channels</numerusform>
-        <numerusform>%n channels</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
@@ -3878,17 +3859,6 @@ to %1</translation>
       <translation type="unfinished">
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation type="unfinished">Please contact Customer Support</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n other</numerusform>
-        <numerusform>Deactivate %n other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3933,6 +3903,48 @@ to %1</translation>
       <source>Deactivate</source>
       <translation type="unfinished">Deactivate</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation type="unfinished">Invalid License Key</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -3957,16 +3969,16 @@ to %1</translation>
       <translation type="unfinished">Failed to open file</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation type="unfinished">Hardware ID copied to clipboard</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4059,7 +4071,7 @@ to %1</translation>
     <name>QnLoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Verbinden met server...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -4102,11 +4114,11 @@ to %1</translation>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -4198,11 +4210,11 @@ to %1</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation type="unfinished">Create Zoom Window</translation>
+      <translation>Zoom-venster maken</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Beeldverbetering</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4210,7 +4222,7 @@ to %1</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4229,13 +4241,13 @@ to %1</translation>
       <translation type="unfinished">Lo-Res</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
     </message>
   </context>
   <context>
@@ -4255,10 +4267,6 @@ to %1</translation>
     <message>
       <source>Merge with %1</source>
       <translation type="unfinished">Merge with %1</translation>
-    </message>
-    <message>
-      <source>Success!</source>
-      <translation type="unfinished">Success!</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -4281,16 +4289,8 @@ to %1</translation>
       <translation type="unfinished">Failed to merge Systems</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation type="unfinished">System was configured successfully.</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation type="unfinished">URL is invalid.</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation type="unfinished">The servers from the remote System should appear in your System soon.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4299,6 +4299,18 @@ to %1</translation>
     <message>
       <source>This is the current System URL.</source>
       <translation type="unfinished">This is the current System URL.</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4309,7 +4321,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -4351,7 +4363,7 @@ to %1</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Vorig frame</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -4359,11 +4371,11 @@ to %1</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Volgend frame</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Om te beginnen</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4371,7 +4383,7 @@ to %1</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Naar het eind</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -4381,16 +4393,16 @@ to %1</translation>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation type="unfinished">b/s</translation>
+      <source>B/s</source>
+      <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation type="unfinished">Kb/s</translation>
+      <source>MB/s</source>
+      <translation type="unfinished">MB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation type="unfinished">Mb/s</translation>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -4468,19 +4480,8 @@ to %1</translation>
       <translation type="unfinished">Alarm: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation type="unfinished">Bookmark it</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks created</numerusform>
-        <numerusform>%n bookmarks created</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -4537,15 +4538,15 @@ to %1</translation>
       <translation type="unfinished">User Input</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuleren</translation>
     </message>
   </context>
   <context>
@@ -4556,14 +4557,14 @@ to %1</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation type="unfinished">Apply changes before exit?</translation>
+      <translation>Wijzigingen opslaan voor het verlaten?</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -4587,7 +4588,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Geen</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4643,14 +4644,14 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Geen</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Geen</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4673,7 +4674,7 @@ to %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lage</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4681,7 +4682,7 @@ to %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Hoog</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4689,7 +4690,7 @@ to %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instant</translation>
     </message>
     <message>
       <source>Position</source>
@@ -4767,7 +4768,7 @@ to %1</translation>
     </message>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Space</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -4803,7 +4804,7 @@ to %1</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Apparaat</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -4957,7 +4958,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -4965,7 +4966,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Alle camera's &amp; apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -4973,7 +4974,7 @@ to %1</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -4999,11 +5000,11 @@ to %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sluiten</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informatie</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -5018,11 +5019,11 @@ to %1</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
@@ -5037,7 +5038,7 @@ to %1</translation>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Alle</translation>
     </message>
   </context>
   <context>
@@ -5059,7 +5060,7 @@ to %1</translation>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -5077,6 +5078,14 @@ to %1</translation>
       <source>Camera</source>
       <translation type="unfinished">Camera</translation>
     </message>
+    <message>
+      <source>Created</source>
+      <translation type="unfinished">Created</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation type="unfinished">Creator</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchLineEdit</name>
@@ -5089,11 +5098,11 @@ to %1</translation>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Elk apparaat</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Elke Camera</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -5158,24 +5167,6 @@ to %1</translation>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>%n additional</source>
       <translation type="unfinished">
@@ -5184,37 +5175,37 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation type="unfinished">User %1 has invalid Email address</translation>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
+      <source>%n of %1 users have invalid email address</source>
       <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
-      <source>Invalid Email address %1</source>
-      <translation type="unfinished">Invalid Email address %1</translation>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
+      <source>%n of %1 additional email addresses are invalid</source>
       <translation type="unfinished">
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
-      <source>Send Email to %1</source>
-      <translation type="unfinished">Send Email to %1</translation>
+      <source>Send email to %1</source>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adres</translation>
     </message>
   </context>
   <context>
@@ -5314,11 +5305,11 @@ to %1</translation>
     <name>QnServerUpdatesModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
   </context>
   <context>
@@ -5609,7 +5600,7 @@ to %1</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Deze actie kan niet ongedaan worden gemaakt.</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -5620,11 +5611,11 @@ to %1</translation>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automatisch</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -5636,11 +5627,11 @@ to %1</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Gebruiker</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5659,7 +5650,7 @@ to %1</translation>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5667,7 +5658,7 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -5746,6 +5737,43 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation type="unfinished">Role %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation type="unfinished">Selected roles have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation type="unfinished">User %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation type="unfinished">Selected users have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -5768,7 +5796,7 @@ to %1</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>ONBEVOEGD</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>
@@ -5819,19 +5847,19 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exporteer de geselecteerde gegevens naar bestand...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Selectie kopiëren naar Klembord</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Verversen</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -5970,7 +5998,7 @@ to %1</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Niet toegankelijk</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -5986,7 +6014,7 @@ to %1</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laden...</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -6060,13 +6088,6 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation type="unfinished">Select at least one user...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6078,7 +6099,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6184,33 +6205,42 @@ to %1</translation>
       <translation type="unfinished">Learn more</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation type="unfinished">Some users have not set their Email addresses</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation type="unfinished">Error while sending Email</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation type="unfinished">Some users have not set their Email addresses.</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation type="unfinished">System is running in safe mode.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
+      <source>Connect</source>
+      <translation type="unfinished">Connect</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your servers from anywhere</translation>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
-      <translation type="unfinished">You cannot receive System notifications by Email.</translation>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
     </message>
     <message>
-      <source>They cannot receive System notifications by Email.</source>
-      <translation type="unfinished">They cannot receive System notifications by Email.</translation>
+      <source>Some users have not set their email addresses</source>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses.</source>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
   </context>
   <context>
@@ -6251,7 +6281,7 @@ to %1</translation>
     <name>QnTimeServerSelectionModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Offset</source>
@@ -6259,7 +6289,7 @@ to %1</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Datum</translation>
     </message>
     <message>
       <source>Timezone</source>
@@ -6267,7 +6297,7 @@ to %1</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tijd</translation>
     </message>
   </context>
   <context>
@@ -6481,7 +6511,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Local user</source>
@@ -6493,7 +6523,7 @@ to %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6550,11 +6580,11 @@ to %1</translation>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6562,7 +6592,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
   </context>
   <context>
@@ -6614,7 +6644,7 @@ to %1</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Machtigingen</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6641,7 +6671,7 @@ to %1</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Machtigingen</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6657,7 +6687,7 @@ to %1</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nieuwe gebruiker...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
@@ -6684,15 +6714,15 @@ to %1</translation>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Lokaal</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6708,11 +6738,11 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -6720,7 +6750,7 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -6731,8 +6761,8 @@ to %1</translation>
       <translation type="unfinished">Passwords do not match.</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
-      <translation type="unfinished">Cloud user with specified Email already exists.</translation>
+      <source>Cloud user with specified email already exists.</source>
+      <translation type="unfinished">Cloud user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -6818,7 +6848,7 @@ to %1</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -6856,7 +6886,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -6882,7 +6912,7 @@ to %1</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Verbinden met server...</translation>
     </message>
     <message>
       <source>%1 in %2</source>
@@ -7076,10 +7106,6 @@ to %1</translation>
       <translation type="unfinished">Administrator Password</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation type="unfinished">Connecting to the current system...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
@@ -7100,16 +7126,24 @@ to %1</translation>
       <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation type="unfinished">Server connected to System</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation type="unfinished">Password cannot be empty.</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation type="unfinished">Cloud Systems cannot be merged</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation type="unfinished">Connecting to the current System...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>
@@ -7276,7 +7310,7 @@ to %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Nieuwe Video Wall...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -7384,20 +7418,12 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation type="unfinished">No user roles found</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation type="unfinished">Users</translation>
@@ -7405,6 +7431,10 @@ to %1</translation>
     <message>
       <source>Custom Users</source>
       <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
     </message>
   </context>
   <context>
@@ -7439,7 +7469,7 @@ to %1</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Volgende</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -7455,11 +7485,27 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
       <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
   </context>
   <context>
@@ -7661,6 +7707,21 @@ to %1</translation>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
     </message>
   </context>
   <context>

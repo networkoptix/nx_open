@@ -27,10 +27,10 @@ class ECConnectionNotificationManager;
 class TimeSynchronizationManager;
 
 class QnTransactionMessageBus:
-    public QnTransactionMessageBusBase
+    public TransactionMessageBusBase
 {
     Q_OBJECT;
-    using base_type = QnTransactionMessageBusBase;
+    using base_type = TransactionMessageBusBase;
 public:
     QnTransactionMessageBus(
         detail::QnDbManager* db,
@@ -126,10 +126,6 @@ public:
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
     virtual void dropConnections() override;
 signals:
-
-    //!Emitted on a new direct connection to a remote peer has been established
-    void newDirectConnectionEstablished(QnTransactionTransport* transport);
-
     void gotLockRequest(ApiLockData);
     //void gotUnlockRequest(ApiLockData);
     void gotLockResponse(ApiLockData);

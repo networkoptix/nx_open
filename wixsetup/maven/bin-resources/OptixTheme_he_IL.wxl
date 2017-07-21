@@ -54,13 +54,13 @@
   <String Id="InstallLicenseText">על ידי לחיצה על \"קבל והתקן\" אתה מסכים</String>
   <String Id="Options">אפשרויות</String>
   <String Id="SelectApps">בחר יישומים להתקנה:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">אין אפשרות להתחבר אל חומת האש של Windows. ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">קובע תצורה של חומת האש של Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">קובע תצורה של חומת האש של Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">מחזיר את תצורת חומת האש של Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">התקנת תצורת חומת האש של Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">מחזיר את תצורת חומת האש של Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">הסרת ההתקנה של תצורת חומת האש של Windows</String>
+  <String Id="Product_ArchMismatch_x86">חבילה זו מיועדת מערכת הפעלה 32 סיביות. ההתקנה תסתיים כעת.</String>
+  <String Id="Product_ArchMismatch_x64">חבילה זו מיועדת עבור מערכת הפעלה של 64 סיביות. ההתקנה תסתיים כעת.</String>
 </WixLocalization>

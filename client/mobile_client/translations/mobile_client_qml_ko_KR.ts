@@ -80,8 +80,8 @@
       <translation>로그인</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>잘못 된 전자 메일 또는 암호</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -281,6 +281,17 @@
     <message>
       <source>Connect</source>
       <translation>연결</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>

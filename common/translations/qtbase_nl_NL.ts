@@ -82,19 +82,19 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Naar links scrollen</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Naar rechts scrollen</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Naar boven scrollen</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Naar beneden scrollen</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
   </context>
   <context>
@@ -340,14 +340,14 @@ Press ESC to cancel</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Oké</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Size</source>
@@ -479,7 +479,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Open</translation>
     </message>
     <message>
       <source>Save As</source>
@@ -519,7 +519,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Verwijderen</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -565,7 +565,7 @@ Please verify the correct file name was given.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
@@ -628,7 +628,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -687,7 +687,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Naam</translation>
     </message>
     <message>
       <source>Size</source>
@@ -771,7 +771,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Onbekende fout</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
@@ -798,14 +798,14 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Onbekende fout</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Onbekende fout</translation>
     </message>
     <message>
       <source>Device is not set</source>
@@ -863,11 +863,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
   </context>
   <context>
@@ -882,22 +882,22 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Oké</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Help</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Oké</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Opslaan</translation>
     </message>
     <message>
       <source>Save All</source>
@@ -905,7 +905,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Open</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -937,11 +937,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sluiten</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuleren</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -949,7 +949,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Help</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -968,7 +968,7 @@ Do you want to delete it anyway?</translation>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuleren</translation>
     </message>
   </context>
   <context>
@@ -1005,7 +1005,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Bovenkant</translation>
     </message>
     <message>
       <source>Right edge</source>
@@ -1013,7 +1013,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Onderkant</translation>
     </message>
     <message>
       <source>Page left</source>
@@ -1127,11 +1127,11 @@ Do you want to delete it anyway?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Naar links scrollen</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Naar rechts scrollen</translation>
     </message>
   </context>
   <context>
@@ -1169,11 +1169,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
   </context>
 </TS>

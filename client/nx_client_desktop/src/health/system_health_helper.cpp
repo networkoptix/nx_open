@@ -1,11 +1,14 @@
 #include "system_health_helper.h"
 
-#include "business/actions/abstract_business_action.h"
+#include <nx/vms/event/actions/abstract_action.h>
 
+#include <helpers/cloud_url_helper.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
-
+#include <ui/style/helper.h>
 #include <utils/common/app_info.h>
+#include <utils/common/html.h>
+#include <watchers/cloud_status_watcher.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -18,13 +21,13 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::SmtpIsNotSet:
             return tr("Email server is not set");
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Some users have not set their Email addresses");
+            return tr("Some users have not set their email addresses");
         case QnSystemHealth::NoPrimaryTimeServer:
             return tr("Select server for others to synchronize time with");
         case QnSystemHealth::SystemIsReadOnly:
             return tr("System is in safe mode");
         case QnSystemHealth::EmailSendError:
-            return tr("Error while sending Email");
+            return tr("Error while sending email");
         case QnSystemHealth::StoragesAreFull:
             return tr("Storage is full");
         case QnSystemHealth::StoragesNotConfigured:
@@ -33,6 +36,14 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Rebuilding archive index is completed");
         case QnSystemHealth::ArchiveRebuildCanceled:
             return tr("Rebuilding archive index is canceled by user");
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+            return tr("Remote archive synchronization has been started");
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+            return tr("Remote archive synchronization has been finished");
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            return tr("Remote archive synchronization is in progress");
+        case QnSystemHealth::RemoteArchiveSyncError:
+            return tr("Error occured during remote archive synchronization");
         default:
             break;
     }
@@ -55,14 +66,32 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
 
         case QnSystemHealth::CloudPromo:
         {
-            const QString kLearnMoreText = tr("Learn more");
-            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(nx::network::AppInfo::cloudName());
+            const bool isLoggedIntoCloud =
+                qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
 
-            const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);
+            const QString kCloudNameText = lit("<b>%1</b>").arg(nx::network::AppInfo::cloudName());
+            const QString kMessage = isLoggedIntoCloud
+                ? tr("Connect your System to %1 &mdash; make it accessible from anywhere!",
+                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText)
+                : tr("Check out %1 &mdash; connect to your System from anywhere!",
+                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText);
 
-            const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a></p>");
-            return kTemplate.arg(kMessage, kLearnMoreText);
+            using nx::vms::utils::SystemUri;
+            QnCloudUrlHelper urlHelper(
+                SystemUri::ReferralSource::DesktopClient,
+                SystemUri::ReferralContext::None);
+
+            static const QString kTemplate = QString::fromLatin1(
+                "<style>td {padding-top: %4px; padding-right: %4px}</style>"
+                "<p>%1</p>"
+                "<table cellpadding='0' cellspacing='0'>"
+                "<tr><td>%2</td><td>%3</td></tr>"
+                "</table>");
+
+            return kTemplate.arg(kMessage)
+                .arg(makeHref(tr("Learn more"), urlHelper.aboutUrl()))
+                .arg(makeHref(tr("Connect"), lit("settings")))
+                .arg(style::Metrics::kStandardPadding);
         }
         default:
             break;
@@ -81,13 +110,13 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString();
 
         case QnSystemHealth::EmailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by Email.");
+            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");
             break;
         case QnSystemHealth::SmtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by Email.");
+            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by email.");
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive System notifications by Email.");
+            messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
             break;
         case QnSystemHealth::NoPrimaryTimeServer:
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");
@@ -109,6 +138,12 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::ArchiveRebuildCanceled:
             messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
+            break;
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+            messageParts << tr("Remote archive synchronization has been started for the following device:") << resourceName;
+            break;
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+            messageParts << tr("Remote archive synchronization has been finished for the following device:") << resourceName;
             break;
         default:
             break;

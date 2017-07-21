@@ -1,5 +1,7 @@
 #include "action_manager.h"
 
+#include <QtCore/QEvent>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
@@ -193,6 +195,18 @@ bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
     QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
     action->trigger();
     return true;
+}
+
+void Manager::triggerForced(IDType id, const Parameters& parameters)
+{
+    Action* action = m_actionById.value(id);
+    NX_EXPECT(action);
+    if (!action)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    action->trigger();
 }
 
 QMenu* Manager::integrateMenu(QMenu* menu, const Parameters& parameters)

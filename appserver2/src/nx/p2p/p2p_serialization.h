@@ -28,8 +28,8 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
 QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reservedSpaceAtFront = 1);
 QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success);
 
-QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records);
-UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& data, int* bytesRead);
+QByteArray serializeTransportHeader(const TransportHeader& records);
+TransportHeader deserializeTransportHeader(const QByteArray& data, int* bytesRead);
 
 QString toString(MessageType value);
 

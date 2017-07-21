@@ -158,17 +158,17 @@ public:
 
     virtual const ec2::ApiPeerData& localPeer() const override;
     virtual const ec2::ApiPeerData& remotePeer() const override;
-    QUrl remoteAddr() const;
+    virtual QUrl remoteAddr() const override;
     SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
 
-    nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
+    virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
     // This is multi thread getters/setters
     void setState(State state);
     State getState() const;
 
-    bool isIncoming() const;
+    virtual bool isIncoming() const override;
 
     void setRemoteIdentityTime(qint64 time);
     qint64 remoteIdentityTime() const;

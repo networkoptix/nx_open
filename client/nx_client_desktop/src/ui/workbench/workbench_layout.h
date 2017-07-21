@@ -206,10 +206,10 @@ public:
     QSet<QnWorkbenchItem*> items(const QList<QRect>& regions) const;
 
     /**
-     * @param resourceUniqueId Resource unique id.
-     * @return Set of items that have the given resource unique id.
+     * @param resource Resource.
+     * @return Set of items that have the given resource.
      */
-    const QSet<QnWorkbenchItem*>& items(const QString& resourceUniqueId) const;
+    const QSet<QnWorkbenchItem*>& items(const QnResourcePtr& resource) const;
 
     /**
      * @return All items of this model.
@@ -250,7 +250,7 @@ public:
      * @return Spacing between cells of this layout,
      * relative to cell size.
      */
-    const qreal cellSpacing() const;
+    qreal cellSpacing() const;
 
     /**
      * @param cellSpacing New spacing between cells for this layout,
@@ -424,8 +424,8 @@ private:
     /** Current bounding rectangle. */
     QRect m_boundingRect;
 
-    /** Map from resource unique id to a set of items. */
-    QHash<QString, QSet<QnWorkbenchItem*> > m_itemsByUid;
+    /** Map from resource to a set of items. */
+    QHash<QnResourcePtr, QSet<QnWorkbenchItem*>> m_itemsByResource;
 
     /** Aspect ratio of a single cell. */
     float m_cellAspectRatio;

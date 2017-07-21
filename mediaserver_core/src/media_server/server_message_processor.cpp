@@ -15,8 +15,8 @@
 #include <nx/utils/log/log.h>
 
 #include "serverutil.h"
-#include "transaction/transaction_message_bus_base.h"
-#include "business/business_message_bus.h"
+#include <transaction/message_bus_adapter.h>
+#include <nx/mediaserver/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
@@ -30,6 +30,7 @@
 #include <nx/network/http/custom_headers.h>
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
+#include "nx_ec/ec_api.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -150,7 +151,7 @@ void QnServerMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType pe
     QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res) {
         res->setStatus(Qn::Offline);
-        if (peerType != Qn::PT_Server) 
+        if (peerType != Qn::PT_Server)
         {
             // This server hasn't own DB
             for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))
@@ -213,8 +214,8 @@ void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpLi
     m_universalTcpListener = tcpListener;
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
-    qnBusinessMessageBus->at_actionReceived(action);
+void QnServerMessageProcessor::execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& action) {
+    qnEventMessageBus->at_actionReceived(action);
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {

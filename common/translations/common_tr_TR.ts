@@ -84,466 +84,11 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>Yer İmi</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>Panik Kaydı</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>Günlüğe Yaz</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>Bildirimi Göster</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>Sesi Tekrarla</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>Sesi Oynat</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>Konuş</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>Depolama Alanı Yetersiz</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Ağ Sorunu</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Sunucu Hatası</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Sunucu Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Sunucu Başlatıldı</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Lisans Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Herhangi Bir Sunucu Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Herhangi Bir Durum</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>%1 Üzerinde Tanımlanamayan Bir Durum Oluştu</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1 Giriş Üzerinde</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1 Hareket Üzerinde</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>%1 Depolama Yetersizliği</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 Ağ Sorunu</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>Durum: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>Kaynak: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Gerekçe: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Conflicting Server#%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Zaman: %2 üzerinde %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
-        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP Veri Kaybı Algılandı. prev seq.=%1 next seq.=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP Veri Kaybı Algılandı.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>%1 Üzerinde I/O Hatası Meydana Geldi.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1 'i Kaydetmek İçin Yeterli HDD/SSD Hızı Yok.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Çakışan Sunucu: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>başlat</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>durdur</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 Sürdürülüyor</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 Üzerinde %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>Bilinmeyen Bir Durum Oluştu</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Sunucuyla Bağlantı Kayboldu.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
-        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Genel Durum</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>Başlık: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kamerayla Bağlantı (birincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>Aygıt Çıkışı</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>Kamera Çıkışı</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>Aygıt Kaydı</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>Kamera Kaydı</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Herhangi Bir Aygıt Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Herhangi Bir Kamera Sorunu</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>%1 Aygıt Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>%1 Kamera Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1 Aygıt IP Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1 Kamera IP Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Aygıtla Bağlantı Beklenmedik Bir Şekilde Kapandı.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ Ön Ayarını Uygula</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>Metin Şablonunu Göster</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Alarm Düzenini Göster</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>Arşiv Yedeklemesi Bitti</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>%1 Genel Durum</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>Port Girişi: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>Arşiv Yedeklemesi Başarıyla Tamamlandı</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>%1 I/O Modül Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Çakışan Adres: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>Arşiv Yedeklemesi Başarısız Oldu: Yeterli Boş Alan ile Yedekleme Depolama Alanı Bulunmuyor</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Depolama Alanı Hatası</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>Arşiv Yedeklemesi Başarısız Oldu: Kaynak Dosya Açma/Okuma Hatası</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Dosya Oluşturma/Yazma Hatası</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>Arşiv Yedeklemesi Başarısız Oldu: Dosya Liste Hatası</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>Arşiv Yedeklemesi Kullanıcı Tarafından İptal Edildi. Veri %1'e kadar Yedeklendi</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP isteği</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Aygıt ağ isteklerine yanıt vermiyor.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Sunucu beklenmedik biçimde durdu.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki kameralar için devre dışı bırakılacaktır:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki I/O cihazları için devre dışı bırakılacaktır:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Haraket olan kamera</numerusform>
-        <numerusform>Haraket olan kamera</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Cihazda giriş sinyali</numerusform>
-        <numerusform>Cihazlarda giriş sinyali</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Kamerada giriş sinyali</numerusform>
-        <numerusform>Kameralarda giriş sinyali</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Aygıt bağlantısı kesildi</numerusform>
-        <numerusform>Aygıt bağlantısı kesildi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kamera bağlantısı kesildi</numerusform>
-        <numerusform>Kameraların bağlantısı kesildi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Cihazda IP çakışması</numerusform>
-        <numerusform>Cihazlarda IP çakışması</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Kamera IP çakışması</numerusform>
-        <numerusform>Kameralarda IP çakışması</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>Arşiv yedeği tamamlandı. Fakat süre bittiğinden tam bitirilemedi. Data %1 e yedeklendi</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>E-Posta Gönder</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
@@ -874,7 +419,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Başla</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -949,22 +494,6 @@
         <numerusform>%1 Arasından %2 %n Kullanılacak.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>Girdiğiniz Lisans Anahtarı Geçersiz. Lütfen Girdiğiniz Lisans Anahtarını Kontrol Ediniz. Sorun Devam Ederse Lisans Anahtarının Geçerli Olup Olmadığını Doğrulamak veya Geçerli Bir Lisans Anahtarı Edinmek İçin Lütfen Destek Birimiyle İletişime Geçiniz.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Yazılımınızla Uyuşmayan Bir Lisans Etkinleştirmeye Çalışıyorsunuz. Geçerli Bir Lisans Anahtarı Edinmek İçin LÜtfen Destek Birimiyle İletişime Geçin.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Lisans Anahtarınızı Etkinleştirirken Bir Sorun Oluştu. Bir Veri Tabanı Hatası Meydana Geldi.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Lisans Anahtarınızı Etkinleştirirken Bir Sorun Oluştu. Geçersiz Veri Alındı. Lütfen Sorunu Bildirmek İçin Destek Birimiyle İletişime Geçin.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -979,21 +508,12 @@
         <numerusform>%n lisansın %1 tanesi kullanılacak.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>Bu %1 hardware ID daha önce %2 üzerine kaydedilmiş. Lütfen destek birimiyle iletişim kurun.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>Geçersiz imza</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -1018,6 +538,10 @@
     <message>
       <source>Unknown error</source>
       <translation>Bilinmeyen Hata</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -1135,16 +659,16 @@
       <translation>ÜCRETSİZ Lisans</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Lisans sahibi: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1500,6 +1024,477 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir. Ve kullanıcıları yönetebilir.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>Yer İmi</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>Panik Kaydı</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>Günlüğe Yaz</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>Bildirimi Göster</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>Sesi Tekrarla</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>Sesi Oynat</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>Konuş</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>PTZ Ön Ayarını Uygula</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>Metin Şablonunu Göster</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Alarm Düzenini Göster</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>HTTP isteği</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>Aygıt Çıkışı</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>Kamera Çıkışı</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>Aygıt Kaydı</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>Kamera Kaydı</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Genel olay</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>Haraket olan kamera</numerusform>
+        <numerusform>Haraket olan kamera</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>Depolama Alanı Yetersiz</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>Ağ Sorunu</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>Sunucu Hatası</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>Sunucu Uyuşmazlığı</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>Sunucu Başlatıldı</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>Lisans Sorunu</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>Arşiv Yedeklemesi Bitti</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>Herhangi Bir Sunucu Sorunu</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>Herhangi Bir Durum</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>Cihazlarda giriş sinyali</numerusform>
+        <numerusform>Cihazlarda giriş sinyali</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>Kameralarda giriş sinyali</numerusform>
+        <numerusform>Kameralarda giriş sinyali</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>Aygıt bağlantısı kesildi</numerusform>
+        <numerusform>Aygıt bağlantısı kesildi</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>Kameraların bağlantısı kesildi</numerusform>
+        <numerusform>Kameraların bağlantısı kesildi</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>Cihazlarda IP çakışması</numerusform>
+        <numerusform>Cihazlarda IP çakışması</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>Kameralarda IP çakışması</numerusform>
+        <numerusform>Kameralarda IP çakışması</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>Herhangi Bir Aygıt Sorunu</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>Herhangi Bir Kamera Sorunu</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>%1 Üzerinde Tanımlanamayan Bir Durum Oluştu</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>%1 Aygıt Bağlantısı Kesildi</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>%1 Kamera Bağlantısı Kesildi</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>%1 I/O Modül Bağlantısı Kesildi</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>%1 Giriş Üzerinde</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>%1 Hareket Üzerinde</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>%1 Depolama Yetersizliği</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>%1 Ağ Sorunu</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1 Aygıt IP Uyuşmazlığı</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1 Kamera IP Uyuşmazlığı</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>%1 Genel Durum</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>Bilinmeyen Bir Durum Oluştu</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>Durum: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Kaynak: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Başlık: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>Port Girişi: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Gerekçe: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>Çakışan Adres: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>Conflicting Server#%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>Çakışan Sunucu: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Zaman: %2 üzerinde %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
+        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
+        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Aygıtla Bağlantı Beklenmedik Bir Şekilde Kapandı.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Kamerayla Bağlantı (birincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP Veri Kaybı Algılandı. prev seq.=%1 next seq.=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP Veri Kaybı Algılandı.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Aygıt ağ isteklerine yanıt vermiyor.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Sunucuyla Bağlantı Kayboldu.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Sunucu beklenmedik biçimde durdu.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>%1 Üzerinde I/O Hatası Meydana Geldi.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>%1 'i Kaydetmek İçin Yeterli HDD/SSD Hızı Yok.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Yeterli Boş Alan ile Yedekleme Depolama Alanı Bulunmuyor</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Depolama Alanı Hatası</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Kaynak Dosya Açma/Okuma Hatası</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Hedef Dosya Oluşturma/Yazma Hatası</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>Arşiv Yedeklemesi Başarısız Oldu: Dosya Liste Hatası</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>Arşiv yedeği tamamlandı. Fakat süre bittiğinden tam bitirilemedi. Data %1 e yedeklendi</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>Arşiv Yedeklemesi Başarıyla Tamamlandı</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>Arşiv Yedeklemesi Kullanıcı Tarafından İptal Edildi. Veri %1'e kadar Yedeklendi</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki kameralar için devre dışı bırakılacaktır:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>Yeteri kadar lisans yok. Kayıt aşağıdaki I/O cihazları için devre dışı bırakılacaktır:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>başlat</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>durdur</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>%1 Sürdürülüyor</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>%1 Üzerinde %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Yetki</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n kullanıcı</numerusform>
+        <numerusform>%n kullanıcı</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n Rolleri</numerusform>
+        <numerusform>%n Rolleri</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tüm Kullanıcılar</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>En az bir kullanıcı seçin</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

@@ -8,14 +8,15 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/common/indents.h>
-#include <ui/style/custom_style.h>
+#include <ui/style/helper.h>
 #include <ui/style/globals.h>
+#include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
+#include <nx/client/desktop/ui/common/item_view_utils.h>
 #include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
 
 namespace nx {
@@ -32,9 +33,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
-
-    m_roles->setCheckable(true);
-    m_roles->setPredefinedRoleIdsEnabled(true);
+    ui->nothingFoundLabel->setHidden(true);
 
     auto filterRoles = new QSortFilterProxyModel(m_roles);
     filterRoles->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -71,7 +70,13 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    // TODO: #vkutin Space single- and batch-toggle! Click-entire-line toggle! Shift-click toggle!
+    ui->allUsersCheckableLine->setUserCheckable(false); //< Entire row clicks are handled instead.
+
+    ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
+        CheckableLineWidget::CheckColumn);
+
+    ItemViewUtils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
         [this](QnTreeView* treeView)
@@ -97,20 +102,22 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connect(ui->showAllUsers, &QPushButton::toggled,
         this, &SubjectSelectionDialog::showAllUsersChanged);
 
-    const auto updateFilterText =
+    const auto updateFilter =
         [this, filterRoles]()
         {
-            m_users->setFilterFixedString(ui->searchLineEdit->text());
-            filterRoles->setFilterFixedString(ui->searchLineEdit->text());
+            const auto filter = ui->searchLineEdit->text().trimmed();
+            m_users->setFilterFixedString(filter);
+            filterRoles->setFilterFixedString(filter);
+            ui->allUsersCheckableLine->setVisible(filter.isEmpty());
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
     connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
-        [this, updateFilterText]()
+        [this, updateFilter]()
         {
             ui->searchLineEdit->clear();
-            updateFilterText();
+            updateFilter();
         });
 
     const auto connectToModelChanges =
@@ -129,11 +136,37 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connectToModelChanges(m_users);
     connectToModelChanges(m_roles);
 
+    const auto updateVisibility =
+        [this]()
+        {
+            const bool noRoles = !ui->rolesTreeView->model()->rowCount();
+            const bool noUsers = !ui->usersTreeView->model()->rowCount();
+            ui->rolesGroupBox->setHidden(noRoles);
+            ui->usersGroupBox->setHidden(noUsers);
+            ui->nothingFoundLabel->setVisible(noRoles && noUsers);
+        };
+
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+
+    // Customized top margin for panel content:
+    static constexpr int kContentTopMargin = 8;
+    QnNxStyle::setGroupBoxContentTopMargin(ui->usersGroupBox, kContentTopMargin);
+    QnNxStyle::setGroupBoxContentTopMargin(ui->rolesGroupBox, kContentTopMargin);
+
     ui->allUsersCheckableLine->setText(tr("All Users"));
     setupTreeView(ui->allUsersCheckableLine->view());
 
-    auto allUsersDelegate = new UserListDelegate(this);
+    auto allUsersDelegate = new QnResourceItemDelegate(this);
     allUsersDelegate->setCheckBoxColumn(CheckableLineWidget::CheckColumn);
+    allUsersDelegate->setOptions(
+        QnResourceItemDelegate::HighlightChecked
+      | QnResourceItemDelegate::ValidateOnlyChecked);
+
     ui->allUsersCheckableLine->view()->setItemDelegate(allUsersDelegate);
 
     const auto allUsersCheckStateChanged =
@@ -142,6 +175,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             const bool checked = checkState == Qt::Checked;
             ui->rolesGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
+            ui->searchLineEdit->setEnabled(!checked);
+            if (checked)
+                ui->searchLineEdit->clear();
             m_roles->setAllUsers(checked);
             m_users->setAllUsers(checked);
             emit changed();
@@ -152,9 +188,6 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
 
     allUsersCheckStateChanged(ui->allUsersCheckableLine->checkState());
     validateAllUsers();
-
-    QnItemViewAutoHider::create(ui->rolesTreeView, tr("No user roles found"));
-    QnItemViewAutoHider::create(ui->usersTreeView, tr("No users found"));
 }
 
 SubjectSelectionDialog::~SubjectSelectionDialog()
@@ -189,9 +222,14 @@ void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
     validateAllUsers();
 }
 
+void SubjectSelectionDialog::setRoleValidator(Qn::RoleValidator roleValidator)
+{
+    m_roles->setRoleValidator(roleValidator);
+}
+
 void SubjectSelectionDialog::validateAllUsers()
 {
-    auto validationState = m_roles->validateUsers(
+    const auto validationState = m_roles->validateUsers(
         resourceAccessSubjectsCache()->allSubjects());
 
     QIcon icon = (validationState == QValidator::Acceptable
@@ -199,7 +237,9 @@ void SubjectSelectionDialog::validateAllUsers()
         : qnSkin->icon(lit("tree/users_alert.png")));
 
     ui->allUsersCheckableLine->setIcon(icon);
-    ui->allUsersCheckableLine->setData(validationState, Qn::ValidationStateRole);
+
+    ui->allUsersCheckableLine->setData(qVariantFromValue(validationState),
+        Qn::ValidationStateRole);
 }
 
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)

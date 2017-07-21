@@ -86,6 +86,7 @@ namespace ec2 {
     struct ApiMiscData;
     typedef std::vector<ApiMiscData> ApiMiscDataList;
     struct ApiPeerSystemTimeData;
+    struct ApiPeerSyncTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
@@ -96,6 +97,8 @@ namespace ec2 {
     struct ApiDatabaseDumpToFileData;
     struct ApiLicenseOverflowData;
     struct ApiCleanupDatabaseData;
+
+    struct ApiP2pStatisticsData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
@@ -171,6 +174,7 @@ namespace ec2 {
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
     (ApiPeerSystemTimeData)\
+    (ApiPeerSyncTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiReverseConnectionData)\
@@ -223,6 +227,7 @@ namespace ec2 {
     (ApiCleanupDatabaseData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
+    (ApiP2pStatisticsData)\
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,

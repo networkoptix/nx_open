@@ -5,7 +5,7 @@
 #include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include <transaction/binary_transaction_serializer.h>
@@ -13,7 +13,7 @@
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
 #include "utils/common/threadqueue.h"
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 
@@ -25,7 +25,7 @@ namespace detail {
 
 struct ServerQueryProcessorAccess
 {
-    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBusBase* messageBus) :
+    ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusAdapter* messageBus):
         m_db(db),
         m_messageBus(messageBus)
     {
@@ -34,13 +34,13 @@ struct ServerQueryProcessorAccess
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
-    QnTransactionMessageBusBase* messageBus() { return m_messageBus; }
+    TransactionMessageBusAdapter* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
 private:
     detail::QnDbManager* m_db;
-    QnTransactionMessageBusBase* m_messageBus;
+    TransactionMessageBusAdapter* m_messageBus;
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
 };
@@ -122,7 +122,7 @@ struct PostProcessTransactionFunction
 {
     template<class T>
     void operator()(
-        QnTransactionMessageBusBase* messageBus,
+        TransactionMessageBusAdapter* messageBus,
         const aux::AuditData& auditData,
         const QnTransaction<T>& tran) const;
 };
@@ -228,6 +228,19 @@ public:
         NX_ASSERT(tran.command == ApiCommand::saveLayouts);
         return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(
             tran, handler, ApiCommand::saveLayout);
+    }
+
+    /**
+    * Execute transaction.
+    * Transaction executed locally and broadcast through the whole cluster.
+    * @param handler Called upon request completion. Functor(ErrorCode).
+    */
+    template<class HandlerType>
+    void processUpdateAsync(QnTransaction<ApiUserDataList>& tran, HandlerType handler)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveUsers);
+        return processMultiUpdateAsync<ApiUserDataList, ApiUserData>(
+            tran, handler, ApiCommand::saveUser);
     }
 
     /**
@@ -786,11 +799,11 @@ private:
 
 template<class T>
 void PostProcessTransactionFunction::operator()(
-    QnTransactionMessageBusBase* messageBus,
+    TransactionMessageBusAdapter* messageBus,
     const aux::AuditData& auditData,
     const QnTransaction<T>& tran) const
 {
-    sendTransaction(messageBus, tran);
+    messageBus->sendTransaction(tran);
     aux::triggerNotification(auditData, tran);
 }
 

@@ -80,7 +80,7 @@
       <translation>התחבר</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
+      <source>Incorrect email or password</source>
       <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
@@ -281,6 +281,17 @@
     <message>
       <source>Connect</source>
       <translation>חיבור</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation>הקש על התמונה כדי למקם את המצלמה</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation>ביטול</translation>
     </message>
   </context>
   <context>

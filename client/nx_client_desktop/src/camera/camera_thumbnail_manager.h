@@ -16,6 +16,7 @@
 
 #include <nx/utils/uuid.h>
 
+//TODO: #GDM create an application-wide set of thumbnails managers with different options: VMS-6759
 class QnCameraThumbnailManager: public QnImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
@@ -27,6 +28,9 @@ public:
 
     QnVirtualCameraResourcePtr selectedCamera() const;
     void selectCamera(const QnVirtualCameraResourcePtr& camera);
+
+    bool autoRotate() const;
+    void setAutoRotate(bool value);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
@@ -72,4 +76,5 @@ private:
     QnVirtualCameraResourcePtr m_selectedCamera;
     QSize m_thumbnailSize;
     QTimer* m_refreshingTimer;
+    bool m_autoRotate = true;
 };

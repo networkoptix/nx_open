@@ -84,466 +84,11 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>Marcador</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>Grabación de pánico</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>Escribir al registro</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>Mostrar notificación</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>Repetir sonido</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>Reproducir sonido</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>Habla</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>Fallo de Almacenamiento</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Problema de red</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Falla en el servidor</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Conflicto del servidor</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Servidor a iniciado</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Problema de licensia</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Cualquier problema del servidor</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Cualquier evento</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Evento indefinido ha ocurrido en %1</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Entrada en %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Movimiento en %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Fallo de Almacenamiento en%1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>Problema de red en %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>Evento: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>Fuente: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Razón: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Conflicto de servidor #%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Tiempo: %1 en %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
-        <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>La pérdida del paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>La pérdida del paquete RTP detectado.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>Error de I/O ha ocurrido en %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>No hay suficiente velocidad HDD/SSD para la grabación a %1.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Conflicto de servidor: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>comenzar</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>parar</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>Mientras %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>En %1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>Ha ocurrido un evento desconocido</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Ha perdido la conexión con el servidor.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>No hay datos recibidos durante los últimos %n segundos.</numerusform>
-        <numerusform>No hay datos recibidos durante los últimos %n segundos.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>Evento genérico</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>Título: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Conexión para cámara (corriente primaria) fue cerrado inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Conexión para cámara (corriente secundaria) fue cerrado inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>Salida de dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>Salida de la cámara</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>Grabación del dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>Grabación de la cámara</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Cualquier problema de dispositivo</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Cualquier problema de la cámara</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Se desconectó el dispositivo %1</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Se desconectó la cámara %1</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>Conflicto IP del dispositivo en %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>Conflicto IP de la Cámara %1</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Conexión al dispositivo se cerró inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>Ejecutar PTZ preestablecido</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>Mostrar texto superpuesto</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Mostrar disposición de alarma</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>Archivo de copia de seguridad a acabado</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>Evento genérico %1</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>Puerto de entrada: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>Copia de seguridad del archivo es completado con éxito</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>Módulo I / O %1 se desconecto</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Conflicto de dirección: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>Archivo de copia de seguridad ha fallado: No hay depósitos de copia de seguridad disponibles con suficiente espacio libre</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>Archivo de copia de seguridad ha fallado: fallo de almacenamiento de destino</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo fuente abierta / error de lectura</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo de destino crear error / escritura</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo de error catálogo</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian al %1</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>Haga solicitud de HTTP</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Dispositivo no responde a las solicitudes de red.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Servidor se detiene inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>No hay suficientes licencias. Grabación está desactivada en los siguientes dispositivos:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>No hay suficientes licencias. Grabación está desactivada en las siguientes cámaras:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>No hay suficientes licencias. Grabación se ha desactivado en los módulos de E/S siguientes:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Movimiento en las cámaras</numerusform>
-        <numerusform>Movimiento en las cámaras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Señal de entrada en dispositivos</numerusform>
-        <numerusform>Señal de entrada en dispositivos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Señal de entrada en las cámaras</numerusform>
-        <numerusform>Señal de entrada en las cámaras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Dispositivos desconectados</numerusform>
-        <numerusform>Dispositivos desconectados</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Cámaras desconectadas</numerusform>
-        <numerusform>Cámaras desconectadas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Conflicto de dispositivos IP</numerusform>
-        <numerusform>Conflicto de dispositivos IP</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Conflicto de IP cámaras</numerusform>
-        <numerusform>Conflicto de IP cámaras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>Backup de archivo terminado, pero no totalmente completa porque el tiempo de copia de seguridad. Se copiarán los datos a %1</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>Enviar correo electrónico</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
@@ -949,22 +494,6 @@
         <numerusform>%n %2 se utilizarán de %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>Hubo un problema al activar su clave de licencia. Se produjo un error de base de datos.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>Hubo un problema de activación de su clave de licencia. Se recibieron datos inválidos. Por favor, póngase en contacto con el equipo de apoyo para informar sobre el problema.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -979,21 +508,12 @@
         <numerusform>%n más %1 se utilizará.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>Esta clave de licencia se ha activado previamente en ID de hardware %1 en %2. Póngase en contacto con el equipo de soporte técnico para obtener una clave de licencia válida.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>Firma no válida</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Servidor con correspondencia a hardware ID no encontrado</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -1018,6 +538,10 @@
     <message>
       <source>Unknown error</source>
       <translation>Error desconocido</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -1135,16 +659,16 @@
       <translation>Licencia GRATIS</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>ID de hardware: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>Licenciado a: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>Filigrana: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1500,6 +1024,477 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Tiene acceso a todo el Sistema y puede manejarlo. Puede crear usuarios.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>Marcador</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>Grabación de pánico</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>Escribir al registro</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>Mostrar notificación</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>Repetir sonido</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>Reproducir sonido</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>Habla</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>Ejecutar PTZ preestablecido</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>Mostrar texto superpuesto</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Mostrar disposición de alarma</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>Haga solicitud de HTTP</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>Salida de dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>Salida de la cámara</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>Grabación del dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>Grabación de la cámara</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Evento genérico</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>Movimiento en las cámaras</numerusform>
+        <numerusform>Movimiento en las cámaras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>Fallo de Almacenamiento</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>Problema de red</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>Falla en el servidor</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>Conflicto del servidor</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>Servidor a iniciado</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>Problema de licensia</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>Archivo de copia de seguridad a acabado</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>Cualquier problema del servidor</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>Cualquier evento</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>Señal de entrada en dispositivos</numerusform>
+        <numerusform>Señal de entrada en dispositivos</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>Señal de entrada en las cámaras</numerusform>
+        <numerusform>Señal de entrada en las cámaras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>Dispositivos desconectados</numerusform>
+        <numerusform>Dispositivos desconectados</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>Cámaras desconectadas</numerusform>
+        <numerusform>Cámaras desconectadas</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>Conflicto de dispositivos IP</numerusform>
+        <numerusform>Conflicto de dispositivos IP</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>Conflicto de IP cámaras</numerusform>
+        <numerusform>Conflicto de IP cámaras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>Cualquier problema de dispositivo</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>Cualquier problema de la cámara</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>Evento indefinido ha ocurrido en %1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>Se desconectó el dispositivo %1</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>Se desconectó la cámara %1</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>Módulo I / O %1 se desconecto</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>Entrada en %1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>Movimiento en %1</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>Fallo de Almacenamiento en%1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>Problema de red en %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Conflicto IP del dispositivo en %1</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Conflicto IP de la Cámara %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>Evento genérico %1</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>Ha ocurrido un evento desconocido</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>Evento: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Fuente: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Título: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>Puerto de entrada: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Razón: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>Conflicto de dirección: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>Conflicto de servidor #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>Conflicto de servidor: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Tiempo: %1 en %2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
+        <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>No hay datos recibidos durante los últimos %n segundos.</numerusform>
+        <numerusform>No hay datos recibidos durante los últimos %n segundos.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Conexión al dispositivo se cerró inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Conexión para cámara (corriente primaria) fue cerrado inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Conexión para cámara (corriente secundaria) fue cerrado inesperadamente.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>La pérdida del paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>La pérdida del paquete RTP detectado.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Dispositivo no responde a las solicitudes de red.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Ha perdido la conexión con el servidor.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Servidor se detiene inesperadamente.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Error de I/O ha ocurrido en %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>No hay suficiente velocidad HDD/SSD para la grabación a %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>Archivo de copia de seguridad ha fallado: No hay depósitos de copia de seguridad disponibles con suficiente espacio libre</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>Archivo de copia de seguridad ha fallado: fallo de almacenamiento de destino</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>Archivo de copia de seguridad ha fallado: Archivo fuente abierta / error de lectura</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>Archivo de copia de seguridad ha fallado: Archivo de destino crear error / escritura</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>Archivo de copia de seguridad ha fallado: Archivo de error catálogo</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>Backup de archivo terminado, pero no totalmente completa porque el tiempo de copia de seguridad. Se copiarán los datos a %1</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>Copia de seguridad del archivo es completado con éxito</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian al %1</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>No hay suficientes licencias. Grabación está desactivada en los siguientes dispositivos:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>No hay suficientes licencias. Grabación está desactivada en las siguientes cámaras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>No hay suficientes licencias. Grabación se ha desactivado en los módulos de E/S siguientes:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>comenzar</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>parar</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>Mientras %1</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>En %1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Todos Los Usuarios</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Seleccione al menos un usuario</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

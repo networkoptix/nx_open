@@ -19,6 +19,9 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/vms/event/actions/common_action.h>
+
+#include <utils/common/synctime.h>
 
 namespace
 {
@@ -27,6 +30,7 @@ namespace
         QString(),
         "tags",
         "add",
+        "acknowledge",
         "update",
         "delete",
     };
@@ -245,10 +249,38 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
 
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     QnCommonModule* /*commonModule*/,
-    QnUpdateBookmarkRequestContext &context)
+    QnUpdateBookmarkRequestContext &context,
+    const QnUuid& authorityUser)
 {
     /* This request always executed locally. */
-    return qnServerDb->addBookmark(context.request().bookmark);
+
+    auto bookmark = context.request().bookmark;
+    bookmark.creatorId = authorityUser;
+    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    if (!qnServerDb->addBookmark(bookmark))
+        return false;
+
+    if (context.request().businessRuleId.isNull())
+        return true;
+
+    nx::vms::event::EventParameters runtimeParams;
+    runtimeParams.eventResourceId = bookmark.cameraId;
+    runtimeParams.eventTimestampUsec = bookmark.startTimeMs * 1000;
+    runtimeParams.eventType = context.request().eventType;
+
+    const auto action = nx::vms::event::CommonAction::create(
+        nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
+
+    action->setRuleId(context.request().businessRuleId);
+
+    auto& actionParams = action->getParams();
+    actionParams.actionResourceId = authorityUser;
+    actionParams.text = bookmark.description;
+
+    qnServerDb->saveActionToDB(action);
+
+    return true;
 }
 
 bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(

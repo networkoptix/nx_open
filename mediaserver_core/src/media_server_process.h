@@ -6,7 +6,7 @@
 #include <QtCore/QStringList>
 
 #include <api/common_message_processor.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <server/server_globals.h>
 
@@ -46,10 +46,7 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
-    QString exceptionFilters;
-
-    // Log level of http requests log.
-    QString msgLogLevel;
+    QString httpLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 
@@ -131,10 +128,10 @@ private slots:
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
-    void at_storageManager_storageFailure(
-        const QnResourcePtr& storage, QnBusiness::EventReason reason);
+    void at_storageManager_storageFailure(const QnResourcePtr& storage,
+        nx::vms::event::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
-    void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
+    void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::event::EventReason code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
@@ -156,14 +153,14 @@ private:
     void registerRestHandlers(
         CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
-        ec2::QnTransactionMessageBusBase* messageBus);
+        ec2::TransactionMessageBusAdapter* messageBus);
 
     template<class TcpConnectionProcessor, typename... ExtraParam>
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
-        ec2::QnTransactionMessageBusBase* messageBus);
+        ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();

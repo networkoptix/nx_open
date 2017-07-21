@@ -37,7 +37,7 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    set(project.version.name "${releaseVersion}")
+    set(project.version.name "${mobileClientVersion}")
     set(project.version.code "${buildNumber}")
 
     file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -53,7 +53,7 @@ if(ANDROID)
     get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
 
     add_android_apk(mobile_client.apk TARGET mobile_client
-        APK_NAME "${client_distribution_name}.apk"
+        APK_NAME "${mobile_client_distribution_name}.apk"
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
@@ -61,5 +61,39 @@ if(ANDROID)
         KEYSTORE_ALIAS "hdwitness"
         KEYSTORE_PASSWORD "hYCmvTDu"
         KEYSTORE_KEY_PASSWORD "31O2zNNy"
+    )
+endif()
+
+if(IOS)
+    configure_file("maven/filter-resources/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
+
+    set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
+
+    if(beta)
+        configure_file("maven/filter-resources/mobile_client-beta.entitlements"
+            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+        set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
+    else()
+        configure_file("maven/filter-resources/mobile_client-release.entitlements"
+            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+        set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
+    endif()
+
+    execute_process(
+        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/shell/get_provisioning_id.sh" "${provisioning_profile}"
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE provisioning_profile_id
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
+    endif()
+
+    set_target_properties(mobile_client PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+        XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
     )
 endif()

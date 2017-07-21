@@ -590,7 +590,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly)
     if (readOnly)
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, false);
 
-    //TODO: #vkutin #GDM Read-only for Fisheye tab
+    // TODO: #vkutin #GDM Read-only for Fisheye tab
 
     m_readOnly = readOnly;
 }

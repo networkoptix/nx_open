@@ -64,7 +64,7 @@ public:
 
     QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
 
-    //TODO: #vkutin Shouldn't be public
+    // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
 
@@ -104,6 +104,8 @@ private:
 
     void handlePermissionsChanged(const QnResourcePtr& resource);
 
+    void updateSystemHasManyServers();
+
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -130,7 +132,7 @@ private:
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
     /** Mapping for resource nodes by resource. */
-    //TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
+    // TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
     QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_resourceNodeByResource;
 
     /** Mapping for recorder nodes by parent node. */
@@ -150,6 +152,8 @@ private:
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;
+
+    bool m_systemHasManyServers = false;
 
     /** Node managers. */
     //TODO: Make them registerable by type.

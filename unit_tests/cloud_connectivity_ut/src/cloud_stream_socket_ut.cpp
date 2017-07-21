@@ -8,6 +8,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/test_outgoing_tunnel.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
@@ -103,14 +104,12 @@ TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
         SocketAddress(testHost));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class CloudStreamSocketTest:
     public ::testing::Test
 {
 public:
-    CloudStreamSocketTest()
-    {
-    }
-
     ~CloudStreamSocketTest()
     {
         if (m_oldCreateStreamSocketFunc)
@@ -319,9 +318,13 @@ TEST_F(CloudStreamSocketTest, cancellation)
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class CloudStreamSocketCancellation:
     public CloudStreamSocketTest
 {
+    using base_type = CloudStreamSocketTest;
+
 public:
     enum class SocketState
     {
@@ -330,27 +333,11 @@ public:
         closed,
     };
 
-    CloudStreamSocketCancellation()
-    {
-        init();
-    }
-
-    ~CloudStreamSocketCancellation()
-    {
-        m_tcpServer->pleaseStopSync();
-    }
-
 protected:
-    SocketAddress serverAddress() const
+    virtual void SetUp() override
     {
-        return m_tcpServer->addressBeingListened();
-    }
+        base_type::SetUp();
 
-private:
-    std::unique_ptr<network::test::RandomDataTcpServer> m_tcpServer;
-
-    void init()
-    {
         m_tcpServer = std::make_unique<network::test::RandomDataTcpServer>(
             network::test::TestTrafficLimitType::none,
             0,
@@ -358,6 +345,22 @@ private:
         m_tcpServer->setLocalAddress(SocketAddress(HostAddress::localhost, 0));
         ASSERT_TRUE(m_tcpServer->start());
     }
+
+    virtual void TearDown() override
+    {
+        base_type::TearDown();
+
+        if (m_tcpServer)
+            m_tcpServer->pleaseStopSync();
+    }
+
+    SocketAddress serverAddress() const
+    {
+        return m_tcpServer->addressBeingListened();
+    }
+
+private:
+    std::unique_ptr<network::test::RandomDataTcpServer> m_tcpServer;
 };
 
 TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
@@ -485,17 +488,18 @@ using TestCrossNatConnector = test::CrossNatConnector<
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
 class CloudStreamSocketShutdown:
     public CloudStreamSocketCancellation
 {
+    using base_type = CloudStreamSocketCancellation;
+
 public:
     CloudStreamSocketShutdown():
         m_terminated(false)
     {
         using namespace std::placeholders;
-
-        if (!SocketGlobals::mediatorConnector().mediatorAddress())
-            SocketGlobals::mediatorConnector().mockupAddress(serverAddress());
 
         m_oldFactory = CrossNatConnectorFactory::instance().setCustomFunc(
             std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, _1));
@@ -513,6 +517,16 @@ public:
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+
+        base_type::SetUp();
+
+        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            url::Builder().setScheme("stun").setEndpoint(serverAddress()));
+    }
+
     void givenSocketConnectedToATcpServer()
     {
         m_clientSocket = std::make_unique<CloudStreamSocket>(

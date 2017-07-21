@@ -25,11 +25,13 @@
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeEdited"
+                       ng-class="{disabled:locked[user.email]}"
                        title="Modifier autorisations"
                        ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Modifier</span></span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
+                       ng-class="{disabled:locked[user.email]}"
                        title="Supprimer"
                        ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Supprimer</span></a></td>
             </tr>

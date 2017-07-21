@@ -5,7 +5,7 @@
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Selecteer camera</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
@@ -49,11 +49,11 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mailadres</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -77,18 +77,18 @@
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Log in</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Connect to Server</source>
@@ -134,15 +134,15 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Oké</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuleren</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sluiten</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -209,14 +209,14 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sluiten</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -273,7 +273,7 @@
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
@@ -281,6 +281,17 @@
     <message>
       <source>Connect</source>
       <translation type="unfinished">Connect</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>
@@ -326,7 +337,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -341,11 +352,11 @@
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laden...</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -394,11 +405,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -417,7 +428,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
@@ -444,7 +455,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Verbinden met server...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -467,7 +478,7 @@
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Instellingen</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
@@ -486,7 +497,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Instellingen</translation>
     </message>
     <message>
       <source>Start test</source>
@@ -498,7 +509,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Verbinding verbreken met de server</translation>
     </message>
   </context>
   <context>
@@ -519,7 +530,7 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
   </context>
   <context>
@@ -545,21 +556,21 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Alles selecteren</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Sluiten</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Authentication required</source>
@@ -582,7 +593,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -598,11 +609,11 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informatie</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Selecteer camera</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>

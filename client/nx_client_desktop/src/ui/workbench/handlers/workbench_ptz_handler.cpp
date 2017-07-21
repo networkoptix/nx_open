@@ -168,7 +168,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToGetPosition(mainWindow(),
+        messages::Ptz::failedToGetPosition(mainWindow(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
@@ -374,7 +374,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToSetPosition(mainWindow(),
+        messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases
@@ -382,38 +382,48 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 
 void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 {
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-
+    auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
+        return;
+
+    // Joystick-controlled action must occur only if ptz is active.
+    const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    if (!ptzActive)
+        return;
+
+    const auto controller = widget->ptzController();
+    const auto item = widget->item();
+    NX_EXPECT(item && controller);
+    if (!item || !controller)
         return;
 
     auto speed = menu()->currentParameters(sender())
         .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
-    auto item = widget->item();
-
-    if (!item)
-        return;
-
-    auto rotation = item->rotation() + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
-    auto controller = widget->ptzController();
-
-    if (!controller)
-        return;
-
+    const auto rotation = item->rotation()
+        + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
     speed = applyRotation(speed, rotation);
-    widget->ptzController()->continuousMove(speed);
+    controller->continuousMove(speed);
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
 {
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-
+    auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
         return;
-    auto controller = widget->ptzController();
+
+    // Joystick-controlled action must occur only if ptz is active.
+    const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    if (!ptzActive)
+        return;
+
+    const auto controller = widget->ptzController();
+    NX_EXPECT(controller);
+    if (!controller)
+        return;
+
     auto presetIndex = menu()->currentParameters(sender())
-        .argument<uint>(Qn::ItemDataRole::PtzPresetIndexRole);
+        .argument(Qn::ItemDataRole::PtzPresetIndexRole).toInt();
 
     QnPtzPresetList presetList;
     controller->getPresets(&presetList);

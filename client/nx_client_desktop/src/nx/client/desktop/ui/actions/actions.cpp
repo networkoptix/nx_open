@@ -1,7 +1,6 @@
 #include "actions.h"
 
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <client/client_runtime_settings.h>
 
@@ -37,8 +36,6 @@ void initialize(Manager* manager, Action* root)
 {
     MenuFactory factory(manager, root);
 
-    using namespace QnResourceCriterionExpressions;
-
     /* Actions that are not assigned to any menu. */
 
     factory(ShowFpsAction)
@@ -71,7 +68,7 @@ void initialize(Manager* manager, Action* root)
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::RemovePermission)
-        .condition(hasFlags(Qn::network));
+        .condition(condition::hasFlags(Qn::network, Any));
 
     factory(NextLayoutAction)
         .flags(GlobalHotkey)
@@ -137,7 +134,8 @@ void initialize(Manager* manager, Action* root)
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
         .flags(ResourceTarget | SingleTarget)
-        .condition(condition::hasFlags(Qn::live_cam, Any));
+        .condition(condition::hasFlags(Qn::live_cam, Any)
+            && !condition::tourIsRunning());
 
     factory(OpenBusinessLogAction)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -560,7 +558,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
-        .text(ContextMenu::tr("Bookmark Search..."))
+        .text(ContextMenu::tr("Bookmark Log..."))
         .shortcut(lit("Ctrl+B"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
@@ -576,6 +574,9 @@ void initialize(Manager* manager, Action* root)
     factory(OpenCloudMainUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Open %1 Portal...", "Open Nx Cloud Portal").arg(nx::network::AppInfo::cloudName()));
+
+    factory(OpenCloudViewSystemUrl)
+        .flags(NoTarget);
 
     factory(OpenCloudManagementUrl)
         .flags(NoTarget)
@@ -684,6 +685,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Zoom to Selection"))
         .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
 
+    factory(AcknowledgeEventAction)
+        .flags(NoTarget);
+
     factory(AddCameraBookmarkAction)
         .flags(Slider | SingleTarget)
         .text(ContextMenu::tr("Add Bookmark..."))
@@ -736,7 +740,7 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
         .condition(new ExportCondition(false));
 
-    factory(ExportTimelapseAction)
+    factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
@@ -768,7 +772,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .text(ContextMenu::tr("Open"))
-        .conditionalText(ContextMenu::tr("Monitor"), hasFlags(Qn::server), All)
+        .conditionalText(ContextMenu::tr("Monitor"),
+            condition::hasFlags(Qn::server, All))
         .condition(
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isLayoutTourReviewMode());
@@ -777,7 +782,8 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .text(ContextMenu::tr("Open in New Tab"))
-        .conditionalText(ContextMenu::tr("Monitor in New Tab"), hasFlags(Qn::server), All)
+        .conditionalText(ContextMenu::tr("Monitor in New Tab"),
+            condition::hasFlags(Qn::server, All))
         .condition(new OpenInNewEntityCondition());
 
     factory(OpenInAlarmLayoutAction)
@@ -789,7 +795,8 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .text(ContextMenu::tr("Open in New Window"))
-        .conditionalText(ContextMenu::tr("Monitor in New Window"), hasFlags(Qn::server), All)
+        .conditionalText(ContextMenu::tr("Monitor in New Window"),
+            condition::hasFlags(Qn::server, All))
         .condition(
             ConditionWrapper(new OpenInNewEntityCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
@@ -802,13 +809,11 @@ void initialize(Manager* manager, Action* root)
     factory(OpenVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Open Video Wall"))
-        .condition(hasFlags(Qn::videowall));
+        .condition(condition::hasFlags(Qn::videowall, Any));
 
     factory(OpenInFolderAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Open Containing Folder"))
-        .shortcut(lit("Ctrl+Enter"))
-        .shortcut(lit("Ctrl+Return"))
         .autoRepeat(false)
         .condition(new OpenInFolderCondition());
 
@@ -1183,7 +1188,7 @@ void initialize(Manager* manager, Action* root)
         //flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
         .autoRepeat(false)
-        .condition(hasFlags(Qn::local_media));
+        .condition(condition::hasFlags(Qn::local_media, All));
 
     factory(SetAsBackgroundAction)
         .flags(Scene | SingleTarget)
@@ -1199,7 +1204,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("User Settings..."))
         .requiredTargetPermissions(Qn::ReadPermission)
-        .condition(hasFlags(Qn::user));
+        .condition(condition::hasFlags(Qn::user, Any));
 
     factory(UserRolesAction)
         .flags(Tree | NoTarget)

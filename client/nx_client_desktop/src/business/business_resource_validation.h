@@ -5,17 +5,22 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QLabel>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
-
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/custom_style.h>
 
-struct QnBusinessActionParameters;
+#include <nx/vms/event/event_fwd.h>
 
 namespace QnBusiness {
 
-bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUserResourcePtr& user);
+bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+    const QnUserResourcePtr& user);
+
+bool hasAccessToSource(const nx::vms::event::EventParameters& params,
+    const QnUserResourcePtr& user);
 
 } // namespace QnBusiness
 
@@ -186,4 +191,62 @@ private:
     static bool isValidUser(const QnUserResourcePtr& user);
 private:
     QLabel* m_warningLabel;
+};
+
+// User and role validation policy.
+class QnSubjectValidationPolicy: public QnConnectionContextAware
+{
+public:
+    explicit QnSubjectValidationPolicy(bool allowEmptySelection = false);
+    virtual ~QnSubjectValidationPolicy();
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const = 0;
+    virtual bool userValidity(const QnUserResourcePtr& user) const = 0;
+
+    virtual QValidator::State validity(bool allUsers, const QSet<QnUuid>& subjects) const;
+    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const;
+
+    void analyze(bool allUsers, const QSet<QnUuid>& subjects,
+        QVector<QnUuid>& validRoles,
+        QVector<QnUuid>& invalidRoles,
+        QVector<QnUuid>& intermediateRoles,
+        QVector<QnUserResourcePtr>& validUsers,
+        QVector<QnUserResourcePtr>& invalidUsers) const;
+
+private:
+    const bool m_allowEmptySelection;
+};
+
+// Default validation policy: users and roles are always valid.
+class QnDefaultSubjectValidationPolicy: public QnSubjectValidationPolicy
+{
+    using base_type = QnSubjectValidationPolicy;
+
+public:
+    QnDefaultSubjectValidationPolicy(bool allowEmptySelection = false);
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual bool userValidity(const QnUserResourcePtr& user) const override;
+};
+
+// Subject validation policy when one global permission is required.
+class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnRequiredPermissionSubjectPolicy)
+    using base_type = QnSubjectValidationPolicy;
+
+public:
+    explicit QnRequiredPermissionSubjectPolicy(Qn::GlobalPermission requiredPermission,
+        const QString& permissionName = QString(), bool allowEmptySelection = false);
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual bool userValidity(const QnUserResourcePtr& user) const override;
+    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
+
+private:
+    bool isRoleValid(const QnUuid& roleId) const;
+
+private:
+    const Qn::GlobalPermission m_requiredPermission;
+    const QString m_permissionName;
 };

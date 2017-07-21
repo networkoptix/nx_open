@@ -29,7 +29,7 @@
     "restorePassword":"Réinitialiser mot de passe -",
     "restorePasswordSuccess":"Mot de passe sauvé -",
     "restorePasswordCode":"Réinitialiser mot de passe -",
-    "view":"View cameras - ",
+    "view":"Voir les caméras - ",
     "contentPage":"",
     "debug":"Débogage",
     "login":"Connexion -",
@@ -117,7 +117,7 @@
     "cantEditAdmin":"Cet usager dispose d’autorisations administrateur",
     "cantOpenClient":"{{VMS_NAME}} application non détectée. <a href=\"/download\"> Télécharger</a>",
     "lostConnection":"Connexion à {{systemName}} perdu",
-    "thisSystem":"the system"
+    "thisSystem":"le système"
   },
   "passwordRequirements":{
     "minLengthMessage":"Mot de passe doit contenir au moins 8 caractères",
@@ -214,7 +214,7 @@
     "createAccount":"Créer compte"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Tous les systèmes",
     "systems":"Systèmes"
   }
 }

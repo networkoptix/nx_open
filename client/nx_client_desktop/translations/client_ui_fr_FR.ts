@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>Post-Enregistrement:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -452,7 +442,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>À</translation>
     </message>
   </context>
   <context>
@@ -599,7 +589,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
@@ -732,20 +722,35 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Autoriser le système à optimiser les paramètres caméra&quot; est désactivé dans l'administration système.</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation>Attention! Ne pas modifier ces paramètres, sauf si vous êtes absolument sûr de leur impact potentiel sur les performances de votre système.</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -760,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation>ID de &amp;sortie:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation>Durée fixe:</translation>
     </message>
@@ -772,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation>secondes</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -904,7 +909,7 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
+      <source>Incorrect email or password</source>
       <translation>Courriel ou mot de passe incorrect</translation>
     </message>
   </context>
@@ -1050,9 +1055,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>Exporter Analyse Rapide</translation>
     </message>
@@ -1068,13 +1073,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>Vitesse Analyse Rapide</translation>
+      <source>Frames Interval</source>
+      <translation>Intervalle d'image</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>Intervalle d'image</translation>
+      <source>Rapid Review speed</source>
+      <translation>Vitesse Analyse Rapide</translation>
     </message>
   </context>
   <context>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>Vérouillé sur ID Matériel:</translation>
+      <source>Features</source>
+      <translation>Fonctionnalités</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation>Fonctionnalités</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1519,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation>ID Matériel</translation>
+      <source>Activation Key File</source>
+      <translation>Fichier Clé d'activation</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation>Fichier Clé d'activation</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1721,7 +1726,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Jouer aux utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -1735,6 +1740,11 @@
       <location/>
       <source>for</source>
       <translation>pour</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation>Forcer Reconnaissance</translation>
     </message>
   </context>
   <context>
@@ -1908,7 +1918,7 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
+      <source>Incorrect email or password</source>
       <translation>Courriel ou mot de passe incorrect</translation>
     </message>
   </context>
@@ -1941,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation>Vérifier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation>Vous serez reconnecté.</translation>
     </message>
     <message>
       <location/>
@@ -2251,7 +2256,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Un ordinateur puissant est recommandé pour une &quot;meilleur&quot; qualité et résolution.</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2276,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Source</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Écran</translation>
     </message>
   </context>
   <context>
@@ -2317,7 +2322,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Parler aux utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2565,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2657,7 +2662,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Disponible à</translation>
     </message>
     <message>
       <location/>
@@ -2667,20 +2672,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
+      <translation>Icône</translation>
     </message>
   </context>
   <context>
@@ -2794,18 +2786,23 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Rôles</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Afficher tous les Utilisateurs</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation>Sélectionner Utilisateurs</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation>Rien ne correspond à votre recherche.</translation>
     </message>
   </context>
   <context>
@@ -2841,7 +2838,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Synchroniser le temps avec Internet</translation>
     </message>
   </context>
   <context>
@@ -2881,8 +2878,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Il n’y a pas de rôle d'usager personnalisé.
+Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     </message>
     <message>
       <location/>

@@ -565,13 +565,13 @@ void Worker::downloadNextChunk()
     }
 
     peers = selectPeersForOperation(1, peers);
-    NX_ASSERT(!peers.isEmpty());
-    NX_ASSERT(peers.size() == 1);
     if (peers.isEmpty())
     {
         waitForNextStep();
         return;
     }
+
+    NX_ASSERT(peers.size() == 1);
 
     const auto& peerId = peers.first();
 

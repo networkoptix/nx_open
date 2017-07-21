@@ -14,6 +14,10 @@ function(_generate_pch_parameters target pch_dir)
         list(APPEND flags ${CMAKE_CXX_FLAGS_MINSIZEREL})
     endif()
 
+    if(CMAKE_CXX_COMPILER_TARGET)
+        list(INSERT flags 0 ${CMAKE_CXX_COMPILE_OPTIONS_TARGET}${CMAKE_CXX_COMPILER_TARGET})
+    endif()
+
     set(flags "$<$<BOOL:${flags}>:$<JOIN:${flags},\n>\n>")
 
     set(include_directories

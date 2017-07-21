@@ -84,490 +84,11 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>סימניה</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>הקלטת מצוקה</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>כתוב לתיעוד</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>הצג התראה</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>חזור על צליל</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>הפעל סאונד</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>דבר</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>כשל אחסון</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>בעיית רשת</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>כשל שרת</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>קונפליקט בשרת</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>השרת הופעל</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>בעיית רשיון</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>כל בעיית שרת</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>כל אירוע</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>אירוע שאיננו מוגדר אירע ב%1</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>קלט ב%1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>תנועה ב%1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>שגיאת אחסון ב%1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>בעיית רשת ב%1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>תקלה בשרת &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>קונפליקט בשרת &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>שרת &quot;%1&quot; הופעל</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>אירוע: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>מקור: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>סיבה: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>שרת ההתנגשות #%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>מועד: %1 ב%2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
-        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
-        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
-        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>זוהה איבוד מנת RTP, רצף קודם=%1 הרצף הבא=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>זוהה איבוד מנת RTP.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>שגיאת קלט/פלט אירעה ב%1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>מהירות הדיסק הקשיח/SSD אינה מספיקה להקלטה אל %1.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>שרת ההתנגשות: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>התחל</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>עצור</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>בזמן %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>ב%1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>אירוע לא מוגדר אירע</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>החיבור לשרת אבד.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
-        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
-        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
-        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>אירוע כללי</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>כתובית: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>החיבור למצלמה (תזרים ראשי) נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>החיבור למצלמה (תזרים משני) נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>יציאת התקן</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>יציאת מצלמה</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>הקלטת התקן</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>הקלטת מצלמה</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>כל בעיה בהתקן</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>כל בעיה במצלמה</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>התקן %1 נותק</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>מצלמה %1 נותקה</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>קונפליקט כתובת רשת של התקן ב %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>קונפליקט כתובת רשת של מצלמה ב %1</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>החיבור להתקן נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>הפעל פריסט PTZ</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>הצג שכבת טקסט</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>הצג בפריסת אזעקה</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>גיבוי ארכיון הסתיים</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>אירוע כללי ב %1</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>פורט כניסה: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>גיבוי ארכיון הסתיים בהצלחה</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>מודול קלט/פלט %1 התנתק</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>קונפליקט בכתובת: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>גיבוי ארכיון נכשל: אין כונני איחסון זמינים עם מספיק מקום פנוי</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>גיבוי ארכיון נכשל: שגיאה בכונן הגיבוי</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>גיבוי ארכיון נכשל: לא ניתן לפתוח את הקבצים לקריאה</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>גיבוי ארכיון נכשל: לא ניתן ליצור קבצים לכתיבה</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>בצע בקשת HTTP</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>ההתקן אינו מגיב לבקשות רשת.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>השרת נעצר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>אין מספיק רישיונות. ההקלטה הושבתה במכשירים הבאים:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>אין מספיק רישיונות. ההקלטה הושבתה במצלמות הבאות:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>אין מספיק רישיונות. ההקלטה הושבתה במודולי I / O הבאים:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>תנועה במצלמות</numerusform>
-        <numerusform>תנועה במצלמות</numerusform>
-        <numerusform>תנועה במצלמות</numerusform>
-        <numerusform>תנועה במצלמות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>אות קלט על המכשירים</numerusform>
-        <numerusform>אות קלט על המכשירים</numerusform>
-        <numerusform>אות קלט על המכשירים</numerusform>
-        <numerusform>אות קלט על המכשירים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>אות קלט במצלמות</numerusform>
-        <numerusform>אות קלט במצלמות</numerusform>
-        <numerusform>אות קלט במצלמות</numerusform>
-        <numerusform>אות קלט במצלמות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>התקנים מנותקים</numerusform>
-        <numerusform>התקנים מנותקים</numerusform>
-        <numerusform>התקנים מנותקים</numerusform>
-        <numerusform>התקנים מנותקים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>מצלמות מנותקות</numerusform>
-        <numerusform>מצלמות מנותקות</numerusform>
-        <numerusform>מצלמות מנותקות</numerusform>
-        <numerusform>מצלמות מנותקות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>התנגשות IP בהתקנים</numerusform>
-        <numerusform>התנגשות IP בהתקנים</numerusform>
-        <numerusform>התנגשות IP בהתקנים</numerusform>
-        <numerusform>התנגשות IP בהתקנים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>התנגשות IP במצלמות</numerusform>
-        <numerusform>התנגשות IP במצלמות</numerusform>
-        <numerusform>התנגשות IP במצלמות</numerusform>
-        <numerusform>התנגשות IP במצלמות</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>לשרת &quot;%1&quot; יש בעיית רישוי</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>שרת &quot;%1&quot; סיים גיבוי ארכיון</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>גיבוי ארכיון הסתיים, אך היא לא הושלם במלואן כי זמן הגיבוי נגמר. נתונים מגובים עד ל %1</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>שלח דוא"ל</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation>מיתוג תוכנתי</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation>מיתוג תוכנתי %1 ב %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation>מיתוג תוכנתי %1 הופעל מספר פעמים</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>התרחשו אירועים מרובים של %1</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation>מיתוג: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>הכונן הקשיח &quot;%1&quot; מלא. הכונן מכיל יותר מדי מידע שאינו מנוהל על ידי מערכת ההקלטה.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>דיסק המערכת &quot;%1&quot; כמעט מלא.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation>מיתוג ברירת מחדל</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>כל המשתמשים</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>תפקיד</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>כל מנהלי המערכת</translation>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
@@ -977,22 +498,6 @@
         <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>מפתח הרשיון שהכנסת שגוי. אנא בדוק שהזנת את המפתח כראוי. במידה והבעיה נמשכת, אנא צור קשר עם קבוצת התמיכה על מנת לוודא את תקינות המפתח או להשיג מפתח תקין.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>אתה מנסה להפעיל רשיון שאיננו תואם לתוכנה. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
@@ -1011,21 +516,12 @@
         <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>מפתח רישיון זה הופעל בעבר על ידי מזהה החומרה %1 ב- %2. צור קשר עם צוות התמיכה כדי לקבל מפתח רישיון חוקי.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>החתימה איננה תקינה</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -1050,6 +546,10 @@
     <message>
       <source>Unknown error</source>
       <translation>שגיאה לא מוגדרת</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -1179,16 +679,16 @@
       <translation>רשיון חינמי</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation>מזהה חומרה: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation>מורשה ל: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation>סימן מים: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1015,7 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>תצוגה מתקדמת</translation>
+      <translation>צופה מתקדם</translation>
     </message>
     <message>
       <source>Viewer</source>
@@ -1523,7 +1023,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>צפיה חיה</translation>
+      <translation>צופה בוידאו חי</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1539,11 +1039,11 @@
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation>ניתן להציג את כל המצלמות ולייצא וידאו.</translation>
+      <translation>יכול לצפות בכל המצלמות ולייצא וידאו.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>ניתן לצפות בוידאו חי מכל המצלמות.</translation>
+      <translation>יכול לצפות בוידאו חי מכל המצלמות.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -1560,6 +1060,501 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>יש גישה לכל המערכת ויכול לנהל את זה. יכול ליצור משתמשים.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>סימניה</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>הקלטת מצוקה</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>כתוב לתיעוד</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>הצג התראה</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>חזור על צליל</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>הפעל סאונד</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>דבר</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>הפעל פריסט PTZ</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>הצג שכבת טקסט</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>הצג בפריסת אזעקה</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>בצע בקשת HTTP</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>יציאת התקן</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>יציאת מצלמה</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>הקלטת התקן</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>הקלטת מצלמה</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>אירוע כללי</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>תנועה במצלמות</numerusform>
+        <numerusform>תנועה במצלמות</numerusform>
+        <numerusform>תנועה במצלמות</numerusform>
+        <numerusform>תנועה במצלמות</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>כשל באחסון</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>בעיית רשת</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>כשל שרת</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>קונפליקט בשרת</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>השרת הופעל</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>בעיית רשיון</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>גיבוי ארכיון הסתיים</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>כל בעיית שרת</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>כל אירוע</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>אות קלט על המכשירים</numerusform>
+        <numerusform>אות קלט על המכשירים</numerusform>
+        <numerusform>אות קלט על המכשירים</numerusform>
+        <numerusform>אות קלט על המכשירים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>אות קלט במצלמות</numerusform>
+        <numerusform>אות קלט במצלמות</numerusform>
+        <numerusform>אות קלט במצלמות</numerusform>
+        <numerusform>אות קלט במצלמות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>התקנים מנותקים</numerusform>
+        <numerusform>התקנים מנותקים</numerusform>
+        <numerusform>התקנים מנותקים</numerusform>
+        <numerusform>התקנים מנותקים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>מצלמות מנותקות</numerusform>
+        <numerusform>מצלמות מנותקות</numerusform>
+        <numerusform>מצלמות מנותקות</numerusform>
+        <numerusform>מצלמות מנותקות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>התנגשות IP בהתקנים</numerusform>
+        <numerusform>התנגשות IP בהתקנים</numerusform>
+        <numerusform>התנגשות IP בהתקנים</numerusform>
+        <numerusform>התנגשות IP בהתקנים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>התנגשות IP במצלמות</numerusform>
+        <numerusform>התנגשות IP במצלמות</numerusform>
+        <numerusform>התנגשות IP במצלמות</numerusform>
+        <numerusform>התנגשות IP במצלמות</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>כל בעיה בהתקן</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>כל בעיה במצלמה</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>אירוע שאיננו מוגדר אירע ב%1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>התקן %1 נותק</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>מצלמה %1 נותקה</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>מודול קלט/פלט %1 התנתק</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>קלט ב%1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>תנועה ב%1</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>שגיאת אחסון ב%1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>בעיית רשת ב%1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation>תקלה בשרת &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>קונפליקט כתובת רשת של התקן ב %1</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>קונפליקט כתובת רשת של מצלמה ב %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation>קונפליקט בשרת &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation>שרת &quot;%1&quot; הופעל</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation>לשרת &quot;%1&quot; יש בעיית רישוי</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation>שרת &quot;%1&quot; סיים גיבוי ארכיון</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>אירוע כללי ב %1</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>אירוע לא מוגדר אירע</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation>התרחשו אירועים מרובים של %1</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>אירוע: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>מקור: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>כתובית: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>פורט כניסה: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>סיבה: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>קונפליקט בכתובת: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>שרת ההתנגשות #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>שרת ההתנגשות: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation>מיתוג: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>מועד: %1 ב%2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
+        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
+        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
+        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
+        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
+        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
+        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>החיבור להתקן נסגר באופן בלתי צפוי.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>החיבור למצלמה (תזרים ראשי) נסגר באופן בלתי צפוי.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>החיבור למצלמה (תזרים משני) נסגר באופן בלתי צפוי.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>זוהה איבוד מנת RTP, רצף קודם=%1 הרצף הבא=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>זוהה איבוד מנת RTP.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>ההתקן אינו מגיב לבקשות רשת.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>החיבור לשרת אבד.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>השרת נעצר באופן בלתי צפוי.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>שגיאת קלט/פלט אירעה ב%1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>מהירות הדיסק הקשיח/SSD אינה מספיקה להקלטה אל %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>הכונן הקשיח &quot;%1&quot; מלא. הכונן מכיל יותר מדי מידע שאינו מנוהל על ידי מערכת ההקלטה.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>דיסק המערכת &quot;%1&quot; כמעט מלא.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>גיבוי ארכיון נכשל: אין כונני איחסון זמינים עם מספיק מקום פנוי</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>גיבוי ארכיון נכשל: שגיאה בכונן הגיבוי</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>גיבוי ארכיון נכשל: לא ניתן לפתוח את הקבצים לקריאה</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>גיבוי ארכיון נכשל: לא ניתן ליצור קבצים לכתיבה</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>גיבוי ארכיון הסתיים, אך היא לא הושלם במלואן כי זמן הגיבוי נגמר. נתונים מגובים עד ל %1</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>גיבוי ארכיון הסתיים בהצלחה</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>אין מספיק רישיונות. ההקלטה הושבתה במכשירים הבאים:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>אין מספיק רישיונות. ההקלטה הושבתה במצלמות הבאות:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>אין מספיק רישיונות. ההקלטה הושבתה במודולי I / O הבאים:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>התחל</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>עצור</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>בזמן %1</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>ב%1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation>שם מיתוג</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>תפקיד</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation>כל מנהלי המערכת</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>כל המשתמשים</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>בחר לפחות משתמש אחד</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation>מיתוג תוכנתי</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation>מיתוג תוכנתי %1 ב %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation>מיתוג תוכנתי %1 הופעל מספר פעמים</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation>שלח דוא"ל</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>אשר</translation>
     </message>
   </context>
   <context>

@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation>אחרי הקלטה:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation>על ידי:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation>בקש אישור לפני יצירת סימנייה</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -739,13 +729,28 @@
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation>אזהרה! אל תשנה הגדרות אלו במידה ואינך מבין לחלוטין את ההשפעה האפשרית שלהם על ביצועי המערכת שלך.</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation>מזהה קלט</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -760,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation>&amp;מזהה פלט:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation>משך זמן קבוע:</translation>
     </message>
@@ -772,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation>שניות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -904,8 +909,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>שם משתמש או סיסמא שגויים</translation>
+      <source>Incorrect email or password</source>
+      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1055,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation>ייצוא סקירה מהירה</translation>
     </message>
@@ -1068,13 +1073,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>מהירות סקירה מהירה</translation>
+      <source>Frames Interval</source>
+      <translation>מרווח תמונות</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>מרווח תמונות</translation>
+      <source>Rapid Review speed</source>
+      <translation>מהירות סקירה מהירה</translation>
     </message>
   </context>
   <context>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation>נעול למזהה-חומרה:</translation>
+      <source>Features</source>
+      <translation>תכונות</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation>תכונות</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1519,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation>מזהה-חומרה</translation>
+      <source>Activation Key File</source>
+      <translation>קובץ מפתח הפעלה</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation>קובץ מפתח הפעלה</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1736,6 +1741,11 @@
       <source>for</source>
       <translation>ל</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation>כפה אישור</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1908,8 +1918,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation>דוא"ל או סיסמה שגויים</translation>
+      <source>Incorrect email or password</source>
+      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -1941,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation>בדוק</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation>תחובר מחדש.</translation>
     </message>
     <message>
       <location/>
@@ -2671,19 +2676,6 @@
     </message>
   </context>
   <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation>&lt; כותרת &gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation>&lt; תיאור &gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2794,11 +2786,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation>דיאלוג</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation>תפקידים</translation>
     </message>
@@ -2806,6 +2793,16 @@
       <location/>
       <source>Show all users</source>
       <translation>הצג את כל המשתמשים</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation>בחר משתמשים</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation>אין פריטים שתואמים לחיפוש.</translation>
     </message>
   </context>
   <context>

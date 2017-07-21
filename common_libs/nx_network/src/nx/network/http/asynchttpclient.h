@@ -175,6 +175,14 @@ public:
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const QUrl& url,
+        const StringType& protocolToUpgradeTo,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
     const nx_http::Request& request() const;
 
     /**
@@ -249,6 +257,9 @@ public:
         m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
     }
     void setAuthType(AuthType value);
+
+    void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
+
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
@@ -335,6 +346,8 @@ private:
     nx::network::aio::Timer m_aioThreadBinder;
     bool m_precalculatedAuthorizationDisabled;
     int m_numberOfRedirectsTried;
+
+    bool m_expectOnlyBody;
 
     AsyncHttpClient();
 

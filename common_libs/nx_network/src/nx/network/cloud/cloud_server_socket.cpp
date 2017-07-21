@@ -1,8 +1,8 @@
 #include "cloud_server_socket.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "tunnel/relay/relay_connection_acceptor.h"
 #include "tunnel/udp/acceptor.h"
@@ -26,10 +26,11 @@ const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::s
 } // namespace
 
 CloudServerSocket::CloudServerSocket(
-    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+    hpm::api::AbstractMediatorConnector* mediatorConnector,
     nx::network::RetryPolicy mediatorRegistrationRetryPolicy)
 :
-    m_mediatorConnection(std::move(mediatorConnection)),
+    m_mediatorConnector(mediatorConnector),
+    m_mediatorConnection(mediatorConnector->systemConnection()),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
@@ -174,6 +175,7 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
                         this,
                         std::placeholders::_1));
                     m_state = State::readyToListen;
+                    /*fallthrough*/
 
                 case State::readyToListen:
                     m_state = State::registeringOnMediator;
@@ -518,7 +520,9 @@ void CloudServerSocket::onConnectionRequested(
         .args(event.connectSessionId, event.originatingPeerID,
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
-    auto acceptors = TunnelAcceptorFactory::instance().create(event);
+    auto acceptors = TunnelAcceptorFactory::instance().create(
+        *m_mediatorConnector->udpEndpoint(),
+        event);
     for (auto& acceptor: acceptors)
     {
         DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")

@@ -79,11 +79,15 @@ void PersistentScheduler::registerEventReceiver(
         QnMutexLocker lock(&m_mutex);
         m_functorToReceiver[functorId] = receiver;
 
-        if (m_functorToTaskToParams.find(functorId) != m_functorToTaskToParams.cend())
+        if (m_functorToTaskToParams.find(functorId) != m_functorToTaskToParams.cend()
+            && m_delayed.find(functorId) != m_delayed.cend())
+        {
             taskToParams = m_functorToTaskToParams[functorId];
+            m_delayed.erase(functorId);
+        }
     }
 
-    for (const auto& taskToParam: taskToParams)
+    for (const auto& taskToParam : taskToParams)
         timerFunction(functorId, taskToParam.first, taskToParam.second);
 }
 
@@ -218,6 +222,7 @@ void PersistentScheduler::timerFunction(
             auto& taskToParams = m_functorToTaskToParams[functorId];
             if (taskToParams.find(taskId) == taskToParams.cend())
                 taskToParams.emplace(taskId, params);
+            m_delayed.emplace(functorId);
             return;
         }
         receiver = it->second;

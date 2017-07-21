@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Informacje o programie</translation>
     </message>
     <message>
       <location/>
@@ -350,16 +350,6 @@
       <source>Post-recording:</source>
       <translation type="unfinished">Post-recording:</translation>
     </message>
-    <message>
-      <location/>
-      <source>By:</source>
-      <translation type="unfinished">By:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ask confirmation before creating bookmark</source>
-      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
-    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -371,7 +361,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -465,7 +455,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -702,7 +692,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Przywróć domyślne</translation>
     </message>
     <message>
       <location/>
@@ -739,13 +729,28 @@
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
       <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
     </message>
+    <message>
+      <location/>
+      <source>PTZ Control</source>
+      <translation type="unfinished">PTZ Control</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable native presets, use system presets instead</source>
+      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Warning! Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <source>Input Id</source>
+      <translation type="unfinished">Input Id</translation>
     </message>
   </context>
   <context>
@@ -760,11 +765,6 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-      <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed duration:</source>
       <translation type="unfinished">Fixed duration:</translation>
     </message>
@@ -772,6 +772,11 @@
       <location/>
       <source>seconds</source>
       <translation type="unfinished">seconds</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Output Id:</source>
+      <translation type="unfinished">Output Id:</translation>
     </message>
   </context>
   <context>
@@ -904,8 +909,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1050,9 +1055,9 @@
     </message>
   </context>
   <context>
-    <name>ExportTimelapseDialog</name>
+    <name>ExportRapidReviewDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
       <translation type="unfinished">Export Rapid Review</translation>
     </message>
@@ -1068,13 +1073,13 @@
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation type="unfinished">Rapid Review speed</translation>
+      <source>Frames Interval</source>
+      <translation type="unfinished">Frames Interval</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation type="unfinished">Frames Interval</translation>
+      <source>Rapid Review speed</source>
+      <translation type="unfinished">Rapid Review speed</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1127,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Rozmiar</translation>
     </message>
     <message>
       <location/>
@@ -1160,7 +1165,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware ID:</source>
-      <translation type="unfinished">Locked to Hardware ID:</translation>
+      <source>Features</source>
+      <translation type="unfinished">Features</translation>
     </message>
     <message>
       <location/>
-      <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <source>Locked to Hardware Id:</source>
+      <translation type="unfinished">Locked to Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1434,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1519,13 +1524,13 @@
     </message>
     <message>
       <location/>
-      <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <source>Activation Key File</source>
+      <translation type="unfinished">Activation Key File</translation>
     </message>
     <message>
       <location/>
-      <source>Activation Key File</source>
-      <translation type="unfinished">Activation Key File</translation>
+      <source>Hardware Id</source>
+      <translation type="unfinished">Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1559,7 +1564,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1736,6 +1741,11 @@
       <source>for</source>
       <translation type="unfinished">for</translation>
     </message>
+    <message>
+      <location/>
+      <source>Force Acknowledgment</source>
+      <translation type="unfinished">Force Acknowledgment</translation>
+    </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
@@ -1780,7 +1790,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1908,8 +1918,8 @@
     </message>
     <message>
       <location/>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1941,11 +1951,6 @@
       <location/>
       <source>Check</source>
       <translation type="unfinished">Check</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You will be reconnected.</source>
-      <translation type="unfinished">You will be reconnected.</translation>
     </message>
     <message>
       <location/>
@@ -2004,7 +2009,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -2022,7 +2027,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
     <message>
       <location/>
@@ -2088,7 +2093,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Opcje</translation>
     </message>
     <message>
       <location/>
@@ -2353,7 +2358,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -2500,7 +2505,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -2555,7 +2560,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Zresetuj</translation>
     </message>
     <message>
       <location/>
@@ -2649,7 +2654,7 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -2662,25 +2667,12 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
       <source>Icon</source>
       <translation type="unfinished">Icon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SpecialLayoutPanelWidget</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
-      <source>&lt;Some Caption&gt;</source>
-      <translation type="unfinished">&lt;Some Caption&gt;</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;Some description&gt;</source>
-      <translation type="unfinished">&lt;Some description&gt;</translation>
     </message>
   </context>
   <context>
@@ -2711,7 +2703,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
     <message>
       <location/>
@@ -2759,7 +2751,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -2794,11 +2786,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2793,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2857,7 +2854,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>

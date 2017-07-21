@@ -9,6 +9,7 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
+#include <common/common_globals.h>
 
 
 namespace nx {
@@ -95,10 +96,11 @@ class CloudUserInfoPool : public AbstractCloudUserInfoPool
 public:
     CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier);
 
-    bool authenticate(
+    Qn::AuthResult authenticate(
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
+    void clear();
 
 private:
     virtual void userInfoChanged(

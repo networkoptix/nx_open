@@ -2,8 +2,6 @@
 
 #include <QtSql/QSqlQuery>
 
-#include <database/api/db_resource_api.h>
-
 #include <nx_ec/data/api_layout_data.h>
 
 #include <nx/fusion/model_functions.h>
@@ -119,6 +117,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         INSERT INTO vms_layoutitem (
             uuid,
             resource_guid,
+            path,
             layout_id,
             left,
             right,
@@ -137,6 +136,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         ) VALUES (
             :id,
             :resourceId,
+            :resourcePath,
             :layoutId,
             :left,
             :right,
@@ -217,6 +217,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
             r.guid as layoutId,
             li.uuid as id,
             li.resource_guid as resourceId,
+            li.path as resourcePath,
             li.left,
             li.right,
             li.top,
@@ -251,34 +252,34 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
 }
 
 bool saveLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const ApiLayoutData& layout)
 {
     qint32 internalId;
     if (!insertOrReplaceResource(resourceContext, layout, &internalId))
         return false;
 
-    if (!insertOrReplaceLayout(resourceContext->database, layout, internalId))
+    if (!insertOrReplaceLayout(resourceContext->database(), layout, internalId))
         return false;
 
-    return updateItems(resourceContext->database, layout, internalId);
+    return updateItems(resourceContext->database(), layout, internalId);
 }
 
 bool removeLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const QnUuid& id)
 {
     int internalId = api::getResourceInternalId(resourceContext, id);
     if (internalId == 0)
         return true;
 
-    if (!removeItems(resourceContext->database, internalId))
+    if (!removeItems(resourceContext->database(), internalId))
         return false;
 
-    if (!cleanupVideoWalls(resourceContext->database, id))
+    if (!cleanupVideoWalls(resourceContext->database(), id))
         return false;
 
-    if (!deleteLayoutInternal(resourceContext->database, internalId))
+    if (!deleteLayoutInternal(resourceContext->database(), internalId))
         return false;
 
     return deleteResourceInternal(resourceContext, internalId);

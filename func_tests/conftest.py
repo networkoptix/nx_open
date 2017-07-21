@@ -9,9 +9,10 @@ import logging
 import pytest
 from netaddr import IPAddress
 from test_utils.utils import SimpleNamespace
-from test_utils.config import TestsConfig, SingleTestConfig
+from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.artifact import ArtifactFactory
-from test_utils.customization import read_customization_company_name
+from test_utils.metrics_saver import MetricsSaver
+from test_utils.customization import detect_customization_company_name
 from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.vagrant_box import VagrantBoxFactory
@@ -27,7 +28,7 @@ DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
-
+DEFAULT_MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
@@ -60,6 +61,8 @@ def pytest_addoption(parser):
     parser.addoption('--bin-dir',
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
+    parser.addoption('--mediaserver-dist-path',
+                     help='path to mediaserver distributive (.deb), default is %s in bin-dir' % DEFAULT_MEDIASERVER_DIST_FNAME)
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
     parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH,
@@ -93,6 +96,8 @@ def pytest_addoption(parser):
                      help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
                      help='Configuration file for tests, in yaml format.')
+    parser.addoption('--test-parameters', type=TestParameter.from_str,
+                     help='Configuration parameters for a test, in format: --test-parameter=test.param1=value1,test.param2=value2')
 
 
 @pytest.fixture(scope='session')
@@ -107,12 +112,21 @@ def run_options(request):
         vm_ssh_host_config = None
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
-    tests_config = TestsConfig.merge_config_list(request.config.getoption('--tests-config-file'))
+    mediaserver_dist_path = request.config.getoption('--mediaserver-dist-path')
+    if mediaserver_dist_path:
+        mediaserver_dist_path = os.path.expandvars(os.path.expanduser(mediaserver_dist_path))
+    mediaserver_dist_path = os.path.join(bin_dir, mediaserver_dist_path or DEFAULT_MEDIASERVER_DIST_FNAME)
+    assert os.path.isfile(mediaserver_dist_path), 'Mediaserver distributive is missing at %r' % mediaserver_dist_path
+    tests_config = TestsConfig.merge_config_list(
+        request.config.getoption('--tests-config-file'),
+        request.config.getoption('--test-parameters'),
+        )
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
+        mediaserver_dist_path=mediaserver_dist_path,
         media_sample_path=request.config.getoption('--media-sample-path'),
         media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
@@ -144,7 +158,7 @@ def test_config(request, run_options):
         return SingleTestConfig()
 
 @pytest.fixture
-def artifact_factory(request, run_options):
+def junk_shop_repository(request, init_logging):
     db_capture_plugin = request.config.pluginmanager.getplugin(JUNK_SHOP_PLUGIN_NAME)
     if db_capture_plugin:
         db_capture_repository = db_capture_plugin.repo
@@ -153,6 +167,11 @@ def artifact_factory(request, run_options):
     else:
         db_capture_repository = None
         current_test_run = None
+    return (db_capture_repository, current_test_run)
+
+@pytest.fixture
+def artifact_factory(request, run_options, junk_shop_repository):
+    db_capture_repository, current_test_run = junk_shop_repository
     artifact_path_prefix = os.path.join(
         run_options.work_dir,
         os.path.basename(request.node.nodeid.replace('::', '-').replace('.py', '')))
@@ -161,10 +180,19 @@ def artifact_factory(request, run_options):
     yield artifact_factory
     artifact_factory.release()
 
+@pytest.fixture
+def metrics_saver(junk_shop_repository):
+    db_capture_repository, current_test_run = junk_shop_repository
+    if not db_capture_repository:
+        log.warning('Junk shop plugin is not available; No metrics will be saved')
+    return MetricsSaver(db_capture_repository, current_test_run)
+
 
 @pytest.fixture(scope='session')
 def customization_company_name(run_options):
-    return read_customization_company_name(run_options.customization)
+    company_name = detect_customization_company_name(run_options.mediaserver_dist_path)
+    log.info('Customization company name: %r', company_name)
+    return company_name
 
 
 @pytest.fixture(params=['http', 'https'])
@@ -183,7 +211,7 @@ def cloud_host_host(init_logging, run_options):
 
 @pytest.fixture(scope='session')
 def box_factory(request, run_options, init_logging, customization_company_name):
-    config_factory = BoxConfigFactory(customization_company_name)
+    config_factory = BoxConfigFactory(run_options.mediaserver_dist_path, customization_company_name)
     factory = VagrantBoxFactory(
         request.config.cache,
         run_options,
@@ -203,12 +231,12 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
     if not run_options.tests_config:
         return None
     pic = PhysicalInstallationCtl(
-        run_options.bin_dir,
+        run_options.mediaserver_dist_path,
         customization_company_name,
         run_options.tests_config.physical_installation_host_list,
         )
     if run_options.reinstall:
-        pic.clean_all_installations()
+        pic.reset_all_installations()
     return pic
 
 @pytest.fixture

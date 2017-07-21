@@ -7,7 +7,7 @@
 
 #include "network/tcp_connection_priv.h"
 #include "nx_ec/data/api_full_info_data.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
 #include <nx/network/http/custom_headers.h>
@@ -19,7 +19,7 @@
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
-#include <nx/p2p/p2p_message_bus.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace nx {
 namespace p2p {
@@ -205,8 +205,9 @@ void ConnectionProcessor::run()
         return;
     }
 
-    const auto& commonModule = d->owner->commonModule();
-    auto messageBus = dynamic_cast<MessageBus*> (commonModule->ec2Connection()->messageBus());
+    const auto commonModule = d->owner->commonModule();
+    const auto connection = commonModule->ec2Connection();
+    auto messageBus = (connection->messageBus()->dynamicCast<MessageBus*>());
     if (!messageBus)
     {
         sendResponse(

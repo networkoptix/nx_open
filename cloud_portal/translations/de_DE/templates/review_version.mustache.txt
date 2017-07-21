@@ -1,0 +1,10 @@
+Es gibt eine neue Version für {{ message.product }}
+
+Klicken Sie auf den Link, um den Entwurf {{ message.id }} für {{ message.product }} zu überprüfen
+
+Link zur Rezension: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+
+Auf dieser Seite können Sie
+1) Erstellen Sie eine Vorschau, um die aktuellsten Änderungen zu sehen.
+2) Veröffentlichen Sie diese Version, die alle Inhalte aktualisiert.
+3) Bearbeiten Sie Kontexts durch einen Klick auf den Aufnahmebearbeitungsbutton. Um diese Änderungen zu sehen, muss eine neue Version erstellt werden.

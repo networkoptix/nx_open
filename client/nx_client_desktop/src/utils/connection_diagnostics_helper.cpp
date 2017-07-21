@@ -128,7 +128,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     }
 
     showValidateConnectionErrorMessage(parentWidget,
-        result, connectionInfo.version.toString());
+        result, connectionInfo);
     return result;
 }
 
@@ -140,8 +140,10 @@ QString QnConnectionDiagnosticsHelper::ldapServerTimeoutMessage()
 void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
     QWidget* parentWidget,
     Qn::ConnectionResult result,
-    const QString& serverVersion)
+    const QnConnectionInfo& connectionInfo)
 {
+    const QString serverVersion = connectionInfo.version.toString();
+
     static const auto kFailedToConnectText = tr("Failed to connect to Server");
 
     switch (result)
@@ -177,10 +179,21 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::IncompatibleInternalConnectionResult:
-        case Qn::IncompatibleCloudHostConnectionResult:
-            QnMessageBox::warning(parentWidget,
-                tr("Incompatible Server"));
+        {
+            QString message = tr("Incompatible Server");
+            if (qnRuntime->isDevMode())
+                message += L'\n' + lit("Protocol: %1").arg(connectionInfo.nxClusterProtoVersion);
+            QnMessageBox::warning(parentWidget, message);
             break;
+        }
+        case Qn::IncompatibleCloudHostConnectionResult:
+        {
+            QString message = tr("Incompatible Server");
+            if (qnRuntime->isDevMode())
+                message += L'\n' + lit("Cloud host: %1").arg(connectionInfo.cloudHost);
+            QnMessageBox::warning(parentWidget, message);
+            break;
+        }
         case Qn::IncompatibleVersionConnectionResult:
             QnMessageBox::critical(parentWidget,
                 getDiffVersionsText(),
@@ -301,10 +314,15 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 ? QnSoftwareVersion::FullFormat
                 : QnSoftwareVersion::MinorFormat);
 
-            const auto extras =
+            auto extras =
                 getDiffVersionFullExtras(qnStaticCommon->engineVersion().toString(), versionString,
                     tr("You have to download another version of %1 to "
                         "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
+            if (qnRuntime->isDevMode())
+            {
+                extras += L'\n' + lit("Protocol: %1").arg(connectionInfo.nxClusterProtoVersion);
+                extras += L'\n' + lit("Cloud host: %1").arg(connectionInfo.cloudHost);
+            }
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,

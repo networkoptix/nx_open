@@ -84,454 +84,11 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>บุ๊คมาร์ก</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>บันทึกความตื่นตระหนก</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>เขียนลงบันทึก</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>แสดงการแจ้งเตือน</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>เล่นเสียงซ้ำ</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>เล่นเสียง</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>พูด</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>ที่เก็บข้อมูลผิดพลาด</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>ปัญหาเครือข่าย</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>เซิร์ฟเวอร์ล้มเหลว</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>เซิร์ฟเวอร์ ขัดข้อง</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>เซิร์ฟเวอร์เริ่มทำงาน</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>ปัญหาใบอนุญาต</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>ปัญหาบางเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>ทุกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>การป้อนข้อมูลบน %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>การเคลื่อนไหวของ %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>ที่เก็บข้อมูลผิดพลาด %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>ปัญหาเครือข่าย %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>เหตุการณ์: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>แหล่งที่มา: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>เหตุผล: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>เวลา: %1 บน %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>เกิดขึ้นครั้งแรก: %1 บน %2 (%n เวลาทั้งหมดl)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I / O ข้อผิดพลาดที่เกิดขึ้นใน %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>ความเร็วไม่เพียงพอ HDD / SSD สำหรับการบันทึกไปยัง %1.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>เริ่มต้น</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>หยุด</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>ในขณะที่ %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>บน %1 %2</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>ไม่มีข้อมูลที่ได้รับในช่วงที่ผ่านมา %n วินาที.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>เหตุการณ์ทั่วไป</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>คำอธิบาย:%1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>การเชื่อมต่อกับกล้อง (กระแสหลัก) ถูกปิดโดยไม่คาดคิด.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>การเชื่อมต่อกับกล้อง (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>อุปกรณ์เอาท์พุท</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>กล้องเอาท์พุท</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>อุปกรณ์บันทึก</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>การบันทึกกล้อง</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>ปัญหาอุปกรณ์อื่น ๆ</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>ปัญหากล้องอื่น ๆ</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>อุปกรณ์ %1 ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>ความขัดแย้ง IP อุปกรณ์ที่ %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>ความขัดแย้ง IP กล้องที่ %1</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>การเชื่อมต่อกับอุปกรณ์ที่ถูกปิดโดยไม่คาดคิด.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>ดำเนิน PTZ ที่ตั้งไว้</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>แสดงการซ้อนทับข้อความ</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าสำเร็จ</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>เหตุการณ์ทั่วไปที่ %1</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>พอร์ตอินพุต: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>การสำรองข้อมูลที่เก็บเสร็จเรียบร้อยแล้ว</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>โมดูล I/O %1 ขาดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>ที่อยู่ที่ขัดแย้งกัน: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไม่มีการเก็บรักษาการสำรองข้อมูลที่สามารถใช้ได้กับพื้นที่ว่างเพียงพอ</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ความล้มเหลวในการจัดเก็บเป้าหมาย</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์ที่มาเปิด / อ่านข้อผิดพลาด</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์เป้าหมายสร้างข้อผิดพลาด</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: แคตตาล็อกไฟล์ผิดพลาด</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>การสำรองข้อมูลเอกสารเก่าจะถูกยกเลิกโดยผู้ใช้ ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>ส่ง HTTP</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
@@ -935,22 +492,6 @@
         <numerusform>%n %2 จะถูกนำมาใช้จาก %1.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>คุณพยายามที่จะเปิดใช้งานใบอนุญาตเข้ากันไม่ได้กับซอฟต์แวร์ของคุณ กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ มีข้อผิดพลาดเกิดขึ้นในฐานข้อมูล.</translation>
-    </message>
-    <message>
-      <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง โปรดติดต่อทีมสนับสนุนเพื่อรายงานปัญหา.</translation>
-    </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation type="unfinished">
@@ -963,21 +504,12 @@
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
     </message>
-    <message>
-      <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
-      <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation type="unfinished">This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</translation>
-    </message>
   </context>
   <context>
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
       <translation>ลายเซ็นไม่ถูกต้อง</translation>
-    </message>
-    <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>เซิร์ฟเวอร์กับฮาร์ดแวร์ที่ตรงกับ ไอดี ไม่พบ</translation>
     </message>
     <message>
       <source>Invalid customization</source>
@@ -1002,6 +534,10 @@
     <message>
       <source>Unknown error</source>
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+    </message>
+    <message>
+      <source>Server with matching Hardware Id not found</source>
+      <translation type="unfinished">Server with matching Hardware Id not found</translation>
     </message>
   </context>
   <context>
@@ -1113,16 +649,16 @@
       <translation>ใบอนุญาตฟรี</translation>
     </message>
     <message>
-      <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
-    </message>
-    <message>
       <source>Licensed To: %1</source>
       <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
       <translation type="unfinished">Watermark: %1</translation>
+    </message>
+    <message>
+      <source>Hardware Id: %1</source>
+      <translation type="unfinished">Hardware Id: %1</translation>
     </message>
   </context>
   <context>
@@ -1347,8 +883,8 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>วินาที</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1417,11 +953,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>เจ้าของ</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>ผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -1470,6 +1006,465 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>บุ๊คมาร์ก</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>บันทึกความตื่นตระหนก</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>เขียนลงบันทึก</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>แสดงการแจ้งเตือน</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>เล่นเสียงซ้ำ</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>เล่นเสียง</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>พูด</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>ดำเนิน PTZ ที่ตั้งไว้</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>แสดงการซ้อนทับข้อความ</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>ส่ง HTTP</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>อุปกรณ์เอาท์พุท</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>กล้องเอาท์พุท</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>อุปกรณ์บันทึก</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>การบันทึกกล้อง</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>เหตุการณ์ทั่วไป</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Motion on Cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>ที่เก็บข้อมูลผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>ปัญหาเครือข่าย</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>เซิร์ฟเวอร์ล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>เซิร์ฟเวอร์ ขัดข้อง</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>เซิร์ฟเวอร์เริ่มทำงาน</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>ปัญหาใบอนุญาต</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าสำเร็จ</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>ปัญหาบางเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation type="unfinished">
+        <numerusform>Input Signal on Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Input Signal on Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Devices Disconnected</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Cameras Disconnected</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Devices IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Cameras IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>ปัญหาอุปกรณ์อื่น ๆ</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>ปัญหากล้องอื่น ๆ</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>อุปกรณ์ %1 ถูกตัดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>โมดูล I/O %1 ขาดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>การป้อนข้อมูลบน %1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>การเคลื่อนไหวของ %1</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>ที่เก็บข้อมูลผิดพลาด %1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>ปัญหาเครือข่าย %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>ความขัดแย้ง IP อุปกรณ์ที่ %1</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>ความขัดแย้ง IP กล้องที่ %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>เหตุการณ์ทั่วไปที่ %1</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>เหตุการณ์: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>แหล่งที่มา: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>คำอธิบาย:%1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>พอร์ตอินพุต: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>เหตุผล: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>ที่อยู่ที่ขัดแย้งกัน: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>เวลา: %1 บน %2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>เกิดขึ้นครั้งแรก: %1 บน %2 (%n เวลาทั้งหมดl)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>ไม่มีข้อมูลที่ได้รับในช่วงที่ผ่านมา %n วินาที.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>การเชื่อมต่อกับอุปกรณ์ที่ถูกปิดโดยไม่คาดคิด.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>การเชื่อมต่อกับกล้อง (กระแสหลัก) ถูกปิดโดยไม่คาดคิด.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>การเชื่อมต่อกับกล้อง (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation type="unfinished">Device does not respond to network requests.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation type="unfinished">Server stopped unexpectedly.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I / O ข้อผิดพลาดที่เกิดขึ้นใน %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>ความเร็วไม่เพียงพอ HDD / SSD สำหรับการบันทึกไปยัง %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไม่มีการเก็บรักษาการสำรองข้อมูลที่สามารถใช้ได้กับพื้นที่ว่างเพียงพอ</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ความล้มเหลวในการจัดเก็บเป้าหมาย</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์ที่มาเปิด / อ่านข้อผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์เป้าหมายสร้างข้อผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: แคตตาล็อกไฟล์ผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>การสำรองข้อมูลที่เก็บเสร็จเรียบร้อยแล้ว</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>การสำรองข้อมูลเอกสารเก่าจะถูกยกเลิกโดยผู้ใช้ ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>เริ่มต้น</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>หยุด</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>ในขณะที่ %1</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>บน %1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation type="unfinished">Soft Trigger</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation type="unfinished">Send email</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>

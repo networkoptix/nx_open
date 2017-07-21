@@ -125,6 +125,8 @@ public:
      * reference to a original ID. So, its overrid this call for fakeMediaServer
      */
     virtual QnUuid getOriginalGuid() const { return getId();  }
+
+    static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 protected:
     static QString apiUrlScheme(bool sslAllowed);
 private slots:

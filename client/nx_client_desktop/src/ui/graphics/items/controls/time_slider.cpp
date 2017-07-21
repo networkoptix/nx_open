@@ -2966,7 +2966,7 @@ void QnTimeSlider::sliderChange(SliderChange change)
             bool wasAtMinimum = windowStart == m_oldMinimum;
             bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            //TODO: #vkutin Enable this when thumbnail updates fully support it
+            // TODO: #vkutin Enable this when thumbnail updates fully support it
             bool keepFullRange = false; // wasAtMinimum && wasAtMaximum;
             if (keepFullRange)
             {
@@ -3222,7 +3222,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
                 m_dragMarker = CreateSelectionMarker;
             immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
             if (m_dragMarker == NoMarker)
-                m_dragMarker = DragMarker; //TODO: #vkutin #3.2 Simplify all this logic!
+                m_dragMarker = DragMarker; // TODO: #vkutin #3.2 Simplify all this logic!
             break;
 
         case Qt::RightButton:

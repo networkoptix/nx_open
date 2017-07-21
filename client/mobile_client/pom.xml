@@ -19,6 +19,8 @@
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
 
+        <mobileClientVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</mobileClientVersion>
+
         <qt.libs>core qml quick quick-private concurrent network sql multimedia qtmultimediaquicktools_private xml webchannel websockets</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
         <global.libs>-lnx_client_core -lnx_media -lnx_audio -lnx_vms_utils -lnx_network -lappserver2 -lcloud_db_client -lcommon -lnx_network -lnx_fusion -lnx_utils -ludt -lnx_kit</global.libs>

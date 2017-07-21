@@ -201,6 +201,11 @@ QString HttpStreamReader::errorText() const
     return QString();
 }
 
+void HttpStreamReader::setState(ReadState state)
+{
+    m_state = state;
+}
+
 void HttpStreamReader::resetState()
 {
     resetStateInternal();
@@ -332,8 +337,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     if (m_httpMessage.type == MessageType::request)
     {
-        if (m_httpMessage.request->requestLine.method != nx_http::Method::Post &&
-            m_httpMessage.request->requestLine.method != nx_http::Method::Put)
+        if (m_httpMessage.request->requestLine.method != nx_http::Method::post &&
+            m_httpMessage.request->requestLine.method != nx_http::Method::put)
         {
             // Only POST and PUT are allowed to have message body.
             m_contentLength = 0;

@@ -472,7 +472,7 @@ void QnLicenseManagerWidget::showIncompatibleLicenceMessageLater()
     showMessageLater(QnMessageBoxIcon::Warning,
         tr("Incompatible license"),
         tr("License you are trying to activate is incompatible with your software.")
-            + L'\n' + tr("Please contact Customer Support to get a valid license key."),
+            + L'\n' + tr("Please contact Customer Support to get a valid License Key."),
         CopyToClipboardButton::Hide);
 }
 
@@ -606,7 +606,7 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     }
 
     const auto key = QString::fromStdString(license->key().constData());
-    const auto channelsCountString = tr("%n channels", "", license->cameraCount());
+    const auto channelsCountString = tr("%n channels.", "", license->cameraCount());
 
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
@@ -658,15 +658,20 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
     {
-        const auto stringKey = QString::fromLatin1(it.key().begin());
         const auto license = findLicense(it.key(), licenses);
         const auto licenseDescription = getLicenseDescription(license);
         const auto error = setWarningStyleHtml(Deactivator::errorDescription(it.value()));
         result += licenseDescription + kEmptyLine + error;
     }
 
-    result += tr("Please contact Customer Support");
-    return result.join(kMessageDelimiter);
+    static const auto kContactCustomerSupportText = tr("Please contact Customer Support.");
+    if (errors.count() > 1)
+    {
+        result.append(kContactCustomerSupportText);
+        return result.join(kMessageDelimiter);
+    }
+
+    return result.join(kMessageDelimiter) + kEmptyLine + kContactCustomerSupportText;
 }
 
 void QnLicenseManagerWidget::showDeactivationErrorsDialog(
@@ -675,12 +680,15 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 {
     const auto filteredErrors = filterDeactivationErrors(errors);
     const int errorsCount = filteredErrors.size();
+    const auto icon = errorsCount < licenses.size()
+        ? QnMessageBoxIcon::Information
+        : QnMessageBoxIcon::Critical;
     const auto text = getDeactivationErrorCaption(licenses.size(), errorsCount);
     const auto extras = getDeactivationErrorMessage(licenses, filteredErrors);
 
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
-    QnMessageBox dialog(QnMessageBoxIcon::Critical, text, QString(),
+    QnMessageBox dialog(icon, text, QString(),
         standardButton, QDialogButtonBox::NoButton);
 
     const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
@@ -701,7 +709,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     else
     {
         const auto deactivateButton = dialog.addButton(
-            tr("Deactivate %n other", "", licenses.size() - errorsCount),
+            tr("Deactivate %n Other", "", licenses.size() - errorsCount),
             QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
         connect(deactivateButton, &QAbstractButton::clicked, this,
             [this, licenses, errors]()
@@ -746,7 +754,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
                     return;
 
                 case Result::ConnectionError:
-                    QnMessageBox::critical(this,
+                    QnMessageBox::information(this,
                         tr("Cannot connect to the License Server"),
                         tr("Please make sure your server has active Internet connection or check firewall settings."));
                     return;
@@ -1015,7 +1023,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     else if (messageId == lit("InvalidKey"))
     {
         showMessageLater(QnMessageBoxIcon::Warning,
-            tr("Invalid license key"),
+            tr("Invalid License Key"),
             tr("Please make sure it is entered correctly.")
             + L'\n' + getProblemPersistMessage(),
             CopyToClipboardButton::Hide);
@@ -1042,7 +1050,7 @@ void QnLicenseManagerWidget::showFailedToActivateLicenseLater(const QString& ext
 
 QString QnLicenseManagerWidget::getContactSupportMessage()
 {
-    return tr("Please contact Customer Support to obtain a valid license key.");
+    return tr("Please contact Customer Support to obtain a valid License Key.");
 }
 
 QString QnLicenseManagerWidget::networkErrorText()
@@ -1052,7 +1060,7 @@ QString QnLicenseManagerWidget::networkErrorText()
 
 QString QnLicenseManagerWidget::networkErrorExtras()
 {
-    return tr("Please contact Customer Support to activate license key manually.");
+    return tr("Please contact Customer Support to activate License Key manually.");
 }
 
 QString QnLicenseManagerWidget::getProblemPersistMessage()
@@ -1064,10 +1072,9 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& hwid,
     const QString& time)
 {
-    //TODO: #GDM #tr almost the same as in QnLicenseUsageHelper::activationMessage
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to hardware ID %1").arg(hwid)
-        : tr("This license is already activated and linked to hardware ID %1 on %2")
+        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware Id %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

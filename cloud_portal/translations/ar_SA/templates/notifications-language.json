@@ -10,5 +10,8 @@
   },
   "system_shared":{
     "emailSubject":"Video system {{message.system_name}} was shared with you"
+  },
+  "review_version":{
+    "emailSubject":"Version {{message.id}} is ready to be reviewed"
   }
 }

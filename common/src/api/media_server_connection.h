@@ -18,7 +18,7 @@
 #include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include "abstract_connection.h"
 #include "model/manual_camera_seach_reply.h"
@@ -88,7 +88,7 @@ public:
      * Get event log.
      *
      * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction>& events)</tt>.
+     * called with signature <tt>(int handle, int httpStatusCode, const QList<nx::vms::event::AbstractAction>& events)</tt>.
      * Status is 0 in case of success, in other cases it holds error code.
      *
      * @param dateFrom Start timestamp in msec.
@@ -102,8 +102,8 @@ public:
         qint64 dateFrom,
         qint64 dateTo,
         QnResourceList cameras,
-        QnBusiness::EventType eventType,
-        QnBusiness::ActionType actionType,
+        nx::vms::event::EventType eventType,
+        nx::vms::event::ActionType actionType,
         QnUuid businessRuleId,
         QObject* target,
         const char* slot);
@@ -205,7 +205,17 @@ public:
 
     int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
 
-    int addBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
+    int acknowledgeEventAsync(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::AbstractActionPtr& action,
+        QObject* target,
+        const char* slot);
+
+    int addBookmarkAsync(
+        const QnCameraBookmark& bookmark,
+        QObject* target,
+        const char* slot);
+
     int updateBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
     int deleteBookmarkAsync(const QnUuid& bookmarkId, QObject* target, const char* slot);
 

@@ -318,9 +318,11 @@ void LayoutTourExecutor::setHintVisible(bool visible)
 {
     if (visible)
     {
-        m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Use keyboard arrows to switch layouts. To exit the tour press Esc."),
-            kHintTimeoutMs);
+        QString hint = m_mode == Mode::MultipleLayouts
+            ? tr("Use keyboard arrows to switch layouts. To exit the tour press Esc.")
+            : tr("Use keyboard arrows to switch cameras. To exit the tour press Esc.");
+
+        m_hintLabel = QnGraphicsMessageBox::information(hint, kHintTimeoutMs);
     }
     else if (m_hintLabel)
     {

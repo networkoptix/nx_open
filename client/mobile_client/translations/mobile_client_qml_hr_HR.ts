@@ -80,8 +80,8 @@
       <translation type="unfinished">Log in</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -281,6 +281,17 @@
     <message>
       <source>Connect</source>
       <translation type="unfinished">Connect</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>

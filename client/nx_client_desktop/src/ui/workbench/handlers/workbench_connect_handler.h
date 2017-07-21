@@ -47,8 +47,9 @@ public:
 private:
     enum ConnectionOption
     {
-        StorePassword = 0x1,
-        AutoLogin = 0x2
+        StoreSession = 0x1,
+        StorePassword = 0x2,
+        AutoLogin = 0x4,
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 
@@ -112,6 +113,11 @@ private:
     void setLogicalState(LogicalState value);
     void setPhysicalState(PhysicalState value);
     void handleStateChanged(LogicalState logicalValue, PhysicalState physicalValue);
+
+    /**
+     * Check if there is at least one online server and try to reconnect. If not, try again later.
+     */
+    void reconnectStep();
 
 signals:
     void stateChanged(LogicalState logicalValue, PhysicalState physicalValue);

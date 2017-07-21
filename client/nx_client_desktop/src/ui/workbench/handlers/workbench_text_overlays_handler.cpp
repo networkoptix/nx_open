@@ -4,9 +4,10 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
+#include <QtGui/QTextDocument>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <client/client_message_processor.h>
 
@@ -26,6 +27,8 @@
 
 #include <utils/common/delayed.h>
 #include <utils/common/html.h>
+
+using namespace nx;
 
 namespace {
 
@@ -97,10 +100,10 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this)),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new nx::vms::event::StringsHelper(commonModule()))
 {
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::businessActionReceived,
-        this, &QnWorkbenchTextOverlaysHandler::at_businessActionReceived);
+        this, &QnWorkbenchTextOverlaysHandler::at_eventActionReceived);
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded,
         this, &QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded);
@@ -110,10 +113,10 @@ QnWorkbenchTextOverlaysHandler::~QnWorkbenchTextOverlaysHandler()
 {
 }
 
-void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
-    const QnAbstractBusinessActionPtr& businessAction)
+void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
+    const vms::event::AbstractActionPtr& businessAction)
 {
-    if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
+    if (businessAction->actionType() != vms::event::showTextOverlayAction)
         return;
 
     if (!context()->user())
@@ -123,7 +126,7 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
 
     const auto state = businessAction->getToggleState();
     const bool isProlongedAction = businessAction->isProlonged();
-    const bool couldBeInstantEvent = (state == QnBusiness::UndefinedState);
+    const bool couldBeInstantEvent = (state == vms::event::EventState::undefined);
 
     /* Do not accept instant events for prolonged actions. */
     if (isProlongedAction && couldBeInstantEvent)
@@ -144,8 +147,8 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
 
     const int timeoutMs = isProlongedAction ? -1 : actionParams.durationMs;
 
-    const auto id = businessAction->getBusinessRuleId();
-    const bool finished = isProlongedAction && (state == QnBusiness::InactiveState);
+    const auto id = businessAction->getRuleId();
+    const bool finished = isProlongedAction && (state == vms::event::EventState::inactive);
 
     Q_D(QnWorkbenchTextOverlaysHandler);
 
@@ -187,8 +190,9 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
         }
         else
         {
+            const auto rich = Qt::mightBeRichText(text) ? text : Qt::convertFromPlainText(text);
             textHtml = elideHtml(
-                htmlFormattedParagraph(text, kDescriptionPixelFontSize),
+                htmlFormattedParagraph(rich, kDescriptionPixelFontSize),
                 kDescriptionMaxLength);
         }
 

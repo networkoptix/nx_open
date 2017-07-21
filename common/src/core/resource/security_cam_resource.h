@@ -10,9 +10,10 @@
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
 #include "common/common_globals.h"
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 #include "api/model/api_ioport_data.h"
 #include "core/dataconsumer/audio_data_transmitter.h"
+#include <core/resource/abstract_remote_archive_manager.h>
 
 #include <mutex>
 #include <map>
@@ -32,6 +33,7 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
+
 public:
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
@@ -278,6 +280,8 @@ public:
 #endif
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -296,7 +300,7 @@ signals:
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
 
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -347,7 +351,10 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+protected:
+#ifdef ENABLE_DATA_PROVIDERS
+    QnAudioTransmitterPtr m_audioTransmitter;
+#endif
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

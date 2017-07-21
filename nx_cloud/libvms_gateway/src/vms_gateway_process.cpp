@@ -4,6 +4,7 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
+#include <nx/network/url/url_builder.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -147,8 +148,9 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 {
     if (!settings.general().mediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-            SocketAddress(settings.general().mediatorEndpoint));
+        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
     }
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
@@ -204,6 +206,7 @@ void VmsGatewayProcess::publicAddressFetched(
         auto& pool = nx::network::SocketGlobals::tcpReversePool();
         pool.setPoolSize(rcSettings.poolSize);
         pool.setKeepAliveOptions(rcSettings.keepAlive);
+        pool.setStartTimeout(rcSettings.startTimeout);
         if (pool.start(publicAddress, rcSettings.port))
         {
             NX_LOG(lm("TCP reverse pool has started with port=%1, poolSize=%2, keepAlive=%3")

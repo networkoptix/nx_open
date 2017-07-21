@@ -46,9 +46,9 @@ public:
 
 private:
     DecoderResourcesNameset m_resNameset;
-    mutable std::auto_ptr<PluginUsageWatcher> m_usageWatcher;
-    mutable std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
-    mutable std::auto_ptr<LinuxGraphicsAdapterDescription> m_graphicsDesc;
+    mutable std::unique_ptr<PluginUsageWatcher> m_usageWatcher;
+    mutable std::unique_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
+    mutable std::unique_ptr<LinuxGraphicsAdapterDescription> m_graphicsDesc;
     QString m_sdkVersionStr;
     bool m_hardwareAccelerationEnabled;
 };

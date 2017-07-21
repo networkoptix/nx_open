@@ -24,7 +24,7 @@ if("${platform}" STREQUAL "linux")
     endif()
 endif()
 
-if("${platform}" STREQUAL "android" OR "${platform}" STREQUAL "ios")
+if("${platform}" MATCHES "android|ios")
     set(_withMediaServer OFF)
     set(_withDesktopClient OFF)
     set(_withClouds OFF)
@@ -37,7 +37,7 @@ if("${platform}" STREQUAL "macosx")
 endif()
 
 if(WINDOWS)
-set(_withTrayTool ON)
+    set(_withTrayTool ON)
 endif()
 
 option(withMediaServer "Enable media server" ${_withMediaServer})

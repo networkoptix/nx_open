@@ -278,10 +278,6 @@ to view more bookmarks</source>
       <translation>נתיב ביקורת...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>חיפוש סימניות...</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>היכנס ל- %1...</translation>
@@ -868,6 +864,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>הפרד התראות</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -923,40 +923,40 @@ to view more bookmarks</source>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation>שגיאה לא ידועה</translation>
+      <source>Unknown error.</source>
+      <translation>שגיאה לא ידועה.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation>הרישיון אינו קיים</translation>
+      <source>License does not exist.</source>
+      <translation>הרישיון אינו קיים.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation>הרישיון אינו זמין</translation>
+      <source>License is disabled.</source>
+      <translation>הרישיון אינו זמין.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation>הרישיון אינו פעיל</translation>
+      <source>License is inactive.</source>
+      <translation>הרישיון אינו פעיל.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation>רישיון לא חוקי</translation>
+      <source>Invalid license.</source>
+      <translation>רישיון לא חוקי.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation>הרישיון הוא רשיון לניסיון</translation>
+      <source>License is trial.</source>
+      <translation>הרישיון הוא רישיון זמני.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation>הרישיון בתהליך השבתה</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation>הרישיון נמצא במצב המתנה לשחרור, אך עדיין לא שוחרר.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation>מזהה חומרה לא חוקי</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation>חריגה ממספר ההשבתות של רשיון זה.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation>חריגה ממגבלה</translation>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1528,6 +1528,10 @@ to view more bookmarks</source>
       <source>Select Cameras to Backup...</source>
       <translation>בחר מצלמות לגיבוי...</translation>
     </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation>אם הגיבוי אינו מוגדר בשרת הנוכחי של המצלמות, הארכיון שלהן לא יגובה.</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
@@ -1612,6 +1616,10 @@ to view more bookmarks</source>
     <message>
       <source>Name cannot be empty.</source>
       <translation>השם אינו יכול להשאר ריק.</translation>
+    </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation>התיאור אינו יכול להיות ריק</translation>
     </message>
   </context>
   <context>
@@ -2024,10 +2032,6 @@ to view more bookmarks</source>
       <translation>טוען...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>מזהה מצלמה</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>זרם ראשי</translation>
     </message>
@@ -2038,10 +2042,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>למצלמה אין זרם משני</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>מזהה מודול קלט/פלט</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2066,6 +2066,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>למודול קלט/פלט אין תזרים אודיו</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +2869,10 @@ to %1</source>
       <source>Connection to Server could not be established.</source>
       <translation>לא ניתן לבצע חיבור לשרת.</translation>
     </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation>משתמש זה מושבת על ידי מנהל המערכת.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -3017,8 +3029,8 @@ to %1</source>
       <translation>לא היתה אפשרות לאתחל התקן שמע &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation>תבניות שמע 44.1khz ו- 48Khz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3467,10 +3479,6 @@ to %1</source>
       <translation>מצב לא תקין</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation>מזהה</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation>בלחיצה</translation>
     </message>
@@ -3492,6 +3500,10 @@ to %1</source>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
       <translation>דחף</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
     </message>
   </context>
   <context>
@@ -3707,12 +3719,12 @@ to %1</source>
       <translation>מפתח רשיון</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation>נעול למזהה חומרה</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation>תכונות:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3826,10 +3838,6 @@ to %1</source>
       <translation>הרישיון שאתה מנסה להפעיל אינו תואם את התוכנה.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation>אנא צרו קשר עם שירות לקוחות כדי לקבל מפתח רשיון תקף.</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation>כבר הפעלת רשיון זה</translation>
     </message>
@@ -3862,24 +3870,12 @@ to %1</source>
       <translation>נתקבלו נתונים לא חוקיים. אנא צרו קשר עם שירות לקוחות כדי לדווח על הבעיה.</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation>מפתח הרישיון לא חוקי</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>הפעלת רשיון נכשלה</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation>אנא צרו קשר עם שירות לקוחות כדי להשיג מפתח רשיון תקף.</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>שגיאת רשת</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation>אנא צרו קשר עם שירות לקוחות כדי להפעיל באופן ידני את מפתח הרישיון.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3911,23 +3907,6 @@ to %1</source>
       <source>Please make sure it is entered correctly.</source>
       <translation>נא ודא שהוקלד כהלכה.</translation>
     </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation>רישיון זה הוא כבר הופעל ומקושרים אל מזהה חומרה %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation>רישיון זה הוא כבר הופעל ומקושר אל החומרה עם מזהה %1 על %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels</source>
-      <translation>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
@@ -3957,19 +3936,6 @@ to %1</source>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation>אנא פנה למוקד תמיכת לקוחות</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4018,6 +3984,52 @@ to %1</source>
       <source>Deactivate</source>
       <translation>השבת</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n ערוצים.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>צור קשר עם תמיכת הלקוחות.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation>
+        <numerusform>השבת %n אחרים</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>מפתח הרישיון לא חוקי</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation>אנא צרו קשר עם שירות לקוחות כדי להשיג מפתח רשיון תקף.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation>אנא צרו קשר עם שירות לקוחות כדי להפעיל באופן ידני את מפתח הרישיון.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation>אנא צרו קשר עם שירות לקוחות כדי להשיג מפתח רשיון תקף.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4042,16 +4054,16 @@ to %1</source>
       <translation>פתיחת קובץ נכשלה</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation>מזהה החומרה הועתק אל הלוח</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>נא לשלוח מייל עם מפתח הרישיון ומזהה החומרה ל %1 כדי לקבל קובץ מפתח ההפעלה.</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>נא לשלוח מייל עם מפתח הרישיון ומזהה החומרה ל %1 כדי לקבל קובץ מפתח ההפעלה.</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4322,13 +4334,13 @@ to %1</source>
       <translation>רזולוציה נמוכה</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation>לחץ והחזק</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation>הפעלת מיתוג %1 (%2) נכשלה</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation>לחץ והחזק</translation>
     </message>
   </context>
   <context>
@@ -4348,10 +4360,6 @@ to %1</source>
     <message>
       <source>Merge with %1</source>
       <translation>מזג עם %1</translation>
-    </message>
-    <message>
-      <source>Success!</source>
-      <translation>הצלחה!</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -4374,16 +4382,8 @@ to %1</source>
       <translation>נכשלה מיזוג מערכות</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation>המערכת הוגדרה בהצלחה.</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>כתובת ה-URL אינה חוקית.</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation>השרתים מהמערכת המרוחקת אמורים להופיע בקרוב במערכת שלך.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4392,6 +4392,18 @@ to %1</source>
     <message>
       <source>This is the current System URL.</source>
       <translation>זהו ה-URL של המערכת הנוכחית.</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4474,16 +4486,16 @@ to %1</source>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation>b/s</translation>
+      <source>B/s</source>
+      <translation>B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation>Kb/s</translation>
+      <source>MB/s</source>
+      <translation>MB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation>Mb/s</translation>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -4563,21 +4575,8 @@ to %1</source>
       <translation>אזעקה: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation>הוסף סימניה</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation>סימניה נוצרה</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation>
-        <numerusform>נוצרו %n סימניות</numerusform>
-        <numerusform>נוצרו %n סימניות</numerusform>
-        <numerusform>נוצרו %n סימניות</numerusform>
-        <numerusform>נוצרו %n סימניות</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation>אשר</translation>
     </message>
   </context>
   <context>
@@ -4634,7 +4633,7 @@ to %1</source>
       <translation>קלט משתמש</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
       <translation>PTZ, יציאת התקן, אודיו דו-כיווני, מיתוג מתוכנת.</translation>
     </message>
   </context>
@@ -5186,6 +5185,14 @@ to %1</source>
       <source>Camera</source>
       <translation>מצלמה</translation>
     </message>
+    <message>
+      <source>Created</source>
+      <translation>נוצר</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation>יוצר</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchLineEdit</name>
@@ -5271,28 +5278,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation>בחר לפחות משתמש אחד</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
@@ -5303,11 +5288,11 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
+      <source>User %1 has invalid email address</source>
       <translation>למשתמש %1 יש כתובת מייל לא חוקית</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
+      <source>%n of %1 users have invalid email address</source>
       <translation>
         <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
         <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
@@ -5316,11 +5301,11 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Invalid Email address %1</source>
+      <source>Invalid email address %1</source>
       <translation>כתובת מייל לא תקינה %1</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
+      <source>%n of %1 additional email addresses are invalid</source>
       <translation>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
@@ -5329,7 +5314,7 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Send Email to %1</source>
+      <source>Send email to %1</source>
       <translation>שלח מייל אל %1</translation>
     </message>
   </context>
@@ -5871,6 +5856,47 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation>
+        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation>למשתמשים שנבחרו אין הרשאת קלט משתמש</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -6187,13 +6213,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation>בחר לפחות משתמש אחד...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6311,33 +6330,42 @@ to %1</source>
       <translation>למד עוד</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל שלהם</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation>שגיאה בעת שליחת דוא"ל</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל.</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>בדוק את %1 &amp;mdash; כדי להתחבר לשרתים שלך מכל מקום</translation>
+      <source>Connect</source>
+      <translation>חיבור</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation>חבר את המערכת שלך ל %1 &amp;mdash; כדי להפוך אותה לזמינה מכל מקום!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation>נסה את %1 &amp;mdash; התחבר למערכת שלך מכל מקום!</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses</source>
+      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל שלהם</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
       <translation>לא ניתן לקבל הודעות מערכת בדוא"ל.</translation>
     </message>
     <message>
-      <source>They cannot receive System notifications by Email.</source>
+      <source>Some users have not set their email addresses.</source>
+      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל שלהם.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
       <translation>הם אינם יכולים לקבל הודעות מערכת באמצעות אימייל.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation>שגיאה בעת שליחת דוא"ל</translation>
     </message>
   </context>
   <context>
@@ -6870,7 +6898,7 @@ to %1</source>
       <translation>הסיסמאות אינן תואמות.</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
+      <source>Cloud user with specified email already exists.</source>
       <translation>משתמש ענן עם דוא"ל שצוין כבר קיים.</translation>
     </message>
   </context>
@@ -7219,10 +7247,6 @@ to %1</source>
       <translation>סיסמת מנהל</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation>מתחבר למערכת הנוכחית...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>המערכות ימוזגו בקרוב</translation>
     </message>
@@ -7243,16 +7267,24 @@ to %1</source>
       <translation>סך כל הרשיונות יקטן</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation>השרת המחובר למערכת</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation>הסיסמא לא יכולה להיות ריקה.</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>אין אפשרות למזג מערכות ענן</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation>מתחבר למערכת הנוכחית...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>
@@ -7539,20 +7571,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation>גרור פריסה כאן כדי להוסיף אותה לסיור</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסיור</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation>לא נמצאו תפקידי משתמש</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>לא נמצאו משתמשים</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation>משתמשים</translation>
@@ -7560,6 +7584,10 @@ to %1</source>
     <message>
       <source>Custom Users</source>
       <translation>משתמשים מותאמים אישית</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>כל המשתמשים</translation>
     </message>
   </context>
   <context>
@@ -7615,6 +7643,22 @@ to %1</source>
     <message>
       <source>Reason for deactivation</source>
       <translation>סיבה להשבתה</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation>- בחר אחד -</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation>הקצתי את הרישיון בטעות למכונה לא נכונה</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation>סיבה אחרת</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation>אני משדרג את המערכת שלי</translation>
     </message>
   </context>
   <context>
@@ -7848,6 +7892,23 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>הם עשויים להתגלות באופן אוטומטי שוב לאחר הסרתם.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation>האם להחליף את סיור הפריסה הקיימת?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation>ישנה פריסת סיור נוספת עם אותו שם.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+      </translation>
     </message>
   </context>
   <context>

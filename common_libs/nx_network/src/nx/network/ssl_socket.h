@@ -78,6 +78,8 @@ public:
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
 
+    virtual QString idForToStringFromPtr() const override;
+
 protected:
     Q_DECLARE_PRIVATE(SslSocket);
     SslSocketPrivate *d_ptr;

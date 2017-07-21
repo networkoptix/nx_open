@@ -5,8 +5,8 @@
 
 #include <utils/common/connective.h>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -23,7 +23,8 @@ class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
 class QnBlinkingImageButtonWidget;
-class QnBusinessStringsHelper;
+
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
 
 class QnNotificationsCollectionWidget: public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -58,12 +59,14 @@ signals:
 private:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
-    void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+
     void handleShowPopupAction(
-        const QnAbstractBusinessActionPtr& businessAction,
+        const nx::vms::event::AbstractActionPtr& action,
         QnNotificationWidget* widget);
 
-    void hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
+    void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
+
     void hideAll();
     void updateBlinker();
 
@@ -83,21 +86,23 @@ private:
     void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, qint64 msecSinceEpoch = -1);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource);
-    QnNotificationWidget* findItem(const QnUuid& businessRuleId, std::function<bool(QnNotificationWidget* item)> filter);
+    QnNotificationWidget* findItem(const QnUuid& eventRuleId, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnUuid& eventRuleId, std::function<bool(QnNotificationWidget* item)> filter);
 
-    QIcon iconForAction(const QnAbstractBusinessActionPtr& businessAction) const;
+    QIcon iconForAction(const nx::vms::event::AbstractActionPtr& action) const;
 
     void cleanUpItem(QnNotificationWidget* item);
+
 private:
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
-    QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
+    QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByEventRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
-    std::unique_ptr<QnBusinessStringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

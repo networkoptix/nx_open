@@ -8,17 +8,18 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <business/business_fwd.h>
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnBusinessStringsHelper;
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
 
 class QnEventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QAbstractItemModel;
+
 public:
     enum Column
     {
@@ -34,7 +35,7 @@ public:
     QnEventLogModel(QObject* parent = nullptr);
     virtual ~QnEventLogModel();
 
-    void setEvents(const QVector<QnBusinessActionDataListPtr> &events);
+    void setEvents(const QVector<nx::vms::event::ActionDataListPtr> &events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column>& columns);
@@ -50,7 +51,7 @@ public:
 
     QnResourceList resourcesForPlayback(const QModelIndex& index) const;
 
-    QnBusiness::EventType eventType(int row) const;
+    nx::vms::event::EventType eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
     qint64 eventTimestamp(int row) const;
 
@@ -60,27 +61,29 @@ public:
 private:
     class DataIndex;
 
-    QnResourcePtr getResource(Column column, const QnBusinessActionData& action) const;
-    QVariant foregroundData(Column column, const QnBusinessActionData& action) const;
+    QnResourcePtr getResource(Column column, const nx::vms::event::ActionData& action) const;
+    QVariant foregroundData(Column column, const nx::vms::event::ActionData& action) const;
 
-    static QVariant iconData(Column column, const QnBusinessActionData& action);
-    QVariant mouseCursorData(Column column, const QnBusinessActionData& action) const;
-    QString textData(Column column, const QnBusinessActionData& action) const;
-    QString tooltip(Column column, const QnBusinessActionData& action) const;
+    static QVariant iconData(Column column, const nx::vms::event::ActionData& action);
+    QVariant mouseCursorData(Column column, const nx::vms::event::ActionData& action) const;
+    QString textData(Column column, const nx::vms::event::ActionData& action) const;
+    QString tooltip(Column column, const nx::vms::event::ActionData& action) const;
 
-    static int helpTopicIdData(Column column, const QnBusinessActionData& action);
+    static int helpTopicIdData(Column column, const nx::vms::event::ActionData& action);
 
-    QString motionUrl(Column column, const QnBusinessActionData& action) const;
+    QString motionUrl(Column column, const nx::vms::event::ActionData& action) const;
     QString getSubjectNameById(const QnUuid& id) const;
     QString getSubjectsText(const std::vector<QnUuid>& ids) const;
+
     static QString getResourceNameString(const QnUuid& id);
 
-    bool hasVideoLink(const QnBusinessActionData& action) const;
+    bool hasVideoLink(const nx::vms::event::ActionData& action) const;
     bool hasAccessToCamera(const QnUuid& cameraId) const;
     bool hasAccessToArchive(const QnUuid& cameraId) const;
+
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
-    std::unique_ptr<QnBusinessStringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
 };

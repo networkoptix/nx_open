@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory> // for auto_ptr
+#include <memory>
 #include <atomic>
 
 #include <nx/utils/thread/mutex.h>

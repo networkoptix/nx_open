@@ -15,7 +15,8 @@ QnConnectionInfo::QnConnectionInfo():
     nxClusterProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
     ecDbReadOnly(false),
     newSystem(false),
-    cloudHost(nx::network::AppInfo::defaultCloudHost())
+    cloudHost(nx::network::AppInfo::defaultCloudHost()),
+    p2pMode(false)
 {
 }
 

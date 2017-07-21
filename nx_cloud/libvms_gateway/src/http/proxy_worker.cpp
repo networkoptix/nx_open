@@ -1,5 +1,6 @@
 #include "proxy_worker.h"
 
+#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
@@ -22,6 +23,8 @@ ProxyWorker::ProxyWorker(
     m_proxyingId(++m_proxyingIdSequence)
 {
     using namespace std::placeholders;
+
+    replaceTargetHostWithFullCloudNameIfAppropriate(connectionToTheTargetPeer.get());
 
     NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
         .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
@@ -78,6 +81,23 @@ void ProxyWorker::stopWhileInAioThread()
     m_targetHostPipeline.reset();
 }
 
+void ProxyWorker::replaceTargetHostWithFullCloudNameIfAppropriate(
+    const AbstractStreamSocket* connectionToTheTargetPeer)
+{
+    auto cloudStreamSocket =
+        dynamic_cast<const nx::network::cloud::CloudStreamSocket*>(connectionToTheTargetPeer);
+    if (!cloudStreamSocket)
+        return;
+    
+    auto foreignHostFullCloudName = cloudStreamSocket->getForeignHostFullCloudName();
+    if (foreignHostFullCloudName.isEmpty())
+        return;
+    if (!foreignHostFullCloudName.endsWith(m_targetHost))
+        return; //< We only make address more precise here, not replacing it.
+
+    m_targetHost = cloudStreamSocket->getForeignHostFullCloudName().toUtf8();
+}
+
 void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
 {
     if (message.type != nx_http::MessageType::response)
@@ -102,9 +122,13 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
         .arg(nx_http::StatusCode::toString(statusCode))
         .arg(contentType.isEmpty() ? nx::String("none") : contentType));
 
-    if (!messageBodyNeedsConvertion(*message.response))
+    if (nx_http::isMessageBodyPresent(*message.response) &&
+        !messageBodyNeedsConvertion(*message.response))
+    {
         return startMessageBodyStreaming(std::move(message));
+    }
 
+    // Will send message with the full body when available.
     m_responseMessage = std::move(message);
 }
 
@@ -163,12 +187,14 @@ void ProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
 
 void ProxyWorker::onMessageEnd()
 {
-    updateMessageHeaders(m_responseMessage.response);
-    
-    auto msgBody = prepareFixedMessageBody();
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    if (nx_http::isMessageBodyPresent(*m_responseMessage.response))
+    {
+        updateMessageHeaders(m_responseMessage.response);
+        msgBody = prepareFixedMessageBody();
+    }
 
     const auto statusCode = m_responseMessage.response->statusLine.statusCode;
-
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(statusCode),

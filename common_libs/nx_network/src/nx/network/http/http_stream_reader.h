@@ -4,8 +4,9 @@
 #include <boost/optional.hpp>
 #endif
 
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
+#include <nx/utils/string.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "http_types.h"
 #include "line_splitter.h"
@@ -49,7 +50,7 @@ public:
      */
     bool parseBytes(
         const BufferType& data,
-        size_t count = nx_http::BufferNpos,
+        size_t count = nx::utils::BufferNpos,
         size_t* bytesProcessed = NULL);
     bool parseBytes(
         const QnByteArrayConstRef& data,
@@ -74,6 +75,10 @@ public:
      * Returns error description of previous parse error.
      */
     QString errorText() const;
+    /**
+     * Forces stream reader state.
+     */
+    void setState(ReadState state);
     /**
      * Makes reader ready to parse new message.
      */

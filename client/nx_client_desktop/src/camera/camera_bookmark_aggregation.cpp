@@ -4,6 +4,8 @@
 
 #include <utils/common/scoped_timer.h>
 
+#include <nx/utils/log/assert.h>
+
 QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList) {
     setBookmarkList(bookmarkList);
 }
@@ -11,9 +13,10 @@ QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkL
 bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
 #ifdef _DEBUG
-    /* C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT, it won't matter under define. */
-    assert(!bookmark.isNull());
+    // C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT.
+    assert(!bookmark.isNull()); //< Safe under define.
 #endif
+
     QN_LOG_TIME(Q_FUNC_INFO);
 
     /* Null bookmarks must not be stored in the aggregation. */

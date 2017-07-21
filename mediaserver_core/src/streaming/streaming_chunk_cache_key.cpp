@@ -31,7 +31,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     const QString& containerFormat,
     const QString& alias,
     quint64 startTimestamp,
-    quint64 duration,
+    std::chrono::microseconds duration,
     MediaQuality streamQuality,
     const std::multimap<QString, QString>& auxiliaryParams )
 :
@@ -99,8 +99,7 @@ quint64 StreamingChunkCacheKey::startTimestamp() const
     return m_startTimestamp;
 }
 
-//!Duration in millis
-quint64 StreamingChunkCacheKey::duration() const
+std::chrono::microseconds StreamingChunkCacheKey::duration() const
 {
     return m_duration;
 }
@@ -108,7 +107,7 @@ quint64 StreamingChunkCacheKey::duration() const
 //!startTimestamp() + duration
 quint64 StreamingChunkCacheKey::endTimestamp() const
 {
-    return m_startTimestamp + m_duration;
+    return m_startTimestamp + m_duration.count();
 }
 
 MediaQuality StreamingChunkCacheKey::streamQuality() const
@@ -247,7 +246,7 @@ uint qHash( const StreamingChunkCacheKey& key )
         + key.channel()
         + key.startTimestamp()
         + qHash(key.alias())
-        + key.duration()
+        + key.duration().count()
         + key.endTimestamp()
         + key.streamQuality()
         + key.pictureSizePixels().width()

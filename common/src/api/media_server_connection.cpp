@@ -49,6 +49,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
 
+using namespace nx;
+
 namespace {
 
 // TODO: Introduce constants for API methods registered in media_server_process.cpp.
@@ -109,6 +111,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
     (ec2BookmarksObject, "ec2/bookmarks")
     (ec2BookmarkAddObject, "ec2/bookmarks/add")
+    (ec2BookmarkAcknowledgeObject, "ec2/bookmarks/acknowledge")
     (ec2BookmarkUpdateObject, "ec2/bookmarks/update")
     (ec2BookmarkDeleteObject, "ec2/bookmarks/delete")
     (ec2BookmarkTagsObject, "ec2/bookmarks/tags")
@@ -248,7 +251,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case EventLogObject:
         {
-            QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
+            vms::event::ActionDataListPtr events(new vms::event::ActionDataList);
             if (response.status == 0)
                 QnEventSerializer::deserialize(events, response.msgBody);
             emitFinished(this, response.status, events, handle);
@@ -270,9 +273,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnBackupStatusData>(this, response, handle);
             break;
         case ec2BookmarkAddObject:
+        case ec2BookmarkAcknowledgeObject:
         case ec2BookmarkUpdateObject:
         case ec2BookmarkDeleteObject:
-            processJsonReply<QnCameraBookmark>(this, response, handle);
+            emitFinished(this, response.status, handle);
             break;
         case InstallUpdateObject:
         case InstallUpdateUnauthenticatedObject:
@@ -930,8 +934,8 @@ int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slo
 }
 
 int QnMediaServerConnection::getEventLogAsync(
-    qint64 dateFrom, qint64 dateTo, QnResourceList camList, QnBusiness::EventType eventType,
-    QnBusiness::ActionType actionType, QnUuid businessRuleId, QObject* target, const char* slot)
+    qint64 dateFrom, qint64 dateTo, QnResourceList camList, vms::event::EventType eventType,
+    vms::event::ActionType actionType, QnUuid businessRuleId, QObject* target, const char* slot)
 {
     QnRequestParamList params;
     params << QnRequestParam("from", dateFrom);
@@ -945,13 +949,13 @@ int QnMediaServerConnection::getEventLogAsync(
     }
     if (!businessRuleId.isNull())
         params << QnRequestParam("brule_id", businessRuleId);
-    if (eventType != QnBusiness::UndefinedEvent)
+    if (eventType != vms::event::undefinedEvent)
         params << QnRequestParam("event", (int) eventType);
-    if (actionType != QnBusiness::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         params << QnRequestParam("action", (int) actionType);
 
     return sendAsyncGetRequestLogged(EventLogObject,
-        params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::event::ActionDataListPtr), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(
@@ -1103,12 +1107,28 @@ int QnMediaServerConnection::recordedTimePeriods(
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
 
+
+int QnMediaServerConnection::acknowledgeEventAsync(
+    const QnCameraBookmark& bookmark,
+    const nx::vms::event::AbstractActionPtr& action,
+    QObject* target,
+    const char* slot)
+{
+    QnUpdateBookmarkRequestData request(bookmark, action);
+    return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,
+        request.toParams(), nullptr, target, slot);
+}
+
 int QnMediaServerConnection::addBookmarkAsync(
-    const QnCameraBookmark& bookmark, QObject* target, const char* slot)
+    const QnCameraBookmark& bookmark,
+    QObject* target,
+    const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark);
     request.format = Qn::SerializationFormat::UbjsonFormat;
-    return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
+
+    return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(),
+        nullptr, target, slot);
 }
 
 int QnMediaServerConnection::updateBookmarkAsync(

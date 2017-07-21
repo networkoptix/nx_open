@@ -7,7 +7,7 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>E-Mail</th>
+                <th>Email</th>
                 <th>Berechtigungen</th>
                 <th class="button-cell"></th>
                 <th class="button-cell"></th>
@@ -25,11 +25,13 @@
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeEdited"
+                       ng-class="{disabled:locked[user.email]}"
                        title="Berechtigungen bearbeiten"
                        ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Bearbeiten</span></span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
+                       ng-class="{disabled:locked[user.email]}"
                        title="Löschen"
                        ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Löschen</span></a></td>
             </tr>

@@ -23,6 +23,28 @@
 #   define TRACE(...)
 #endif
 
+namespace {
+
+// Returns true, if a resource has been inserted. false - if updated existing resource
+template <class T>
+bool insertOrUpdateResource(const T& resource, QHash<QnUuid, T>* const resourcePool)
+{
+    const QnUuid& id = resource->getId();
+    auto itr = resourcePool->find(id);
+    if (itr == resourcePool->end())
+    {
+        // new resource
+        resourcePool->insert(id, resource);
+        return true;
+    }
+
+    // if we already have such resource in the pool
+    itr.value()->update(resource);
+    return false;
+}
+
+} // namespace
+
 static const QString kLiteClientLayoutKey = lit("liteClient");
 
 QnResourcePool::QnResourcePool(QObject* parent):
@@ -62,17 +84,17 @@ void QnResourcePool::commit()
     m_tmpResources.clear();
 }
 
-void QnResourcePool::addResource(const QnResourcePtr &resource)
+void QnResourcePool::addResource(const QnResourcePtr& resource, bool instantly)
 {
-    if (m_tranInProgress)
+    if (!instantly && m_tranInProgress)
         m_tmpResources << resource;
     else
         addResources(QnResourceList() << resource);
 }
 
-void QnResourcePool::addIncompatibleResource(const QnResourcePtr &resource)
+void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& server)
 {
-    addResources(QnResourceList() << resource, false);
+    addResources(QnResourceList() << server, false);
 }
 
 void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool)
@@ -103,15 +125,23 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
             continue;
         }
 
-        if( insertOrUpdateResource(
-                resource,
-                mainPool ? &m_resources : &m_incompatibleResources) )
+        if (mainPool)
         {
-            newResources.insert(resource->getId(), resource);
+            if (insertOrUpdateResource(resource, &m_resources))
+            {
+                m_cache.resourceAdded(resource);
+                newResources.insert(resource->getId(), resource);
+            }
+            m_incompatibleServers.remove(resource->getId());
+        }
+        else
+        {
+            auto server = resource.dynamicCast<QnMediaServerResource>();
+            NX_EXPECT(server, "Only fake servers allowed here");
+            if (insertOrUpdateResource(server, &m_incompatibleServers))
+                newResources.insert(resource->getId(), resource);
         }
 
-        if (mainPool)
-            m_incompatibleResources.remove(resource->getId());
     }
 
     resourcesLock.unlock();
@@ -191,10 +221,10 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
         QnUuid resId = resource->getId();
-        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resId);
         if (m_adminResource && resId == m_adminResource->getId())
             m_adminResource.clear();
 
+        const auto resIter = m_resources.find(resId);
         if (resIter != m_resources.end())
         {
             m_cache.resourceRemoved(resource);
@@ -203,10 +233,10 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         }
         else
         {
-            resIter = m_incompatibleResources.find(resource->getId());
-            if (resIter != m_incompatibleResources.end())
+            const auto iter = m_incompatibleServers.find(resource->getId());
+            if (iter != m_incompatibleServers.end())
             {
-                m_incompatibleResources.erase(resIter);
+                m_incompatibleServers.erase(iter);
                 appendRemovedResource(resource);
             }
         }
@@ -542,41 +572,25 @@ QnLayoutResourceList QnResourcePool::getLayoutsWithResource(const QnUuid &camera
     return result;
 }
 
-bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QnUuid, QnResourcePtr>* const resourcePool )
+QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(const QnUuid& id,
+    bool useCompatible) const
 {
-    const QnUuid& id = resource->getId();
-    auto itr = resourcePool->find(id);
-    if (itr == resourcePool->end())
-    {
-        // new resource
-        resourcePool->insert(id, resource);
-        if (resourcePool == &m_resources)
-            m_cache.resourceAdded(resource);
-        return true;
-    }
-    else {
-        // if we already have such resource in the pool
-        itr.value()->update(resource);
-        return false;
-    }
-}
+    QnMutexLocker locker(&m_resourcesMtx);
 
-QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid &id, bool useCompatible) const {
-    QnMutexLocker locker( &m_resourcesMtx );
-
-    auto it = m_incompatibleResources.find(id);
-    if (it != m_incompatibleResources.end())
+    auto it = m_incompatibleServers.find(id);
+    if (it != m_incompatibleServers.end())
         return it.value();
 
     if (useCompatible)
-        return getResourceById(id);
+        return getResourceById(id).dynamicCast<QnMediaServerResource>();
 
-    return QnResourcePtr();
+    return QnMediaServerResourcePtr();
 }
 
-QnResourceList QnResourcePool::getAllIncompatibleResources() const {
-    QnMutexLocker locker( &m_resourcesMtx );
-    return m_incompatibleResources.values();
+QnMediaServerResourceList QnResourcePool::getIncompatibleServers() const
+{
+    QnMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleServers.values();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid &uuid) const {

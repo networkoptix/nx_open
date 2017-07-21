@@ -1,7 +1,7 @@
 #include <QtXml/QDomElement>
 
 #include "hikvision_audio_transmitter.h"
-#include "hikvision_parsing_utils.h"
+#include "hikvision_utils.h"
 
 #include <nx/utils/std/cpp14.h>
 
@@ -14,9 +14,6 @@ const QString kOpenTwoWayAudioUrlTemplate = lit("%1/open");
 const QString kCloseTwoWayAudioUrlTemplate = lit("%1/close");
 const QString kTransmitTwoWayAudioUrlTemplate = lit("%1/audioData");
 
-const QString kStatusCodeOk = lit("1");
-const QString kSubStatusCodeOk = lit("ok");
-
 const std::chrono::milliseconds kHttpHelperTimeout(4000);
 const std::chrono::milliseconds kTransmissionTimeout(4000);
 
@@ -27,7 +24,9 @@ bool responseIsOk(const nx_http::Response* const response)
 
 } // namespace
 
-using namespace nx::plugins;
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
 
 HikvisionAudioTransmitter::HikvisionAudioTransmitter(QnSecurityCamResource* resource):
     base_type(resource)
@@ -39,7 +38,7 @@ HikvisionAudioTransmitter::~HikvisionAudioTransmitter()
     stop();
 }
 
-bool HikvisionAudioTransmitter::isCompatible(const QnAudioFormat& format) const
+bool HikvisionAudioTransmitter::isCompatible(const QnAudioFormat& /*format*/) const
 {
     // Unused function
     return true;
@@ -173,9 +172,7 @@ bool HikvisionAudioTransmitter::closeChannel()
 
     auto response = hikvision::parseCommonResponse(messageBody);
 
-    if (!response 
-        || response->statusCode != kStatusCodeOk 
-        || response->subStatusCode.toLower() != kSubStatusCodeOk)
+    if (!response || !hikvision::responseIsOk(response.get()))
     {
         return false;
     }
@@ -196,3 +193,7 @@ std::unique_ptr<nx_http::HttpClient> HikvisionAudioTransmitter::createHttpHelper
 
     return httpHelper;
 }
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx

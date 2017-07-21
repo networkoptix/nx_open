@@ -6,11 +6,12 @@
 
 namespace test  {
 
-const nx::Buffer kTestRealm = "test-realm";
-const nx::Buffer kTestAlgorithm = "MD5";
-const nx::Buffer kTestPassword = "password";
-const nx::Buffer kTestUri = "/uri";
-const nx::Buffer kTestMethod = "GET";
+static const nx::Buffer kTestRealm = "test-realm";
+static const nx::Buffer kTestAlgorithm = "MD5";
+static const nx::Buffer kTestPassword = "password";
+static const nx::Buffer kWrongPassword = "wrong_password";
+static const nx::Buffer kTestUri = "/uri";
+static const nx::Buffer kTestMethod = "GET";
 
 
 class TestCdbNonceFetcher : public ::CdbNonceFetcher
@@ -60,7 +61,8 @@ protected:
 
     nx_http::header::Authorization generateAuthHeader(
         const nx::Buffer& userName,
-        const nx::Buffer& cloudNonce)
+        const nx::Buffer& cloudNonce,
+        const nx::Buffer& password = kTestPassword)
     {
         nx_http::header::WWWAuthenticate authServerHeader;
         authServerHeader.authScheme = nx_http::header::AuthScheme::digest;
@@ -73,7 +75,7 @@ protected:
         nx_http::calcDigestResponse(
             "GET",
             userName,
-            kTestPassword,
+            password,
             boost::none,
             kTestUri,
             authServerHeader,
@@ -147,26 +149,54 @@ protected:
         supplier->removeUser("vasya");
     }
 
+    void whenAllUsersRemoved()
+    {
+        supplier->removeUser("vasya");
+        supplier->removeUser("petya");
+    }
+
+    void whenClearCalled()
+    {
+        userInfoPool.clear();
+    }
+
+
+    void thenCommonNonceShouldBeNull()
+    {
+        ASSERT_FALSE((bool)userInfoPool.newestMostCommonNonce());
+    }
+
     void thenSecondStillCanAuth()
     {
-        ASSERT_FALSE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_WrongLogin, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce())));
 
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
     }
 
     void thenBothUsersCanAuthenticateUsingNewestMostCommonNonce()
     {
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce())));
 
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
+    }
+
+    void thenBothUsersCanNotAuthenticateWithWrongPasswords()
+    {
+        ASSERT_EQ(Qn::Auth_WrongPassword, userInfoPool.authenticate(
+            kTestMethod,
+            generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce(), kWrongPassword)));
+
+        ASSERT_EQ(Qn::Auth_WrongPassword, userInfoPool.authenticate(
+            kTestMethod,
+            generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce(), kWrongPassword)));
     }
 
     nx::Buffer generateTestNonce(char c)
@@ -201,6 +231,25 @@ TEST_F(CloudUserInfoPool, commonNonce_twoUsers_onlyFirstNonceIsCommon_SecondRemo
     thenSecondStillCanAuth();
 }
 
+TEST_F(CloudUserInfoPool, allUsersRemoved_nonceCleared)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenAllUsersRemoved();
+    thenCommonNonceShouldBeNull();
+}
+
+TEST_F(CloudUserInfoPool, clear)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenClearCalled();
+    thenCommonNonceShouldBeNull();
+}
+
+TEST_F(CloudUserInfoPool, IncorrectPassword)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    thenBothUsersCanNotAuthenticateWithWrongPasswords();
+}
 
 }
 

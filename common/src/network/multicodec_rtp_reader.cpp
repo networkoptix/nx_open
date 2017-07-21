@@ -5,40 +5,44 @@
 #include <QtCore/QSettings>
 #include <set>
 
-#include <business/events/reasoned_business_event.h>
-#include <business/events/network_issue_business_event.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/event/events/network_issue_event.h>
+
 #include <common/common_module.h>
-#include <core/resource_management/resource_data_pool.h>
-#include <api/global_settings.h>
-
-#include "network/h264_rtp_parser.h"
-#include "nx/streaming/rtp_stream_parser.h"
-
-#include <nx/utils/log/log.h>
-#include "utils/common/synctime.h"
-#include "utils/common/util.h"
-#include <nx/network/compat_poll.h>
-
-#include "core/resource/network_resource.h"
-#include "core/resource/resource_media_layout.h"
-#include "core/resource/media_resource.h"
-#include "core/resource/camera_resource.h"
-
-#include "aac_rtp_parser.h"
-#include "simpleaudio_rtp_parser.h"
-#include "mjpeg_rtp_parser.h"
-#include "api/app_server_connection.h"
 #include <common/static_common_module.h>
 
+#include <api/global_settings.h>
+#include <api/app_server_connection.h>
+
+#include <network/h264_rtp_parser.h>
+#include <network/hevc_rtp_parser.h>
+#include <network/aac_rtp_parser.h>
+#include <network/simpleaudio_rtp_parser.h>
+#include <network/mjpeg_rtp_parser.h>
+
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/network/compat_poll.h>
+#include <nx/utils/log/log.h>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+
+#include <core/resource/network_resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_data_pool.h>
+
+using namespace nx;
 
 namespace {
+
 static const int RTSP_RETRY_COUNT = 6;
 static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
-
 
 } // namespace
 
@@ -152,15 +156,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (isRtpFail || elapsed > m_rtpFrameTimeoutMs)
     {
         QString reasonParamsEncoded;
-        QnBusiness::EventReason reason;
+        vms::event::EventReason reason;
         if (elapsed > m_rtpFrameTimeoutMs) {
-            reason = QnBusiness::NetworkNoFrameReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
+            reason = vms::event::EventReason::networkNoFrame;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
             NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
         else {
-            reason = QnBusiness::NetworkConnectionClosedReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
+            reason = vms::event::EventReason::networkConnectionClosed;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
             NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
 
@@ -382,6 +386,8 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         return 0;
     else if (codecName == QLatin1String("H264"))
         result = new CLH264RtpParser;
+    else if (codecName == QLatin1String("H265"))
+        result = new nx::network::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
         result = new QnMjpegRtpParser;
     else if (codecName == QLatin1String("MPEG4-GENERIC"))
@@ -435,8 +441,8 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
     emit networkIssue(resource,
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      QnBusiness::NetworkRtpPacketLossReason,
-                      QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
+                      vms::event::EventReason::networkRtpPacketLoss,
+                      vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
 
 }
 

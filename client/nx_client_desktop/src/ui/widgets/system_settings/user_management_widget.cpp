@@ -5,6 +5,8 @@
 
 #include <QtGui/QKeyEvent>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <api/global_settings.h>
 
 #include <client/client_settings.h>
@@ -321,8 +323,10 @@ void QnUserManagementWidget::updateLdapState()
 void QnUserManagementWidget::applyChanges()
 {
     auto modelUsers = m_usersModel->users();
+    QnUserResourceList modifiedUsers;
     QnUserResourceList usersToDelete;
-    for (auto user : resourcePool()->getResources<QnUserResource>())
+
+    for (auto user: resourcePool()->getResources<QnUserResource>())
     {
         if (!modelUsers.contains(user))
         {
@@ -333,26 +337,27 @@ void QnUserManagementWidget::applyChanges()
         bool enabled = m_usersModel->isUserEnabled(user);
         if (user->isEnabled() != enabled)
         {
-            qnResourcesChangesManager->saveUser(user,
-                [enabled](const QnUserResourcePtr &user)
-                {
-                    user->setEnabled(enabled);
-                });
+            user->setEnabled(enabled);
+            modifiedUsers << user;
         }
     }
+    qnResourcesChangesManager->saveUsers(modifiedUsers);
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (nx::client::desktop::ui::resources::deleteResources(this, usersToDelete))
+    if (nx::client::desktop::ui::messages::Resources::deleteResources(this, usersToDelete))
     {
-        setEnabled(false);
         qnResourcesChangesManager->deleteResources(usersToDelete,
-            [this, guard = QPointer<QnUserManagementWidget>(this)](bool /* success */)
+            [this, guard = QPointer<QnUserManagementWidget>(this)](bool success)
             {
                 if (guard)
+                {
                     setEnabled(true);
-
-                emit hasChangesChanged();
+                    emit hasChangesChanged();
+                }
             });
+
+        setEnabled(false);
+        emit hasChangesChanged();
     }
     else
     {
@@ -362,6 +367,9 @@ void QnUserManagementWidget::applyChanges()
 
 bool QnUserManagementWidget::hasChanges() const
 {
+    if (!isEnabled())
+        return false;
+
     using boost::algorithm::any_of;
     return any_of(resourcePool()->getResources<QnUserResource>(),
         [this, users = m_usersModel->users()](const QnUserResourcePtr& user)
@@ -438,7 +446,7 @@ void QnUserManagementWidget::openLdapSettings()
 
 void QnUserManagementWidget::editRoles()
 {
-    menu()->triggerIfPossible(action::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::UserRolesAction); // TODO: #vkutin #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::createUser()

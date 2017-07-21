@@ -278,10 +278,6 @@ to view more bookmarks</source>
       <translation>시스템 감사...</translation>
     </message>
     <message>
-      <source>Bookmark Search...</source>
-      <translation>북마크검색</translation>
-    </message>
-    <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
       <translation>%1에 로그인</translation>
@@ -746,7 +742,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>설정</translation>
     </message>
     <message>
       <source>Close</source>
@@ -868,6 +864,10 @@ to view more bookmarks</source>
       <source>Unpin Notifications</source>
       <translation>알림 비고정</translation>
     </message>
+    <message>
+      <source>Bookmark Log...</source>
+      <translation type="unfinished">Bookmark Log...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -923,40 +923,40 @@ to view more bookmarks</source>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <source>Unknown error.</source>
+      <translation>알수없는 오류</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation type="unfinished">License does not exist</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation type="unfinished">License is disabled</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation type="unfinished">License is inactive</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation type="unfinished">Invalid license</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation type="unfinished">License is trial</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation type="unfinished">License is in deactivation process</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation type="unfinished">Invalid hardware id</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation type="unfinished">Limit exceeded</translation>
+      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -1507,6 +1507,10 @@ to view more bookmarks</source>
       <source>Select Cameras to Backup...</source>
       <translation>백업할 카메라선택</translation>
     </message>
+    <message>
+      <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
+      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
@@ -1588,6 +1592,10 @@ to view more bookmarks</source>
     <message>
       <source>Name cannot be empty.</source>
       <translation>이름을 반드시 입력해주세요</translation>
+    </message>
+    <message>
+      <source>Description cannot be empty</source>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -1976,10 +1984,6 @@ to view more bookmarks</source>
       <translation>읽는 중...</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>카메라 ID</translation>
-    </message>
-    <message>
       <source>Primary Stream</source>
       <translation>기본 스트림</translation>
     </message>
@@ -1990,10 +1994,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera has no secondary stream</source>
       <translation>카메라는 2nd 스트림 없음</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O 모듈 ID</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2018,6 +2018,14 @@ to view more bookmarks</source>
     <message>
       <source>I/O module has no audio stream</source>
       <translation>I/O 모듈에는 오디오 스트림 없음</translation>
+    </message>
+    <message>
+      <source>I/O Module Id</source>
+      <translation type="unfinished">I/O Module Id</translation>
+    </message>
+    <message>
+      <source>Camera Id</source>
+      <translation type="unfinished">Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2779,6 +2787,10 @@ to %1</source>
       <source>Connection to Server could not be established.</source>
       <translation>서버에 연결을 설정할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -2935,8 +2947,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
-      <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</translation>
+      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3367,10 +3379,6 @@ to %1</source>
       <translation>유효하지 않은 상태</translation>
     </message>
     <message>
-      <source>ID</source>
-      <translation>ID</translation>
-    </message>
-    <message>
       <source>On click</source>
       <translation>클릭에</translation>
     </message>
@@ -3392,6 +3400,10 @@ to %1</source>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
       <translation>Impulse</translation>
+    </message>
+    <message>
+      <source>Id</source>
+      <translation type="unfinished">Id</translation>
     </message>
   </context>
   <context>
@@ -3604,12 +3616,12 @@ to %1</source>
       <translation>인증키</translation>
     </message>
     <message>
-      <source>Locked to Hardware ID</source>
-      <translation>하드웨어 ID 잠금</translation>
-    </message>
-    <message>
       <source>Features:</source>
       <translation>기능:</translation>
+    </message>
+    <message>
+      <source>Locked to Hardware Id</source>
+      <translation type="unfinished">Locked to Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3720,10 +3732,6 @@ to %1</source>
       <translation>활성화 하려는 라이선스 소프트웨어와 호환 되지 않습니다.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to get a valid license key.</source>
-      <translation>유효한 라이센스 키를 얻으려면 고객 지원 문의 하십시오.</translation>
-    </message>
-    <message>
       <source>You already activated this license</source>
       <translation>당신은 이미 라이센스를 활성화했습니다.</translation>
     </message>
@@ -3756,24 +3764,12 @@ to %1</source>
       <translation>잘못 된 데이터 받았습니다. 고객 지원에 문의 하시기 바랍니다.</translation>
     </message>
     <message>
-      <source>Invalid license key</source>
-      <translation>잘못 된 라이센스 키</translation>
-    </message>
-    <message>
       <source>Failed to activate license</source>
       <translation>라이센스를 활성화 하지 못했습니다.</translation>
     </message>
     <message>
-      <source>Please contact Customer Support to obtain a valid license key.</source>
-      <translation>유효한 라이센스 키를 얻으려면 고객 지원센터 문의 하십시오.</translation>
-    </message>
-    <message>
       <source>Network error</source>
       <translation>네트워크 문제</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support to activate license key manually.</source>
-      <translation>수동으로 라이센스 키를 활성화 하기 위해 고객 지원에 문의 하시기 바랍니다.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -3799,20 +3795,6 @@ to %1</source>
       <source>Please make sure it is entered correctly.</source>
       <translation>올바르게 입력 했는지 확인 하십시오.</translation>
     </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1</source>
-      <translation>이 라이센스하드웨어 ID %1에서 활성화 되었습니다.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to hardware ID %1 on %2</source>
-      <translation>이 라이센스 %2 의 하드웨어 ID %1에서 활성화 되었습니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels</source>
-      <translation type="unfinished">
-        <numerusform>%n channels</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
@@ -3833,16 +3815,6 @@ to %1</source>
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation type="unfinished">
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation type="unfinished">Please contact Customer Support</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3885,6 +3857,46 @@ to %1</source>
       <source>Deactivate</source>
       <translation type="unfinished">Deactivate</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>잘못 된 라이센스 키</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to obtain a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to activate License Key manually.</source>
+      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support to get a valid License Key.</source>
+      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -3909,16 +3921,16 @@ to %1</source>
       <translation>파일 열기 실패!</translation>
     </message>
     <message>
-      <source>Hardware ID copied to clipboard</source>
-      <translation>클립보드에 하드웨어 ID복사</translation>
+      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>인증키 파일을 얻으려면 라이센스키와 HW ID를 이메일로 보내주세요.</translation>
+      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>인증키 파일을 얻으려면 라이센스키와 HW ID를 보내주세요.</translation>
+      <source>Hardware Id copied to clipboard</source>
+      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4177,13 +4189,13 @@ to %1</source>
       <translation>저해상도</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <comment>Software Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
-    </message>
-    <message>
       <source>Failed to invoke trigger %1 (%2)</source>
       <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
     </message>
   </context>
   <context>
@@ -4203,10 +4215,6 @@ to %1</source>
     <message>
       <source>Merge with %1</source>
       <translation>%1로 병합</translation>
-    </message>
-    <message>
-      <source>Success!</source>
-      <translation>성공!</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -4229,16 +4237,8 @@ to %1</source>
       <translation>시스템을 병합 하지 못했습니다.</translation>
     </message>
     <message>
-      <source>System was configured successfully.</source>
-      <translation>시스템은 성공적으로 구성 되었습니다.</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL이 유효 하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>The servers from the remote System should appear in your System soon.</source>
-      <translation>원격 시스템의 서버는 곧 시스템에 표시 됩니다.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -4247,6 +4247,18 @@ to %1</source>
     <message>
       <source>This is the current System URL.</source>
       <translation>현재 시스템의 URL입니다.</translation>
+    </message>
+    <message>
+      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>You will be reconnected</source>
+      <translation type="unfinished">You will be reconnected</translation>
+    </message>
+    <message>
+      <source>Systems will be merged shortly</source>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
   </context>
   <context>
@@ -4329,16 +4341,16 @@ to %1</source>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
-      <source>b/s</source>
-      <translation>b/초</translation>
+      <source>B/s</source>
+      <translation type="unfinished">B/s</translation>
     </message>
     <message>
-      <source>Kb/s</source>
-      <translation>Kb/초</translation>
+      <source>MB/s</source>
+      <translation type="unfinished">MB/s</translation>
     </message>
     <message>
-      <source>Mb/s</source>
-      <translation>Mb/초</translation>
+      <source>kB/s</source>
+      <translation type="unfinished">kB/s</translation>
     </message>
   </context>
   <context>
@@ -4415,18 +4427,8 @@ to %1</source>
       <translation>알람: %1</translation>
     </message>
     <message>
-      <source>Bookmark it</source>
-      <translation type="unfinished">Bookmark it</translation>
-    </message>
-    <message>
-      <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks created</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks created</numerusform>
-      </translation>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
@@ -4483,8 +4485,8 @@ to %1</source>
       <translation>사용자 입력</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
@@ -5017,6 +5019,14 @@ to %1</source>
       <source>Camera</source>
       <translation>카메라</translation>
     </message>
+    <message>
+      <source>Created</source>
+      <translation type="unfinished">Created</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation type="unfinished">Creator</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchLineEdit</name>
@@ -5096,22 +5106,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation>최소 하나의 사용자를 선택하세요</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n 사용자</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n 역할</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
@@ -5119,28 +5113,28 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation>사용자 %1 이 메일 주소가 유효하지 않습니다.</translation>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
-      <translation>
-        <numerusform>%n 개중 %1개 사용자의 이메일이 유효 하지 않습니다.</numerusform>
+      <source>%n of %1 users have invalid email address</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
-      <source>Invalid Email address %1</source>
-      <translation>잘못 된 이메일 주소 %1</translation>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
     </message>
     <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
-      <translation>
-        <numerusform>%n 개중 %1 개 추가 이메일 주소는 유효 하지 않습니다.</numerusform>
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
-      <source>Send Email to %1</source>
-      <translation>%1 이메일 보내기</translation>
+      <source>Send email to %1</source>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
@@ -5678,6 +5672,41 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Role %1 has no User Input permission</source>
+      <comment>%1 is the name of selected role</comment>
+      <translation type="unfinished">Role %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no User Input permission</source>
+      <translation type="unfinished">Selected roles have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no User Input permission</source>
+      <comment>%1 is number of selected roles</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no User Input permission</source>
+      <comment>%1 is the name of selected user</comment>
+      <translation type="unfinished">User %1 has no User Input permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no User Input permission</source>
+      <translation type="unfinished">Selected users have no User Input permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no User Input permission</source>
+      <comment>%1 is number of selected users</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
@@ -5991,13 +6020,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation type="unfinished">Select at least one user...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6115,33 +6137,42 @@ to %1</source>
       <translation>자세히 알아보기</translation>
     </message>
     <message>
-      <source>Some users have not set their Email addresses</source>
-      <translation>일부 사용자의 이멜일이 설정되지 않았습니다.</translation>
-    </message>
-    <message>
-      <source>Error while sending Email</source>
-      <translation>메시지 보내는 중 오류 발생</translation>
-    </message>
-    <message>
-      <source>Some users have not set their Email addresses.</source>
-      <translation>일부 사용자의 이멜일이 설정되지 않았습니다.</translation>
-    </message>
-    <message>
       <source>System is running in safe mode.</source>
       <translation>시스템 안전모드 상태 입니다</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
+      <source>Connect</source>
+      <translation>연결</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Check out %1 &amp;mdash; 어디서든 연결합니다.</translation>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by Email.</source>
-      <translation>시스템 알림을 이메일로 받을 수 없습니다.</translation>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
     </message>
     <message>
-      <source>They cannot receive System notifications by Email.</source>
-      <translation>그들은 이메일로 시스템 알림을 받을 수 없습니다.</translation>
+      <source>Some users have not set their email addresses</source>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
+    </message>
+    <message>
+      <source>You cannot receive System notifications by email.</source>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some users have not set their email addresses.</source>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
+    </message>
+    <message>
+      <source>They cannot receive System notifications by email.</source>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+    </message>
+    <message>
+      <source>Error while sending email</source>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
   </context>
   <context>
@@ -6656,8 +6687,8 @@ to %1</source>
       <translation>비밀번호가 일치하지 않습니다.</translation>
     </message>
     <message>
-      <source>Cloud user with specified Email already exists.</source>
-      <translation>지정 된 이메일 주소를 가진 클라우드 사용자는 이미 존재합니다.</translation>
+      <source>Cloud user with specified email already exists.</source>
+      <translation type="unfinished">Cloud user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -6754,7 +6785,7 @@ to %1</source>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>웹페이지:</translation>
     </message>
   </context>
   <context>
@@ -6999,10 +7030,6 @@ to %1</source>
       <translation>관리자 비밀번호</translation>
     </message>
     <message>
-      <source>Connecting to the current system...</source>
-      <translation>현재 서버에 접속 중...</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>시스템은 곧 병합 완료 됩니다.</translation>
     </message>
@@ -7023,16 +7050,24 @@ to %1</source>
       <translation>총 라이센스 수량은 줄어듭니다.</translation>
     </message>
     <message>
-      <source>Server connected to System</source>
-      <translation>서버가 시스템에 연결되었습니다.</translation>
-    </message>
-    <message>
       <source>Password cannot be empty.</source>
       <translation>비밀번호는 비울 수 없습니다.</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>클라우드 시스템을 병합할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Connecting to the current System...</source>
+      <translation type="unfinished">Connecting to the current System...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to the System shortly</source>
+      <translation type="unfinished">Server will be connected to the System shortly</translation>
+    </message>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
   </context>
   <context>
@@ -7301,20 +7336,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation type="unfinished">No user roles found</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation>사용자</translation>
@@ -7322,6 +7349,10 @@ to %1</source>
     <message>
       <source>Custom Users</source>
       <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>모든 사용자</translation>
     </message>
   </context>
   <context>
@@ -7377,6 +7408,22 @@ to %1</source>
     <message>
       <source>Reason for deactivation</source>
       <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
   </context>
   <context>
@@ -7562,6 +7609,20 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>제거 후 다시 자동 발견 있을 수 있습니다</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
     </message>
   </context>
   <context>

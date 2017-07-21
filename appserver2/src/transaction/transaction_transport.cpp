@@ -7,13 +7,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include <nx/network/http/custom_headers.h>
 
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -42,7 +42,7 @@ QnTransactionTransport::QnTransactionTransport(
 }
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBusBase* bus,
+    TransactionMessageBusBase* bus,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :

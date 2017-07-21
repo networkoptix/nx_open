@@ -11,7 +11,7 @@
 #include <api/runtime_info_manager.h>
 #include <api/common_message_processor.h>
 
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include <common/common_meta_types.h>
 
@@ -145,23 +145,24 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
-    m_eventRuleManager = new QnEventRuleManager(this); //< Depends on nothing.
+    m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
+    m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
     m_moduleDiscoveryManager = new nx::vms::discovery::Manager(this, clientMode, m_resourcePool);
     // TODO: bind m_moduleDiscoveryManager to resPool server changes
     m_router = new QnRouter(this, m_moduleDiscoveryManager);
 
     m_userRolesManager = new QnUserRolesManager(this);         /*< Depends on nothing. */
-    m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
+
+    // Depends on respool and roles.
+    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
+
+    // Depends on respool, roles and global permissions.
+    m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this);
 
     // Depends on respool, roles and shared resources.
     m_resourceAccessProvider = new QnResourceAccessProvider(resourceAccessMode, this);
-
-    // Depends on respool.
-    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
-    m_runtimeInfoManager = new QnRuntimeInfoManager(this);
-
 
     // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
     m_resourceAccessProvider->addBaseProvider(
@@ -176,13 +177,29 @@ QnCommonModule::QnCommonModule(bool clientMode,
     // Depends on access provider.
     m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);
 
-
     m_globalSettings = new QnGlobalSettings(this);
     m_cameraHistory = new QnCameraHistoryPool(this);
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_startupTime = QDateTime::currentDateTime();
+
+    m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    m_moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    m_moduleInformation.brand = QnAppInfo::productNameShort();
+    m_moduleInformation.customization = QnAppInfo::customizationName();
+    m_moduleInformation.version = QnSoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.type = clientMode ?
+        QnModuleInformation::nxClientId() : QnModuleInformation::nxMediaServerId();
+}
+
+void QnCommonModule::setModuleGUID(const QnUuid& guid)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_uuid = guid;
+    }
+    resetCachedValue(); //< Update module information
 }
 
 QnCommonModule::~QnCommonModule()
@@ -203,6 +220,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
     connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
 
+    resetCachedValue();
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid)
@@ -264,6 +282,10 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInfor
 
         isReadOnlyChanged = m_moduleInformation.ecDbReadOnly != moduleInformation.ecDbReadOnly;
         m_moduleInformation = moduleInformation;
+
+        // TODO: This is generally a bad idea to fill some structure in setter and always replace
+        //     some of the values by internal logic. It has to be redesigned.
+        m_dirtyModuleInformation = true;
     }
     if (isReadOnlyChanged)
         emit readOnlyChanged(moduleInformation.ecDbReadOnly);
@@ -281,7 +303,6 @@ QnModuleInformation QnCommonModule::moduleInformation()
         }
         return m_moduleInformation;
     }
-
 }
 
 void QnCommonModule::resetCachedValue()
@@ -299,13 +320,15 @@ void QnCommonModule::updateModuleInformationUnsafe()
 {
     // This code works only on server side.
     NX_ASSERT(!moduleGUID().isNull());
+    m_moduleInformation.id = m_uuid;
+    m_moduleInformation.runtimeId = m_runUuid;
 
     QnMediaServerResourcePtr server = m_resourcePool->getResourceById<QnMediaServerResource>(moduleGUID());
     //NX_ASSERT(server);
     if (!server)
         return;
-
-    m_moduleInformation.port = server->getPort();
+    if (server->getPort())
+        m_moduleInformation.port = server->getPort();
     m_moduleInformation.name = server->getName();
     m_moduleInformation.serverFlags = server->getServerFlags();
 
@@ -383,6 +406,7 @@ void QnCommonModule::updateRunningInstanceGuid()
         m_runUuid = QnUuid::createUuid();
     }
     emit runningInstanceGUIDChanged();
+    resetCachedValue(); //< UpdateModuleInformation
 }
 
 QnUuid QnCommonModule::dbId() const

@@ -19,7 +19,7 @@ namespace network {
 namespace aio {
 
 class DummyEventHandler:
-    public AIOEventHandler<Pollable>
+    public AIOEventHandler
 {
 public:
     DummyEventHandler(std::function<void(Pollable*, aio::EventType)> func)
@@ -59,7 +59,7 @@ TEST(aio, socketPolledNotification)
     aio::AIOThread aioThread;
     aioThread.start();
 
-    aioThread.watchSocket(
+    aioThread.startMonitoring(
         &socket,
         aio::etRead,
         &evHandler,
@@ -71,7 +71,7 @@ TEST(aio, socketPolledNotification)
     std::this_thread::sleep_for(std::chrono::seconds(2));
     ASSERT_TRUE(socketAddedFlag);
     ASSERT_FALSE(handlerCalledFlag);
-    aioThread.removeFromWatch(&socket, aio::etRead, true);
+    aioThread.stopMonitoring(&socket, aio::etRead, true);
 }
 
 class TestPollSet:
@@ -109,7 +109,7 @@ TEST(aio, pollsetError)
     aio::AIOThread aioThread(std::make_unique<TestPollSet>());
     aioThread.start();
 
-    aioThread.watchSocket(
+    aioThread.startMonitoring(
         &socket,
         aio::etRead,
         &evHandler,

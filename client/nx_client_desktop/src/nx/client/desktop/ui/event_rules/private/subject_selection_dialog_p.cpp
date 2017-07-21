@@ -37,13 +37,26 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     base_type(parent, StandardRoleFlag | UserRoleFlag),
     QnCommonModuleAware(parent)
 {
+    setHasCheckBoxes(true);
+    setUserCheckable(false); //< Entire row clicks are handled instead.
+    setPredefinedRoleIdsEnabled(true);
+}
+
+void SubjectSelectionDialog::RoleListModel::setRoleValidator(Qn::RoleValidator roleValidator)
+{
+    m_roleValidator = roleValidator;
+    m_validationStates.clear();
+    emitDataChanged();
 }
 
 void SubjectSelectionDialog::RoleListModel::setUserValidator(Qn::UserValidator userValidator)
 {
     m_userValidator = userValidator;
-    m_validationStates.clear();
-    emitDataChanged();
+    if (!m_roleValidator)
+    {
+        m_validationStates.clear();
+        emitDataChanged();
+    }
 }
 
 void SubjectSelectionDialog::RoleListModel::emitDataChanged()
@@ -84,6 +97,9 @@ QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, i
 
 QValidator::State SubjectSelectionDialog::RoleListModel::validateRole(const QnUuid& roleId) const
 {
+    if (m_roleValidator)
+        return m_roleValidator(roleId);
+
     return m_userValidator
         ? validateUsers(resourceAccessSubjectsCache()->usersInRole(roleId))
         : QValidator::Acceptable;
@@ -178,7 +194,7 @@ SubjectSelectionDialog::UserListModel::UserListModel(
         this, &UserListModel::updateIndicators);
 
     m_usersModel->setHasCheckboxes(true);
-    m_usersModel->setUserCheckable(true);
+    m_usersModel->setUserCheckable(false); //< Entire row clicks are handled instead.
     m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -265,16 +281,7 @@ QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, i
             if (index.column() != IndicatorColumn)
                 return base_type::data(index, role);
 
-            const auto user = getUser(index);
-            if (!user)
-                return QVariant();
-
-            const auto role = user->userRole();
-            const auto roleId = role == Qn::UserRole::CustomUserRole
-                ? user->userRoleId()
-                : QnUserRolesManager::predefinedRoleId(role);
-
-            return m_rolesModel->checkedRoles().contains(roleId)
+            return isIndirectlyChecked(index)
                 ? QVariant(qnSkin->icon(lit("tree/users.png")))
                 : QVariant();
         }
@@ -309,9 +316,24 @@ bool SubjectSelectionDialog::UserListModel::isChecked(const QModelIndex& index) 
     return checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
 }
 
+bool SubjectSelectionDialog::UserListModel::isIndirectlyChecked(const QModelIndex& index) const
+{
+    const auto user = getUser(index);
+    if (!user)
+        return false;
+
+    const auto role = user->userRole();
+    const auto roleId = role == Qn::UserRole::CustomUserRole
+        ? user->userRoleId()
+        : QnUserRolesManager::predefinedRoleId(role);
+
+    return m_rolesModel->checkedRoles().contains(roleId);
+}
+
 QnUserResourcePtr SubjectSelectionDialog::UserListModel::getUser(const QModelIndex& index)
 {
-    return index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+    return index.sibling(index.row(), NameColumn)
+        .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 }
 
 void SubjectSelectionDialog::UserListModel::setUserValidator(Qn::UserValidator userValidator)
@@ -405,6 +427,18 @@ void SubjectSelectionDialog::UserListDelegate::initStyleOption(
     base_type::initStyleOption(option, index);
     if (index.column() == UserListModel::NameColumn && !index.data(Qn::ValidRole).toBool())
         option->icon = qnSkin->icon(lit("tree/user_alert.png"));
+}
+
+QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::itemState(
+    const QModelIndex& index) const
+{
+    auto model = qobject_cast<const SubjectSelectionDialog::UserListModel*>(index.model());
+    NX_EXPECT(model);
+
+    if (model->isIndirectlyChecked(index))
+        return ItemState::selected;
+
+    return base_type::itemState(index);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -3,8 +3,13 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 
+#include <client_core/client_core_module.h>
+
+#include <client/client_runtime_settings.h>
+
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
@@ -42,7 +47,7 @@ static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
 
 static const QSize kCellSize{1, 1};
 
-QRect createItemGrid(const QPoint& topLeft, int itemCount)
+QRect createItemGrid(int itemCount)
 {
     static const QSize kMinMatrixSize(2, 2);
     QSize size(kMinMatrixSize);
@@ -56,7 +61,7 @@ QRect createItemGrid(const QPoint& topLeft, int itemCount)
     if (itemCount > 8)
         size.setHeight(std::max(4, root));
 
-    return QRect(topLeft, size);
+    return QRect({0, 0}, size);
 }
 
 struct GridWalker
@@ -330,7 +335,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
     const int itemCount = layout->items().size();
 
-    QRect boundingRect = createItemGrid(layout->boundingRect().topLeft(), itemCount);
+    QRect boundingRect = createItemGrid(itemCount);
 
     static const int kMaxSize = 4;
     if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
@@ -339,7 +344,9 @@ void LayoutTourReviewController::updatePlaceholders()
         return;
     }
 
-    for (const auto& p: m_dropPlaceholders.keys())
+    // Copy list to avoid crash while iterating.
+    const auto existingPlaceholders = m_dropPlaceholders.keys();
+    for (const auto& p: existingPlaceholders)
     {
         if (!boundingRect.contains(p))
             m_dropPlaceholders.remove(p);
@@ -386,9 +393,6 @@ void LayoutTourReviewController::updateItemsLayout()
 
     auto layoutItems = wbLayout->items().toList();
     QnWorkbenchItem::sortByGeometry(&layoutItems);
-    const auto topLeft = layoutItems.empty()
-        ? QPoint(0, 0)
-        : layoutItems.first()->geometry().topLeft();
 
     for (auto layoutItem : layoutItems)
     {
@@ -396,7 +400,7 @@ void LayoutTourReviewController::updateItemsLayout()
         NX_EXPECT(unpinned);
     }
 
-    const auto itemGrid = createItemGrid(topLeft, (int)tour.items.size());
+    const auto itemGrid = createItemGrid((int)tour.items.size());
     GridWalker walker(itemGrid);
 
     // Dynamically reorder existing items to match new order (if something was added or removed).
@@ -406,7 +410,7 @@ void LayoutTourReviewController::updateItemsLayout()
         auto existing = std::find_if(layoutItems.begin(), layoutItems.end(),
             [this, item](QnWorkbenchItem* existing)
             {
-                const auto resource = resourcePool()->getResourceByUniqueId(existing->resourceUid());
+                const auto resource = existing->resource();
                 return resource && resource->getId() == item.resourceId;
             });
 
@@ -445,7 +449,9 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
         qnResourceRuntimeDataManager->cleanupData(itemId);
     layout->setItems(QnLayoutItemDataList());
 
-    const auto grid = createItemGrid({0, 0}, (int)items.size());
+    const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
+
+    const auto grid = createItemGrid(gridSize);
     GridWalker walker(grid);
 
     for (const auto& item: items)
@@ -462,6 +468,9 @@ void LayoutTourReviewController::addItemToReviewLayout(
     const QPointF& position,
     bool pinItem)
 {
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
+        return;
+
     QnLayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
     itemData.combinedGeometry = QRectF(position, kCellSize);
@@ -497,7 +506,8 @@ bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* i
     QnWorkbenchItem::sortByGeometry(&layoutItems);
     for (auto item: layoutItems)
     {
-        const auto resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
+        const auto resource = item->resource();
+        NX_ASSERT(resource);
         if (!resource)
             continue;
 
@@ -586,6 +596,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     layoutTourManager()->addOrUpdateTour(tour);
+    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, true);
 
     m_saveToursQueue.insert(tour.id);
     m_saveToursOperation->requestOperation();

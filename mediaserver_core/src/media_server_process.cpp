@@ -37,10 +37,11 @@
 
 #include <appserver/processor.h>
 
-#include <business/business_event_connector.h>
-#include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
-#include <business/events/reasoned_business_event.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
 
 #include <camera/camera_pool.h>
 
@@ -63,8 +64,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource.h>
-
-#include <events/mserver_business_rule_processor.h>
 
 #include <media_server/media_server_app_info.h>
 #include <media_server/mserver_status_watcher.h>
@@ -120,18 +119,19 @@
 #include <recorder/schedule_sync.h>
 
 #include <rest/handlers/acti_event_rest_handler.h>
-#include <rest/handlers/business_event_log_rest_handler.h>
-#include "rest/handlers/business_log2_rest_handler.h"
+#include <rest/handlers/event_log_rest_handler.h>
+#include <rest/handlers/event_log2_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/crash_server_handler.h>
-#include <rest/handlers/external_business_event_rest_handler.h>
+#include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/p2p_stats_rest_handler.h>
 #include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
@@ -170,6 +170,7 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <rest/handlers/multiserver_time_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
@@ -181,7 +182,7 @@
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
-#include <rest/handlers/distributed_file_downloader_rest_handler.h>
+#include <rest/handlers/downloads_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -217,13 +218,11 @@
 #include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
-#include "transaction/transaction_message_bus_base.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
-#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -259,7 +258,11 @@
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
+#include <managers/discovery_manager.h>
+#include <rest/helper/p2p_statistics.h>
+#include <recorder/remote_archive_synchronizer.h>
+#include <nx/utils/std/cpp14.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -272,6 +275,8 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
+using namespace nx;
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1038,8 +1043,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
-    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
-    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
@@ -1096,8 +1100,8 @@ void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
         m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
 
-    if (m_cmdLineArguments.msgLogLevel.isEmpty())
-        m_cmdLineArguments.msgLogLevel = settings->roSettings()->value(
+    if (m_cmdLineArguments.httpLogLevel.isEmpty())
+        m_cmdLineArguments.httpLogLevel = settings->roSettings()->value(
             nx_ms_conf::HTTP_MSG_LOG_LEVEL,
             nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
 
@@ -1532,7 +1536,7 @@ void MediaServerProcess::loadResourcesFromECS(
 
     {
         //loading business rules
-        QnBusinessEventRuleList rules;
+        vms::event::RuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
         {
             qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
@@ -1541,7 +1545,7 @@ void MediaServerProcess::loadResourcesFromECS(
                 return;
         }
 
-        for(const QnBusinessEventRulePtr &rule: rules)
+        for (const auto& rule: rules)
             messageProcessor->on_businessEventAddedOrUpdated(rule);
     }
 
@@ -1651,12 +1655,12 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
-        NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS);
-
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
+            NX_LOGX(lit("New external address %1 has been mapped")
+                    .arg(address), cl_logALWAYS);
+
             it->second = mappedAddress.port;
             updateAddressesList();
         }
@@ -1688,11 +1692,21 @@ void MediaServerProcess::at_connectionOpened()
 {
     if (isStopping())
         return;
+
     const auto& resPool = commonModule()->resourcePool();
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(resPool->getResourceById<QnMediaServerResource>(serverGuid()), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
-    if (!m_startMessageSent) {
-        qnBusinessRuleConnector->at_mserverStarted(resPool->getResourceById<QnMediaServerResource>(serverGuid()), qnSyncTime->currentUSecsSinceEpoch());
+    {
+        qnEventRuleConnector->at_serverFailure(
+            resPool->getResourceById<QnMediaServerResource>(serverGuid()),
+            m_firstRunningTime * 1000,
+            nx::vms::event::EventReason::serverStarted,
+            QString());
+    }
+    if (!m_startMessageSent)
+    {
+        qnEventRuleConnector->at_serverStarted(
+            resPool->getResourceById<QnMediaServerResource>(serverGuid()),
+            qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
@@ -1701,7 +1715,7 @@ void MediaServerProcess::at_connectionOpened()
 void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto& resPool = commonModule()->resourcePool();
-    qnBusinessRuleConnector->at_mediaServerConflict(
+    qnEventRuleConnector->at_serverConflict(
         resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()),
         qnSyncTime->currentUSecsSinceEpoch(),
         module,
@@ -1714,7 +1728,9 @@ void MediaServerProcess::at_timer()
         return;
 
     //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
-    qnServerModule->runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qnServerModule->runTimeSettings()->setValue(
+        "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+
     const auto& resPool = commonModule()->resourcePool();
     QnResourcePtr mServer = resPool->getResourceById(commonModule()->moduleGUID());
     if (!mServer)
@@ -1727,30 +1743,32 @@ void MediaServerProcess::at_timer()
 void MediaServerProcess::at_storageManager_noStoragesAvailable() {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
+    qnEventRuleConnector->at_noStorages(m_mediaServer);
 }
 
-void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason) {
+void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
+    nx::vms::event::EventReason reason)
+{
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+    qnEventRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
+    qnEventRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
 }
 
 void MediaServerProcess::at_archiveBackupFinished(
     qint64                      backedUpToMs,
-    QnBusiness::EventReason     code
+    nx::vms::event::EventReason code
 )
 {
     if (isStopping())
         return;
 
-    qnBusinessRuleConnector->at_archiveBackupFinished(
+    qnEventRuleConnector->at_archiveBackupFinished(
         m_mediaServer,
         qnSyncTime->currentUSecsSinceEpoch(),
         code,
@@ -1762,7 +1780,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_cameraIPConflict(
+    qnEventRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
         macAddrList,
@@ -1772,7 +1790,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
 	auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
@@ -1806,8 +1824,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
-    reg("api/createEvent", new QnExternalBusinessEventRestHandler());
-    reg("api/gettime", new QnTimeRestHandler());
+    reg("api/createEvent", new QnExternalEventRestHandler());
+    static const char kGetTimePath[] = "api/gettime";
+    reg(kGetTimePath, new QnTimeRestHandler());
+    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
@@ -1818,14 +1838,15 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
     reg("api/ping", new QnPingRestHandler());
+    reg(rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), kViewLogs); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), kViewLogs); //< new version
+    reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated
+    reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1838,7 +1859,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
-    reg("api/downloader/", new QnDistributedFileDownloaderRestHandler());
+    reg("api/downloads/", new QnDownloadsRestHandler());
 
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
@@ -1869,7 +1890,6 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
-
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
@@ -1900,7 +1920,7 @@ void MediaServerProcess::regTcp(
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
@@ -2288,43 +2308,32 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
-
-    // TODO: Generalize nx::utils::log::Settings parsing from QSetting and cmdLineArguments
-    // for mediaserver and all clients.
-    const auto makeLevel =
-        [&](const QString& agrValue, const QString& settingsKey)
-        {
-            const auto settingsValue = settings->value(settingsKey);
-            const auto settingsLevel = nx::utils::log::levelFromString(settingsValue.toString());
-            if (settingsLevel != nx::utils::log::Level::undefined)
-                return settingsLevel;
-
-            const auto argLevel = nx::utils::log::levelFromString(agrValue);
-            if (argLevel != nx::utils::log::Level::undefined)
-                return argLevel;
-
-            return nx::utils::log::Settings::kDefaultLevel;
-        };
-
-    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
-
-    for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
-        logSettings.exceptionFilers.insert(filter);
+    logSettings.level.parse(
+        cmdLineArguments().logLevel, settings->value("logLevel").toString());
 
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
-    logSettings.level = makeLevel(cmdLineArguments().msgLogLevel, "http-log-level");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel");
+    logSettings.level.reset();
+    logSettings.level.parse(
+        cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
@@ -2459,24 +2468,25 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), nx_http::AuthMethod::noAuth);
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
 
-    std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(commonModule()));
+    std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
+        new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
     std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
 
     std::unique_ptr<QnMotionHelper> motionHelper(new QnMotionHelper());
 
-    std::unique_ptr<QnBusinessEventConnector> businessEventConnector(new QnBusinessEventConnector(commonModule()) );
+    std::unique_ptr<mediaserver::event::EventConnector> eventConnector(
+        new mediaserver::event::EventConnector(commonModule()) );
     auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
     std::unique_ptr<QThread, decltype(stopQThreadFunc)> connectorThread( new QThread(), stopQThreadFunc );
     connectorThread->start();
-    qnBusinessRuleConnector->moveToThread(connectorThread.get());
+    qnEventRuleConnector->moveToThread(connectorThread.get());
 
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
@@ -2501,6 +2511,8 @@ void MediaServerProcess::run()
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
+    auto remoteArchiveSynchronizer =
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -2560,6 +2572,7 @@ void MediaServerProcess::run()
     ec2ConnectionFactory->setConfParams(std::move(confParams));
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
+    std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
     while (!needToStop())
     {
@@ -2571,7 +2584,9 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
-                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
+                discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+                    ec2ConnectionFactory->messageBus());
+
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }
@@ -2650,8 +2665,20 @@ void MediaServerProcess::run()
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
-    connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
+    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+        [this](qint64 newTime)
+        {
+            QnSyncTime::instance()->updateTime(newTime);
+
+            using namespace ec2;
+            QnTransaction<ApiPeerSyncTimeData> tran(
+                ApiCommand::broadcastPeerSyncTime,
+                commonModule()->moduleGUID());
+            tran.params.syncTimeMs = newTime;
+            if (auto connection = commonModule()->ec2Connection())
+                connection->messageBus()->sendTransaction(tran);
+        }
+        );
 
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
@@ -2695,11 +2722,6 @@ void MediaServerProcess::run()
 
     QnResource::startCommandProc();
 
-
-    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
-        new StreamingChunkTranscoder(
-            commonModule()->resourcePool(),
-            StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
@@ -2828,17 +2850,14 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
-    selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    QnModuleInformation selfInformation = commonModule()->moduleInformation();
+    if (compatibilityMode)
+    {
+        selfInformation.brand = QString();
+        selfInformation.customization = QString();
+    }
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
@@ -3094,6 +3113,7 @@ void MediaServerProcess::run()
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
+    discoveryMonitor.reset();
     m_crashReporter.reset();
 
     //cancelling dumping system usage
@@ -3118,7 +3138,6 @@ void MediaServerProcess::run()
     nx::utils::TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
-    streamingChunkTranscoder.reset();
 
     recordingManager.reset();
 
@@ -3140,11 +3159,12 @@ void MediaServerProcess::run()
     connectorThread->wait();
 
     //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
-    businessEventConnector.reset();
+    eventConnector.reset();
 
-    mserverBusinessRuleProcessor.reset();
+    eventRuleProcessor.reset();
 
     motionHelper.reset();
+    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3207,7 +3227,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
             ec2::ApiCommand::runtimeInfoChanged,
             commonModule()->moduleGUID());
         tran.params = runtimeInfo.data;
-        sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+        commonModule()->ec2Connection()->messageBus()->sendTransaction(tran);
     }
 }
 

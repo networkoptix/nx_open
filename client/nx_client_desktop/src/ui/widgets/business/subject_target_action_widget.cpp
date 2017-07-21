@@ -3,23 +3,24 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QPushButton>
 
-#include <business/business_action_parameters.h>
-#include <business/business_strings_helper.h>
+#include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(QWidget* parent):
     base_type(parent),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
 }
 
@@ -27,14 +28,14 @@ QnSubjectTargetActionWidget::~QnSubjectTargetActionWidget()
 {
 }
 
-void QnSubjectTargetActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnSubjectTargetActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    if (fields.testFlag(QnBusiness::ActionParamsField))
+    if (fields.testFlag(Field::actionParams))
         updateSubjectsButton();
 }
 
@@ -46,6 +47,12 @@ void QnSubjectTargetActionWidget::selectSubjects()
     SubjectSelectionDialog dialog(this);
     auto params = model()->actionParams();
 
+    dialog.setRoleValidator(
+        [this](const QnUuid& roleId) { return roleValidity(roleId); });
+
+    dialog.setUserValidator(
+        [this](const QnUserResourcePtr& user) { return userValidity(user); });
+
     QSet<QnUuid> selected;
     for (auto id: params.additionalResources)
         selected << id;
@@ -54,11 +61,9 @@ void QnSubjectTargetActionWidget::selectSubjects()
     dialog.setAllUsers(params.allUsers);
 
     const auto updateAlert =
-        [&dialog]()
+        [this, &dialog]()
         {
-            dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
-                ? QnBusinessStringsHelper::needToSelectUserText()
-                : QString());
+            dialog.showAlert(calculateAlert(dialog.allUsers(), dialog.checkedSubjects()));
         };
 
     connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
@@ -106,27 +111,82 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
+    const auto icon =
+        [](const QString& path) -> QIcon
+        {
+            static const QnIcon::SuffixesList suffixes {{ QnIcon::Normal, lit("selected") }};
+            return qnSkin->icon(path, QString(), &suffixes);
+        };
+
     const auto params = model()->actionParams();
-
-    QnUserResourceList users;
-    QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-
-    if (!params.allUsers && users.isEmpty() && roles.isEmpty())
+    if (params.allUsers)
     {
-        m_subjectsButton->setText(QnBusinessStringsHelper::needToSelectUserText());
-        m_subjectsButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
+        m_subjectsButton->setText(vms::event::StringsHelper::allUsersText());
+
+        const auto users = resourcePool()->getResources<QnUserResource>()
+            .filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
+
+        const bool allValid =
+            std::all_of(users.begin(), users.end(),
+                [this](const QnUserResourcePtr& user) { return userValidity(user); });
+
+        m_subjectsButton->setIcon(icon(allValid
+            ? lit("tree/users.png")
+            : lit("tree/users_alert.png")));
     }
     else
     {
-        m_subjectsButton->setText(params.allUsers
-            ? QnBusinessStringsHelper::allUsersText()
-            : m_helper->actionSubjects(users, roles));
+        QnUserResourceList users;
+        QList<QnUuid> roles;
+        userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
+        users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
-        const bool multiple = params.allUsers || users.size() > 1 || !roles.empty();
+        if (users.isEmpty() && roles.isEmpty())
+        {
+            m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
+            m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
+        }
+        else
+        {
+            const bool allValid =
+                std::all_of(users.begin(), users.end(),
+                    [this](const QnUserResourcePtr& user) { return userValidity(user); })
+                && std::all_of(roles.begin(), roles.end(),
+                    [this](const QnUuid& roleId)
+                    {
+                        return roleValidity(roleId) == QValidator::Acceptable;
+                    });
 
-        m_subjectsButton->setIcon(qnResIconCache->icon(multiple
-            ? QnResourceIconCache::Users
-            : QnResourceIconCache::User));
+            // TODO: #vkutin #3.2 Color the button red if selection is completely invalid.
+
+            const bool multiple = users.size() > 1 || !roles.empty();
+            m_subjectsButton->setText(m_helper->actionSubjects(users, roles));
+            m_subjectsButton->setIcon(icon(multiple
+                ? (allValid ? lit("tree/users.png") : lit("tree/users_alert.png"))
+                : (allValid ? lit("tree/user.png") : lit("tree/user_alert.png"))));
+        }
     }
+}
+
+void QnSubjectTargetActionWidget::setValidationPolicy(QnSubjectValidationPolicy* policy)
+{
+    m_validationPolicy.reset(policy);
+}
+
+QValidator::State QnSubjectTargetActionWidget::roleValidity(const QnUuid& roleId) const
+{
+    return m_validationPolicy ? m_validationPolicy->roleValidity(roleId) : QValidator::Acceptable;
+}
+
+bool QnSubjectTargetActionWidget::userValidity(const QnUserResourcePtr& user) const
+{
+    return m_validationPolicy ? m_validationPolicy->userValidity(user) : true;
+}
+
+QString QnSubjectTargetActionWidget::calculateAlert(
+    bool allUsers, const QSet<QnUuid>& subjects) const
+{
+    return m_validationPolicy
+        ? m_validationPolicy->calculateAlert(allUsers, subjects)
+        : QString();
 }
