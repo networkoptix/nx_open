@@ -9,7 +9,7 @@ var SystemsListPage = function () {
     this.url = '/systems';
 
     this.activeMenuItem = element(by.css('.navbar-nav')).element(by.css('.active'));
-    this.systemsList = element.all(by.repeater('system in systems'));
+    this.systemsList = element.all(by.css('.system-button'));
 
     //These functions allows to find desired child in provided element
     this.openInNxButton = function(ancestor) {
