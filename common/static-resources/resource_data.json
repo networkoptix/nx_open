@@ -1821,8 +1821,8 @@
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
-                        "logical": [1, 31.55],
-                        "logicalMultiplier": 37.5,
+                        "logical": [1, 20],
+                        "logicalMultiplier": 32,
                         "space": "35MmEquiv"
                     }
                 }
