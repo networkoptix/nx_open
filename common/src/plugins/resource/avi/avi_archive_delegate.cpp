@@ -123,7 +123,6 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_startTimeUsec(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
-    m_ioContext(0),
     m_eofReached(false),
     m_openMutex(QnMutex::Recursive),
     m_fastStreamFind(false),
@@ -323,8 +322,8 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         }
 
         m_formatContext = avformat_alloc_context();
-        m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
-        if (!m_ioContext) {
+        m_formatContext->pb = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
+        if (!m_formatContext->pb) {
             close();
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
@@ -358,14 +357,12 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext)
-        avformat_close_input(&m_formatContext);
-
-    if (m_ioContext)
-    {
-        QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
-        m_ioContext = 0;
-    }
+	if (m_formatContext)
+	{
+		QnFfmpegHelper::closeFfmpegIOContext(m_formatContext->pb);
+		m_formatContext->pb = 0;
+		avformat_close_input(&m_formatContext);
+	}
 
     m_contexts.clear();
     m_formatContext = 0;

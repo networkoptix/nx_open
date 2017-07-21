@@ -102,7 +102,6 @@ private:
     qint64 m_duration;
 
     friend class QnAviAudioLayout;
-    AVIOContext* m_ioContext;
     bool m_eofReached;
     QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
