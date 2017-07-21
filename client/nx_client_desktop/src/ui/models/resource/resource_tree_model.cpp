@@ -341,7 +341,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::ServersNode:
         if (m_scope == CamerasScope && isAdmin)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
-        if (m_scope == FullScope && isAdmin)
+        if (m_scope == FullScope && isAdmin && m_systemHasManyServers)
             return rootNode;
         return bastardNode;
 
@@ -368,10 +368,19 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::EdgeNode:
+    {
         /* Only admins can see edge nodes. */
-        if (m_scope != UsersScope && isAdmin)
+        if (!isAdmin || m_scope == UsersScope)
+            return bastardNode;
+
+        if (m_scope == CamerasScope)
             return m_rootNodes[Qn::ServersNode];
-        return bastardNode;
+
+        NX_EXPECT(m_scope == FullScope);
+        return m_systemHasManyServers
+            ? m_rootNodes[Qn::ServersNode]
+            : rootNode;
+    }
 
     case Qn::ResourceNode:
         return expectedParentForResourceNode(node);
@@ -406,10 +415,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
     if (node->resourceFlags().testFlag(Qn::server))
     {
-        if (isAdmin)
-            return m_rootNodes[Qn::ServersNode];
+        if (!isAdmin)
+            return bastardNode;
 
-        return bastardNode;
+        return m_systemHasManyServers
+            ? m_rootNodes[Qn::ServersNode]
+            : rootNode;
     }
 
     if (node->resourceFlags().testFlag(Qn::videowall))
@@ -885,7 +896,10 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
-        connect(server,     &QnMediaServerResource::redundancyChanged, this, &QnResourceTreeModel::at_server_redundancyChanged);
+    {
+        connect(server, &QnMediaServerResource::redundancyChanged, this,
+            &QnResourceTreeModel::at_server_redundancyChanged);
+    }
 
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
@@ -897,6 +911,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             if (m_resourceNodeByResource.contains(camera))
                 at_resource_parentIdChanged(camera);
         }
+        updateSystemHasManyServers();
     }
 
     if (videoWall)
@@ -932,6 +947,9 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
     m_nodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
+
+    if (resource->hasFlags(Qn::server))
+        updateSystemHasManyServers();
 }
 
 
@@ -1028,6 +1046,32 @@ void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource
     {
         for (auto node : m_nodesByResource[resource])
             node->updateRecursive();
+    }
+}
+
+void QnResourceTreeModel::updateSystemHasManyServers()
+{
+    const auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+    const bool hasManyServers = servers.size() > 1;
+    if (m_systemHasManyServers == hasManyServers)
+        return;
+
+    m_systemHasManyServers = hasManyServers;
+    for (const auto& server: servers)
+    {
+        if (QnMediaServerResource::isHiddenServer(server))
+        {
+            for (const auto& camera: resourcePool()->getAllCameras(server, true))
+            {
+                auto node = ensureResourceNode(camera);
+                updateNodeParent(node);
+            }
+        }
+        else
+        {
+            auto node = ensureResourceNode(server);
+            updateNodeParent(node);
+        }
     }
 }
 
