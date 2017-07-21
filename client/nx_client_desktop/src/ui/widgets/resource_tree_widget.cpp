@@ -69,7 +69,8 @@ private:
     /**
      * Helper function to list nodes in the correct order.
      * Root nodes are strictly ordered, but there is one type of node which is inserted in between:
-     * videowall nodes, which are pinned between Layouts and WebPages.
+     * videowall nodes, which are pinned between Layouts and WebPages. Also if the system has one
+     * server, ServersNode is not displayed, so server/edge node must be displayed on it's place.
      */
     qreal nodeOrder(const QModelIndex &index) const
     {
@@ -78,9 +79,16 @@ private:
             return nodeType;
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool isVideoWall = resource->flags().testFlag(Qn::videowall);
+        const bool isVideoWall = resource->hasFlags(Qn::videowall);
         if (isVideoWall)
             return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
+
+        const bool isServer = resource->hasFlags(Qn::server);
+        if (isServer)
+            return Qn::ServersNode;
+
+        if (nodeType == Qn::EdgeNode)
+            return Qn::ServersNode;
 
         return nodeType;
     }

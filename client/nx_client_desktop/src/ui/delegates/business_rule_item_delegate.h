@@ -11,6 +11,7 @@
 
 typedef QVector<QnUuid> IDList;
 class QnBusinessTypesComparator;
+class QnSubjectValidationPolicy;
 
 namespace nx { namespace vms { namespace event { class QnBusinessStringsHelper; }}}
 
@@ -20,7 +21,8 @@ class QnSelectResourcesDialogButton: public QPushButton
     typedef QPushButton base_type;
 
 public:
-    explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
+    explicit QnSelectResourcesDialogButton(QWidget* parent = nullptr);
+    virtual ~QnSelectResourcesDialogButton();
 
     QSet<QnUuid> resources() const;
     void setResources(QSet<QnUuid> resources);
@@ -30,6 +32,8 @@ public:
 
     QnResourceSelectionDialog::Filter selectionTarget() const;
     void setSelectionTarget(QnResourceSelectionDialog::Filter target);
+
+    void setSubjectValidationPolicy(QnSubjectValidationPolicy* policy); //< Takes ownership.
 
 signals:
     void commit();
@@ -45,6 +49,7 @@ private:
     QSet<QnUuid> m_resources;
     QnResourceSelectionDialogDelegate* m_dialogDelegate;
     QnResourceSelectionDialog::Filter m_target;
+    QScopedPointer<QnSubjectValidationPolicy> m_subjectValidation;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware

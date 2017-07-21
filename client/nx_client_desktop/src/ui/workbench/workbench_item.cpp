@@ -55,7 +55,7 @@ QnLayoutItemData QnWorkbenchItem::data() const
 
     QnLayoutItemData data;
     data.uuid = m_uuid;
-    if (m_resource->hasFlags(Qn::local_media))
+    if (m_resource && m_resource->hasFlags(Qn::local_media))
         data.resource.uniqueId = m_resource->getUniqueId();
     data.resource.id = m_resource ? m_resource->getId() : QnUuid();
     data.flags = flags();

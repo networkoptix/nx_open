@@ -5,7 +5,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
-class QnSearchBookmarksModel : public QAbstractItemModel
+class QnSearchBookmarksModelPrivate;
+
+class QnSearchBookmarksModel: public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -23,7 +25,7 @@ public:
     };
 
 public:
-    QnSearchBookmarksModel(QObject *parent = nullptr);
+    QnSearchBookmarksModel(QObject* parent = nullptr);
     virtual ~QnSearchBookmarksModel();
 
 
@@ -32,34 +34,40 @@ public:
 
     void applyFilter();
 
-    void setRange(qint64 utcStartTimeMs
-        , qint64 utcFinishTimeMs);
+    void setRange(qint64 utcStartTimeMs, qint64 utcFinishTimeMs);
 
-    void setFilterText(const QString &text);
+    void setFilterText(const QString& text);
 
-    void setCameras(const QnVirtualCameraResourceList &cameras);
+    void setCameras(const QnVirtualCameraResourceList& cameras);
 
-    const QnVirtualCameraResourceList &cameras() const;
+    const QnVirtualCameraResourceList& cameras() const;
 
-    /// QAbstractItemModel overrides
+    void cancelUpdateOperation();
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+public: //< QAbstractItemModel overrides
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     /// TODO: #ynikitenkov Refactor to use proxy model
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(
+        int row,
+        int column = 0,
+        const QModelIndex& parent = QModelIndex()) const override;
 
-    QModelIndex parent(const QModelIndex &child) const override;
+    QModelIndex parent(const QModelIndex& child) const override;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    QVariant headerData(int section, Qt::Orientation orientation,
+    QVariant headerData(
+        int section,
+        Qt::Orientation orientation,
         int role = Qt::DisplayRole) const override;
 
 private:
-    class Impl;
-    Impl * const m_impl;
+    Q_DECLARE_PRIVATE(QnSearchBookmarksModel)
+    const QScopedPointer<QnSearchBookmarksModelPrivate> d_ptr;
 };

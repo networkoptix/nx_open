@@ -5,6 +5,8 @@
 
 #include <QtGui/QKeyEvent>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <api/global_settings.h>
 
 #include <client/client_settings.h>
@@ -344,15 +346,17 @@ void QnUserManagementWidget::applyChanges()
     /* User still can press cancel on 'Confirm Remove' dialog. */
     if (nx::client::desktop::ui::messages::Resources::deleteResources(this, usersToDelete))
     {
-        setEnabled(false);
         qnResourcesChangesManager->deleteResources(usersToDelete,
-            [this, guard = QPointer<QnUserManagementWidget>(this)](bool /* success */)
+            [this, guard = QPointer<QnUserManagementWidget>(this)](bool success)
             {
                 if (guard)
+                {
                     setEnabled(true);
-
-                emit hasChangesChanged();
+                    emit hasChangesChanged();
+                }
             });
+
+        setEnabled(false);
         emit hasChangesChanged();
     }
     else
