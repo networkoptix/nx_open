@@ -10,6 +10,7 @@
             <outputDirectory>../</outputDirectory>
             <includes>
                 <include>**/mediaserver.pdb</include>
+                <include>/plugins/*.pdb</include>
             </includes>
         </fileSet>
     </fileSets>

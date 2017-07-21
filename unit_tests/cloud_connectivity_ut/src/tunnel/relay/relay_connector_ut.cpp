@@ -14,6 +14,8 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+static constexpr auto kTimeout = std::chrono::milliseconds(1);
+
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
 
@@ -79,8 +81,13 @@ protected:
 
         m_connector->connect(
             hpm::api::ConnectResponse(),
-            std::chrono::milliseconds(1),
+            kTimeout,
             std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
+    }
+
+    void waitForAnyResponseReported()
+    {
+        m_connectFinished.get_future().get();
     }
 
     void assertConnectorProvidedAConnection()
@@ -113,6 +120,12 @@ protected:
         ASSERT_TRUE(
             m_prevClientToRelayConnectionInstanciated.load() == nullptr ||
             m_prevClientToRelayConnectionInstanciated.load()->scheduledRequestCount() == 0);
+    }
+
+    void assertConnectorTimeoutIsNotReported()
+    {
+        // Reporting timeout reuslts in crash, so just have to wait.
+        std::this_thread::sleep_for(kTimeout * 7);
     }
 
 private:
@@ -185,6 +198,14 @@ TEST_F(RelayConnector, reports_timedout_on_relay_request_timeout)
     whenConnectorIsInvokedWithTimeout();
     assertTimedOutHasBeenReported();
     assertRequestToRelayServerHasBeenCancelled();
+}
+
+TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
+{
+    givenHappyRelay();
+    whenConnectorIsInvokedWithTimeout();
+    waitForAnyResponseReported();
+    assertConnectorTimeoutIsNotReported();
 }
 
 } // namespace test

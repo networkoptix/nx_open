@@ -5,12 +5,14 @@
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/log/log.h>
 #include <api/common_message_processor.h>
+#include <api/global_settings.h>
 
 namespace nx {
 namespace p2p {
 namespace test {
 
 int P2pMessageBusTestBase::m_instanceCounter = 0;
+static const QString kP2pTestSystemName(lit("P2pTestSystem"));
 
 void P2pMessageBusTestBase::initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -18,6 +20,16 @@ void P2pMessageBusTestBase::initResourceTypes(ec2::AbstractECConnection* ec2Conn
     const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
     ASSERT_EQ(ec2::ErrorCode::ok, errorCode);
     qnResTypePool->replaceResourceTypeList(resourceTypeList);
+}
+
+void initUsers(ec2::AbstractECConnection* ec2Connection)
+{
+    ec2::ApiUserDataList users;
+    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+    auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
+    ASSERT_EQ(ec2::ErrorCode::ok, errorCode);
+    for (const auto &user: users)
+        messageProcessor->updateResource(user, ec2::NotificationSource::Local);
 }
 
 void P2pMessageBusTestBase::createData(
@@ -30,6 +42,12 @@ void P2pMessageBusTestBase::createData(
     auto messageProcessor = server->moduleInstance()->commonModule()->messageProcessor();
 
     initResourceTypes(connection);
+    initUsers(connection);
+
+    const auto settings = connection->commonModule()->globalSettings();
+    settings->setSystemName(kP2pTestSystemName);
+    settings->setLocalSystemId(guidFromArbitraryData(kP2pTestSystemName));
+    settings->synchronizeNow();
 
     //read server list
     ec2::ApiMediaServerDataList mediaServerList;
@@ -110,7 +128,7 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 baseTcpPort)
 {
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
@@ -130,24 +148,32 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
     const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
     result->addArg(guidArg.toStdString().c_str());
 
+    if (baseTcpPort)
+    {
+        const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
+        result->addArg(guidArg.toStdString().c_str());
+    }
+
     ++m_instanceCounter;
 
     result->start();
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex)
+void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, quint16 baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver(i == keekDbAtServerIndex));
+        m_servers.push_back(createAppserver(i == keekDbAtServerIndex, baseTcpPort));
 
     for (const auto& server: m_servers)
     {
         ASSERT_TRUE(server->waitUntilStarted());
-        NX_LOG(lit("Server started at url %1").arg(server->moduleInstance()->endpoint().toString()),
-            cl_logINFO);
+        auto commonModule = server->moduleInstance()->commonModule();
+        NX_INFO(this, lit("Server %1 started at url %2")
+            .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
+            .arg(server->moduleInstance()->endpoint().toString()));
     }
 }
 

@@ -1350,7 +1350,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                if( m_display[i] )
+                if (isFillerPacket && m_display[i])
                     m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }

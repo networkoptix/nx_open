@@ -37,8 +37,8 @@ class ServerFactory(object):
             else:
                 box = self._vagrant_box_factory(must_be_recreated=config.leave_initial_cloud_host)
             server = box.get_server(config)
+        self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
         self._prepare_server(config, server)
-        self._allocated_servers.append(server)
         log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
                  server.title, server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
         return server
@@ -66,13 +66,13 @@ class ServerFactory(object):
         for server in self._allocated_servers:
             self._save_server_artifacts(server)
         if self._physical_installation_ctl:
-            self._physical_installation_ctl.release_all()
+            self._physical_installation_ctl.release_all_servers()
         self._allocated_servers = []
 
     def _save_server_artifacts(self, server):
+        server_name = server.title.lower()
         log_contents = server.get_log_file()
         if log_contents:
-            server_name = server.title.lower()
             artifact_factory = self._artifact_factory(
                 ['server', server_name], ext='.log', name='server-%s' % server_name, type_name='log')
             log_path = artifact_factory.produce_file_path()
@@ -92,6 +92,9 @@ class ServerFactory(object):
         log.info('----- test is finished, performing post-test checks ------------------------>8 -----------------------------------------')
         core_dumped_servers = []
         for server in self._allocated_servers:
+            if server.is_started() and not server.is_server_online():
+                log.warning('Server %s is started but does not respond to ping - making core dump', server)
+                server.make_core_dump()
             if server.list_core_files():
                 core_dumped_servers.append(server.title)
         assert not core_dumped_servers, 'Following server(s) left core dump(s): %s' % ', '.join(core_dumped_servers)

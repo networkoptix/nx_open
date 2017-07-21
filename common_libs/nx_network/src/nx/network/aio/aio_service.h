@@ -31,7 +31,7 @@ namespace aio {
  *   (with win32 extensions making event array traversal O(1)). 
  *   Linux implementation uses epoll, BSD - kqueue.
  * @note All methods are thread-safe.
- * @note All methods are non-blocking except AIOService::removeFromWatch
+ * @note All methods are non-blocking except AIOService::stopMonitoring
  *   (when called with waitForRunningHandlerCompletion set to true).
  */
 class NX_NETWORK_API AIOService
@@ -59,7 +59,7 @@ public:
      * @note if no event in corresponding socket timeout (if not 0), then aio::etTimedOut event will be reported.
      * @note If not called from aio thread sock can be added to event loop with some delay.
      */
-    void watchSocket(
+    void startMonitoring(
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
@@ -74,7 +74,7 @@ public:
      * @note If this method is called from asio thread, sock is processed in (e.g., from event handler associated with sock).
      *   this method does not block and always works like waitForRunningHandlerCompletion has been set to true.
      */
-    void removeFromWatch(
+    void stopMonitoring(
         Pollable* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion = true,
@@ -84,7 +84,7 @@ public:
      * Register timeout, associated with socket sock.
      * eventHandler->eventTriggered(sock, aio::etTimedOut) will be called every 
      * timeoutMillis milliseconds until cancelled with 
-     * aio::AIOService::removeFromWatch(sock, aio::etTimedOut ).
+     * aio::AIOService::stopMonitoring(sock, aio::etTimedOut ).
      */
     void registerTimer(
         Pollable* const sock,
@@ -129,12 +129,12 @@ public:
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
 
     /**
-     * Same as AIOService::watchSocket, but does not lock mutex. 
+     * Same as AIOService::startMonitoring, but does not lock mutex. 
      *   Calling entity MUST lock AIOService::mutex() before calling this method.
      * @param socketAddedToPollHandler Called after socket has been added 
      *   to pollset but before pollset.poll has been called.
      */
-    void watchSocketNonSafe(
+    void startMonitoringNonSafe(
         QnMutexLockerBase* const lock,
         Pollable* const sock,
         aio::EventType eventToWatch,
@@ -145,10 +145,10 @@ public:
             = nx::utils::MoveOnlyFunc<void()>());
 
     /**
-     * Same as AIOService::removeFromWatch, but does not lock mutex. 
+     * Same as AIOService::stopMonitoring, but does not lock mutex. 
      * Calling entity MUST lock AIOService::mutex() before calling this method.
      */
-    void removeFromWatchNonSafe(
+    void stopMonitoringNonSafe(
         QnMutexLockerBase* const lock,
         Pollable* const sock,
         aio::EventType eventType,

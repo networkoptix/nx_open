@@ -181,7 +181,6 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
                 const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
                 manager->broadcastBusinessAction(action, this, fakeHandler);
             }
-            emit notificationRemoved(businessAction);
         };
 
     bookmarksDialog->submitData(bookmark);
@@ -192,6 +191,9 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     bookmark.creationTimeStampMs = currentTimeMs;
 
     qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction, creationCallback);
+
+    // Hiding notification instantly to keep UX smooth.
+    emit notificationRemoved(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::clear()
@@ -284,6 +286,10 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -376,6 +382,10 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::RemoteArchiveSyncError:
             return;
 
         case QnSystemHealth::SystemIsReadOnly:

@@ -350,16 +350,6 @@
         <source>Post-recording:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>By:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ask confirmation before creating bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -739,12 +729,27 @@
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>PTZ Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable native presets, use system presets instead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Native camera presets will not be avaliable.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-        <source>Input ID</source>
+        <source>Input Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -760,17 +765,17 @@
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-        <source>Output ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Fixed duration:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Id:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1410,13 +1415,13 @@
     </message>
     <message>
         <location/>
-        <source>Locked to Hardware ID:</source>
+        <source>Features</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Features</source>
-        <translation></translation>
+        <source>Locked to Hardware Id:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1519,12 +1524,12 @@
     </message>
     <message>
         <location/>
-        <source>Hardware ID</source>
+        <source>Activation Key File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Activation Key File</source>
+        <source>Hardware Id</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1736,6 +1741,11 @@
         <source>for</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Force Acknowledgment</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PopupSettingsWidget</name>
@@ -1940,11 +1950,6 @@
     <message>
         <location/>
         <source>Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>You will be reconnected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

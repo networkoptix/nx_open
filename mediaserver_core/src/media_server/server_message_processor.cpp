@@ -15,7 +15,7 @@
 #include <nx/utils/log/log.h>
 
 #include "serverutil.h"
-#include "transaction/transaction_message_bus.h"
+#include <transaction/message_bus_adapter.h>
 #include <nx/mediaserver/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
@@ -30,6 +30,7 @@
 #include <nx/network/http/custom_headers.h>
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
+#include "nx_ec/ec_api.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
     base_type(commonModule),

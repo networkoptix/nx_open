@@ -565,7 +565,7 @@ module.exports = function (grunt) {
         protractor: {
             options: {
                 configFile: 'protractor-conf.js', // Default config file
-                keepAlive: true, // If false, the grunt process stops when the test fails.
+                //keepAlive: true, // If false, the grunt process stops when the test fails.
                 noColor: false, // If true, protractor will not use colors in its output.
                 args: {
                     // Arguments passed to the command
@@ -624,7 +624,7 @@ module.exports = function (grunt) {
         },
         protractor_webdriver: {
             options:{
-                keepAlive : true,
+                keepAlive : false,
                 command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom'
             },
             default: { },

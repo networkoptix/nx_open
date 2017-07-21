@@ -53,7 +53,8 @@ public:
             const boost::optional<QUrl>& cdbUrl,
             const std::string& user,
             const std::string& password,
-            std::chrono::milliseconds updateInterval)> FactoryFunc;
+            std::chrono::milliseconds updateInterval,
+            std::chrono::milliseconds startTimeout)> FactoryFunc;
 
     virtual ~AbstractCloudDataProviderFactory() {}
 
@@ -61,7 +62,8 @@ public:
         const boost::optional<QUrl>& cdbUrl,
         const std::string& user,
         const std::string& password,
-        std::chrono::milliseconds updateInterval);
+        std::chrono::milliseconds updateInterval,
+        std::chrono::milliseconds startTimeout);
 
     /**
      * @return Initial factory func.
@@ -82,13 +84,16 @@ public:
         const boost::optional<QUrl>& cdbUrl,
         const std::string& user,
         const std::string& password,
-        std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL);
+        std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL,
+        std::chrono::milliseconds startTimeout = std::chrono::milliseconds::zero());
     ~CloudDataProvider();
 
     virtual boost::optional< System > getSystem(const String& systemId) const override;
 
 private:
     const std::chrono::milliseconds m_updateInterval;
+    const std::chrono::steady_clock::time_point m_startTime;
+    const std::chrono::milliseconds m_startTimeout;
 
     void updateSystemsAsync();
 

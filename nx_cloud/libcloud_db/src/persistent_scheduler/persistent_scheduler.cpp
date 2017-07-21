@@ -74,8 +74,21 @@ void PersistentScheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_functorToReceiver[functorId] = receiver;
+    std::unordered_map<QnUuid, ScheduleParams> taskToParams;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_functorToReceiver[functorId] = receiver;
+
+        if (m_functorToTaskToParams.find(functorId) != m_functorToTaskToParams.cend()
+            && m_delayed.find(functorId) != m_delayed.cend())
+        {
+            taskToParams = m_functorToTaskToParams[functorId];
+            m_delayed.erase(functorId);
+        }
+    }
+
+    for (const auto& taskToParam : taskToParams)
+        timerFunction(functorId, taskToParam.first, taskToParam.second);
 }
 
 nx::utils::db::DBResult PersistentScheduler::subscribe(
@@ -209,6 +222,7 @@ void PersistentScheduler::timerFunction(
             auto& taskToParams = m_functorToTaskToParams[functorId];
             if (taskToParams.find(taskId) == taskToParams.cend())
                 taskToParams.emplace(taskId, params);
+            m_delayed.emplace(functorId);
             return;
         }
         receiver = it->second;

@@ -146,7 +146,8 @@ void MediatorFunctionalTest::registerCloudDataProvider(
                 const boost::optional<QUrl>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
-                std::chrono::milliseconds /*updateInterval*/)
+                std::chrono::milliseconds /*updateInterval*/,
+                std::chrono::milliseconds /*startTimeout*/)
             {
                 return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
             });

@@ -153,7 +153,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(), tr("Server connected to System"));
+            QnMessageBox::success(mainWindow(),
+                tr("Server will be connected to System shortly"),
+                tr("It will appear in the resource tree when the database synchronization is finished."));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:

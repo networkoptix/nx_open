@@ -585,7 +585,7 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 
     /* Initialize frame color if zoom window was loaded from a layout and
      * not created through this instrument. */
-    if (!widget->zoomRect().isNull() && !widget->frameDistinctionColor().isValid())
+    if (widget->isZoomWindow() && !widget->frameDistinctionColor().isValid())
         widget->setFrameDistinctionColor(nextZoomWindowColor());
 }
 

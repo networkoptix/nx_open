@@ -51,7 +51,7 @@ describe('System suite', function () {
                 p.helper.navigateBack();
             }
         });
-    }, 120000);
+    }, 240000);
 
     it("should confirm, if owner deletes system (You are going to disconnect your system from cloud)", function() {
         p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
@@ -70,8 +70,8 @@ describe('System suite', function () {
         p.ownedSystem.click();
         p.userDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('Delete system?\nYou are about to disconnect this system '+
-            'from your account. You will not be able to access this system via cloud anymore. Are you sure?');
+        expect(p.disconnectDialog.getText()).toContain('Disconnect System?\n You are about to disconnect this System '+
+            'from your account. You will not be able to access this System anymore. Are you sure?');
         p.cancelDisconnectButton.click();
     });
 

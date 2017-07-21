@@ -82,7 +82,6 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         return;
 
     const bool exists = m_systems.contains(priority);
-    NX_ASSERT(!exists, "System exists already");
     if (exists)
         return;
 

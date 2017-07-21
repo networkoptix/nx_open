@@ -51,20 +51,24 @@ void Connector::connect(
 {
     m_handler = std::move(handler);
 
-    if (timeout > std::chrono::milliseconds::zero())
-        m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
-
-    m_relayClient->startSession(
-        m_connectSessionId,
-        m_targetHostAddress.host.toString().toUtf8(),
-        [this](
-            nx::cloud::relay::api::ResultCode resultCode,
-            nx::cloud::relay::api::CreateClientSessionResponse response)
+    dispatch(
+        [this, timeout]()
         {
-            onStartRelaySessionResponse(
-                resultCode,
-                m_relayClient->prevRequestSysErrorCode(),
-                std::move(response));
+            m_relayClient->startSession(
+                m_connectSessionId,
+                m_targetHostAddress.host.toString().toUtf8(),
+                [this](
+                    nx::cloud::relay::api::ResultCode resultCode,
+                    nx::cloud::relay::api::CreateClientSessionResponse response)
+                {
+                    onStartRelaySessionResponse(
+                        resultCode,
+                        m_relayClient->prevRequestSysErrorCode(),
+                        std::move(response));
+                });
+
+            if (timeout > std::chrono::milliseconds::zero())
+                m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
         });
 }
 
@@ -87,10 +91,11 @@ void Connector::onStartRelaySessionResponse(
     decltype(m_handler) handler;
     handler.swap(m_handler);
 
+    m_timer.pleaseStopSync();
+
     if (resultCode != nx::cloud::relay::api::ResultCode::ok)
     {
         m_relayClient.reset();
-        m_timer.pleaseStopSync();
         return handler(
             toNatTraversalResultCode(resultCode),
             sysErrorCode,

@@ -335,6 +335,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [this]
         {
             disconnectFromServer(DisconnectFlag::Force);
+            action(action::ResourcesModeAction)->setChecked(true);
         });
 
     connect(action(action::LogoutFromCloud), &QAction::triggered, this,
@@ -390,6 +391,10 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(resourceModeAction, &QAction::toggled, this,
         [this, welcomeScreen](bool checked)
         {
+            // Check if action state was changed during queued connection.
+            if (action(action::ResourcesModeAction)->isChecked() != checked)
+                return;
+
             if (welcomeScreen)
                 welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
@@ -600,7 +605,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
      */
 
     const bool autoLogin = options.testFlag(AutoLogin);
-    const bool storePassword = options.testFlag(StorePassword) | autoLogin;
+    const bool storePassword = options.testFlag(StorePassword) || autoLogin;
     if (!storePassword && helpers::isNewSystem(info))
         return;
 
@@ -610,8 +615,15 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const bool cloudConnection = isConnectionToCloud(url);
 
     // Stores local credentials for successful connection
-    if (helpers::isLocalUser(url.userName()) && !cloudConnection)
+    if (helpers::isLocalUser(url.userName()) && !cloudConnection && options.testFlag(StoreSession))
     {
+        NX_DEBUG("CredentialsManager", lm("Store connection record of %1 to the system %2")
+            .arg(url.userName()).arg(localId));
+        NX_ASSERT(!url.password().isEmpty());
+        NX_DEBUG("CredentialsManager", storePassword
+            ? "Password is set"
+            : "Password must be cleared");
+
         const auto credentials = (storePassword
             ? QnEncodedCredentials(url)
             : QnEncodedCredentials(url.userName(), QString()));
@@ -622,23 +634,27 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
 
     if (autoLogin)
     {
+        NX_ASSERT(!url.password().isEmpty());
+        NX_DEBUG("CredentialsManager", lm("Saving last used connection of %1 to the system %2")
+            .arg(url.userName()).arg(url.host()));
+
         const auto lastUsed = QnConnectionData(info.systemName, url, localId);
         qnSettings->setLastUsedConnection(lastUsed);
-        qnSettings->setAutoLogin(autoLogin);
+        qnSettings->setAutoLogin(true);
         qnSettings->save();
     }
 
     if (cloudConnection)
     {
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
-        return;
     }
+    else
+    {
+        NX_ASSERT(!url.host().isEmpty(), "Wrong host is going to be saved to the recent connections list");
 
-    const bool correctHost = (!cloudConnection && !url.host().isEmpty());
-    NX_ASSERT(correctHost, "Wrong host is going to be saved to the recent connections list");
-
-    // Stores connection if it is local
-    storeLocalSystemConnection(info.systemName, localId, url, storePassword);
+        // Stores connection if it is local
+        storeLocalSystemConnection(info.systemName, localId, url, storePassword);
+    }
 }
 
 void QnWorkbenchConnectHandler::showWarnMessagesOnce()
@@ -913,6 +929,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     commonModule()->updateRunningInstanceGuid();
 
     const auto parameters = menu()->currentParameters(sender());
+    NX_ASSERT(parameters.hasArgument(Qn::StoreSessionRole));
+    const bool storeSession = parameters.argument(Qn::StoreSessionRole, true);
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (directConnection)
@@ -926,6 +944,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     {
         const auto forceConnection = parameters.argument(Qn::ForceRole, false);
         ConnectionOptions options;
+        if (storeSession)
+            options |= StoreSession;
         if (parameters.argument(Qn::StorePasswordRole, false))
             options |= StorePassword;
         if (parameters.argument(Qn::AutoLoginRole, false))
@@ -938,7 +958,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
 
-        /* Try to connect with saved password. */
+        // Try to connect with saved password. No need to store session once more.
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
             testConnectionToServer(url, AutoLogin, true);
@@ -975,7 +995,9 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
 
-    menu()->trigger(action::ConnectAction, {Qn::UrlRole, url});
+    action::Parameters connectParams{Qn::UrlRole, url};
+    connectParams.setArgument(Qn::StoreSessionRole, true);
+    menu()->trigger(action::ConnectAction, connectParams);
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
@@ -1080,6 +1102,8 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     {
         case Qn::IncompatibleProtocolConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
+        // This code is also returned if we are downloading compatibility version
+        case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
             if (!applauncher::checkOnline(false))
                 break;

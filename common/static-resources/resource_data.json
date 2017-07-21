@@ -27,6 +27,7 @@
                     "video_encoder_config1,video_encoder_config3"
                 ]
             },
+
             "preStreamConfigureRequests": [
                 {
                     "templateString": "/command/camera.cgi?ImageCodec2=off",
@@ -43,6 +44,20 @@
             ],
             "highStreamAvailableBitrates": ["16000"],
             "lowStreamAvailableBitrates": ["2000"]
+        },
+        {
+            "keys": [
+                "Sony|SNC-CX600*"
+            ],
+
+            "2WayAudio":
+            {
+                "codec": "AAC",
+                "bitrateKbps": 64,
+                "sampleRate": 16,
+                "urlPath": "/audio-out/aac16_64.cgi",
+                "contentType": ""
+            }
         },
         {
             "keys": [
@@ -1813,6 +1828,40 @@
         },
         {
             "keys": [
+                "Winic|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "12345"
+                }
+            ]
+        },
+        {
+            "keys": [
+                "Samsung Techwin|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "root",
+                    "password": "4321"
+                },
+                {
+                    "user": "root",
+                    "password": "admin"
+                },
+                {
+                    "user": "admin",
+                    "password": "4321"
+                },
+                {
+                    "user": "admin",
+                    "password": "1111111"
+                }
+            ]
+        },
+        {
+            "keys": [
                 "Cellinx|STH795"
             ],
 			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
@@ -1831,8 +1880,8 @@
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
-                        "logical": [1, 31.55],
-                        "logicalMultiplier": 37.5,
+                        "logical": [1, 20],
+                        "logicalMultiplier": 32,
                         "space": "35MmEquiv"
                     }
                 }
@@ -1909,6 +1958,35 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P"
+            ],
+            "2WayAudio":
+            {
+                "codec": "ALAW",
+                "bitrateKbps": 64,
+                "sampleRate": 12,
+                "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
+                "contentType": "Audio/G.711A",
+                "noAuth": true
+            }
+            
+        },
+        {
+            "keys": [
+                "Dahua|DH-IPC-K35P", "Dahua|IPC-K35P"
+            ],
+            "2WayAudio":
+            {
+                "codec": "ALAW",
+                "bitrateKbps": 64,
+                "sampleRate": 8,
+                "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
+                "contentType": "Audio/G.711A"
+            }
+            
         },
         {
             "keys": [

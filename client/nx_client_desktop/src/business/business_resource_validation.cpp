@@ -24,6 +24,8 @@
 
 namespace {
 
+static const QString kForceHtml = lit("<html>%1</html>");
+
 QString braced(const QString& source)
 {
     return L'<' + source + L'>';
@@ -274,45 +276,22 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     QnUserResourceList users;
     QList<QnUuid> roles;
     module->userRolesManager()->usersAndRoles(ids, users, roles);
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
     auto additional = parseAdditional(additionalList);
 
-    QStringList receivers;
-    int invalid = 0;
-    int total = 0;
-    int explicitUsers = 0;
-    QnUserResourcePtr invalidUser;
-
-    for (const auto& user: users)
-    {
-        if (!user->isEnabled())
-            continue;
-
-        ++explicitUsers;
-
-        QString userMail = user->getEmail();
-        if (isValidUser(user))
-        {
-            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
-        }
-        else
-        {
-            ++invalid;
-            if (!invalidUser)
-                invalidUser = user;
-        }
-    }
-
-    if (explicitUsers == 0 && roles.empty() && additional.isEmpty())
+    if (users.empty() && roles.empty() && additional.isEmpty())
         return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (!detailed)
     {
         QStringList recipients;
-        if (explicitUsers)
-            recipients << tr("%n Users", "", explicitUsers);
-        if (!roles.empty())
-            recipients << tr("%n Roles", "", (int)roles.size());
+        if (!users.empty() || !roles.empty())
+        {
+            recipients << nx::vms::event::StringsHelper(qnClientCoreModule->commonModule())
+                .actionSubjects(users, roles, true);
+        }
+
         if (!additional.empty())
             recipients << tr("%n additional", "", additional.size());
 
@@ -320,7 +299,19 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
         return recipients.join(lit(", "));
     }
 
-    total = explicitUsers;
+    QStringList receivers;
+    QSet<QnUserResourcePtr> invalidUsers;
+
+    for (const auto& user : users)
+    {
+        QString userMail = user->getEmail();
+        if (isValidUser(user))
+            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
+        else
+            invalidUsers << user;
+    }
+
+    int total = users.size();
 
     for (const auto& roleId: roles)
     {
@@ -333,18 +324,15 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 
             ++total;
             if (!isValidUser(user))
-            {
-                ++invalid;
-                if (!invalidUser)
-                    invalidUser = user;
-            }
+                invalidUsers << user;
         }
     }
 
+    int invalid = invalidUsers.size();
     if (invalid > 0)
     {
         return invalid == 1
-            ? tr("User %1 has invalid email address").arg(invalidUser->getName())
+            ? tr("User %1 has invalid email address").arg((*invalidUsers.cbegin())->getName())
             : tr("%n of %1 users have invalid email address", "", invalid).arg(total);
     }
 
@@ -446,3 +434,272 @@ bool hasAccessToSource(const nx::vms::event::EventParameters& params,
 }
 
 } // namespace QnBusiness
+
+// ------------------------------------------------------------------------------------------------
+// QnSubjectValidationPolicy
+
+QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
+    m_allowEmptySelection(allowEmptySelection)
+{
+}
+
+QnSubjectValidationPolicy::~QnSubjectValidationPolicy()
+{
+}
+
+void QnSubjectValidationPolicy::analyze(
+    bool allUsers,
+    const QSet<QnUuid>& subjects,
+    QVector<QnUuid>& validRoles,
+    QVector<QnUuid>& invalidRoles,
+    QVector<QnUuid>& intermediateRoles,
+    QVector<QnUserResourcePtr>& validUsers,
+    QVector<QnUserResourcePtr>& invalidUsers) const
+{
+    validRoles.clear();
+    invalidRoles.clear();
+    intermediateRoles.clear();
+    validUsers.clear();
+    invalidUsers.clear();
+
+    QnUserResourceList users;
+    QList<QnUuid> roleIds;
+
+    if (allUsers)
+        users = resourcePool()->getResources<QnUserResource>();
+    else
+        userRolesManager()->usersAndRoles(subjects, users, roleIds);
+
+    for (const auto& id: roleIds)
+    {
+        switch (roleValidity(id))
+        {
+            case QValidator::Acceptable:
+                validRoles << id;
+                break;
+
+            case QValidator::Intermediate:
+                intermediateRoles << id;
+                break;
+
+            default: // QValidator::Invalid:
+                invalidRoles << id;
+                break;
+        }
+    }
+
+    for (const auto& user: users)
+    {
+        if (userValidity(user))
+            validUsers << user;
+        else
+            invalidUsers << user;
+    }
+}
+
+// This function is generally faster than QnSubjectValidationPolicy::analyze.
+QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
+    const QSet<QnUuid>& subjects) const
+{
+    if (!allUsers && subjects.empty() && !m_allowEmptySelection)
+        return QValidator::Invalid;
+
+    QnUserResourceList users;
+    QList<QnUuid> roleIds;
+
+    if (allUsers)
+        users = resourcePool()->getResources<QnUserResource>();
+    else
+        userRolesManager()->usersAndRoles(subjects, users, roleIds);
+
+    enum StateFlag
+    {
+        kInvalid = 0x1,
+        kValid = 0x2,
+        kIntermediate = kInvalid | kValid
+    };
+
+    int state = 0;
+
+    for (const auto& id: roleIds)
+    {
+        switch (roleValidity(id))
+        {
+            case QValidator::Invalid:
+                state |= kInvalid;
+                break;
+
+            case QValidator::Intermediate:
+                state |= kIntermediate;
+                break;
+
+            case QValidator::Acceptable:
+                state |= kValid;
+                break;
+
+            default:
+                NX_ASSERT(false); //< Should never happen.
+                break;
+        }
+
+        if (state == kIntermediate)
+            return QValidator::Intermediate;
+    }
+
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
+    for (const auto& user: users)
+    {
+        state |= (userValidity(user) ? kValid : kInvalid);
+
+        if (state == kIntermediate)
+            return QValidator::Intermediate;
+    }
+
+    return state == kValid
+        ? QValidator::Acceptable
+        : QValidator::Invalid;
+}
+
+QString QnSubjectValidationPolicy::calculateAlert(
+    bool allUsers, const QSet<QnUuid>& subjects) const
+{
+    return !allUsers && subjects.empty() && !m_allowEmptySelection
+        ? kForceHtml.arg(nx::vms::event::StringsHelper::needToSelectUserText())
+        : QString();
+}
+
+// ------------------------------------------------------------------------------------------------
+// QnDefaultSubjectValidationPolicy
+
+QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
+    base_type(allowEmptySelection)
+{
+}
+
+QValidator::State QnDefaultSubjectValidationPolicy::roleValidity(const QnUuid& /*roleId*/) const
+{
+    return QValidator::Acceptable;
+}
+
+bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*user*/) const
+{
+    return true;
+}
+
+// ------------------------------------------------------------------------------------------------
+// QnRequiredPermissionSubjectPolicy
+
+QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
+    Qn::GlobalPermission requiredPermission,
+    const QString& permissionName,
+    bool allowEmptySelection)
+    :
+    base_type(allowEmptySelection),
+    m_requiredPermission(requiredPermission),
+    m_permissionName(permissionName)
+{
+}
+
+bool QnRequiredPermissionSubjectPolicy::userValidity(const QnUserResourcePtr& user) const
+{
+    return resourceAccessManager()->hasGlobalPermission(user, m_requiredPermission);
+}
+
+QValidator::State QnRequiredPermissionSubjectPolicy::roleValidity(const QnUuid& roleId) const
+{
+    return isRoleValid(roleId) ? QValidator::Acceptable : QValidator::Invalid;
+}
+
+bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
+{
+    const auto role = userRolesManager()->predefinedRole(roleId);
+    switch (role)
+    {
+        case Qn::UserRole::CustomPermissions:
+        {
+            NX_ASSERT(false); //< Should never happen.
+            return false;
+        }
+
+        case Qn::UserRole::CustomUserRole:
+        {
+            const auto customRole = userRolesManager()->userRole(roleId);
+            return customRole.permissions.testFlag(m_requiredPermission);
+        }
+
+        default:
+        {
+            const auto permissions = userRolesManager()->userRolePermissions(role);
+            return permissions.testFlag(m_requiredPermission);
+        }
+    }
+}
+
+QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
+    const QSet<QnUuid>& subjects) const
+{
+    QString alert = base_type::calculateAlert(allUsers, subjects);
+    if (!alert.isEmpty())
+        return alert;
+
+    QVector<QnUuid> validRoles;
+    QVector<QnUuid> invalidRoles;
+    QVector<QnUuid> intermediateRoles;
+    QVector<QnUserResourcePtr> validUsers;
+    QVector<QnUserResourcePtr> invalidUsers;
+
+    analyze(allUsers, subjects,
+        validRoles, invalidRoles, intermediateRoles,
+        validUsers, invalidUsers);
+
+    NX_EXPECT(intermediateRoles.empty()); //< Unused in this policy.
+
+    if (invalidRoles.size() > 0)
+    {
+        if (invalidRoles.size() == 1)
+        {
+            alert = tr("Role %1 has no %2 permission",
+                "%1 is the name of selected role, %2 is permission name")
+                .arg(lit("<b>%1</b>").arg(userRolesManager()->userRoleName(invalidRoles.front())))
+                .arg(m_permissionName);
+        }
+        else if (validRoles.empty())
+        {
+            alert = tr("Selected roles have no %1 permission", "%1 is permission name")
+                .arg(m_permissionName);
+        }
+        else
+        {
+            alert = tr("%n of %1 selected roles have no %2 permission",
+                "%1 is number of selected roles, %2 is permission name", invalidRoles.size())
+                .arg(validRoles.size() + invalidRoles.size()).arg(m_permissionName);
+        }
+    }
+
+    if (invalidUsers.size() > 0)
+    {
+        if (!alert.isEmpty())
+            alert += lit("<br>");
+
+        if (invalidUsers.size() == 1)
+        {
+            alert += tr("User %1 has no %2 permission",
+                "%1 is the name of selected user, %2 is permission name")
+                .arg(lit("<b>%1</b>").arg(invalidUsers.front()->getName()))
+                .arg(m_permissionName);
+        }
+        else if (validUsers.empty())
+        {
+            alert += tr("Selected users have no %1 permission", "%1 is permission name")
+                .arg(m_permissionName);
+        }
+        else
+        {
+            alert += tr("%n of %1 selected users have no %2 permission",
+                "%1 is number of selected users, %2 is permission name", invalidUsers.size())
+                .arg(validUsers.size() + invalidUsers.size()).arg(m_permissionName);
+        }
+    }
+
+    return alert.isEmpty() ? alert : kForceHtml.arg(alert);
+}

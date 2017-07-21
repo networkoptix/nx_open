@@ -80,8 +80,8 @@
       <translation>로그인</translation>
     </message>
     <message>
-      <source>Incorrect Email or Password</source>
-      <translation>잘못 된 전자 메일 또는 암호</translation>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
