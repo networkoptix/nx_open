@@ -225,8 +225,11 @@ void ListeningPeerPool::startWaitingForNewConnection(
     PeerContext* peerContext,
     TakeIdleConnectionHandler completionHandler)
 {
-    const auto expirationTime = 
+    auto expirationTime = 
         nx::utils::monotonicTime() + m_settings.listeningPeer().takeIdleConnectionTimeout;
+    // NOTE: Client request timer cannot last beyond peer offline timeout.
+    if (peerContext->expirationTimer)
+        expirationTime = std::min(expirationTime, (*peerContext->expirationTimer)->first);
 
     ConnectionAwaitContext connectionAwaitContext;
     connectionAwaitContext.handler = std::move(completionHandler);
