@@ -337,8 +337,8 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
 void QnTCPConnectionProcessor::pleaseStop()
 {
     Q_D(QnTCPConnectionProcessor);
-    if (d->socket)
-        d->socket->shutdown();
+    if (auto socket = d->socket)
+        socket->shutdown();
     QnLongRunnable::pleaseStop();
 }
 

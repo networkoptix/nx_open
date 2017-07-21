@@ -6,11 +6,10 @@
 #include <nx/utils/byte_stream/pipeline.h>
 
 namespace nx {
-namespace cloud {
-namespace relay {
+namespace network {
 namespace test {
 
-class StreamSocketStub:
+class NX_NETWORK_API StreamSocketStub:
     public nx::network::StreamSocketDelegate
 {
     using base_type = nx::network::StreamSocketDelegate;
@@ -51,6 +50,5 @@ private:
 };
 
 } // namespace test
-} // namespace relay
-} // namespace cloud
+} // namespace network
 } // namespace nx

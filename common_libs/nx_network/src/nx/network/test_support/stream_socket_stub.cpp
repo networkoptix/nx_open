@@ -3,8 +3,7 @@
 #include <thread>
 
 namespace nx {
-namespace cloud {
-namespace relay {
+namespace network {
 namespace test {
 
 StreamSocketStub::StreamSocketStub():
@@ -104,6 +103,5 @@ void StreamSocketStub::setPostDelay(boost::optional<std::chrono::milliseconds> p
 }
 
 } // namespace test
-} // namespace relay
-} // namespace cloud
+} // namespace network
 } // namespace nx

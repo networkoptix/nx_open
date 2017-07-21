@@ -104,6 +104,8 @@ TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
         SocketAddress(testHost));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class CloudStreamSocketTest:
     public ::testing::Test
 {
@@ -315,6 +317,8 @@ TEST_F(CloudStreamSocketTest, cancellation)
         cloudSocket.cancelIOSync(aio::etNone);
     }
 }
+
+//-------------------------------------------------------------------------------------------------
 
 class CloudStreamSocketCancellation:
     public CloudStreamSocketTest
