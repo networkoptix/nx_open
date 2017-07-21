@@ -350,6 +350,12 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
+    factory(StartAnalyticsAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Start Analytics..."))
+        .childFactory(new AnalyticsModeActionFactory(manager))
+        .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
+
     factory()
         .flags(TitleBar)
         .separator();

@@ -306,16 +306,22 @@ bool QnLiveStreamProvider::needMetaData()
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (needAnalyzeStream(getRole()))
         {
-            if (m_videoMetadataPlugin->hasMetadata())
-                return true;
-
-            for (int i = 0; i < m_videoChannels; ++i)
+            if (nx::analytics::ini().enableDetectionPlugin
+                && m_videoMetadataPlugin->hasMetadata())
             {
-                bool rez = m_motionEstimation[i].existsMetadata();
-                if (rez)
+                return true;
+            }
+
+            if (nx::analytics::ini().enableMotionDetection)
+            {
+                for (int i = 0; i < m_videoChannels; ++i)
                 {
-                    m_softMotionLastChannel = i;
-                    return rez;
+                    bool rez = m_motionEstimation[i].existsMetadata();
+                    if (rez)
+                    {
+                        m_softMotionLastChannel = i;
+                        return rez;
+                    }
                 }
             }
         }
