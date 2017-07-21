@@ -32,7 +32,7 @@ inline size_t testClientCount()
 }
 
 static const bool kEnableTestDebugOutput = false;
-template <typename Message>
+template<typename Message>
 static void testDebugOutput(const Message& message)
 {
     if (kEnableTestDebugOutput)

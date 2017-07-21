@@ -165,8 +165,8 @@ void OutgoingTunnel::postponeConnectTask(
 {
     const auto timeoutTimePoint =
         timeout > std::chrono::milliseconds::zero()
-        ? std::chrono::steady_clock::now() + timeout
-        : std::chrono::steady_clock::time_point::max();
+            ? std::chrono::steady_clock::now() + timeout
+            : std::chrono::steady_clock::time_point::max();
     ConnectionRequestData data;
     data.socketAttributes = std::move(socketAttributes);
     data.timeout = timeout;
