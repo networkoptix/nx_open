@@ -4,16 +4,16 @@
 
 namespace ec2
 {
-    class TransactionMessageBusSelector;
+    class AbstractTransactionMessageBus;
 }
 
 class QnActiveConnectionsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    QnActiveConnectionsRestHandler(const ec2::TransactionMessageBusSelector* messageBus);
+    QnActiveConnectionsRestHandler(const ec2::AbstractTransactionMessageBus* messageBus);
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
-    const ec2::TransactionMessageBusSelector* m_messageBus;
+    const ec2::AbstractTransactionMessageBus* m_messageBus;
 };

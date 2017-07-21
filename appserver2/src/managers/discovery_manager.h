@@ -50,7 +50,7 @@ namespace ec2
     class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
     {
     public:
-        QnDiscoveryMonitor(TransactionMessageBusSelector* messageBus);
+        QnDiscoveryMonitor(TransactionMessageBusAdapter* messageBus);
         virtual ~QnDiscoveryMonitor();
 
     private:
@@ -62,7 +62,7 @@ namespace ec2
         void send(ApiCommand::Value command, Transaction data, const Target& target);
 
     private:
-        TransactionMessageBusSelector* m_messageBus;
+        TransactionMessageBusAdapter* m_messageBus;
         std::map<QnUuid, ApiDiscoveredServerData> m_serverCache;
     };
 

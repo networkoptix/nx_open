@@ -103,8 +103,9 @@ QUrl BasicTestFixture::relayUrl() const
 
 void BasicTestFixture::assertConnectionCanBeEstablished()
 {
-    auto clientSocket = SocketFactory::createStreamSocket();
-    ASSERT_TRUE(clientSocket->setNonBlockingMode(true));
+    m_clientSocket = SocketFactory::createStreamSocket();
+    auto clientSocketGuard = makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
+    ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
 
     nx::String targetAddress = 
         m_remotePeerName
@@ -112,7 +113,7 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
         : serverSocketCloudAddress();
 
     nx::utils::promise<SystemError::ErrorCode> done;
-    clientSocket->connectAsync(
+    m_clientSocket->connectAsync(
         targetAddress,
         [&done](SystemError::ErrorCode sysErrorCode)
         {
@@ -120,8 +121,6 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
         });
     const auto resultCode = done.get_future().get();
     ASSERT_EQ(SystemError::noError, resultCode);
-
-    clientSocket->pleaseStopSync();
 }
 
 void BasicTestFixture::startExchangingFixedData()
@@ -179,6 +178,11 @@ void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
 void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol)
 {
     m_mediatorApiProtocol = mediatorApiProtocol;
+}
+
+const std::unique_ptr<AbstractStreamSocket>& BasicTestFixture::clientSocket()
+{
+    return m_clientSocket;
 }
 
 void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()

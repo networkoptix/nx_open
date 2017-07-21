@@ -67,6 +67,8 @@ protected:
     void setRemotePeerName(const nx::String& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
+    const std::unique_ptr<AbstractStreamSocket>& clientSocket();
+
 private:
     struct HttpRequestResult
     {
@@ -90,6 +92,7 @@ private:
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
     QUrl m_relayUrl;
+    std::unique_ptr<AbstractStreamSocket> m_clientSocket;
 
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();

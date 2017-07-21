@@ -50,7 +50,7 @@ TEST(ExecActionAccessRightsTest, main)
 
         ec2::QnJsonTransactionSerializer jsonTranSerializer;
         ec2::QnUbjsonTransactionSerializer ubjsonTranSerializer;
-        ec2::TransactionMessageBusSelector messageBus(
+        ec2::TransactionMessageBusAdapter messageBus(
             nullptr/*QnDbManager*/,
             Qn::PT_Server,
             launcher.commonModule(),

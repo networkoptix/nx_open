@@ -11,7 +11,7 @@
 #include "server_query_processor.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 
 using namespace nx;
 
@@ -20,7 +20,7 @@ namespace ec2
 
 template<class QueryProcessorType>
 QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
-    TransactionMessageBusSelector* messageBus,
+    TransactionMessageBusAdapter* messageBus,
     QueryProcessorType* const queryProcessor,
     const Qn::UserAccessData &userAccessData)
 :

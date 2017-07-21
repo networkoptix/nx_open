@@ -10,7 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include "core/resource/network_resource.h"
 #include <nx/network/http/custom_headers.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 #include "network/router.h"
 #include "network/tcp_listener.h"
 #include "network/universal_tcp_listener.h"
@@ -44,7 +44,7 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-    ec2::TransactionMessageBusSelector* messageBus,
+    ec2::TransactionMessageBusAdapter* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :

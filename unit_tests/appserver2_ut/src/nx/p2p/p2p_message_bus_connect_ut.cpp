@@ -87,7 +87,7 @@ protected:
             for (const auto& server: m_servers)
             {
                 const auto& connection = server->moduleInstance()->ecConnection();
-                const auto& bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
+                const auto& bus = connection->messageBus()->dynamicCast<MessageBus*>();
                 const auto& commonModule = server->moduleInstance()->commonModule();
                 for (const auto& serverTo: m_servers)
                 {
@@ -158,8 +158,8 @@ protected:
         {
             ec2::Ec2DirectConnection* connection =
                 dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
-            const auto& bus = dynamic_cast<MessageBus*>(connection->messageBus()->impl());
-            for (const auto& connection : bus->connections())
+            const auto& bus = connection->messageBus()->dynamicCast<MessageBus*>();
+            for (const auto& connection: bus->connections())
             {
                 ++totalConnections;
                 if (bus->context(connection)->isLocalStarted)

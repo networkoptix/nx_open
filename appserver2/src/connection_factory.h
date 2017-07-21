@@ -66,7 +66,7 @@ namespace ec2 {
 
         virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
-        virtual TransactionMessageBusSelector* messageBus() const override;
+        virtual TransactionMessageBusAdapter* messageBus() const override;
         virtual QnDistributedMutexManager* distributedMutex() const override;
         virtual TimeSynchronizationManager* timeSyncManager() const override;
 
@@ -81,7 +81,7 @@ private:
 
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
-    std::unique_ptr<TransactionMessageBusSelector> m_bus;
+    std::unique_ptr<TransactionMessageBusAdapter> m_bus;
 
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;

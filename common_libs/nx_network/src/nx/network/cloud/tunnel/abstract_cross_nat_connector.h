@@ -26,6 +26,7 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler) = 0;
+    virtual QString getRemotePeerName() const = 0;
 };
 
 } // namespace cloud

@@ -33,7 +33,7 @@
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
 #include <http/p2p_connection_listener.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 
 #include <ini.h>
 
@@ -62,7 +62,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
     }
 
-    m_bus.reset(new TransactionMessageBusSelector(
+    m_bus.reset(new TransactionMessageBusAdapter(
         m_dbManager.get(),
         peerType,
         commonModule,
@@ -79,7 +79,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     if (peerType == Qn::PT_Server)
     {
         m_bus->init(ini().isP2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
-        if (auto messageBus = dynamic_cast<QnTransactionMessageBus*>(m_bus->impl()))
+        if (auto messageBus = m_bus->dynamicCast<QnTransactionMessageBus*>())
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
     }
@@ -168,14 +168,14 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus->impl()))
+    if (auto bus = m_bus->dynamicCast<QnTransactionMessageBus*>())
     {
         httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus*>(
             "HTTP", "ec2/events", bus);
         httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus*>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
-    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus->impl()))
+    else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
             "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
@@ -1946,7 +1946,7 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
         permission);
 }
 
-TransactionMessageBusSelector* Ec2DirectConnectionFactory::messageBus() const
+TransactionMessageBusAdapter* Ec2DirectConnectionFactory::messageBus() const
 {
     return m_bus.get();
 }

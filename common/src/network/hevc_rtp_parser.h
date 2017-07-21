@@ -34,8 +34,8 @@ class HevcParser: public QnRtpVideoStreamParser
     // Decoding order number field type.
     enum class DonType
     {
-        Donl,
-        Dond
+        donl,
+        dond
     };
 
 public:
@@ -98,7 +98,7 @@ private:
     inline bool skipDonIfNeeded(
         const uint8_t** outPayload,
         int* outPayloadLength,
-        DonType donType = DonType::Donl);
+        DonType donType = DonType::donl);
 
     inline void skipPayloadHeader(const uint8_t** outPayload, int* outPayloadLength);
     inline void skipFuHeader(const uint8_t** outPayload, int* outPayloadLength);

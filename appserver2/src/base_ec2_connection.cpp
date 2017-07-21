@@ -394,7 +394,7 @@ QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
 }
 
 template<class QueryProcessorType>
-TransactionMessageBusSelector* BaseEc2Connection<QueryProcessorType>::messageBus() const
+TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus() const
 {
     return m_connectionFactory->messageBus();
 }

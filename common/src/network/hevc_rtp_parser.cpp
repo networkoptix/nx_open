@@ -324,13 +324,13 @@ bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     auto packetType = hevc::fromNalUnitTypeToPacketType(packetHeader.unitType);
     switch (packetType)
     {
-        case hevc::PacketType::SingleNalUnitPacket:
+        case hevc::PacketType::singleNalUnitPacket:
             return handleSingleNalUnitPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::FragmentationPacket:
+        case hevc::PacketType::fragmentationPacket:
             return handleFragmentationPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::AggregationPacket:
+        case hevc::PacketType::aggregationPacket:
             return handleAggregationPacket(&packetHeader, payload, payloadLength);
-        case hevc::PacketType::PaciPacket:
+        case hevc::PacketType::paciPacket:
             return handlePaciPacket(&packetHeader, payload, payloadLength);
         default:
             return false;
@@ -361,7 +361,7 @@ bool HevcParser::handleSingleNalUnitPacket(
     }
 
     updateNalFlags(header->unitType, payload, payloadLength);
-    if (header->unitType == hevc::NalUnitType::SpsNut)
+    if (header->unitType == hevc::NalUnitType::spsNut)
     {
         hevc::Sps sps;
         sps.decode(payload, payloadLength);
@@ -380,11 +380,11 @@ bool HevcParser::handleAggregationPacket(
     const uint8_t* payload,
     int payloadLength)
 {
-    DonType donType = DonType::Donl;
+    DonType donType = DonType::donl;
     while (payloadLength > 0)
     {
         skipDonIfNeeded(&payload, &payloadLength, donType);
-        donType = DonType::Dond;
+        donType = DonType::dond;
 
         auto nalSize = ntohs(*(uint16_t*)payload);
         payload += 2; //< Skip size field.
@@ -463,7 +463,7 @@ bool HevcParser::skipDonIfNeeded(
 {
     if (m_context.spropMaxDonDiff)
     {
-        auto bytesToSkip = donType == DonType::Donl ? 2 : 1;
+        auto bytesToSkip = donType == DonType::donl ? 2 : 1;
         *outPayload += bytesToSkip;
         *outPayloadLength -= bytesToSkip;
     }
@@ -494,16 +494,16 @@ void HevcParser::updateNalFlags(
     const uint8_t* payload,
     int payloadLength)
 {
-    if (unitType == hevc::NalUnitType::VpsNut)
+    if (unitType == hevc::NalUnitType::vpsNut)
     {
         m_context.inStreamVpsFound = true;
     }
-    else if (unitType == hevc::NalUnitType::SpsNut)
+    else if (unitType == hevc::NalUnitType::spsNut)
     {
         m_context.inStreamSpsFound = true;
         extractPictureDimensionsFromSps(payload, payloadLength);
     }
-    else if (unitType == hevc::NalUnitType::PpsNut)
+    else if (unitType == hevc::NalUnitType::ppsNut)
     {
         m_context.inStreamPpsFound = true;
     }

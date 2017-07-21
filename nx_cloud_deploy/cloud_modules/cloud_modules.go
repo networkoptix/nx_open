@@ -19,6 +19,15 @@ func GetIntEnvVar(variable string)(int32) {
 	return int32(intval)
 }
 
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
     data, err := Asset("cloud_modules.xml.template")
     if err != nil {
@@ -43,7 +52,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
-	// config, err := clientcmd.BuildConfigFromFlags("", "/Users/ivigasin/.nxcloud/instances/cloud-devk/kubeconfig")
+	// config, err := clientcmd.BuildConfigFromFlags("", "/Users/ivigasin/.nxcloud/instances/cloud-testk/kubeconfig")
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +67,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	mediatorPort := services.Items[0].Spec.Ports[0].NodePort
+	mediatorPort := int32(0);
+
+	for _, v := range services.Items[0].Spec.Ports {
+		if v.Protocol == "UDP" {
+			mediatorPort = v.NodePort
+			break
+		}
+	}
+
+	if mediatorPort == 0 {
+		panic("Couldn't find mediator")
+	}
+
+	var mediatorNodes []string;
+	pods, err := clientset.CoreV1().Pods("default").List(metav1.ListOptions{LabelSelector: "app=connection-mediator"})
+	for _, pod := range pods.Items {
+		if pod.Status.Phase == "Running" {
+			mediatorNodes = append(mediatorNodes, pod.Spec.NodeName)
+		}
+	}
 
 	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "kubernetes.io/role=node"})
 	if err != nil {
@@ -68,6 +96,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	var mediatorEndpoints []Endpoint
 
 	for _, node := range nodes.Items {
+		if !stringInSlice(node.Name, mediatorNodes) {
+			continue
+		}
+
 		for _, address := range node.Status.Addresses {
 			if address.Type == "ExternalIP" {
 				mediatorEndpoints = append(mediatorEndpoints, Endpoint{address.Address, mediatorPort})
