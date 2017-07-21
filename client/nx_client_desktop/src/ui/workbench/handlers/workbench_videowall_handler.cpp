@@ -696,7 +696,7 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
         return;
 
     bool closeCurrentInstance = false;
-    if (!nx::client::desktop::ui::videowall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+    if (!messages::Videowall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
         return;
 
     if (closeCurrentInstance)
@@ -1508,7 +1508,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            nx::client::desktop::ui::videowall::anotherVideoWall(mainWindow());
+            messages::Videowall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -3064,7 +3064,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    return nx::client::desktop::ui::videowall::checkLocalFiles(mainWindow(), index,
+    return messages::Videowall::checkLocalFiles(mainWindow(), index,
         layout->layoutResources().toList());
 }
 

@@ -56,7 +56,7 @@ public:
 
     void addResources(const QnResourceList &resources, bool mainPool = true);
 
-    void addResource(const QnResourcePtr &resource);
+    void addResource(const QnResourcePtr& resource, bool instantly = false);
     // TODO: We need to remove this function. Client should use separate instance of resource pool instead
     void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 

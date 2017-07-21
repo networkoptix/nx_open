@@ -3,10 +3,13 @@
 
 #include <ui/workbench/workbench_context.h>
 
+#include <business/business_resource_validation.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <utils/common/scoped_value_rollback.h>
+
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
-#include <utils/common/scoped_value_rollback.h>
+#include <nx/vms/event/strings_helper.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -34,8 +37,6 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (!model() || m_updating)
         return;
 
-    base_type::at_model_dataChanged(fields);
-
     if (fields.testFlag(Field::eventType))
     {
         const auto sourceCameraRequired =
@@ -45,6 +46,9 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::actionParams))
         ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);
+
+    updateValidationPolicy();
+    base_type::at_model_dataChanged(fields);
 }
 
 void QnPopupBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
@@ -69,5 +73,22 @@ void QnPopupBusinessActionWidget::parametersChanged()
     auto params = model()->actionParams();
     params.needConfirmation = ui->forceAcknoledgementCheckBox->isChecked();
     model()->setActionParams(params);
+    updateValidationPolicy();
+    updateSubjectsButton();
 }
 
+void QnPopupBusinessActionWidget::updateValidationPolicy()
+{
+    const bool forceAcknowledgement = ui->forceAcknoledgementCheckBox->isEnabled()
+        && ui->forceAcknoledgementCheckBox->isChecked();
+
+    if (forceAcknowledgement)
+    {
+        setValidationPolicy(new QnRequiredPermissionSubjectPolicy(
+            Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+    }
+    else
+    {
+        setValidationPolicy(new QnDefaultSubjectValidationPolicy());
+    }
+}

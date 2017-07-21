@@ -19,6 +19,7 @@ public:
 
 private:
     void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent* event);
 
 private:
     Q_DECLARE_PRIVATE(QnSearchBookmarksDialog)

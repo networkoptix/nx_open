@@ -100,6 +100,7 @@ public:
 
     bool isValid(const QModelIndex& index) const;
     bool isChecked(const QModelIndex& index) const;
+    bool isIndirectlyChecked(const QModelIndex& index) const;
 
     bool allUsers() const;
     void setAllUsers(bool value);
@@ -155,6 +156,8 @@ public:
 protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
+
+    virtual ItemState itemState(const QModelIndex& index) const;
 };
 
 //-------------------------------------------------------------------------------------------------
