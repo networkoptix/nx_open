@@ -32,7 +32,7 @@ QString NX_UTILS_API toString(Level level);
 
 using LevelFilters = std::map<QString, Level>;
 
-NX_UTILS_API struct LevelSettings
+struct NX_UTILS_API LevelSettings
 {
     Level primary = kDefaultLevel;
     LevelFilters filters;
