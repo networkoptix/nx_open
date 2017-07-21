@@ -63,7 +63,9 @@ TEST_F(FtEc2MserverCloudSynchronization, general)
         testSynchronizingUserFromMediaServerToCloud();
 
         if (i == 0)
+        {
             ASSERT_TRUE(cdb()->restart());
+        }
     }
 }
 

@@ -262,7 +262,9 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
 
                 EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 3U : 2U);
                 if (!isSub)
+                {
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
+                }
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
             });
     }

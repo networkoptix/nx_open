@@ -229,7 +229,7 @@ void DeviceSearcher::onSomeBytesRead(
     AbstractCommunicatingSocket* sock,
     SystemError::ErrorCode errorCode,
     nx::Buffer* readBuffer,
-    size_t /*bytesRead*/ ) noexcept
+    size_t /*bytesRead*/ )
 {
     if( errorCode )
     {

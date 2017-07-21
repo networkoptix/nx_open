@@ -14,7 +14,9 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace cloud {
@@ -56,6 +58,9 @@ public:
     void takeIdleConnection(
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler);
+
+    nx::utils::Subscription<std::string /*peer full name*/>& peerConnectedSubscription();
+    nx::utils::Subscription<std::string /*peer full name*/>& peerDisconnectedSubscription();
 
 private:
     /**
@@ -99,6 +104,16 @@ private:
     DisconnectedPeerExpirationTimers m_peerExpirationTimers;
     nx::network::aio::Timer m_periodicTasksTimer;
     TakeIdleConnectionRequestTimers m_takeIdleConnectionRequestTimers;
+    nx::utils::Subscription<std::string> m_peerConnectedSubscription;
+    nx::utils::Subscription<std::string> m_peerDisconnectedSubscription;
+    std::deque<nx::utils::MoveOnlyFunc<void()>> m_scheduledEvents;
+
+    bool someoneIsWaitingForPeerConnection(const PeerContext& peerContext) const;
+    void provideConnectionToTheClient(
+        const QnMutexLockerBase& lock,
+        const std::string& peerName,
+        PeerContext* peerContext,
+        std::unique_ptr<ConnectionContext> connectionContext);
 
     void startWaitingForNewConnection(
         const QnMutexLockerBase& lock,
@@ -129,12 +144,21 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);
-    void processExpirationTimers(const QnMutexLockerBase& lock);
+    void processExpirationTimers(
+        const QnMutexLockerBase& lock,
+        std::chrono::steady_clock::time_point currentTime = nx::utils::monotonicTime());
+    void processExpirationTimers(std::chrono::steady_clock::time_point currentTime);
 
     void doPeriodicTasks();
-    void handleTimedoutTakeConnectionRequests();
+    void handleTimedoutTakeConnectionRequests(
+        std::chrono::steady_clock::time_point currentTime);
     std::vector<TakeIdleConnectionHandler> findTimedoutTakeConnectionRequestHandlers(
-        const QnMutexLockerBase& lock);
+        const QnMutexLockerBase& lock,
+        std::chrono::steady_clock::time_point currentTime);
+
+    void scheduleEvent(nx::utils::MoveOnlyFunc<void()> raiseEventFunc);
+    void forcePeriodicTasksProcessing();
+    void raiseScheduledEvents();
 };
 
 } // namespace model

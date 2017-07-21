@@ -35,7 +35,9 @@ public:
         nx_http::RequestProcessedHandler completionHandler )
     {
         if (m_securityExpectation)
+        {
             EXPECT_EQ(m_securityExpectation.get(), connection->isSsl());
+        }
 
         QUrlQuery requestQuery(request.requestLine.url.query());
 

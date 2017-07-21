@@ -272,7 +272,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto tunnelAcceptorFactoryFuncBak =
         TunnelAcceptorFactory::instance().setCustomFunc(
             [&addressManager](
-                const SocketAddress& mediatorUdpEndpoint,
+                const SocketAddress& /*mediatorUdpEndpoint*/,
                 hpm::api::ConnectionRequestedEvent)
             {
                 std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
