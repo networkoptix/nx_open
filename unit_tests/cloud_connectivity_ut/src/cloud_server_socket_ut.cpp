@@ -287,7 +287,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         });
 
     PredefinedMediatorConnector mediatorConnector(
-        *nx::network::SocketGlobals::mediatorConnector().udpEndpoint(),
+        stunAsyncClient->remoteAddress(),
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::mediatorConnector()));
@@ -378,7 +378,7 @@ protected:
                 });
 
         m_mediatorConnector = std::make_unique<PredefinedMediatorConnector>(
-            *SocketGlobals::mediatorConnector().udpEndpoint(),
+            m_stunClient->remoteAddress(),
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
                 &SocketGlobals::mediatorConnector()));
