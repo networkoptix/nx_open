@@ -4,6 +4,7 @@ import re
 import json
 import codecs
 import base64
+from notifications.engines.email_engine import update_logo_cache
 
 
 STATIC_DIR = 'static/{{customization}}/source/'
@@ -93,6 +94,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
     context_name, language_code = context_for_file(source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
+    email_context = Context.objects.filter(name="Email templates")
     context = Context.objects.filter(file_path=context_name, product_id=product_id)
     if language_code:
         language = Language.objects.filter(code=language_code)
@@ -107,6 +109,8 @@ def process_file(source_file, customization, product_id, preview, version_id):
         content = process_context_structure(customization, context.first(), content, language, version_id)
     if branding_context.exists():
         content = process_context_structure(customization, branding_context.first(), content, None, version_id)
+    if email_context.exists():
+        content = process_context_structure(customization, email_context.first(), content, None, version_id)
 
     filename = context_name
     if language_code:
@@ -166,9 +170,15 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
 
 
 def convert_b64_image_to_png(record, storage_location):
+    if not record.value:
+        return
+
     file_name = os.path.join(storage_location, record.data_structure.name)
     make_dir(file_name)
-
     image_png = base64.b64decode(record.value)
+
+    if record.data_structure.context.name == "Email templates":
+        update_logo_cache(file_name, image_png)
+
     with open(file_name, 'wb') as f:
         f.write(image_png)

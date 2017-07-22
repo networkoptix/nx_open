@@ -89,3 +89,8 @@ def read_logo(filename):
         with open(filename, 'rb') as fp:
             logos_cache[filename] = fp.read()
     return logos_cache[filename]
+
+
+def update_logo_cache(file_name, image):
+    global logos_cache
+    logos_cache[file_name] = image
