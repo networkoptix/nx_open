@@ -1,5 +1,4 @@
-#ifndef _SERVER_UTIL_H
-#define _SERVER_UTIL_H
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
@@ -10,7 +9,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/transaction_timestamp.h>
-#include <api/model/password_data.h>
+#include <api/model/configure_system_data.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -20,7 +19,7 @@ void setUseAlternativeGuid(bool value);
 class QnCommonModule;
 
 namespace ec2 {
-    class QnTransactionMessageBusBase;
+    class AbstractTransactionMessageBus;
     class AbstractECConnection;
 }
 
@@ -83,43 +82,6 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 bool isLocalAppServer(const QString &host);
 
 
-struct ConfigureSystemData : public PasswordData
-{
-    ConfigureSystemData():
-        PasswordData(),
-        wholeSystem(false),
-        sysIdTime(0),
-        port(0),
-        rewriteLocalSettings(false)
-    {
-    }
-
-    ConfigureSystemData(const QnRequestParams& params) :
-        PasswordData(params),
-        localSystemId(params.value(lit("localSystemId"))),
-        wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
-        sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
-        //tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
-        port(params.value(lit("port")).toInt()),
-        systemName(params.value(lit("systemName")))
-    {
-        tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
-        tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
-    }
-
-    QnUuid localSystemId;
-    bool wholeSystem;
-    qint64 sysIdTime;
-    ec2::Timestamp tranLogTime;
-    int port;
-    ec2::ApiMediaServerData foreignServer;
-    std::vector<ec2::ApiUserData> foreignUsers;
-    ec2::ApiResourceParamDataList foreignSettings;
-    ec2::ApiResourceParamWithRefDataList additionParams;
-    bool rewriteLocalSettings;
-    QString systemName; //added for compatibility with NxTool
-};
-
 /*
 * @param localSystemId - new local system id
 * @param sysIdTime - database recovery time (last back time)
@@ -127,7 +89,7 @@ struct ConfigureSystemData : public PasswordData
 */
 bool changeLocalSystemId(
     const ConfigureSystemData& data,
-    ec2::QnTransactionMessageBusBase* messageBus);
+    ec2::AbstractTransactionMessageBus* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body
@@ -138,13 +100,3 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
  * @return false if failed to save some data.
  */
 bool resetSystemToStateNew(QnCommonModule* commonModule);
-
-
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json));
-
-
-#endif // _SERVER_UTIL_H

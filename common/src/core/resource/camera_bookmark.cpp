@@ -344,7 +344,6 @@ QnUuid QnCameraBookmark::systemUserId()
 }
 
 QnCameraBookmark::QnCameraBookmark():
-    guid(QnUuid::createUuid()),
     creatorId(systemUserId()),
     timeout(-1),
     startTimeMs(0),

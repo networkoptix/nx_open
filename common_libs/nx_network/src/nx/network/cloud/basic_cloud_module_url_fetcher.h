@@ -161,13 +161,16 @@ protected:
         {
             const auto it = m_moduleToDefaultUrlScheme.find(
                 nameset().findResourceByID(moduleAttrName).name);
+
+            static const auto kHttpScheme = lit("http");
+            static const auto kHttpsScheme = lit("https");
             if (it != m_moduleToDefaultUrlScheme.end())
                 url.setScheme(it->second);
             else
-                url.setScheme("http");
+                url.setScheme(kHttpScheme);
 
-            if ((url.scheme() == "http") && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
-                url.setScheme("https");
+            if ((url.scheme() == kHttpScheme) && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+                url.setScheme(kHttpsScheme);
         }
 
         return url;

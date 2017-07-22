@@ -1,5 +1,7 @@
 #include "action_manager.h"
 
+#include <QtCore/QEvent>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 

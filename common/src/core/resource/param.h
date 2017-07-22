@@ -58,6 +58,7 @@ namespace Qn
     static const QString HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("highStreamBitrateBounds");
     static const QString LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("lowStreamBitrateBounds");
     static const QString kUnauthrizedTimeoutParamName = lit("unauthorizedTimeoutSec");
+    static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
@@ -78,12 +79,14 @@ namespace Qn
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+    static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
 	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
+    static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

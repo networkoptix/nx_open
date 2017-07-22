@@ -6,8 +6,6 @@
 
 #include <client/client_globals.h>
 
-#include <text/tr_functions.h>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {

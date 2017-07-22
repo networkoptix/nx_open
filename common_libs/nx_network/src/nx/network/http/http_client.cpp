@@ -16,7 +16,8 @@ HttpClient::HttpClient():
     m_done(false),
     m_error(false),
     m_terminated(false),
-    m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
+    m_maxInternalBufferSize(kDefaultMaxInternalBufferSize),
+    m_expectOnlyBody(false)
 {
     instantiateHttpClient();
 }
@@ -213,6 +214,11 @@ void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     m_proxyEndpoint = proxyEndpoint;
 }
 
+void HttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
+{
+    m_expectOnlyBody = expectOnlyBody;
+}
+
 const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
 {
     return m_asyncHttpClient->socket();
@@ -315,6 +321,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
+
+        m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
 
         lk.relock();
     }

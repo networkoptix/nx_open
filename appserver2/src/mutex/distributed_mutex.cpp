@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "utils/common/delete_later.h"
@@ -55,9 +55,9 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
     if (dstPeer.isNull())
-        ec2::sendTransaction(m_owner->messageBus(), tran); //< Broadcast
+        m_owner->messageBus()->sendTransaction(tran); //< Broadcast
     else
-        ec2::sendTransaction(m_owner->messageBus(), tran, dstPeer);
+        m_owner->messageBus()->sendTransaction(tran, dstPeer);
 }
 
 void QnDistributedMutex::at_newPeerFound(QnUuid peer, Qn::PeerType peerType)

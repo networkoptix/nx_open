@@ -33,7 +33,7 @@ class ServerInstallation(object):
 
     def list_core_files(self):
         return (self.host.run_command(
-            ['ls', os.path.join(self.dir, 'bin/core*')], check_retcode=False)
+            ['ls', os.path.join(self.dir, 'bin/*core*')], check_retcode=False)
             .splitlines())
 
     def cleanup_core_files(self):

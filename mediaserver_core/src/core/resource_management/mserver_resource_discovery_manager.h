@@ -2,6 +2,7 @@
 #define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
 
@@ -33,6 +34,7 @@ private:
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+    bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const;
 private:
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_resourceDiscoveryCounter;
@@ -44,6 +46,7 @@ private:
     QMap<QString, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;
     QnMutex m_discoveryMutex;
+    QElapsedTimer m_startupTimer;
 };
 
 #endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

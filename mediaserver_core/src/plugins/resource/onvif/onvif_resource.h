@@ -270,8 +270,9 @@ public:
     virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
 
     QnMutex* getStreamConfMutex();
-    void beforeConfigureStream();
-    void afterConfigureStream();
+    virtual void beforeConfigureStream(Qn::ConnectionRole role);
+    virtual void afterConfigureStream(Qn::ConnectionRole role);
+    virtual CameraDiagnostics::Result customStreamConfiguration(Qn::ConnectionRole role);
 
     double getClosestAvailableFps(double desiredFps);
 
@@ -286,6 +287,14 @@ protected:
     void setAudioCodec(AUDIO_CODECS c);
 
     virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
+        CapabilitiesResp* outCapabilitiesResponse,
+        DeviceSoapWrapper** outDeviceSoapWrapper);
+    virtual CameraDiagnostics::Result initializeMedia(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializePtz(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeIo(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeAdvancedParameters(const CapabilitiesResp& onvifCapabilities);
+
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCroppingPhysical(QRect cropping);
@@ -304,8 +313,6 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
         return CameraDiagnostics::NoErrorResult();
     }
-
-
 
 private:
     void setMaxFps(int f);
@@ -343,6 +350,8 @@ private:
 
     bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
+
+    bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -563,6 +572,7 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
+    bool initializeTwoWayAudio();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

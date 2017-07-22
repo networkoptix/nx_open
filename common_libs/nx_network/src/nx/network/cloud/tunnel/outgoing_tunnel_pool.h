@@ -83,6 +83,7 @@ private:
     TunnelContext& getTunnel(const AddressEntry& targetHostAddress);
     void reportConnectionResult(
         SystemError::ErrorCode sysErrorCode,
+        TunnelAttributes tunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection,
         TunnelContext* tunnelContext,
         std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter);

@@ -134,7 +134,8 @@ void initialize(Manager* manager, Action* root)
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
         .flags(ResourceTarget | SingleTarget)
-        .condition(condition::hasFlags(Qn::live_cam, Any));
+        .condition(condition::hasFlags(Qn::live_cam, Any)
+            && !condition::tourIsRunning());
 
     factory(OpenBusinessLogAction)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -557,7 +558,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
-        .text(ContextMenu::tr("Bookmark Search..."))
+        .text(ContextMenu::tr("Bookmark Log..."))
         .shortcut(lit("Ctrl+B"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);

@@ -32,7 +32,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include <transaction/transaction_message_bus_base.h>
+#include <transaction/message_bus_adapter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -49,6 +49,7 @@
 #include "server/server_globals.h"
 #include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
+#include <api/model/password_data.h>
 
 namespace
 {
@@ -92,11 +93,6 @@ QString getDataDirectory()
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json),
-    _Fields)
 
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
@@ -204,7 +200,7 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
     return true;
 }
 
-void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBusBase* messageBus)
+void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
@@ -218,7 +214,7 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBusBase* messageBus)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::AbstractTransactionMessageBus* messageBus)
 {
     const auto& commonModule = messageBus->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)

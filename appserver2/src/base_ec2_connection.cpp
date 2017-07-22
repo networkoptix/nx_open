@@ -66,11 +66,11 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
 {
-    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBusBase::peerFound,
+    connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::peerFound,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerFound, Qt::DirectConnection);
-    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerLost,
+    connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::peerLost,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);
-    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::remotePeerUnauthorized,
+    connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::remotePeerUnauthorized,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized, Qt::DirectConnection);
     m_connectionFactory->messageBus()->start();
 }
@@ -394,7 +394,7 @@ QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
 }
 
 template<class QueryProcessorType>
-QnTransactionMessageBusBase* BaseEc2Connection<QueryProcessorType>::messageBus() const
+TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus() const
 {
     return m_connectionFactory->messageBus();
 }

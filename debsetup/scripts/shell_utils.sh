@@ -22,7 +22,7 @@ function crash_gdb_bt() {
         REPORT=$(basename $BIN_PATH)_$($BIN_PATH --version)_$TIME.gdb-bt
 
         echo Generate crash report $REPORT...        BACKGROUND
-        echo "t apply all bt 25" | gdb $BIN_PATH $CORE 2>&1 >/tmp/$REPORT && \
+        echo "t apply all bt 25" | gdb $BIN_PATH $CORE >/tmp/$REPORT 2>&1 && \
             mv /tmp/$REPORT ~/$REPORT &
 
         ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null

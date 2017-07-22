@@ -26,7 +26,7 @@ QString helpers::getBookmarkCreatorName(
     QnResourcePool* resourcePool)
 {
     static const auto kSystemEventText =
-        QObject::tr("System Event", "Shows that bookmark was created by system event");
+        QObject::tr("System Event", "Shows that the bookmark was created by a system event");
 
     if (bookmark.isCreatedInOlderVMS())
         return QString();

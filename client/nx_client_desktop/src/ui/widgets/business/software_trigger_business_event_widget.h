@@ -13,6 +13,8 @@ namespace nx { namespace vms { namespace event {
 class StringsHelper;
 }}} // namespace nx::vms::event
 
+class QnSubjectValidationPolicy;
+
 class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
@@ -32,11 +34,8 @@ private:
     void updateUsersButton();
     void paramsChanged();
 
-    bool isRoleValid(const QnUuid& id) const;
-    bool isUserValid(const QnUserResourcePtr& user) const;
-    QString calculateAlert(bool allUsers, const QSet<QnUuid>& checkedSubjects) const;
-
 private:
     QScopedPointer<Ui::SoftwareTriggerBusinessEventWidget> ui;
     QScopedPointer<nx::vms::event::StringsHelper> m_helper;
+    QScopedPointer<QnSubjectValidationPolicy> m_validationPolicy;
 };

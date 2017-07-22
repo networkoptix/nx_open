@@ -186,7 +186,7 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         for (auto line: body.split('\n'))
         {
             if (line.trimmed().startsWith("gotoserverpresetno"))
-                m_capabilities |= Ptz::PresetsPtzCapability;
+                m_capabilities |= (Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability);
         }
     }
 }

@@ -4,6 +4,8 @@
 #include <nx/network/socket_global.h>
 #include <client_core/client_core_settings.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace client {
 namespace core {
@@ -44,6 +46,13 @@ void removeConnection(const QnUuid& localSystemId, const QUrl& url)
 
 void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials)
 {
+    NX_DEBUG("CredentialsManager", lm("Saving credentials of %1 to the system %2")
+        .arg(credentials.user).arg(localSystemId));
+
+    NX_DEBUG("CredentialsManager", credentials.decodedPassword().isEmpty()
+        ? "Password is empty"
+        : "Password is filled");
+
     auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
@@ -63,6 +72,9 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
 
 void removeCredentials(const QnUuid& localSystemId, const QString& userName)
 {
+    NX_DEBUG("CredentialsManager", lm("Removing credentials of %1 to the system %2")
+        .arg(userName).arg(localSystemId));
+
     auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
 
     if (userName.isEmpty())

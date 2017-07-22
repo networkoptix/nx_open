@@ -10,5 +10,8 @@
   },
   "system_shared":{
     "emailSubject":"מערכת הווידאו {{message.system_name}} שותפה איתך"
+  },
+  "review_version":{
+    "emailSubject":"גרסה {{message.id}} מוכנה לבדיקה"
   }
 }

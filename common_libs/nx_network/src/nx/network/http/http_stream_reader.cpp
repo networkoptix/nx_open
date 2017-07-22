@@ -201,6 +201,11 @@ QString HttpStreamReader::errorText() const
     return QString();
 }
 
+void HttpStreamReader::setState(ReadState state)
+{
+    m_state = state;
+}
+
 void HttpStreamReader::resetState()
 {
     resetStateInternal();

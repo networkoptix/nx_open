@@ -211,7 +211,7 @@ void CloudUserInfoPool::logNonceUpdates(
     const std::map<nx::Buffer, int>& nonceToCount,
     const std::map<nx::Buffer, uint64_t>& nonceToMaxTs)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
     {
         QString logMessage;
         QTextStream logStream(&logMessage);

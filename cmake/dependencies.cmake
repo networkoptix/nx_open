@@ -19,10 +19,6 @@ function(detect_package_versions)
         set(_qt_version "5.6.1-1")
     endif()
 
-    if(LINUX AND arch STREQUAL "x86")
-        set(_festival_version "2.1")
-    endif()
-
     if(MACOSX)
         set(_quazip_version "0.7.2")
         set(_festival_version "2.1")
@@ -32,6 +28,11 @@ function(detect_package_versions)
         set(_qt_version "5.6.2-2")
         set(_openssl_version "1.0.2g")
         set(_openal_version "1.17.2")
+    endif()
+
+    if(IOS)
+        set(_openssl_version "1.0.1i")
+        set(_libjpeg-turbo_version "1.4.1")
     endif()
 
     if(box MATCHES "bpi|bananapi")
@@ -103,8 +104,11 @@ function(get_dependencies)
     set(QT_DIR ${QT_DIR} PARENT_SCOPE)
 
     nx_rdep_add_package(any/boost)
-    nx_rdep_add_package(any/qtservice)
-    nx_rdep_add_package(any/qtsinglecoreapplication)
+
+    if(haveServer OR haveDesktopClient OR haveTests)
+        nx_rdep_add_package(any/qtservice)
+        nx_rdep_add_package(any/qtsinglecoreapplication)
+    endif()
 
     nx_rdep_add_package(any/nx_kit)
 
@@ -156,7 +160,7 @@ function(get_dependencies)
         endif()
     endif()
 
-    if(ANDROID)
+    if(ANDROID OR IOS)
         nx_rdep_add_package(libjpeg-turbo)
     endif()
 

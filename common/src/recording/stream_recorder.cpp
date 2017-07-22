@@ -114,7 +114,9 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
     m_role(StreamRecorderRole::serverRecording),
-    m_gen(m_rd())
+    m_gen(m_rd()),
+    m_forcedAudioLayout(nullptr),
+    m_disableRegisterFile(false)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -180,7 +182,7 @@ void QnStreamRecorder::close()
             qint64 fileDuration = m_startDateTime !=
                 qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
-            if (m_lastError.lastError != StreamRecorderError::fileCreate)
+            if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
                 fileFinished(
                     fileDuration,
                     m_recordingContextVector[i].fileName,
@@ -554,7 +556,7 @@ void QnStreamRecorder::endOfRun()
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-    NX_ASSERT(m_mediaProvider);
+    //NX_ASSERT(m_mediaProvider); //< Commented out since 
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -741,7 +743,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             }
         }
 
-        QnConstResourceAudioLayoutPtr audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
+        QnConstResourceAudioLayoutPtr audioLayout = m_forcedAudioLayout 
+                ? m_forcedAudioLayout.dynamicCast<const QnResourceAudioLayout>()
+                : mediaDev->getAudioLayout(m_mediaProvider);
+
         m_isAudioPresent = audioLayout->channelCount() > 0;
         for (int j = 0; j < audioLayout->channelCount(); ++j)
         {
@@ -825,12 +830,13 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             return false;
         }
 
-        fileStarted(
-            m_startDateTime/1000,
-            m_currentTimeZone,
-            m_recordingContextVector[i].fileName,
-            m_mediaProvider
-        );
+        if (!m_disableRegisterFile)
+            fileStarted(
+                m_startDateTime/1000,
+                m_currentTimeZone,
+                m_recordingContextVector[i].fileName,
+                m_mediaProvider
+            );
 
         if (m_truncateInterval > 0)
         {
@@ -923,6 +929,9 @@ bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 
 bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
+    if (m_motionHandler)
+        return m_motionHandler(motion);
+
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     return true;
@@ -1055,6 +1064,21 @@ void QnStreamRecorder::disconnectFromResource()
 {
     stop();
     QnResourceConsumer::disconnectFromResource();
+}
+
+void QnStreamRecorder::forceAudioLayout(const QnResourceAudioLayoutPtr& layout)
+{
+    m_forcedAudioLayout = layout;
+}
+
+void QnStreamRecorder::disableRegisterFile(bool disable)
+{
+    m_disableRegisterFile = disable;
+}
+
+void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
+{
+    m_motionHandler = handler;
 }
 
 void QnStreamRecorder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)

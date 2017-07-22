@@ -30,9 +30,12 @@
 #include <media_server/media_server_module.h>
 
 namespace {
+
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
-static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
+static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
 static const int kRetryCountToMakeCamOffline = 3;
+static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
+
 } // namespace
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
@@ -45,6 +48,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
         "redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_foreignResourcesRetryCount = 0;
+    m_startupTimer.restart();
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -101,7 +105,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
             }
         }
-        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES)
+        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
+            m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
             m_foreignResourcesRetryCount = 0;
 
@@ -180,7 +185,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 			}
 		}
 
-		if (newCamRes && newCamRes->needCheckIpConflicts())
+		if (newCamRes)
 		{
 			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
 			if (ips)
@@ -247,7 +252,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // ========================= send conflict info =====================
     for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
-        if (itr.value().size() > 1)
+        if (hasIpConflict(itr.value()))
         {
             QHostAddress hostAddr(itr.key());
             QStringList conflicts;
@@ -291,6 +296,26 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         printInLogNetResources(resources);
     }
     return true;
+}
+
+bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const
+{
+    if (cameras.size() < 2)
+        return false;
+    QSet<int> portList;
+    for (const auto& netRes: cameras)
+    {
+        auto camera = netRes.dynamicCast<QnSecurityCamResource>();
+        if (!camera || !camera->needCheckIpConflicts())
+            continue;
+        if (!camera->isManuallyAdded())
+            return true;
+        const int port = QUrl(camera->getUrl()).port();
+        if (portList.contains(port))
+            return true; //< Conflict detected
+        portList << port;
+    }
+    return false;
 }
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)

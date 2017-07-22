@@ -96,7 +96,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 
 :
-    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
+    TransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_timer(nullptr),
     m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule)),
     m_restartPending(false)
@@ -105,9 +105,19 @@ QnTransactionMessageBus::QnTransactionMessageBus(
     qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
     qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
-    m_timer = new QTimer();
-    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::doPeriodicTasks);
-    m_timer->start(500);
+
+    connect(m_thread, &QThread::started,
+        [this]()
+        {
+            if (!m_timer)
+            {
+                m_timer = new QTimer();
+                connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::doPeriodicTasks);
+            }
+            m_timer->start(500);
+        });
+    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
+
     m_aliveSendTimer.invalidate();
     m_currentTimeTimer.restart();
 
@@ -898,7 +908,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << commonModule()->moduleGUID());
 }
 
-bool QnTransactionMessageBusBase::readApiFullInfoData(
+bool TransactionMessageBusBase::readApiFullInfoData(
     const Qn::UserAccessData& userAccess,
     const ec2::ApiPeerData& remotePeer,
     ApiFullInfoData* outData)

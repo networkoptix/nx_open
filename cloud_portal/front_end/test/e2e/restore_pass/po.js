@@ -27,7 +27,7 @@ RestorePasswordPage = function () {
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     };
 
-    this.iForgotPasswordLink = p.helper.forms.login.messageLoginLink;
+    this.iForgotPasswordLink = p.helper.forms.login.forgotPasswordLink;
     this.emailInput = element(by.model('data.email'));
     this.emailInputWrap = this.emailInput.element(by.xpath('../..'));
     this.passwordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));

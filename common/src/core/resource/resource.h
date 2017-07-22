@@ -40,6 +40,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
+    Q_FLAGS(Qn::ResourceFlags)
     Q_PROPERTY(QnUuid id READ getId WRITE setId)
     Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
