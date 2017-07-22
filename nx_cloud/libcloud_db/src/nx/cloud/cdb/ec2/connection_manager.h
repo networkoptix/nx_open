@@ -27,6 +27,7 @@
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
+#include "transaction_transport.h"
 #include "../access_control/auth_types.h"
 
 namespace nx_http {
@@ -121,17 +122,9 @@ private:
 
     struct ConnectionContext
     {
-        std::unique_ptr<TransactionTransport> connection;
+        std::unique_ptr<AbstractTransactionTransport> connection;
         nx::String connectionId;
         FullPeerName fullPeerName;
-    };
-
-    struct ConnectionRequestAttributes
-    {
-        nx::String connectionId;
-        ::ec2::ApiPeerData remotePeer;
-        nx::String contentEncoding;
-        int remotePeerProtocolVersion = 0;
     };
 
     typedef boost::multi_index::multi_index_container<

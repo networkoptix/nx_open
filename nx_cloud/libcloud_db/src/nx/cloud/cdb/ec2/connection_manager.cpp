@@ -133,13 +133,11 @@ void ConnectionManager::createTransactionConnection(
         connection->getAioThread(),
         &m_connectionGuardSharedState,
         m_transactionLog,
+        connectionRequestAttributes,
         systemIdLocal,
-        connectionRequestAttributes.connectionId,
         m_localPeerData,
-        connectionRequestAttributes.remotePeer,
         connection->socket()->getForeignAddress(),
-        request,
-        connectionRequestAttributes.contentEncoding);
+        request);
 
     ConnectionContext context{
         std::move(newTransport),
@@ -243,7 +241,7 @@ void ConnectionManager::dispatchTransaction(
         m_connections.get<kConnectionByFullPeerNameIndex>();
 
     std::size_t connectionCount = 0;
-    std::array<TransactionTransport*, 7> connectionsToSendTo;
+    std::array<AbstractTransactionTransport*, 7> connectionsToSendTo;
     for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
             .lower_bound(FullPeerName{systemId, nx::String()});
         connectionIt != connectionBySystemIdAndPeerIdIndex.end()
@@ -262,9 +260,11 @@ void ConnectionManager::dispatchTransaction(
             continue;
 
         for (auto& connection : connectionsToSendTo)
+        {
             connection->sendTransaction(
                 transportHeader,
                 transactionSerializer);
+        }
         connectionCount = 0;
     }
 
@@ -278,9 +278,11 @@ void ConnectionManager::dispatchTransaction(
     else
     {
         for (std::size_t i = 0; i < connectionCount; ++i)
+        {
             connectionsToSendTo[i]->sendTransaction(
                 transportHeader,
                 transactionSerializer);
+        }
     }
 }
 
@@ -468,7 +470,7 @@ void ConnectionManager::removeConnectionByIter(
     Iterator connectionIterator,
     CompletionHandler completionHandler)
 {
-    std::unique_ptr<TransactionTransport> existingConnection;
+    std::unique_ptr<AbstractTransactionTransport> existingConnection;
     connectionIndex.modify(
         connectionIterator,
         [&existingConnection](ConnectionContext& data)
@@ -477,7 +479,7 @@ void ConnectionManager::removeConnectionByIter(
         });
     connectionIndex.erase(connectionIterator);
 
-    TransactionTransport* existingConnectionPtr = existingConnection.get();
+    AbstractTransactionTransport* existingConnectionPtr = existingConnection.get();
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Removing transaction connection %1 from %2")
@@ -628,17 +630,23 @@ void ConnectionManager::processSpecialTransaction(
                 //  delay after connection has been removed from m_connections.
     lk.unlock();
 
-    connectionIter->connection->processSpecialTransaction(
-        transportHeader,
-        std::move(data),
-        std::move(handler));
+    // TODO: #ak Get rid of dynamic_cast.
+    auto transactionTransport = 
+        dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+    if (transactionTransport)
+    {
+        transactionTransport->processSpecialTransaction(
+            transportHeader,
+            std::move(data),
+            std::move(handler));
+    }
 }
 
 nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionConnection(
     const ConnectionRequestAttributes& connectionRequestAttributes,
     nx_http::Response* const response)
 {
-    response->headers.emplace("Content-Type", ec2::TransactionTransport::TUNNEL_CONTENT_TYPE);
+    response->headers.emplace("Content-Type", ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE);
     response->headers.emplace("Content-Encoding", connectionRequestAttributes.contentEncoding);
     response->headers.emplace(Qn::EC2_GUID_HEADER_NAME, m_localPeerData.id.toByteArray());
     response->headers.emplace(
@@ -670,7 +678,7 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
         };
     requestResult.dataSource =
         std::make_unique<nx_http::EmptyMessageBodySource>(
-            ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
+            ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE,
             boost::none);
 
     return requestResult;
