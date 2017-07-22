@@ -221,7 +221,7 @@ signals:
     void onSomeDataReceivedFromRemotePeer();
 
 protected:
-    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) {};
+    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& /*httpClient*/, bool /*authByKey*/) {};
 
 private:
     struct DataToSend
