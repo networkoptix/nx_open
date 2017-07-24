@@ -456,10 +456,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         return bastardNode;
     }
 
-    /* Storages are not to be displayed to users. */
-    if (node->resource().dynamicCast<QnStorageResource>())
-        return bastardNode;
-
     /* Checking local resources. */
     auto parentResource = node->resource()->getParentResource();
     if (!parentResource || parentResource->flags().testFlag(Qn::local_server))
@@ -858,6 +854,9 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         return;
 
     if (resource->hasFlags(Qn::user))
+        return;
+
+    if (resource.dynamicCast<QnStorageResource>())
         return;
 
     connect(resource, &QnResource::parentIdChanged, this,
