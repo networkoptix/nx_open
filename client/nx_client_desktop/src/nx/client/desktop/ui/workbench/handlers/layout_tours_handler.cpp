@@ -101,7 +101,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
                 if (other.name == name)
                 {
-                    if (!ui::resources::overrideLayoutTour(mainWindow()))
+                    if (!ui::messages::Resources::overrideLayoutTour(mainWindow()))
                         return;
 
                     layoutTourManager()->removeTour(other.id);

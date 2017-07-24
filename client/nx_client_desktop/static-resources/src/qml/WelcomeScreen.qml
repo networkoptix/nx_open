@@ -50,12 +50,6 @@ Rectangle
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
-
-            onQueryChanged:
-            {
-                if (grid.model)
-                    grid.model.setFilterWildcard(query);
-            }
             z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 
@@ -214,8 +208,9 @@ Rectangle
 
                     sourceComponent: Component
                     {
-                        FilteringSystemsModel
+                        OrderedSystemsModel
                         {
+                            filterWildcard: searchEdit.query
                             filterCaseSensitivity: Qt.CaseInsensitive;
                             filterRole: 257;    // Search text role
                         }
@@ -225,7 +220,7 @@ Rectangle
                     {
                         if (grid.model)
                         {
-                            grid.setPage(0);
+                            pageSwitcher.setPage(0);
                             searchEdit.clear();
                         }
 

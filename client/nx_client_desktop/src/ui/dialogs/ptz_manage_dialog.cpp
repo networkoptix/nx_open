@@ -24,6 +24,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/client/ptz/ptz_helpers.h>
 #include <utils/threaded_image_loader.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -37,6 +38,7 @@
 #include <ui/workbench/workbench_item.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
@@ -214,12 +216,9 @@ void QnPtzManageDialog::accept()
 
 void QnPtzManageDialog::loadData(const QnPtzData &data)
 {
-    QnPtzPresetList presets = data.presets;
+    const auto presets = nx::client::core::ptz::helpers::sortedPresets(
+        controller()->resource(), data.presets);
     QnPtzTourList tours = data.tours;
-    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-    {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
     std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r)
     {
         return nx::utils::naturalStringLess(l.name, r.name);
@@ -348,6 +347,10 @@ void QnPtzManageDialog::saveData()
 
     m_hotkeysDelegate->updateHotkeys(m_model->hotkeys());
 
+    QnPtzPresetList presets;
+    if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
+        m_model->setPresets(presets);
+
     // reset active ptz object if the current active ptz object is an empty tour
     QnPtzObject ptzObject;
     if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject)
@@ -373,14 +376,8 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields)
     if (fields & Qn::PresetsPtzField)
     {
         QnPtzPresetList presets;
-        if (controller()->getPresets(&presets))
-        {
-            std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-            {
-                return nx::utils::naturalStringLess(l.name, r.name);
-            });
+        if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
             m_model->setPresets(presets);
-        }
     }
 
     if (fields & Qn::ToursPtzField)
@@ -448,7 +445,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToGetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -467,7 +464,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToSetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -508,7 +505,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        ui::ptz::failedToSetPosition(this, m_resource->getName());
+        messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -563,7 +560,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse && !ui::ptz::deletePresetInUse(this))
+            if (presetIsInUse && !messages::Ptz::deletePresetInUse(this))
                 break;
 
             m_model->removePreset(data.presetModel.preset.id);

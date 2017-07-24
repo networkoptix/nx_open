@@ -8,7 +8,6 @@
 
 #include <ui/style/globals.h>
 
-#include <nx/client/ptz/ptz_helpers.h>
 #include <nx/utils/collection.h>
 
 namespace {
@@ -103,11 +102,6 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
     beginResetModel();
     m_spots = spots;
     endResetModel();
-}
-
-QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const
-{
-    return nx::client::core::ptz::helpers::sortedPresets(m_presets);
 }
 
 const QnPtzPresetList& QnPtzTourSpotsModel::presets() const {

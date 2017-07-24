@@ -13,6 +13,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include "api/model/api_ioport_data.h"
 #include "core/dataconsumer/audio_data_transmitter.h"
+#include <core/resource/abstract_remote_archive_manager.h>
 
 #include <mutex>
 #include <map>
@@ -32,6 +33,7 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
+
 public:
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
@@ -278,6 +280,8 @@ public:
 #endif
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

@@ -43,6 +43,7 @@ public:
 
         {
             QnMutexLocker lock(&m_mutex);
+            //qWarning() << taskId << "fired";
             ++m_tasks[taskId].fired;
         }
 
@@ -113,6 +114,7 @@ public:
                 NX_ASSERT(!taskId.isNull());
                 {
                     QnMutexLocker lock(&m_mutex);
+                    //qWarning() << taskId << "subscribed";
                     m_tasks.emplace(taskId, Task(0, true));
                 }
                 completionHandler(taskId);

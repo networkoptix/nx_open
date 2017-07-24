@@ -27,6 +27,11 @@ enum MessageType
     ArchiveRebuildCanceled,
     ArchiveFastScanFinished,
 
+    RemoteArchiveSyncStarted,
+    RemoteArchiveSyncFinished,
+    RemoteArchiveSyncProgress,
+    RemoteArchiveSyncError,
+
     CloudPromo, //local promo message
 
     Count

@@ -48,15 +48,15 @@ public:
         QnWorkbenchContextAware(context),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
-        m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzHotkeyHash>())
+        m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>())
     {
     }
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
-    virtual QnPtzHotkeyHash hotkeys() const override
+    virtual QnPtzIdByHotkeyHash hotkeys() const override
     {
-        QnPtzHotkeyHash result;
+        QnPtzIdByHotkeyHash result;
 
         if (!m_camera)
             return result;
@@ -71,7 +71,7 @@ public:
         return result;
     }
 
-    virtual void updateHotkeys(const QnPtzHotkeyHash &value) override
+    virtual void updateHotkeys(const QnPtzIdByHotkeyHash &value) override
     {
         if (!m_camera)
             return;
@@ -90,7 +90,7 @@ public:
 private:
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
-    std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzHotkeyHash>> m_propertyHandler;
+    std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
     mutable QnMutex m_mutex;
 };
 
@@ -168,7 +168,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToGetPosition(mainWindow(),
+        messages::Ptz::failedToGetPosition(mainWindow(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
@@ -374,7 +374,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToSetPosition(mainWindow(),
+        messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases

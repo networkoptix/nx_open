@@ -51,7 +51,8 @@ INSTALLED_APPS = (
     'corsheaders',
     'notifications',
     'api',
-    'cms'
+    'cms',
+    'tinymce'
 )
 
 MIDDLEWARE_CLASSES = (

@@ -98,6 +98,8 @@ namespace ec2 {
     struct ApiLicenseOverflowData;
     struct ApiCleanupDatabaseData;
 
+    struct ApiP2pStatisticsData;
+
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
@@ -225,6 +227,7 @@ namespace ec2 {
     (ApiCleanupDatabaseData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
+    (ApiP2pStatisticsData)\
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,

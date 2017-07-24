@@ -134,6 +134,8 @@ public:
     void setZoomRect(const QRectF &zoomRect);
     QnResourceWidget *zoomTargetWidget() const;
 
+    bool isZoomWindow() const;
+
     /**
      * \returns                         Frame opacity of this widget.
      */

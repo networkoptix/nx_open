@@ -7,6 +7,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -18,7 +19,6 @@
 #include <settings.h>
 
 #include "../settings_loader.h"
-#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
@@ -321,7 +321,7 @@ protected:
             std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
     }
 
-    relay::test::StreamSocketStub* lastListeningPeerConnection()
+    nx::network::test::StreamSocketStub* lastListeningPeerConnection()
     {
         return m_lastListeningPeerConnection;
     }
@@ -358,9 +358,9 @@ private:
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
-    relay::test::StreamSocketStub* m_lastListeningPeerConnection = nullptr;
+    nx::network::test::StreamSocketStub* m_lastListeningPeerConnection = nullptr;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
-    relay::test::StreamSocketStub* m_lastClientConnection = nullptr;
+    nx::network::test::StreamSocketStub* m_lastClientConnection = nullptr;
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
     SocketAddress m_clientEndpoint;
     SettingsLoader m_settingsLoader;
@@ -372,7 +372,7 @@ private:
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
-            auto tcpConnection = std::make_unique<relay::test::StreamSocketStub>();
+            auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             m_lastListeningPeerConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
                 nullptr,
@@ -391,7 +391,7 @@ private:
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
-            auto tcpConnection = std::make_unique<relay::test::StreamSocketStub>();
+            auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             tcpConnection->setForeignAddress(m_clientEndpoint);
             m_lastClientConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(

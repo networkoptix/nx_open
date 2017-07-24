@@ -88,7 +88,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>אירוע מערכת</translation>
     </message>
   </context>
   <context>
@@ -549,7 +549,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
   </context>
   <context>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>מזהה חומרה: %1</translation>
     </message>
   </context>
   <context>

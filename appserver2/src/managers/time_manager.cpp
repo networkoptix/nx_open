@@ -20,7 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/http/custom_headers.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/abstract_transaction_message_bus.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
@@ -295,7 +295,7 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBusBase* messageBus,
+    AbstractTransactionMessageBus* messageBus,
     Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
@@ -381,7 +381,7 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    connect(m_messageBus, &QnTransactionMessageBusBase::newDirectConnectionEstablished,
+    connect(m_messageBus, &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &TimeSynchronizationManager::onNewConnectionEstablished,
         Qt::DirectConnection);
 

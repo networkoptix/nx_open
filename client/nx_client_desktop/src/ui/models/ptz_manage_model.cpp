@@ -142,7 +142,7 @@ void QnPtzManageModel::removePreset(const QString &id) {
     updatePresetsCache();
 }
 
-void QnPtzManageModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
+void QnPtzManageModel::setHotkeys(const QnPtzIdByHotkeyHash &hotkeys) {
     if (m_hotkeys == hotkeys)
         return;
     m_hotkeys = hotkeys;
@@ -150,7 +150,7 @@ void QnPtzManageModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
     emit dataChanged(index(0, HotkeyColumn), index(rowCount(), HotkeyColumn));
 }
 
-const QnPtzHotkeyHash& QnPtzManageModel::hotkeys() const {
+const QnPtzIdByHotkeyHash& QnPtzManageModel::hotkeys() const {
     return m_hotkeys;
 }
 
@@ -193,7 +193,7 @@ bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) {
         m_hotkeys.remove(key);
 
     /* Set new hotkey. */
-    if (hotkey != QnPtzHotkey::NoHotkey)
+    if (hotkey != QnPtzHotkey::kNoHotkey)
         m_hotkeys.insert(hotkey, id);
 
     { /* Mark preset as modified (if any). */
@@ -286,11 +286,11 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
     } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
         bool ok = false;
         int hotkey = value.toInt(&ok);
-        if (!ok || ((hotkey > 9 || hotkey < 0) && hotkey != QnPtzHotkey::NoHotkey))
+        if (!ok || ((hotkey > 9 || hotkey < 0) && hotkey != QnPtzHotkey::kNoHotkey))
             return false;
 
         /* Check if hotkey is already in use. */
-        if (hotkey != QnPtzHotkey::NoHotkey) {
+        if (hotkey != QnPtzHotkey::kNoHotkey) {
             QString currentId = m_hotkeys.value(hotkey);
             if (!currentId.isEmpty() && currentId != data.id())
                 return false;
@@ -547,7 +547,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         case NameColumn:
             return presetModel.preset.name;
         case HotkeyColumn: {
-            int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
+            int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::kNoHotkey);
             return hotkey < 0 ? tr("None") : QString::number(hotkey);
         }
         case HomeColumn:
@@ -593,7 +593,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
             return tourModel.tour.name;
         case HotkeyColumn:
             {
-                int hotkey = m_hotkeys.key(tourModel.tour.id, QnPtzHotkey::NoHotkey);
+                int hotkey = m_hotkeys.key(tourModel.tour.id, QnPtzHotkey::kNoHotkey);
                 return hotkey < 0 ? tr("None") : QString::number(hotkey);
             }
         case DetailsColumn: {

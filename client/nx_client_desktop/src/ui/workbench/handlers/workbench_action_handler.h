@@ -220,6 +220,8 @@ private:
 
     qint64 getFirstBookmarkTimeMs();
 
+    void renameLocalFile(const QnResourcePtr& resource, const QString &newName);
+
     void openInBrowserDirectly(const QnMediaServerResourcePtr& server,
         const QString& path, const QString& fragment = QString());
     void openInBrowser(const QnMediaServerResourcePtr& server,

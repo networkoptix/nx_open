@@ -131,6 +131,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/p2p_stats_rest_handler.h>
 #include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
@@ -217,13 +218,11 @@
 #include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
-#include "transaction/transaction_message_bus_base.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
-#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -259,8 +258,11 @@
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
-#include <transaction/message_bus_selector.h>
+#include <transaction/message_bus_adapter.h>
 #include <managers/discovery_manager.h>
+#include <rest/helper/p2p_statistics.h>
+#include <recorder/remote_archive_synchronizer.h>
+#include <nx/utils/std/cpp14.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1789,7 +1791,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
 	auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
@@ -1837,6 +1839,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
     reg("api/ping", new QnPingRestHandler());
+    reg(rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
@@ -1918,7 +1921,7 @@ void MediaServerProcess::regTcp(
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
-    ec2::QnTransactionMessageBusBase* messageBus)
+    ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
@@ -2520,6 +2523,8 @@ void MediaServerProcess::run()
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
+    auto remoteArchiveSynchronizer =
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -2682,7 +2687,8 @@ void MediaServerProcess::run()
                 ApiCommand::broadcastPeerSyncTime,
                 commonModule()->moduleGUID());
             tran.params.syncTimeMs = newTime;
-            sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+            if (auto connection = commonModule()->ec2Connection())
+                connection->messageBus()->sendTransaction(tran);
         }
         );
 
@@ -2728,11 +2734,6 @@ void MediaServerProcess::run()
 
     QnResource::startCommandProc();
 
-
-    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
-        new StreamingChunkTranscoder(
-            commonModule()->resourcePool(),
-            StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
@@ -2861,17 +2862,14 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.id = commonModule()->moduleGUID();
-    selfInformation.type = QnModuleInformation::nxMediaServerId();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-
-    selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
-    selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    QnModuleInformation selfInformation = commonModule()->moduleInformation();
+    if (compatibilityMode)
+    {
+        selfInformation.brand = QString();
+        selfInformation.customization = QString();
+    }
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
-    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
@@ -3152,7 +3150,6 @@ void MediaServerProcess::run()
     nx::utils::TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
-    streamingChunkTranscoder.reset();
 
     recordingManager.reset();
 
@@ -3179,6 +3176,7 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
+    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3241,7 +3239,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
             ec2::ApiCommand::runtimeInfoChanged,
             commonModule()->moduleGUID());
         tran.params = runtimeInfo.data;
-        sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+        commonModule()->ec2Connection()->messageBus()->sendTransaction(tran);
     }
 }
 

@@ -49,16 +49,16 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
-                            <h3>變更管理員密碼</h3>
-                            <p>如果本系統是本地系統 (未連接到雲) 這將改變使用者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
-                                否則這將只恢復密碼.</p>
+                            <h3>變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)</h3>
+                            <p>如果本系統是本地系統 (未連接到雲) 這將只改變管理者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
+                                否則這將只變更還原密碼.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">變更密碼</button>
+                                        ng-click="changePassword()">確定變更管理者密碼</button>
                             </div>
                         </form>
                     </div>

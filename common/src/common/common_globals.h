@@ -40,7 +40,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
-        AudioTransmitCapability             = 0x040
+        AudioTransmitCapability             = 0x040,
+        RemoteArchiveCapability             = 0x100
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -308,7 +309,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
         SF_SupportsTranscoding = 0x200,
         SF_HasLiteClient = 0x400,
-        SF_P2pSyncDone = 0x800, //< For UT purpose only
+        SF_P2pSyncDone = 0x1000000, //< For UT purpose only
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

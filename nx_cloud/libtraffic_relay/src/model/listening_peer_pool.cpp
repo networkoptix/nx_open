@@ -35,7 +35,7 @@ ListeningPeerPool::~ListeningPeerPool()
     for (auto& peerContext: m_peers)
     {
         for (auto& connectionContext: peerContext.second.connections)
-            connectionContext.connection->pleaseStopSync();
+            connectionContext->connection->pleaseStopSync();
     }
 }
 
@@ -65,6 +65,9 @@ void ListeningPeerPool::addConnection(
             .arg(SystemError::toString(sysErrorCode)));
     }
     
+    auto connectionContext = std::make_unique<ConnectionContext>();
+    connectionContext->connection = std::move(connection);
+
     if (!peerContext.takeConnectionRequestQueue.empty())
     {
         NX_ASSERT(peerContext.connections.empty());
@@ -77,15 +80,13 @@ void ListeningPeerPool::addConnection(
         startPeerExpirationTimer(lock, peerName, &peerContext);
 
         giveAwayConnection(
-            std::move(connection),
+            std::move(connectionContext),
             std::move(awaitContext.handler));
     }
     else
     {
-        ConnectionContext connectionContext;
-        connectionContext.connection = std::move(connection);
         peerContext.connections.push_back(std::move(connectionContext));
-        monitoringConnectionForClosure(peerName, &peerContext.connections.back());
+        monitoringConnectionForClosure(peerName, peerContext.connections.back().get());
     }
 }
 
@@ -175,7 +176,7 @@ void ListeningPeerPool::takeIdleConnection(
         startPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
 
     giveAwayConnection(
-        std::move(connectionContext.connection),
+        std::move(connectionContext),
         std::move(completionHandler));
 }
 
@@ -199,17 +200,17 @@ void ListeningPeerPool::startWaitingForNewConnection(
 }
 
 void ListeningPeerPool::giveAwayConnection(
-    std::unique_ptr<AbstractStreamSocket> connection,
+    std::unique_ptr<ConnectionContext> connectionContext,
     TakeIdleConnectionHandler completionHandler)
 {
-    auto connectionPtr = connection.get();
+    auto connectionPtr = connectionContext->connection.get();
     connectionPtr->post(
-        [this, connection = std::move(connection),
+        [this, connectionContext = std::move(connectionContext),
             completionHandler = std::move(completionHandler),
             scopedCallGuard = m_apiCallCounter.getScopedIncrement()]() mutable
         {
-            connection->cancelIOSync(network::aio::etNone);
-            completionHandler(api::ResultCode::ok, std::move(connection));
+            connectionContext->connection->cancelIOSync(network::aio::etNone);
+            completionHandler(api::ResultCode::ok, std::move(connectionContext->connection));
         });
 }
 
@@ -267,12 +268,13 @@ void ListeningPeerPool::closeConnection(
     PeerContext& peerContext = peerIter->second;
     auto connectionContextIter = std::find_if(
         peerContext.connections.begin(), peerContext.connections.end(),
-        [connectionContextToErase](const ConnectionContext& context)
+        [connectionContextToErase](const std::unique_ptr<ConnectionContext>& context)
         {
-            return &context == connectionContextToErase;
+            return context.get() == connectionContextToErase;
         });
     if (connectionContextIter != peerContext.connections.end())
     {
+        NX_ASSERT((*connectionContextIter)->connection->isInSelfAioThread());
         peerContext.connections.erase(connectionContextIter);
         if (peerContext.connections.empty())
             startPeerExpirationTimer(lock, peerName, &peerContext);
@@ -303,6 +305,7 @@ void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& /*lock*
         auto peerIter = m_peers.find(peerName);
         NX_ASSERT(peerIter != m_peers.end());
         NX_ASSERT(peerIter->second.takeConnectionRequestQueue.empty());
+        NX_ASSERT(peerIter->second.connections.empty());
         m_peers.erase(peerIter);
         m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
     }

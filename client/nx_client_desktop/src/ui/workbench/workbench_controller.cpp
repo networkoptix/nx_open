@@ -103,6 +103,7 @@
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <utils/common/delayed.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -542,7 +543,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget->resource()->hasFlags(Qn::motion))
             continue;
-        if (!widget->zoomRect().isNull())
+        if (widget->isZoomWindow())
             continue;
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
@@ -724,7 +725,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
             int hotkey = e->key() - Qt::Key_0;
 
-            QnPtzHotkeysResourcePropertyAdaptor adaptor;
+            nx::client::core::ptz::PtzHotkeysResourcePropertyAdaptor adaptor;
             adaptor.setResource(widget->resource()->toResourcePtr());
 
             QString objectId = adaptor.value().value(hotkey);
@@ -1087,7 +1088,13 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     layout->addItem(data);
 }
 
-void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
+void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*view*/,
+    QnMediaResourceWidget* widget)
+{
+    NX_EXPECT(menu()->canTrigger(action::StartSmartSearchAction, widget));
+    if (!menu()->canTrigger(action::StartSmartSearchAction, widget))
+        return;
+
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
@@ -1424,7 +1431,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered()
         if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
-        if (!widget->zoomRect().isNull())
+        if (widget->isZoomWindow())
             continue;
 
         if(!(widget->options() & QnResourceWidget::DisplayMotion)) {

@@ -13,7 +13,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
@@ -565,10 +564,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         {
             return true;
         }
-
-        /* Hide storages. */
-        if (m_resource.dynamicCast<QnStorageResource>())
-            return true;
 
         /* Hide edge servers, camera will be displayed instead. */
         if (QnMediaServerResource::isHiddenServer(m_resource) &&

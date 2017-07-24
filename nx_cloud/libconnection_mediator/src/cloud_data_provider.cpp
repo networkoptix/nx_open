@@ -20,7 +20,8 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     const boost::optional<QUrl>& cdbUrl,
     const std::string& user,
     const std::string& password,
-    std::chrono::milliseconds updateInterval)
+    std::chrono::milliseconds updateInterval,
+    std::chrono::milliseconds startTimeout)
 {
     if (cloudDataProviderFactoryFunc)
     {
@@ -28,7 +29,8 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
             cdbUrl,
             user,
             password,
-            updateInterval);
+            updateInterval,
+            startTimeout);
     }
     else
     {
@@ -36,7 +38,8 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
             cdbUrl,
             user,
             password,
-            updateInterval);
+            updateInterval,
+            startTimeout);
     }
 }
 
@@ -103,9 +106,12 @@ CloudDataProvider::CloudDataProvider(
     const boost::optional<QUrl>& cdbUrl,
     const std::string& user,
     const std::string& password,
-    std::chrono::milliseconds updateInterval)
-    :
+    std::chrono::milliseconds updateInterval,
+    std::chrono::milliseconds startTimeout)
+:
     m_updateInterval(std::move(updateInterval)),
+    m_startTime(std::chrono::steady_clock::now()),
+    m_startTimeout(startTimeout),
     m_isTerminated(false),
     m_connectionFactory(makeConnectionFactory(cdbUrl)),
     m_connection(m_connectionFactory->createConnection())
@@ -156,8 +162,9 @@ void CloudDataProvider::updateSystemsAsync()
         {
             if (code != cdb::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Error: %1")
-                    .arg(m_connectionFactory->toString(code)), cl_logERROR);
+                NX_LOGX(lm("Error: %1").arg(m_connectionFactory->toString(code)),
+                    (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
+                        ? cl_logERROR : cl_logDEBUG1);
 
                 // TODO: shall we m_systemCache.clear() after a few failing attempts?
             }

@@ -2,13 +2,24 @@
 
 #include <QtCore/QIODevice>
 
-int readFromQIODevice(void* opaque, uint8_t* buf, int size)
+int readFromIoDevice(void* opaque, uint8_t* buf, int size)
 {
+    if (!opaque || !buf)
+        return -1;
 
     auto ioDevice = reinterpret_cast<QIODevice*>(opaque);
     auto result = ioDevice->read((char*)buf, size);
 
     return result;
+}
+
+int checkIoDevice(void* opaque)
+{
+    if (!opaque)
+        return 1;
+
+    auto ioDevice = reinterpret_cast<QIODevice*>(opaque);
+    return !ioDevice->isOpen();
 }
 
 nxcip::AudioFormat::SampleType fromFfmpegSampleFormatToNx(AVSampleFormat avFormat)

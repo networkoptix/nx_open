@@ -51,6 +51,10 @@ QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
+QnSelectResourcesDialogButton::~QnSelectResourcesDialogButton()
+{
+}
+
 QSet<QnUuid> QnSelectResourcesDialogButton::resources() const
 {
     return m_resources;
@@ -81,6 +85,11 @@ void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog
     m_target = target;
 }
 
+void QnSelectResourcesDialogButton::setSubjectValidationPolicy(QnSubjectValidationPolicy* policy)
+{
+    m_subjectValidation.reset(policy);
+}
+
 void QnSelectResourcesDialogButton::at_clicked()
 {
     if (m_target == QnResourceSelectionDialog::Filter::users)
@@ -105,6 +114,24 @@ void QnSelectResourcesDialogButton::at_clicked()
                     return m_dialogDelegate->isValid(user->getId());
                 });
         }
+        else
+        {
+            dialog.setRoleValidator(
+                [this](const QnUuid& roleId)
+                {
+                    return m_subjectValidation
+                        ? m_subjectValidation->roleValidity(roleId)
+                        : QValidator::Acceptable;
+                });
+
+            dialog.setUserValidator(
+                [this](const QnUserResourcePtr& user)
+                {
+                    return m_subjectValidation
+                        ? m_subjectValidation->userValidity(user)
+                        : true;
+                });
+        }
 
         const auto updateAlert =
             [this, &dialog]
@@ -113,12 +140,13 @@ void QnSelectResourcesDialogButton::at_clicked()
                 if (m_dialogDelegate)
                 {
                     dialog.showAlert(m_dialogDelegate->validationMessage(
-                        dialog.totalCheckedUsers()));
+                        dialog.checkedSubjects()));
                 }
                 else
                 {
-                    dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
-                        ? vms::event::StringsHelper::needToSelectUserText()
+                    dialog.showAlert(m_subjectValidation
+                        ? m_subjectValidation->calculateAlert(dialog.allUsers(),
+                            dialog.checkedSubjects())
                         : QString());
                 }
             };
@@ -271,6 +299,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case Column::target:
         {
             vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
+            auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
 
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
@@ -299,6 +328,15 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             else if (actionType == vms::event::showPopupAction)
             {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
+                if (model->actionParams().needConfirmation)
+                {
+                    btn->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
+                        Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+                }
+                else
+                {
+                    btn->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
+                }
             }
             else if (actionType == vms::event::playSoundAction ||
                 actionType == vms::event::playSoundOnceAction ||

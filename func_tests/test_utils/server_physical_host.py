@@ -57,10 +57,11 @@ class PhysicalInstallationCtl(object):
     def __init__(self, mediaserver_dist_path, customization_company_name, config_list):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self._installation_hosts = [
-            PhysicalInstallationHost.from_config(config, customization_company_name, mediaserver_dist_path) for config in config_list]
+            PhysicalInstallationHost.from_config(config, mediaserver_dist_path, customization_company_name) for config in config_list]
         self._available_hosts = self._installation_hosts[:]
 
-    def clean_all_installations(self):
+    # will unpack [new] distributive and reinstall servers
+    def reset_all_installations(self):
         for host in self._installation_hosts:
             host.reset_installations()
 
@@ -76,7 +77,7 @@ class PhysicalInstallationCtl(object):
                 del self._available_hosts[0]
         return None
 
-    def release_all(self):
+    def release_all_servers(self):
         log.info('Releasing all physical installations')
         for host in self._installation_hosts:
             host.release_all_servers()
@@ -86,28 +87,29 @@ class PhysicalInstallationCtl(object):
 class PhysicalInstallationHost(object):
 
     @classmethod
-    def from_config(cls, config, customization_company_name, mediaserver_dist_path):
+    def from_config(cls, config, mediaserver_dist_path, customization_company_name):
         return cls(config.name, host_from_config(config.location), config.root_dir, config.limit,
-                   customization_company_name, mediaserver_dist_path)
+                   mediaserver_dist_path, customization_company_name)
 
-    def __init__(self, name, host, root_dir, limit, customization_company_name, mediaserver_dist_path):
+    def __init__(self, name, host, root_dir, limit, mediaserver_dist_path, customization_company_name):
         self._name = name
         self._host = host  # Host (LocalHost or RemoteSshHost)
         self._root_dir = host.expand_path(root_dir)
         self._limit = limit
-        self._customization_company_name = customization_company_name
         self._mediaserver_dist_path = mediaserver_dist_path
+        self._customization_company_name = customization_company_name
         self._dist_unpacked = self._host.dir_exists(self._remote_dist_subdir)
         self._ensure_root_dir_exists()
         self._installations = list(self._read_installations())  # ServerInstallation list
         self._available_installations = self._installations[:]  # ServerInstallation list, set up but yet unallocated
         self._allocated_server_list = []
         self._timezone = host.get_timezone()
+        self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
 
     def reset_installations(self):
         log.info('%s: removing directory: %s', self._name, self._root_dir)
         self._host.rm_tree(self._root_dir, ignore_errors=True)
-        self._dist_unpacked = False
+        self._dist_unpacked = False  # although unpacked dist is still in place, it will be reunpacked again with new deb
         self._installations = []
         self._available_installations = []
 
@@ -140,6 +142,12 @@ class PhysicalInstallationHost(object):
     def _read_installations(self):
         for dir in sorted(self._host.expand_glob(os.path.join(self._root_dir, 'server-*'))):
             yield ServerInstallation(self._host, dir)
+
+    def _ensure_servers_are_stopped(self):
+        for installation in self._installations:
+            server_ctl = PhysicalHostServerCtl(self._host, installation.dir)
+            if server_ctl.get_state():
+                server_ctl.set_state(is_started=False)
 
     def _create_installation(self):
         if self._limit and len(self._installations) >= self._limit:

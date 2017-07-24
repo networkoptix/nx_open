@@ -9,6 +9,8 @@ import logging
 import time
 import requests
 import datetime
+import traceback
+from functools import wraps
 import test_utils.utils as utils
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
@@ -98,9 +100,8 @@ def wait_merge_done(servers, method, api_object, api_method, start_time, merge_t
 
         if result_expected is None:
             if utils.datetime_utc_now() - start_time >= merge_timeout:
-                pytest.fail("%r can't get response for '%s' during %s" % (
-                    servers[0], api_method,
-                    merge_timeout - (api_call_start_time - start_time)))
+                pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                    merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
             continue
 
         def check(servers, result_expected):
@@ -166,6 +167,18 @@ def get_server_admin(server):
     return admins[0]
 
 
+def with_traceback(fn):
+    @wraps(fn)  # critical for Pool.map to work
+    def wrapper(*args, **kw):
+        try:
+            return fn(*args, **kw)
+        except:
+            for line in traceback.format_exc().splitlines():
+                log.error(line)
+            raise
+    return wrapper
+
+@with_traceback
 def create_test_data_on_server((config, server, index)):
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * config.CAMERAS_PER_SERVER),

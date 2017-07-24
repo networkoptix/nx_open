@@ -16,7 +16,6 @@ QnStorageResource::QnStorageResource(QnCommonModule* commonModule):
     m_storageBitrateCoeff(0.0),
     m_isBackup(false)
 {
-    addFlags(Qn::remote);
 }
 
 QnStorageResource::~QnStorageResource()

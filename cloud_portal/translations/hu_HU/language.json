@@ -29,7 +29,7 @@
     "restorePassword":"Jelszó visszaállítása -",
     "restorePasswordSuccess":"Jelszó elmentve -",
     "restorePasswordCode":"Jelszó visszaállítása -",
-    "view":"View cameras - ",
+    "view":"Kamerák megtekintése - ",
     "contentPage":"",
     "debug":"Hibakeresés",
     "login":"Bejelentkezés -",
@@ -117,7 +117,7 @@
     "cantEditAdmin":"Ez a felhasználó rendszergazdai jogokkal rendelkezik",
     "cantOpenClient":"{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection":"{{systemName}} kapcsolat megszakadt",
-    "thisSystem":"the system"
+    "thisSystem":"a rendszer"
   },
   "passwordRequirements":{
     "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
@@ -214,7 +214,7 @@
     "createAccount":"Fiók létrehozása"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Minden rendszer",
     "systems":"Rendszerek"
   }
 }

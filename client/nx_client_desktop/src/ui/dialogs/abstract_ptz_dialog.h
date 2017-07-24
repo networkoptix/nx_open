@@ -9,6 +9,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_constants.h>
+#include <nx/client/ptz/ptz_types.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -16,8 +17,8 @@
 class QnAbstractPtzHotkeyDelegate {
 public:
     virtual ~QnAbstractPtzHotkeyDelegate() {}
-    virtual QnPtzHotkeyHash hotkeys() const = 0;
-    virtual void updateHotkeys(const QnPtzHotkeyHash &value) = 0;
+    virtual QnPtzIdByHotkeyHash hotkeys() const = 0;
+    virtual void updateHotkeys(const QnPtzIdByHotkeyHash &value) = 0;
 };
 
 class QnAbstractPtzDialog : public QnSessionAwareButtonBoxDialog {

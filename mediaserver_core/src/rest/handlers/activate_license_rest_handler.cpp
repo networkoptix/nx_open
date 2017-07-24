@@ -67,7 +67,7 @@ QString activationMessage(const QJsonObject& errorMessage)
 
     if (messageId == lit("InvalidBrand"))
     {
-        return lit("You are trying to activate an incompatible license with your software. Please "
+        return lit("You are trying to activate a license incompatible with your software. Please "
             "contact the support team to obtain a valid License Key.");
     }
 
