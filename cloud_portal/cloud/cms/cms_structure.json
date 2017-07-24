@@ -26,6 +26,7 @@
       "url": "/content/about",
       "translatable": true,
       "values":[
+        ["static/images/promo/cloud.png", "", "Cloud image", "Image", "{}"],
         ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
         ["%BLOCK1_TITLE%","Connect from Anywhere"],
         ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password","","Long Text"],
