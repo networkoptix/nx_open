@@ -469,14 +469,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         return bastardNode;
     }
 
-    /* Checking cameras in the exported nov-files. */
-    if (parentResource->flags().testFlag(Qn::local_layout))
-    {
-        if (node->resourceFlags().testFlag(Qn::local))
-            return ensureResourceNode(parentResource);
-        return bastardNode;
-    }
-
     if (QnVirtualCameraResourcePtr camera = node->resource().dynamicCast<QnVirtualCameraResource>())
     {
         auto parentNode = isAdmin
@@ -857,6 +849,12 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         return;
 
     if (resource.dynamicCast<QnStorageResource>())
+        return;
+
+    // Skip cameras inside the exported layouts. Only layout items are to be displayed there.
+    const bool isExportedCamera = resource->hasFlags(Qn::local_media)
+        && !resource->getParentId().isNull();
+    if (isExportedCamera)
         return;
 
     connect(resource, &QnResource::parentIdChanged, this,
