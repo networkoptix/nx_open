@@ -4,14 +4,28 @@ set(product.title "${mobile_client.name}")
 set(product.display.title "${mobile_client.display.name}")
 
 nx_configure_file(
+    maven/filter-resources/version.h
+    ${CMAKE_CURRENT_BINARY_DIR})
+nx_configure_file(
     maven/filter-resources/mobile_client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+if(IOS)
+    set(ios_sources
+        src/nx/mobile_client/settings/settings_migration_ios.mm
+        src/ui/window_utils_ios.mm
+        src/utils/app_delegate.mm
+    )
+else()
+    set(ios_sources)
+endif()
+
 set(target_args
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
+        ${ios_sources}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mobile_client/resources"
     OTHER_SOURCES
@@ -95,5 +109,68 @@ if(IOS)
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+    )
+
+    set(static_plugins_args_file "${CMAKE_CURRENT_BINARY_DIR}/qml_static_plugins.parameters")
+
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
+            --print-static-plugins
+            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        OUTPUT_FILE ${static_plugins_args_file}
+        RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot get list of static qml plugins.")
+    endif()
+
+    set_property(TARGET mobile_client APPEND_STRING PROPERTY
+        LINK_FLAGS "@${static_plugins_args_file}")
+
+    if(qml_debug)
+        set(qml_debug_libs
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_debugger.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_inspector.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_local.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_native.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_profiler.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_server.a"
+            "${QT_DIR}/plugins/qmltooling/libqmldbg_tcp.a"
+        )
+    else()
+        set(qml_debug_libs)
+    endif()
+
+    # So far Qt does not export dependent libraries for CMake, so we have to specify them manually.
+    target_link_libraries(mobile_client PRIVATE
+        "-framework MobileCoreServices"
+        "-framework Foundation"
+        "-framework UIKit"
+        "-framework CoreText"
+        "-framework CoreGraphics"
+        "-framework MobileCoreServices"
+        "-framework Foundation"
+        "-framework UIKit"
+        "-framework CoreFoundation"
+        "-framework Security"
+        "-framework SystemConfiguration"
+        "-framework OpenGLES"
+        "-framework VideoToolbox"
+        "-framework AudioToolbox"
+        "-framework CoreAudio"
+        "-framework CoreVideo"
+        "-framework CoreMedia"
+        "-framework AVFoundation"
+        "-framework QuartzCore"
+        "-framework AssetsLibrary"
+        "-L${QT_DIR}/lib"
+        qtharfbuzzng qtpcre qtfreetype
+        "${QT_DIR}/plugins/platforms/libqios.a"
+        Qt5PlatformSupport
+        "${QT_DIR}/plugins/mediaservice/libqtmedia_audioengine.a"
+        "${QT_DIR}/plugins/audio/libqtaudio_coreaudio.a"
+        ${qml_debug_libs}
+        Qt5LabsControls Qt5LabsTemplates
+        z
     )
 endif()

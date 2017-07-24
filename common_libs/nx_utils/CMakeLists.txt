@@ -7,9 +7,14 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
+if(IOS)
+    set(ios_sources "src/nx/utils/log/log_ios.mm")
+endif()
+
 nx_add_target(nx_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
+        ${ios_sources}
     PUBLIC_LIBS
         boost openssl Qt5::Core Qt5::Xml Qt5::Sql
         nx_kit
