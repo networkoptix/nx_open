@@ -1,6 +1,5 @@
 #include <algorithm>
 #include "media_db.h"
-#include <nx/utils/log/log.h>
 #include <cerrno>
 
 namespace nx
@@ -22,7 +21,7 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream, Error *error)
+    RecordVisitor(FaultTolerantDataStream* stream, Error *error)
         : m_stream(stream),
           m_error(error)
     {}
@@ -64,7 +63,7 @@ public:
     }
 
 private:
-    QDataStream *m_stream;
+    FaultTolerantDataStream *m_stream;
     Error *m_error;
 };
 
@@ -97,6 +96,9 @@ void DbHelper::run()
 
         if (m_needStop)
             return;
+
+        if (m_mode == Mode::Read)
+            continue;
 
         auto record = m_writeQueue.front();
 

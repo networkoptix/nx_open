@@ -267,10 +267,11 @@ bool QnStorageDb::open(const QString& fileName)
 bool QnStorageDb::resetIoDevice()
 {
     m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
+    m_dbHelper.setDevice(nullptr);
     if (!m_ioDevice)
     {
-        return false;
         NX_LOG(lit("%1 DB file open failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
     }
     m_dbHelper.setDevice(m_ioDevice.get());
     return true;
@@ -350,7 +351,10 @@ bool QnStorageDb::startDbFile()
     nx::media_db::Error error = m_dbHelper.writeFileHeader(kDbVersion);
 
     if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
+    {
         NX_LOG(lit("%1 write DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
+    }
     m_dbVersion = kDbVersion;
 
     return true;
@@ -362,7 +366,10 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
     NX_LOG(lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
             .arg(m_storage->getUrl())
             .arg(m_dbFileName), cl_logINFO);
-    vacuum(&result);
+
+    if (!vacuum(&result))
+        NX_LOG("[StorageDb] vacuum failed", cl_logWARNING);
+
     return result;
 }
 
@@ -501,6 +508,8 @@ bool QnStorageDb::vacuumInternal()
 
     res = resetIoDevice();
     NX_ASSERT(res);
+    if (!res)
+        return false;
 
     auto readDataCopy = m_readData;
     uint8_t dbVersion;
