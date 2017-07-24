@@ -1060,7 +1060,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Check File Watermark"))
         .shortcut(lit("Alt+C"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::exported_media, All)
+        .condition(condition::hasFlags(Qn::local_video, Any)
             && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
