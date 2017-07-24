@@ -41,20 +41,18 @@ QString toString(ConnectionBase::State value)
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     const QUrl& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
     m_httpClient(new nx_http::AsyncClient()),
     m_localPeer(localPeer),
     m_direction(Direction::outgoing),
     m_keepAliveTimeout(keepAliveTimeout),
-    m_opaqueObject(std::move(opaqueObject))
+    m_opaqueObject(std::move(opaqueObject)),
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
-    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
-        std::move(connectionLockGuard));
-
     m_remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
@@ -63,22 +61,18 @@ ConnectionBase::ConnectionBase(
 ConnectionBase::ConnectionBase(
     const ApiPeerDataEx& remotePeer,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
-    const Qn::UserAccessData& userAccessData,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
     m_webSocket(std::move(webSocket)),
     m_state(State::Connected),
     m_direction(Direction::incoming),
-    m_userAccessData(userAccessData),
-    m_opaqueObject(std::move(opaqueObject))
+    m_opaqueObject(std::move(opaqueObject)),
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
-    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
-        std::move(connectionLockGuard));
-
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_timer.bindToAioThread(m_webSocket->getAioThread());
 }
@@ -162,7 +156,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     const auto& headers = m_httpClient->response()->headers;
-    if (headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
+    if (m_connectionLockGuard && headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
     {
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
         if (m_connectionLockGuard->tryAcquireConnecting())
@@ -204,7 +198,7 @@ void ConnectionBase::onHttpClientDone()
     if (m_remotePeer.id == ::ec2::kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
 
-    if (!m_connectionLockGuard->tryAcquireConnected())
+    if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {
         cancelConnecting(State::Error, lm("tryAcquireConnected failed"));
         return;
@@ -420,6 +414,11 @@ nx_http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authData() const
 QObject* ConnectionBase::opaqueObject()
 {
     return m_opaqueObject.get();
+}
+
+const nx::network::WebSocket* ConnectionBase::webSocket() const
+{
+    return m_webSocket.get();
 }
 
 } // namespace p2p

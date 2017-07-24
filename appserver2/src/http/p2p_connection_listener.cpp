@@ -44,6 +44,7 @@ private:
 // -------------------------- ConnectionProcessor ---------------------
 
 const QString ConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
+const QString ConnectionProcessor::kCloudPathPrefix(lit("/cdb"));
 
 ConnectionProcessor::ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,

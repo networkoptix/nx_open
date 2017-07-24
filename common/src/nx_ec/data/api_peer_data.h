@@ -119,6 +119,11 @@ struct ApiPeerData: ApiPersistentIdData
         return isServer(peerType);
     }
 
+    bool isCloudServer() const
+    {
+        return peerType == Qn::PT_CloudServer;
+    }
+
     bool isMobileClient() const
     {
         return isMobileClient(peerType);

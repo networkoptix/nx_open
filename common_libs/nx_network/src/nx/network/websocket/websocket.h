@@ -72,6 +72,7 @@ public:
      */
     void setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier);
     AbstractStreamSocket* socket() { return m_socket.get(); }
+    const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
 protected:
     int m_pingsReceived = 0;
