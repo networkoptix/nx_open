@@ -147,7 +147,10 @@ void QnRecordingSettingsWidget::initScreenComboBox()
         ui->screenComboBox->addItem(item, i);
     }
 
-    ui->screenComboBox->setVisible(desktop->screenCount() > 1);
+    const bool screenSelectorVisible = ui->screenComboBox->count() > 0;
+    ui->screenComboBox->setVisible(screenSelectorVisible);
+    ui->screenLabel->setVisible(screenSelectorVisible);
+
     connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
         &QnRecordingSettingsWidget::updateDisableAeroCheckbox);
     connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
