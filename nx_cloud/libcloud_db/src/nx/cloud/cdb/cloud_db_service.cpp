@@ -306,8 +306,8 @@ void CloudDbService::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
-        nx_http::Method::options,
-        kEstablishEc2TransactionConnectionPath,
+        nx_http::Method::get,
+        kEstablishEc2P2pTransactionConnectionPath,
         &ec2::ConnectionManager::createWebsocketTransactionConnection,
         ec2ConnectionManager);
 

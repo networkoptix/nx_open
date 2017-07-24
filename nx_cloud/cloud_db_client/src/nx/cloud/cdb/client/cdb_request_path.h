@@ -31,6 +31,7 @@ extern const char* const kPingPath;
 
 extern const char* const kEstablishEc2TransactionConnectionPath;
 extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
+extern const char* const kEstablishEc2P2pTransactionConnectionPath;
 
 // Maintenance.
 extern const char* const kMaintenanceGetVmsConnections;

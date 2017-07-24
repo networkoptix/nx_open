@@ -213,7 +213,9 @@ private:
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx_http::Response* const response);
 
-    void onHttpConnectionUpgraded(nx_http::HttpServerConnection* connection);
+    void onHttpConnectionUpgraded(
+        nx_http::HttpServerConnection* connection,
+        ::ec2::ApiPeerDataEx remotePeerInfo);
 };
 
 } // namespace ec2

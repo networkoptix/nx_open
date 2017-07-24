@@ -13,14 +13,18 @@ constexpr static const int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
     TransactionLog* const transactionLog,
-    std::unique_ptr<network::websocket::WebSocket> webSocket)
+    std::unique_ptr<network::websocket::WebSocket> webSocket,
+    ::ec2::ApiPeerData localPeerData,
+    ::ec2::ApiPeerDataEx remotePeerData)
     :
     nx::p2p::ConnectionBase(
         ::ec2::ApiPeerDataEx(), //< TODO: remotePeer,
         ::ec2::ApiPeerDataEx(), //< TODO: localPeer,
         std::move(webSocket),
         std::make_unique<nx::p2p::ConnectionContext>()),
-    m_transactionLog(transactionLog)
+    m_transactionLog(transactionLog),
+    m_localPeerData(std::move(localPeerData)),
+    m_remotePeerData(std::move(remotePeerData))
 {
     connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::at_gotMessage);
     connect(this, &ConnectionBase::allDataSent,
