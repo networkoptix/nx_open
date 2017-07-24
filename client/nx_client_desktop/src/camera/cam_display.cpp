@@ -1,4 +1,6 @@
 #include "cam_display.h"
+#include "video_stream_display.h"
+#include "audio_stream_display.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
@@ -7,19 +9,15 @@
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 
-#include <client/client_settings.h>
-
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
 
-#include "decoders/audio/ffmpeg_audio_decoder.h"
-#include "nx/streaming/archive_stream_reader.h"
-#include "redass/redass_controller.h"
-
-#include "video_stream_display.h"
-#include "audio_stream_display.h"
-
+#include <core/resource/camera_resource.h>
+#include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <redass/redass_controller.h>
+#include <client/client_settings.h>
+#include <analytics/metadata_analytics_controller.h>
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
@@ -31,7 +29,7 @@
 
 Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
-static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
+static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
 static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 
@@ -1155,7 +1153,12 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
 
     const QnAbstractCompressedMetadataPtr& metadata = itr->second;
     if (metadata->containTime(video->timestamp))
+    {
         video->motion = metadata;
+        qnMetadataAnalyticsController->gotMetadataPacket(
+            m_resource.dynamicCast<QnVirtualCameraResource>(),
+            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+    }
     queue.erase(queue.begin(), itr);
 }
 

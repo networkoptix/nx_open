@@ -197,10 +197,12 @@ void QnWorkbenchAnalyticsHandler::startAnalytics()
         return;
     }
 
-    ControllerPtr controller(new QnWorkbenchAnalyticsController(
-        size,
-        camera,
-        new QnProxyAnalyticsDriver(camera, this)));
+    ControllerPtr controller(
+        new QnWorkbenchAnalyticsController(
+            size,
+            camera,
+            new QnProxyAnalyticsDriver(camera, this)));
+
     m_controllers.push_back(controller);
     menu()->trigger(action::OpenInNewTabAction, controller->layout());
 }

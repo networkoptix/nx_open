@@ -66,6 +66,7 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <redass/redass_controller.h>
+#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -321,6 +322,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnGlobals());
 
     commonModule->store(new QnRedAssController());
+    commonModule->store(new QnMetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
