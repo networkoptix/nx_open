@@ -762,7 +762,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
                 case Result::ServerError:
                     QnMessageBox::critical(this,
                         tr("License Server error"),
-                        tr("If the problem presists please contact Customer Support."));
+                        tr("If the problem persists please contact Customer Support."));
                     return;
 
                 default:
