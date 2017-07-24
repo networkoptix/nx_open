@@ -62,9 +62,9 @@ ConnectSessionManager::ConnectSessionManager(
         {
             m_remoteRelayPool->removePeer(peer, "This_Relay_Host")
                 .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
+                    [this, peer](cf::future<bool> removePeerFuture)
                     {
-                        if (addPeerFuture.get())
+                        if (removePeerFuture.get())
                         {
                             NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
                                 .arg(peer));
