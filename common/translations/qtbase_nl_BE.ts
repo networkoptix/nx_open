@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation type="unfinished">Toggle</translation>
+      <translation>Schakel</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuratie</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -212,7 +212,7 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Knippen</translation>
     </message>
     <message>
       <source>Copy</source>

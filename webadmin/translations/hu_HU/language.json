@@ -3,7 +3,7 @@
   "dialogs":{
     "okButton":"Ok",
     "openLink":"Látogassa meg ezt a linket",
-    "openLinkWithTitle":"{{title}} - Látogassa meg ezt a linket"
+    "openLinkWithTitle":"Látogassa meg ezt a linket - {{title}}"
   },
   "setup":{
     "createAccount":"fiók létrehozása",

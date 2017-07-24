@@ -42,14 +42,14 @@
     </message>
     <message>
       <source>Go to %1</source>
-      <translation>Menj %1</translation>
+      <translation>Belépés %1 portálba</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Password</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
   </context>
   <context>

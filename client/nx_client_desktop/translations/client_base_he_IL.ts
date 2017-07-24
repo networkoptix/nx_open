@@ -866,7 +866,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>יומן סימניות...</translation>
     </message>
   </context>
   <context>
@@ -956,7 +956,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>מזהה החומרה של שרת עם רשיון זה אינו תואם מזהה החומרה שבו הופעל רשיון.</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1012,21 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>גלול למטה</translation>
+    </message>
+  </context>
+  <context>
+    <name>LocalFiles</name>
+    <message>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>קובץ &quot;%1&quot; נמצא בשימוש בתהליך אחר. נסה שם אחר.</translation>
     </message>
   </context>
   <context>
@@ -1074,6 +1089,37 @@ to view more bookmarks</source>
     <message>
       <source>Permissions</source>
       <translation>הרשאות</translation>
+    </message>
+  </context>
+  <context>
+    <name>Ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation>לא ניתן לקבל את המיקום הנוכחי ממצלמה &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>יש להמתין למצלמה שתעבור למצב מקוון.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>לא ניתן היה לקבל את המיקום הנוכחי</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation>לא ניתן להגדיר את המיקום הנוכחי למצלמה &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>הגדרת המיקום הנוכחי נכשלה</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>הפריסט בשימוש ע"י מספר סיורים. האם למחוק בכל זאת?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>סיורים אלו יהפכו ללא תקינים.</translation>
     </message>
   </context>
   <context>
@@ -1692,6 +1738,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>נהל סימניות</translation>
+    </message>
+  </context>
+  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1836,10 +1889,6 @@ to view more bookmarks</source>
       <translation>סנן לפי מצלמות...</translation>
     </message>
     <message>
-      <source>Reset all rules to default?</source>
-      <translation>האם לאפס את כל הכללים לברירת מחדל?</translation>
-    </message>
-    <message>
       <source>Failed to retrieve rules</source>
       <translation>לא ניתן היה לאחזר את החוקים</translation>
     </message>
@@ -1858,6 +1907,10 @@ to view more bookmarks</source>
     <message>
       <source>This action cannot be undone.</source>
       <translation>פעולה זו אינה הפיכה.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation>שחזר את כל החוקים לברירת מחדל?</translation>
     </message>
   </context>
   <context>
@@ -2069,11 +2122,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation type="unfinished">I/O Module Id</translation>
+      <translation>מזהה מודול קלט/פלט</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>מזהה מצלמה</translation>
     </message>
   </context>
   <context>
@@ -3029,8 +3082,8 @@ to %1</source>
       <translation>לא היתה אפשרות לאתחל התקן שמע &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>תבניות שמע 44.1khz ו- 48Khz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
     </message>
   </context>
   <context>
@@ -3503,7 +3556,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>מזהה</translation>
     </message>
   </context>
   <context>
@@ -3724,7 +3777,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation type="unfinished">Locked to Hardware Id</translation>
+      <translation>נעול למזהה-חומרה</translation>
     </message>
   </context>
   <context>
@@ -3960,10 +4013,6 @@ to %1</source>
       <translation>שגיאת שרת רשיון</translation>
     </message>
     <message>
-      <source>If the problem presists please contact Customer Support.</source>
-      <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
-    </message>
-    <message>
       <source>License deactivated</source>
       <translation>הרשיון הושבת</translation>
     </message>
@@ -4024,11 +4073,15 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+      <translation>רישיון זה כבר פעיל ומקושר אל מזהה החומרה %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+      <translation>רישיון זה כבר הופעל ומקושר אל מזהה החומרה %1 ב- %2</translation>
+    </message>
+    <message>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
     </message>
   </context>
   <context>
@@ -4055,15 +4108,15 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>אנא שלח דוא"ל עם מפתח רישיון ומזהה חומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
     </message>
     <message>
       <source>Hardware Id copied to clipboard</source>
-      <translation type="unfinished">Hardware Id copied to clipboard</translation>
+      <translation>מזהה החומרה הועתק אל הלוח</translation>
     </message>
   </context>
   <context>
@@ -4395,15 +4448,15 @@ to %1</source>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
-    </message>
-    <message>
-      <source>You will be reconnected</source>
-      <translation type="unfinished">You will be reconnected</translation>
+      <translation>שרתים ממערכת אחרת יופיעו בעץ המשאבים כאשר סנכרון מסד הנתונים יסתיים.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>המערכות ימוזגו בקרוב</translation>
+    </message>
+    <message>
+      <source>You will be reconnected.</source>
+      <translation>תחובר מחדש.</translation>
     </message>
   </context>
   <context>
@@ -4494,8 +4547,8 @@ to %1</source>
       <translation>MB/s</translation>
     </message>
     <message>
-      <source>kB/s</source>
-      <translation type="unfinished">kB/s</translation>
+      <source>KB/s</source>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
@@ -4635,6 +4688,13 @@ to %1</source>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
       <translation>PTZ, יציאת התקן, אודיו דו-כיווני, מיתוג מתוכנת.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>נהל סימניות</translation>
     </message>
   </context>
   <context>
@@ -4991,6 +5051,49 @@ to %1</source>
     <message>
       <source>Motion + Lo-Res</source>
       <translation>תנועה + איכות נמוכה</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+      <source>Role %1 has no %2 permission</source>
+      <comment>%1 is the name of selected role, %2 is permission name</comment>
+      <translation>לתפקיד %1 אין הרשאה %2</translation>
+    </message>
+    <message>
+      <source>Selected roles have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>לתפקידים שנבחרו אין הרשאה %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no %2 permission</source>
+      <comment>%1 is number of selected roles, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected users have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5858,42 +5961,8 @@ to %1</source>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-      <source>Role %1 has no User Input permission</source>
-      <comment>%1 is the name of selected role</comment>
-      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
-    </message>
-    <message>
-      <source>Selected roles have no User Input permission</source>
-      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no User Input permission</source>
-      <comment>%1 is number of selected roles</comment>
-      <translation>
-        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 התפקידים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no User Input permission</source>
-      <comment>%1 is the name of selected user</comment>
-      <translation>לתפקיד %1 אין הרשאת קלט משתמש</translation>
-    </message>
-    <message>
-      <source>Selected users have no User Input permission</source>
-      <translation>למשתמשים שנבחרו אין הרשאת קלט משתמש</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no User Input permission</source>
-      <comment>%1 is number of selected users</comment>
-      <translation>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאו קלט למשתמש</numerusform>
-      </translation>
+      <source>User Input</source>
+      <translation>קלט משתמש</translation>
     </message>
   </context>
   <context>
@@ -6366,6 +6435,30 @@ to %1</source>
     <message>
       <source>Error while sending email</source>
       <translation>שגיאה בעת שליחת דוא"ל</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started</source>
+      <translation type="unfinished">Remote archive synchronization has been started</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished</source>
+      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is in progress</source>
+      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+    </message>
+    <message>
+      <source>Error occured during remote archive synchronization</source>
+      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
     </message>
   </context>
   <context>
@@ -7279,12 +7372,12 @@ to %1</source>
       <translation>מתחבר למערכת הנוכחית...</translation>
     </message>
     <message>
-      <source>Server will be connected to the System shortly</source>
-      <translation type="unfinished">Server will be connected to the System shortly</translation>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation>הוא יופיע בעץ המשאבים כאשר סנכרון מסד הנתונים מסתיים.</translation>
     </message>
     <message>
-      <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <source>Server will be connected to System shortly</source>
+      <translation>השרת יחובר למערכת בקרוב</translation>
     </message>
   </context>
   <context>
@@ -7550,6 +7643,218 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>Resources</name>
+    <message>
+      <source>There is another layout with the same name</source>
+      <translation>ישנה פריסה נוספת עם אותו שם</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>אין לך הרשאה כדי לדרוס אותה.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout?</source>
+      <translation>האם להחליף את הפריסה הקיימת?</translation>
+    </message>
+    <message>
+      <source>There is another layout with the same name.</source>
+      <translation>ישנה פריסה נוספת עם אותו שם.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation>האם להחליף את סיור הפריסה הקיימת?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation>ישנה פריסת סיור נוספת עם אותו שם.</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to User Settings.</source>
+      <translation>כדי להסיר את הגישה, נא עבור אל הגדרות המשתמש.</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will get access to %n resources:</source>
+      <translation>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to Role Settings.</source>
+      <translation>כדי להסיר גישה, עבור אל הגדרות תפקיד.</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Changes will affect other users</source>
+      <translation>השינויים ישפיעו על משתמשים אחרים</translation>
+    </message>
+    <message>
+      <source>This layout is shared with other users, so you change it for them too.</source>
+      <translation>פריסה זו משותפת עם משתמשים אחרים, כך שתשנה אותה גם עבורם.</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will lose access to %n resources:</source>
+      <translation>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will lose access to %n resources:</source>
+      <translation>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n shared layouts?</source>
+      <translation>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+      <translation>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout?</source>
+      <translation>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>הסר</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>אתה הולך למחוק כמה משאבים שיש לך גישה מקיר הוידאו בלבד. אתה לא תראה אותם ברשימת המשאבים שלך ולא תוכל להוסיף אותם שוב לקיר הוידאו.</translation>
+    </message>
+    <message>
+      <source>You will lose access to following resources:</source>
+      <translation>אתה תאבד את הגישה למשאבים הבאים:</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>מחק %n משתמשים?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n devices?</source>
+      <translation>
+        <numerusform>מחק %n התקנים?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n cameras?</source>
+      <translation>
+        <numerusform>מחק %n מצלמות?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n I/O Modules?</source>
+      <translation>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n items?</source>
+      <translation>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of them are auto-discovered.</source>
+      <translation>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras are auto-discovered.</source>
+      <translation>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules are auto-discovered.</source>
+      <translation>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>They may be auto-discovered again after removing.</source>
+      <translation>הם עשויים להתגלות באופן אוטומטי שוב לאחר הסרתם.</translation>
+    </message>
+  </context>
+  <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
@@ -7559,6 +7864,33 @@ to %1</source>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
+    <message>
+      <source>There is another video wall with the same name</source>
+      <translation>יש קיר וידאו אחר עם אותו שם</translation>
+    </message>
+    <message>
+      <source>Close %1 before starting Video Wall?</source>
+      <translation>סגור את %1 לפני הפעלת קיר הוידאו?</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>סגירה</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>שמור</translation>
+    </message>
+    <message>
+      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+      <translation>לא ניתן להציב קבצים מקומיים על קיר וידאו המחובר למחשב אחר</translation>
+    </message>
+    <message>
+      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+      <translation>כדי להציג קבצים מקומיים על קיר וידאו, צרף אותם באמצעות המחשב שבו קיר הוידאו פועל.</translation>
     </message>
   </context>
   <context>
@@ -7666,276 +7998,6 @@ to %1</source>
     <message>
       <source>Go to Live</source>
       <translation>עבור למצב חי</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>לא ניתן לקבל את המיקום הנוכחי ממצלמה &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>יש להמתין למצלמה שתעבור למצב מקוון.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>לא ניתן היה לקבל את המיקום הנוכחי</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>לא ניתן להגדיר את המיקום הנוכחי למצלמה &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>הגדרת המיקום הנוכחי נכשלה</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>הפריסט בשימוש ע"י מספר סיורים. האם למחוק בכל זאת?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>סיורים אלו יהפכו ללא תקינים.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::resources</name>
-    <message>
-      <source>There is another layout with the same name</source>
-      <translation>ישנה פריסה נוספת עם אותו שם</translation>
-    </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>אין לך הרשאה כדי לדרוס אותה.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout?</source>
-      <translation>האם להחליף את הפריסה הקיימת?</translation>
-    </message>
-    <message>
-      <source>There is another layout with the same name.</source>
-      <translation>ישנה פריסה נוספת עם אותו שם.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>כדי להסיר את הגישה, נא עבור אל הגדרות המשתמש.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>כדי להסיר גישה, עבור אל הגדרות תפקיד.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changes will affect other users</source>
-      <translation>השינויים ישפיעו על משתמשים אחרים</translation>
-    </message>
-    <message>
-      <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>פריסה זו משותפת עם משתמשים אחרים, כך שתשנה אותה גם עבורם.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
-        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
-        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
-        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
-        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>למחוק %n פריסות משותפות?</numerusform>
-        <numerusform>למחוק %n פריסות משותפות?</numerusform>
-        <numerusform>למחוק %n פריסות משותפות?</numerusform>
-        <numerusform>למחוק %n פריסות משותפות?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
-        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
-        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
-        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>הסרה</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>אתה הולך למחוק כמה משאבים שיש לך גישה מקיר הוידאו בלבד. אתה לא תראה אותם ברשימת המשאבים שלך ולא תוכל להוסיף אותם שוב לקיר הוידאו.</translation>
-    </message>
-    <message>
-      <source>You will lose access to following resources:</source>
-      <translation>אתה תאבד את הגישה למשאבים הבאים:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>מחק %n משתמשים?</numerusform>
-        <numerusform>מחק %n משתמשים?</numerusform>
-        <numerusform>מחק %n משתמשים?</numerusform>
-        <numerusform>מחק %n משתמשים?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>מחק %n התקנים?</numerusform>
-        <numerusform>מחק %n התקנים?</numerusform>
-        <numerusform>מחק %n התקנים?</numerusform>
-        <numerusform>מחק %n התקנים?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>מחק %n מצלמות?</numerusform>
-        <numerusform>מחק %n מצלמות?</numerusform>
-        <numerusform>מחק %n מצלמות?</numerusform>
-        <numerusform>מחק %n מצלמות?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>מחק %n פריטים?</numerusform>
-        <numerusform>מחק %n פריטים?</numerusform>
-        <numerusform>מחק %n פריטים?</numerusform>
-        <numerusform>מחק %n פריטים?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>They may be auto-discovered again after removing.</source>
-      <translation>הם עשויים להתגלות באופן אוטומטי שוב לאחר הסרתם.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation>האם להחליף את סיור הפריסה הקיימת?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation>ישנה פריסת סיור נוספת עם אותו שם.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::videowall</name>
-    <message>
-      <source>There is another video wall with the same name</source>
-      <translation>יש קיר וידאו אחר עם אותו שם</translation>
-    </message>
-    <message>
-      <source>Close %1 before starting Video Wall?</source>
-      <translation>סגור את %1 לפני הפעלת קיר הוידאו?</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>סגור</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>שמור</translation>
-    </message>
-    <message>
-      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>לא ניתן להציב קבצים מקומיים על קיר וידאו המחובר למחשב אחר</translation>
-    </message>
-    <message>
-      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>כדי להציג קבצים מקומיים על קיר וידאו, צרף אותם באמצעות המחשב שבו קיר הוידאו פועל.</translation>
     </message>
   </context>
   <context>
@@ -8145,6 +8207,10 @@ to %1</source>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
       <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסיור לחץ על Esc.</translation>
+    </message>
+    <message>
+      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
     </message>
   </context>
   <context>
