@@ -6,6 +6,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace nx {
 namespace cassandra {
@@ -229,10 +230,22 @@ public:
     cf::future<CassError> executeUpdate(Query query);
     cf::future<CassError> executeUpdate(const char* queryString);
 
+    void wait();
+
 private:
     CassCluster* m_cluster = nullptr;
     CassSession* m_session = nullptr;
     QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    int m_pendingCount = 0;
+
+    void incPending();
+    void decPending();
+
+    static void onDone(CassFuture* future, void* data);
+    static void onPrepare(CassFuture* future, void* data);
+    static void onSelect(CassFuture* future, void* data);
+    static void onUpdate(CassFuture* future, void* data);
 };
 
 } // namespace cassandra

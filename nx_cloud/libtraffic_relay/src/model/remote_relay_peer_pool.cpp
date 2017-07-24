@@ -81,6 +81,7 @@ void RemoteRelayPeerPool::prepareDbStructure()
                 {
                     NX_VERBOSE(this, "Prepare db successful");
                     m_dbReady = true;
+                    return cf::unit();
                 }
 
                 NX_VERBOSE(this, "Prepare db failed");
@@ -371,6 +372,11 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
 cassandra::AsyncConnection* RemoteRelayPeerPool::getConnection()
 {
     return m_cassConnection.get();
+}
+
+RemoteRelayPeerPool::~RemoteRelayPeerPool()
+{
+    m_cassConnection->wait();
 }
 
 } // namespace model

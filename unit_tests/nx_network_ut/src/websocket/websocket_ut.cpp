@@ -792,7 +792,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
         {
             if (ecode != SystemError::noError || transferred == 0)
                 return;
-            receivedDataSize += transferred;
+            receivedDataSize += (int)transferred;
             serverReadBuf.clear();
 
             if (receivedDataSize == kReceiveAmount)
@@ -838,7 +838,7 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
         {
             if (ecode != SystemError::noError || transferred == 0)
                 return;
-            receivedDataSize += transferred;
+            receivedDataSize += (int)transferred;
             serverReadBuf.clear();
             if (receivedDataSize == kReceiveAmount)
             {

@@ -262,16 +262,11 @@ public:
     base_type::wait();
     if (base_type::exception_ptr_)
       std::rethrow_exception(base_type::exception_ptr_);
-    if (value_retrieved_)
-      throw future_error(errc::future_already_retrieved,
-                         errc_string(errc::future_already_retrieved));
-    value_retrieved_ = true;
     return std::move(value_);
   }
 
 private:
   value_type value_;
-  bool value_retrieved_ = false;
 };
 
 template<typename T>

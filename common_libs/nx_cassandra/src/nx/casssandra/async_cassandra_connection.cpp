@@ -27,15 +27,6 @@ void* makeErrorCbContext(AsyncConnection* AsyncConnection, MoveOnlyFunc<void(Cas
     return new ErrorCbContext(AsyncConnection, std::move(cb));
 }
 
-static void onDone(CassFuture* future, void* data)
-{
-    CassError result = cass_future_error_code(future);
-    ErrorCbContext* ctx = (ErrorCbContext*)data;
-    ctx->cb(result);
-    ctx->free();
-}
-
-
 struct QueryCbContext
 {
     nx::cassandra::AsyncConnection* ctx;
@@ -60,14 +51,6 @@ void* makeQueryCbContext(
     MoveOnlyFunc<void(CassError, Query query)> cb)
 {
     return new QueryCbContext(AsyncConnection, std::move(cb));
-}
-
-static void onPrepare(CassFuture* future, void* data)
-{
-    CassError result = cass_future_error_code(future);
-    QueryCbContext* ctx = (QueryCbContext*)data;
-    ctx->cb(result, Query(future));
-    ctx->free();
 }
 
 
@@ -101,14 +84,6 @@ void* makeSelectCbContext(
     return new SelectCbContext(AsyncConnection, std::move(query), std::move(cb));
 }
 
-static void onSelect(CassFuture* future, void* data)
-{
-    CassError result = cass_future_error_code(future);
-    SelectCbContext* ctx = (SelectCbContext*)data;
-    ctx->cb(result, QueryResult(future));
-    ctx->free();
-}
-
 
 struct UpdateCbContext
 {
@@ -140,13 +115,6 @@ void* makeUpdateCbContext(
     return new UpdateCbContext(AsyncConnection, std::move(query), std::move(cb));
 }
 
-static void onUpdate(CassFuture* future, void* data)
-{
-    CassError result = cass_future_error_code(future);
-    UpdateCbContext* ctx = (UpdateCbContext*)data;
-    ctx->cb(result);
-    ctx->free();
-}
 } // namespace
 
 namespace nx {
@@ -509,6 +477,7 @@ AsyncConnection::AsyncConnection(const char* host):
 
 void AsyncConnection::init(nx::utils::MoveOnlyFunc<void(CassError)> initCb)
 {
+    incPending();
     CassFuture* future = cass_session_connect(m_session, m_cluster);
     cass_future_set_callback(
         future,
@@ -535,6 +504,7 @@ void AsyncConnection::prepareQuery(
     const char* queryString,
     nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb)
 {
+    incPending();
     CassFuture* future = cass_session_prepare(m_session, queryString);
     cass_future_set_callback(
         future,
@@ -562,6 +532,7 @@ void AsyncConnection::executeSelect(
     Query query,
     nx::utils::MoveOnlyFunc<void(CassError, QueryResult)> selectCb)
 {
+    incPending();
     CassFuture* future = cass_session_execute(m_session, query.m_statement);
     cass_future_set_callback(
         future,
@@ -574,6 +545,7 @@ void AsyncConnection::executeSelect(
     const char* queryString,
     nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb)
 {
+    incPending();
     CassStatement* statement = cass_statement_new(queryString, 0);
     CassFuture* future = cass_session_execute(m_session, statement);
     cass_future_set_callback(
@@ -618,6 +590,7 @@ void AsyncConnection::executeUpdate(
     Query query,
     nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
 {
+    incPending();
     CassFuture* future = cass_session_execute(m_session, query.m_statement);
     cass_future_set_callback(
         future,
@@ -630,6 +603,7 @@ void AsyncConnection::executeUpdate(
     const char* queryString,
     nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
 {
+    incPending();
     CassStatement* statement = cass_statement_new(queryString, 0);
     CassFuture* future = cass_session_execute(m_session, statement);
     cass_future_set_callback(
@@ -675,6 +649,63 @@ AsyncConnection::~AsyncConnection()
     cass_session_free(m_session);
     cass_cluster_free(m_cluster);
 }
+
+void AsyncConnection::wait()
+{
+    QnMutexLocker lock(&m_mutex);
+    while (m_pendingCount != 0)
+        m_cond.wait(lock.mutex());
+}
+
+void AsyncConnection::incPending()
+{
+    QnMutexLocker lock(&m_mutex);
+    ++m_pendingCount;
+}
+
+void AsyncConnection::decPending()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (--m_pendingCount == 0)
+        m_cond.wakeAll();
+}
+
+void AsyncConnection::onDone(CassFuture* future, void* data)
+{
+    CassError result = cass_future_error_code(future);
+    ErrorCbContext* ctx = (ErrorCbContext*)data;
+    ctx->cb(result);
+    ctx->ctx->decPending();
+    ctx->free();
+}
+
+void AsyncConnection::onPrepare(CassFuture* future, void* data)
+{
+    CassError result = cass_future_error_code(future);
+    QueryCbContext* ctx = (QueryCbContext*)data;
+    ctx->cb(result, Query(future));
+    ctx->ctx->decPending();
+    ctx->free();
+}
+
+void AsyncConnection::onSelect(CassFuture* future, void* data)
+{
+    CassError result = cass_future_error_code(future);
+    SelectCbContext* ctx = (SelectCbContext*)data;
+    ctx->cb(result, QueryResult(future));
+    ctx->ctx->decPending();
+    ctx->free();
+}
+
+void AsyncConnection::onUpdate(CassFuture* future, void* data)
+{
+    CassError result = cass_future_error_code(future);
+    UpdateCbContext* ctx = (UpdateCbContext*)data;
+    ctx->cb(result);
+    ctx->ctx->decPending();
+    ctx->free();
+}
+
 
 } // namespace cassandra
 } // namespace nx

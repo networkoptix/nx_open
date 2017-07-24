@@ -21,6 +21,7 @@ class RemoteRelayPeerPool
 {
 public:
     RemoteRelayPeerPool(const char* cassandraHost);
+    ~RemoteRelayPeerPool();
 
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
     cf::future<bool> addPeer(const std::string& domainName, const std::string& relayHost);

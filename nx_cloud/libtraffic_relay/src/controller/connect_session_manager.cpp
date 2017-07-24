@@ -31,6 +31,31 @@ ConnectSessionManager::ConnectSessionManager(
     m_trafficRelay(trafficRelay),
     m_remoteRelayPool(new model::RemoteRelayPeerPool("127.0.1.1"))
 {
+    nx::utils::SubscriptionId subscriptionId;
+    m_listeningPeerPool->peerConnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->addPeer(peer, "This_Relay_Host")
+                .then(
+                    [this, peer](cf::future<bool> addPeerFuture)
+                    {
+                        if (addPeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
 }
 
 ConnectSessionManager::~ConnectSessionManager()
@@ -47,6 +72,9 @@ ConnectSessionManager::~ConnectSessionManager()
 
     for (auto& relaySession: relaySessions)
         relaySession.listeningPeerConnection->pleaseStopSync();
+
+    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
+        m_listeningPeerPool->peerConnectedSubscription().removeSubscription(subscriptionId);
 }
 
 void ConnectSessionManager::beginListening(
@@ -86,57 +114,7 @@ void ConnectSessionManager::beginListening(
         std::bind(&ConnectSessionManager::saveServerConnection, this,
             request.peerName, _1);
 
-    struct Context
-    {
-        api::BeginListeningRequest request;
-        api::BeginListeningResponse response;
-        nx_http::ConnectionEvents connectionEvents;
-        BeginListeningHandler completionHandler;
-
-        Context(
-            const api::BeginListeningRequest request,
-            api::BeginListeningResponse response,
-            nx_http::ConnectionEvents connectionEvents,
-            BeginListeningHandler completionHandler)
-            :
-            request(request),
-            response(std::move(response)),
-            connectionEvents(std::move(connectionEvents)),
-            completionHandler(std::move(completionHandler))
-        {}
-    };
-
-    auto sharedContext = std::make_shared<Context>(
-        request,
-        std::move(response),
-        std::move(connectionEvents),
-        std::move(completionHandler));
-
-    cf::async(m_asyncExecutor,
-        [this, sharedContext]() mutable
-        {
-            return m_remoteRelayPool->addPeer(sharedContext->request.peerName, "thisRelayHost")
-                .then(
-                    [this, sharedContext] (
-                        cf::future<bool> addPeerFuture) mutable
-                    {
-                        if (!addPeerFuture.get())
-                        {
-                            sharedContext->completionHandler(
-                                api::ResultCode::unknownError,
-                                api::BeginListeningResponse(),
-                                nx_http::ConnectionEvents());
-                            return cf::unit();
-                        }
-
-                        sharedContext->completionHandler(
-                            api::ResultCode::ok,
-                            std::move(sharedContext->response),
-                            std::move(sharedContext->connectionEvents));
-
-                        return cf::unit();
-                    });
-        });
+    completionHandler(api::ResultCode::ok, std::move(response), std::move(connectionEvents));
 }
 
 void ConnectSessionManager::createClientSession(
@@ -151,80 +129,35 @@ void ConnectSessionManager::createClientSession(
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
-    struct Context
+    const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
+    if (!peerName.empty())
     {
-        CreateClientSessionHandler handler;
-        api::CreateClientSessionRequest request;
-        api::CreateClientSessionResponse response;
-        bool peerFound = false;
+        response.sessionId = m_clientSessionPool->addSession(request.desiredSessionId, peerName);
+        completionHandler(api::ResultCode::ok, std::move(response));
 
-        Context(
-            CreateClientSessionHandler handler,
-            const api::CreateClientSessionRequest& request,
-            const api::CreateClientSessionResponse& response)
-            :
-            handler(std::move(handler)),
-            request(request),
-            response(response)
-        {}
-    };
+        return;
+    }
 
-    auto sharedContext = std::make_shared<Context>(
-        std::move(completionHandler),
-        request,
-        response);
-
-    cf::async(m_asyncExecutor,
-        [this, sharedContext]
-        {
-            const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(
-                sharedContext->request.targetPeerName);
-            if (!peerName.empty())
-            {
-                sharedContext->response.sessionId = m_clientSessionPool->addSession(
-                    sharedContext->request.desiredSessionId, peerName);
-                sharedContext->handler(api::ResultCode::ok, std::move(sharedContext->response));
-                sharedContext->peerFound = true;
-
-                return cf::unit();
-            }
-
-            return cf::unit();
-        })
+    m_remoteRelayPool->findRelayByDomain(request.targetPeerName)
         .then(
-            [this, sharedContext](cf::future<cf::unit> /*result*/)
+            [completionHandler = std::move(completionHandler), response = std::move(response),
+            request, this](
+                cf::future<std::string> findRelayFuture) mutable
             {
-                if (sharedContext->peerFound)
-                    return cf::make_ready_future(std::string());
-
-                NX_VERBOSE(this, lm("Session %1. Failed to find peer %2 on the current relay")
-                   .arg(sharedContext->request.desiredSessionId)
-                   .arg(sharedContext->request.targetPeerName));
-
-                return m_remoteRelayPool->findRelayByDomain(
-                    sharedContext->request.targetPeerName);
-            })
-        .then(
-            [this, sharedContext](cf::future<std::string> result)
-            {
-                if (result.get().empty() && !sharedContext->peerFound)
+                response.redirectHost = findRelayFuture.get();
+                if (response.redirectHost.empty())
                 {
-                    NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-                        .arg(sharedContext->request.desiredSessionId)
-                        .arg(sharedContext->request.targetPeerName), cl_logDEBUG1);
-                    sharedContext->handler(
-                        api::ResultCode::notFound,
-                        std::move(sharedContext->response));
+                    NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
+                        .arg(request.desiredSessionId)
+                        .arg(request.targetPeerName));
+                    completionHandler(api::ResultCode::notFound, std::move(response));
 
                     return cf::unit();
                 }
-
-                sharedContext->response.redirectHost = result.get();
-                sharedContext->handler(
-                    api::ResultCode::needRedirect,
-                    std::move(sharedContext->response));
+                completionHandler(api::ResultCode::needRedirect, std::move(response));
 
                 return cf::unit();
+
             });
 }
 
