@@ -5,6 +5,7 @@
 #include "nx/utils/latin1_array.h"
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/app_info.h>
+#include <nx/network/http/http_types.h>
 
 namespace ec2 {
 
@@ -154,6 +155,8 @@ struct ApiPeerDataEx: public ApiPeerData
 };
 
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
+
+ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request);
 
 } // namespace ec2
 

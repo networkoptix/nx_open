@@ -12,8 +12,6 @@ namespace p2p {
 class MessageBus;
 class P2pConnectionProcessorPrivate;
 
-ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request);
-
 class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:

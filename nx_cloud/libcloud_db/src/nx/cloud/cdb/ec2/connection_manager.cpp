@@ -6,7 +6,6 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <http/p2p_connection_listener.h>
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
@@ -173,7 +172,7 @@ void ConnectionManager::createWebsocketTransactionConnection(
 {
     using namespace std::placeholders;
 
-    auto remotePeerInfo = nx::p2p::deserializeRemotePeerInfo(request);
+    auto remotePeerInfo = ::ec2::deserializeRemotePeerInfo(request);
 
     nx_http::RequestResult result(nx_http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =

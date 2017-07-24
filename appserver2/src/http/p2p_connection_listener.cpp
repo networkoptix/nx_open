@@ -41,28 +41,6 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket;
 };
 
-ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request)
-{
-    ec2::ApiPeerDataEx remotePeer;
-    QUrlQuery query(request.requestLine.url.query());
-
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
-    if (query.hasQueryItem("format"))
-        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
-
-    bool success = false;
-    QByteArray peerData = nx_http::getHeaderValue(request.headers, Qn::EC2_PEER_DATA);
-    peerData = QByteArray::fromBase64(peerData);
-    if (dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-    else if (dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-
-    if (remotePeer.id.isNull())
-        remotePeer.id = QnUuid::createUuid();
-    return remotePeer;
-}
-
 // -------------------------- ConnectionProcessor ---------------------
 
 const QString ConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
