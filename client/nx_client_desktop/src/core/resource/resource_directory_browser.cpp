@@ -264,7 +264,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
         auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-        resourcePool->addResource(aviResource, /*instantly*/ true);
+        resourcePool->addResource(aviResource, QnResourcePool::SkipAddingTransaction);
 
         // Check if we have updated an existing resource.
         auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
