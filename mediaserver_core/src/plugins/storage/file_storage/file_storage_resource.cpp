@@ -867,7 +867,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
     // write check fail is a cause to set dirty to true, thus enabling
     // remount attempt in initOrUpdate()
-    if (!m_writeCapCached)
+    if (!m_writeCapCached.get())
     {
         NX_LOG("[initOrUpdate] write test file failed", cl_logDEBUG2);
         m_valid = false;
@@ -895,7 +895,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? QnPlatformMonitor::LocalDiskPartition : 
+        local ? QnPlatformMonitor::LocalDiskPartition :
         QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
@@ -903,7 +903,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     else
     {
         qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
-        if (baseSpaceLimit > maxSpaceLimit) //< User explicitely set large spaceLimit, let's hope he knows what he's doing.
+        if (baseSpaceLimit > maxSpaceLimit) //< User explicitly set large spaceLimit, let's hope he knows what he's doing.
             return baseSpaceLimit;
         return qMin(maxSpaceLimit, qMax(m_cachedTotalSpace / kMaxSpaceLimitRatio, baseSpaceLimit));
     }
@@ -933,7 +933,7 @@ bool QnFileStorageResource::isLocal()
     if (!storageTypeString.isEmpty())
     {
        if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
-          return true; 
+          return true;
        return false;
     }
 
