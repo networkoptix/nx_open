@@ -51,8 +51,8 @@ public:
     enum AddResourceFlag
     {
         NoAddResourceFlags = 0x00,
-        UseIncompatibleServerPool = 0x01,
-        SkipAddingTransaction = 0x02,
+        UseIncompatibleServerPool = 0x01,   //< TODO: #GDM Remove when implement VMS-6789
+        SkipAddingTransaction = 0x02,       //< Add resource instantly even if transaction is open.
     };
     Q_DECLARE_FLAGS(AddResourceFlags, AddResourceFlag);
 
