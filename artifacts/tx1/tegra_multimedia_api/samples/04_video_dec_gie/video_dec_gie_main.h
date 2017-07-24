@@ -8,12 +8,11 @@
 #include <errno.h>
 #include <fstream>
 #include <iostream>
-#include <linux/videodev2.h>
 #include <malloc.h>
 #include <pthread.h>
 #include <string.h>
+
 #include <unistd.h>
-#include <sys/prctl.h>
 
 #include "NvUtils.h"
 #include "NvCudaProc.h"
@@ -21,30 +20,27 @@
 #include "video_dec_gie.h"
 #include "gie_inference.h"
 
-class LockGurad
-{
-public:
-    LockGurad(pthread_mutex_t* mutex): m_mutex(mutex) { pthread_mutex_lock(m_mutex); }
-    ~LockGurad() { pthread_mutex_unlock(m_mutex); }
-
-private:
-    pthread_mutex_t* m_mutex;
-};
-
 class Detector
 {
 public:
-    Detector():
+    Detector(const char* id):
+        m_id(id),
+        m_videoDecoderName(std::string("dec") + id),
+        m_videoConverterName(std::string("conv") + id),
         m_firstTimePush(true),
         m_firstTimePushBufferNum(0)
     {
     }
 
-    int startInference(std::string modelFileName, std::string deployFileName, std::string cacheFileName);
+    int startInference(
+        const std::string& modelFileName,
+        const std::string& deployFileName,
+        const std::string& cacheFileName);
+
     bool stopSync();
-    bool pushCompressedFrame(const uint8_t* data, int dataSize);
+    bool pushCompressedFrame(const uint8_t* data, int dataSize, int64_t ptUs);
     bool hasRectangles();
-    std::vector<cv::Rect> getRectangles();
+    std::vector<cv::Rect> getRectangles(int64_t* outPts);
     int getNetWidth() const;
     int getNetHeight() const;
 
@@ -52,6 +48,9 @@ private:
     int fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer);
 
 private:
+    const std::string m_id;
+    const std::string m_videoDecoderName;
+    const std::string m_videoConverterName;
     std::mutex m_mutex;
     std::queue<std::vector<cv::Rect>> m_rects;
     context_t m_ctx;

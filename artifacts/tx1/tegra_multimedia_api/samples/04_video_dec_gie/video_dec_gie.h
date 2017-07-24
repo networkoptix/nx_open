@@ -40,6 +40,7 @@
 #include <vector>
 #include <queue>
 #include <opencv2/objdetect.hpp>
+#include <chrono>
 
 using namespace std;
 
@@ -86,6 +87,15 @@ typedef struct
     string modelfile;
     std::queue<std::vector<cv::Rect>>* rectQueuePtr;
     bool needToStop;
+    std::chrono::high_resolution_clock::time_point m_firstFrameArrivalTime 
+        = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(0));
+    int m_framesProcessed = 0;
+
+    std::chrono::high_resolution_clock::time_point m_lastInferenceTime
+        = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(0));
+
+    std::queue<int64_t> m_ptsQueue;
+
 } context_t;
 
 typedef struct
