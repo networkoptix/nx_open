@@ -1,63 +1,44 @@
 #!/bin/bash
 set -e
 
-CUSTOMIZATION=${deb.customization.company.name}
-PRODUCT_NAME=${product.name.short}
-VERSION=${release.version}.${buildNumber}
+# [in] environment
+CUSTOMIZATION="${deb.customization.company.name}"
+PRODUCT_NAME="${product.name.short}"
+VERSION="${release.version}.${buildNumber}"
 MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
-PACKAGE_NAME=${artifact.name.server}.tar.gz
-UPDATE_NAME=${artifact.name.server_update}.zip
-RESOURCE_BUILD_DIR="${project.build.directory}"
-BUILD_OUTPUT_DIR=${libdir}
-LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
-BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
+TAR_FILENAME="${artifact.name.server}.tar.gz"
+ZIP_FILENAME="${artifact.name.server_update}.zip"
+SRC_DIR="${project.build.directory}"
+BUILD_DIR="${libdir}"
+LIB_BUILD_DIR="$BUILD_DIR/lib/${build.configuration}"
+BIN_BUILD_DIR="$BUILD_DIR/bin/${build.configuration}"
 QT_DIR="${qt.dir}"
 BOX="${box}"
-VOX_SOURCE_DIR=${ClientVoxSourceDir}
+VOX_SOURCE_DIR="${ClientVoxSourceDir}"
 
-MODULE="mediaserver"
 INSTALL_PATH="opt/$CUSTOMIZATION"
 
-if [ "$BOX" = "bananapi" ]; then #< Bananapi uses bpi toolchain.
-    PACKAGES_ROOT="$environment/packages/bpi"
-    TOOLCHAIN_ROOT="$environment/packages/bpi/gcc-${gcc.version}"
-else
-    PACKAGES_ROOT="$environment/packages/$BOX"
-    TOOLCHAIN_ROOT="$environment/packages/$BOX/gcc-${gcc.version}"
-fi
+PACKAGES_DIR="${packages.dir}/${rdep.target}"
 
-TOOLCHAIN_PREFIX="$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-"
-SYSROOT_PREFIX="$PACKAGES_ROOT/sysroot/usr/lib/arm-linux-gnueabihf"
-
-WORK_DIR=$(mktemp -d)
-TAR_DIR="$WORK_DIR/tar"
-DEBUG_TAR_DIR="$WORK_DIR/debug-tar"
 if [ "$BOX" = "bpi" ]; then
-    TARGET_LIB_PATH="$INSTALL_PATH/lib"
+    LIB_INSTALL_PATH="$INSTALL_PATH/lib"
 else
-    TARGET_LIB_PATH="$INSTALL_PATH/mediaserver/lib"
+    LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
-DEBS_DIR="$BUILD_OUTPUT_DIR/deb"
-UBOOT_DIR="$BUILD_OUTPUT_DIR/root"
-USR_DIR="$BUILD_OUTPUT_DIR/usr"
+#--------------------------------------------------------------------------------------------------
 
 help()
 {
     echo "Options:"
-    echo "--target-dir=<dir to copy archive to>"
-    echo "--no-strip"
     echo "--no-client"
 }
 
-# [out] TARGET_DIR
-# [out] STRIP
 # [out] WITH_CLIENT
 parseArgs() # "$@"
 {
-    STRIP=""
     WITH_CLIENT="1"
 
     local ARG
@@ -65,45 +46,19 @@ parseArgs() # "$@"
         if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
             help
             exit 0
-        elif [[ "$ARG" =~ ^--target-dir= ]] ; then
-            TARGET_DIR=${ARG#--target-dir=}
-        elif [ "$ARG" = "--no-strip" ] ; then
-            STRIP=""
         elif [ "$i" = "--no-client" ] ; then
             WITH_CLIENT=""
         fi
     done
 }
 
-# Copy debug version of LIB to DEBUG_LIB via objcopy, and strip the original LIB.
-copyAndStripIfNeeded() # LIB DEBUG_LIB
+# [in] LIB_INSTALL_DIR
+copyBuildLibs()
 {
-    local LIB="$1"
-    local DEBUG_LIB="$2"
+    mkdir -p "$LIB_INSTALL_DIR"
 
-    if [ ! -z "$STRIP" ]; then
-        "${TOOLCHAIN_PREFIX}objcopy" --only-keep-debug "$LIB" "$DEBUG_LIB.debug"
-        "${TOOLCHAIN_PREFIX}objcopy" --add-gnu-debuglink="$DEBUG_LIB.debug" "$LIB"
-        "${TOOLCHAIN_PREFIX}strip" -g "$LIB"
-    fi
-}
-
-copyNonQtLibs()
-{
     local LIBS_TO_COPY=(
-        libavcodec
-        libavdevice
-        libavfilter
-        libavformat
-        libavutil
-        liblber-2.4
-        libldap-2.4
-        libldap_r-2.4
-        libquazip
-        libsasl2
-        libsigar
-        libswresample
-        libswscale
+        # nx
         libappserver2
         libcloud_db_client
         libcommon
@@ -113,8 +68,28 @@ copyNonQtLibs()
         libnx_kit
         libnx_network
         libnx_utils
+
+        # ffmpeg
+        libavcodec
+        libavdevice
+        libavfilter
+        libavformat
+        libavutil
+        libswresample
+        libswscale
         libpostproc
+
+        # third-party
+        liblber
+        libldap
+        libquazip
+        libsasl2
+        libsigar
         libudt
+    )
+
+    local OPTIONAL_LIBS_TO_COPY=(
+        libvpx
     )
 
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
@@ -126,45 +101,49 @@ copyNonQtLibs()
         )
     fi
 
-    # Additional libs for nx1.
+    # Libs for nx1 lite client.
     if [ "$BOX" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
         LIBS_TO_COPY+=(
+            # nx
+            libnx_audio
+            libnx_client_core
+            libnx_media
+            libnx_vms_utils
+
+            # third-party
             ldpreloadhook
             libcedrus
-            libnx_vms_utils
-            libnx_client_core
-            libnx_audio
-            libnx_media
             libopenal
+            libpixman-1
             libproxydecoder
+            libvdpau_sunxi
             libEGL
             libGLESv1_CM
-            libpixman-1
-            libvdpau_sunxi
         )
     fi
 
-    [ -e "$LIBS_DIR/libvpx.so.1.2.0" ] && LIBS_TO_COPY+=(libvpx.so)
-
-    if [ ! "$CUSTOMIZATION" = "networkoptix" ]; then
-        mv -f "opt/networkoptix" "opt/$CUSTOMIZATION"
-    fi
-    rm -rf "$TAR_DIR"
-    mkdir -p "$TAR_DIR/$INSTALL_PATH"
-    echo "$VERSION" >"$TAR_DIR/$INSTALL_PATH/version.txt"
-
     # Copy libs.
-    mkdir -p "$TAR_DIR/$TARGET_LIB_PATH"
-    mkdir -p "$DEBUG_TAR_DIR/$TARGET_LIB_PATH"
+    local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
         echo "Adding lib $LIB"
-        cp -r "$LIBS_DIR/$LIB"* "$TAR_DIR/$TARGET_LIB_PATH/"
-        copyAndStripIfNeeded "$TAR_DIR/$TARGET_LIB_PATH/$LIB" "$DEBUG_TAR_DIR/$TARGET_LIB_PATH/$LIB"
+        cp -r "$LIB_BUILD_DIR/$LIB"* "$LIB_INSTALL_DIR/"
+    done
+    for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"; do
+        local EXISTING_LIB
+        for EXISTING_LIB in "$LIB_BUILD_DIR/$LIB"*; do
+            if [ -f "$EXISTING_LIB" ]; then
+                echo "Adding optional lib file $(basename $EXISTING_LIB)"
+                cp -r "$EXISTING_LIB" "$LIB_INSTALL_DIR/"
+            fi
+        done
     done
 }
 
+# [in] LIB_INSTALL_DIR
 copyQtLibs()
 {
+    mkdir -p "$LIB_INSTALL_DIR"
+
     local QT_LIBS_TO_COPY=(
         Concurrent
         Core
@@ -177,6 +156,7 @@ copyQtLibs()
         WebSockets
     )
 
+    # Qt libs for nx1 lite client.
     if [ "$BOX" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
         QT_LIBS_TO_COPY+=(
             WebChannel
@@ -194,45 +174,52 @@ copyQtLibs()
 
     local QT_LIB
     for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do
-        local LIB=libQt5$QT_LIB.so
+        local LIB="libQt5$QT_LIB.so"
         echo "Adding Qt lib $LIB"
-        cp -r "$QT_DIR/lib/$LIB"* "$TAR_DIR/$TARGET_LIB_PATH/"
+        cp -r "$QT_DIR/lib/$LIB"* "$LIB_INSTALL_DIR/"
     done
 }
 
+# [in] MEDIASERVER_BIN_INSTALL_DIR
 copyBins()
 {
-    mkdir -p "$TAR_DIR/$INSTALL_PATH/mediaserver/bin"
-    mkdir -p "$DEBUG_TAR_DIR/$INSTALL_PATH/mediaserver/bin"
-    cp "$BINS_DIR/mediaserver" "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/"
-    cp "$BINS_DIR/external.dat" "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/"
-    copyAndStripIfNeeded "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/mediaserver" \
-        "$DEBUG_TAR_DIR/$INSTALL_PATH/mediaserver/bin/mediaserver"
+    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
+    cp "$BIN_BUILD_DIR/mediaserver" "$MEDIASERVER_BIN_INSTALL_DIR/"
+    cp "$BIN_BUILD_DIR/external.dat" "$MEDIASERVER_BIN_INSTALL_DIR/"
 
-    if [ -e "$BINS_DIR/plugins" ]; then
-        mkdir -p "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins"
-        mkdir -p "$DEBUG_TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins"
-        cp "$BINS_DIR/plugins"/*.* "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins/"
-        # TODO: mshevchenko: Eliminate "ls".
-        for FILE in $(ls $TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins/); do
-            copyAndStripIfNeeded "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins/$FILE" \
-                "$DEBUG_TAR_DIR/$INSTALL_PATH/mediaserver/bin/plugins/$FILE"
-        done
+    # TODO: bpi|bananapi|rpi.
+    if [ -e "$BIN_BUILD_DIR/plugins" ]; then
+        mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
+        cp "$BIN_BUILD_DIR/plugins"/* "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
     fi
 }
 
+# [in] INSTALL_DIR
 copyConf()
 {
-    mkdir -p $TAR_DIR/$INSTALL_PATH/mediaserver/etc/
-    cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template \
-        $TAR_DIR/$INSTALL_PATH/mediaserver/etc
+    # TODO: bpi|rpi|bananapi.
+    local MEDIASERVER_CONF_FILENAME="mediaserver.conf.template"
+
+    mkdir -p "$INSTALL_DIR/mediaserver/etc"
+    cp "$SRC_DIR/opt/networkoptix/mediaserver/etc/$MEDIASERVER_CONF_FILENAME" \
+        "$INSTALL_DIR/mediaserver/etc/"
 }
 
 # Copy the autostart script and platform-specific scripts.
+# [in] TAR_DIR
+# [in] INSTALL_DIR
 copyScripts()
 {
-    cp -r ./etc "$TAR_DIR"
-    cp -r ./opt "$TAR_DIR"
+    # TODO: Consider more general approach: copy all dirs and files, customizing filenames,
+    # assigning proper permissions. Top-level dirs (etc, opt, root, etc) should be either moved
+    # to e.g. "sysroot" folder, or enumerated manually.
+
+    echo "Copying scripts"
+    cp -r "$SRC_DIR/etc" "$TAR_DIR"
+    chmod -R 755 "$TAR_DIR/etc/init.d"
+
+    cp -r "$SRC_DIR/opt/networkoptix/"* "$INSTALL_DIR/"
+    chmod -R 755 "$INSTALL_DIR/mediaserver/var/scripts"
 
     NON_CUSTOMIZED_MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/networkoptix-mediaserver"
     MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/$CUSTOMIZATION-mediaserver"
@@ -247,39 +234,44 @@ copyScripts()
             mv "$NON_CUSTOMIZED_LITE_CLIENT_STARTUP_SCRIPT" "$LITE_CLIENT_STARTUP_SCRIPT"
         fi
     fi
-
-    chmod -R 755 "$TAR_DIR/etc/init.d"
 }
 
+# [in] TAR_DIR
 copyDebs()
 {
-    cp -r "$DEBS_DIR" "$TAR_DIR/opt/"
+    local DEBS_DIR="$BUILD_DIR/deb"
+    if [ -d "$DEBS_DIR" ]; then
+        # Dereference symlinks to allow the build system to create .deb symlinks instead of copying
+        # the .deb files.
+        cp -r -L "$DEBS_DIR" "$TAR_DIR/opt/"
+    fi
 }
 
+# [in] DEBUG_TAR_DIR
+# [in] INSTALL_DIR
+# [in] LIB_INSTALL_DIR
 copyBpiLiteClient()
 {
     # Copy libs of ffmpeg for proxydecoder, if they exist.
-    if [ -d "$LIBS_DIR/ffmpeg" ]; then
-        cp -r "$LIBS_DIR/ffmpeg" "$TAR_DIR/$TARGET_LIB_PATH/"
+    if [ -d "$LIB_BUILD_DIR/ffmpeg" ]; then
+        cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
     # Copy lite_client bin.
-    mkdir -p "$TAR_DIR/$INSTALL_PATH/lite_client/bin"
+    mkdir -p "$INSTALL_DIR/lite_client/bin"
     mkdir -p "$DEBUG_TAR_DIR/$INSTALL_PATH/lite_client/bin"
-    cp "$BINS_DIR/mobile_client" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/"
-    copyAndStripIfNeeded "$TAR_DIR/$INSTALL_PATH/lite_client/bin/mobile_client" \
-        "$DEBUG_TAR_DIR/$INSTALL_PATH/lite_client/bin/mobile_client"
+    cp "$BIN_BUILD_DIR/mobile_client" "$INSTALL_DIR/lite_client/bin/"
 
     # Create symlink for rpath needed by mediaserver binary.
-    ln -s "../lib" "$TAR_DIR/$INSTALL_PATH/mediaserver/lib"
+    ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
 
     # Create symlink for rpath needed by mobile_client binary.
-    ln -s "../lib" "$TAR_DIR/$INSTALL_PATH/lite_client/lib"
+    ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
 
     # Create symlink for rpath needed by Qt plugins.
-    ln -s "../../lib" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/lib"
+    ln -s "../../lib" "$INSTALL_DIR/lite_client/bin/lib"
 
-    # Copy directories needed by lite client.
+    # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
         egldeviceintegrations
         fonts
@@ -289,31 +281,44 @@ copyBpiLiteClient()
         qml
         video
     )
+    local DIR
     for DIR in "${DIRS_TO_COPY[@]}"; do
         echo "Copying directory $DIR"
-        cp -r "$BINS_DIR/$DIR" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/"
+        cp -r "$BIN_BUILD_DIR/$DIR" "$INSTALL_DIR/lite_client/bin/"
     done
 
-    # Copying uboot.
-    cp -r "$UBOOT_DIR" "$TAR_DIR/root/"
-
-    # Copy additional binaries.
-    cp -r "$USR_DIR" "$TAR_DIR/usr/"
-
-    # Copy additional platform-specific files.
-    cp -r "$QT_DIR/libexec" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/"
-    mkdir -p "$TAR_DIR/$INSTALL_PATH/lite_client/bin/translations"
-    cp -r "$QT_DIR/translations" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/"
-    cp -r "$QT_DIR/resources" "$TAR_DIR/$INSTALL_PATH/lite_client/bin/"
-    cp "$QT_DIR/resources/"* "$TAR_DIR/$INSTALL_PATH/lite_client/bin/libexec/"
-    cp -r ./root "$TAR_DIR/"
-    mkdir -p "$TAR_DIR/root/tools/nx"
-    cp "opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template" "$TAR_DIR/root/tools/nx/"
-    chmod -R 755 "$TAR_DIR/$INSTALL_PATH/mediaserver/var/scripts"
+    # Copy additional platform-specific Qt files.
+    cp -r "$QT_DIR/libexec" "$INSTALL_DIR/lite_client/bin/"
+    mkdir -p "$INSTALL_DIR/lite_client/bin/translations"
+    cp -r "$QT_DIR/translations" "$INSTALL_DIR/lite_client/bin/"
+    # TODO: Investigate how to get rid of "resources" duplication.
+    cp -r "$QT_DIR/resources" "$INSTALL_DIR/lite_client/bin/"
+    cp "$QT_DIR/resources/"* "$INSTALL_DIR/lite_client/bin/libexec/"
 }
 
+# [in] TAR_DIR
+copyBpiSpecificFiles()
+{
+    # Copying uboot.
+    cp -r "$BUILD_DIR/root" "$TAR_DIR/root/"
+
+    # Copy additional binaries.
+    cp -r "$BUILD_DIR/usr" "$TAR_DIR/usr/"
+
+    cp -r "$SRC_DIR/root" "$TAR_DIR/"
+    mkdir -p "$TAR_DIR/root/tools/nx"
+
+    # Copy default server conf used on "factory reset".
+    cp "$SRC_DIR/opt/networkoptix/mediaserver/etc/mediaserver.conf.template" \
+        "$TAR_DIR/root/tools/nx/"
+}
+
+# [in] INSTALL_DIR
+# [in] LIB_INSTALL_DIR
 copyAdditionalSysrootFilesIfNeeded()
 {
+    local SYSROOT_LIB_DIR="$PACKAGES_DIR/sysroot/usr/lib/arm-linux-gnueabihf"
+
     if [ "$BOX" = "bpi" ]; then
         local SYSROOT_LIBS_TO_COPY=(
             libopus
@@ -321,75 +326,78 @@ copyAdditionalSysrootFilesIfNeeded()
             libwebpdemux
             libwebp
         )
-        for LIB in ${SYSROOT_LIBS_TO_COPY[@]}; do
-            echo "Adding lib $LIB"
-            cp -r "$SYSROOT_PREFIX/$LIB"* "$TAR_DIR/$TARGET_LIB_PATH/"
+        local LIB
+        for LIB in "${SYSROOT_LIBS_TO_COPY[@]}"; do
+            echo "Adding sysroot lib $LIB"
+            cp -r "$SYSROOT_LIB_DIR/$LIB"* "$LIB_INSTALL_DIR/"
         done
     elif [ "$BOX" = "bananapi" ]; then
         # Add files required for bananapi on Debian 8 "Jessie".
-        cp -r "$SYSROOT_PREFIX/libglib"* "$TAR_DIR/$TARGET_LIB_PATH/"
-        cp -r "$PACKAGES_ROOT/sysroot/usr/bin/hdparm" "$TAR_DIR/$INSTALL_PATH/mediaserver/bin/"
+        cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
+        cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     fi
 }
 
+# [in] INSTALL_DIR
+# [in] VOX_SOURCE_DIR
 copyVox()
 {
-    local VOX_TARGET_DIR="$TAR_DIR/$INSTALL_PATH/$MODULE/bin/vox"
-    mkdir -p "$VOX_TARGET_DIR"
-    cp -r "$VOX_SOURCE_DIR/"* "$VOX_TARGET_DIR/"
+    if [ -d "$VOX_SOURCE_DIR" ]; then
+        local VOX_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin/vox"
+        mkdir -p "$VOX_INSTALL_DIR"
+        cp -r "$VOX_SOURCE_DIR/"* "$VOX_INSTALL_DIR/"
+    fi
 }
 
+# [in] LIB_INSTALL_DIR
 copyLibcIfNeeded()
 {
+    # TODO: Unconditionally copy from the compiler artifact. Decision on usage will be
+    # made in install.sh on the box.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
-        # Uncomment to enable libc/libstdc++ upgrade.
-        #cp -P "$PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s"* "$TAR_DIR/$TARGET_LIB_PATH/"
-        cp -P "$PACKAGES_ROOT/libstdc++-6.0.19/lib/libstdc++.s"* "$TAR_DIR/$TARGET_LIB_PATH/"
+        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
     fi
 }
 
+# [in] TAR_DIR
 buildArchives()
 {
-    pushd "$TAR_DIR"
-    if [ "$BOX" = "bpi" ]; then
-        if [ ! -z "$WITH_CLIENT" ]; then
-            tar czf "$PACKAGE_NAME" ./opt ./etc ./root ./usr
-        else
-            tar czf "$PACKAGE_NAME" ./opt ./etc
-        fi
+    # Create main distro archive.
+    if [ "$BOX" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
+        ( cd "$TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME" ./opt ./etc ./root ./usr )
     else
-        tar czf "$PACKAGE_NAME" ./opt ./etc
-    fi
-    cp "$PACKAGE_NAME" "$RESOURCE_BUILD_DIR/"
-    popd
-
-    if [ ! -z "$STRIP" ]; then
-        # TODO: #mshevchenko: Also add Lite Client bin(s) to the debug archive.
-        pushd "$DEBUG_TAR_DIR/$INSTALL_PATH/mediaserver"
-        tar czf "$PACKAGE-debug-symbols.tar.gz" ./bin ./lib
-        cp "$PACKAGE-debug-symbols.tar.gz" "$RESOURCE_BUILD_DIR/"
-        popd
+        ( cd "$TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME" ./opt ./etc )
     fi
 
-    mkdir -p zip
-    mv "$PACKAGE_NAME" ./zip
-    mv update.* ./zip
-    mv install.sh ./zip
-    cd zip
-    if [ ! -f "$PACKAGE_NAME" ]; then
-        echo "ERROR: Distribution is not created."
-        exit 1
-    fi
-    zip "./$UPDATE_NAME" ./*
-    mv ./* ../
-    cd ..
+    # Create "update" zip with the tar inside.
+    local ZIP_DIR="$WORK_DIR/zip"
+    mkdir -p "$ZIP_DIR"
+    cp -r "$SRC_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$SRC_DIR"/update.* "$ZIP_DIR/"
+    cp -r "$SRC_DIR"/install.sh "$ZIP_DIR/"
+    ( cd "$ZIP_DIR" && zip "$SRC_DIR/$ZIP_FILENAME" * )
 }
+
+#--------------------------------------------------------------------------------------------------
 
 main()
 {
     parseArgs "$@"
 
-    copyNonQtLibs
+    local WORK_DIR=$(mktemp -d)
+    rm -rf "$WORK_DIR"
+
+    local TAR_DIR="$WORK_DIR/tar"
+    local DEBUG_TAR_DIR="$WORK_DIR/debug-symbols-tar"
+    local INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
+    local LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
+    local MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
+    echo "Creating distribution in $WORK_DIR (please delete it on failure). Current dir: $(pwd)"
+
+    mkdir -p "$INSTALL_DIR"
+    echo "$VERSION" >"$INSTALL_DIR/version.txt"
+
+    copyBuildLibs
     copyQtLibs
     copyBins
     copyConf
@@ -399,16 +407,16 @@ main()
     copyVox
     copyLibcIfNeeded
 
-    if [ "$BOX" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
-        copyBpiLiteClient
+    if [ "$BOX" = "bpi" ]; then
+        copyBpiSpecificFiles
+        if [ ! -z "$WITH_CLIENT" ]; then
+            copyBpiLiteClient
+        fi
     fi
 
     buildArchives
 
-    rm -rf zip
-    rm -rf "$TAR_DIR"
     rm -rf "$WORK_DIR"
-    rm -rf "$DEBUG_TAR_DIR"
 }
 
 main "$@"
