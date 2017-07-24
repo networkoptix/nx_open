@@ -9,8 +9,6 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-struct ButtonWithConfirmationPrivate;
-
 // A button that switches into non-interactive confirmation state with different text and icon
 // for a short duration after being clicked, then animates back to normal state.
 class ButtonWithConfirmation: public QPushButton
@@ -54,7 +52,8 @@ protected:
     virtual bool event(QEvent* event) override;
 
 private:
-    QScopedPointer<ButtonWithConfirmationPrivate> m_d;
+    struct Private;
+    QScopedPointer<Private> m_d;
 };
 
 } // namespace ui
