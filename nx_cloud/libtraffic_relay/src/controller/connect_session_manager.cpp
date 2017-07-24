@@ -63,20 +63,20 @@ ConnectSessionManager::ConnectSessionManager(
             m_remoteRelayPool->removePeer(peer, "This_Relay_Host")
                 .then(
                     [this, peer](cf::future<bool> addPeerFuture)
-            {
-                if (addPeerFuture.get())
-                {
-                    NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
-                        .arg(peer));
-                }
-                else
-                {
-                    NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
-                        .arg(peer));
-                }
+                    {
+                        if (addPeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
 
-                return cf::unit();
-            });
+                        return cf::unit();
+                    });
         },
         &subscriptionId);
 
