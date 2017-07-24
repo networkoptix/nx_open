@@ -852,7 +852,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         return;
 
     // Skip cameras inside the exported layouts. Only layout items are to be displayed there.
-    const bool isExportedCamera = resource->hasFlags(Qn::local_media)
+    const bool isExportedCamera = resource->hasFlags(Qn::local_video)
         && !resource->getParentId().isNull();
     if (isExportedCamera)
         return;
