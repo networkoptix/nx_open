@@ -322,7 +322,7 @@ void QnResource::update(const QnResourcePtr& other)
 
     {
         QnMutexLocker lk(&m_mutex);
-        if (!useLocalProperties() && !m_locallySavedProperties.empty())
+        if (!useLocalProperties() && !m_locallySavedProperties.empty() && commonModule())
         {
             std::map<QString, LocalPropertyValue> locallySavedProperties;
             std::swap(locallySavedProperties, m_locallySavedProperties);
@@ -591,7 +591,10 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    return commonModule()->statusDictionary()->value(getId());
+    NX_EXPECT(commonModule());
+    return commonModule()
+        ? commonModule()->statusDictionary()->value(getId())
+        : Qn::NotDefined;
 }
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
@@ -630,7 +633,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_ASSERT(commonModule());
+    NX_EXPECT(commonModule());
     if (!commonModule())
         return;
 
@@ -856,9 +859,9 @@ QString QnResource::getProperty(const QString &key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second.value;
         }
-        else if (commonModule())
+        else if (auto module = commonModule())
         {
-            value = commonModule()->propertyDictionary()->value(m_id, key);
+            value = module->propertyDictionary()->value(m_id, key);
         }
     }
 
@@ -882,7 +885,11 @@ QString QnResource::getResourceProperty(
     //TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    QString value = commonModule->propertyDictionary()->value(resourceId, key);
+    NX_EXPECT(commonModule);
+    QString value = commonModule
+        ? commonModule->propertyDictionary()->value(resourceId, key)
+        : QString();
+
     if (value.isNull())
     {
         // find default value in resourceType
@@ -914,7 +921,11 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     }
 
     NX_ASSERT(!getId().isNull());
-    bool isModified = commonModule()->propertyDictionary()->setValue(getId(), key, value, markDirty, replaceIfExists);
+    NX_EXPECT(commonModule());
+
+    bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
+        getId(), key, value, markDirty, replaceIfExists);
+
     if (isModified)
         emitPropertyChanged(key);
 
@@ -933,6 +944,10 @@ bool QnResource::removeProperty(const QString& key)
     }
 
     NX_ASSERT(!getId().isNull());
+    NX_EXPECT(commonModule());
+    if (!commonModule())
+        return false;
+
     commonModule()->propertyDictionary()->removeProperty(getId(), key);
     emitPropertyChanged(key);
 
@@ -963,16 +978,21 @@ ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
             result.push_back(ec2::ApiResourceParamData(itr->first, itr->second.value));
         return result;
     }
-    else
+    else if (auto module = commonModule())
     {
-        return commonModule()->propertyDictionary()->allProperties(getId());
+        return module->propertyDictionary()->allProperties(getId());
     }
+
+    return ec2::ApiResourceParamDataList();
 }
 
 ec2::ApiResourceParamDataList QnResource::getAllProperties() const
 {
     ec2::ApiResourceParamDataList result;
-    ec2::ApiResourceParamDataList runtimeProperties = commonModule()->propertyDictionary()->allProperties(getId());
+    ec2::ApiResourceParamDataList runtimeProperties;
+    if (auto module = commonModule())
+        runtimeProperties = module->propertyDictionary()->allProperties(getId());
+
     ParamTypeMap staticDefaultProperties;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
@@ -1239,13 +1259,24 @@ QnCommonModule* QnResource::commonModule() const
     return nullptr;
 }
 
+QString QnResource::idForToStringFromPtr() const
+{
+    return getId().toSimpleString();
+}
+
 bool QnResource::saveParams()
 {
-    return commonModule()->propertyDictionary()->saveParams(getId());
+    NX_EXPECT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParams(getId());
+    return false;
 }
 
 int QnResource::saveParamsAsync()
 {
-    return commonModule()->propertyDictionary()->saveParamsAsync(getId());
+    NX_EXPECT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParamsAsync(getId());
+    return false;
 }
 

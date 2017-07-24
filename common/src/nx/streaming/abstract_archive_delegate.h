@@ -7,7 +7,8 @@
 #include <QtCore/QSize>
 
 #include <core/resource/resource_fwd.h>
-#include "core/resource/resource_media_layout.h"
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/motion_window.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
 
@@ -95,6 +96,8 @@ public:
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) { Q_UNUSED(channel); return QnAbstractMotionArchiveConnectionPtr(); }
 
     virtual void setSendMotion(bool value) {Q_UNUSED(value); }
+
+    virtual void setMotionRegion(const QnMotionRegion& /*region*/) {};
 
     /** This function used for multi-view delegate to help connect different streams together (VMAX) */
     virtual void setGroupId(const QByteArray& groupId) { Q_UNUSED(groupId); }

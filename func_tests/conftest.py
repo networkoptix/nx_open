@@ -236,7 +236,7 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
         run_options.tests_config.physical_installation_host_list,
         )
     if run_options.reinstall:
-        pic.clean_all_installations()
+        pic.reset_all_installations()
     return pic
 
 @pytest.fixture

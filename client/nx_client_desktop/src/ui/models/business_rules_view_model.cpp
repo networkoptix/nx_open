@@ -61,8 +61,11 @@ int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
     return QnBusinessRuleViewModel::allColumns().size();
 }
 
-QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
+QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const
+{
     auto ruleModel = rule(index);
+    if (role == Qn::RuleModelRole)
+        return qVariantFromValue(ruleModel);
     return ruleModel
         ? ruleModel->data(Column(index.column()), role)
         : QVariant();

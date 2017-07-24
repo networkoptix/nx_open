@@ -8,6 +8,7 @@
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
+#include <media_server/serverutil.h>
 
 //#define REDUCE_NET_ISSUE_HACK
 
@@ -204,6 +205,64 @@ void EventConnector::at_noStorages(const QnResourcePtr& resource)
         QnSystemHealth::StoragesNotConfigured, resource->getId()));
     qnEventRuleProcessor->broadcastAction(action);
 }
+
+void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
+{
+    vms::event::SystemHealthActionPtr action(
+        new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
+void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
+{
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
+void EventConnector::at_remoteArchiveSyncError(
+    const QnResourcePtr &resource,
+    const QString& error)
+{
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncError,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    params.caption = error;
+    action->setRuntimeParams(params);
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
+void EventConnector::at_remoteArchiveSyncProgress(
+    const QnResourcePtr &resource,
+    double progress)
+{
+    NX_ASSERT(progress >= 0 && progress <= 1);
+
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncProgress,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
+    qDebug() << "Broadcasting sync progress business action";
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
+
 
 void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
     QnSystemHealth::MessageType msgType)

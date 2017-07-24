@@ -542,7 +542,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget->resource()->hasFlags(Qn::motion))
             continue;
-        if (!widget->zoomRect().isNull())
+        if (widget->isZoomWindow())
             continue;
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
@@ -1087,7 +1087,13 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     layout->addItem(data);
 }
 
-void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
+void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*view*/,
+    QnMediaResourceWidget* widget)
+{
+    NX_EXPECT(menu()->canTrigger(action::StartSmartSearchAction, widget));
+    if (!menu()->canTrigger(action::StartSmartSearchAction, widget))
+        return;
+
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
@@ -1424,7 +1430,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered()
         if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
-        if (!widget->zoomRect().isNull())
+        if (widget->isZoomWindow())
             continue;
 
         if(!(widget->options() & QnResourceWidget::DisplayMotion)) {

@@ -41,6 +41,7 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler) override;
+    virtual QString getRemotePeerName() const override;
 
     SocketAddress localAddress() const;
     void replaceOriginatingHostAddress(const QString& address);
@@ -68,6 +69,7 @@ private:
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     bool m_done;
     nx::hpm::api::ConnectionParameters m_connectionParameters;
+    QString m_remotePeerFullName;
     std::unique_ptr<aio::Timer> m_timer;
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
 

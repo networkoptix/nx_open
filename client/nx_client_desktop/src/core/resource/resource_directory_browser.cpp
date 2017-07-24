@@ -264,13 +264,16 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
         auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-        resourcePool->addResource(aviResource);
-        aviResource = resourcePool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
-        if (!aviResource)
-        {
-            qnWarning("ACHTUNG! Total mess up in exported layout loading!");
-            continue;
-        }
+        resourcePool->addResource(aviResource, /*instantly*/ true);
+
+        // Check if we have updated an existing resource.
+        auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
+            aviResource->getUniqueId());
+
+        NX_EXPECT(existingResource);
+        if (existingResource)
+            aviResource = existingResource;
+
         item.resource.id = aviResource->getId();
 
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)

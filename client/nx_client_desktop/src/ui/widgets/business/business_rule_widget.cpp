@@ -502,7 +502,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
                 {
                     // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
                     dialog.showAlert(dialogDelegate->validationMessage(
-                        dialog.totalCheckedUsers()));
+                        dialog.checkedSubjects()));
                 };
 
             connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);

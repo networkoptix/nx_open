@@ -129,6 +129,7 @@ std::atomic<size_t> DummyConnection::instanceCount(0);
 std::set<DummyConnection*> DummyConnection::instances;
 QnMutex DummyConnection::instanceSetMutex;
 
+static const QString kRemoteCloudPeerFullName("serverId.systemId");
 
 class DummyConnector:
     public AbstractCrossNatConnector
@@ -238,6 +239,11 @@ public:
         }
     }
 
+    virtual QString getRemotePeerName() const override
+    {
+        return kRemoteCloudPeerFullName;
+    }
+
     void setConnectionInvokedPromise(
         nx::utils::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
     {
@@ -303,13 +309,16 @@ public:
     struct ConnectionResult
     {
         SystemError::ErrorCode sysErrorCode;
+        TunnelAttributes tunnelAttributes;
         std::unique_ptr<AbstractStreamSocket> connection;
 
         ConnectionResult(
             SystemError::ErrorCode sysErrorCode,
+            TunnelAttributes tunnelAttributes,
             std::unique_ptr<AbstractStreamSocket> connection)
             :
             sysErrorCode(sysErrorCode),
+            tunnelAttributes(std::move(tunnelAttributes)),
             connection(std::move(connection))
         {
         }
@@ -404,11 +413,12 @@ protected:
                 SocketAttributes(),
                 [&connectionContext](
                     SystemError::ErrorCode errorCode,
+                    TunnelAttributes tunnelAttributes,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
                     connectionContext.endTime = steady_clock::now();
                     connectionContext.completionPromise.set_value(
-                        ConnectionResult(errorCode, std::move(socket)));
+                        ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
                 });
         }
     }
@@ -497,9 +507,11 @@ TEST_F(OutgoingTunnel, general)
                 SocketAttributes(),
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
+                    TunnelAttributes tunnelAttributes,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
+                    connectedPromise.set_value(
+                        ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
                 });
 
             const auto result = connectedPromise.get_future().get();
@@ -516,15 +528,20 @@ TEST_F(OutgoingTunnel, general)
                 else
                 {
                     ASSERT_EQ(SystemError::noError, result.sysErrorCode);
+                    ASSERT_EQ(kRemoteCloudPeerFullName, result.tunnelAttributes.remotePeerName);
                     ASSERT_NE(nullptr, result.connection);
                 }
             }
             else
             {
                 if (!connectorWillSucceed)
+                {
                     ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
+                }
                 else if (!connectionWillSucceed)
+                {
                     ASSERT_EQ(SystemError::connectionReset, result.sysErrorCode);
+                }
                 ASSERT_EQ(nullptr, result.connection);
             }
 
@@ -559,30 +576,29 @@ TEST_F(OutgoingTunnel, singleShotConnection)
                 singleShotConnection);
         });
 
-    for (int j = 0; j < 1000; ++j)
+    cloud::OutgoingTunnel tunnel(std::move(addressEntry));
+
+    for (int i = 0; i < connectionsToCreate; ++i)
     {
-        cloud::OutgoingTunnel tunnel(std::move(addressEntry));
+        ConnectionCompletedPromise connectedPromise;
+        tunnel.establishNewConnection(
+            SocketAttributes(),
+            [&connectedPromise](
+                SystemError::ErrorCode errorCode,
+                TunnelAttributes tunnelAttributes,
+                std::unique_ptr<AbstractStreamSocket> socket)
+            {
+                connectedPromise.set_value(
+                    ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
+            });
 
-        for (int i = 0; i < connectionsToCreate; ++i)
-        {
-            ConnectionCompletedPromise connectedPromise;
-            tunnel.establishNewConnection(
-                SocketAttributes(),
-                [&connectedPromise](
-                    SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> socket)
-                {
-                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
-                });
+        const auto result = connectedPromise.get_future().get();
 
-            const auto result = connectedPromise.get_future().get();
-
-            ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
-            ASSERT_EQ(nullptr, result.connection);
-        }
-
-        tunnel.pleaseStopSync();
+        ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
+        ASSERT_EQ(nullptr, result.connection);
     }
+
+    tunnel.pleaseStopSync();
 }
 
 TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
@@ -613,9 +629,11 @@ TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
             SocketAttributes(),
             [&connectedPromise](
                 SystemError::ErrorCode errorCode,
+                TunnelAttributes tunnelAttributes,
                 std::unique_ptr<AbstractStreamSocket> socket)
             {
-                connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
+                connectedPromise.set_value(
+                    ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
             });
     }
 
@@ -663,9 +681,11 @@ TEST_F(OutgoingTunnel, cancellation)
                 SocketAttributes(),
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
+                    TunnelAttributes tunnelAttributes,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
+                    connectedPromise.set_value(
+                        ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
                 });
 
             if (waitConnectionCompletion)
@@ -681,7 +701,9 @@ TEST_F(OutgoingTunnel, cancellation)
             tunnelStoppedPromise.get_future().wait();
 
             if (!waitConnectionCompletion)
+            {
                 ASSERT_TRUE(connectedPromise.get_future().valid());
+            }
         }
 }
 
@@ -730,11 +752,12 @@ TEST_F(OutgoingTunnel, connectTimeout2)
         SocketAttributes(),
         [&connectionContext](
             SystemError::ErrorCode errorCode,
+            TunnelAttributes tunnelAttributes,
             std::unique_ptr<AbstractStreamSocket> socket)
         {
             connectionContext.endTime = std::chrono::steady_clock::now();
             connectionContext.completionPromise.set_value(
-                ConnectionResult(errorCode, std::move(socket)));
+                ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
         });
 
     ASSERT_EQ(
@@ -786,10 +809,11 @@ TEST_F(OutgoingTunnel, pool)
             SocketAttributes(),
             [&connectionContext](
                 SystemError::ErrorCode errorCode,
+                TunnelAttributes tunnelAttributes,
                 std::unique_ptr<AbstractStreamSocket> socket)
             {
                 connectionContext.completionPromise.set_value(
-                    ConnectionResult(errorCode, std::move(socket)));
+                    ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
             });
     }
 
@@ -848,7 +872,10 @@ protected:
     {
         m_tunnel->establishNewConnection(
             SocketAttributes(),
-            [](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) {});
+            [](
+                SystemError::ErrorCode,
+                TunnelAttributes /*tunnelAttributes*/,
+                std::unique_ptr<AbstractStreamSocket>) {});
     }
 
     void whenTunnelConnectionHasBeenClosed()
@@ -873,7 +900,10 @@ private:
         nx::utils::promise<void> tunnelOpened;
         tunnel->establishNewConnection(
             SocketAttributes(),
-            [&tunnelOpened](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)
+            [&tunnelOpened](
+                SystemError::ErrorCode,
+                TunnelAttributes /*tunnelAttributes*/,
+                std::unique_ptr<AbstractStreamSocket>)
             {
                 tunnelOpened.set_value();
             });

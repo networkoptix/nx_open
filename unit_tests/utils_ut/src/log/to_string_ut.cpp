@@ -19,11 +19,11 @@ void assertToString(const T& value, const char* string)
 
 TEST(ToString, BuildIn)
 {
-    assertToString(1, "1");
-    assertToString(77777, "77777");
+    assertToString((int) 1, "1");
+    assertToString((uint) 77777, "77777");
 
-    assertToString(2.5, "2.5");
-    assertToString(12.34, "12.34");
+    assertToString((float) 2.5, "2.5");
+    assertToString((double) 12.34, "12.34");
 
     assertToString("hello", "hello");
     assertToString("hello world", "hello world");
@@ -143,6 +143,13 @@ void assertPtrToString(const char* pattern)
 struct CustomBase { virtual ~CustomBase() = default; };
 struct CustomInheritor: CustomBase {};
 
+struct CustomInt
+{
+    int i = 0;
+    CustomInt(int i = 0): i(i) {}
+    QString idForToStringFromPtr() const { return toString(i); }
+};
+
 TEST(ToString, Pointers)
 {
     std::string data("data");
@@ -159,8 +166,13 @@ TEST(ToString, Pointers)
     std::unique_ptr<CustomBase> inheritorBase(new CustomInheritor);
     std::unique_ptr<CustomInheritor> inheritor(new CustomInheritor);
     assertToStringPattern(base, "nx::utils::test::CustomBase(0x*)");
-    assertToStringPattern(inheritorBase, "nx::utils::test::CustomBase(0x*)");
+    assertToStringPattern(inheritorBase, "nx::utils::test::CustomInheritor(0x*)");
     assertToStringPattern(inheritor, "nx::utils::test::CustomInheritor(0x*)");
+
+    std::unique_ptr<CustomInt> int0(new CustomInt);
+    std::unique_ptr<CustomInt> int777(new CustomInt{777});
+    assertToStringPattern(int0, "nx::utils::test::CustomInt(0x*, 0)");
+    assertToStringPattern(int777, "nx::utils::test::CustomInt(0x*, 777)");
 }
 
 template<typename T>

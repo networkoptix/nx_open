@@ -15,7 +15,7 @@ class QnTransactionTransport
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
-        QnTransactionMessageBusBase* bus,
+        TransactionMessageBusBase* bus,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -27,7 +27,7 @@ public:
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
     QnTransactionTransport(
-        QnTransactionMessageBusBase* bus,
+        TransactionMessageBusBase* bus,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer);
     ~QnTransactionTransport();
@@ -119,19 +119,19 @@ public:
         {
         case Qn::JsonFormat:
             if (remotePeer().peerType == Qn::PT_OldMobileClient)
-                addData(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
             else
-                addData(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
             //case Qn::BnsFormat:
-            //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            //    addDataToTheSendQueue(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             //    break;
         case Qn::UbjsonFormat:
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
         default:
             qWarning() << "Client has requested data in an unsupported format" << remotePeer().dataFormat;
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }
@@ -141,7 +141,7 @@ protected:
         bool authByKey) override;
 
 private:
-    QnTransactionMessageBusBase* m_bus;
+    TransactionMessageBusBase* m_bus;
     const Qn::UserAccessData m_userAccessData;
     std::function<void()> m_beforeDestructionHandler;
 };

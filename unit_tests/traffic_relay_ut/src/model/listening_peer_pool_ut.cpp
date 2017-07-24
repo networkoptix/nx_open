@@ -7,6 +7,7 @@
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -14,7 +15,6 @@
 #include <settings.h>
 
 #include "../settings_loader.h"
-#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
@@ -39,6 +39,11 @@ public:
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
     }
 
+    ~ListeningPeerPool()
+    {
+        m_pool.reset();
+    }
+
 protected:
     void addArg(const std::string& name, const std::string& value)
     {
@@ -52,7 +57,7 @@ protected:
 
     void addConnection(const std::string& peerName)
     {
-        auto connection = std::make_unique<relay::test::StreamSocketStub>();
+        auto connection = std::make_unique<network::test::StreamSocketStub>();
         connection->setPostDelay(m_connectionPostDelay);
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
@@ -64,6 +69,7 @@ protected:
     void givenConnectionFromPeer()
     {
         addConnection(m_peerName);
+        m_peerConnectedEvents.pop();
     }
 
     void givenListeningPeerWhoseConnectionsHaveBeenTaken()
@@ -71,6 +77,12 @@ protected:
         givenConnectionFromPeer();
         whenRequestedConnection();
         thenConnectionHasBeenProvided();
+    }
+
+    void givenPeerWithMultipleConnections()
+    {
+        for (int i= 0; i < 3; ++i)
+            addConnection(m_peerName);
     }
 
     void whenPeerHasEstablshedNewConnection()
@@ -104,15 +116,21 @@ protected:
         m_poolHasBeenDestroyed = true;
     }
 
-    void whenAddedConnectionToThePool()
+    void whenAddConnectionToThePool()
     {
         addConnection(m_peerName);
     }
 
     void whenCloseAllConnections()
     {
-        for (int i = 0; i < m_peerConnections.size(); ++i)
+        for (std::size_t i = 0; i < m_peerConnections.size(); ++i)
             m_peerConnections[i]->setConnectionToClosedState();
+    }
+
+    void whenTakenConnectionFromPeer()
+    {
+        whenRequestedConnection();
+        thenConnectionHasBeenProvided();
     }
 
     void assertConnectionHasBeenAdded()
@@ -130,7 +148,7 @@ protected:
         ASSERT_FALSE(pool().isPeerOnline(m_peerName));
     }
 
-    void waitForPeerToBecomeOffline()
+    void thenPeerBecomesOffline()
     {
         while (pool().isPeerOnline(m_peerName))
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -181,6 +199,26 @@ protected:
             *keepAliveOptions);
     }
 
+    void thenPeerConnectedEventHasBeenRaised()
+    {
+        ASSERT_EQ(m_peerName, m_peerConnectedEvents.pop());
+    }
+
+    void thenPeerConnectedEventHasNotBeenRaised()
+    {
+        ASSERT_TRUE(m_peerConnectedEvents.isEmpty());
+    }
+
+    void thenPeerDisconnectedEventHasBeenRaised()
+    {
+        ASSERT_EQ(m_peerName, m_peerDisconnectedEvents.pop());
+    }
+
+    void thenPeerDisconnectedEventHasNotBeenRaised()
+    {
+        ASSERT_TRUE(m_peerDisconnectedEvents.isEmpty());
+    }
+
     const model::ListeningPeerPool& pool() const
     {
         if (!m_pool)
@@ -215,11 +253,13 @@ private:
     std::unique_ptr<model::ListeningPeerPool> m_pool;
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
-    relay::test::StreamSocketStub* m_peerConnection;
-    std::vector<relay::test::StreamSocketStub*> m_peerConnections;
+    network::test::StreamSocketStub* m_peerConnection;
+    std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     SettingsLoader m_settingsLoader;
     boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
+    nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
+    nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -232,9 +272,20 @@ private:
 
     void initializePool()
     {
+        using namespace std::placeholders;
+
         m_settingsLoader.load();
         m_pool = std::make_unique<model::ListeningPeerPool>(
             m_settingsLoader.settings());
+
+        nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
+        m_pool->peerConnectedSubscription().subscribe(
+            std::bind(&nx::utils::SyncQueue<std::string>::push, &m_peerConnectedEvents, _1),
+            &subscriptionId);
+
+        m_pool->peerDisconnectedSubscription().subscribe(
+            std::bind(&nx::utils::SyncQueue<std::string>::push, &m_peerDisconnectedEvents, _1),
+            &subscriptionId);
     }
 };
 
@@ -275,7 +326,7 @@ TEST_F(
     peer_without_idle_connections_becomes_offline_when_timeout_passes)
 {
     givenListeningPeerWhoseConnectionsHaveBeenTaken();
-    waitForPeerToBecomeOffline();
+    thenPeerBecomesOffline();
 }
 
 TEST_F(ListeningPeerPool, get_idle_connection)
@@ -338,7 +389,7 @@ TEST_F(
 
 TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
 {
-    whenAddedConnectionToThePool();
+    whenAddConnectionToThePool();
     thenKeepAliveHasBeenEnabledOnConnection();
 }
 
@@ -352,6 +403,32 @@ TEST_F(ListeningPeerPool, connection_closed_simultaneously_with_take_request)
     whenCloseAllConnections();
 
     thenConnectRequestHasCompleted();
+}
+
+TEST_F(ListeningPeerPool, event_peer_connected_reported)
+{
+    whenAddConnectionToThePool();
+    thenPeerConnectedEventHasBeenRaised();
+}
+
+TEST_F(ListeningPeerPool, event_peer_connected_not_reported_on_adding_subsequent_connection)
+{
+    givenConnectionFromPeer();
+    whenAddConnectionToThePool();
+    thenPeerConnectedEventHasNotBeenRaised();
+}
+
+TEST_F(ListeningPeerPool, event_peer_disconnected_reported)
+{
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+    thenPeerDisconnectedEventHasBeenRaised();
+}
+
+TEST_F(ListeningPeerPool, event_peer_disconnected_not_reported_on_taking_last_connection)
+{
+    givenPeerWithMultipleConnections();
+    whenTakenConnectionFromPeer();
+    thenPeerDisconnectedEventHasNotBeenRaised();
 }
 
 //-------------------------------------------------------------------------------------------------

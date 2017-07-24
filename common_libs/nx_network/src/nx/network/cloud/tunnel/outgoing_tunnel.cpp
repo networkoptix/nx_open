@@ -104,7 +104,7 @@ void OutgoingTunnel::establishNewConnection(
             post(
                 [handlerIter, this]
                 {
-                    handlerIter->second.handler(m_lastErrorCode, nullptr);
+                    handlerIter->second.handler(m_lastErrorCode, TunnelAttributes(), nullptr);
                     QnMutexLocker lk(&m_mutex);
                     m_connectHandlers.erase(handlerIter);
                 });
@@ -113,23 +113,12 @@ void OutgoingTunnel::establishNewConnection(
 
         case State::init:
             startAsyncTunnelConnect(&lk);
+            postponeConnectTask(timeout, std::move(socketAttributes), std::move(handler));
+            break;
 
         case State::connecting:
-        {
-            // Saving handler for later use.
-            const auto timeoutTimePoint =
-                timeout > std::chrono::milliseconds::zero()
-                ? std::chrono::steady_clock::now() + timeout
-                : std::chrono::steady_clock::time_point::max();
-            ConnectionRequestData data;
-            data.socketAttributes = std::move(socketAttributes);
-            data.timeout = timeout;
-            data.handler = std::move(handler);
-            m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
-
-            post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
+            postponeConnectTask(timeout, std::move(socketAttributes), std::move(handler));
             break;
-        }
 
         default:
             NX_ASSERT(
@@ -167,6 +156,24 @@ QString OutgoingTunnel::stateToString(State state)
     }
 
     return lm("unknown(%1)").arg(static_cast<int>(state));
+}
+
+void OutgoingTunnel::postponeConnectTask(
+    std::chrono::milliseconds timeout,
+    SocketAttributes socketAttributes,
+    NewConnectionHandler handler)
+{
+    const auto timeoutTimePoint =
+        timeout > std::chrono::milliseconds::zero()
+            ? std::chrono::steady_clock::now() + timeout
+            : std::chrono::steady_clock::time_point::max();
+    ConnectionRequestData data;
+    data.socketAttributes = std::move(socketAttributes);
+    data.timeout = timeout;
+    data.handler = std::move(handler);
+    m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
+
+    post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
 }
 
 void OutgoingTunnel::updateTimerIfNeeded()
@@ -222,9 +229,12 @@ void OutgoingTunnel::onTimer()
     lk.unlock();
     //triggering timedout operations
     for (const auto& connectOperationContext: timedoutConnectOperations)
+    {
         connectOperationContext.handler(
             SystemError::timedOut,
+            TunnelAttributes(),
             std::unique_ptr<AbstractStreamSocket>());
+    }
 }
 
 void OutgoingTunnel::onConnectFinished(
@@ -233,7 +243,7 @@ void OutgoingTunnel::onConnectFinished(
     std::unique_ptr<AbstractStreamSocket> socket,
     bool stillValid)
 {
-    handler(code, std::move(socket));
+    handler(code, m_attributes, std::move(socket));
     if (code != SystemError::noError || !stillValid)
         onTunnelClosed(stillValid ? code : SystemError::connectionReset);
 }
@@ -273,6 +283,8 @@ void OutgoingTunnel::onConnectorFinished(
 {
     QnMutexLocker lk(&m_mutex);
 
+    m_attributes.remotePeerName = m_connector->getRemotePeerName();
+
     NX_ASSERT(!m_connection);
     m_connector.reset();
 
@@ -289,7 +301,7 @@ void OutgoingTunnel::onConnectorFinished(
     m_lastErrorCode = errorCode;
     lk.unlock();
     for (auto& connectRequest: connectHandlers)
-        connectRequest.second.handler(errorCode, nullptr);
+        connectRequest.second.handler(errorCode, TunnelAttributes(), nullptr);
     // Reporting tunnel failure.
     onTunnelClosed(errorCode);
 }

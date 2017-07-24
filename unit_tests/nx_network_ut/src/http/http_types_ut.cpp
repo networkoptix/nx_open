@@ -650,7 +650,9 @@ protected:
         Server headerToParse;
         ASSERT_EQ(isValid, headerToParse.parse(serializedValue));
         if (isValid)
+        {
             ASSERT_EQ(serverHeader, headerToParse);
+        }
     }
 
     void testSerialization(

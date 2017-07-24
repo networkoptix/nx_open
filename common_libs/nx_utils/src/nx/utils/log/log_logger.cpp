@@ -15,9 +15,9 @@ namespace nx {
 namespace utils {
 namespace log {
 
-Logger::Logger(Level level, std::unique_ptr<AbstractWriter> writer):
+Logger::Logger(Level defaultLevel, std::unique_ptr<AbstractWriter> writer):
     m_mutex(QnMutex::Recursive),
-    m_defaultLevel(level)
+    m_defaultLevel(defaultLevel)
 {
     if (writer)
         m_writers.push_back(std::move(writer));
@@ -53,14 +53,14 @@ void Logger::logForced(Level level, const QString& tag, const QString& message)
 bool Logger::isToBeLogged(Level level, const QString& tag)
 {
     QnMutexLocker lock(&m_mutex);
-    if (static_cast<int>(level) <= static_cast<int>(m_defaultLevel))
-        return true;
-
-    for (const auto& filter: m_exceptionFilters)
+    for (const auto& filter: m_levelFilters)
     {
-        if (tag.startsWith(filter))
-            return true;
+        if (tag.startsWith(filter.first))
+            return level <= filter.second;
     }
+
+    if (level <= m_defaultLevel)
+        return true;
 
     return false;
 }
@@ -77,16 +77,16 @@ void Logger::setDefaultLevel(Level level)
     m_defaultLevel = level;
 }
 
-std::set<QString> Logger::exceptionFilters() const
+LevelFilters Logger::levelFilters() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_exceptionFilters;
+    return m_levelFilters;
 }
 
-void Logger::setExceptionFilters(std::set<QString> filters)
+void Logger::setLevelFilters(LevelFilters filters)
 {
     QnMutexLocker lock(&m_mutex);
-    m_exceptionFilters = std::move(filters);
+    m_levelFilters = std::move(filters);
 }
 
 void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)

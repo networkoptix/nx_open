@@ -154,6 +154,13 @@ private:
         const char* handlerPath,
         typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
         ManagerType* manager);
+
+    template<typename ManagerType>
+    void registerHttpHandler(
+        nx_http::Method::ValueType method,
+        const char* handlerPath,
+        typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+        ManagerType* manager);
 };
 
 } // namespace cdb

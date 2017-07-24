@@ -142,12 +142,32 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
             [this](const vms::event::AbstractActionPtr& businessAction)
             {
                 vms::event::EventType eventType = businessAction->getRuntimeParams().eventType;
-                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent) {
+                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent) 
+                {
                     QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - vms::event::systemHealthEvent);
-                    if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
+                    if (healthMessage == QnSystemHealth::ArchiveRebuildFinished
+                        || healthMessage == QnSystemHealth::ArchiveFastScanFinished
+                        || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                        || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                     {
-                        auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
-                        for (const auto &cameraId : cameras)
+                        auto eventParams = businessAction->getRuntimeParams();
+                        std::vector<QnUuid> cameras;
+
+                        if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                            || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
+                        {
+                            if (eventParams.metadata.cameraRefs.empty())
+                                return;
+
+                            cameras = eventParams.metadata.cameraRefs;
+                        }
+                        else
+                        {
+                            cameras = getServerFootageData(eventParams.eventResourceId);
+                        }
+                        
+
+                        for (const auto &cameraId: cameras)
                             invalidateCameraHistory(cameraId);
 
                         for (const auto &cameraId : cameras)
