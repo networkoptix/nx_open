@@ -135,7 +135,7 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" STREQUAL "arm")
+    if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
     add_compile_options(
@@ -145,6 +145,7 @@ if(LINUX)
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
+    # TODO: #dmishin ask #dklychkov about this condition.
     if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()

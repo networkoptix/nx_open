@@ -58,6 +58,12 @@ function(detect_package_versions)
         set(_openssl_version "1.0.1f")
         set(_quazip_version "0.7.2")
     endif()
+    
+    if(box STREQUAL "tx1")
+        set(_festival_version "2.1x")
+        set(_openssl_version "1.0.0j")
+        set(_quazip_version "0.7")
+    endif()
 
     set(qt_version ${_qt_version} CACHE STRING "")
     set(boost_version ${_boost_version} CACHE STRING "")
