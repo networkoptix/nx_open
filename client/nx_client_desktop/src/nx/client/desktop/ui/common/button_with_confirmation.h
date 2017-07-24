@@ -9,8 +9,8 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-// A button that switches into non-interactive confirmation state with different text and icon
-// for a short duration after being clicked, then animates back to normal state.
+// A flat button that switches into non-interactive confirmation state with different text
+// and icon for a short duration after being clicked, then animates back to normal state.
 class ButtonWithConfirmation: public QPushButton
 {
     Q_OBJECT

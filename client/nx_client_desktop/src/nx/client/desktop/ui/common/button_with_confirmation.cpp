@@ -49,6 +49,8 @@ ButtonWithConfirmation::ButtonWithConfirmation(QWidget* parent):
     base_type(parent),
     m_d(new Private())
 {
+    setFlat(true);
+
     m_d->opacityEffect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(m_d->opacityEffect);
 

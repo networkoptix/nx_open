@@ -1,5 +1,6 @@
 #include "clipboard_button.h"
 
+#include <nx/utils/log/assert.h>
 #include <ui/style/skin.h>
 
 namespace nx {
@@ -68,7 +69,6 @@ ClipboardButton::ClipboardButton(
         confirmationText,
         parent)
 {
-    setFlat(true);
 }
 
 } // namespace ui
