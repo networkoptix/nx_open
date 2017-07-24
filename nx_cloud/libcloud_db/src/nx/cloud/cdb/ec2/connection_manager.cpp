@@ -725,6 +725,7 @@ void ConnectionManager::onHttpConnectionUpgraded(
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
         connection->takeSocket());
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
+        m_transactionLog,
         std::move(webSocket));
 
     nx::String systemId;

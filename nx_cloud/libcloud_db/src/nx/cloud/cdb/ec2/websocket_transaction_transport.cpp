@@ -5,6 +5,7 @@ namespace cdb {
 namespace ec2 {
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
+    TransactionLog* const /*transactionLog*/,
     std::unique_ptr<network::websocket::WebSocket> webSocket)
     :
     m_webSocket(std::move(webSocket))
