@@ -12,6 +12,8 @@ namespace p2p {
 class MessageBus;
 class P2pConnectionProcessorPrivate;
 
+ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request);
+
 class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
@@ -30,7 +32,6 @@ private:
     QByteArray responseBody(Qn::SerializationFormat dataFormat);
     bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
     bool isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const;
-    ec2::ApiPeerDataEx deserializeRemotePeerInfo();
     Qn::UserAccessData userAccessData(const ec2::ApiPeerDataEx& remotePeer) const;
 };
 

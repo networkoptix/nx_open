@@ -6,9 +6,13 @@ namespace ec2 {
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
     TransactionLog* const /*transactionLog*/,
-    std::unique_ptr<network::websocket::WebSocket> webSocket)
+    std::unique_ptr<network::websocket::WebSocket> webSocket,
+    ::ec2::ApiPeerData localPeerData,
+    ::ec2::ApiPeerDataEx remotePeerData)
     :
-    m_webSocket(std::move(webSocket))
+    m_webSocket(std::move(webSocket)),
+    m_localPeerData(std::move(localPeerData)),
+    m_remotePeerData(std::move(remotePeerData))
 {
 }
 

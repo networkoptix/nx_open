@@ -6,6 +6,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <http/p2p_connection_listener.h>
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
@@ -166,17 +167,18 @@ void ConnectionManager::createTransactionConnection(
 void ConnectionManager::createWebsocketTransactionConnection(
     nx_http::HttpServerConnection* const /*connection*/,
     nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx_http::Request /*request*/,
+    nx_http::Request request,
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
 
-    // TODO: Reading connection attributes from request.
+    auto remotePeerInfo = nx::p2p::deserializeRemotePeerInfo(request);
 
     nx_http::RequestResult result(nx_http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectionManager::onHttpConnectionUpgraded, this, _1);
+        std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
+            _1, std::move(remotePeerInfo));
     completionHandler(std::move(result));
 }
 
@@ -717,7 +719,8 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
 }
 
 void ConnectionManager::onHttpConnectionUpgraded(
-    nx_http::HttpServerConnection* connection)
+    nx_http::HttpServerConnection* connection,
+    ::ec2::ApiPeerDataEx remotePeerInfo)
 {
     // TODO
 
@@ -726,7 +729,9 @@ void ConnectionManager::onHttpConnectionUpgraded(
         connection->takeSocket());
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         m_transactionLog,
-        std::move(webSocket));
+        std::move(webSocket),
+        m_localPeerData,
+        remotePeerInfo);
 
     nx::String systemId;
     nx::String remotePeerId;
