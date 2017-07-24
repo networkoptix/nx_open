@@ -898,7 +898,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <festival.version>2.1x-SNAPSHOT</festival.version>
+                <festival.version>2.1x</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -950,7 +950,6 @@
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
-                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
