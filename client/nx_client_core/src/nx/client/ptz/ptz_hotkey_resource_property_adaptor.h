@@ -8,10 +8,10 @@ namespace client {
 namespace core {
 namespace ptz {
 
-class PtzHotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<QnHotkeyPtzHash>
+class PtzHotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<QnPtzIdByHotkeyHash>
 {
     Q_OBJECT
-    using base_type = QnJsonResourcePropertyAdaptor<QnHotkeyPtzHash>;
+    using base_type = QnJsonResourcePropertyAdaptor<QnPtzIdByHotkeyHash>;
 
 public:
     PtzHotkeysResourcePropertyAdaptor(QObject* parent = nullptr);

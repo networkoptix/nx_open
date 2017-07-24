@@ -12,7 +12,7 @@ namespace core {
 namespace ptz {
 
 PtzHotkeysResourcePropertyAdaptor::PtzHotkeysResourcePropertyAdaptor(QObject* parent):
-    base_type(kNamePtzHotkeys, QnHotkeyPtzHash(), parent)
+    base_type(kNamePtzHotkeys, QnPtzIdByHotkeyHash(), parent)
 {
 }
 

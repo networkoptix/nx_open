@@ -17,8 +17,8 @@
 class QnAbstractPtzHotkeyDelegate {
 public:
     virtual ~QnAbstractPtzHotkeyDelegate() {}
-    virtual QnHotkeyPtzHash hotkeys() const = 0;
-    virtual void updateHotkeys(const QnHotkeyPtzHash &value) = 0;
+    virtual QnPtzIdByHotkeyHash hotkeys() const = 0;
+    virtual void updateHotkeys(const QnPtzIdByHotkeyHash &value) = 0;
 };
 
 class QnAbstractPtzDialog : public QnSessionAwareButtonBoxDialog {

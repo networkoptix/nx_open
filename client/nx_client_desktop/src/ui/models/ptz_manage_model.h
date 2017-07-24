@@ -122,8 +122,8 @@ public:
     void addPreset();
     void removePreset(const QString &id);
 
-    const QnHotkeyPtzHash& hotkeys() const;
-    void setHotkeys(const QnHotkeyPtzHash & hotkeys);
+    const QnPtzIdByHotkeyHash& hotkeys() const;
+    void setHotkeys(const QnPtzIdByHotkeyHash & hotkeys);
 
     const QString homePosition() const;
     void setHomePosition(const QString &homePosition);
@@ -190,7 +190,7 @@ private:
     QList<QnPtzTourItemModel> m_tours;
     QStringList m_removedTours;
 
-    QnHotkeyPtzHash m_hotkeys;
+    QnPtzIdByHotkeyHash m_hotkeys;
     QString m_homePosition;
     bool m_homePositionChanged;
 

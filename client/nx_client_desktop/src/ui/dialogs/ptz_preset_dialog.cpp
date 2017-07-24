@@ -39,7 +39,7 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
         hotkeys.push_back(i);
     hotkeys.push_back(0);
 
-    QnHotkeyPtzHash usedHotkeys = m_hotkeysDelegate->hotkeys();
+    QnPtzIdByHotkeyHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
         int key = usedHotkeys.key(preset.id, QnPtzHotkey::kNoHotkey);
         if (key == QnPtzHotkey::kNoHotkey)
@@ -68,7 +68,7 @@ void QnPtzPresetDialog::saveData() {
     if (!m_hotkeysDelegate || hotkey() < 0)
         return;
 
-    QnHotkeyPtzHash hotkeys = m_hotkeysDelegate->hotkeys();
+    QnPtzIdByHotkeyHash hotkeys = m_hotkeysDelegate->hotkeys();
     hotkeys[hotkey()] = presetId;
     m_hotkeysDelegate->updateHotkeys(hotkeys);
     return;

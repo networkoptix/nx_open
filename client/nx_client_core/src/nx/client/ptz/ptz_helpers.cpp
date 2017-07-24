@@ -45,7 +45,7 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
     const auto getPtzPresetName =
         [presetIdHotkeyHash](const QnPtzPreset& preset) -> QString
         {
-            const auto it =  presetIdHotkeyHash. find(preset.id);
+            const auto it = presetIdHotkeyHash. find(preset.id);
             if (it == presetIdHotkeyHash.end())
                 return preset.name;
 
@@ -53,7 +53,7 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
         };
 
     std::sort(presets.begin(), presets.end(),
-        [getPtzPresetName](const QnPtzPreset &left, const QnPtzPreset &right)
+        [getPtzPresetName](const QnPtzPreset& left, const QnPtzPreset& right)
         {
             return nx::utils::naturalStringLess(
                 getPtzPresetName(left),

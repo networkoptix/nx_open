@@ -142,7 +142,7 @@ void QnPtzManageModel::removePreset(const QString &id) {
     updatePresetsCache();
 }
 
-void QnPtzManageModel::setHotkeys(const QnHotkeyPtzHash &hotkeys) {
+void QnPtzManageModel::setHotkeys(const QnPtzIdByHotkeyHash &hotkeys) {
     if (m_hotkeys == hotkeys)
         return;
     m_hotkeys = hotkeys;
@@ -150,7 +150,7 @@ void QnPtzManageModel::setHotkeys(const QnHotkeyPtzHash &hotkeys) {
     emit dataChanged(index(0, HotkeyColumn), index(rowCount(), HotkeyColumn));
 }
 
-const QnHotkeyPtzHash& QnPtzManageModel::hotkeys() const {
+const QnPtzIdByHotkeyHash& QnPtzManageModel::hotkeys() const {
     return m_hotkeys;
 }
 

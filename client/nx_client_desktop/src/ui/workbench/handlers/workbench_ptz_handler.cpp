@@ -48,15 +48,15 @@ public:
         QnWorkbenchContextAware(context),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
-        m_propertyHandler(new QnJsonResourcePropertyHandler<QnHotkeyPtzHash>())
+        m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>())
     {
     }
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
-    virtual QnHotkeyPtzHash hotkeys() const override
+    virtual QnPtzIdByHotkeyHash hotkeys() const override
     {
-        QnHotkeyPtzHash result;
+        QnPtzIdByHotkeyHash result;
 
         if (!m_camera)
             return result;
@@ -71,7 +71,7 @@ public:
         return result;
     }
 
-    virtual void updateHotkeys(const QnHotkeyPtzHash &value) override
+    virtual void updateHotkeys(const QnPtzIdByHotkeyHash &value) override
     {
         if (!m_camera)
             return;
@@ -90,7 +90,7 @@ public:
 private:
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
-    std::unique_ptr<QnJsonResourcePropertyHandler<QnHotkeyPtzHash>> m_propertyHandler;
+    std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
     mutable QnMutex m_mutex;
 };
 

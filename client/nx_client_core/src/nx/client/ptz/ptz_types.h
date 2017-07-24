@@ -15,7 +15,7 @@ struct QnPtzHotkey
     int hotkey;
 };
 
-using QnHotkeyPtzHash = QHash<int, QString>;
+using QnPtzIdByHotkeyHash = QHash<int, QString>;
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
 
-bool deserialize(const QString& value, QnHotkeyPtzHash* target);
+bool deserialize(const QString& value, QnPtzIdByHotkeyHash* target);

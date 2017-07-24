@@ -120,7 +120,7 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         return result;
 
     QnPtzPresetList presets;
-    // In case of error empty list will be returned
+    // In case of error empty list will be returned.
     nx::client::core::ptz::helpers::getSortedPresets(widget->ptzController(), presets);
 
     QnPtzTourList tours;
@@ -137,7 +137,7 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
 
     nx::client::core::ptz::PtzHotkeysResourcePropertyAdaptor adaptor;
     adaptor.setResource(widget->resource()->toResourcePtr());
-    QnHotkeyPtzHash idByHotkey = adaptor.value();
+    QnPtzIdByHotkeyHash idByHotkey = adaptor.value();
 
     for (const auto& preset: presets)
     {
