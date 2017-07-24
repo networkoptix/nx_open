@@ -20,6 +20,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx/client/ptz/ptz_helpers.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -118,17 +120,14 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         return result;
 
     QnPtzPresetList presets;
+    // In case of error empty list will be returned
+    nx::client::core::ptz::helpers::getSortedPresets(widget->ptzController(), presets);
+
     QnPtzTourList tours;
     QnPtzObject activeObject;
-    widget->ptzController()->getPresets(&presets);
+
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
-
-    std::sort(presets.begin(), presets.end(),
-        [](const QnPtzPreset& l, const QnPtzPreset& r)
-        {
-            return nx::utils::naturalStringLess(l.name, r.name);
-        });
 
     std::sort(tours.begin(), tours.end(),
         [](const QnPtzTour& l, const QnPtzTour& r)
@@ -136,9 +135,9 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
             return nx::utils::naturalStringLess(l.name, r.name);
         });
 
-    QnPtzHotkeysResourcePropertyAdaptor adaptor;
+    nx::client::core::ptz::PtzHotkeysResourcePropertyAdaptor adaptor;
     adaptor.setResource(widget->resource()->toResourcePtr());
-    QnPtzHotkeyHash idByHotkey = adaptor.value();
+    QnHotkeyPtzHash idByHotkey = adaptor.value();
 
     for (const auto& preset: presets)
     {
@@ -148,8 +147,8 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         else
             action->setText(preset.name);
 
-        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
-        if (hotkey != QnPtzHotkey::NoHotkey)
+        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::kNoHotkey);
+        if (hotkey != QnPtzHotkey::kNoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
         connect(action, &QAction::triggered, this,
@@ -180,8 +179,8 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         else
             action->setText(tour.name);
 
-        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
-        if (hotkey != QnPtzHotkey::NoHotkey)
+        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::kNoHotkey);
+        if (hotkey != QnPtzHotkey::kNoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
         connect(action, &QAction::triggered, this,

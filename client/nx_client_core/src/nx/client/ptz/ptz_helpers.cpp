@@ -2,6 +2,7 @@
 
 #include <nx/utils/string.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 
 namespace nx {
 namespace client {
@@ -9,29 +10,54 @@ namespace core {
 namespace ptz {
 namespace helpers {
 
-QnPtzPresetList getSortedPresets(const QnAbstractPtzController* controller)
+bool getSortedPresets(const QnAbstractPtzController* controller, QnPtzPresetList& presets)
 {
     if (!controller)
-        return QnPtzPresetList();
+        return false;
 
-    QnPtzPresetList presets;
     if (!controller->getPresets(&presets))
-        return QnPtzPresetList();
+        return false;
 
-    return sortedPresets(presets);
+    presets = sortedPresets(controller->resource(), presets);
+    return true;
 }
 
-QnPtzPresetList getSortedPresets(const QnPtzControllerPtr& controller)
+bool getSortedPresets(const QnPtzControllerPtr& controller, QnPtzPresetList& presets)
 {
-    return getSortedPresets(controller.data());
+    return getSortedPresets(controller.data(), presets);
 }
 
-QnPtzPresetList sortedPresets(QnPtzPresetList presets)
+QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList presets)
 {
-    std::sort(presets.begin(), presets.end(),
-        [](const QnPtzPreset &l, const QnPtzPreset &r)
+    PtzHotkeysResourcePropertyAdaptor adaptor;
+    adaptor.setResource(resource);
+
+    const auto presetIdHotkeyHash =
+        [&adaptor]()
         {
-            return nx::utils::naturalStringLess(l.name, r.name);
+            QHash<QString, int> result;
+            const auto hotkeyPresetIdHash = adaptor.value();
+            for (auto hotkey: hotkeyPresetIdHash.keys())
+                result.insert(hotkeyPresetIdHash.value(hotkey), hotkey);
+            return result;
+        }();
+
+    const auto getPtzPresetName =
+        [presetIdHotkeyHash](const QnPtzPreset& preset) -> QString
+        {
+            const auto it =  presetIdHotkeyHash. find(preset.id);
+            if (it == presetIdHotkeyHash.end())
+                return preset.name;
+
+            return QString::number(it.value()) + preset.name;
+        };
+
+    std::sort(presets.begin(), presets.end(),
+        [getPtzPresetName](const QnPtzPreset &left, const QnPtzPreset &right)
+        {
+            return nx::utils::naturalStringLess(
+                getPtzPresetName(left),
+                getPtzPresetName(right));
         });
 
     return presets;

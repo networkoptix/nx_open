@@ -39,22 +39,22 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
         hotkeys.push_back(i);
     hotkeys.push_back(0);
 
-    QnPtzHotkeyHash usedHotkeys = m_hotkeysDelegate->hotkeys();
+    QnHotkeyPtzHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
-        int key = usedHotkeys.key(preset.id, QnPtzHotkey::NoHotkey);
-        if (key == QnPtzHotkey::NoHotkey)
+        int key = usedHotkeys.key(preset.id, QnPtzHotkey::kNoHotkey);
+        if (key == QnPtzHotkey::kNoHotkey)
             continue;
         hotkeys.removeOne(key);
     }
     foreach (const QnPtzTour &tour, data.tours) {
-        int key = usedHotkeys.key(tour.id, QnPtzHotkey::NoHotkey);
-        if (key == QnPtzHotkey::NoHotkey)
+        int key = usedHotkeys.key(tour.id, QnPtzHotkey::kNoHotkey);
+        if (key == QnPtzHotkey::kNoHotkey)
             continue;
         hotkeys.removeOne(key);
     }
 
     ui->hotkeyComboBox->clear();
-    ui->hotkeyComboBox->addItem(tr("None"), QnPtzHotkey::NoHotkey);
+    ui->hotkeyComboBox->addItem(tr("None"), QnPtzHotkey::kNoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
     setHotkey(hotkeys.isEmpty() ? -1 : hotkeys.first());
@@ -68,7 +68,7 @@ void QnPtzPresetDialog::saveData() {
     if (!m_hotkeysDelegate || hotkey() < 0)
         return;
 
-    QnPtzHotkeyHash hotkeys = m_hotkeysDelegate->hotkeys();
+    QnHotkeyPtzHash hotkeys = m_hotkeysDelegate->hotkeys();
     hotkeys[hotkey()] = presetId;
     m_hotkeysDelegate->updateHotkeys(hotkeys);
     return;
@@ -97,7 +97,7 @@ int QnPtzPresetDialog::hotkey() const {
 void QnPtzPresetDialog::setHotkey(int hotkey) {
     int index = ui->hotkeyComboBox->findData(hotkey);
     if(index < 0)
-        index = ui->hotkeyComboBox->findData(QnPtzHotkey::NoHotkey);
+        index = ui->hotkeyComboBox->findData(QnPtzHotkey::kNoHotkey);
     ui->hotkeyComboBox->setCurrentIndex(index);
 }
 
