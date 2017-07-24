@@ -164,10 +164,10 @@ void ConnectionManager::createTransactionConnection(
 }
 
 void ConnectionManager::createWebsocketTransactionConnection(
-    nx_http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Request request,
-    nx_http::Response* const response,
+    nx_http::HttpServerConnection* const /*connection*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
+    nx_http::Request /*request*/,
+    nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
