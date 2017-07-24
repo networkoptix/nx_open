@@ -77,6 +77,13 @@ protected:
         }
     }
 
+    void whenFivePeersHaveBeenRemoved()
+    {
+        for (const auto& relayToDomain : m_relayToDomainTestData)
+            ASSERT_TRUE(m_relayPool->removePeer(
+                std::get<2>(relayToDomain), std::get<1>(relayToDomain)).get());
+    }
+
     void whenTableIsFilledWithTestData()
     {
         struct Context
@@ -181,6 +188,15 @@ protected:
         }
 
         return std::make_pair(reversedParts, domainTailString);
+    }
+
+    void thenRelayPeersTableShouldBeEmpty()
+    {
+        auto selectResult = m_relayPool->getConnection()->executeSelect(
+            "SELECT * from cdb.relay_peers;").get();
+
+        ASSERT_EQ(CASS_OK, selectResult.first);
+        ASSERT_FALSE(selectResult.second.next());
     }
 
     void thenAllRecordsExistAndSplitCorreclty()
@@ -302,6 +318,16 @@ TEST_F(RemoteRelayPeerPool, addPeer)
     whenFivePeersHaveBeenAdded();
 
     thenAllRecordsExistAndSplitCorreclty();
+}
+
+TEST_F(RemoteRelayPeerPool, removePeer)
+{
+    givenDbWithNotExistentCdbKeyspace();
+    whenRelayPoolObjectHasBeenCreated();
+    whenFivePeersHaveBeenAdded();
+    whenFivePeersHaveBeenRemoved();
+
+    thenRelayPeersTableShouldBeEmpty();
 }
 
 TEST_F(RemoteRelayPeerPool, getRelayByDomain)

@@ -56,6 +56,31 @@ ConnectSessionManager::ConnectSessionManager(
         &subscriptionId);
 
     m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+
+    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->removePeer(peer, "This_Relay_Host")
+                .then(
+                    [this, peer](cf::future<bool> addPeerFuture)
+            {
+                if (addPeerFuture.get())
+                {
+                    NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                        .arg(peer));
+                }
+                else
+                {
+                    NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                        .arg(peer));
+                }
+
+                return cf::unit();
+            });
+        },
+        &subscriptionId);
+
+    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
 }
 
 ConnectSessionManager::~ConnectSessionManager()

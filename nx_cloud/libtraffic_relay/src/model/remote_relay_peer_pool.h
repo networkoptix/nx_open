@@ -25,6 +25,7 @@ public:
 
     cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
     cf::future<bool> addPeer(const std::string& domainName, const std::string& relayHost);
+    cf::future<bool> removePeer(const std::string& domainName, const std::string& relayHost);
 
 protected:
     cassandra::AsyncConnection* getConnection();
@@ -37,7 +38,7 @@ private:
 
     void prepareDbStructure();
     std::string whereStringForFind(const std::string& domainName) const;
-    bool bindInsertParameters(
+    bool bindUpdateParameters(
         cassandra::Query* query,
         const std::string& domainName,
         const std::string& relayHost) const;

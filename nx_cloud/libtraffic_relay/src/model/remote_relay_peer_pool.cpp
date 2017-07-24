@@ -262,7 +262,7 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
-                if (!bindInsertParameters(&prepareResult.second, domainName, relayHost))
+                if (!bindUpdateParameters(&prepareResult.second, domainName, relayHost))
                 {
                     NX_VERBOSE(this, "Bind parameters for insert into cdb.relay_peers failed");
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
@@ -284,7 +284,64 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
             });
 }
 
-bool RemoteRelayPeerPool::bindInsertParameters(
+cf::future<bool> RemoteRelayPeerPool::removePeer(
+    const std::string& domainName,
+    const std::string& relayHost)
+{
+    if (!m_dbReady)
+        return cf::make_ready_future(false);
+
+    return getLocalHostId()
+        .then(
+            [this](cf::future<int> getLocalHostIdFuture)
+            {
+                auto errorCode = (CassError)getLocalHostIdFuture.get();
+                if (errorCode != CASS_OK)
+                    return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
+
+                return m_cassConnection->prepareQuery(
+                    "DELETE FROM cdb.relay_peers WHERE \
+                        relay_id=? AND \
+                        relay_host=? AND \
+                        domain_suffix_1=? AND \
+                        domain_suffix_2=? AND \
+                        domain_suffix_3=? AND \
+                        domain_name_tail = ?;");
+            })
+        .then(
+            [this, domainName, relayHost](
+                cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
+            {
+                auto prepareResult = prepareFuture.get();
+                if (prepareResult.first != CASS_OK)
+                {
+                    NX_VERBOSE(this, "Prepare delete from cdb.relay_peers failed");
+                    return cf::make_ready_future(std::move((CassError)prepareResult.first));
+                }
+
+                if (!bindUpdateParameters(&prepareResult.second, domainName, relayHost))
+                {
+                    NX_VERBOSE(this, "Bind parameters for delete from cdb.relay_peers failed");
+                    return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
+                }
+
+                return m_cassConnection->executeUpdate(std::move(prepareResult.second));
+            })
+        .then(
+            [this](cf::future<CassError> executeFuture)
+            {
+                if (executeFuture.get() != CASS_OK)
+                {
+                    NX_VERBOSE(this, "Execute delete from cdb.relay_peers failed");
+                    return false;
+                }
+
+                NX_VERBOSE(this, "Execute delete from cdb.relay_peers succeded");
+                return true;
+            });
+}
+
+bool RemoteRelayPeerPool::bindUpdateParameters(
     cassandra::Query* query,
     const std::string& domainName,
     const std::string& relayHost) const
