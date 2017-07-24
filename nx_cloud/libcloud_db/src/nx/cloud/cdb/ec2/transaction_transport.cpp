@@ -140,43 +140,6 @@ const TransactionTransportHeader&
     return m_commonTransportHeaderOfRemoteTransaction;
 }
 
-void TransactionTransport::setOutgoingConnection(
-    QSharedPointer<AbstractCommunicatingSocket> socket)
-{
-    m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
-}
-
-void TransactionTransport::startOutgoingChannel()
-{
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Starting outgoing transaction channel to %1")
-        .arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
-
-    //sending tranSyncRequest
-    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> requestTran(
-        ::ec2::ApiCommand::tranSyncRequest,
-        m_baseTransactionTransport.localPeer().id);
-    requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
-
-    TransactionTransportHeader transportHeader;
-    transportHeader.vmsTransportHeader.processedPeers
-        << m_baseTransactionTransport.remotePeer().id;
-    transportHeader.vmsTransportHeader.processedPeers
-        << m_baseTransactionTransport.localPeer().id;
-
-    sendTransaction(
-        std::move(requestTran),
-        std::move(transportHeader));
-}
-
-void TransactionTransport::receivedTransaction(
-    const nx_http::HttpHeaders& headers,
-    const QnByteArrayConstRef& tranData)
-{
-    m_baseTransactionTransport.receivedTransaction(headers, tranData);
-}
-
 void TransactionTransport::sendTransaction(
     TransactionTransportHeader transportHeader,
     const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
@@ -218,6 +181,43 @@ void TransactionTransport::sendTransaction(
                 transactionHeader.persistentInfo.sequence;
             //transaction will be sent later
         });
+}
+
+void TransactionTransport::receivedTransaction(
+    const nx_http::HttpHeaders& headers,
+    const QnByteArrayConstRef& tranData)
+{
+    m_baseTransactionTransport.receivedTransaction(headers, tranData);
+}
+
+void TransactionTransport::setOutgoingConnection(
+    QSharedPointer<AbstractCommunicatingSocket> socket)
+{
+    m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
+}
+
+void TransactionTransport::startOutgoingChannel()
+{
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Starting outgoing transaction channel to %1")
+        .arg(m_commonTransportHeaderOfRemoteTransaction),
+        cl_logDEBUG1);
+
+    //sending tranSyncRequest
+    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> requestTran(
+        ::ec2::ApiCommand::tranSyncRequest,
+        m_baseTransactionTransport.localPeer().id);
+    requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
+
+    TransactionTransportHeader transportHeader;
+    transportHeader.vmsTransportHeader.processedPeers
+        << m_baseTransactionTransport.remotePeer().id;
+    transportHeader.vmsTransportHeader.processedPeers
+        << m_baseTransactionTransport.localPeer().id;
+
+    sendTransaction(
+        std::move(requestTran),
+        std::move(transportHeader));
 }
 
 void TransactionTransport::processSpecialTransaction(

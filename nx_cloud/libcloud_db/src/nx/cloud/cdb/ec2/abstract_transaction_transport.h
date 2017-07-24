@@ -31,11 +31,6 @@ public:
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) = 0;
     virtual QnUuid connectionGuid() const = 0;
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const = 0;
-    virtual void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket) = 0;
-    virtual void startOutgoingChannel() = 0;
-    virtual void receivedTransaction(
-        const nx_http::HttpHeaders& headers,
-        const QnByteArrayConstRef& tranData) = 0;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) = 0;

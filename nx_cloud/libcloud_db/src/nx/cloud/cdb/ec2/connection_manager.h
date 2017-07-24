@@ -76,6 +76,12 @@ public:
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler);
+    void createWebsocketTransactionConnection(
+        nx_http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::RequestProcessedHandler completionHandler);
     /**
      * Mediaserver uses this method to push transactions.
      */
@@ -206,6 +212,8 @@ private:
     nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx_http::Response* const response);
+
+    void onHttpConnectionUpgraded(nx_http::HttpServerConnection* connection);
 };
 
 } // namespace ec2

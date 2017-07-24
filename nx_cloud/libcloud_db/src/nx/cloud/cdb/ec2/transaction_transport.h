@@ -60,14 +60,17 @@ public:
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
-    virtual void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket) override;
-    virtual void startOutgoingChannel() override;
-    virtual void receivedTransaction(
-        const nx_http::HttpHeaders& headers,
-        const QnByteArrayConstRef& tranData) override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+
+    void receivedTransaction(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData);
+
+    void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
+
+    void startOutgoingChannel();
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,

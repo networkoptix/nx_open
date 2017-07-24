@@ -4,6 +4,7 @@
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_fwd.h>
@@ -17,6 +18,7 @@
 #include "p2p_sync_settings.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
+#include "websocket_transaction_transport.h"
 #include "../access_control/authorization_manager.h"
 #include "../stree/cdb_ns.h"
 
@@ -161,6 +163,23 @@ void ConnectionManager::createTransactionConnection(
     completionHandler(std::move(requestResult));
 }
 
+void ConnectionManager::createWebsocketTransactionConnection(
+    nx_http::HttpServerConnection* const connection,
+    nx::utils::stree::ResourceContainer authInfo,
+    nx_http::Request request,
+    nx_http::Response* const response,
+    nx_http::RequestProcessedHandler completionHandler)
+{
+    using namespace std::placeholders;
+
+    // TODO: Reading connection attributes from request.
+
+    nx_http::RequestResult result(nx_http::StatusCode::switchingProtocols);
+    result.connectionEvents.onResponseHasBeenSent =
+        std::bind(&ConnectionManager::onHttpConnectionUpgraded, this, _1);
+    completionHandler(std::move(result));
+}
+
 void ConnectionManager::pushTransaction(
     nx_http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer /*authInfo*/,
@@ -202,17 +221,24 @@ void ConnectionManager::pushTransaction(
         return completionHandler(nx_http::StatusCode::notFound);
     }
 
+    auto transactionTransport =
+        dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+    if (!transactionTransport)
+    {
+        return completionHandler(nx_http::StatusCode::badRequest);
+    }
+
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Received %1 request from %2 for connection %3")
         .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
         .arg(connectionId),
         cl_logDEBUG2);
 
-    connectionIter->connection->post(
-        [connectionPtr = connectionIter->connection.get(),
+    transactionTransport->post(
+        [transactionTransport,
             request = std::move(request)]() mutable
         {
-            connectionPtr->receivedTransaction(
+            transactionTransport->receivedTransaction(
                 std::move(request.headers),
                 std::move(request.messageBody));
         });
@@ -672,9 +698,15 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
             auto connectionIter = connectionByIdIndex.find(connectionId);
             NX_ASSERT(connectionIter != connectionByIdIndex.end());
 
-            connectionIter->connection->setOutgoingConnection(
-                QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()));
-            connectionIter->connection->startOutgoingChannel();
+            auto transactionTransport =
+                dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+            if (transactionTransport)
+            {
+                transactionTransport->setOutgoingConnection(
+                    QSharedPointer<AbstractCommunicatingSocket>(\
+                        connection->takeSocket().release()));
+                transactionTransport->startOutgoingChannel();
+            }
         };
     requestResult.dataSource =
         std::make_unique<nx_http::EmptyMessageBodySource>(
@@ -682,6 +714,36 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
             boost::none);
 
     return requestResult;
+}
+
+void ConnectionManager::onHttpConnectionUpgraded(
+    nx_http::HttpServerConnection* connection)
+{
+    // TODO
+
+    const auto remoteAddress = connection->socket()->getForeignAddress();
+    auto webSocket = std::make_unique<network::websocket::WebSocket>(
+        connection->takeSocket());
+    auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
+        std::move(webSocket));
+
+    nx::String systemId;
+    nx::String remotePeerId;
+    //systemId = ...;
+    //remotePeerId = ...;
+    auto connectionId = QnUuid::createUuid().toSimpleByteArray();
+    ConnectionContext context{
+        std::move(transactionTransport),
+        connectionId,
+        { systemId, remotePeerId } };
+
+    if (!addNewConnection(std::move(context)))
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
+            .arg(remotePeerId).arg(systemId).arg(remoteAddress).arg(connectionId),
+            cl_logDEBUG1);
+    }
 }
 
 } // namespace ec2
