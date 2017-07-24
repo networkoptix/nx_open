@@ -1,5 +1,4 @@
 #include "detection_plugin.h"
-#if defined(ENABLE_NVIDIA_ANALYTICS)
 
 #include <QtCore/QFile>
 
@@ -8,8 +7,9 @@
 #include <fstream>
 #include <ios>
 
-#define OUTPUT_PREFIX "[analytics::CarDetectionPlugin] "
+#define NX_OUTPUT_PREFIX "[analytics::CarDetectionPlugin] "
 #include <nx/kit/ini_config.h>
+#include <nx/kit/debug.h>
 
 #include <utils/common/synctime.h>
 #include <analytics/plugins/detection/config.h>
@@ -25,7 +25,7 @@ QByteArray loadFileToByteArray(const QString& filename)
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly))
     {
-        PRINT << "Unable to open file for reading: [" << filename << "]";
+        NX_OUTPUT << "Unable to open file for reading: [" << filename.toStdString() << "]";
         return result;
     }
 
@@ -33,9 +33,9 @@ QByteArray loadFileToByteArray(const QString& filename)
     file.close();
 
     if (result.isEmpty())
-        PRINT << "Unable to read from file: " << filename;
+        NX_OUTPUT << "Unable to read from file: " << filename.toStdString();
 
-    OUTPUT << "Substituted frame from file: " << filename;
+    NX_OUTPUT << "Substituted frame from file: " << filename.toStdString();
     return result;
 }
 
@@ -48,9 +48,9 @@ DetectionPlugin::DetectionPlugin(const QString& id):
     std::string idStr = id.toStdString();
 
     params.id = idStr.c_str();
-    params.modelFile = conf.modelFile;
-    params.deployFile = conf.deployFile;
-    params.cacheFile = conf.cacheFile;
+    params.modelFile = ini().modelFile;
+    params.deployFile = ini().deployFile;
+    params.cacheFile = ini().cacheFile;
 
     m_tegraVideo.reset(TegraVideo::create(params));
     NX_CRITICAL(m_tegraVideo, "Unable to initialize tegra_video.");
@@ -82,7 +82,7 @@ bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameD
     TegraVideo::CompressedFrame compressedFrame;
     QByteArray dataFromFile;
 
-    if (conf.substituteFramesFilePrefix[0] != '\0')
+    if (ini().substituteFramesFilePrefix[0] != '\0')
     {
         // Instead of the received data, read a raw frame from the file.
         static int frameNumber = 0;
@@ -90,7 +90,7 @@ bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameD
 
         dataFromFile = loadFileToByteArray(
                 lit("%1.%2")
-                    .arg(QLatin1String(conf.substituteFramesFilePrefix))
+                    .arg(QLatin1String(ini().substituteFramesFilePrefix))
                     .arg(frameNumber));
 
         compressedFrame.data = (const uint8_t*) dataFromFile.constData();
@@ -106,7 +106,7 @@ bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameD
 
     if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
     {
-        PRINT << "ERROR: pushCompressedFrame(dataSize: " << compressedFrame.dataSize
+        NX_PRINT << "ERROR: pushCompressedFrame(dataSize: " << compressedFrame.dataSize
             << ", ptsUs: " << compressedFrame.ptsUs << ") -> false";
         return false;
     }
@@ -148,8 +148,8 @@ QnObjectDetectionMetadataPtr DetectionPlugin::tegraVideoRectsToObjectDetectionMe
     QnObjectDetectionMetadataPtr metadata =
         std::make_shared<QnObjectDetectionMetadata>();
 
-    PRINT << "---------------------------------------------------------";
-    PRINT << "----------------- GOT RECTANGLES: " << rectangleCount;
+    NX_OUTPUT << "---------------------------------------------------------";
+    NX_OUTPUT << "----------------- GOT RECTANGLES: " << rectangleCount;
     for (auto i = 0; i < rectangleCount; ++i)
     {
         const auto& rect = rectangles[i];
@@ -164,18 +164,16 @@ QnObjectDetectionMetadataPtr DetectionPlugin::tegraVideoRectsToObjectDetectionMe
 
     for (const auto& obj: metadata->detectedObjects)
     {
-        PRINT << "OBJECT ID: "<< obj.objectId << " ("
+        NX_OUTPUT << "OBJECT ID: " << obj.objectId.toStdString() << " ("
             << obj.boundingBox.topLeft.x << " "
             << obj.boundingBox.topLeft.y << ") ("
             << obj.boundingBox.bottomRight.x << " "
             << obj.boundingBox.bottomRight.y << ")";
     }
-    PRINT << "-------------------------------------------------------";
+    NX_OUTPUT << "-------------------------------------------------------";
 
     return metadata;
 }
 
 } // namespace analytics
 } // namespace nx
-
-#endif // defined(ENABLE_NVIDIA_ANALYTICS)

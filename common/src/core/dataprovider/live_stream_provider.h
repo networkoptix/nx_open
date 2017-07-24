@@ -1,5 +1,4 @@
-#ifndef live_strem_provider_h_1508
-#define live_strem_provider_h_1508
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -27,8 +26,6 @@
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
-//#define DESIRED_SECOND_STREAM_FPS (7)
-//#define MIN_SECOND_STREAM_FPS (2)
 
 class QnLiveStreamProvider;
 
@@ -65,18 +62,16 @@ public:
     void onPrimaryFpsUpdated(int newFps);
     QnLiveStreamParams getLiveParams();
 
-    // I assume this function is called once per video frame
     bool needMetaData();
 
     void onStreamReopen();
 
-    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& currentLiveParams,
-                                 bool isCameraControlRequired);
+    virtual void onGotVideoFrame(
+        const QnCompressedVideoDataPtr& videoData,
+        const QnLiveStreamParams& currentLiveParams,
+        bool isCameraControlRequired);
 
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
-
-    void setUseSoftwareMotion(bool value);
 
     virtual void updateSoftwareMotion();
     bool canChangeStatus() const;
@@ -84,11 +79,6 @@ public:
     virtual bool secondaryResolutionIsLarge() const { return false; }
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
-
-    /*!
-        Start provider if not running yet.
-        @param canTouchCameraSettings can control camera settings if true
-    */
     virtual void startIfNotRunning() override;
 
     bool isCameraControlDisabled() const;
@@ -98,18 +88,16 @@ public:
     void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
-protected:
-    /*! Called when @param currentStreamParams are updated */
 
+protected:
     QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
-    /*!
-        \param picSize video size in pixels
-    */
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
+
 protected:
     mutable QnMutex m_livemutex;
+
 private:
     float getDefaultFps() const;
     bool needAnalyzeStream(Qn::ConnectionRole role);
@@ -126,12 +114,10 @@ private:
         const QnLiveStreamParams& liveParams,
         bool isCameraConfigured);
 
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
-#endif
 
 private:
-    // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopend
+    // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened
     // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)
     QnLiveStreamParams m_newLiveParams;
 
@@ -145,11 +131,14 @@ private:
     QnMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+#endif
+
     std::unique_ptr<nx::analytics::VideoMetadataPlugin> m_videoMetadataPlugin;
     nx::analytics::NaiveDetectionSmoother m_detectionSmoother;
-#endif
+
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     std::atomic<int> m_videoChannels;
@@ -165,5 +154,3 @@ private:
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //live_strem_provider_h_1508

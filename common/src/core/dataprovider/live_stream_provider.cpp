@@ -362,7 +362,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
         saveBitrateIfNeeded(videoData, currentLiveParams, isCameraControlRequired);
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
     bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming2()
         && (m_role == Qn::CR_LiveVideo)
@@ -407,7 +407,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
             m_resolutionCheckTimer.restart();
         }
     }
-#endif
+#endif // ENABLE_SOFTWARE_MOTION_DETECTION
 }
 
 void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
@@ -511,10 +511,9 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
     {
         metadata = m_metadataQueue.front();
         m_metadataQueue.pop();
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
         if (metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
             emitAnalyticsEventIfNeeded(metadata);
-#endif
+
         return metadata;
     }
 
@@ -524,7 +523,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
 QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
 {
     QnMetaDataV1Ptr result(new QnMetaDataV1(1));
-    result->m_duration = 1000*1000*1000; // 1000 sec
+    result->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return result;
 }
 
@@ -703,10 +702,13 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     }
 }
 
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 void QnLiveStreamProvider::emitAnalyticsEventIfNeeded(
     const QnAbstractCompressedMetadataPtr& metadata)
 {
+#if !defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+    return;
+#endif
+
     if (!metadata)
         return;
 
@@ -729,6 +731,5 @@ void QnLiveStreamProvider::emitAnalyticsEventIfNeeded(
                 std::string(nx::analytics::ini().detectionEndDescription)));
     }
 }
-#endif
 
 #endif // ENABLE_DATA_PROVIDERS
