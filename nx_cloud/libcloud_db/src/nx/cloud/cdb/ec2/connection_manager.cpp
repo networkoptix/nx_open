@@ -75,8 +75,8 @@ ConnectionManager::~ConnectionManager()
         std::swap(localConnections, m_connections);
     }
 
-    for (auto& connectionContext: localConnections)
-        connectionContext.connection->pleaseStopSync();
+    for (auto it = localConnections.begin(); it != localConnections.end(); ++it)
+        it->connection->pleaseStopSync();
 
     m_startedAsyncCallsCounter.wait();
 }
@@ -316,12 +316,12 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
 {
     QnMutexLocker lk(&m_mutex);
     api::VmsConnectionDataList result;
-    for (const auto& connectionContext: m_connections)
+    for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
         api::VmsConnectionData connectionData;
-        connectionData.systemId = connectionContext.fullPeerName.systemId.toStdString();
+        connectionData.systemId = it->fullPeerName.systemId.toStdString();
         connectionData.mediaserverEndpoint =
-            connectionContext.connection->remoteSocketAddr().toString().toStdString();
+            it->connection->remoteSocketAddr().toString().toStdString();
         result.connections.push_back(std::move(connectionData));
     }
 
