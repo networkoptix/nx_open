@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0008_datastructure_meta_settings'),
+        ('cms', '0009_delete_blank'),
     ]
 
     operations = [
