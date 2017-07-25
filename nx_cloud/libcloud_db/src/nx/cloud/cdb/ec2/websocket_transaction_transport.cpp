@@ -89,7 +89,7 @@ void WebSocketTransactionTransport::readTransactions()
     m_transactionLog->readTransactions(
         remotePeer().systemId.toByteArray(),
         m_remoteSubscription,
-        ::ec2::QnTranState(), //< toState. Unlimited
+        boost::optional<::ec2::QnTranState>(), //< toState. Unlimited
         kMaxTransactionsPerIteration,
         std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
