@@ -490,7 +490,7 @@ void socketTransferAsync(
     }
 }
 
-template <typename Sender, typename Receiver>
+template<typename Sender, typename Receiver>
 void transferSyncAsync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
@@ -512,7 +512,7 @@ void transferSyncAsync(Sender* sender, Receiver* receiver)
     promise.get_future().wait();
 }
 
-template <typename Sender, typename Receiver>
+template<typename Sender, typename Receiver>
 static void transferAsyncSync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> promise;
@@ -531,7 +531,7 @@ static void transferAsyncSync(Sender* sender, Receiver* receiver)
     promise.get_future().wait();
 }
 
-template <typename Sender, typename Receiver>
+template<typename Sender, typename Receiver>
 static void transferSync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
@@ -540,7 +540,7 @@ static void transferSync(Sender* sender, Receiver* receiver)
     EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << SystemError::getLastOSErrorText().toStdString();
 }
 
-template <typename Sender, typename Receiver>
+template<typename Sender, typename Receiver>
 static void transferAsync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> sendPromise;
