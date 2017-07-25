@@ -1,0 +1,3 @@
+Server {{#source}}{{source}} {{/source}}started 
+
+{{#aggregated}} {{timestampDate}} {{timestampTime}} {{/aggregated}}

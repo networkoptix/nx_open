@@ -1881,7 +1881,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 20],
-                        "logicalMultiplier": 32,
+                        "logicalMultiplier": 30,
                         "space": "35MmEquiv"
                     }
                 }
