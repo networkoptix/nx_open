@@ -13,6 +13,7 @@ titles_cache = {}
 templates_cache = {}
 configs_cache = {}
 logos_cache = {}
+modified_file_time_cache = {}
 
 
 def send(email, msg_type, message, customization):
@@ -85,12 +86,13 @@ def read_template(name, location, html):
 
 
 def read_logo(filename):
-    if filename not in logos_cache:
+    global modified_file_time_cache, logos_cache
+
+    if filename not in logos_cache or filename in modified_file_time_cache\
+                                   and os.stat(filename)[8] != modified_file_time_cache[filename]:
         with open(filename, 'rb') as fp:
             logos_cache[filename] = fp.read()
+        
+        modified_file_time_cache[filename] = os.stat(filename)[8]
     return logos_cache[filename]
 
-
-def update_logo_cache(file_name, image):
-    global logos_cache
-    logos_cache[file_name] = image

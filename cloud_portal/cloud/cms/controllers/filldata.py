@@ -4,7 +4,6 @@ import re
 import json
 import codecs
 import base64
-from notifications.engines.email_engine import update_logo_cache
 
 
 STATIC_DIR = 'static/{{customization}}/source/'
@@ -176,9 +175,6 @@ def convert_b64_image_to_png(record, storage_location):
     file_name = os.path.join(storage_location, record.data_structure.name)
     make_dir(file_name)
     image_png = base64.b64decode(record.value)
-
-    if record.data_structure.context.name == "Email templates":
-        update_logo_cache(file_name, image_png)
 
     with open(file_name, 'wb') as f:
         f.write(image_png)
