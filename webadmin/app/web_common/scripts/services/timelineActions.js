@@ -77,7 +77,6 @@ TimelineActions.prototype.updatePosition = function(){
     if(self.positionProvider) {
         if(self.nextPlayedPosition){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
-                console.log("clear nextPlayedPosition", self.nextPlayedPosition, self.positionProvider.playedPosition);
                 self.nextPlayedPosition = false;
             }
 
