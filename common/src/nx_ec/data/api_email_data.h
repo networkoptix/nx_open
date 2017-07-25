@@ -29,10 +29,11 @@ namespace ec2
     {
         ApiEmailData() {}
 
-        ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, int timeout_, const QnEmailAttachmentList& attachments_)
+        ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, const QString& plainBody_, int timeout_, const QnEmailAttachmentList& attachments_)
             : to(to_),
             subject(subject_),
             body(body_),
+            plainBody(plainBody_),
             timeout(timeout_),
             attachments(attachments_)
         {}
@@ -40,11 +41,12 @@ namespace ec2
         QStringList to;
         QString subject;
         QString body;
+        QString plainBody;
         int timeout;
 
         QnEmailAttachmentList attachments;
     };
-#define ApiEmailData_Fields (to)(subject)(body)(timeout)
+#define ApiEmailData_Fields (to)(subject)(body)(plainBody)(timeout)
 
 } // namespace ec2
 

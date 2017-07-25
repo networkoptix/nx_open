@@ -73,11 +73,27 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
         message.addRecipient(EmailAddress(recipient));
 
     message.setSubject(data.subject);
-    message.addPart(new MimeHtml(data.body));
 
-    // Need to store all attachments as smtp client operates on attachment pointers
-    for (const QnEmailAttachmentPtr& attachment: data.attachments)
-        message.addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
+    MimeMultiPart *mainPart = new MimeMultiPart(MimeMultiPart::Alternative);
+    MimeMultiPart *bodyPart = new MimeMultiPart(MimeMultiPart::Related);
+    if (!data.body.isEmpty())
+    {
+        mainPart->addPart(new MimeText(data.plainBody));
+        bodyPart->addPart(new MimeHtml(data.body));
+
+        for (const QnEmailAttachmentPtr& attachment: data.attachments)
+            bodyPart->addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
+    } else
+    {
+        bodyPart->addPart(new MimeText(data.plainBody));
+
+        for (const QnEmailAttachmentPtr& attachment: data.attachments)
+            bodyPart->addPart(new MimeFile(attachment->content, attachment->filename, attachment->mimetype));
+    }
+
+    mainPart->addPart(bodyPart);
+
+    message.setContent(mainPart);
 
     // Actually send
     int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
