@@ -13,11 +13,11 @@
 namespace {
 
 static constexpr auto kRemoveSystemTimeoutMs = 10000;
-static constexpr auto kNextActionPeriodMs = 2000;
+static constexpr auto kNextActionPeriodMs = 4000;
 static constexpr auto kImmediateActionDelayMs = 0;
 
 static const auto kCheckEmptyTileMessage =
-    lit("Please check if there is an empty item on the screen");
+    lit("Please check if there is an empty item(s) on the screen");
 
 int castTileToInt(QnTileTest test)
 {
@@ -98,6 +98,31 @@ qreal getSystemMaxWeight()
     return result;
 }
 
+QnSystemDescriptionPtr getSystemWithMinimalWeight(
+    const QnTestSystemsFinder::SystemDescriptionList& systems)
+{
+    static constexpr qreal kReallyBigWeight = 10000000000000;
+    const auto weights = qnSystemWeightsManager->weights();
+    QnSystemDescriptionPtr target;
+    qreal minWeight = kReallyBigWeight;
+    for (const auto system: systems)
+    {
+        const auto it = std::find_if(weights.begin(), weights.end(),
+            [localId = system->localId()](const nx::client::core::WeightData& data)
+            {
+                return data.localId == localId;
+            });
+        if (it == weights.end())
+            continue;
+        if (it.value().weight < minWeight)
+        {
+            target = system;
+            minWeight = it.value().weight;
+        }
+    }
+    return target;
+}
+
 QnRaiiGuardPtr addSystem(
     const QnSystemDescriptionPtr& system,
     QnTestSystemsFinder* finder)
@@ -121,6 +146,8 @@ QString getMessage(QnTileTest test)
 {
     static const QHash<int, QString> kMessages =
         {
+            { castTileToInt(QnTileTest::Vms6515And6519),
+                lit("VMS 6515/6519 - wrong page/empty tiles on first page")},
             { castTileToInt(QnTileTest::ChangeWeightOnCollapse),
                 lit("change order of systems on tile collapse")},
             { castTileToInt(QnTileTest::ChangeVersion),
@@ -163,6 +190,27 @@ QnRaiiGuardPtr makeDelayedCompletionGuard(
         });
 }
 
+using RemoveSystemGuardList = QList<QnRaiiGuardPtr>;
+struct SeveralSystems
+{
+    RemoveSystemGuardList guard;
+    QnSystemDescriptionPtr maxWeightSystem;
+};
+
+static constexpr auto kTilesCountForTowPages = 9;
+
+SeveralSystems createSeveralSystems(int count, QnTestSystemsFinder* finder)
+{
+    SeveralSystems result;
+    for (auto i = 0; i != count; ++i)
+    {
+        result.maxWeightSystem = createSystem();
+        setSystemMaxWeight(result.maxWeightSystem);
+        result.guard.append(addSystem(result.maxWeightSystem, finder));
+    }
+    return result;
+}
+
 } // namespace
 
 QnSystemTilesTestCase::QnSystemTilesTestCase(
@@ -185,6 +233,9 @@ void QnSystemTilesTestCase::startTest(
         {
             switch(test)
             {
+                case QnTileTest::Vms6515And6519:
+                    vms6515and6519(completionHandler);
+                    break;
                 case QnTileTest::ChangeWeightOnCollapse:
                     changeWeightsTest(completionHandler);
                     break;
@@ -300,33 +351,18 @@ void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandle
 
 void QnSystemTilesTestCase::switchPageTest(CompletionHandler completionHandler)
 {
-    QList<QnRaiiGuardPtr> systemRemoveGuards;
-
-    // We have 8 tiles per page as maximum. So, to have 2 pages we need 9 tiles.
-    static constexpr auto kTilesCountEnoughForTowPages = 9;
-    QnSystemDescriptionPtr maxWeightSystem;
-    for (auto i = 0; i != kTilesCountEnoughForTowPages; ++i)
-    {
-        maxWeightSystem = createSystem();
-        setSystemMaxWeight(maxWeightSystem);
-        systemRemoveGuards.append(addSystem(maxWeightSystem, m_finder));
-    }
-
+    const auto systems = createSeveralSystems(kTilesCountForTowPages, m_finder);
     const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
-        QnTileTest::SwitchPage, completionHandler, systemRemoveGuards, this);
+        QnTileTest::SwitchPage, completionHandler, systems.guard, this);
 
-    const auto switchToFirstPage =
-        [this, completionGuard]()
-        {
-            switchPage(0);
-        };
-
+    const auto switchToFirstPage = [this, completionGuard]() { switchPage(0); };
     const auto switchToSecondPage =
         [this, switchToFirstPage]()
         {
             emit switchPage(1);
             executeDelayedParented(switchToFirstPage, kNextActionPeriodMs, this);
         };
+
     const auto collapseTileCallback =
         [this, switchToSecondPage]()
         {
@@ -335,7 +371,7 @@ void QnSystemTilesTestCase::switchPageTest(CompletionHandler completionHandler)
         };
 
     const auto openTileCallback =
-        [this, collapseTileCallback, id = maxWeightSystem->id()]()
+        [this, collapseTileCallback, id = systems.maxWeightSystem->id()]()
         {
             emit openTile(id);
             executeDelayedParented(collapseTileCallback, kNextActionPeriodMs, this);
@@ -344,6 +380,51 @@ void QnSystemTilesTestCase::switchPageTest(CompletionHandler completionHandler)
     executeDelayedParented(openTileCallback, kNextActionPeriodMs, this);
 }
 
+void QnSystemTilesTestCase::vms6515and6519(CompletionHandler completionHandler)
+{
+    /**
+      * Test does following things:
+      * 1. adds 9 new systems with big weights;
+      * 2. switches to second page;
+      * 3. moves on of the newly created systems from second page to the first
+      * 4. switchs to first page
+      *
+      * Desired results:
+      * 1. after step #3 - all visible tiles should be from the second page
+      * 2. after step #4 - no empty tiles at the first page
+      */
+    const auto systems = createSeveralSystems(kTilesCountForTowPages , m_finder);
+    const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
+        QnTileTest::Vms6515And6519, completionHandler, systems.guard, this);
+
+    const auto switchToFirstPage =
+        [this, completionGuard]()
+        {
+            switchPage(0);
+        };
+
+    const auto moveTileFromSecondPageToTheFirst =
+        [this, switchToFirstPage]()
+        {
+            const auto systems = m_finder->systems();
+            if (const auto target = getSystemWithMinimalWeight(systems))
+                qnSystemWeightsManager->setWeight(target->localId(), getSystemMaxWeight());
+            else
+                NX_ASSERT(false, "Something went wrong - we can't find any system");
+
+            executeDelayed(switchToFirstPage, kNextActionPeriodMs);
+        };
+
+    const auto switchToSecondPage =
+        [this, moveTileFromSecondPageToTheFirst]()
+        {
+            switchPage(1);
+
+            executeDelayed(moveTileFromSecondPageToTheFirst, kNextActionPeriodMs);
+        };
+
+    executeDelayedParented(switchToSecondPage, kNextActionPeriodMs, this);
+}
 
 void QnSystemTilesTestCase::showAutohideMessage(
     const QString& message,

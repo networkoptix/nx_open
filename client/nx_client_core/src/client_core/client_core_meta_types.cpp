@@ -8,7 +8,6 @@
 #include <ui/video/video_output.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/filtering_systems_model.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/model_data_accessor.h>
 #include <client/forgotten_systems_manager.h>
@@ -28,7 +27,6 @@ void QnClientCoreMetaTypes::initialize()
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
-    qmlRegisterType<QnFilteringSystemsModel>("Nx.Models", 1, 0, "FilteringSystemsModel");
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 

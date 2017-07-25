@@ -157,7 +157,8 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
+        <ClientHelpSourceDir>${packages.dir}/any/help-${help.version}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -181,7 +182,6 @@
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
-        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -321,7 +321,6 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -336,9 +335,10 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/customization/default-values.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                                 <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
-                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
@@ -898,7 +898,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <festival.version>2.1x-SNAPSHOT</festival.version>
+                <festival.version>2.1x</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -950,7 +950,6 @@
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
-                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -970,6 +969,7 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
+                <festival.version>2.1x</festival.version>
                 <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
