@@ -161,7 +161,9 @@ if(IOS)
     endif()
 
     set_property(TARGET mobile_client APPEND_STRING PROPERTY
-        LINK_FLAGS "@${static_plugins_args_file}")
+        LINK_FLAGS " -Wl,-e,_qt_main_wrapper")
+    set_property(TARGET mobile_client APPEND_STRING PROPERTY
+        LINK_FLAGS " @${static_plugins_args_file}")
 
     # So far Qt does not export dependent libraries for CMake, so we have to specify them manually.
     target_link_libraries(mobile_client PRIVATE
