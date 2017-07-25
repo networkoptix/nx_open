@@ -482,6 +482,9 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (!display()->camDisplay()->isRealTimeSource())
         return;
 
+    if (item()->layout()->isSearchLayout())
+        return;
+
     resetTriggers();
 
     auto eventRuleManager = commonModule()->eventRuleManager();
