@@ -332,7 +332,7 @@ void QnResourceTreeModelNode::update()
         case Qn::LayoutTourNode:
         {
             auto tour = layoutTourManager()->tour(m_uuid);
-            setNameInternal(tour.name.isEmpty() ? tr("Reel") : tour.name);
+            setNameInternal(tour.name.isEmpty() ? tr("Showreel") : tour.name);
             break;
         }
         case Qn::CurrentSystemNode:
