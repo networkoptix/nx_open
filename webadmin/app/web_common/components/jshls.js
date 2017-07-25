@@ -109,10 +109,6 @@ function JsHlsAPI(){
             };
             events.load.push(event);
             events.bitrate.push({time : performance.now() - events.t0, bitrate : event.bw , duration : data.frag.duration, level : event.id});
-            if(hls.bufferTimer === undefined) {
-                events.buffer.push({ time : 0, buffer : 0, pos: 0});
-                hls.bufferTimer = window.setInterval(this.checkBuffer, 100);
-            }
 
             var latency = data.stats.tfirst - data.stats.trequest,
             parsing = data.stats.tparsed - data.stats.tload,
@@ -358,10 +354,6 @@ function JsHlsAPI(){
         if(Hls.isSupported()) {
             if(this.hls) {
                 this.hls.destroy();
-                if(this.hls.bufferTimer) {
-                    window.clearInterval(this.hls.bufferTimer);
-                    this.hls.bufferTimer = undefined;
-                }
                 this.hls = null;
             }
         }
@@ -458,13 +450,6 @@ function JsHlsAPI(){
                     console.log(",cannot recover, last media error recovery failed ...");
                 }
             }
-        }
-    };
-
-    this.checkBuffer = function(){
-        var v = this.video.buffered;
-        if (v) {
-            events.buffer.push();
         }
     };
 }

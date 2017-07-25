@@ -9,7 +9,8 @@ enum class QnTileTest
 {
     First,
 
-    ChangeWeightOnCollapse = First,
+    Vms6515And6519 = First,
+    ChangeWeightOnCollapse,
     ChangeVersion,
     MaximizeAppOnCollapse,
     SwitchPage,
@@ -46,11 +47,11 @@ signals:
     void makeFullscreen();
     void restoreApp();
 
-    void switchPage(int pageNumber);
+    void switchPage(int pageIndex);
 
     void messageChanged(const QString& message);
 
-private:
+private: //< Tests section
     void changeWeightsTest(CompletionHandler completionHandler);
 
     void maximizeTest(CompletionHandler completionHandler);
@@ -59,6 +60,9 @@ private:
 
     void switchPageTest(CompletionHandler completionHandler);
 
+    void vms6515and6519(CompletionHandler completionHandler);
+
+private:
     void showAutohideMessage(
         const QString& message,
         qint64 hideDelay);

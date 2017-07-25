@@ -1006,8 +1006,18 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         );
 
                 case vms::event::showPopupAction:
-                    return m_actionParams.allUsers || !filterSubjectIds(
-                        m_actionParams.additionalResources).empty();
+                {
+                    static const QnDefaultSubjectValidationPolicy defaultPolicy;
+                    static const QnRequiredPermissionSubjectPolicy acknowledgePolicy(
+                        Qn::GlobalManageBookmarksPermission, QString());
+
+                    const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
+                    const auto validationState = m_actionParams.needConfirmation
+                        ? acknowledgePolicy.validity(m_actionParams.allUsers, subjects)
+                        : defaultPolicy.validity(m_actionParams.allUsers, subjects);
+
+                    return validationState != QValidator::Invalid;
+                }
 
                 case vms::event::sayTextAction:
                     return !m_actionParams.sayText.isEmpty()

@@ -56,7 +56,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_editBookmarkAction      (new QAction(action(action::EditCameraBookmarkAction)->text(), this))
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(action::RemoveBookmarksAction)->text(), this))
-    , m_updatingNow(false)
+    , m_updatingParametersNow(false)
 
     , utcRangeStartMs(utcStartTimeMs)
     , utcRangeEndMs(utcFinishTimeMs)
@@ -95,7 +95,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     connect(m_ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this,
         [this](qint64 startTimeMs, qint64 endTimeMs)
         {
-            if (m_updatingNow)
+            if (m_updatingParametersNow)
                 return;
             m_model->setRange(startTimeMs, endTimeMs);
             applyModelChanges();
@@ -150,6 +150,13 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, boldItemDelegate);
     grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
+
+    connect(m_model, &QAbstractItemModel::modelAboutToBeReset, this,
+        [this]() { m_ui->stackedWidget->setCurrentWidget(m_ui->progressPage); });
+
+    connect(m_model, &QAbstractItemModel::modelReset, this,
+        [this]() { m_ui->stackedWidget->setCurrentWidget(m_ui->gridPage); });
+    m_ui->stackedWidget->setCurrentWidget(m_ui->progressPage);
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()
@@ -158,7 +165,7 @@ QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()
 
 void QnSearchBookmarksDialogPrivate::applyModelChanges()
 {
-    if (!m_updatingNow)
+    if (!m_updatingParametersNow)
         m_model->applyFilter();
 }
 
@@ -172,7 +179,7 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
     , qint64 utcFinishTimeMs)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingParametersNow, true);
 
         resetToAllAvailableCameras();
         m_ui->filterLineEdit->lineEdit()->setText(filterText);
@@ -286,17 +293,21 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &p
     menu()->trigger(action::BookmarksModeAction);
 }
 
+void QnSearchBookmarksDialogPrivate::cancelUpdateOperation()
+{
+    m_model->cancelUpdateOperation();
+}
+
 void QnSearchBookmarksDialogPrivate::refresh()
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingParametersNow, true);
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
         m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
 
     applyModelChanges();
 }
-
 
 QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() const
 {

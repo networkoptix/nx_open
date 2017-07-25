@@ -100,6 +100,10 @@ void QnResourcesChangesManager::deleteResources(
 
             const bool success = errorCode == ec2::ErrorCode::ok;
 
+            // We don't want to wait until transaction is received.
+            if (success)
+                resourcePool()->removeResources(resources);
+
             if (thread)
                 executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
 

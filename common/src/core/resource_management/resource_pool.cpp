@@ -84,9 +84,9 @@ void QnResourcePool::commit()
     m_tmpResources.clear();
 }
 
-void QnResourcePool::addResource(const QnResourcePtr &resource)
+void QnResourcePool::addResource(const QnResourcePtr& resource, bool instantly)
 {
-    if (m_tranInProgress)
+    if (!instantly && m_tranInProgress)
         m_tmpResources << resource;
     else
         addResources(QnResourceList() << resource);
