@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
@@ -56,6 +57,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 #include <nx/utils/string.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 const qreal kButtonsSize = 24.0;
@@ -1025,7 +1028,8 @@ void QnResourceWidget::paintWindowFrame(
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
     const QRectF& /*channelRect*/, const QRectF& paintRect)
 {
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
+    const PainterTransformScaleStripper scaleStripper(painter);
+    painter->fillRect(scaleStripper.mapRect(paintRect), palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
 }
 
