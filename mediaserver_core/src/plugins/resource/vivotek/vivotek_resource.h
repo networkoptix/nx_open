@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_ONVIF)
+
 #include <QtCore/QFlags>
 
 #include <boost/optional/optional.hpp>
@@ -64,3 +66,5 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(VivotekResource::StreamCodecCapabilities);
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF
