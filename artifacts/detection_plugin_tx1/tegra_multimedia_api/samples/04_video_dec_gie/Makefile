@@ -36,12 +36,12 @@ APP := video_dec_gie
 SO := libdetection_plugin.so
 
 CLASS_DIR := ../common/classes
-NX_UTILS_DIR := ../../nx/utils/
+NX_KIT_DIR := ../../../../../open/artifacts/nx_kit/src/nx/kit
 ALGO_DIR := ../common/algorithm/cuda
 GIE_DIR := ../common/algorithm/gie
 
-NX_UTILS_SRCS := $(wildcard $(NX_UTILS_DIR)/*.cpp)
-NX_UTILS_OBJS := $(NX_UTILS_SRCS:.cpp=.o)
+NX_KIT_SRCS := $(wildcard $(NX_KIT_DIR)/*.cpp)
+NX_KIT_OBJS := $(NX_UTILS_SRCS:.cpp=.o)
 
 SRCS := \
 	video_dec_gie_csvparser.cpp \
@@ -67,6 +67,7 @@ CPPFLAGS += \
 	-I"../common/algorithm/cuda" \
 	-I"../common/algorithm/gie" \
 	-I"$(CUDA_PATH)/targets/aarch64-linux/include" \
+    -I"$(NX_KIT_DIR)"
 
 LDFLAGS += \
 	-L"$(CUDA_PATH)/targets/aarch64-linux/lib" \
@@ -93,10 +94,10 @@ all: $(APP) $(SO)
 $(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp
 	$(MAKE) -C $(CLASS_DIR)
 
-debug_utils.o: $(NX_UTILS_DIR)/debug_utils.cpp $(NX_UTILS_DIR)/debug_utils.h
+debug.o: $(NX_KIT_DIR)/debug.cpp $(NX_KIT_DIR)/debug.h
 	$(CPP) $(CPPFLAGS) -c $<
 
-flag_config.o: $(NX_UTILS_DIR)/flag_config.cpp $(NX_UTILS_DIR)/flag_config.h
+ini_config.o: $(NX_KIT_DIR)/ini_config.cpp $(NX_KIT_DIR)/ini_config.h
 	$(CPP) $(CPPFLAGS) -c $<
 
 $(ALGO_DIR)/%.o: $(ALGO_DIR)/%.c
@@ -121,4 +122,4 @@ clean:
 	$(MAKE) -C $(CLASS_DIR) clean
 	$(MAKE) -C $(ALGO_DIR) clean
 	$(MAKE) -C $(GIE_DIR) clean
-	rm -rf *.o $(NX_UTILS_DIR)/*.o $(APP) $(SO)
+	rm -rf *.o $(NX_KIT_DIR)/*.o $(APP) $(SO)

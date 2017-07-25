@@ -29,19 +29,8 @@
 ###############################################################################
 
 SUBDIRS = \
-	samples/00_video_decode \
-	samples/01_video_encode \
-	samples/02_video_dec_cuda \
-	samples/03_video_cuda_enc \
 	samples/04_video_dec_gie \
-	samples/05_jpeg_encode \
-	samples/06_jpeg_decode \
-	samples/07_video_convert \
-	samples/09_camera_jpeg_capture \
-	samples/10_camera_recording \
-	samples/11_camera_object_identification \
-	samples/backend \
-	tools/ConvertCaffeToGieModel
+	samples/backend
 
 .PHONY: all
 all:
