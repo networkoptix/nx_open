@@ -153,7 +153,7 @@ bool requiresServerResource(EventType eventType)
     switch (eventType)
     {
         case storageFailureEvent:
-            return false; //TODO: #GDM #Business restore when will work fine
+            return false; // TODO: #GDM #Business restore when will work fine
         default:
             return false;
     }

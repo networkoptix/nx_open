@@ -76,7 +76,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     {
         m_userDigest = m_user->getDigest();
 
-        //TODO: #GDM #Common get rid of resourceChanged
+        // TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnResource::resourceChanged, this,
             &QnWorkbenchUserWatcher::at_user_resourceChanged);
     }

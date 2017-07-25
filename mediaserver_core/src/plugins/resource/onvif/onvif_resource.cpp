@@ -379,7 +379,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
                 continue;
 
             if (conf->DHCP && conf->FromDHCP) {
-                //TODO: #vasilenko UTF unuse std::string
+                // TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(conf->FromDHCP->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -397,7 +397,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
                 if (!addrPtr)
                     continue;
 
-                //TODO: #vasilenko UTF unuse std::string
+                // TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(addrPtr->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -1858,7 +1858,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
 
-    //TODO: #ak should read local address only once
+    // TODO: #ak should read local address only once
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(nx_http::DEFAULT_HTTP_PORT) ) )
     {
@@ -1911,7 +1911,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     if (m_appStopping)
         return false;
 
-    //TODO: #ak if this variable is unused following code may be deleted as well
+    // TODO: #ak if this variable is unused following code may be deleted as well
     time_t utcTerminationTime; // = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     if( response.oasisWsnB2__TerminationTime )
     {
@@ -2538,7 +2538,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QnMutexLocker lock( &m_mutex );
-            //TODO: #vasilenko UTF unuse std::string
+            // TODO: #vasilenko UTF unuse std::string
             m_audioEncoderId = QString::fromStdString(conf->token);
         }
     }
@@ -2828,7 +2828,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QnMutexLocker lock( &m_mutex );
-            //TODO: #vasilenko UTF unuse std::string
+            // TODO: #vasilenko UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
             return CameraDiagnostics::NoErrorResult();
         }
@@ -3083,7 +3083,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
 #endif
         if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
-            return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   //TODO: #ak find param name
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   // TODO: #ak find param name
         else
             return CameraDiagnostics::CannotConfigureMediaStreamResult( QString() );
     }

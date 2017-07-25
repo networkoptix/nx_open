@@ -89,7 +89,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
 
 Qn::GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(Qn::GlobalPermissions source) const
 {
-    //TODO: #GDM code duplication with ::dependentPermissions() method.
+    // TODO: #GDM code duplication with ::dependentPermissions() method.
     Qn::GlobalPermissions result = source;
     if (!result.testFlag(Qn::GlobalViewArchivePermission))
     {

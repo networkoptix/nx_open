@@ -64,7 +64,7 @@ public:
                     beginEditing();
             });
 
-        //TODO: #common Button lacks default icon
+        // TODO: #common Button lacks default icon
         connect(button, &QToolButton::clicked, this, &QnEditableLabelPrivate::beginEditing);
 
         /* Page with line edit: */

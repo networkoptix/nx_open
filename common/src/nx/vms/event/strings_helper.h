@@ -54,7 +54,7 @@ public:
 
     QStringList eventDetails(const EventParameters &params) const;
 
-    //TODO: #vasilenko isPublic field is not used, why?
+    // TODO: #vasilenko isPublic field is not used, why?
     QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) const;
 
     QString toggleStateToString(EventState state) const;

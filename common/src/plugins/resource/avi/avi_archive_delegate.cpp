@@ -394,7 +394,7 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     if (!m_initialized)
         return defaultVideoLayout;
 
-    //TODO: #rvasilenko why do we read metadata in the getVideoLayout() method (which must be const semantically)
+    // TODO: #rvasilenko why do we read metadata in the getVideoLayout() method (which must be const semantically)
     if (!m_videoLayout)
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );

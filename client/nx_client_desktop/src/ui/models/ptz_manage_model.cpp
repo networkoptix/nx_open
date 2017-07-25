@@ -624,7 +624,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tourModel.tour);
     case Qn::ValidRole:
-        //TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
+        // TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
         return tourIsValid(tourModel);
     case Qn::HelpTopicIdRole:
         return column == HomeColumn ? Qn::PtzManagement_HomePosition_Help : Qn::PtzManagement_Tour_Help;

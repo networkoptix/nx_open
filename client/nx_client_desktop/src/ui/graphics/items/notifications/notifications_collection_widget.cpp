@@ -33,7 +33,7 @@
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
-//TODO: #gdm think about moving out pages enums
+// TODO: #gdm think about moving out pages enums
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 
@@ -341,7 +341,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     QStringList tooltip = m_helper->eventDescription(action,
         vms::event::AggregationInfo(), qnSettings->extraInfoInTree());
 
-    //TODO: #GDM #3.1 move this code to ::eventDetails()
+    // TODO: #GDM #3.1 move this code to ::eventDetails()
     if (eventType == vms::event::licenseIssueEvent
         && params.reasonCode == vms::event::EventReason::licenseRemoved)
     {

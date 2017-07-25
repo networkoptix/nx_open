@@ -162,9 +162,9 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
 
-    //TODO: implement preview receiving and displaying
+    // TODO: implement preview receiving and displaying
 
-    //TODO: think about forced refresh in some cases or even a button - low priority
+    // TODO: think about forced refresh in some cases or even a button - low priority
 }
 
 QnPtzManageDialog::~QnPtzManageDialog()
@@ -522,7 +522,7 @@ void QnPtzManageDialog::at_addTourButton_clicked()
     //bool wasEmpty = m_model->rowCount() == 0;
     m_model->addTour();
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
-    //if (wasEmpty) { //TODO: check if needed
+    //if (wasEmpty) { // TODO: check if needed
         // TODO: #Elric duplicate code with QnPtzTourWidget
     for (int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
         if (ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)

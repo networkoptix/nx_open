@@ -63,7 +63,7 @@ auto weeks(int count)
     return days(count * kDaysPerWeek);
 }
 
-//TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+// TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
 const qint64 kBytesInGB = 1024ll * 1024 * 1024;
 const qint64 kBytesInTB = 1024ll * kBytesInGB;
 const qint64 kFinalStepSeconds = 1000000000ll * 10;
@@ -71,7 +71,7 @@ const qint64 kFinalStepSeconds = 1000000000ll * 10;
 const int kTableRowHeight = 24;
 const int kMinimumColumnWidth = 110;
 
-//TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
+// TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
 const std::array<qint64, 5> kExtraDataBase =
 {
     10 * kBytesInGB,
@@ -228,7 +228,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
 
-    //TODO: #GDM move to std texts
+    // TODO: #GDM move to std texts
     ui->extraSizeSpinBox->setSuffix(L' ' + tr("TB", "TB - terabytes"));
     ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
         , qRound(ui->extraSizeSpinBox->maximum())));

@@ -165,7 +165,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    //TODO: #GDM #PTZ fix the text
+    // TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
         messages::Ptz::failedToGetPosition(mainWindow(),
@@ -193,7 +193,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
     if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
-        //TODO: #GDM #PTZ show appropriate error message?
+        // TODO: #GDM #PTZ show appropriate error message?
         return;
     }
 
@@ -377,7 +377,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
         messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
-    //TODO: #GDM #PTZ check other cases
+    // TODO: #GDM #PTZ check other cases
 }
 
 void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()

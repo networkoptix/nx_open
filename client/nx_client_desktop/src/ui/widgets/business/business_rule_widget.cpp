@@ -138,7 +138,7 @@ void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
 /*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);
         ui->actionTypeComboBox->setModel(NULL);*/
-        //TODO: #GDM #Business clear model? dummy?
+        // TODO: #GDM #Business clear model? dummy?
         return;
     }
 
@@ -448,7 +448,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); //TODO: #GDM #Business or servers?
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); // TODO: #GDM #Business or servers?
 
     vms::event::EventType eventType = m_model->eventType();
     if (eventType == vms::event::cameraMotionEvent)

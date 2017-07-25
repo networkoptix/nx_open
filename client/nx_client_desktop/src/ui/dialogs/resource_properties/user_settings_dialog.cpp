@@ -151,7 +151,7 @@ private:
     {
         QString name = categoryName(filter);
         if (all) //: This will be a part of "All Cameras & Resources" or "All Shared Layouts"
-            return makeGenericCountRow(name, tr("All")); //TODO: #GDM #tr make sure comment is handled
+            return makeGenericCountRow(name, tr("All")); // TODO: #GDM #tr make sure comment is handled
 
         if (filter == QnResourceAccessFilter::LayoutsFilter || total < 0)
             return makeGenericCountRow(name, count);
@@ -171,7 +171,7 @@ private:
                     ++count;
             };
 
-        //TODO: #GDM think where to store flags set to avoid duplication
+        // TODO: #GDM think where to store flags set to avoid duplication
         checkFlag(Qn::GlobalEditCamerasPermission);
         checkFlag(Qn::GlobalControlVideoWallPermission);
         checkFlag(Qn::GlobalViewLogsPermission);
@@ -238,7 +238,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
             m_user = newUser;
             m_model->setUser(m_user);
 
-    #if false //TODO: #common Enable this if we want to change OK button caption when creating a cloud user
+    #if false // TODO: #common Enable this if we want to change OK button caption when creating a cloud user
             buttonBox()->button(QDialogButtonBox::Ok)->setText(
                 isCloud ? tr("Send Invite") : QCoreApplication::translate("QPlatformTheme", "OK")); // As in Qt
     #endif
@@ -459,8 +459,8 @@ void QnUserSettingsDialog::applyChanges()
     if (mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
         return;
 
-    //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
-    //TODO: #GDM #access SafeMode what to rollback if we were creating new user
+    // TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
+    // TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user,
         [this, mode](const QnUserResourcePtr& /*user*/)
         {

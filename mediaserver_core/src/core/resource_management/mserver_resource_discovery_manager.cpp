@@ -157,7 +157,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {
-            //TODO: #rvasilenko please make sure we can safely continue here
+            // TODO: #rvasilenko please make sure we can safely continue here
             //it = resources.erase(it); // do not need to investigate OK resources
             ++it;
             continue;

@@ -213,7 +213,7 @@ QnResourceWidget::~QnResourceWidget()
     ensureAboutToBeDestroyedEmitted();
 }
 
-//TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
+// TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
     addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));

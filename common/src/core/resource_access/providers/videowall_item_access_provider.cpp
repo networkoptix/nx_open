@@ -61,7 +61,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         if (!QnResourceAccessFilter::isShareableMedia(resource))
             return false;
 
-        //TODO: #GDM here resource splitting may help a lot: take all videowalls before, then
+        // TODO: #GDM here resource splitting may help a lot: take all videowalls before, then
         //      go over all layouts, checking only if parent id is in set
         const auto resourceId = resource->getId();
         for (const auto& resource: commonModule()->resourcePool()->getResourcesWithFlag(Qn::layout))

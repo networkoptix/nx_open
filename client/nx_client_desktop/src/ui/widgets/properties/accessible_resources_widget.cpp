@@ -352,7 +352,7 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
             return false;
 
         // Ignore "Preview Search" layouts.
-        //TODO: #GDM do not add preview search layouts to the resource pool
+        // TODO: #GDM do not add preview search layouts to the resource pool
         if (layout->data().contains(Qn::LayoutSearchStateRole))
             return false;
 
@@ -438,7 +438,7 @@ void QnAccessibleResourcesWidget::initSortFilterModel()
     m_sortFilterModel->setFilterKeyColumn(QnResourceListModel::NameColumn);
     m_sortFilterModel->setDynamicSortFilter(true);
 
-    //TODO: #GDM #replace with SearchLineEdit
+    // TODO: #GDM #replace with SearchLineEdit
     ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
     ui->filterLineEdit->setClearButtonEnabled(true);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, updateFilter);

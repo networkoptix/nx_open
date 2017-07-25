@@ -106,13 +106,13 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     }
     painter->fillRect(paintRect, m_backgroundColor);
 
-    //TODO: #GDM #3.1 paint layout background and calculate its size in bounding geometry
+    // TODO: #GDM #3.1 paint layout background and calculate its size in bounding geometry
     QRectF bounding;
     for(const auto& data: m_layout->getItems())
     {
         QRectF itemRect = data.combinedGeometry;
         if (!itemRect.isValid())
-            continue; //TODO: #GDM #VW some items can be not placed yet, wtf
+            continue; // TODO: #GDM #VW some items can be not placed yet, wtf
         bounding = bounding.united(itemRect);
     }
 
@@ -188,7 +188,7 @@ LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
     if (!resource)
         return ThumbnailInfo();
 
-    //TODO: #GDM #rename placeholders
+    // TODO: #GDM #rename placeholders
     if (resource->hasFlags(Qn::server))
         return qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png");
 
@@ -204,7 +204,7 @@ LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     NX_EXPECT(camera);
 
-    //TODO: #GDM remove m_thumbnailManager->select and thumbnailReady?
+    // TODO: #GDM remove m_thumbnailManager->select and thumbnailReady?
     if (!m_thumbnailManager->hasThumbnailForCamera(camera))
         m_thumbnailManager->selectCamera(camera);
 

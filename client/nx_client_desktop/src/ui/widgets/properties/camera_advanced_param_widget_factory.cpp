@@ -196,7 +196,7 @@ public:
 
     virtual QSize sizeHint() const override
     {
-        //TODO: #GDM Looks like dirty hack. Investigation is required. #low #future
+        // TODO: #GDM Looks like dirty hack. Investigation is required. #low #future
         return QSize(9999, m_lineEdit->sizeHint().height());
     }
 

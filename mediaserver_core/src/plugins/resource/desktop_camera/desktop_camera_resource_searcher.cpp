@@ -101,7 +101,7 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
 QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info)
 {
     QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
-    cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
+    cam->setModel(lit("virtual desktop camera"));   // TODO: #GDM globalize the constant
     cam->setTypeId(QnResourceTypePool::kDesktopCameraTypeUuid);
     cam->setPhysicalId(info.userId);
     return cam;

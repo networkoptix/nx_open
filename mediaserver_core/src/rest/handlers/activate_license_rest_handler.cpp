@@ -103,7 +103,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);
     params.addQueryItem(kBrand, runtimeData.brand);
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
     if(QnAppInfo::isBpi() || QnAppInfo::isNx1())

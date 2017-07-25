@@ -17,7 +17,7 @@
 
 namespace {
 
-//TODO: #GDM #3.1 think about common place for this code or simply move shortcut creating to handler
+// TODO: #GDM #3.1 think about common place for this code or simply move shortcut creating to handler
 QString binaryPath()
 {
     const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
@@ -114,7 +114,7 @@ bool QnVideowallSettingsDialog::deleteShortcut(const QnVideoWallResourcePtr &vid
     return qnPlatform->shortcuts()->deleteShortcut(destinationPath, videowall->getName());
 }
 
-//TODO: #GDM duplicate code
+// TODO: #GDM duplicate code
 bool QnVideowallSettingsDialog::canStartVideowall(const QnVideoWallResourcePtr &videowall) const {
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {

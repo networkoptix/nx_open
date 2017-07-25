@@ -390,7 +390,7 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             return true;
         };
 
-    //TODO: #GDM support videowall reviews
+    // TODO: #GDM support videowall reviews
     auto sourceId = [](const QnLayoutResourcePtr& layout)
         {
             const auto tourId = layout->data(Qn::LayoutTourUuidRole).value<QnUuid>();

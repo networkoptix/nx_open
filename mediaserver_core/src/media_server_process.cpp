@@ -1728,7 +1728,7 @@ void MediaServerProcess::at_timer()
     if (isStopping())
         return;
 
-    //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
+    // TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     qnServerModule->runTimeSettings()->setValue(
         "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
 
@@ -3012,10 +3012,10 @@ void MediaServerProcess::run()
     qnServerModule->roSettings()->sync();
 
 #ifndef EDGE_SERVER
-    //TODO: #GDM make this the common way with other settings
+    // TODO: #GDM make this the common way with other settings
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
-    qnGlobalSettings->synchronizeNowSync(); //TODO: #GDM double sync
+    qnGlobalSettings->synchronizeNowSync(); // TODO: #GDM double sync
 #endif
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));

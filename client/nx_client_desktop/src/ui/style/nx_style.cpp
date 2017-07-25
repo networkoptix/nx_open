@@ -539,7 +539,7 @@ QnNxStylePrivate::QnNxStylePrivate() :
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
-    //TODO: Think through how to make it better
+    // TODO: Think through how to make it better
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates.
      * Menu popups do not cause deactivation but steal focus so we should handle that too. */
     installEventHandler(qApp, { QEvent::WindowDeactivate, QEvent::FocusOut }, this,

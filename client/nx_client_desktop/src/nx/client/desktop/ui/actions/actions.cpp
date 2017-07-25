@@ -901,7 +901,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
-    factory(SaveLayoutAsAction) //TODO: #GDM #access check canCreateResource permission
+    factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
         .condition(
@@ -909,7 +909,7 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
         );
 
-    factory(SaveLayoutForCurrentUserAsAction) //TODO: #GDM #access check canCreateResource permission
+    factory(SaveLayoutForCurrentUserAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As..."))
         .condition(
@@ -1183,7 +1183,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree)
         .separator();
 
-    //TODO: #gdm restore this functionality and allow to delete exported layouts
+    // TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(DeleteFromDiskAction)
         //flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
@@ -1378,7 +1378,7 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
-    //TODO: #GDM Move to childFactory, reduce actions number
+    // TODO: #GDM Move to childFactory, reduce actions number
     factory.beginSubMenu();
     {
         factory.beginGroup();

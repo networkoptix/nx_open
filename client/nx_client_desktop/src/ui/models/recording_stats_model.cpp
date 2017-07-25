@@ -17,7 +17,7 @@
 namespace {
 
 // TODO: #vkutin #common Refactor all this to use some common formatting
-//TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+// TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
 const qreal kBytesInKB = 1024.0;
 
 const qreal kBytesInMB = kBytesInKB * kBytesInKB;

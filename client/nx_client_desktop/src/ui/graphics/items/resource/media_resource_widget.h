@@ -45,7 +45,7 @@ class SoftwareTriggerButton;
 } // namespace client
 } // namespace nx
 
-//TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
+// TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
 
 class QnResourceDisplay;
