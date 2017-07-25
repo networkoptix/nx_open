@@ -758,10 +758,11 @@ void ConnectionManager::onHttpConnectionUpgraded(
         localPeerData,
         remotePeerInfo);
 
-    auto connectionId = QnUuid::createUuid().toSimpleByteArray();
+    auto connectionId = QnUuid::createUuid();
+    transactionTransport->setConnectionGuid(connectionId);
     ConnectionContext context{
         std::move(transactionTransport),
-        connectionId,
+        connectionId.toSimpleByteArray(),
         { localPeerData.systemId.toByteArray(), remotePeerInfo.id.toByteArray() } };
 
     if (!addNewConnection(std::move(context)))

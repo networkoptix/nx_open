@@ -155,7 +155,12 @@ void WebSocketTransactionTransport::setOnGotTransaction(GotTransactionEventHandl
 
 QnUuid WebSocketTransactionTransport::connectionGuid() const
 {
-    return QnUuid();
+    return m_connectionGuid;
+}
+
+void WebSocketTransactionTransport::setConnectionGuid(const QnUuid& value)
+{
+    m_connectionGuid = value;
 }
 
 const TransactionTransportHeader&

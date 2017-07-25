@@ -32,6 +32,7 @@ public:
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
+    void setConnectionGuid(const QnUuid& value);
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
@@ -60,6 +61,7 @@ private:
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
     ::ec2::QnTranState m_remoteSubscription; //< remote -> local subscription
+    QnUuid m_connectionGuid;
 };
 
 } // namespace ec2
