@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <api/app_server_connection.h>
 #include <api/server_rest_connection.h>
 
@@ -757,6 +759,33 @@ void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visi
     m_textOverlayWidget->addItem(text, options, id);
 }
 
+Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
+    QPainter* painter,
+    int channel,
+    const QRectF& sourceSubRect,
+    const QRectF& targetRect)
+{
+    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+
+    qreal opacity = effectiveOpacity();
+    bool opaque = qFuzzyCompare(opacity, 1.0);
+    // always use blending for images --gdm
+    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    m_renderer->setBlurFactor(m_statusOverlay->opacity());
+    const auto result = m_renderer->paint(channel, sourceSubRect, targetRect, effectiveOpacity());
+    m_paintedChannels[channel] = true;
+
+    /* There is no need to restore blending state before invoking endNativePainting. */
+    QnGlNativePainting::end(painter);
+
+    return result;
+}
+
 void QnMediaResourceWidget::setupHud()
 {
     static const int kScrollLineHeight = 8;
@@ -1273,26 +1302,57 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateInfoTextLater();
 }
 
-Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect)
+Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
+    QPainter* painter,
+    int channel,
+    const QRectF& channelRect,
+    const QRectF& paintRect)
 {
-    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+    const auto& transform = painter->transform();
+    const auto type = transform.type();
+    const QRectF sourceSubRect = toSubRect(channelRect, paintRect);
 
-    qreal opacity = effectiveOpacity();
-    bool opaque = qFuzzyCompare(opacity, 1.0);
-    // always use blending for images --gdm
-    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+    Qn::RenderStatus result = Qn::NothingRendered;
+
+    // 1. The simplest case: only translate & scale.
+    qDebug() << "transform type" << type;
+    if (type <= QTransform::TxScale)
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        const QRect devicePaintRect = transform.mapRect(paintRect).toAlignedRect();
+        const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+
+        result = paintVideoTexture(painter,
+            channel,
+            sourceSubRect,
+            devicePaintRect);
     }
+    else if (type <= QTransform::TxRotate)
+    {
+        // 2. More complicated case: with possible rotation.
+        const auto sx = std::hypot(transform.m11(), transform.m12());
+        const auto sy = std::hypot(transform.m21(), transform.m22());
 
-    QRectF sourceRect = toSubRect(channelRect, paintRect);
-    m_renderer->setBlurFactor(m_statusOverlay->opacity());
-    Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
-    m_paintedChannels[channel] = true;
+        // Uniform scale, no shear; possible mirroring.
+        if (qFuzzyEquals(qAbs(sx), qAbs(sy)) && !qFuzzyIsNull(sx))
+        {
+            /* Strip transformation of scale: */
+            const QnScopedPainterTransformRollback transformRollback(painter, QTransform(
+                transform.m11() / sx, transform.m12() / sx,
+                transform.m21() / sy, transform.m22() / sy,
+                transform.dx(), transform.dy()));
 
-    /* There is no need to restore blending state before invoking endNativePainting. */
-    QnGlNativePainting::end(painter);
+            const auto scaledPaintRect = QTransform::fromScale(sx, sy).mapRect(paintRect);
+            result = paintVideoTexture(painter,
+                channel,
+                sourceSubRect,
+                scaledPaintRect);
+        }
+    }
+    else
+    {
+        // 3. The most complicated case: non-conformal mapping.
+        NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
+    }
 
     if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
         base_type::paintChannelBackground(painter, channel, channelRect, paintRect);

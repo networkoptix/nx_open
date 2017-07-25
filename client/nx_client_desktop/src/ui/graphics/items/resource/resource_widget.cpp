@@ -993,10 +993,33 @@ void QnResourceWidget::paintWindowFrame(
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
+    int mainBorderWidth = 1;
+
+    switch (m_selectionState)
+    {
+        case SelectionState::invalid:
+        case SelectionState::notSelected:
+            return;
+
+        case SelectionState::inactiveFocused:
+        case SelectionState::focused:
+        case SelectionState::focusedAndSelected:
+            mainBorderWidth = 2;
+            break;
+        case SelectionState::selected:
+            break;
+    }
+
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
-    static const int kFramePadding = 1;
+
+    // Dark outer border right near the camera.
+    static const int kSpacerBorderWidth = 1;
+    const QColor spacerBorderColor = qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(3);
+    QnNxStyle::paintCosmeticFrame(painter, rect(), spacerBorderColor, kSpacerBorderWidth,
+        -kSpacerBorderWidth);
+
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
-        -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
+        mainBorderWidth, -kSpacerBorderWidth - mainBorderWidth);
 }
 
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,

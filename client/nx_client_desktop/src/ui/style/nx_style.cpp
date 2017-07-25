@@ -3601,7 +3601,7 @@ int QnNxStyle::styleHint(
         case SH_FocusFrame_AboveWidget:
             return 1;
         case SH_DialogButtonLayout:
-            return QDialogButtonBox::KdeLayout;            
+            return QDialogButtonBox::KdeLayout;
         case SH_ScrollBar_ContextMenu:
             return 0;
         default:
@@ -4260,8 +4260,8 @@ void paintRectFrame(QPainter* painter, const Rect& rect,
 
     const Rect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
     const Rect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
-    const Rect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
-    const Rect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+    const Rect rightRect(innerRect.left() + innerRect.width(), innerRect.top(), width, innerRect.height());
+    const Rect bottomRect(outerRect.left(), innerRect.top() + innerRect.height(), outerRect.width(), width);
 
     const QBrush brush(color);
     painter->fillRect(topRect, brush);
