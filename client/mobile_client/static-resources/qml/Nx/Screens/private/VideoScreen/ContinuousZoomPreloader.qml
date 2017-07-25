@@ -9,6 +9,8 @@ Item
 
     property color color: "white"
     property real spacing: 8
+    property real sectionFOV: Math.PI / 2
+    property real sectionRotation: Math.PI / 2
 
     implicitHeight: 96
     implicitWidth: 96
@@ -35,10 +37,8 @@ Item
             {
                 id: section
 
-                readonly property real angleDiff: Math.PI / 3
                 property int sectionIndex: index
                 property real offset: 0
-                property real angle: offset + (index % 2 ? Math.PI / 2 : 0)
                 property real innerRadius: dot.radius + control.spacing * (index * 2 + 1)
                 property real outerRadius: innerRadius + control.spacing
 
@@ -56,13 +56,13 @@ Item
                     context.scale(Screen.devicePixelRatio, Screen.devicePixelRatio)
 
                     context.fillStyle = Qt.rgba(255, 255, 255, 255)
-                    drawSection(angle + Math.PI, angleDiff)
-                    drawSection(angle, angleDiff)
+                    drawSection(offset + Math.PI * 3 / 2)
+                    drawSection(offset + Math.PI / 2)
                 }
 
-                function drawSection(targetAngle, fov)
+                function drawSection(targetAngle)
                 {
-                    var angleDiff = fov / 2
+                    var angleDiff = control.sectionFOV / 2
                     var centerAspect = 1 / (2 * Screen.devicePixelRatio)
                     var center = Qt.vector2d(
                         section.width * centerAspect,
@@ -105,8 +105,8 @@ Item
                         property: "offset"
                         duration: 1000
                         easing.type: Easing.InOutQuad
-                        from: -animation.initialSign * Math.PI / 2
-                        to: animation.initialSign * Math.PI / 2
+                        from: animation.initialSign * control.sectionRotation / 2
+                        to: -animation.initialSign * control.sectionRotation / 2
                     }
 
                     onStopped:
