@@ -25,7 +25,7 @@ public:
     WebSocketTransactionTransport(
         TransactionLog* const transactionLog,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
-        ::ec2::ApiPeerData localPeerData,
+        ::ec2::ApiPeerDataEx localPeerData,
         ::ec2::ApiPeerDataEx remotePeerData);
 
     virtual SocketAddress remoteSocketAddr() const override;
@@ -56,8 +56,6 @@ private:
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     TransactionLog* const m_transactionLog;
-    ::ec2::ApiPeerData m_localPeerData;
-    ::ec2::ApiPeerDataEx m_remotePeerData;
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;

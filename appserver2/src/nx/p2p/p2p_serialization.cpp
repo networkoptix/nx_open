@@ -218,18 +218,23 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
 QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront)
 {
     QByteArray result;
-    QBuffer buffer(&result);
-    buffer.open(QIODevice::WriteOnly);
-    QDataStream out(&buffer);
-
-    for (auto itr = request.values.begin(); itr != request.values.end(); ++itr)
     {
-        const ApiPersistentIdData& peer = itr.key();
-        qint32 sequence = itr.value();
+        QBuffer buffer(&result);
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream out(&buffer);
 
-        out.writeRawData(peer.id.toRfc4122().data(), kGuidSize);
-        out.writeRawData(peer.persistentId.toRfc4122().data(), kGuidSize);
-        out << sequence;
+        for (int i = 0; i < reservedSpaceAtFront; ++i)
+            out << (quint8) 0;
+
+        for (auto itr = request.values.begin(); itr != request.values.end(); ++itr)
+        {
+            const ApiPersistentIdData& peer = itr.key();
+            qint32 sequence = itr.value();
+
+            out.writeRawData(peer.id.toRfc4122().data(), kGuidSize);
+            out.writeRawData(peer.persistentId.toRfc4122().data(), kGuidSize);
+            out << sequence;
+        }
     }
     return result;
 }

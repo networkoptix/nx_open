@@ -937,7 +937,7 @@ void MessageBus::at_gotMessage(
         result = handleSubscribeForDataUpdates(connection, payload);
         break;
     case MessageType::subscribeAll:
-        result = handleSubscribeForDataUpdates(connection, payload);
+        result = handleSubscribeForAllDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
         result = handlePushTransactionData(connection, payload, TransportHeader());
@@ -1144,21 +1144,6 @@ void MessageBus::sendRuntimeData(
     }
 }
 
-void mergeTranStateList(QnTranState& newSubscription, const QnTranState& oldSubscription)
-{
-    auto itrOldSubscription = oldSubscription.values.begin();
-    for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
-    {
-        while (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() < itr.key())
-            ++itrOldSubscription;
-
-        if (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() == itr.key())
-        {
-            itr.value() = std::max(itr.value(), itrOldSubscription.value());
-        }
-    }
-}
-
 bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
@@ -1176,7 +1161,18 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
 
     // merge current and new subscription
     QnTranState& oldSubscription = context(connection)->remoteSubscription;
-    mergeTranStateList(newSubscription, oldSubscription);
+    auto itrOldSubscription = oldSubscription.values.begin();
+    for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
+    {
+        while (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() < itr.key())
+            ++itrOldSubscription;
+
+        if (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() == itr.key())
+        {
+            itr.value() = std::max(itr.value(), itrOldSubscription.value());
+        }
+    }
+
 
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(connection->remotePeer()));
     if (context(connection)->sendDataInProgress)
@@ -1234,10 +1230,11 @@ bool MessageBus::selectAndSendTransactions(
     if (addImplicitData)
     {
         // Add all implicit records from 0 sequence.
-        auto currentState = m_db->transactionLog()->getTransactionsState();
-        for (auto itr = currentState.values.begin(); itr != currentState.values.end(); ++itr)
-            itr.value() = 0;
-        mergeTranStateList(newSubscription, currentState);
+        for (const auto& key: m_db->transactionLog()->getTransactionsState().values.keys())
+        {
+            if (!newSubscription.values.contains(key))
+                newSubscription.values.insert(key, 0);
+        }
     }
 
     if (m_db)

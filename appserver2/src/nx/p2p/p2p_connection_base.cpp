@@ -291,6 +291,8 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
+    NX_ASSERT(!data.isEmpty());
+
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);

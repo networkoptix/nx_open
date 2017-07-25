@@ -152,6 +152,9 @@ typedef QSet<QnUuid> QnPeerSet;
 
 struct ApiPeerDataEx: public ApiPeerData
 {
+    ApiPeerDataEx(): ApiPeerData() {}
+    ApiPeerDataEx(const ApiPeerData& data) : ApiPeerData(data) {}
+
     QnUuid systemId;
     QString cloudHost = nx::network::AppInfo::defaultCloudHost();
     qint64 identityTime = 0;
@@ -161,7 +164,11 @@ struct ApiPeerDataEx: public ApiPeerData
 
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
 
-ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request);
+ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request);
+void serializeToResponse(
+    nx_http::Response* response,
+    ec2::ApiPeerDataEx localPeer,
+    Qn::SerializationFormat dataFormat);
 
 } // namespace ec2
 

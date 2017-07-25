@@ -28,7 +28,7 @@ protected:
     virtual void run() override;
 
 private:
-    QByteArray responseBody(Qn::SerializationFormat dataFormat);
+    ec2::ApiPeerDataEx localPeer() const;
     bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
     bool isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const;
     Qn::UserAccessData userAccessData(const ec2::ApiPeerDataEx& remotePeer) const;

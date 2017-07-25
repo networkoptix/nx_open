@@ -5,7 +5,7 @@
 
 namespace ec2 {
 
-ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request)
+ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request)
 {
     ec2::ApiPeerDataEx remotePeer;
     QUrlQuery query(request.requestLine.url.query());
@@ -25,6 +25,22 @@ ec2::ApiPeerDataEx deserializeRemotePeerInfo(const nx_http::Request& request)
     if (remotePeer.id.isNull())
         remotePeer.id = QnUuid::createUuid();
     return remotePeer;
+}
+
+void serializeToResponse(
+    nx_http::Response* response,
+    ec2::ApiPeerDataEx localPeer,
+    Qn::SerializationFormat dataFormat)
+{
+    QByteArray result;
+    if (dataFormat == Qn::JsonFormat)
+        result = QJson::serialized(localPeer);
+    else if (dataFormat == Qn::UbjsonFormat)
+        result = QnUbjson::serialized(localPeer);
+    else
+        NX_ASSERT(0, "Unsupported data format.");
+
+    response->headers.insert(nx_http::HttpHeader(Qn::EC2_PEER_DATA, result.toBase64()));
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
