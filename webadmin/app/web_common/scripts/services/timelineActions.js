@@ -77,6 +77,7 @@ TimelineActions.prototype.updatePosition = function(){
     if(self.positionProvider) {
         if(self.nextPlayedPosition){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
+                console.log("clear nextPlayedPosition", self.nextPlayedPosition, self.positionProvider.playedPosition);
                 self.nextPlayedPosition = false;
             }
 
@@ -365,7 +366,8 @@ TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.catchScrollSlider = this.scaleManager.scrollSlider();
 };
 TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
-    if(!this.catchScrollSlider.scrollingWidth){ // Do not scroll on full zoom out
+    if(!this.catchScrollSlider || !this.catchScrollSlider.scrollingWidth){
+        // Do not scroll if there is no caught position and on full zoom out
         return;
     }
     if(this.catchScrollBar) {
