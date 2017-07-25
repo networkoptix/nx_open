@@ -32,7 +32,7 @@
                 </property>
             </activation>
             <properties>
-                <!-- Uncomment to enable libc/libstdc++ upgrade -->
+                <!-- Uncomment to enable libc/libstdc upgrade -->
                 <!-- <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1 libc6-2.23 libstdc++-6.0.20 read-edid-3.0.2 a10-display ffmpeg-3.0.2 fontconfig-2.11.0 curl-7.51.0</rdep.linux.packages> -->
                 <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ldpreloadhook-1.0-deb7 libpixman-0.34.0-deb7 libump-3.0 libvdpau-sunxi-1.0-deb7 libcedrus-1.0-deb7 libvdpau-1.0.4.1 libstdc++-6.0.19 read-edid-3.0.2 a10-display ffmpeg-3.0.2 fontconfig-2.11.0 proxy-decoder-deb7 fonts-takao-mincho-00303.01</rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
@@ -41,7 +41,7 @@
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>mobile_client</artifactId>
-                    <version>${project.version}</version>
+                    <version>3.0.3-SNAPSHOT</version>
                     <type>pom</type>
                     <scope>system</scope>
                     <systemPath>${root.dir}/client/mobile_client/pom.xml</systemPath>
