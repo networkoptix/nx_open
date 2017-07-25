@@ -54,14 +54,15 @@ void WebSocketTransactionTransport::at_gotMessage(
         {
             TransactionTransportHeader cdbTransportHeader;
             cdbTransportHeader.endpoint = remoteSocketAddr();
-            cdbTransportHeader.systemId = remotePeer().systemId.toByteArray();
-            cdbTransportHeader.connectionId = connectionGuid().toByteArray();
+            cdbTransportHeader.systemId = m_cloudSystemId.toSimpleByteArray();
+            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
             cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
             m_gotTransactionEventHandler(
                 remotePeer().dataFormat,
                 std::move(payload),
                 std::move(cdbTransportHeader));
+                //cdbTransportHeader);
             break;
         }
         case nx::p2p::MessageType::subscribeAll:
@@ -163,6 +164,11 @@ void WebSocketTransactionTransport::setConnectionGuid(const QnUuid& value)
     m_connectionGuid = value;
 }
 
+void WebSocketTransactionTransport::setCloudSystemId(const QnUuid& id)
+{
+    m_cloudSystemId = id;
+}
+
 const TransactionTransportHeader&
     WebSocketTransactionTransport::commonTransportHeaderOfRemoteTransaction() const
 {
@@ -178,7 +184,6 @@ void WebSocketTransactionTransport::sendTransaction(
 
     auto serializedTransaction = transactionSerializer->serialize(
         remotePeer().dataFormat,
-        std::move(transportHeader),
         highestProtocolVersionCompatibleWithRemotePeer());
     sendMessage(nx::p2p::MessageType::pushTransactionData, serializedTransaction);
 }

@@ -39,6 +39,8 @@ public:
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
+
+    void setCloudSystemId(const QnUuid& id);
 protected:
     virtual void setState(State state) override;
 private:
@@ -62,6 +64,7 @@ private:
     bool m_tranLogRequestInProgress = false;
     ::ec2::QnTranState m_remoteSubscription; //< remote -> local subscription
     QnUuid m_connectionGuid;
+    QnUuid m_cloudSystemId;
 };
 
 } // namespace ec2

@@ -748,10 +748,9 @@ void ConnectionManager::onHttpConnectionUpgraded(
             .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
         return;
     }
+    const nx::String systemIdLocal(systemId.c_str());
 
     ::ec2::ApiPeerDataEx localPeerData(m_localPeerData);
-    // Do not trust specified systemId. Use it from authentication info instead
-    localPeerData.systemId = remotePeerInfo.systemId = QnUuid(systemId);
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         m_transactionLog,
         std::move(webSocket),
@@ -760,16 +759,17 @@ void ConnectionManager::onHttpConnectionUpgraded(
 
     auto connectionId = QnUuid::createUuid();
     transactionTransport->setConnectionGuid(connectionId);
+    transactionTransport->setCloudSystemId(QnUuid(systemIdLocal));
     ConnectionContext context{
         std::move(transactionTransport),
         connectionId.toSimpleByteArray(),
-        { localPeerData.systemId.toByteArray(), remotePeerInfo.id.toByteArray() } };
+        { systemIdLocal, remotePeerInfo.id.toByteArray() } };
 
     if (!addNewConnection(std::move(context)))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
-            .arg(remotePeerInfo.id).arg(remotePeerInfo.systemId).arg(remoteAddress).arg(connectionId),
+            .arg(remotePeerInfo.id).arg(systemIdLocal).arg(remoteAddress).arg(connectionId),
             cl_logDEBUG1);
     }
 }
