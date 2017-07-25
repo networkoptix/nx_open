@@ -1,3 +1,7 @@
+if(IOS)
+    set(codesignKeychain "nx_build" CACHE STRING "Keychain name to be used to sign binaries.")
+endif()
+
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
 set(product.title "${mobile_client.name}")
@@ -12,12 +16,22 @@ nx_configure_file(
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+set(resources)
+
 if(IOS)
+    if(NOT mobile_client_ios_launch_screen)
+        set(mobile_client_ios_launch_screen "${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib")
+    endif()
+
     set(ios_sources
         src/nx/mobile_client/settings/settings_migration_ios.mm
         src/ui/window_utils_ios.mm
         src/utils/app_delegate.mm
     )
+
+    set(icons_dir "${customization_dir}/icons/ios/ios/images")
+    file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+    list(APPEND resources ${mobile_client_ios_launch_screen})
 else()
     set(ios_sources)
 endif()
@@ -30,6 +44,7 @@ set(target_args
         "${customization_dir}/mobile_client/resources"
     OTHER_SOURCES
         ${QML_FILES}
+        ${resources}
     PUBLIC_LIBS
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
@@ -79,8 +94,6 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    configure_file("maven/filter-resources/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-
     set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
 
     if(beta)
@@ -105,9 +118,11 @@ if(IOS)
 
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
+        RESOURCE "${resources}"
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+        XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codesignKeychain}.keychain"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
     )
 
@@ -172,5 +187,14 @@ if(IOS)
         ${qml_debug_libs}
         Qt5LabsControls Qt5LabsTemplates
         z
+    )
+
+    set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
+
+    add_custom_command(TARGET mobile_client PRE_LINK
+        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
+            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+            --output "${app_dir}/qt_qml"
+        COMMENT "Copying QML imports"
     )
 endif()
