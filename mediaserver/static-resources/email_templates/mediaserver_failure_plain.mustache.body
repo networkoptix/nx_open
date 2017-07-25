@@ -1,0 +1,4 @@
+Server {{#source}}"{{source}}" {{/source}}failed 
+
+Reason: {{reason}}
+Time: {{timestampDate}} {{timestampTime}}
