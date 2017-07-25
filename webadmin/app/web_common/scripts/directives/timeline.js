@@ -279,7 +279,8 @@ angular.module('nxCommon')
                 function canvasDrag(event){
                     updateMouseCoordinate(event);
                     dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
-                              timelineActions.timelineDrag (mouseXOverTimeline);
+                              timelineActions.timelineDrag (mouseXOverTimeline) || dragged;
+                              // dragged is true if it was actually dragged at least once during interaction
                 }
 
                 var preventClick = false;
