@@ -37,6 +37,18 @@ to view more bookmarks</source>
       <translation>Zoom sur chronologie 
 pour afficher plus de signets</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1019,11 +1031,11 @@ pour afficher plus de signets</translation>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Le chemin &quot;%1&quot; n'est pas valide. S.V.P. essayer un autre chemin.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Fichier &quot;%1&quot; existe déjà. S.V.P essayer un autre nom.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
@@ -1170,10 +1182,6 @@ pour afficher plus de signets</translation>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 utilise les librairies externes suivantes:</translation>
@@ -1720,7 +1728,7 @@ pour afficher plus de signets</translation>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Gérer Signets</translation>
     </message>
   </context>
   <context>
@@ -2118,10 +2126,6 @@ pour afficher plus de signets</translation>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
@@ -3692,10 +3696,6 @@ to %1</source>
       <translation>Flux Archive Autorisés:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>Générique:</translation>
     </message>
@@ -3997,7 +3997,7 @@ to %1</source>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>Si le problème persiste, contactez le support client.</translation>
     </message>
   </context>
   <context>
@@ -4600,7 +4600,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Gérer Signets</translation>
     </message>
   </context>
   <context>
@@ -4952,37 +4952,37 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>Rôle %1 n'a pas d'autorisation %2</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>Rôles sélectionnés n'ont pas d'autorisation %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n de %1 Rôles sélectionnés n'ont pas d'autorisation %2</numerusform>
+        <numerusform>%n de %1 Rôles sélectionnés n'ont pas d'autorisation %2</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>Usager %1 n'a pas d'autorisation %2</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>Usagers sélectionnés n'ont pas d'autorisation %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n de %1 Usagers sélectionnés n'ont pas d'autorisation %2</numerusform>
+        <numerusform>%n de %1 Usagers sélectionnés n'ont pas d'autorisation %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6314,27 +6314,27 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>Synchronisation d'archives à distance a été démarré</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>Synchronisation d'archives à distance a été terminée</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>Synchronisation d'archives à distance est en cours</translation>
     </message>
     <message>
       <source>Error occured during remote archive synchronization</source>
-      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+      <translation>Une erreur s'est produite lors de la synchronisation d'archives à distance</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>Synchronisation d'archive à distance a été lancée pour le périphérique suivant:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>Synchronisation d'archive à distance a été terminée pour le périphérique suivant:</translation>
     </message>
   </context>
   <context>
@@ -7708,6 +7708,37 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Copier</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Copier vers Presse-Papier</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Coller</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Coller du Presse-Papier</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
     <message>
       <source>NO DATA</source>
@@ -8010,7 +8041,7 @@ to %1</source>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
+      <translation>Utilisez les flèches du clavier pour changer les caméras. Pour quitter le tour appuyez sur Echap(Esc).</translation>
     </message>
   </context>
   <context>

@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>更にブックマークを表示するにはタイムラインをズームします</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1170,10 +1182,6 @@ to view more bookmarks</source>
   <context>
     <name>QnAboutDialog</name>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
-    <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 は以下の外部ライブラリを使用します:</translation>
     </message>
@@ -2100,10 +2108,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
@@ -3651,10 +3655,6 @@ to %1</source>
     <message>
       <source>Archive Streams Allowed:</source>
       <translation>アーカイブストリーム許可:</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -7605,6 +7605,37 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>コピー</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>クリップボードにコピー</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>貼り付け</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>クリップボードから貼付け</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>

@@ -37,6 +37,18 @@ to view more bookmarks</source>
       <translation>放大時間軸
 以瀏覽更多書籤</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1019,11 +1031,11 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>路徑&quot;%1&quot; 無效. 請嘗試其它路徑.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>檔案 &quot;%1&quot; 已存在. 請嘗試其它名稱.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
@@ -1170,10 +1182,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>複製到剪貼簿</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1使用了下列外部函式庫:</translation>
@@ -1709,7 +1717,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>管理書籤</translation>
     </message>
   </context>
   <context>
@@ -2101,10 +2109,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>複製到剪貼簿</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>確認</translation>
@@ -3658,10 +3662,6 @@ to %1</source>
       <translation>允許的錄影串流:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>複製到剪貼簿</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>通用:</translation>
     </message>
@@ -3953,7 +3953,7 @@ to %1</source>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>如果問題仍然存在, 請與客戶支援連絡.</translation>
     </message>
   </context>
   <context>
@@ -4551,7 +4551,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>管理書籤</translation>
     </message>
   </context>
   <context>
@@ -4897,35 +4897,35 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>角色 %1 沒有 %2 權限</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>所選的角色沒有 %1 權限</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%1 個選定角色中有 %n 個角色沒有 %2 權限</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>使用者 %1 沒有 %2 權限</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>所選的使用者沒有 %1 權限</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%1 個選定使用者中有 %n 個使用者沒有 %2 權限</numerusform>
       </translation>
     </message>
   </context>
@@ -6250,27 +6250,27 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>已啟動遠端錄影備份</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>遠端錄影備份已結束</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>遠端錄影備份進行中</translation>
     </message>
     <message>
       <source>Error occured during remote archive synchronization</source>
-      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+      <translation>遠端錄影備份過程中發生錯誤</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>下列設備已開始遠端錄影備份</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>下列設備已完成遠端錄影備份</translation>
     </message>
   </context>
   <context>
@@ -6373,7 +6373,7 @@ to %1</source>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>dd</translation>
+      <translation>dd日</translation>
     </message>
     <message>
       <source>MMMM</source>
@@ -6388,27 +6388,27 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd日 MMMM yyyy hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm ap</translation>
+      <translation>dd日 MMMM yyyy hh: mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd日 MMMM yyyy hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
+      <translation>dd日 MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
+      <translation>dd日 MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
@@ -7613,6 +7613,37 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>複製</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>複製到剪貼簿</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>貼上</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>從剪貼簿貼上</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
     <message>
       <source>NO DATA</source>
@@ -7908,7 +7939,7 @@ to %1</source>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
+      <translation>使用鍵盤的方向鍵切換攝影機. 退出請按Esc鍵.</translation>
     </message>
   </context>
   <context>

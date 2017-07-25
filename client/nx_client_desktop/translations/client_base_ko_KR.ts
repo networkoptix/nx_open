@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>더 많은 북마크를 보려면 타임 라인을 확대/축소</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1170,10 +1182,6 @@ to view more bookmarks</source>
   <context>
     <name>QnAboutDialog</name>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세보기 복사</translation>
-    </message>
-    <message>
       <source>%1 uses the following external libraries:</source>
       <translation>다음 외부 라이브러리에 %1 사용:</translation>
     </message>
@@ -2100,10 +2108,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세 정보 복사</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>확인</translation>
@@ -3651,10 +3655,6 @@ to %1</source>
     <message>
       <source>Archive Streams Allowed:</source>
       <translation>저장 스트림 허용:</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세보기 복사</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -7605,6 +7605,37 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>비디오 월에 로컬 파일을 표시 하려면 main 비디오월이 설정된 Pc에 파일을 입력하세요</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>복사</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>클립보드 복사</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>붙여넣기</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>클립보드 붙여넣기</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>

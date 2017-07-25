@@ -37,6 +37,18 @@ to view more bookmarks</source>
       <translation type="unfinished">Zoom timeline
 to view more bookmarks</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1171,10 +1183,6 @@ to view more bookmarks</translation>
   <context>
     <name>QnAboutDialog</name>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
-    </message>
-    <message>
       <source>%1 uses the following external libraries:</source>
       <translation type="unfinished">%1 uses the following external libraries:</translation>
     </message>
@@ -2118,10 +2126,6 @@ to view more bookmarks</translation>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation type="unfinished">OK</translation>
@@ -3690,10 +3694,6 @@ to %1</translation>
     <message>
       <source>Archive Streams Allowed:</source>
       <translation type="unfinished">Archive Streams Allowed:</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -7705,6 +7705,37 @@ to %1</translation>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation type="unfinished">Copy to Clipboard</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Paste</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation type="unfinished">Paste from Clipboard</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>
