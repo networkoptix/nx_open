@@ -142,30 +142,31 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
 
         case State::connected:
             m_state = State::reconnecting;
+            retryToConnect();
+            break;
 
         case State::reconnecting:
-        {
-            //retrying
-            const bool nextTryScheduled = m_reconnectTimer.scheduleNextTry(
-                [this]
-                {
-                    initiateConnection();
-                });
-            if (!nextTryScheduled)
-            {
-                //reporting error event
-                m_state = State::failed;
-                if (m_eventHandlers.onConnectionLost)
-                {
-                    //TODO #ak fill event data
-                    m_eventHandlers.onConnectionLost(api::ConnectionLostEvent());
-                }
-            }
-            return;
-        }
+            retryToConnect();
+            break;
 
         default:
             NX_CRITICAL(false, lm("m_state = %1").arg(static_cast<int>(m_state)));
+    }
+}
+
+void EventConnection::retryToConnect()
+{
+    const bool nextTryScheduled = m_reconnectTimer.scheduleNextTry(
+        std::bind(&EventConnection::initiateConnection, this));
+    if (!nextTryScheduled)
+    {
+        //reporting error event
+        m_state = State::failed;
+        if (m_eventHandlers.onConnectionLost)
+        {
+            //TODO #ak fill event data
+            m_eventHandlers.onConnectionLost(api::ConnectionLostEvent());
+        }
     }
 }
 

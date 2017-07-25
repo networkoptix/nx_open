@@ -37,7 +37,9 @@ TEST(RetryTimer, tryCount)
                 doNextTryCalledPromise.get_future().wait_for(std::chrono::seconds(1)));
         }
         if (retryCount != RetryPolicy::kInfiniteRetries)
+        {
             ASSERT_FALSE(retryTimer.scheduleNextTry([]{}));
+        }
 
         retryTimer.pleaseStopSync();
     }

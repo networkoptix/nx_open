@@ -535,9 +535,13 @@ TEST_F(OutgoingTunnel, general)
             else
             {
                 if (!connectorWillSucceed)
+                {
                     ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
+                }
                 else if (!connectionWillSucceed)
+                {
                     ASSERT_EQ(SystemError::connectionReset, result.sysErrorCode);
+                }
                 ASSERT_EQ(nullptr, result.connection);
             }
 
@@ -697,7 +701,9 @@ TEST_F(OutgoingTunnel, cancellation)
             tunnelStoppedPromise.get_future().wait();
 
             if (!waitConnectionCompletion)
+            {
                 ASSERT_TRUE(connectedPromise.get_future().valid());
+            }
         }
 }
 

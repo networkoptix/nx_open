@@ -19,7 +19,7 @@ public:
     {
     }
 
-    virtual int QAbstractAnimation::duration() const override
+    virtual int duration() const override
     {
         return -1; //< Unlimited duration.
     }

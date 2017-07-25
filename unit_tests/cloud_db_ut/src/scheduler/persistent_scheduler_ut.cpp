@@ -198,10 +198,14 @@ protected:
     void thenTimersFiredSeveralTimes(int taskCount = -1)
     {
         if (taskCount >= 0)
+        {
             ASSERT_EQ(user->tasks().size(), static_cast<std::size_t>(taskCount));
+        }
 
         for (const auto& task : user->tasks())
+        {
             ASSERT_GT(task.second.fired, 0);
+        }
     }
 
     SqlExecutorStub executor;
