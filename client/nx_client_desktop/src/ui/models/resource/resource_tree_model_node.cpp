@@ -124,7 +124,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setNameInternal(tr("Layouts"));
         break;
     case Qn::LayoutToursNode:
-        setNameInternal(tr("Layout Tours"));
+        setNameInternal(tr("Reels"));
         break;
     case Qn::RecorderNode:
         m_state = Invalid;
@@ -331,7 +331,7 @@ void QnResourceTreeModelNode::update()
         case Qn::LayoutTourNode:
         {
             auto tour = layoutTourManager()->tour(m_uuid);
-            setNameInternal(tour.name.isEmpty() ? tr("Layout Tour") : tour.name);
+            setNameInternal(tour.name.isEmpty() ? tr("Showreel") : tour.name);
             break;
         }
         case Qn::CurrentSystemNode:

@@ -1,0 +1,4 @@
+Input signal{{#source}} on {{source}}{{/source}}
+
+Input Port: {{inputPort}}
+Time: {{timestampDate}} {{timestampTime}}
