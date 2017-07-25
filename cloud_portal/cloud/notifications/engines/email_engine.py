@@ -90,7 +90,3 @@ def read_logo(filename):
             logos_cache[filename] = fp.read()
     return logos_cache[filename]
 
-
-def update_logo_cache(file_name, image):
-    global logos_cache
-    logos_cache[file_name] = image

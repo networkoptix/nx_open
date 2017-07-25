@@ -3,7 +3,7 @@ from datetime import datetime
 from notifications.engines.email_engine import send
 
 from PIL import Image
-import base64, ast
+import base64
 
 from .filldata import fill_content
 from api.models import Account
@@ -62,10 +62,7 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 				#Gets the meta_settings form the DataStructure to check if the sizes are valid
 				#if the length is zero then there is no meta settings
 				if len(data_structure.meta_settings):
-					#ast.literal_eval used to convert string to dict
-					data_structure_meta = ast.literal_eval(data_structure.meta_settings)
-
-					size_errors = check_image_dimensions(data_structure_name, data_structure_meta, dimensions)
+					size_errors = check_image_dimensions(data_structure_name, data_structure.meta_settings, dimensions)
 
 					if size_errors:
 						upload_errors.extend(size_errors)
