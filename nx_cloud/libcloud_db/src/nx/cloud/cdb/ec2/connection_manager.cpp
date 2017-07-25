@@ -166,7 +166,7 @@ void ConnectionManager::createTransactionConnection(
 
 void ConnectionManager::createWebsocketTransactionConnection(
     nx_http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
+    nx::utils::stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler completionHandler)
@@ -183,7 +183,7 @@ void ConnectionManager::createWebsocketTransactionConnection(
     nx_http::RequestResult result(nx_http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
-            _1, std::move(remotePeerInfo));
+            _1, std::move(remotePeerInfo), std::move(authInfo));
 
     auto error = websocket::validateRequest(request, response);
     if (error != websocket::Error::noError)
@@ -672,7 +672,7 @@ void ConnectionManager::processSpecialTransaction(
     lk.unlock();
 
     // TODO: #ak Get rid of dynamic_cast.
-    auto transactionTransport = 
+    auto transactionTransport =
         dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
     if (transactionTransport)
     {
@@ -733,16 +733,25 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
 
 void ConnectionManager::onHttpConnectionUpgraded(
     nx_http::HttpServerConnection* connection,
-    ::ec2::ApiPeerDataEx remotePeerInfo)
+    ::ec2::ApiPeerDataEx remotePeerInfo,
+    nx::utils::stree::ResourceContainer authInfo)
 {
-    // TODO
-
     const auto remoteAddress = connection->socket()->getForeignAddress();
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
         connection->takeSocket());
 
+    std::string systemId;
+    if (!authInfo.get(attr::authSystemId, &systemId))
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Ignoring createTransactionConnection request without systemId from %1")
+            .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
+        return;
+    }
+
     ::ec2::ApiPeerDataEx localPeerData(m_localPeerData);
-    localPeerData.systemId = remotePeerInfo.systemId;
+    // Do not trust specified systemId. Use it from authentication info instead
+    localPeerData.systemId = remotePeerInfo.systemId = QnUuid(systemId);
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         m_transactionLog,
         std::move(webSocket),

@@ -56,7 +56,7 @@ class TransactionTransportHeader;
 class ConnectionManager
 {
 public:
-    using SystemStatusChangedSubscription = 
+    using SystemStatusChangedSubscription =
         nx::utils::Subscription<std::string /*systemId*/, api::SystemHealth>;
 
     ConnectionManager(
@@ -165,39 +165,39 @@ private:
     SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 
     bool addNewConnection(ConnectionContext connectionContext);
-    
+
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
         const ConnectionContext& context) const;
-    
+
     unsigned int getConnectionCountBySystemId(
         const QnMutexLockerBase& lk,
         const nx::String& systemId) const;
-    
+
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
             const QnMutexLockerBase& /*lock*/,
             ConnectionKeyType connectionKey);
-    
+
     template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
     void removeConnectionByIter(
         const QnMutexLockerBase& /*lock*/,
         ConnectionIndex& connectionIndex,
         Iterator connectionIterator,
         CompletionHandler completionHandler);
-    
+
     void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
 
     void removeConnection(const nx::String& connectionId);
-    
+
     void onGotTransaction(
         const nx::String& connectionId,
         Qn::SerializationFormat tranFormat,
         QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
-    
+
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
-    
+
     bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
         ConnectionRequestAttributes* connectionRequestAttributes);
@@ -215,7 +215,8 @@ private:
 
     void onHttpConnectionUpgraded(
         nx_http::HttpServerConnection* connection,
-        ::ec2::ApiPeerDataEx remotePeerInfo);
+        ::ec2::ApiPeerDataEx remotePeerInfo,
+        nx::utils::stree::ResourceContainer authInfo);
 };
 
 } // namespace ec2
