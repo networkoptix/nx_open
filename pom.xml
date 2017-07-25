@@ -157,7 +157,8 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
+        <ClientHelpSourceDir>${packages.dir}/any/help-${help.version}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -181,7 +182,6 @@
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
-        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -321,7 +321,6 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -336,9 +335,10 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/customization/default-values.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                                 <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
-                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
