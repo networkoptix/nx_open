@@ -534,7 +534,7 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
 
     auto notifyCustomColumnChanged = [this]()
         {
-            //TODO: #GDM update only custom column and changed rows
+            // TODO: #GDM update only custom column and changed rows
             const auto root = m_rootNodes[rootNodeTypeForScope()];
             NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
                 .arg(m_scope).arg(rootNodeTypeForScope()));
@@ -854,7 +854,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     // Ignore "Preview Search" layouts.
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        //TODO: #GDM do not add preview search layouts to the resource pool
+        // TODO: #GDM do not add preview search layouts to the resource pool
         if (layout->data().contains(Qn::LayoutSearchStateRole))
             return;
     }
@@ -1147,7 +1147,7 @@ void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallRes
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, matrix.uuid, Qn::VideoWallMatrixNode);
-    node->update(); //TODO: #GDM what for?
+    node->update(); // TODO: #GDM what for?
 }
 
 void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)

@@ -129,7 +129,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -491,7 +491,7 @@ void ActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
 
 void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
 {
-    //TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
+    // TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
     // There at_workbench_cellSpacingChanged will also use this method
     auto actionId = [spacing]
         {
@@ -1908,7 +1908,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
             //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),

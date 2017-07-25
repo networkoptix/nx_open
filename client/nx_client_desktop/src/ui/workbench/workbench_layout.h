@@ -73,7 +73,7 @@ public:
      */
     static QnWorkbenchLayout* instance(const QnLayoutResourcePtr& layout);
 
-    //TODO: #GDM reimplement the same way as layout tour reviews are done
+    // TODO: #GDM reimplement the same way as layout tour reviews are done
     /**
      * @return Layout associated with the given resource, if any.
      */

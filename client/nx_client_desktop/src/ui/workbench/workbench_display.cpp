@@ -729,13 +729,13 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
 
     qreal magicConst = maxExpandedSize;
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        magicConst = 0.8;   //TODO: #Elric magic const
+        magicConst = 0.8;   // TODO: #Elric magic const
     else
         if (
             canShowLayoutBackground() &&
             (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
             )
-            magicConst = 0.33;  //TODO: #Elric magic const
+            magicConst = 0.33;  // TODO: #Elric magic const
     QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
 
     QPointF viewportCenter = viewportGeometry.center();

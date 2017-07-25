@@ -100,7 +100,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,   &QnWorkbenchLayout::cellAspectRatioChanged, this, &QnWorkbenchLayoutSynchronizer::at_layout_cellAspectRatioChanged);
     connect(m_layout,   &QnWorkbenchLayout::cellSpacingChanged,     this, &QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged);
     connect(m_layout,   &QnWorkbenchLayout::aboutToBeDestroyed,     this, &QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed);
-    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
+    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged); // TODO: #GDM #Common get rid of resourceChanged
     connect(m_resource, &QnLayoutResource::nameChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_nameChanged);
     connect(m_resource, &QnLayoutResource::cellAspectRatioChanged,  this, &QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged);
     connect(m_resource, &QnLayoutResource::cellSpacingChanged,      this, &QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged);

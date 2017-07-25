@@ -2619,7 +2619,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         if (!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
             break;
 
-    highlightIndex = qMin(highlightIndex, stepCount - 1); //TODO: #Elric remove this line.
+    highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: #Elric remove this line.
     const QnTimeStep& highlightStep = m_steps[highlightIndex];
 
     qreal topMargin = qFloor((rect.height() - kDateTextFontHeight) * 0.5);
@@ -2771,7 +2771,7 @@ void QnTimeSlider::drawThumbnail(QPainter* painter, const ThumbnailData& data, c
     painter->setOpacity(opacity);
 }
 
-//TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
+// TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
 void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
 {
     if (!m_bookmarksVisible)

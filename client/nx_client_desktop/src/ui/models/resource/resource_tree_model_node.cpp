@@ -730,7 +730,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             result |= Qt::ItemIsDragEnabled;
         break;
     }
-    case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
+    case Qn::VideoWallItemNode: // TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
     case Qn::LayoutTourNode:
         result |= Qt::ItemIsDragEnabled;
@@ -904,7 +904,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
-        //TODO: #GDM #3.1 get rid of all this logic, just pass uuid
+        // TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
