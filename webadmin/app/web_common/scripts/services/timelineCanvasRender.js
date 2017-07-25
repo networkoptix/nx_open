@@ -487,6 +487,23 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             top = Math.floor(top);
             height = Math.ceil(height);
         }
+        else if(levelIndex != chunk.level || !chunk.level){
+            if(lastMinuteTexture){
+                context.fillStyle = lastMinuteTexture;
+            }
+            else{
+                if(!lastMinuteTextureImg) {
+                    var img = new Image();
+                    img.onload = function () {
+                        lastMinuteTexture = context.createPattern(img, 'repeat');
+                        context.fillStyle = lastMinuteTexture;
+                    };
+                    img.src = Config.viewsDirCommon + '../images/lastminute.png';
+                    lastMinuteTextureImg = img;
+                }
+                context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
+            }
+        }
 
         context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
             top,
