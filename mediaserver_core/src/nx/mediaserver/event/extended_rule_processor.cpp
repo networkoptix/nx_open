@@ -595,20 +595,31 @@ void ExtendedRuleProcessor::sendEmailAsync(
     vms::event::SendMailActionPtr action,
     QStringList recipients, int aggregatedResCount)
 {
+    bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+
     QnEmailAttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    if (isHtml)
+    {
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+
+        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    }
+
     if (!cloudOwnerAccount.isEmpty())
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-        contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        if (isHtml)
+        {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
+            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        }
+
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
         const auto allUsers = resourcePool()->getResources<QnUserResource>();
@@ -624,7 +635,6 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     QnEmailAddress supportEmail(emailSettings.supportEmail);
 
-//    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportLink] = supportEmail.isValid()
@@ -641,7 +651,14 @@ void ExtendedRuleProcessor::sendEmailAsync(
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
-    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+    if (isHtml)
+        renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+
+    QString messagePlainBody;
+    QFileInfo fileInfo(attachmentData.templatePath);
+    QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
+    renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
+
 
     // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.
@@ -657,6 +674,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
         recipients,
         subject,
         messageBody,
+        messagePlainBody,
         emailSettings.timeout,
         attachments);
 
