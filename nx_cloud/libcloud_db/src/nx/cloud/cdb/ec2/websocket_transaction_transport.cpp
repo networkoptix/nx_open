@@ -32,7 +32,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
                 readTransactions(); //< Continue reading
         });
 
-    auto tranState = transactionLog->getTransactionState(remotePeer().systemId.toByteArray());
+    auto tranState = transactionLog->getTransactionState(m_cloudSystemId.toSimpleByteArray());
 
     auto serializedData = nx::p2p::serializeSubscribeAllRequest(tranState);
     serializedData.data()[0] = (quint8)(nx::p2p::MessageType::subscribeAll);
@@ -88,7 +88,7 @@ void WebSocketTransactionTransport::readTransactions()
     using namespace std::placeholders;
     m_tranLogRequestInProgress = true;
     m_transactionLog->readTransactions(
-        remotePeer().systemId.toByteArray(),
+        m_cloudSystemId.toSimpleByteArray(),
         m_remoteSubscription,
         boost::optional<::ec2::QnTranState>(), //< toState. Unlimited
         kMaxTransactionsPerIteration,
@@ -107,7 +107,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
             this,
             lm("systemId %1. Error reading transaction log (%2). "
                 "Closing connection to the peer %3")
-            .arg(remotePeer().systemId.toByteArray())
+            .arg(m_cloudSystemId)
             .arg(api::toString(resultCode))
             .arg(remoteSocketAddr()));
         setState(State::Error);   //closing connection
