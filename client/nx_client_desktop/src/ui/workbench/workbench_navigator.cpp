@@ -1375,13 +1375,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
-#ifdef Q_OS_MAC
-    // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
-    // TODO: #ynikitenkov #high WTF? Get rid of timer and check in 3.1 if everything is Ok.
-    if (mode != UpdateSliderMode::ForcedUpdate && m_updateSliderTimer.elapsed() < 33)
-        return;
-    m_updateSliderTimer.restart();
-#endif
 
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
