@@ -521,14 +521,14 @@ module.exports = function (grunt) {
                 command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;python ../../devtools/util/merge_dev.py -t default;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
 
             pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
             },
             merge_release: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
             version: {
                 command: 'hg parent > static/version.txt'

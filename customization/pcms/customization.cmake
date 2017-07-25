@@ -1,4 +1,5 @@
 set(supported "false")
+set(defaultSkin "dark_green")
 
 # Components Namings
 set(parent.customization "vista")
