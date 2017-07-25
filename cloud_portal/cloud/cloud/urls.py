@@ -16,13 +16,18 @@ Including another URLconf
 
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
-import settings
-# from django.views.generic.base import RedirectView
 
-admin.autodiscover()
+
+def redirect_login(request):
+    target_url = '/login'
+    if request.META.QUERY_STRING:
+        target_url += '?' + request.META.QUERY_STRING
+    return redirect(target_url)
 
 urlpatterns = [
+    url(r'^admin/login/', redirect_login),
     url(r'^admin/cms/', include('cms.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
