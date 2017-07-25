@@ -321,7 +321,6 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -336,9 +335,10 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/customization/default-values.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                                 <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
-                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
