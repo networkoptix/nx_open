@@ -148,11 +148,11 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 
     // Scene drop is working only for resources that are already in the pool.
 
-     if (!isDragValid())
-     {
-         event->ignore();
-         return false;
-     }
+    if (!isDragValid())
+    {
+        event->ignore();
+        return false;
+    }
 
     event->acceptProposedAction();
     return true;
