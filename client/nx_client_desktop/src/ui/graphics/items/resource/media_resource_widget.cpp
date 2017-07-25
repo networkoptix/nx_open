@@ -54,6 +54,7 @@
 #include <nx/utils/collection.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
@@ -1313,44 +1314,12 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     const QRectF sourceSubRect = toSubRect(channelRect, paintRect);
 
     Qn::RenderStatus result = Qn::NothingRendered;
-
-    // 1. The simplest case: only translate & scale.
-    if (type <= QTransform::TxScale)
     {
-        const QRect devicePaintRect = transform.mapRect(paintRect).toAlignedRect();
-        const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
-
+        const PainterTransformScaleStripper scaleStripper(painter);
         result = paintVideoTexture(painter,
             channel,
             sourceSubRect,
-            devicePaintRect);
-    }
-    else if (type <= QTransform::TxRotate)
-    {
-        // 2. More complicated case: with possible rotation.
-        const auto sx = std::hypot(transform.m11(), transform.m12());
-        const auto sy = std::hypot(transform.m21(), transform.m22());
-
-        // Uniform scale, no shear; possible mirroring.
-        if (qFuzzyEquals(qAbs(sx), qAbs(sy)) && !qFuzzyIsNull(sx))
-        {
-            /* Strip transformation of scale: */
-            const QnScopedPainterTransformRollback transformRollback(painter, QTransform(
-                transform.m11() / sx, transform.m12() / sx,
-                transform.m21() / sy, transform.m22() / sy,
-                transform.dx(), transform.dy()));
-
-            const auto scaledPaintRect = QTransform::fromScale(sx, sy).mapRect(paintRect);
-            result = paintVideoTexture(painter,
-                channel,
-                sourceSubRect,
-                scaledPaintRect);
-        }
-    }
-    else
-    {
-        // 3. The most complicated case: non-conformal mapping.
-        NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
+            scaleStripper.mapRect(paintRect));
     }
 
     if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
