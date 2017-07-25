@@ -538,10 +538,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
 
-            /* Hide "Preview Search" layouts */
-            if (layout->data().contains(Qn::LayoutSearchStateRole)) //TODO: #GDM make it consistent with QnWorkbenchLayout::isSearchLayout
-                return true;
-
             if (layout->isServiceLayout())
                 return true;
 

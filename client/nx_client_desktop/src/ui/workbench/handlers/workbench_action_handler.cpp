@@ -1505,6 +1505,12 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
+    /**
+     * TODO: #GDM #3.2
+     * Adding layout to the resource pool is not needed, moreover it requires to add a lot of
+     * additional checks in different places. But to remove this line we need to implement a
+     * mechanism to cleanup QnResourceRuntimeDataManager layout item data.
+    */
     resourcePool()->addResource(layout);
     menu()->trigger(action::OpenInNewTabAction, layout);
 }

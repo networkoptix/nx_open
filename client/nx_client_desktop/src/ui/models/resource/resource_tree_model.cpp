@@ -851,6 +851,14 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (resource.dynamicCast<QnStorageResource>())
         return;
 
+    // Ignore "Preview Search" layouts.
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        //TODO: #GDM do not add preview search layouts to the resource pool
+        if (layout->data().contains(Qn::LayoutSearchStateRole))
+            return;
+    }
+
     // Skip cameras inside the exported layouts. Only layout items are to be displayed there.
     const bool isExportedCamera = resource->hasFlags(Qn::local_video)
         && !resource->getParentId().isNull();
