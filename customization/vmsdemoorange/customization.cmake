@@ -1,3 +1,5 @@
+set(defaultSkin "dark_orange")
+
 # Components Namings
 set(parent.customization "digitalwatchdog")
 set(product.name "VMS Demonstration")

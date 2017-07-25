@@ -1,0 +1,14 @@
+{{#systemName}}
+{{systemName}}
+{{#systemSignature}}
+{{systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+{{>body}}
+
+Website: {{companyUrl}}
+Support: {{supportLinkText}}
