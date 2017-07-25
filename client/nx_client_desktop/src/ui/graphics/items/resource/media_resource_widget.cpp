@@ -1315,7 +1315,6 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     Qn::RenderStatus result = Qn::NothingRendered;
 
     // 1. The simplest case: only translate & scale.
-    qDebug() << "transform type" << type;
     if (type <= QTransform::TxScale)
     {
         const QRect devicePaintRect = transform.mapRect(paintRect).toAlignedRect();
