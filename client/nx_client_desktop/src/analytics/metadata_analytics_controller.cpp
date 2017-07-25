@@ -22,7 +22,6 @@ void QnMetadataAnalyticsController::gotMetadataPacket(
     objectDetectionMetadata.deserialize(metadata);
 
     handleObjectDetectionMetadata(camera, objectDetectionMetadata);
-
 }
 
 QRectF QnMetadataAnalyticsController::toQRectF(const QnRect& rect)
@@ -41,7 +40,6 @@ void QnMetadataAnalyticsController::handleObjectDetectionMetadata(
         const QnVirtualCameraResourcePtr& camera,
         const QnObjectDetectionMetadata& objectDetectionMetadata)
 {
-
     std::map<QnUuid, QRectF> rectangles;
     auto& prevRectangles = m_rectMap[camera->getId()];
     auto detectedObjects = objectDetectionMetadata.detectedObjects;
