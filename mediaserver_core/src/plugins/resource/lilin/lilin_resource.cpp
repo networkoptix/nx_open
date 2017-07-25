@@ -1,3 +1,5 @@
+#if defined (ENABLE_ONVIF)
+
 #include "lilin_resource.h"
 
 #include <plugins/resource/lilin/lilin_remote_archive_manager.h>
@@ -43,3 +45,5 @@ nx::core::resource::AbstractRemoteArchiveManager* LilinResource::remoteArchiveMa
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

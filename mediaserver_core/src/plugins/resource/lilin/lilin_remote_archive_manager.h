@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined (ENABLE_ONVIF)
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
@@ -70,3 +72,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE ONVIF
