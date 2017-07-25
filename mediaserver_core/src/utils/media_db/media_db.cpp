@@ -97,9 +97,6 @@ void DbHelper::run()
         if (m_needStop)
             return;
 
-        if (m_mode == Mode::Read)
-            continue;
-
         auto record = m_writeQueue.front();
 
         Error error = Error::NoError;
