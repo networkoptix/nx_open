@@ -1,36 +1,35 @@
 #!/bin/bash
 set -e
+shopt -s nullglob
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="${deb.customization.company.name}"
 PRODUCT_NAME="${product.name.short}"
 VERSION="${release.version}.${buildNumber}"
 MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
-PACKAGE_NAME="${artifact.name.server}.tar.gz"
-UPDATE_NAME="${artifact.name.server_update}.zip"
-RESOURCE_BUILD_DIR="${project.build.directory}"
-BUILD_OUTPUT_DIR="${libdir}"
-LIBS_DIR="$BUILD_OUTPUT_DIR/lib/${build.configuration}"
-BINS_DIR="$BUILD_OUTPUT_DIR/bin/${build.configuration}"
-STRIP="${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip"
+TAR_FILENAME="${artifact.name.server}.tar.gz"
+ZIP_FILENAME="${artifact.name.server_update}.zip"
+SRC_DIR="${project.build.directory}"
+BUILD_DIR="${libdir}"
+LIB_BUILD_DIR="$BUILD_DIR/lib/${build.configuration}"
+BIN_BUILD_DIR="$BUILD_DIR/bin/${build.configuration}"
 QT_DIR="${qt.dir}"
-#BOX="${box}"
+BOX="${box}"
 
-MODULE="mediaserver"
 INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
-INSTALL_SYMLINK_PATH="opt/$CUSTOMIZATION" #< If not empty, will refer to $INSTALL_PATH.
+SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION" #< If not empty, will refer to $INSTALL_PATH.
 SDCARD_STUFF_PATH="sdcard/${CUSTOMIZATION}_service"
+
+#--------------------------------------------------------------------------------------------------
 
 help()
 {
     echo "Options:"
-    echo "--target-dir=<dir to copy archive to>"
-    echo "--no-strip"
+    echo "-h"
 }
 
 # [out] TARGET_DIR
-# [out] STRIP
 parseArgs() # "$@"
 {
     local ARG
@@ -38,157 +37,173 @@ parseArgs() # "$@"
         if [ "$ARG" = "-h" -o "$ARG" = "--help"  ]; then
             help
             exit 0
-        elif [[ "$ARG" =~ ^--target-dir= ]] ; then
-            TARGET_DIR=${ARG#--target-dir=}
-        elif [ "$ARG" == "--no-strip" ] ; then
-            STRIP=
         fi
     done
 }
 
-# [in] INSTALL_DIR
-copyNonQtLibs()
+# [in] LIB_INSTALL_DIR
+copyBuildLibs()
 {
-    mkdir -p "$INSTALL_DIR/$MODULE/lib/"
+    mkdir -p "$LIB_INSTALL_DIR"
 
     local LIBS_TO_COPY=(
-        libavcodec.so
-        libavdevice.so
-        libavfilter.so
-        libavformat.so
-        libavutil.so
-        libudt.so
-        libcommon.so
-        libcloud_db_client.so
-        libnx_fusion.so
-        libnx_kit.so
-        libnx_network.so
-        libnx_utils.so
-        libnx_email.so
-        libappserver2.so
-        libmediaserver_core.so
-        libquazip.so
-        libsasl2.so
-        liblber-2.4.so.2
-        libldap-2.4.so.2
-        libldap_r-2.4.so.2
-        libsigar.so
-        libswresample.so
-        libswscale.so
-        libpostproc.so
+        # nx
+        libappserver2
+        libcloud_db_client
+        libcommon
+        libmediaserver_core
+        libnx_email
+        libnx_fusion
+        libnx_kit
+        libnx_network
+        libnx_utils
+
+        # ffmpeg
+        libavcodec
+        libavdevice
+        libavfilter
+        libavformat
+        libavutil
+        libswresample
+        libswscale
+        libpostproc
+
+        # third-party
+        liblber
+        libldap
+        libquazip
+        libsasl2
+        libsigar
+        libudt
     )
 
-    [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=(libvpx.so)
+    local OPTIONAL_LIBS_TO_COPY=(
+        libvpx
+    )
 
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
-        echo "Adding lib $LIB"
-        cp -r "$LIBS_DIR/$LIB"* "$INSTALL_DIR/$MODULE/lib/"
-        if [ ! -z "$STRIP" ]; then
-            "$STRIP" "$INSTALL_DIR/$MODULE/lib/$LIB"
-        fi
+        local EXISTING_LIB
+        for EXISTING_LIB in "$LIB_BUILD_DIR/$LIB"*; do
+            if [[ $EXISTING_LIB != *.debug ]]; then
+                echo "Adding $(basename "$EXISTING_LIB")"
+                cp -r "$EXISTING_LIB" "$LIB_INSTALL_DIR/"
+            fi
+        done
     done
-    # TODO: Use "find" instead of "*" to copy all libs except ".debug".
-    rm "$INSTALL_DIR/$MODULE/lib"/*.debug #< Delete debug symbol files copied above via "*".
-}
-
-# [in] INSTALL_DIR
-# [in] SDCARD_STUFF_DIR
-copyQtLibs()
-{
-    # To save storage space, Qt libs are copied onto sdcard which does not support symlinks.
-
-    mkdir -p "$INSTALL_DIR/$MODULE/lib/"
-
-    local QT_LIBS_TO_COPY=(
-        Core
-        Gui
-        Xml
-        XmlPatterns
-        Concurrent
-        Network
-        Sql
-        Multimedia
-        WebSockets
-    )
-
-    local QT_LIB
-    for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do
-        local LIB="libQt5$QT_LIB.so"
-        echo "Adding Qt lib $LIB"
-        local FILE
-        for FILE in "$QT_DIR/lib/$LIB"*; do
-            if [ -L "$FILE" ]; then
-                # FILE is a symlink - put to install dir.
-                cp -r "$FILE" "$INSTALL_DIR/$MODULE/lib/"
-            else
-                # FILE is not a symlink - put to sdcard.
-                cp -r "$FILE" "$SDCARD_STUFF_DIR/"
-                ln -s "/$SDCARD_STUFF_PATH/$(basename "$FILE")" \
-                    "$INSTALL_DIR/$MODULE/lib/$(basename "$FILE")"
+    for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"; do
+        local EXISTING_LIB
+        for EXISTING_LIB in "$LIB_BUILD_DIR/$LIB"*; do
+            if [ -f "$EXISTING_LIB" ]; then
+                echo "Adding (optional) $(basename "$EXISTING_LIB")"
+                cp -r "$EXISTING_LIB" "$LIB_INSTALL_DIR/"
             fi
         done
     done
 }
 
-# [in] INSTALL_DIR
+# [in] LIB_INSTALL_DIR
+# [in] SDCARD_STUFF_DIR
+copyQtLibs()
+{
+    # TODO: Implement SD Card support in create_mediaserver_tar.sh for bpi|bananapi|rpi.
+
+    # To save storage space, Qt libs are copied onto sdcard which does not support symlinks.
+
+    mkdir -p "$LIB_INSTALL_DIR"
+
+    local QT_LIBS_TO_COPY=(
+        Concurrent
+        Core
+        Gui
+        Xml
+        XmlPatterns
+        Network
+        Multimedia
+        Sql
+        WebSockets
+    )
+
+    local QT_LIB
+    for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do
+        local LIB_FILENAME="libQt5$QT_LIB.so"
+        echo "Adding (Qt) $LIB_FILENAME"
+        local FILE
+        for FILE in "$QT_DIR/lib/$LIB_FILENAME"*; do
+            if [ -L "$FILE" ]; then
+                # FILE is a symlink - put to install dir.
+                cp -r "$FILE" "$LIB_INSTALL_DIR/"
+            else
+                # FILE is not a symlink - put to sdcard.
+                cp -r "$FILE" "$SDCARD_STUFF_DIR/"
+                ln -s "/$SDCARD_STUFF_PATH/$(basename "$FILE")" \
+                    "$LIB_INSTALL_DIR/$(basename "$FILE")"
+            fi
+        done
+    done
+}
+
+# [in] MEDIASERVER_BIN_INSTALL_DIR
 copyBins()
 {
-    mkdir -p "$INSTALL_DIR/$MODULE/bin/"
-    cp "$BINS_DIR/mediaserver" "$INSTALL_DIR/$MODULE/bin/"
-    cp "$BINS_DIR/external.dat" "$INSTALL_DIR/$MODULE/bin/"
+    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
+    cp "$BIN_BUILD_DIR/mediaserver" "$MEDIASERVER_BIN_INSTALL_DIR/"
+    cp "$BIN_BUILD_DIR/external.dat" "$MEDIASERVER_BIN_INSTALL_DIR/"
 
-    mkdir -p "$INSTALL_DIR/$MODULE/bin/plugins/"
-    cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
+    # TODO: edge1. Plugins from $BIN_BUILD_DIR/plugins are not copied.
+    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+    cp "$LIB_BUILD_DIR/libcpro_ipnc_plugin.so.1.0.0" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
 }
 
 # [in] INSTALL_DIR
 copyConf()
 {
-    mkdir -p "$INSTALL_DIR/$MODULE/etc/"
-    cp "mediaserver.conf.template" "$INSTALL_DIR/$MODULE/etc/mediaserver.conf"
+    # TODO: edge1.
+    local MEDIASERVER_CONF_FILENAME="mediaserver.conf"
+
+    mkdir -p "$INSTALL_DIR/mediaserver/etc"
+    cp "$SRC_DIR/opt/networkoptix/mediaserver/etc/$MEDIASERVER_CONF_FILENAME" \
+        "$INSTALL_DIR/mediaserver/etc/"
 }
 
 # [in] TAR_DIR
 copyScripts()
 {
+    # TODO: edge1.
     mkdir -p "$TAR_DIR/etc/init.d"
-    install -m 755 "$RESOURCE_BUILD_DIR/etc/init.d/S99networkoptix-$MODULE" \
-        "$TAR_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE"
+    install -m 755 "$SRC_DIR/etc/init.d/S99networkoptix-mediaserver" \
+        "$TAR_DIR/etc/init.d/S99$CUSTOMIZATION-mediaserver"
 }
 
 # [in] WORK_DIR
 # [in] TAR_DIR
 buildArchives()
 {
-    # Create main distro archive.
-    pushd "$TAR_DIR" >/dev/null
-    mkdir -p $(dirname "$INSTALL_SYMLINK_PATH")
-    ln -s "/$INSTALL_PATH" "$INSTALL_SYMLINK_PATH"
-    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" *
-    popd >/dev/null
+    echo "Creating main distro .tar.gz"
+    mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
+    ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
+    ( cd "$TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME" * )
 
-    [ ! -z "$TARGET_DIR" ] && cp "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$TARGET_DIR"
-
-    # Create debug symbols archive.
-    local SYMBOLS_DIR="$WORK_DIR/debug-symbols"
-    mkdir -p "$SYMBOLS_DIR"
-    cp -r "$LIBS_DIR"/*.debug "$SYMBOLS_DIR/" || true
-    cp -r "$BINS_DIR"/*.debug "$SYMBOLS_DIR/" || true
-    cp -r "$BINS_DIR/plugins"/*.debug "$SYMBOLS_DIR/" || true
-    pushd "$SYMBOLS_DIR" >/dev/null
-    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME-debug-symbols.tar.gz" ./*
-    popd >/dev/null
-
-    # Create "update" zip with the tar inside.
+    echo "Creating \"update\" .zip"
     local ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$ZIP_DIR/"
-    cp -r "$RESOURCE_BUILD_DIR"/update.* "$ZIP_DIR/"
-    cp -r "$RESOURCE_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    pushd "$ZIP_DIR" >/dev/null
-    zip "$RESOURCE_BUILD_DIR/$UPDATE_NAME" ./*
-    popd >/dev/null
+    cp -r "$SRC_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$SRC_DIR"/update.* "$ZIP_DIR/"
+    cp -r "$SRC_DIR"/install.sh "$ZIP_DIR/"
+    ( cd "$ZIP_DIR" && zip "$SRC_DIR/$ZIP_FILENAME" * )
+
+    echo "Creating debug symbols .tar.gz"
+    local DEBUG_TAR_DIR="$WORK_DIR/debug-symbols-tar"
+    mkdir -p "$DEBUG_TAR_DIR"
+    local FILE
+    for FILE in \
+        "$LIB_BUILD_DIR"/*.debug \
+        "$BIN_BUILD_DIR"/*.debug \
+        "$BIN_BUILD_DIR/plugins"/*.debug \
+    ; do
+        cp -r "$FILE" "$DEBUG_TAR_DIR/"
+    done
+    ( cd "$DEBUG_TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME-debug-symbols.tar.gz" * )
 }
 
 #--------------------------------------------------------------------------------------------------
@@ -199,17 +214,19 @@ main()
 
     local WORK_DIR=$(mktemp -d)
     rm -rf "$WORK_DIR"
+
     local TAR_DIR="$WORK_DIR/tar"
-    mkdir -p "$TAR_DIR"
     local INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
-    mkdir -p "$INSTALL_DIR"
+    local LIB_INSTALL_DIR="$INSTALL_DIR/mediaserver/lib"
+    local MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
     local SDCARD_STUFF_DIR="$TAR_DIR/$SDCARD_STUFF_PATH"
     mkdir -p "$SDCARD_STUFF_DIR"
-    echo "Creating distribution in $WORK_DIR (please delete it on failure)."
+    echo "Creating distribution in $WORK_DIR (please delete it on failure). Current dir: $(pwd)"
 
+    mkdir -p "$INSTALL_DIR"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
-    copyNonQtLibs
+    copyBuildLibs
     copyQtLibs
     copyBins
     copyConf

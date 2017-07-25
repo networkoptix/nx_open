@@ -106,8 +106,8 @@ bool Resources::overrideLayoutTour(QWidget* parent)
 {
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
-    messageBox.setText(tr("Overwrite existing layout tour?"));
-    messageBox.setInformativeText(tr("There is another layout tour with the same name."));
+    messageBox.setText(tr("Overwrite existing showreel?"));
+    messageBox.setInformativeText(tr("There is another showreel with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -213,7 +213,7 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Warning);
-    messageBox.setText(tr("Remove %n items from layout tour?", "", resources.size()));
+    messageBox.setText(tr("Remove %n items from showreel?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));

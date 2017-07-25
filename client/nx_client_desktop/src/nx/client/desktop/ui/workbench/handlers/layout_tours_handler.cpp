@@ -60,7 +60,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             tour.id = QnUuid::createUuid();
             tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
-                usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
+                usedNames, tr("Showreel"), tr("Showreel %1"));
             layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
             menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
