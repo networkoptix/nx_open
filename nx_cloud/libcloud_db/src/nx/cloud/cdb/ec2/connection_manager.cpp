@@ -749,17 +749,18 @@ void ConnectionManager::onHttpConnectionUpgraded(
         return;
     }
     const nx::String systemIdLocal(systemId.c_str());
+    auto connectionId = QnUuid::createUuid();
 
     ::ec2::ApiPeerDataEx localPeerData(m_localPeerData);
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
+        connection->getAioThread(),
         m_transactionLog,
+        systemIdLocal,
+        connectionId,
         std::move(webSocket),
         localPeerData,
         remotePeerInfo);
 
-    auto connectionId = QnUuid::createUuid();
-    transactionTransport->setConnectionGuid(connectionId);
-    transactionTransport->setCloudSystemId(QnUuid(systemIdLocal));
     ConnectionContext context{
         std::move(transactionTransport),
         connectionId.toSimpleByteArray(),

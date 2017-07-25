@@ -10,6 +10,7 @@
 #include "dao/abstract_transaction_data_object.h"
 #include <nx/p2p/connection_context.h>
 #include <nx_ec/data/api_tran_state_data.h>
+#include "transaction_log_reader.h"
 
 namespace nx {
 namespace cdb {
@@ -23,26 +24,30 @@ class WebSocketTransactionTransport:
 {
 public:
     WebSocketTransactionTransport(
+        nx::network::aio::AbstractAioThread* aioThread,
         TransactionLog* const transactionLog,
+        const nx::String& systemId,
+        const QnUuid& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         ::ec2::ApiPeerDataEx localPeerData,
         ::ec2::ApiPeerDataEx remotePeerData);
+    virtual ~WebSocketTransactionTransport() override;
 
     virtual SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
-    void setConnectionGuid(const QnUuid& value);
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
-
-    void setCloudSystemId(const QnUuid& id);
 protected:
     virtual void setState(State state) override;
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 private:
     int highestProtocolVersionCompatibleWithRemotePeer() const;
     void at_gotMessage(
@@ -58,13 +63,12 @@ private:
     TransactionTransportHeader m_commonTransactionHeader;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
-    TransactionLog* const m_transactionLog;
+    std::unique_ptr<TransactionLogReader> m_transactionLogReader;
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
     ::ec2::QnTranState m_remoteSubscription; //< remote -> local subscription
     QnUuid m_connectionGuid;
-    QnUuid m_cloudSystemId;
 };
 
 } // namespace ec2

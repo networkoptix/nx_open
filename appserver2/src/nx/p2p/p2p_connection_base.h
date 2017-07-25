@@ -94,6 +94,7 @@ signals:
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 protected:
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) = 0;
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 private:
     void cancelConnecting(State state, const QString& reason);
 

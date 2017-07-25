@@ -12,7 +12,10 @@ namespace ec2 {
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
+    nx::network::aio::AbstractAioThread* aioThread,
     TransactionLog* const transactionLog,
+    const nx::String& systemId,
+    const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
     ::ec2::ApiPeerDataEx localPeerData,
     ::ec2::ApiPeerDataEx remotePeerData)
@@ -22,8 +25,14 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         localPeerData,
         std::move(webSocket),
         std::make_unique<nx::p2p::ConnectionContext>()),
-    m_transactionLog(transactionLog)
+    m_transactionLogReader(std::make_unique<TransactionLogReader>(
+        transactionLog,
+        systemId,
+        remotePeerData.dataFormat)),
+    m_connectionGuid(connectionId)
 {
+    bindToAioThread(aioThread);
+
     connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::at_gotMessage);
     connect(this, &ConnectionBase::allDataSent,
         [this]()
@@ -32,12 +41,30 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
                 readTransactions(); //< Continue reading
         });
 
-    auto tranState = transactionLog->getTransactionState(m_cloudSystemId.toSimpleByteArray());
-
+    auto tranState = m_transactionLogReader->getCurrentState();
     auto serializedData = nx::p2p::serializeSubscribeAllRequest(tranState);
     serializedData.data()[0] = (quint8)(nx::p2p::MessageType::subscribeAll);
     sendMessage(serializedData);
     startReading();
+}
+
+WebSocketTransactionTransport::~WebSocketTransactionTransport()
+{
+    stopWhileInAioThread();
+}
+
+void WebSocketTransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    AbstractTransactionTransport::bindToAioThread(aioThread);
+    nx::p2p::ConnectionBase::bindToAioThread(aioThread);
+    m_transactionLogReader->bindToAioThread(aioThread);
+}
+
+void WebSocketTransactionTransport::stopWhileInAioThread()
+{
+    AbstractTransactionTransport::stopWhileInAioThread();
+    // nx::p2p::ConnectionBase is able to stop from any thread
+    m_transactionLogReader.reset();
 }
 
 void WebSocketTransactionTransport::at_gotMessage(
@@ -54,7 +81,7 @@ void WebSocketTransactionTransport::at_gotMessage(
         {
             TransactionTransportHeader cdbTransportHeader;
             cdbTransportHeader.endpoint = remoteSocketAddr();
-            cdbTransportHeader.systemId = m_cloudSystemId.toSimpleByteArray();
+            cdbTransportHeader.systemId = m_transactionLogReader->systemId();
             cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
             cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
@@ -87,8 +114,7 @@ void WebSocketTransactionTransport::readTransactions()
 {
     using namespace std::placeholders;
     m_tranLogRequestInProgress = true;
-    m_transactionLog->readTransactions(
-        m_cloudSystemId.toSimpleByteArray(),
+    m_transactionLogReader->readTransactions(
         m_remoteSubscription,
         boost::optional<::ec2::QnTranState>(), //< toState. Unlimited
         kMaxTransactionsPerIteration,
@@ -107,7 +133,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
             this,
             lm("systemId %1. Error reading transaction log (%2). "
                 "Closing connection to the peer %3")
-            .arg(m_cloudSystemId)
+            .arg(m_transactionLogReader->systemId())
             .arg(api::toString(resultCode))
             .arg(remoteSocketAddr()));
         setState(State::Error);   //closing connection
@@ -157,16 +183,6 @@ void WebSocketTransactionTransport::setOnGotTransaction(GotTransactionEventHandl
 QnUuid WebSocketTransactionTransport::connectionGuid() const
 {
     return m_connectionGuid;
-}
-
-void WebSocketTransactionTransport::setConnectionGuid(const QnUuid& value)
-{
-    m_connectionGuid = value;
-}
-
-void WebSocketTransactionTransport::setCloudSystemId(const QnUuid& id)
-{
-    m_cloudSystemId = id;
 }
 
 const TransactionTransportHeader&

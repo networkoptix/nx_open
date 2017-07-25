@@ -81,6 +81,7 @@ ConnectionBase::~ConnectionBase()
 {
     if (m_timer.isInSelfAioThread())
     {
+        // All objects in the same AIO thread
         m_timer.pleaseStopSync();
         m_webSocket.reset();
         m_httpClient.reset();
@@ -429,6 +430,15 @@ QObject* ConnectionBase::opaqueObject()
 const nx::network::WebSocket* ConnectionBase::webSocket() const
 {
     return m_webSocket.get();
+}
+
+void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    m_timer.bindToAioThread(aioThread);
+    if (m_httpClient)
+        m_httpClient->bindToAioThread(aioThread);
+    if (m_webSocket)
+        m_webSocket->bindToAioThread(aioThread);
 }
 
 } // namespace p2p
