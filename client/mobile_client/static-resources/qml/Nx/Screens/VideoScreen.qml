@@ -397,11 +397,19 @@ PageBase
             visible: false
         }
 
+        ContinuousZoomPreloader
+        {
+            id: zoomPreloader
+            parent: videoScreen
+        }
+
         MoveOnTapOverlay
         {
             id: moveOnTapOverlay
 
             parent: videoScreen
+            x: 300
+            y: 300
         }
 
         Loader
