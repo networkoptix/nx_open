@@ -79,6 +79,14 @@ ConnectionBase::ConnectionBase(
 
 ConnectionBase::~ConnectionBase()
 {
+    if (m_timer.isInSelfAioThread())
+    {
+        m_timer.pleaseStopSync();
+        m_webSocket.reset();
+        m_httpClient.reset();
+        return;
+    }
+
     std::promise<void> waitToStop;
     m_timer.pleaseStop(
         [&]()
