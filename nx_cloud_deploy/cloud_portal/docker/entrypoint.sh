@@ -1,5 +1,7 @@
 #!/usr/local/bin/dumb-init /bin/bash
-set -e
+set -ex
+
+env
 
 function instantiate_config()
 {
@@ -35,18 +37,23 @@ done
 CUSTOMIZATION=$ORIG_CUSTOMIZATION
 
 case "$1" in
-    copystatic)
-        cp -R /app/app/static /static_volume
-        ;;
-    web)
+    migratedb)
         write_my_cnf
         echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
         yes "yes" | /app/env/bin/python manage.py migrate
         yes "yes" | /app/env/bin/python manage.py createcachetable
+
         /app/env/bin/python manage.py initdb
         /app/env/bin/python manage.py readstructure
         /app/env/bin/python manage.py initbranding
+        ;;
+    copystatic)
+        cp -R /app/app/static /static_volume
+        ;;
+    web)
+        write_my_cnf
+
         /app/env/bin/python manage.py filldata
 
         find /app/app/static | xargs touch
@@ -58,6 +65,6 @@ case "$1" in
         exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
         ;;
     *)
-        echo Usage: cloud_portal '[web|celery|copystatic]'
+        echo Usage: cloud_portal '[web|celery|copystatic|migratedb]'
         ;;
 esac
