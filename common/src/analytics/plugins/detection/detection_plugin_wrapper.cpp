@@ -1,15 +1,17 @@
-#include "detection_plugin.h"
+#include "detection_plugin_wrapper.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QLibrary>
 
 #include <limits.h>
 #include <cmath>
 #include <fstream>
 #include <ios>
 
-#define NX_OUTPUT_PREFIX "[analytics::CarDetectionPlugin] "
-#include <nx/kit/ini_config.h>
+#define NX_OUTPUT_PREFIX "[analytics::DetectionPlugin] "
 #include <nx/kit/debug.h>
+
+#include <nx/utils/log/log.h>
 
 #include <utils/common/synctime.h>
 #include <analytics/plugins/detection/config.h>
@@ -39,47 +41,49 @@ QByteArray loadFileToByteArray(const QString& filename)
     return result;
 }
 
+const int kMaxIdLength = 255;
+
 } // namespace
 
-DetectionPlugin::DetectionPlugin(const QString& id):
-    m_tegraVideo(nullptr)
+DetectionPluginWrapper::DetectionPluginWrapper()
 {
-    TegraVideo::Params params;
-    std::string idStr = id.toStdString();
-
-    params.id = idStr.c_str();
-    params.modelFile = ini().modelFile;
-    params.deployFile = ini().deployFile;
-    params.cacheFile = ini().cacheFile;
-
-    m_tegraVideo.reset(TegraVideo::create(params));
-    NX_CRITICAL(m_tegraVideo, "Unable to initialize tegra_video.");
 }
 
-DetectionPlugin::~DetectionPlugin()
+DetectionPluginWrapper::~DetectionPluginWrapper()
 {
-    m_tegraVideo.reset();
+    m_detector.reset();
 }
 
-QString DetectionPlugin::id() const
+QString DetectionPluginWrapper::id() const
 {
-    return m_tegraVideo->id();
+    if (!m_detector)
+        return QString();
+
+    char id[kMaxIdLength];
+    m_detector->id(id, kMaxIdLength);
+    return QString::fromStdString(std::string(id, kMaxIdLength));
 }
 
-bool DetectionPlugin::hasMetadata()
+bool DetectionPluginWrapper::hasMetadata()
 {
-    return m_tegraVideo->hasMetadata();
+    if (!m_detector)
+        return false;
+
+    return m_detector->hasMetadata();
 }
 
-bool DetectionPlugin::pushFrame(const CLVideoDecoderOutputPtr& data)
+bool DetectionPluginWrapper::pushFrame(const CLVideoDecoderOutputPtr& data)
 {
     NX_ASSERT(false, "Not implemented!");
     return false;
 }
 
-bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameData)
+bool DetectionPluginWrapper::pushFrame(const QnCompressedVideoDataPtr& compressedFrameData)
 {
-    TegraVideo::CompressedFrame compressedFrame;
+    if (!m_detector)
+        return false;
+
+    AbstractDetectionPlugin::CompressedFrame compressedFrame;
     QByteArray dataFromFile;
 
     if (ini().substituteFramesFilePrefix[0] != '\0')
@@ -104,7 +108,7 @@ bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameD
 
     compressedFrame.ptsUs = compressedFrameData->timestamp;
 
-    if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
+    if (!m_detector->pushCompressedFrame(&compressedFrame))
     {
         NX_PRINT << "ERROR: pushCompressedFrame(dataSize: " << compressedFrame.dataSize
             << ", ptsUs: " << compressedFrame.ptsUs << ") -> false";
@@ -113,14 +117,17 @@ bool DetectionPlugin::pushFrame(const QnCompressedVideoDataPtr& compressedFrameD
     return true;
 }
 
-QnAbstractCompressedMetadataPtr DetectionPlugin::getNextMetadata()
+QnAbstractCompressedMetadataPtr DetectionPluginWrapper::getNextMetadata()
 {
+    if (!m_detector)
+        return nullptr;
+
     QnObjectDetectionMetadataPtr result;
     int64_t pts;
     int count = 0;
 
-    m_tegraVideo->pullRectsForFrame(m_tegraVideoRects, kMaxRectanglesNumber, &count, &pts);
-    result = tegraVideoRectsToObjectDetectionMetadata(m_tegraVideoRects, count);
+    m_detector->pullRectsForFrame(m_detections, kMaxRectanglesNumber, &count, &pts);
+    result = rectsToObjectDetectionMetadata(m_detections, count);
 
     if (result)
     {
@@ -134,13 +141,18 @@ QnAbstractCompressedMetadataPtr DetectionPlugin::getNextMetadata()
     return nullptr;
 }
 
-void DetectionPlugin::reset()
+void DetectionPluginWrapper::reset()
 {
-    m_tegraVideo.reset();
+    m_detector.reset();
 }
 
-QnObjectDetectionMetadataPtr DetectionPlugin::tegraVideoRectsToObjectDetectionMetadata(
-    const TegraVideo::Rect* rectangles, int rectangleCount) const
+void DetectionPluginWrapper::setDetector(std::unique_ptr<AbstractDetectionPlugin> detector)
+{
+    m_detector = std::move(detector);
+}
+
+QnObjectDetectionMetadataPtr DetectionPluginWrapper::rectsToObjectDetectionMetadata(
+    const AbstractDetectionPlugin::Rect* rectangles, int rectangleCount) const
 {
     static QElapsedTimer timer;
     timer.restart();

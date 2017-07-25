@@ -16,6 +16,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_properties.h>
 
+#include <common/common_module.h>
+
 #include <utils/media/h264_utils.h>
 #include <utils/media/jpeg_utils.h>
 #include <utils/media/nalUnits.h>
@@ -62,6 +64,24 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
         memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
+
+        if (i == 0)
+        {
+            auto commonModule = res->commonModule();
+            if (!commonModule)
+                continue;
+
+            auto metadataPluginFactory = commonModule->metadataPluginFactory();
+            auto plugin = metadataPluginFactory->createMetadataPlugin(
+                res,
+                MetadataType::ObjectDetection);
+
+            if (!plugin)
+                continue;
+
+            m_videoMetadataPlugin.reset(
+                dynamic_cast<nx::analytics::VideoMetadataPlugin*>(plugin.release()));
+        }
 #endif
     }
 
@@ -279,7 +299,8 @@ bool QnLiveStreamProvider::needAnalyzeStream(Qn::ConnectionRole role)
         || (role == Qn::CR_LiveVideo
             && (strcmp(nx::analytics::ini().inferenceStream, "primary") == 0))
         || (role == Qn::CR_SecondaryLiveVideo
-            && (strcmp(nx::analytics::ini().inferenceStream, "secondary") == 0));
+            && (strcmp(nx::analytics::ini().inferenceStream, "secondary") == 0))
+        && m_videoMetadataPlugin;
 
     return (needAnalyzeMotion && nx::analytics::ini().enableMotionDetection)
         || (needDetectObjects && nx::analytics::ini().enableDetectionPlugin);
@@ -288,7 +309,7 @@ bool QnLiveStreamProvider::needAnalyzeStream(Qn::ConnectionRole role)
 bool QnLiveStreamProvider::isMaxFps() const
 {
     QnMutexLocker mtx( &m_livemutex );
-    return m_newLiveParams.fps >= m_cameraRes->getMaxFps()-0.1;
+    return m_newLiveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
 bool QnLiveStreamProvider::needMetaData()
@@ -307,6 +328,7 @@ bool QnLiveStreamProvider::needMetaData()
         if (needAnalyzeStream(getRole()))
         {
             if (nx::analytics::ini().enableDetectionPlugin
+                && m_videoMetadataPlugin
                 && m_videoMetadataPlugin->hasMetadata())
             {
                 return true;
@@ -391,7 +413,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
             }
         }
 
-        if (nx::analytics::ini().enableDetectionPlugin)
+        if (nx::analytics::ini().enableDetectionPlugin && m_videoMetadataPlugin)
         {
             m_videoMetadataPlugin->pushFrame(videoData);
         }
@@ -496,6 +518,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
         && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid;
 
     bool detectionMetadataExists = nx::analytics::ini().enableDetectionPlugin
+        && m_videoMetadataPlugin
         && m_videoMetadataPlugin->hasMetadata();
 
     if (detectionMetadataExists)

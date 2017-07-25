@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tegra_video.h>
+#include <detection_plugin_interface/detection_plugin_interface.h>
 
 #include <utils/media/frame_info.h>
 #include <nx/utils/uuid.h>
@@ -13,11 +13,11 @@
 namespace nx {
 namespace analytics {
 
-class DetectionPlugin: public VideoMetadataPlugin
+class DetectionPluginWrapper: public VideoMetadataPlugin
 {
 public:
-    DetectionPlugin(const QString& id);
-    ~DetectionPlugin();
+    DetectionPluginWrapper();
+    ~DetectionPluginWrapper();
 
     virtual QString id() const override;
     virtual bool hasMetadata() override;
@@ -29,18 +29,20 @@ public:
 
     virtual void reset() override;
 
+    virtual void setDetector(std::unique_ptr<AbstractDetectionPlugin> detector);
+
 private:
     static const int kMaxRectanglesNumber = 40;
 
 private:
-    QnObjectDetectionMetadataPtr tegraVideoRectsToObjectDetectionMetadata(
-        const TegraVideo::Rect* rectangles,
+    QnObjectDetectionMetadataPtr rectsToObjectDetectionMetadata(
+        const AbstractDetectionPlugin::Rect* rectangles,
         int rectangleCount) const;
 
 private:
     mutable NaiveObjectTracker m_objectTracker;
-    std::unique_ptr<TegraVideo> m_tegraVideo;
-    TegraVideo::Rect m_tegraVideoRects[kMaxRectanglesNumber];
+    std::unique_ptr<AbstractDetectionPlugin> m_detector;
+    AbstractDetectionPlugin::Rect m_detections[kMaxRectanglesNumber];
 };
 
 } // namespace analytics

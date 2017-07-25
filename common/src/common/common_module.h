@@ -13,9 +13,11 @@
 #include <utils/common/instance_storage.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include "network/module_information.h"
-#include "nx_ec/data/api_runtime_data.h"
+#include <network/module_information.h>
+#include <nx_ec/data/api_runtime_data.h>
 #include <utils/common/value_cache.h>
+#include <analytics/plugins/detection/detection_plugin_factory.h>
+#include <analytics/common/metadata_plugin_factory.h>
 
 class QSettings;
 class QnSessionManager;
@@ -169,6 +171,16 @@ public:
         return m_eventRuleManager;
     }
 
+    nx::analytics::DetectionPluginFactory* detectionPluginFactory() const
+    {
+        return m_detectionPluginFactory;
+    }
+
+    nx::analytics::MetadataPluginFactory* metadataPluginFactory() const
+    {
+        return m_metadataPluginFactory;
+    }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -305,6 +317,9 @@ private:
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
+
+    nx::analytics::DetectionPluginFactory* m_detectionPluginFactory = nullptr;
+    nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
 
     QnUuid m_videowallGuid;
 };

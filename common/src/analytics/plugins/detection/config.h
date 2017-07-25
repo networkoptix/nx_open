@@ -14,6 +14,7 @@ struct IniConfig: public nx::kit::IniConfig
     IniConfig(): nx::kit::IniConfig("analytics") { reload(); }
 
     // Common parameters
+    NX_INI_STRING("", pathToPlugin, "");
     NX_INI_FLAG(0, enableOutput, "Enable debug output.");
     NX_INI_STRING(
         "",
@@ -25,8 +26,8 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_INT(1920, frameWidth, "");
     NX_INI_INT(1080, frameHeight, "");
 
-    NX_INI_STRING(NX_ANALYTICS_PATH "/deploy_ped100.prototxt", deployFile, "");
-    NX_INI_STRING(NX_ANALYTICS_PATH "/ped100_snapshot_iter_70800.caffemodel", modelFile, "");
+    NX_INI_STRING(NX_ANALYTICS_PATH "/pednet.prototxt", deployFile, "");
+    NX_INI_STRING(NX_ANALYTICS_PATH "/pednet.caffemodel", modelFile, "");
     NX_INI_STRING(NX_VAR_PATH "/var/cuda_engine.cache", cacheFile, "");
 
     NX_INI_FLAG(0, enableDetectionPlugin, "");

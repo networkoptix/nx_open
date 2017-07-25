@@ -10,7 +10,7 @@
  * Interface to an external lib 'libdetection_plugin', which performs processing of video frames.
  * ATTENTION: This interface is intentionally kept pure C++ and does not depend on other libs.
  */
-class DETECTION_PLUGIN_API DetectionPlugin
+class DETECTION_PLUGIN_API AbstractDetectionPlugin
 {
 public:
     struct Params
@@ -20,12 +20,6 @@ public:
         const char* deployFile = "undefined_deployFile";
         const char* cacheFile = "undefined_cacheFile";
     };
-
-    static DetectionPlugin* create(const Params& params);
-    static DetectionPlugin* createImpl(const Params& params);
-    static DetectionPlugin* createStub(const Params& params);
-
-    virtual ~DetectionPlugin() = default;
 
     /**
      * Input data for the decoder, a single frame.
@@ -37,9 +31,6 @@ public:
         int64_t ptsUs = 0;
     };
 
-    /** @param compressedFrame Is not referenced after this call returns; the data is copied. */
-    virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) = 0;
-
     struct Rect
     {
         float x = 0;
@@ -48,8 +39,17 @@ public:
         float height = 0;
     };
 
+public:
+    virtual ~AbstractDetectionPlugin() = default;
+
+    virtual void id(char* idString, int maxIdLength) const = 0;
+    virtual bool hasMetadata() const = 0;
+    virtual void setParams(const Params& params) = 0;
+
+    /** @param compressedFrame Is not referenced after this call returns; the data is copied. */
+    virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) = 0;
     virtual bool pullRectsForFrame(
         Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) = 0;
-
-    virtual bool hasMetadata() const = 0;
 };
+
+using CreateDetectionPluginProcedure = AbstractDetectionPlugin* (*)();

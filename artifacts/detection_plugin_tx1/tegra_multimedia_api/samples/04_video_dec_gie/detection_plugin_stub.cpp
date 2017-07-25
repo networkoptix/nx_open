@@ -1,4 +1,4 @@
-#include "detection_plugin.h"
+#include "../../../../detection_plugin_interface/detection_plugin_interface.h"
 
 // Alternative impl of DetectionPlugin as a pure software stub.
 
@@ -11,7 +11,7 @@
 
 namespace {
 
-class Stub: public DetectionPlugin
+class Stub: public AbstractDetectionPlugin
 {
 public:
     Stub(const Params& params);
@@ -76,7 +76,7 @@ bool Stub::hasMetadata() const
 
 //-------------------------------------------------------------------------------------------------
 
-DetectionPlugin* DetectionPlugin:createStub(const Params& params)
+AbstractDetectionPlugin* AbstractDetectionPlugin:createStub(const Params& params)
 {
     ini().reload();
     return new Stub(params);
