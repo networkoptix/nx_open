@@ -67,7 +67,7 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     setPaletteColor(this, QPalette::Window, Qt::transparent);
     setFrameBrush(calculateFrameColor(palette()));
 
-    auto caption = new QLabel(tr("Drag layout or camera here to add it to the tour"));
+    auto caption = new QLabel(tr("Drag layout or camera here to add it to the reel"));
     caption->setAlignment(Qt::AlignCenter);
     caption->setWordWrap(true);
     caption->setFixedWidth(kFixedTextWidth);

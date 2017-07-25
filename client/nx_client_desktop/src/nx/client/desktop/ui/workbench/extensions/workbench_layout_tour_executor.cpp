@@ -319,7 +319,7 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     if (visible)
     {
         m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Use keyboard arrows to switch layouts. To exit the tour press Esc."),
+            tr("Use keyboard arrows to switch layouts. To exit the reel press Esc."),
             kHintTimeoutMs);
     }
     else if (m_hintLabel)
