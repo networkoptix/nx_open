@@ -31,7 +31,9 @@ if(IOS)
 
     set(icons_dir "${customization_dir}/icons/ios/ios/images")
     file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+
     list(APPEND resources ${mobile_client_ios_launch_screen})
+    list(APPEND resources "${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf")
 else()
     set(ios_sources)
 endif()
