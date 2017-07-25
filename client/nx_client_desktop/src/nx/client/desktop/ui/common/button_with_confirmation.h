@@ -53,7 +53,7 @@ protected:
 
 private:
     struct Private;
-    QScopedPointer<Private> m_d;
+    QScopedPointer<Private> d;
 };
 
 } // namespace ui
