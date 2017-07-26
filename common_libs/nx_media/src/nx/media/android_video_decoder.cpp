@@ -90,6 +90,10 @@ static void fillInputBuffer(
     memcpy(bytes, srcData, qMin(dataSize, capacity));
 }
 
+#define CHECK_GL_ERROR \
+    if (const auto error = funcs->glGetError()) \
+        qDebug() << lit("gl error %1").arg(error); \
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -259,8 +263,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     createGlResources();
     FboPtr fbo = fboManager->getFbo();
 
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
 
     auto t1 = tm.elapsed();
 
@@ -280,8 +283,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     //GLuint prevFbo = 0;
     //funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint *) &prevFbo);
 
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
 
     if (stencilTestEnabled)
         glDisable(GL_STENCIL_TEST);
@@ -295,24 +297,18 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     fbo->bind();
 
     glViewport(0, 0, frameSize.width(), frameSize.height());
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
 
     program->bind();
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
     program->enableAttributeArray(0);
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
     program->enableAttributeArray(1);
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
     program->setUniformValue("frameTexture", GLuint(0));
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
     program->setUniformValue("texMatrix", getTransformMatrix());
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, g_texture_data);
@@ -323,8 +319,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     program->disableAttributeArray(1);
 
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+    CHECK_GL_ERROR
 
     fbo->release();
 
@@ -378,8 +373,7 @@ void AndroidVideoDecoderPrivate::createGlResources()
             "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n"
             "}\n");
         program->addShader(vertexShader);
-        if (funcs->glGetError())
-            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+        CHECK_GL_ERROR
 
         QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program);
         fragmentShader->compileSourceCode(
@@ -391,14 +385,12 @@ void AndroidVideoDecoderPrivate::createGlResources()
             "    gl_FragColor = texture2D(frameTexture, textureCoords); \n"
             "}\n");
         program->addShader(fragmentShader);
-        if (funcs->glGetError())
-            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+        CHECK_GL_ERROR
 
         program->bindAttributeLocation("vertexCoordsArray", 0);
         program->bindAttributeLocation("textureCoordArray", 1);
         program->link();
-        if (funcs->glGetError())
-            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+        CHECK_GL_ERROR
     }
 }
 
