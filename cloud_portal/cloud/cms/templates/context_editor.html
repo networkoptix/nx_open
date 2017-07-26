@@ -46,12 +46,15 @@
         </div>
     {% endfor %}
 
+    {% if perms.cms.edit_content %}
     <div class="submit-row">
         <button class="button" type="submit" name="SaveDraft">Save Draft</button>
         <button class="button" type="submit" name="Preview">Save and Preview</button>
         <button class="button" type="submit" name="SendReview">Send for Review</button>
         <button class="button" type="reset"  name="Reset">Reset</button>
     </div>
+    {% endif %}
+
 </form>
 
 {% if preview_link %}
