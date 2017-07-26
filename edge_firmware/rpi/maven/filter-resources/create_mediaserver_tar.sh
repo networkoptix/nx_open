@@ -219,7 +219,8 @@ copyScripts()
     chmod -R 755 "$TAR_DIR/etc/init.d"
 
     cp -r "$SRC_DIR/opt/networkoptix/"* "$INSTALL_DIR/"
-    chmod -R 755 "$INSTALL_DIR/mediaserver/var/scripts"
+    local SCRIPTS_DIR="$INSTALL_DIR/mediaserver/var/scripts"
+    [ -d "$SCRIPTS_DIR" ] && chmod -R 755 "$SCRIPTS_DIR"
 
     NON_CUSTOMIZED_MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/networkoptix-mediaserver"
     MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/$CUSTOMIZATION-mediaserver"

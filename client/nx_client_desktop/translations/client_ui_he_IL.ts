@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>כל השרתים אינם זמינים. היומנים אינם זמינים.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>יומן סימניות</translation>
     </message>
@@ -732,17 +727,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>בקרת PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>השבת פריסטים במצלמה, השתמש בפריסטים של המערכת במקום</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>אזהרה! פריסטים של המצלמה לא יהיו זמינים.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>מזהה קלט</translation>
     </message>
   </context>
   <context>
@@ -776,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>מזהה פלט:</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1416,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>נעול למזהה-חומרה:</translation>
     </message>
   </context>
   <context>
@@ -1530,7 +1525,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>מזהה-חומרה</translation>
     </message>
   </context>
   <context>

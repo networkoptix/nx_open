@@ -29,6 +29,12 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
         settings.value(makeKey("maxFileSize")).toString(), maxFileSize);
 }
 
+void Settings::updateDirectoryIfEmpty(const QString dataDirectory)
+{
+    if (directory.isEmpty())
+        directory = dataDirectory + lit("/log");
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx

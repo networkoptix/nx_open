@@ -136,7 +136,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
+    // TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -145,7 +145,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     /*
      * This check can be safely omitted in release - it is better to add bookmark on another server than do not
      * add bookmark at all.
-     * //TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
+     * // TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
      */
     if (QnAppInfo::beta())
     {
@@ -188,7 +188,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
+    // TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -217,7 +217,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
+    // TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 

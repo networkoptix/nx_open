@@ -246,7 +246,6 @@ void initLog(const QString& logLevel)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*dataDir*/ QString(),
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
             /*baseName*/
@@ -262,7 +261,6 @@ void initLog(const QString& logLevel)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*dataDir*/ QString(),
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
             /*baseName*/

@@ -456,10 +456,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         return bastardNode;
     }
 
-    /* Storages are not to be displayed to users. */
-    if (node->resource().dynamicCast<QnStorageResource>())
-        return bastardNode;
-
     /* Checking local resources. */
     auto parentResource = node->resource()->getParentResource();
     if (!parentResource || parentResource->flags().testFlag(Qn::local_server))
@@ -470,14 +466,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
                 return m_rootNodes[Qn::LocalResourcesNode];
             return rootNode;
         }
-        return bastardNode;
-    }
-
-    /* Checking cameras in the exported nov-files. */
-    if (parentResource->flags().testFlag(Qn::local_layout))
-    {
-        if (node->resourceFlags().testFlag(Qn::local))
-            return ensureResourceNode(parentResource);
         return bastardNode;
     }
 
@@ -546,7 +534,7 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
 
     auto notifyCustomColumnChanged = [this]()
         {
-            //TODO: #GDM update only custom column and changed rows
+            // TODO: #GDM update only custom column and changed rows
             const auto root = m_rootNodes[rootNodeTypeForScope()];
             NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
                 .arg(m_scope).arg(rootNodeTypeForScope()));
@@ -860,6 +848,23 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (resource->hasFlags(Qn::user))
         return;
 
+    if (resource.dynamicCast<QnStorageResource>())
+        return;
+
+    // Ignore "Preview Search" layouts.
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        // TODO: #GDM do not add preview search layouts to the resource pool
+        if (layout->data().contains(Qn::LayoutSearchStateRole))
+            return;
+    }
+
+    // Skip cameras inside the exported layouts. Only layout items are to be displayed there.
+    const bool isExportedCamera = resource->hasFlags(Qn::local_video)
+        && !resource->getParentId().isNull();
+    if (isExportedCamera)
+        return;
+
     connect(resource, &QnResource::parentIdChanged, this,
         &QnResourceTreeModel::at_resource_parentIdChanged);
 
@@ -1142,7 +1147,7 @@ void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallRes
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, matrix.uuid, Qn::VideoWallMatrixNode);
-    node->update(); //TODO: #GDM what for?
+    node->update(); // TODO: #GDM what for?
 }
 
 void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)

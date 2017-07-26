@@ -10,6 +10,10 @@
 
 #include <ui/style/custom_style.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+
+using namespace nx::client::desktop::ui;
+
 QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),
     ui(new Ui::LicenseDetailsDialog())
@@ -40,13 +44,11 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
     ui->errorLabel->setText(QnLicenseValidator::errorMessage(QnLicenseErrorCode::FutureLicense));
     ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
-    QString licenseText = licenseDescription(license);
+    const auto licenseText = licenseDescription(license);
 
-    QPushButton* copyButton = new QPushButton(this);
-    copyButton->setText(tr("Copy to Clipboard"));
-    connect(copyButton, &QPushButton::clicked, this, [this, licenseText] {
-        qApp->clipboard()->setText(licenseText);
-    });
+    auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
+    connect(copyButton, &QPushButton::clicked, this,
+        [this, licenseText] { qApp->clipboard()->setText(licenseText); });
 
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();

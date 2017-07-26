@@ -32,6 +32,9 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
+// TODO: #ak #move to cdb api section
+static const QString cloudAuthInfoPropertyName(lit("cloudUserAuthenticationInfo"));
+
 class PermissionsInfoTable: public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(PermissionsInfoTable)
@@ -151,7 +154,7 @@ private:
     {
         QString name = categoryName(filter);
         if (all) //: This will be a part of "All Cameras & Resources" or "All Shared Layouts"
-            return makeGenericCountRow(name, tr("All")); //TODO: #GDM #tr make sure comment is handled
+            return makeGenericCountRow(name, tr("All")); // TODO: #GDM #tr make sure comment is handled
 
         if (filter == QnResourceAccessFilter::LayoutsFilter || total < 0)
             return makeGenericCountRow(name, count);
@@ -171,7 +174,7 @@ private:
                     ++count;
             };
 
-        //TODO: #GDM think where to store flags set to avoid duplication
+        // TODO: #GDM think where to store flags set to avoid duplication
         checkFlag(Qn::GlobalEditCamerasPermission);
         checkFlag(Qn::GlobalControlVideoWallPermission);
         checkFlag(Qn::GlobalViewLogsPermission);
@@ -238,7 +241,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
             m_user = newUser;
             m_model->setUser(m_user);
 
-    #if false //TODO: #common Enable this if we want to change OK button caption when creating a cloud user
+    #if false // TODO: #common Enable this if we want to change OK button caption when creating a cloud user
             buttonBox()->button(QDialogButtonBox::Ok)->setText(
                 isCloud ? tr("Send Invite") : QCoreApplication::translate("QPlatformTheme", "OK")); // As in Qt
     #endif
@@ -373,8 +376,21 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     if (!tryClose(false))
         return;
 
+    if (m_user)
+        m_user->disconnect(this);
+
     m_user = user;
     m_model->setUser(user);
+
+    if (m_user)
+    {
+        connect(m_user, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& propertyName)
+            {
+                if (resource == m_user && propertyName == cloudAuthInfoPropertyName)
+                    forcedUpdate();
+            });
+    }
 
     /* Hide Apply button if cannot apply changes. */
     bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile
@@ -395,8 +411,23 @@ void QnUserSettingsDialog::loadDataToUi()
 
     base_type::loadDataToUi();
 
-    bool userIsEnabled = m_user && m_user->isEnabled();
+    if (!m_user)
+        return;
+
+    bool userIsEnabled = m_user->isEnabled();
     m_userEnabledButton->setChecked(userIsEnabled);
+
+    if (m_user->userType() == QnUserType::Cloud
+        && m_model->mode() == QnUserSettingsModel::OtherSettings)
+    {
+        const auto auth = m_user->getProperty(cloudAuthInfoPropertyName);
+        if (auth.isEmpty())
+        {
+            ui->alertBar->setText(tr("This user has not yet signed up for %1",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+            return;
+        }
+    }
     if (!userIsEnabled)
         ui->alertBar->setText(tr("User is disabled"));
 }
@@ -459,8 +490,8 @@ void QnUserSettingsDialog::applyChanges()
     if (mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
         return;
 
-    //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
-    //TODO: #GDM #access SafeMode what to rollback if we were creating new user
+    // TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
+    // TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user,
         [this, mode](const QnUserResourcePtr& /*user*/)
         {

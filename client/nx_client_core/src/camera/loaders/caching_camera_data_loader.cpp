@@ -60,7 +60,7 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 }
 
 void QnCachingCameraDataLoader::init() {
-    //TODO: #GDM 2.4 move to camera history
+    // TODO: #GDM 2.4 move to camera history
     if(m_resource.dynamicCast<QnNetworkResource>()) {
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
     }
@@ -254,7 +254,7 @@ void QnCachingCameraDataLoader::discardCachedData()
 }
 
 void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType, bool forced) {
-    //TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
+    // TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
     if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
     {
         if (forced)

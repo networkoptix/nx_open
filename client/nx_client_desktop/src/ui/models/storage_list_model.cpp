@@ -9,7 +9,7 @@
 
 namespace
 {
-    //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+    // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
     const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
     const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
@@ -92,7 +92,7 @@ void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
     if (m_server == server)
         return;
 
-    ScopedReset reset(this); //TODO: #common Do we need this reset?
+    ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_server = server;
 }
 
@@ -197,7 +197,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     return tr("Loading...");
                 default:
                 {
-                    //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+                    // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
                     const auto tb = storageData.totalSpace / kBytesInTb;
                     if (tb >= 1.0)
                         return lit("%1 TB").arg(QString::number(tb, 'f', 1));

@@ -12,6 +12,6 @@
     "emailSubject":"与你分享了视频系统 {{message.system_name}}"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"版本{{message.id}}已准备好审核"
   }
 }

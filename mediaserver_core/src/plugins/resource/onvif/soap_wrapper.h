@@ -300,7 +300,7 @@ private:
 class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 {
 public:
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
     virtual ~DeviceSoapWrapper();
 

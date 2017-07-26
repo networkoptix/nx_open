@@ -246,7 +246,7 @@ bool AxHDWitness::doInitialize()
     AllowSetForegroundWindow(ASFW_ANY);
 
     /* These attributes must be set before application instance is created. */
-    //TODO: #ynikitenkov how is it supposed to work here?
+    // TODO: #ynikitenkov how is it supposed to work here?
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 

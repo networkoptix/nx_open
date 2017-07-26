@@ -9,7 +9,7 @@ namespace nx {
 namespace media_utils {
 namespace hevc {
 
-//TODO: #dmishin refactor to embed HEVC NALs to existing H264 hierarchy.
+// TODO: #dmishin refactor to embed HEVC NALs to existing H264 hierarchy.
 
 using DecodedUev = uint32_t;
 

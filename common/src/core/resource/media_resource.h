@@ -51,7 +51,7 @@ public:
     virtual QnMediaDewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 
-    //TODO: #dklychkov change to QnAspectRatio in 2.4
+    // TODO: #dklychkov change to QnAspectRatio in 2.4
     virtual qreal customAspectRatio() const;
     void setCustomAspectRatio(qreal value);
     void clearCustomAspectRatio();

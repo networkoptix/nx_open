@@ -102,7 +102,7 @@ QSize QnMultiImageProvider::sizeHint() const
 
 Qn::ThumbnailStatus QnMultiImageProvider::status() const
 {
-    //TODO: #gdm improve logic, statusChanged
+    // TODO: #gdm improve logic, statusChanged
     for (const auto& provider: m_providers)
     {
         if (provider->status() == Qn::ThumbnailStatus::Loaded)

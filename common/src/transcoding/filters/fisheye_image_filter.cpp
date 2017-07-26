@@ -134,7 +134,7 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 #else
 static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 {
-    //TODO: C fallback routine
+    // TODO: C fallback routine
     return 0;
 }
 #endif
@@ -175,7 +175,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO: C fallback routine
+    // TODO: C fallback routine
 #endif
 
     if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat)
@@ -227,7 +227,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO: C fallback routine
+    // TODO: C fallback routine
 #endif
     return frame;
 }
