@@ -43,14 +43,14 @@ public:
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 protected:
     virtual void setState(State state) override;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 private:
     int highestProtocolVersionCompatibleWithRemotePeer() const;
-    void at_gotMessage(
+    void onGotMessage(
         QWeakPointer<nx::p2p::ConnectionBase> connection,
         nx::p2p::MessageType messageType,
         const QByteArray& payload);

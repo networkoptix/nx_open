@@ -33,7 +33,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
 {
     bindToAioThread(aioThread);
 
-    connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::at_gotMessage);
+    connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::onGotMessage);
     connect(this, &ConnectionBase::allDataSent,
         [this]()
         {
@@ -67,7 +67,7 @@ void WebSocketTransactionTransport::stopWhileInAioThread()
     m_transactionLogReader.reset();
 }
 
-void WebSocketTransactionTransport::at_gotMessage(
+void WebSocketTransactionTransport::onGotMessage(
     QWeakPointer<nx::p2p::ConnectionBase> connection,
     nx::p2p::MessageType messageType,
     const QByteArray& payload)

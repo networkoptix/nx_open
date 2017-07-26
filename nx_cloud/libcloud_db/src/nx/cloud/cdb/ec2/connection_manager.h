@@ -216,7 +216,8 @@ private:
     void onHttpConnectionUpgraded(
         nx_http::HttpServerConnection* connection,
         ::ec2::ApiPeerDataEx remotePeerInfo,
-        nx::utils::stree::ResourceContainer authInfo);
+        nx::utils::stree::ResourceContainer authInfo,
+        const nx::String systemId);
 };
 
 } // namespace ec2
