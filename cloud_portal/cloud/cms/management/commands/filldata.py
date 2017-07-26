@@ -8,7 +8,11 @@ class Command(BaseCommand):
     help = 'Fills initial data from CMS database to static files'
 
     def handle(self, *args, **options):
-        filldata.fill_content(customization_name=settings.CUSTOMIZATION, product='cloud_portal', preview=False)
+        filldata.fill_content(
+            customization_name=settings.CUSTOMIZATION,
+            product='cloud_portal',
+            preview=False)
         # for custom in Customization.objects.all():
         #    filldata.fill_content(customization_name=custom.name, product='cloud_portal', preview=False)
-        self.stdout.write(self.style.SUCCESS('Successfully initiated static content'))
+        self.stdout.write(self.style.SUCCESS(
+            'Successfully initiated static content'))
