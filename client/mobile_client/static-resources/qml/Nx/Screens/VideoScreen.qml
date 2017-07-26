@@ -397,9 +397,9 @@ PageBase
             visible: false
         }
 
-        ContinuousZoomPreloader
+        FocusPreloader
         {
-            id: zoomPreloader
+            id: focusPreloader
             parent: videoScreen
         }
 
@@ -407,14 +407,22 @@ PageBase
         {
             id: movePreloader
             parent: videoScreen
-            y: zoomPreloader.height
+            y: focusPreloader.height
         }
 
-        FocusPreloader
+        ContinuousZoomPreloader
         {
-            id: focusPreloader
+            id: zoomPreloader
             parent: videoScreen
             y: movePreloader.y + movePreloader.height
+        }
+
+        ContinuousZoomPreloader
+        {
+            id: zoomOutPreloader
+            parent: videoScreen
+            y: zoomPreloader.y + zoomPreloader.height
+            zoomInIndicator: false
         }
 
         MoveOnTapOverlay

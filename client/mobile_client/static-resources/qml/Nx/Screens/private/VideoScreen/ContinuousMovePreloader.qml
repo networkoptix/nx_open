@@ -6,9 +6,9 @@ Item
     id: control
 
     property color color: Qt.rgba(1, 1, 1, 1)
-    property real sideSize: height / 2
-    property real thickness: 7
-    property int period: 2000
+    property real sideSize: height / 2.5
+    property real thickness: 6
+    property int period: 2200
     property int figuresCount: 5
 
     implicitWidth: implicitHeight * 1.5

@@ -8,7 +8,7 @@ Item
     id: control
 
     property color color: "white"
-    property real thickness: 8
+    property real thickness: 6
     property real sectionFOV: Math.PI / 2
     property real sectionRotationDegrees: 90
 
