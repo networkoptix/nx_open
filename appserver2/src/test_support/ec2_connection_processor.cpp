@@ -54,15 +54,17 @@ bool Ec2ConnectionProcessor::authenticate()
         return false;
     }
 
-    auto findUserByName = [this](const QString& userName)
-    {
-        for (const auto& user: commonModule()->resourcePool()->getResources<QnUserResource>())
+    const auto findUserByName =
+        [this](const QString& userName)
         {
-            if (user->getName().toLower() == userName.toLower())
-                return user;
-        }
-        return QnUserResourcePtr();
-    };
+            const auto userNameLower = userName.toLower();
+            for (const auto& user: commonModule()->resourcePool()->getResources<QnUserResource>())
+            {
+                if (user->getName().toLower() == userNameLower)
+                    return user;
+            }
+            return QnUserResourcePtr();
+        };
 
     nx_http::header::Authorization authorizationHeader;
     if (authorizationHeader.parse(authorization))
