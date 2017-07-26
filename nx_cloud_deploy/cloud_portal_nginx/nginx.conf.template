@@ -105,6 +105,11 @@ http {
             error_page 404 /static/index.html;
         }
 
+        location /static/tiny_mce/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
         location /fonts/ {
             root /app/app/static/common/static;
             error_page 404 /static/index.html;

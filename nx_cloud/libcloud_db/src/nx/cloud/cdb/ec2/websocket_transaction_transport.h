@@ -18,7 +18,9 @@ class WebSocketTransactionTransport:
 public:
     WebSocketTransactionTransport(
         TransactionLog* const transactionLog,
-        std::unique_ptr<network::websocket::WebSocket> webSocket);
+        std::unique_ptr<network::websocket::WebSocket> webSocket,
+        ::ec2::ApiPeerData localPeerData,
+        ::ec2::ApiPeerDataEx remotePeerData);
 
     virtual SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
@@ -32,6 +34,8 @@ public:
 private:
     TransactionTransportHeader m_commonTransactionHeader;
     std::unique_ptr<network::websocket::WebSocket> m_webSocket;
+    ::ec2::ApiPeerData m_localPeerData;
+    ::ec2::ApiPeerDataEx m_remotePeerData;
 };
 
 } // namespace ec2
