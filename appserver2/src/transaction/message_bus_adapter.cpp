@@ -24,7 +24,10 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
 void TransactionMessageBusAdapter::init(MessageBusType value)
 {
     m_bus.reset();
-    if (value == MessageBusType::P2pMode)
+
+    if (value == MessageBusType::None)
+        return;
+    else if (value == MessageBusType::P2pMode)
         m_bus.reset(new nx::p2p::MessageBus(
             m_db,
             m_peerType,
