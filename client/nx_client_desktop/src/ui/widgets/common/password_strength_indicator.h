@@ -14,30 +14,27 @@ class QnPasswordStrengthIndicator : public QWidget
     typedef QWidget base_type;
 
     Q_PROPERTY(QnPasswordStrengthColors colors READ colors WRITE setColors)
-    Q_PROPERTY(QMargins indicatorMargins READ indicatorMargins WRITE setIndicatorMargins)
     Q_PROPERTY(qreal roundingRadius READ roundingRadius WRITE setRoundingRadius)
-    Q_PROPERTY(int textMargins READ textMargins WRITE setTextMargins)
+    Q_PROPERTY(QMargins textMargins READ textMargins WRITE setTextMargins)
 
 public:
     explicit QnPasswordStrengthIndicator(QLineEdit* lineEdit);
-    virtual ~QnPasswordStrengthIndicator();
+    virtual ~QnPasswordStrengthIndicator() override;
 
     const QnPasswordInformation& currentInformation() const;
 
     const QnPasswordStrengthColors& colors() const;
     void setColors(const QnPasswordStrengthColors& colors);
 
-    const QMargins& indicatorMargins() const;
-    void setIndicatorMargins(const QMargins& margins);
-
     qreal roundingRadius() const;
     void setRoundingRadius(qreal radius);
 
-    int textMargins() const;
-    void setTextMargins(int margins);
+    QMargins textMargins() const;
+    void setTextMargins(const QMargins& value);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+    virtual QSize minimumSizeHint() const override;
 
 private:
     QScopedPointer<QnPasswordStrengthIndicatorPrivate> d_ptr;
