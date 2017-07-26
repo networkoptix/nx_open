@@ -19,7 +19,7 @@ public:
      * Receives socket state change event.
      * Implementation MUST NOT block otherwise it will result poor performance and/or deadlock.
      */
-    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() = 0;
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) = 0;
 };
 
 } // namespace aio

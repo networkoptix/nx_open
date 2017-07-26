@@ -152,14 +152,8 @@ def review_version_request(request, context=None, language=None):
 		customization = Customization.objects.get(name=settings.CUSTOMIZATION)
 		publish_latest_version(customization, request.user)
 		version = ContentVersion.objects.latest('created_date')
-		contexts = get_records_for_version(version)
 		messages.success(request._request, "Version " + str(version.id) +" has been published")
-		return render(request, 'review_records.html', {'version': version.id,
-													   'contexts': contexts,
-													   'user': request.user,
-													   'has_permission': mysite.has_permission(request),
-													   'site_url': mysite.site_url,
-													   'title': 'Review A version'})
+		return redirect(reverse('review_version', args=[version.id]))
 	return Response("Invalid")
 		
 

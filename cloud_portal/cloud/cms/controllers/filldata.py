@@ -3,6 +3,7 @@ import os
 import re
 import json
 import codecs
+import base64
 
 
 STATIC_DIR = 'static/{{customization}}/source/'
@@ -80,7 +81,11 @@ def process_context_structure(customization, context, content, language, version
             content_value = record.default
 
         # replace marker with value
-        content = content.replace(record.name, content_value)
+        if record.type != DataStructure.get_type('Image'):
+            content = content.replace(record.name, content_value)
+        elif content_record.exists():
+            image_storage = os.path.join('static', customization.name)
+            convert_b64_image_to_png(content_record.latest('version_id'), image_storage)
     return content
 
 
@@ -153,11 +158,17 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
         else:
             version_id = 0
 
-    # here we use version_id if specified, or latest data records otherwise
-
     # iterate all files (same way we fill structure)
     for source_file in iterate_cms_files(customization_name, False):
         process_file(source_file, customization, product_id, preview, version_id)
 
     generate_languages_json(customization_name, preview)
-# from cms.controllers.filldata import *
+
+
+def convert_b64_image_to_png(record, storage_location):
+    file_name = os.path.join(storage_location, record.data_structure.name)
+    make_dir(file_name)
+
+    image_png = base64.b64decode(record.value)
+    with open(file_name, 'wb') as f:
+        f.write(image_png)

@@ -257,7 +257,9 @@ private:
             [](nx::utils::db::QueryContext* queryContext)
             {
                 if (queryContext->transaction()->isActive())
+                {
                     ASSERT_EQ(nx::utils::db::DBResult::ok, queryContext->transaction()->commit());
+                }
                 delete queryContext->transaction();
                 delete queryContext;
             };

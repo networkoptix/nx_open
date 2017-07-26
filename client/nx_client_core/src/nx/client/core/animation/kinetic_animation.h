@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointF>
+
 #include "kinetic_helper.h"
 
 namespace nx {
