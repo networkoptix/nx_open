@@ -403,6 +403,20 @@ PageBase
             parent: videoScreen
         }
 
+        ContinuousMovePreloader
+        {
+            id: movePreloader
+            parent: videoScreen
+            y: zoomPreloader.height
+        }
+
+        FocusPreloader
+        {
+            id: focusPreloader
+            parent: videoScreen
+            y: movePreloader.y + movePreloader.height
+        }
+
         MoveOnTapOverlay
         {
             id: moveOnTapOverlay
