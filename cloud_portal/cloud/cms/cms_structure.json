@@ -17,7 +17,7 @@
         ["{{IOS_APP_LINK}}","disabled","Link for iOS application in Apple AppStore"],
         ["{{ANDROID_APP_LINK}}","disabled","Link for Android application in Google Play"],
         ["{{COMPANY_NAME}}", "Network Optix", "The name of the company itself"],
-        ["static/images/logo.png", "", "Logo for branding", "Image", {"height_le": 500}]
+        ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}]
       ]
     },
     {
@@ -51,7 +51,9 @@
       "description": "Content for emails",
       "translatable": false,
       "values": [
-        ["templates/email_logo.png", "", "Logo for email", "Image", {"height": 36}]
+        ["templates/email_logo.png", "",
+          "Logo for email. Height must be not more than 40px, width - not more than 100px",
+          "Image", {"height_le": 40, "width_le": 100}]
       ]
     }
   ]
