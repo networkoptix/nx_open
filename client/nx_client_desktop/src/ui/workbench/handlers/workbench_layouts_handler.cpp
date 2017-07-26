@@ -39,8 +39,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
-#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_export_handler.h>     // TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
@@ -218,7 +218,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     }
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
-        //TODO: #GDM #VW #LOW refactor common code to common place
+        // TODO: #GDM #VW #LOW refactor common code to common place
         NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
@@ -235,8 +235,8 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     }
     else
     {
-        //TODO: #GDM #Common check existing layouts.
-        //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
+        // TODO: #GDM #Common check existing layouts.
+        // TODO: #GDM #Common all remotes layout checking and saving should be done in one place
 
         const auto change = calculateLayoutChange(layout);
         const auto layoutOwner = layout->getParentResource();

@@ -253,7 +253,7 @@ void AudioPlayer::run()
                     //end of file reached
                     m_renderer->playCurrentBuffer();
 
-                    //TODO: #ak IMPL block till playback is finished
+                    // TODO: #ak IMPL block till playback is finished
                     msleep( AUDIO_BUF_SIZE / 2 );
 
                     emit done();

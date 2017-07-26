@@ -100,7 +100,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,   &QnWorkbenchLayout::cellAspectRatioChanged, this, &QnWorkbenchLayoutSynchronizer::at_layout_cellAspectRatioChanged);
     connect(m_layout,   &QnWorkbenchLayout::cellSpacingChanged,     this, &QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged);
     connect(m_layout,   &QnWorkbenchLayout::aboutToBeDestroyed,     this, &QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed);
-    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
+    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged); // TODO: #GDM #Common get rid of resourceChanged
     connect(m_resource, &QnLayoutResource::nameChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_nameChanged);
     connect(m_resource, &QnLayoutResource::cellAspectRatioChanged,  this, &QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged);
     connect(m_resource, &QnLayoutResource::cellSpacingChanged,      this, &QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged);
@@ -222,6 +222,9 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResource
 
     if(m_layout->item(itemData.uuid) != NULL)
         return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
+
+    if (!resourcePool()->getResourceByDescriptor(itemData.resource))
+        return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
     QnWorkbenchItem *item = new QnWorkbenchItem(itemData, this);

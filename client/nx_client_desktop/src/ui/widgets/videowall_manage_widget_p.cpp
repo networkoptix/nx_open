@@ -481,7 +481,7 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
     }
 }
 
-//TODO: #GDM #VW create iterators
+// TODO: #GDM #VW create iterators
 void QnVideowallManageWidgetPrivate::foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler) {
     bool abort = false;
     for (auto screen = m_screens.begin(); screen != m_screens.end(); ++screen) {
@@ -640,7 +640,7 @@ QTransform QnVideowallManageWidgetPrivate::getInvertedTransform(const QRect &rec
 
 QRect QnVideowallManageWidgetPrivate::targetRect(const QRect &rect) const
 {
-    if (m_unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid
+    if (m_unitedGeometry.isNull())    // TODO: #GDM #VW replace by model.Valid
         return QRect();
 
     return expanded(aspectRatio(m_unitedGeometry), rect, Qt::KeepAspectRatio).toRect();

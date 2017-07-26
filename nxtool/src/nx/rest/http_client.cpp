@@ -23,7 +23,7 @@ QNetworkRequest preparePostJsonRequestRequest(const QUrl &url)
     return result;
 }
 
-//TODO: #tr #ynikitenkov Strings must be generated in the UI class, not in the network one
+// TODO: #tr #ynikitenkov Strings must be generated in the UI class, not in the network one
 QString errorCodeToString(QNetworkReply::NetworkError errorCode) {
     switch (errorCode) {
     case QNetworkReply::NetworkError::NoError:

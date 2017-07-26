@@ -24,7 +24,7 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 
     bool contextIsValid = true;
 
-    if (!versionString.contains("ES 2.0")) { //TODO: #asinaisky more strict check required
+    if (!versionString.contains("ES 2.0")) { // TODO: #asinaisky more strict check required
         QnSoftwareVersion version(versionString);
         if (version < QnSoftwareVersion(2, 0, 0, 0)) {
             qnWarning("OpenGL version %1 is not supported.", versionString);

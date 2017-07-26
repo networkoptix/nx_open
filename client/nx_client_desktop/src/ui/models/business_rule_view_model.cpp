@@ -114,7 +114,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionTy
 
 /**
 *  This method must cleanup all action parameters that are not required for the given action.
-*  //TODO: #GDM implement correct filtering
+*  // TODO: #GDM implement correct filtering
 */
 vms::event::ActionParameters filterActionParams(vms::event::ActionType actionType, const vms::event::ActionParameters &params)
 {
@@ -376,7 +376,7 @@ void QnBusinessRuleViewModel::loadFromRule(vms::event::RulePtr businessRule)
     m_comments = businessRule->comment();
     m_schedule = businessRule->schedule();
 
-    updateActionTypesModel();//TODO: #GDM #Business connect on dataChanged?
+    updateActionTypesModel();// TODO: #GDM #Business connect on dataChanged?
 
     emit dataChanged(Field::all);
 }
@@ -387,8 +387,8 @@ vms::event::RulePtr QnBusinessRuleViewModel::createRule() const
     rule->setId(m_id);
     rule->setEventType(m_eventType);
     rule->setEventResources(toIdList(filterEventResources(m_eventResources, m_eventType)));
-    rule->setEventState(m_eventState);   //TODO: #GDM #Business check
-    rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
+    rule->setEventState(m_eventState);   // TODO: #GDM #Business check
+    rule->setEventParams(m_eventParams); // TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
     rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
     rule->setActionParams(filterActionParams(m_actionType, m_actionParams));
@@ -497,7 +497,7 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
     updateEventStateModel();
 
     emit dataChanged(fields);
-    //TODO: #GDM #Business check others, params and resources should be merged
+    // TODO: #GDM #Business check others, params and resources should be merged
 }
 
 
@@ -811,7 +811,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
     {
         case Column::source:
         {
-            //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+            // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
             auto resources = resourcePool()->getResources(eventResources());
             if (!vms::event::isResourceRequired(m_eventType))
             {
@@ -870,7 +870,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
                     break;
             }
 
-            //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+            // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
             QnResourceList resources = resourcePool()->getResources(actionResources());
             if (!vms::event::requiresCameraResource(m_actionType))
             {
@@ -1053,7 +1053,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     break;
             }
 
-            //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+            // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
             auto resources = resourcePool()->getResources(filtered);
             if (vms::event::requiresCameraResource(m_actionType) && resources.isEmpty())
             {
@@ -1192,7 +1192,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             break;
     }
 
-    //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+    // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
     if (!vms::event::requiresCameraResource(m_actionType))
         return braced(tr("System"));
 

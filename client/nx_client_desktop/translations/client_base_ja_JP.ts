@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>更にブックマークを表示するにはタイムラインをズームします</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1015,6 +1027,21 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LocalFiles</name>
+    <message>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+    </message>
+  </context>
+  <context>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
@@ -1077,6 +1104,37 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>Ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>カメラがオンラインになるまでお待ちください.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>現在の位置の取得に失敗しました</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>現在の位置の設定に失敗しました</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>プリセットはツアーで使用されてます 削除しますか？</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>これらのツアーは無効になります</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1123,10 +1181,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 は以下の外部ライブラリを使用します:</translation>
@@ -1659,6 +1713,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation type="unfinished">Manage Bookmarks</translation>
+    </message>
+  </context>
+  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1797,10 +1858,6 @@ to view more bookmarks</source>
       <translation>カメラでフィルター...</translation>
     </message>
     <message>
-      <source>Reset all rules to default?</source>
-      <translation>すべてのルールを既定に戻しますか？</translation>
-    </message>
-    <message>
       <source>Failed to retrieve rules</source>
       <translation>ルールの取得に失敗しました</translation>
     </message>
@@ -1819,6 +1876,10 @@ to view more bookmarks</source>
     <message>
       <source>This action cannot be undone.</source>
       <translation>この操作は元に戻せません</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation type="unfinished">Restore all rules to default?</translation>
     </message>
   </context>
   <context>
@@ -2047,10 +2108,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
@@ -2947,8 +3004,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3600,10 +3657,6 @@ to %1</source>
       <translation>アーカイブストリーム許可:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>一般:</translation>
     </message>
@@ -3836,10 +3889,6 @@ to %1</source>
       <translation type="unfinished">License Server error</translation>
     </message>
     <message>
-      <source>If the problem presists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
-    </message>
-    <message>
       <source>License deactivated</source>
       <translation type="unfinished">License deactivated</translation>
     </message>
@@ -3896,6 +3945,10 @@ to %1</source>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
       <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+    </message>
+    <message>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -4253,12 +4306,12 @@ to %1</source>
       <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
-      <source>You will be reconnected</source>
-      <translation type="unfinished">You will be reconnected</translation>
+      <source>Systems will be merged shortly</source>
+      <translation>システムをすぐに統合されます</translation>
     </message>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <source>You will be reconnected.</source>
+      <translation>再接続されます.</translation>
     </message>
   </context>
   <context>
@@ -4349,8 +4402,8 @@ to %1</source>
       <translation type="unfinished">MB/s</translation>
     </message>
     <message>
-      <source>kB/s</source>
-      <translation type="unfinished">kB/s</translation>
+      <source>KB/s</source>
+      <translation type="unfinished">KB/s</translation>
     </message>
   </context>
   <context>
@@ -4487,6 +4540,13 @@ to %1</source>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
       <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation type="unfinished">Manage Bookmarks</translation>
     </message>
   </context>
   <context>
@@ -4825,6 +4885,43 @@ to %1</source>
     <message>
       <source>Motion + Lo-Res</source>
       <translation>常時低 ＋ モーション高解像度</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+      <source>Role %1 has no %2 permission</source>
+      <comment>%1 is the name of selected role, %2 is permission name</comment>
+      <translation type="unfinished">Role %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected roles have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no %2 permission</source>
+      <comment>%1 is number of selected roles, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected users have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5674,36 +5771,8 @@ to %1</source>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-      <source>Role %1 has no User Input permission</source>
-      <comment>%1 is the name of selected role</comment>
-      <translation type="unfinished">Role %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected roles have no User Input permission</source>
-      <translation type="unfinished">Selected roles have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no User Input permission</source>
-      <comment>%1 is number of selected roles</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no User Input permission</source>
-      <comment>%1 is the name of selected user</comment>
-      <translation type="unfinished">User %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected users have no User Input permission</source>
-      <translation type="unfinished">Selected users have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no User Input permission</source>
-      <comment>%1 is number of selected users</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
-      </translation>
+      <source>User Input</source>
+      <translation>ユーザー入力</translation>
     </message>
   </context>
   <context>
@@ -6173,6 +6242,30 @@ to %1</source>
     <message>
       <source>Error while sending email</source>
       <translation type="unfinished">Error while sending email</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started</source>
+      <translation type="unfinished">Remote archive synchronization has been started</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished</source>
+      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is in progress</source>
+      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+    </message>
+    <message>
+      <source>Error occured during remote archive synchronization</source>
+      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
     </message>
   </context>
   <context>
@@ -7062,12 +7155,12 @@ to %1</source>
       <translation type="unfinished">Connecting to the current System...</translation>
     </message>
     <message>
-      <source>Server will be connected to the System shortly</source>
-      <translation type="unfinished">Server will be connected to the System shortly</translation>
-    </message>
-    <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
       <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>Server will be connected to System shortly</source>
+      <translation type="unfinished">Server will be connected to System shortly</translation>
     </message>
   </context>
   <context>
@@ -7318,12 +7411,231 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>Resources</name>
+    <message>
+      <source>There is another layout with the same name</source>
+      <translation>同じ名前の別のレイアウトがあります</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>それを上書きする権限がありません</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout?</source>
+      <translation>既存のレイアウトを上書きしますか？</translation>
+    </message>
+    <message>
+      <source>There is another layout with the same name.</source>
+      <translation>同じ名前の別のレイアウトがあります</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>ユーザーは削除された %n リソースへアクセスできます</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to User Settings.</source>
+      <translation>アクセスを削除するには、ユーザーの設定をご覧ください</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will get access to %n resources:</source>
+      <translation>
+        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to Role Settings.</source>
+      <translation>アクセスを削除するには、ユーザーの役割をご覧ください</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>この役割を持つすべてのユーザーは削除された %n リソースへアクセスできます</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Changes will affect other users</source>
+      <translation>変更は他のユーザーに影響を与えます</translation>
+    </message>
+    <message>
+      <source>This layout is shared with other users, so you change it for them too.</source>
+      <translation>このレイアウトは他のユーザーと共有されています</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will lose access to %n resources:</source>
+      <translation>
+        <numerusform>ユーザーは、%n リソースにアクセスをできなくなります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will lose access to %n resources:</source>
+      <translation>
+        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n shared layouts?</source>
+      <translation>
+        <numerusform>共有 %n レイアウトを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+      <translation>
+        <numerusform>これらの %n レイアウトは他のユーザーと共有されています</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout?</source>
+      <translation>
+        <numerusform>レイアウトから %n アイテムを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>削除</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>ビデオウォールからのみアクセス可能なリソースを削除しようとしました　削除するとリソース一リストには表示されません　再度ビデオウォールに追加することはできません</translation>
+    </message>
+    <message>
+      <source>You will lose access to following resources:</source>
+      <translation>次のリソースにアクセスをできなくなります:</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>%n ユーザーを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n devices?</source>
+      <translation>
+        <numerusform>%n デバイスを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n cameras?</source>
+      <translation>
+        <numerusform>%n カメラを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n I/O Modules?</source>
+      <translation>
+        <numerusform>%n I/O モジュールを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n items?</source>
+      <translation>
+        <numerusform>%n アイテムを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of them are auto-discovered.</source>
+      <translation>
+        <numerusform>%n は自動検出</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras are auto-discovered.</source>
+      <translation>
+        <numerusform>%n カメラは自動検出</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules are auto-discovered.</source>
+      <translation>
+        <numerusform>%n I/Oモジュールは自動検出</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>They may be auto-discovered again after removing.</source>
+      <translation>削除した後に再度自動検索されるかもしれません</translation>
+    </message>
+  </context>
+  <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
       <translation>
         <numerusform>ユーザー %n</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
+    <message>
+      <source>There is another video wall with the same name</source>
+      <translation>同じ名前を持つ別のビデオウォールがあります。</translation>
+    </message>
+    <message>
+      <source>Close %1 before starting Video Wall?</source>
+      <translation>ビデオウォールを開始する前に %1 を閉じますか？</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>閉じる</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>維持</translation>
+    </message>
+    <message>
+      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+      <translation>ローカル ファイルを別のコンピューターに接続されているビデオウォールスクリーンに配置できません</translation>
+    </message>
+    <message>
+      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+      <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>コピー</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>クリップボードにコピー</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>貼り付け</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>クリップボードから貼付け</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>
@@ -7431,225 +7743,6 @@ to %1</source>
     <message>
       <source>Go to Live</source>
       <translation type="unfinished">Go to Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>現在の位置の取得に失敗しました</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>現在の位置の設定に失敗しました</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>プリセットはツアーで使用されてます 削除しますか？</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>これらのツアーは無効になります</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::resources</name>
-    <message>
-      <source>There is another layout with the same name</source>
-      <translation>同じ名前の別のレイアウトがあります</translation>
-    </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>それを上書きする権限がありません</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout?</source>
-      <translation>既存のレイアウトを上書きしますか？</translation>
-    </message>
-    <message>
-      <source>There is another layout with the same name.</source>
-      <translation>同じ名前の別のレイアウトがあります</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>ユーザーは削除された %n リソースへアクセスできます</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの設定をご覧ください</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの役割をご覧ください</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>この役割を持つすべてのユーザーは削除された %n リソースへアクセスできます</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changes will affect other users</source>
-      <translation>変更は他のユーザーに影響を与えます</translation>
-    </message>
-    <message>
-      <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>このレイアウトは他のユーザーと共有されています</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>ユーザーは、%n リソースにアクセスをできなくなります</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>共有 %n レイアウトを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>これらの %n レイアウトは他のユーザーと共有されています</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>レイアウトから %n アイテムを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>ビデオウォールからのみアクセス可能なリソースを削除しようとしました　削除するとリソース一リストには表示されません　再度ビデオウォールに追加することはできません</translation>
-    </message>
-    <message>
-      <source>You will lose access to following resources:</source>
-      <translation>次のリソースにアクセスをできなくなります:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>%n ユーザーを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>%n デバイスを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>%n カメラを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>%n I/O モジュールを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>%n アイテムを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n は自動検出</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n カメラは自動検出</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/Oモジュールは自動検出</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>They may be auto-discovered again after removing.</source>
-      <translation>削除した後に再度自動検索されるかもしれません</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation type="unfinished">Overwrite existing layout tour?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation type="unfinished">There is another layout tour with the same name.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout tour?</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::videowall</name>
-    <message>
-      <source>There is another video wall with the same name</source>
-      <translation>同じ名前を持つ別のビデオウォールがあります。</translation>
-    </message>
-    <message>
-      <source>Close %1 before starting Video Wall?</source>
-      <translation>ビデオウォールを開始する前に %1 を閉じますか？</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>閉じる</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>維持</translation>
-    </message>
-    <message>
-      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>ローカル ファイルを別のコンピューターに接続されているビデオウォールスクリーンに配置できません</translation>
-    </message>
-    <message>
-      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
     </message>
   </context>
   <context>
@@ -7838,6 +7931,10 @@ to %1</source>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+    <message>
+      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
     </message>
   </context>
   <context>

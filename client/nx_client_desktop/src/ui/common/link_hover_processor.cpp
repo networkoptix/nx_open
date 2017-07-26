@@ -116,7 +116,7 @@ void QnLinkHoverProcessor::updateColors(UpdateTime when)
         if (pos == -1)
             break;
 
-        //TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
+        // TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
         const QColor color = style::linkColor(m_label->palette(), pos == hoveredHrefPos);
         alteredText.insert(pos, lit("style='color: %1' ").arg(color.name(QColor::HexRgb)));
     }

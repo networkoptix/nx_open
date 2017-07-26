@@ -203,23 +203,23 @@ class Server(object):
         if self._state != self._bool2final_state(is_started):
             self.set_service_status(is_started)
 
-    def wait_for_server_become_online(self):
+    def wait_for_server_become_online(self, check_interval_sec=0.5):
         wait_time_sec = MEDIASERVER_START_TIMEOUT_SEC
         start_time = time.time()
         while time.time() < start_time + wait_time_sec:
-            if self.is_server_online():
+            response = self.is_server_online()
+            if response:
                 log.info('Server is online now.')
-                return
+                return response
             else:
                 log.debug('Server is still offline...')
-                time.sleep(0.5)
+                time.sleep(check_interval_sec)
         else:
             raise RuntimeError('Server %s has not went online in %d seconds' % (self, wait_time_sec))
 
     def is_server_online(self):
         try:
-            self.rest_api.api.ping.GET(timeout_sec=10)
-            return True
+            return self.rest_api.api.ping.GET(timeout_sec=10)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 

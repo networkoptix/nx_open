@@ -124,7 +124,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
     const QString displayName = nx::utils::elideString(
         qnGlobalSettings->systemName(), kMaxSystemNameLength);
 
-    //TODO: #GDM #tr translators would go crazy
+    // TODO: #GDM #tr translators would go crazy
     ui->currentSystemLabel->setText(
         tr("You are about to merge the current System %1 with System")
         .arg(displayName));

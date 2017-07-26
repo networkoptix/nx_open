@@ -1,3 +1,5 @@
+#if defined(ENABLE_ONVIF)
+
 #include "vivotek_resource.h"
 
 #include <chrono>
@@ -261,3 +263,5 @@ bool VivotekResource::setVivotekParameter(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

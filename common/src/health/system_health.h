@@ -8,7 +8,7 @@
 namespace QnSystemHealth {
 
 // enum order change is forbidden as leads to stored settings failure.
-//TODO: #GDM refactor settings storage
+// TODO: #GDM refactor settings storage
 enum MessageType
 {
     // These messages are generated on the client

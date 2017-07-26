@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_factory.h>
 
-//TODO: #rename file
+// TODO: #rename file
 class QnClientResourceFactory: public QObject, public QnResourceFactory, public Singleton<QnClientResourceFactory> {
     Q_OBJECT
 public:

@@ -20,7 +20,7 @@ namespace Ui {
     class QnCompatibilityVersionInstallationDialog;
 }
 
-//TODO: #dklychkov rename class in 2.4
+// TODO: #dklychkov rename class in 2.4
 class CompatibilityVersionInstallationDialog : public Connective<QnDialog> {
     Q_OBJECT
 

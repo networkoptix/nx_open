@@ -9,7 +9,7 @@
 #include "network/module_information.h"
 #include <nx/vms/discovery/manager.h>
 
-//TODO: #dklychkov move the watcher to the network folder, as the router and module finder
+// TODO: #dklychkov move the watcher to the network folder, as the router and module finder
 class QnServerInterfaceWatcher : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT

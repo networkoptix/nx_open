@@ -128,7 +128,7 @@ bool QnThirdPartyResource::setParam(const char * id, const char * value) {
 
 bool QnThirdPartyResource::ping()
 {
-    //TODO: should check if camera supports http and, if supports, check http port
+    // TODO: should check if camera supports http and, if supports, check http port
     return true;
 }
 
@@ -325,7 +325,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         {
             for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
                 for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
-                    motionDataPicture->setPixel( x, y, 1 ); //TODO: some optimization would be appropriate
+                    motionDataPicture->setPixel( x, y, 1 ); // TODO: some optimization would be appropriate
         }
 
         searchOptions.motionMask = motionDataPicture.release();

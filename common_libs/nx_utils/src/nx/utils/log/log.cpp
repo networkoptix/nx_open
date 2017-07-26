@@ -47,7 +47,7 @@ QnLog* QnLogs::get()
 
 void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QString& msg)
 {
-    //TODO: #Elric use ctx
+    // TODO: #Elric use ctx
 
     QnLogLevel logLevel;
     switch (type)

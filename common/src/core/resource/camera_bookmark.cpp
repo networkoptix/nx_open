@@ -10,7 +10,7 @@
 
 namespace
 {
-    //TODO: #ynikitenkov make generic version of algorithm
+    // TODO: #ynikitenkov make generic version of algorithm
     typedef std::function<bool (const QnCameraBookmark &first, const QnCameraBookmark &second)> BinaryPredicate;
     QnCameraBookmarkList mergeSortedBookmarks(
         const QnMultiServerCameraBookmarkList &source,
@@ -305,7 +305,7 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const Q
     return validTags.join(delimiter);
 }
 
-//TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
+// TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
 
 void QnCameraBookmark::sortBookmarks(
     QnCommonModule* commonModule,

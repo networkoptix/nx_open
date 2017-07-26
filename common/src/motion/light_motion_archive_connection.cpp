@@ -12,7 +12,7 @@ QnLightMotionArchiveConnection::QnLightMotionArchiveConnection(const QnMetaDataL
 QnMetaDataV1Ptr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
 {
     if (m_motionData.empty() ||
-            (m_lastResult && m_lastResult->containTime(timeUsec)))  //TODO: #rvasilenko Is this check sane? Why do we return empty result?
+            (m_lastResult && m_lastResult->containTime(timeUsec)))  // TODO: #rvasilenko Is this check sane? Why do we return empty result?
         return QnMetaDataV1Ptr();
 
     qint64 timeMs = timeUsec/1000;

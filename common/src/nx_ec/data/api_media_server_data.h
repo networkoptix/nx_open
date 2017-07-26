@@ -9,7 +9,7 @@ namespace ec2
 {
     namespace backup
     {
-        //TODO: #rvasilenko move out to more general space
+        // TODO: #rvasilenko move out to more general space
         enum DayOfWeek
         {
             Never       = 0x00,

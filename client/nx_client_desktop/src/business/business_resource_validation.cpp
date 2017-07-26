@@ -218,7 +218,7 @@ void QnSendEmailActionDelegate::init(QWidget* parent)
 
 QString QnSendEmailActionDelegate::validationMessage(const QSet<QnUuid>& selected) const
 {
-    const bool valid = isValidList(selected, QString()); //TODO: FIXME! Why additional is empty?
+    const bool valid = isValidList(selected, QString()); // TODO: FIXME! Why additional is empty?
     return valid ? QString() : getText(selected, true, QString());
 }
 

@@ -25,10 +25,10 @@
     </div>
     
     <div ng-if="reactivating">
-        <h1>Fiók nyugtásása</h1>
+        <h1>Fiók nyugtázása</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">E-mail</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -53,7 +53,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Jelszóvisszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
+            Jelszó visszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
         </h1>
     </div>
 

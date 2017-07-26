@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos los servidores están desconectados. Los registros no están disponibles.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Registro de Marcador</translation>
     </message>
