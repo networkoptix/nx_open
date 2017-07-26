@@ -99,9 +99,15 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 QnAbstractCompressedMetadata* metadata = nullptr;
 
                 if (dataType == QnAbstractMediaData::META_V1)
+                {
                     metadata = new QnMetaDataV1();
+                    metadata->metadataType = MetadataType::Motion;
+                }
                 else
+                {
                     metadata = new QnCompressedMetadata(metadataType);
+                    metadata->metadataType = metadataType;
+                }
 
                 metadata->m_data.clear();
                 context.reset();

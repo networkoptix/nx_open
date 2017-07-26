@@ -13,6 +13,9 @@ namespace analytics {
 
 void NaiveObjectTracker::filterAndTrack(QnObjectDetectionMetadataPtr outMetadata)
 {
+    if (!ini().enableNaiveObjectTracking)
+        return;
+
     std::vector<QnObjectDetectionInfo> filtered;
     for (auto& info: outMetadata->detectedObjects)
     {

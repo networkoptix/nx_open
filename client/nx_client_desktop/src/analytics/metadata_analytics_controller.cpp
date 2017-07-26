@@ -12,8 +12,8 @@ void QnMetadataAnalyticsController::gotMetadataPacket(
         return;
 
     bool metadataIsOk = metadata
-        && metadata->dataType != QnAbstractMediaData::DataType::GENERIC_METADATA
-        && metadata->metadataType != MetadataType::ObjectDetection;
+        && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
+        && metadata->metadataType == MetadataType::ObjectDetection;
 
     if (!metadataIsOk)
         return;
