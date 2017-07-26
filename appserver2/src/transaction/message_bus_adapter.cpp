@@ -27,22 +27,27 @@ void TransactionMessageBusAdapter::init(MessageBusType value)
 
     if (value == MessageBusType::None)
         return;
-    else if (value == MessageBusType::P2pMode)
+
+    if (value == MessageBusType::P2pMode)
+    {
         m_bus.reset(new nx::p2p::MessageBus(
             m_db,
             m_peerType,
             commonModule(),
             m_jsonTranSerializer,
             m_ubjsonTranSerializer));
+    }
     else
+    {
         m_bus.reset(new QnTransactionMessageBus(
             m_db,
             m_peerType,
             commonModule(),
             m_jsonTranSerializer,
             m_ubjsonTranSerializer));
-    m_bus->setTimeSyncManager(m_timeSyncManager);
+    }
 
+    m_bus->setTimeSyncManager(m_timeSyncManager);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerLost,
