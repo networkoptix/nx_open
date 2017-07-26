@@ -33,8 +33,8 @@ def get_post_parameters(request, context_id, language_id):
     if not language:
         language = customization.default_language
 
-    form = CustomContextForm(request.POST, request.FILES, initial={
-                             'language': language.id, 'context': context.id})
+    form = CustomContextForm(
+        initial={'language': language.id, 'context': context.id})
 
     return context, language, form, customization, user
 

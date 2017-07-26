@@ -26,13 +26,6 @@
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
-            {{ field.label_tag }}
-            {{ field }}
-            
-            {% if field.help_text %}
-            <p class="help">{{ field.help_text }}</p>
-            {% endif %}
-            
             <div>
                 <br>
                 <div>
@@ -43,6 +36,13 @@
                 <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}"
                      onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
             </div>
+            
+            {{ field.label_tag }}
+            {{ field }}
+            
+            {% if field.help_text %}
+            <p class="help">{{ field.help_text }}</p>
+            {% endif %}
         </div>
     {% endfor %}
 
