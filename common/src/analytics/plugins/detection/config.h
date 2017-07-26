@@ -22,6 +22,7 @@ struct IniConfig: public nx::kit::IniConfig
         "If not empty, save compressed frames as <this_param>.#");
     NX_INI_STRING("", substituteFramesFilePrefix, "");
     NX_INI_FLAG(0, singleInstance, "");
+    NX_INI_FLAG(0, useTestImplementation, "");
     NX_INI_INT(0, timestampShift, "Shifts timestamp of recognized objects.");
     NX_INI_INT(1920, frameWidth, "");
     NX_INI_INT(1080, frameHeight, "");

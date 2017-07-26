@@ -1,9 +1,12 @@
 #include "detection_plugin_factory.h"
+#include "test_detection_plugin.h"
 
 #define NX_OUTPUT_PREFIX "[Detection plugin factory] ";
 #include "config.h"
 
 #include <QtCore/QLibrary>
+
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace analytics {
@@ -18,9 +21,15 @@ std::unique_ptr<AbstractDetectionPlugin> DetectionPluginFactory::createDetection
     if (ini().singleInstance && m_instanceCount > 0)
         return nullptr;
 
-    if (!m_factoryFunction)
-        m_factoryFunction = extractFactoryFunction(
-            QString::fromStdString(std::string(ini().pathToPlugin)));
+    if (ini().useTestImplementation)
+        return std::unique_ptr<AbstractDetectionPlugin>(new TestDetectionPlugin());
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_factoryFunction)
+            m_factoryFunction = extractFactoryFunction(
+                QString::fromStdString(std::string(ini().pathToPlugin)));
+    }
 
     if (!m_factoryFunction)
         return nullptr;
@@ -39,6 +48,7 @@ std::unique_ptr<AbstractDetectionPlugin> DetectionPluginFactory::createDetection
 
     instance->setParams(params);
 
+    ++m_instanceCount;
     return std::unique_ptr<AbstractDetectionPlugin>(instance);
 }
 
