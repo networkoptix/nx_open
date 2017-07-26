@@ -46,10 +46,18 @@ public:
     virtual bool hasMetadata() const = 0;
     virtual void setParams(const Params& params) = 0;
 
+    virtual bool start() = 0;
+
     /** @param compressedFrame Is not referenced after this call returns; the data is copied. */
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) = 0;
     virtual bool pullRectsForFrame(
         Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) = 0;
 };
 
-using CreateDetectionPluginProcedure = AbstractDetectionPlugin* (*)();
+typedef AbstractDetectionPlugin* (*CreateDetectionPluginProcedure)();
+
+extern "C" {
+
+AbstractDetectionPlugin* createDetectionPluginInstance();
+
+} // extern "C"

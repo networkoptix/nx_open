@@ -48,9 +48,7 @@ SRCS := \
 	video_dec_gie_main.cpp \
 	config.cpp \
 	main_dp.cpp \
-	detection_plugin.cpp \
-	detection_plugin_impl.cpp \
-	detection_plugin_stub.cpp \
+	jetson_detection_plugin.cpp \
 	$(wildcard $(CLASS_DIR)/*.cpp) \
 
 OBJS := $(SRCS:.cpp=.o)
@@ -62,7 +60,7 @@ CPPFLAGS += \
 	-fPIC \
 	-fvisibility=hidden \
 	-DNX_UTILS_API= \
-	-DTEGRA_VIDEO_API='__attribute__ ((visibility ("default")))' \
+	-DDETECTION_PLUGIN_API='__attribute__ ((visibility ("default")))' \
 	-I"../.." \
 	-I"../common/algorithm/cuda" \
 	-I"../common/algorithm/gie" \

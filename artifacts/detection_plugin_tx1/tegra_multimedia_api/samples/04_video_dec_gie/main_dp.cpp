@@ -1,4 +1,5 @@
 #include "main_dp.h"
+#include "config.h"
 
 #include <iostream>
 #include <fstream>
@@ -9,9 +10,7 @@
 #include <atomic>
 #include <cstdarg>
 
-#include "detection_plugin.h"
-
-#include "config.h"
+#include <detection_plugin_interface/detection_plugin_interface.h>
 
 #include <nx/utils/string.h>
 
@@ -101,7 +100,7 @@ public:
         const char* videoFilename,
         const char* frameFilePrefix,
         int bufSize,
-        const DetectionPlugin::Params& params)
+        const AbstractDetectionPlugin::Params& params)
         :
         m_id(id),
         m_videoFilename(NX_CRITICAL(videoFilename)),
@@ -111,7 +110,8 @@ public:
     {
         auto paramsWithId = params;
         paramsWithId.id = id.c_str();
-        m_detectionPlugin.reset(DetectionPlugin::create(paramsWithId));
+        m_detectionPlugin.reset(createDetectionPluginInstance());
+        m_detectionPlugin->setParams(paramsWithId);
     }
 
     bool execute()
@@ -178,9 +178,9 @@ private:
 
     bool processBuf(int dataSize)
     {
-        // NOTE: Current impl of DetectionPlugin allows arbitrary consecutive chunks of a video file
+        // NOTE: Current impl of AbstractDetectionPlugin allows arbitrary consecutive chunks of a video file
         // in struct CompressedFrame - it does not have to be exactly one frame.
-        DetectionPlugin::CompressedFrame compressedFrame;
+        AbstractDetectionPlugin::CompressedFrame compressedFrame;
         compressedFrame.data = m_buf->data();
         compressedFrame.dataSize = dataSize;
 
@@ -197,10 +197,10 @@ private:
 
         int64_t ptsUs = 0;
         constexpr int kMaxRects = 100;
-        DetectionPlugin::Rect DetectionPluginRects[kMaxRects];
+        AbstractDetectionPlugin::Rect detectionPluginRects[kMaxRects];
         int rectsCount = 0;
         while (m_detectionPlugin->pullRectsForFrame(
-            DetectionPluginRects, kMaxRects, &rectsCount, &ptsUs))
+            detectionPluginRects, kMaxRects, &rectsCount, &ptsUs))
         {
             NX_OUTPUT << "Executor #" << m_id << ": pullRectsForFrame() -> {rects.size: "
                 << rectsCount << ", ptsUs: " << ptsUs << "}";
@@ -216,7 +216,7 @@ private:
     std::unique_ptr<std::vector<uint8_t>> m_buf;
     const int m_bufSize;
     std::ifstream m_videoFile;
-    std::unique_ptr<DetectionPlugin> m_detectionPlugin;
+    std::unique_ptr<AbstractDetectionPlugin> m_detectionPlugin;
     int m_frameFileNumber = 0;
 };
 
@@ -238,7 +238,7 @@ int TEGRA_VIDEO_API mainTv(int argc, char** argv)
 {
     NX_OUTPUT << "mainTv()";
 
-    DetectionPlugin::Params params;
+    AbstractDetectionPlugin::Params params;
     params.modelFile = ini().modelFile;
     params.deployFile = ini().deployFile;
     params.cacheFile = ini().cacheFile;
@@ -254,15 +254,15 @@ int TEGRA_VIDEO_API mainTv(int argc, char** argv)
         videoFilename = argv[1];
     }
 
-    if (ini().DetectionPluginCount < 1)
+    if (ini().detectionPluginCount < 1)
     {
-        NX_PRINT << "ERROR: .ini DetectionPluginCount should be 1 or more.";
+        NX_PRINT << "ERROR: .ini detectionPluginCount should be 1 or more.";
         return 1;
     }
 
     std::vector<std::unique_ptr<DetectionPluginExecutor>> executors;
     std::vector<pthread_t> threads;
-    for (int i = 0; i < ini().DetectionPluginCount; ++i)
+    for (int i = 0; i < ini().detectionPluginCount; ++i)
     {
         executors.emplace_back(new DetectionPluginExecutor(
             format("%d", i), videoFilename, ini().substituteFramesFilePrefix, kChunkSize, params));

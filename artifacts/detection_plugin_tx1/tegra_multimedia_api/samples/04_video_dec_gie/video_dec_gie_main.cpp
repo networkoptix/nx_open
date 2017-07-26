@@ -61,18 +61,6 @@
 
 namespace {
 
-#if 0 // car detection
-
-static const int kNetWidth = 960;
-static const int kNetHeight = 540;
-
-#else // pedestrian detection
-
-static const int kNetWidth = 1024;
-static const int kNetHeight = 512;
-
-#endif
-
 class Lock
 {
 public:
@@ -1602,12 +1590,12 @@ std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
 
 int Detector::getNetWidth() const
 {
-    return kNetWidth;
+    return m_ctx->getNetWidth();
 }
 
 int Detector::getNetHeight() const
 {
-    return kNetHeight;
+    return m_ctx-->getNetHeight();
 }
 
 int Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)

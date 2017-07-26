@@ -17,6 +17,8 @@ public:
     virtual void id(char* idString, int maxIdLength) const override;
     virtual bool hasMetadata() const override;
     virtual void setParams(const Params& params) override;
+    
+    virtual bool start() override;
 
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
     virtual bool pullRectsForFrame(
@@ -53,6 +55,11 @@ void Stub::setParams(const Params& params)
     m_modelFile = params.modelFile;
     m_deployFile = params.deployFile;
     m_cacheFile = params.cacheFile;
+}
+
+bool start()
+{
+    return true;
 }
 
 bool Stub::pushCompressedFrame(const CompressedFrame* compressedFrame)

@@ -6,8 +6,6 @@ struct DetectionPluginConfig: public nx::kit::IniConfig
 {
     DetectionPluginFlagConfig(): nx::kit::IniConfig("detection_plugin") { reload(); }
 
-    NX_INI_FLAG(0, disable, "Use stub implementation.");
-
     NX_INI_FLAG(0, enableOutput, "");
     NX_INI_FLAG(0, enableTime, "");
     NX_INI_FLAG(0, enableFps, "");
@@ -17,19 +15,19 @@ struct DetectionPluginConfig: public nx::kit::IniConfig
     NX_INI_INT(1, tegraVideoCount, "Number of simultaneous DetectionPlugin instances.");
 
     NX_INI_STRING(
-        //"../../data/model/GoogleNet-modified.prototxt",
-        "/opt/networkoptix/mediaserver/bin/nvidia_models/GoogleNet-modified.prototxt",
-        deployFile, "");
+        "/opt/networkoptix/mediaserver/bin/nvidia_models/pednet.prototxt",
+        deployFile,
+        "");
 
     NX_INI_STRING(
-        //"../../data/model/GoogleNet-modified-online_iter_30000.caffemodel",
-        "/opt/networkoptix/mediaserver/bin/nvidia_models/GoogleNet-modified-online_iter_30000.caffemodel",
-        modelFile, "");
+        "/opt/networkoptix/mediaserver/bin/nvidia_models/pednet.caffemodel",
+        modelFile,
+        "");
 
     NX_INI_STRING(
-        //"./gieModel.cache",
         "/opt/networkoptix/mediaserver/var/cuda_engine.cache",
-        cacheFile, "");
+        cacheFile,
+        "");
 
     NX_INI_STRING("", substituteFramesFilePrefix, "");
 
