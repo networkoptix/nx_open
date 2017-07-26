@@ -263,6 +263,7 @@
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
+#include "ini.h"
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2557,7 +2558,8 @@ void MediaServerProcess::run()
         getConnectionFactory(
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            commonModule()));
+            commonModule(),
+            ini().isP2pMode));
 
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
