@@ -523,12 +523,11 @@ module.exports = function (grunt) {
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
-
-            pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
+            pull:{
+                command: 'hg pull -u; python ../../devtools/util/merge_dev.py -r <%= pull.branch %>'
             },
-            merge_release: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
+            push:{
+                command: 'python ../../devtools/util/merge_dev.py -t <%= push.branch %>'
             },
             version: {
                 command: 'hg parent > static/version.txt'

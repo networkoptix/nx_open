@@ -457,6 +457,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
         return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
+
+    var chunkLoadingTexture = false;
+    var chunkLoadingTextureImg = false;
     function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
         var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
@@ -488,27 +491,52 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             height = Math.ceil(height);
         }
         else if(levelIndex != chunk.level || !chunk.level){
-            if(lastMinuteTexture){
-                context.fillStyle = lastMinuteTexture;
-            }
-            else{
-                if(!lastMinuteTextureImg) {
-                    var img = new Image();
-                    img.onload = function () {
-                        lastMinuteTexture = context.createPattern(img, 'repeat');
-                        context.fillStyle = lastMinuteTexture;
-                    };
-                    img.src = Config.viewsDirCommon + '../images/lastminute.png';
-                    lastMinuteTextureImg = img;
-                }
-                context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
-            }
-        }
-
-        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
+            //Show loading color under loading texture
+            context.fillStyle = blurColor(timelineConfig.loadingChunkColor, blur);
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
             top,
                 (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
             height);
+            
+            //Load the loading texture
+            if(chunkLoadingTexture){
+                context.fillStyle = chunkLoadingTexture;
+            }
+            else{
+                if(!chunkLoadingTextureImg) {
+                    var img = new Image();
+                    img.onload = function () {
+                        chunkLoadingTexture = context.createPattern(img, 'repeat');
+                        context.fillStyle = chunkLoadingTexture;
+                    };
+                    img.src = Config.viewsDirCommon + '../images/chunkloading.png';
+                    chunkLoadingTextureImg = img;
+                }
+                context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
+            }
+
+            //Give the texture the appearance of moving
+            var start = self.scaleManager.lastMinute();
+            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start);
+            
+            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize);
+
+            context.save();
+            context.translate(offset_x, 0);
+
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x,
+                top,
+                    (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
+                height);
+
+            context.restore();
+        }
+        else{
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
+                top,
+                    (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
+                height);
+        }
     }
 
 
