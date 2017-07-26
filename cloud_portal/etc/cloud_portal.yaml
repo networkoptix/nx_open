@@ -35,20 +35,8 @@ admins:
         - 'Cloud Portal Admins'
         - 'cloud-portal-admins@networkoptix.com'
 languages:
-    - en
-    - ru
-    - fr
-    - de
-    - es
-    - ja
-    - ko
-    - th
-    - zh_CN
-    - zh_TW
-    - vi_VN
-    - hu
-    - he
-    - pt_PT
+    - en_US
+    - ru_RU
 
 queue_name: '$INSTANCE_NAME'
 max_retries: 10
