@@ -310,6 +310,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateDisplay);
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
         &QnMediaResourceWidget::updateFisheye);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
+        &QnMediaResourceWidget::dewarpingParamsChanged);
     connect(item, &QnWorkbenchItem::imageEnhancementChanged, this,
         &QnMediaResourceWidget::at_item_imageEnhancementChanged);
     connect(this, &QnMediaResourceWidget::dewarpingParamsChanged, this,
