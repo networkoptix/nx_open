@@ -326,8 +326,8 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewLayoutTourAction)
             .flags(Main | Tree | NoTarget)
-            .text(ContextMenu::tr("Layout Tour..."))
-            .pulledText(ContextMenu::tr("New Layout Tour..."))
+            .text(ContextMenu::tr("Showreel..."))
+            .pulledText(ContextMenu::tr("New Showreel..."))
             .condition(condition::isLoggedIn()
                 && condition::treeNodeType({Qn::LayoutsNode, Qn::LayoutToursNode})
                 && !condition::isSafeMode()
@@ -901,7 +901,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
-    factory(SaveLayoutAsAction) //TODO: #GDM #access check canCreateResource permission
+    factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
         .condition(
@@ -909,7 +909,7 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
         );
 
-    factory(SaveLayoutForCurrentUserAsAction) //TODO: #GDM #access check canCreateResource permission
+    factory(SaveLayoutForCurrentUserAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As..."))
         .condition(
@@ -1060,7 +1060,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Check File Watermark"))
         .shortcut(lit("Alt+C"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::exported_media, All)
+        .condition(condition::hasFlags(Qn::local_video, Any)
             && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
@@ -1125,7 +1125,8 @@ void initialize(Manager* manager, Action* root)
     factory(RemoveLayoutItemFromSceneAction)
         .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove from Layout"))
-        .conditionalText(ContextMenu::tr("Remove from Tour"), condition::isLayoutTourReviewMode())
+        .conditionalText(ContextMenu::tr("Remove from Showreel"),
+            condition::isLayoutTourReviewMode())
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .autoRepeat(false)
@@ -1183,7 +1184,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree)
         .separator();
 
-    //TODO: #gdm restore this functionality and allow to delete exported layouts
+    // TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(DeleteFromDiskAction)
         //flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
@@ -1378,7 +1379,7 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
-    //TODO: #GDM Move to childFactory, reduce actions number
+    // TODO: #GDM Move to childFactory, reduce actions number
     factory.beginSubMenu();
     {
         factory.beginGroup();
@@ -1443,8 +1444,8 @@ void initialize(Manager* manager, Action* root)
     factory(ToggleLayoutTourModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("Start Tour"))
-        .conditionalText(ContextMenu::tr("Stop Tour"), condition::tourIsRunning())
+        .text(ContextMenu::tr("Start Showreel"))
+        .conditionalText(ContextMenu::tr("Stop Showreel"), condition::tourIsRunning())
         .shortcut(lit("Alt+T"))
         .checkable()
         .autoRepeat(false)
@@ -1455,7 +1456,7 @@ void initialize(Manager* manager, Action* root)
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("Start Tour")) //< To be displayed on the button
+        .text(ContextMenu::tr("Start Showreel")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
         .icon(qnSkin->icon("buttons/play.png"))
         .condition(
@@ -1498,7 +1499,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(MakeLayoutTourAction)
         .flags(Tree | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Layout Tour"))
+        .text(ContextMenu::tr("Make Showreel"))
         .condition(condition::hasFlags(Qn::layout, All)
             && !condition::isSafeMode());
 

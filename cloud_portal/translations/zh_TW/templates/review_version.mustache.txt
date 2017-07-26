@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+新版本公告: {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+點擊連接以查看{{ message.product }}的{{ message.id }}草稿
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+連接到: {{ config.portal_url }} /admin/cms/review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+你可以在此頁:
+1) 建立預覽以查看最新的變更.
+2) 發布此更新內容版本.
+3) 點擊編輯記錄按鈕編輯內文。 要查看這些變更, 您需要創建一個新版本.

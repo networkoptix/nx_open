@@ -378,7 +378,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         }
     }
 
-    //TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
+    // TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
     qnSettings->setVSyncEnabled(!startupParams.vsyncDisabled);
     qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
@@ -397,7 +397,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
-    //TODO: #GDM fix it
+    // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
 #ifndef __arm__
     QnPerformanceTest::detectLightMode();

@@ -508,7 +508,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if( !encoderParamsToSet )
         return CameraDiagnostics::RequestFailedResult( QLatin1String("fetchVideoEncoder"), QString() );
 
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
     if (!isCameraControlRequired || m_mustNotConfigureResource)
@@ -535,7 +535,7 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     for (;iter != response.Configurations.end(); ++iter)
     {
         VideoEncoder* conf = *iter;
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (conf && id == QString::fromStdString(conf->token)) {
             /*
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
@@ -823,7 +823,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     if( !result )
         return CameraDiagnostics::RequestFailedResult( QLatin1String("fetchAudioEncoder"), QString() );
 
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
     if (!isCameraControlRequired)
@@ -842,7 +842,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
     std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (*iter && id == QString::fromStdString((*iter)->token)) {
             return *iter;
         }
@@ -933,7 +933,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
 
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     for (; it != response.Configurations.end(); ++it) {
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }

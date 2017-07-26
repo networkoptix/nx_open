@@ -324,7 +324,7 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
         if (!item.stateChangeTimer.isValid())
             continue;
 
-        //TODO: Probably rewrite this logic
+        // TODO: Probably rewrite this logic
 
         /* If I/O port toggle is confirmed by the monitor, stateChangeTimer is invalidated. */
         /* If stateChangeTimer is valid and expired, I/O port toggle was unsuccessful: */

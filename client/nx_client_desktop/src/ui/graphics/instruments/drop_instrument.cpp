@@ -127,6 +127,7 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
 {
     m_ids.clear();
+    m_localFiles.clear();
 
     const auto mimeData = event->mimeData();
     if (mimeData->hasFormat(Qn::NoSceneDrop))
@@ -135,22 +136,19 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
         return false;
     }
 
-#ifdef Q_OS_MAC
-    if (mimeData->hasUrls())
-    {
-        for (const auto& url: mimeData->urls())
-        {
-            if (url.isLocalFile() && QFile::exists(url.toLocalFile()))
-                mac_saveFileBookmark(url.path());
-        }
-    }
-#endif
 
-    // Scene drop is working only for resources that are already in the pool.
     MimeData data(mimeData);
     m_ids = data.getIds();
 
-    if (m_ids.empty())
+    if (mimeData->hasUrls())
+    {
+        for (const auto& url: mimeData->urls())
+            processLocalFileDrag(url);
+    }
+
+    // Scene drop is working only for resources that are already in the pool.
+
+    if (!isDragValid())
     {
         event->ignore();
         return false;
@@ -162,7 +160,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
 {
-    if (m_ids.empty())
+    if (!isDragValid())
     {
         event->ignore();
         return false;
@@ -174,7 +172,7 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent 
 
 bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *)
 {
-    if (m_ids.empty())
+    if (!isDragValid())
         return false;
 
     return true;
@@ -210,7 +208,10 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
         return true;
     }
 
-    const auto resources = resourcePool()->getResources(m_ids);
+    const auto resources = m_ids.empty()
+        ? QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(m_localFiles))
+        : resourcePool()->getResources(m_ids);
+
     if (!m_intoNewLayout)
     {
         delayedTriggerIfPossible(
@@ -254,4 +255,25 @@ bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::P
 
     executeDelayed(triggerIfPossible);
     return true;
+}
+
+void DropInstrument::processLocalFileDrag(const QUrl& url)
+{
+    if (!url.isLocalFile())
+        return;
+
+    const QString filePath = url.toLocalFile();
+    if (!QFile::exists(filePath))
+        return;
+
+#ifdef Q_OS_MAC
+    mac_saveFileBookmark(url.path());
+#endif
+
+    m_localFiles.push_back(filePath);
+}
+
+bool DropInstrument::isDragValid() const
+{
+    return !m_ids.empty() || !m_localFiles.empty();
 }

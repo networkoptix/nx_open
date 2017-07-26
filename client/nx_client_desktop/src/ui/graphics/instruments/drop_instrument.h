@@ -47,8 +47,16 @@ private:
     bool delayedTriggerIfPossible(nx::client::desktop::ui::action::IDType id,
         const nx::client::desktop::ui::action::Parameters& parameters);
 
+    /**
+     * Handles local file, dragged into the client.
+     */
+    void processLocalFileDrag(const QUrl& url);
+
+    bool isDragValid() const;
+
 private:
     QList<QnUuid> m_ids;
+    QStringList m_localFiles;
 
     QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;

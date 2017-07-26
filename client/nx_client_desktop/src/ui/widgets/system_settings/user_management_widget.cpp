@@ -451,7 +451,7 @@ void QnUserManagementWidget::editRoles()
 
 void QnUserManagementWidget::createUser()
 {
-    menu()->triggerIfPossible(action::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::NewUserAction); // TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers()

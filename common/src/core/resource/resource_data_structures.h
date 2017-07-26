@@ -35,7 +35,7 @@ Q_DECLARE_METATYPE(TwoWayAudioParams);
 
 struct QnBounds
 {
-    //TODO: #dmishin move to signed integer type and refactor isNull method
+    // TODO: #dmishin move to signed integer type and refactor isNull method
     quint64 min;
     quint64 max;
 

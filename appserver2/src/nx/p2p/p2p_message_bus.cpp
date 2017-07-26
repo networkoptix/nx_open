@@ -1368,7 +1368,7 @@ void MessageBus::gotTransaction(
     // process special cases
     switch (tran.command)
     {
-        //TODO: move it to the global setting param or emit this data via NotificationManager
+        // TODO: move it to the global setting param or emit this data via NotificationManager
         case ApiCommand::forcePrimaryTimeServer:
             m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             if (localPeer().isServer())

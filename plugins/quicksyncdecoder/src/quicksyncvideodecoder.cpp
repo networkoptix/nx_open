@@ -465,7 +465,7 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
 
             if( !convertToAnnexBInPlace )
             {
-                inputStream.Data = const_cast<mfxU8*>(m_tempFrameBuffer.data());    //TODO: #ak give up const_cast after move to c++11
+                inputStream.Data = const_cast<mfxU8*>(m_tempFrameBuffer.data());    // TODO: #ak give up const_cast after move to c++11
                 inputStream.DataLength = m_tempFrameBuffer.size();
                 inputStream.MaxLength = m_tempFrameBuffer.size();
             }

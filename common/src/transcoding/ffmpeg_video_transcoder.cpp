@@ -221,7 +221,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    //TODO: ffmpeg-test
+    // TODO: ffmpeg-test
     //int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
     m_outPacket->data = m_videoEncodingBuffer;

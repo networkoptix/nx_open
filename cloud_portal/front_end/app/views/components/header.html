@@ -58,6 +58,9 @@
                     <li><a href="/account/">Account Settings</a></li>
                     <li><a href="/account/password/">Change Password</a></li>
                     <li><a href="" ng-click="logout()">Log Out</a></li>
+
+                    <li class="hidden-expanded nav-divider" role="separator" ng-if="account.is_staff"></li>
+                    <li><a href="/admin/" ng-if="account.is_staff">Portal management</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

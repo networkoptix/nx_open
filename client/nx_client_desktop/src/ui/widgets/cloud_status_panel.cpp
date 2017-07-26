@@ -18,7 +18,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 
-//TODO: #dklychkov Uncomment when cloud login is implemented
+// TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
 
 using namespace nx::client::desktop::ui;
@@ -200,7 +200,7 @@ void QnCloudStatusPanelPrivate::updateSystems()
     {
         QAction* action = systemsMenu->addAction(system.name);
         QUrl url;
-        //TODO: #dklychkov Prepare URL
+        // TODO: #dklychkov Prepare URL
         action->setData(url);
     }
 

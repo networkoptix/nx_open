@@ -13,7 +13,7 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>De gebruikersnaam of het wachtwoord is ongeldig.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
@@ -411,7 +411,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>I/O module</translation>
     </message>
   </context>
   <context>
@@ -995,7 +995,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Aangepast</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1090,7 +1090,7 @@
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Generic Event</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>

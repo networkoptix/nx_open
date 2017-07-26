@@ -37,5 +37,5 @@ private:
 private:
     QVector<int> m_eventTypeToLexOrder;
     QVector<int> m_actionTypeToLexOrder;
-    bool m_onlyUserAvailableActions;
+    const bool m_onlyUserAvailableActions;
 };
