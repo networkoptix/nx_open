@@ -23,28 +23,41 @@ class LightweightServersFactory(object):
         self._artifact_factory = artifact_factory
         self._physical_installation_ctl = physical_installation_ctl
         self._test_binary_path = test_binary_path
-        self._physical_installation_host = self._pick_server()
-        self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, self._physical_installation_host)
+        physical_installation_host = self._pick_server()
+        if physical_installation_host:
+            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host)
+        else:
+            self._lws_host = None
 
     def __call__(self, server_count):
         return self._allocate(server_count)
 
     def release(self):
-        self._lws_host.release()
+        if self._lws_host:
+            self._lws_host.release()
 
     def perform_post_checks(self):
-        self._lws_host.perform_post_checks()
+        if self._lws_host:
+            self._lws_host.perform_post_checks()
 
     def _pick_server(self):
+        if not self._physical_installation_ctl:
+            return None
         for config, host in zip(self._physical_installation_ctl.config_list,
                                 self._physical_installation_ctl.installation_hosts):
             if config.lightweight_servers_limit:
                 log.info('Lightweight host: %s %s', config, host)
                 return host
-        assert False, 'No lightweight servers configured'
+        return None
 
     def _allocate(self, server_count):
-        return list(self._lws_host.allocate(server_count))
+        if not server_count:
+            return []
+        if self._lws_host:
+            return list(self._lws_host.allocate(server_count))
+        else:
+            log.warning('No lightweight servers are configured, but requested: %d' % server_count)
+            return []
 
 
 class LightweightServersInstallation(object):

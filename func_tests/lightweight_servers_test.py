@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 LWS_MERGE_TIMEOUT = datetime.timedelta(minutes=10)
 
 
+@pytest.mark.skipif(not os.environ.has_key('FRAMEWORK_TEST'), reason='Only for testing of testing framework itself')
 @pytest.mark.parametrize('iteration', range(2))
 def test_merge(server_factory, lightweight_servers_factory, iteration):
     server = server_factory('full')
