@@ -1172,8 +1172,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
-
-    updateWidgetsFrameOpacity();
     return true;
 }
 
@@ -1370,15 +1368,6 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
     m_viewportAnimator->setMarginFlags(flags);
 
     synchronizeSceneBoundsExtension();
-}
-
-void QnWorkbenchDisplay::updateWidgetsFrameOpacity()
-{
-    // Opacity for all widgets frames
-    const auto normalOpacity = qFuzzyIsNull(workbench()->mapper()->spacing()) ? 0.0 : 1.0;
-
-    for (auto widget: m_widgets)
-        widget->setFrameOpacity(widget->isSelected() ? 1.0 : normalOpacity);
 }
 
 // -------------------------------------------------------------------------- //
@@ -2267,8 +2256,6 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
     {
         workbench()->setItem(Qn::SingleSelectedRole, NULL);
     }
-
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_view_destroyed()
@@ -2299,7 +2286,6 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     synchronizeAllGeometries(false);
     synchronizeSceneBounds();
     fitInView(false);
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

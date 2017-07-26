@@ -880,7 +880,9 @@ bool QnResourceWidget::isHovered() const
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+void QnResourceWidget::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
     const bool animate = display()->animationAllowed();
 
@@ -915,6 +917,9 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
     updateStatusOverlay(animate);
+
+    if (qFuzzyIsNull(item()->layout()->cellSpacing()))
+        paintInnerFrame(painter);
 
     emit painted();
 }
@@ -989,11 +994,7 @@ void QnResourceWidget::paintWindowFrame(
     const QStyleOptionGraphicsItem* option,
     QWidget* /*widget*/)
 {
-    const auto paintRect = option->exposedRect & rect();
-    if (!paintRect.isEmpty())
-        painter->fillRect(paintRect, palette().window());
-
-    if (qFuzzyIsNull(m_frameOpacity))
+    if (qFuzzyIsNull(m_frameOpacity) || qFuzzyIsNull(item()->layout()->cellSpacing()))
         return;
 
     int mainBorderWidth = 1;
@@ -1043,6 +1044,33 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
 
     painter->fillRect(rect,
         toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), kSelectionOpacity));
+}
+
+void QnResourceWidget::paintInnerFrame(QPainter* painter)
+{
+    if (qFuzzyIsNull(m_frameOpacity))
+        return;
+
+    NX_EXPECT(qFuzzyIsNull(item()->layout()->cellSpacing()));
+
+    static const int kInnerBorderWidth = 2;
+
+    switch (m_selectionState)
+    {
+        case SelectionState::invalid:
+        case SelectionState::notSelected:
+        case SelectionState::selected:
+            return;
+
+        case SelectionState::inactiveFocused:
+        case SelectionState::focused:
+        case SelectionState::focusedAndSelected:
+            break;
+    }
+
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
+    QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
+        kInnerBorderWidth, 0);
 }
 
 float QnResourceWidget::defaultAspectRatio() const
