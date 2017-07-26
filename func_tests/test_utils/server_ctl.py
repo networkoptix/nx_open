@@ -7,6 +7,7 @@ from .host import Host
 
 MEDIASERVER_DIR = 'opt/{customization_company_name}/mediaserver'
 MEDIASERVER_SERVICE_NAME = '{customization_company_name}-mediaserver'
+SERVER_CTL_TARGET_PATH = 'server_ctl.sh'
 
 
 class ServerCtl(object):
@@ -97,6 +98,8 @@ class PhysicalHostServerCtl(ServerCtl):
         return self._host.get_timezone()
 
     def get_state(self):
+        if not self._host.file_exists(self._server_ctl_path):
+            return False  # not even installed
         return self._run_service_action('is_active') == 'active'
 
     def set_state(self, is_started):
@@ -106,5 +109,8 @@ class PhysicalHostServerCtl(ServerCtl):
         self._run_service_action('make_core_dump')
 
     def _run_service_action(self, action):
-        server_ctl_path = os.path.join(self._dir, 'server_ctl.sh')
-        return self._host.run_command([server_ctl_path, action]).strip()
+        return self._host.run_command([self._server_ctl_path, action]).strip()
+
+    @property
+    def _server_ctl_path(self):
+        return os.path.join(self._dir, 'server_ctl.sh')
