@@ -22,8 +22,8 @@ from django.views.generic.base import TemplateView
 
 def redirect_login(request):
     target_url = '/login'
-    if request.META.QUERY_STRING:
-        target_url += '?' + request.META.QUERY_STRING
+    if 'QUERY_STRING' in request.META:
+        target_url += '?%s' % request.META.QUERY_STRING
     return redirect(target_url)
 
 urlpatterns = [
