@@ -264,8 +264,7 @@ void MessageBus::connectSignals(const P2pConnectionPtr& connection)
 }
 
 void MessageBus::createOutgoingConnections(
-    const QMap<ApiPersistentIdData,
-    P2pConnectionPtr>& currentSubscription)
+    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
     if (hasStartingConnections())
         return;
