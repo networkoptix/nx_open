@@ -78,7 +78,7 @@ def read_structure_json():
             context.file_path = context_data["file_path"]
         if "url" in context_data:
             context.url = context_data["url"]
-            context.save()
+        context.save()
 
         for record in context_data["values"]:
             type = None
