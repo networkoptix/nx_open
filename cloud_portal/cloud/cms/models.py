@@ -17,6 +17,7 @@ class Product(models.Model):
 
 
 class Context(models.Model):
+
     class Meta:
         verbose_name = 'Content page'
         verbose_name_plural = 'Content pages'
@@ -43,6 +44,7 @@ DATA_TYPES = (
     (3, 'Long Text')
 )
 
+
 class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
@@ -62,6 +64,7 @@ class DataStructure(models.Model):
 
 # CMS settings. Release engineer can change that
 
+
 class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=8, unique=True)
@@ -72,7 +75,8 @@ class Language(models.Model):
 
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    default_language = models.ForeignKey(Language, related_name='default_in_%(class)s')
+    default_language = models.ForeignKey(
+        Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
 
     def __str__(self):
@@ -82,6 +86,7 @@ class Customization(models.Model):
 # CMS data. Partners can change that
 
 class ContentVersion(models.Model):
+
     class Meta:
         permissions = (
             ("publish_version", "Can publish content to production"),
@@ -91,11 +96,14 @@ class ContentVersion(models.Model):
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        blank=True, related_name='created_%(class)s')
 
     accepted_date = models.DateTimeField(null=True, blank=True)
-    accepted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
-                                    related_name='accepted_%(class)s')
+    accepted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        related_name='accepted_%(class)s')
 
     def __str__(self):
         return str(self.id)
@@ -108,14 +116,16 @@ class DataRecord(models.Model):
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        blank=True, related_name='created_%(class)s')
 
     value = models.TextField()
 
     def __str__(self):
         return self.value
 
-    #added for images base64 encoding makes the field really long
+    # added for images base64 encoding makes the field really long
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
