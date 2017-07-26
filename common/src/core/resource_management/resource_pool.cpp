@@ -202,15 +202,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
     QnMutexLocker lk( &m_resourcesMtx );
 
-    for (const QnResourcePtr &resource: resources)
+    for (const QnResourcePtr& resource: resources)
     {
-        if (!resource)
+        if (!resource || resource->resourcePool() != this)
             continue;
 
-        disconnect(resource, nullptr, this, nullptr);
+        resource->disconnect(this);
 
         resource->addFlags(Qn::removed);
-        NX_EXPECT(resource->resourcePool() == this);
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
