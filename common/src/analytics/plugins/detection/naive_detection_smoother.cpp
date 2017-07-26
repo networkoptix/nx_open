@@ -28,12 +28,17 @@ DetectionEventState NaiveDetectionSmoother::smooth(
     if (!objDetection)
         return DetectionEventState::sameState;
 
-    if (strcmp(ini().smoothingFilterType, kActivationSequenceSmoothing) == 0)
+    auto smoothingFilterType = ini().smoothingFilterType;
+    if (strcmp(smoothingFilterType, kActivationSequenceSmoothing) == 0)
         return smoothByActivationSequence(objDetection.get());
-    else if (strcmp(ini().smoothingFilterType, kSlidingWindowSmoothing) == 0)
+    else if (strcmp(smoothingFilterType, kSlidingWindowSmoothing) == 0)
         return smoothBySlidingWindow(objDetection.get());
 
-    NX_ASSERT(false, "Unknown smoothing filter type.");
+    NX_ASSERT(
+        false,
+        lit("Unknown smoothing filter type. %1")
+            .arg(QString::fromStdString(std::string(smoothingFilterType))));
+
     return DetectionEventState::sameState;
 }
 

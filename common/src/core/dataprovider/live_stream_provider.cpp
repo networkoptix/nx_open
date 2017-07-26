@@ -526,13 +526,14 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
 
     if (motionMetadataExists)
         m_metadataQueue.push(m_motionEstimation[m_softMotionLastChannel].getMotion());
-    else
+    else if (m_cameraRes->getMotionType() != Qn::MT_SoftwareGrid)
 #endif
         m_metadataQueue.push(getCameraMetadata());
 
     if (!m_metadataQueue.empty())
     {
         metadata = m_metadataQueue.front();
+        NX_ASSERT(metadata, "Metadata should exsist");
         m_metadataQueue.pop();
         if (metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
             emitAnalyticsEventIfNeeded(metadata);

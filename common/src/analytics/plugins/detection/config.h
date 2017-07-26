@@ -11,7 +11,7 @@ namespace analytics {
 
 struct IniConfig: public nx::kit::IniConfig
 {
-    IniConfig(): nx::kit::IniConfig("analytics") { reload(); }
+    IniConfig(): nx::kit::IniConfig("analytics.ini") { reload(); }
 
     // Common parameters
     NX_INI_STRING("", pathToPlugin, "");
@@ -102,7 +102,7 @@ struct IniConfig: public nx::kit::IniConfig
         "Available values are 'primary' and 'secondary'");
 
     NX_INI_STRING(
-        "activationSequence",
+        "continuousSequence",
         smoothingFilterType,
         "Type of smoothing filter. "
         "Available values are 'slidingWindow' and 'continuousSequence'");

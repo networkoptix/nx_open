@@ -23,7 +23,7 @@ void TestDetectionPlugin::setParams(const AbstractDetectionPlugin::Params& param
 
 bool TestDetectionPlugin::hasMetadata() const
 {
-    return m_hasMetadata = !m_hasMetadata;
+    return m_hasMetadata;
 }
 
 bool TestDetectionPlugin::start()
@@ -34,6 +34,7 @@ bool TestDetectionPlugin::start()
 bool TestDetectionPlugin::pushCompressedFrame(
     const AbstractDetectionPlugin::CompressedFrame* compressedFrame)
 {
+    m_hasMetadata = true;
     return true;
 }
 
@@ -43,6 +44,7 @@ bool TestDetectionPlugin::pullRectsForFrame(
     int* outRectsCount,
     int64_t* outPtsUs)
 {
+    m_hasMetadata = false;
     if (!maxRectsCount)
         return true;
 

@@ -25,7 +25,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     CreateDetectionPluginProcedure m_factoryFunction = nullptr;
-    std::atomic<int> m_instanceCount = 0;
+    std::atomic<int> m_instanceCount;
 };
 
 } // namespace analytics

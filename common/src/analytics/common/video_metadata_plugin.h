@@ -16,7 +16,7 @@ public:
     virtual void setChannelNumber(int i) { m_channel = i; }
 
 protected:
-    int m_channel;
+    int m_channel = 0;
 };
 
 } // analytics
