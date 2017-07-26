@@ -661,16 +661,17 @@ module.exports = function (grunt) {
                 }
             }
         },
-
         shell:{
             updateTest:{
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
             pull:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r <%= pull.branch %>'
+                branch:'',
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r <%= shell.pull.branch %>'
             },
             push:{
-                command: 'python ../../../devtools/util/merge_dev.py -t <%= push.branch %>'
+                branch:'',
+                command: 'python ../../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -862,14 +863,14 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('pull', function(branch){
-        grunt.config.set('pull.branch', branch);
+        grunt.config.set('shell.pull.branch', branch);
         grunt.task.run([
             'shell:pull'
         ]);
     });
 
     grunt.registerTask('push', function(branch){
-        grunt.config.set('push.branch', branch);
+        grunt.config.set('shell.push.branch', branch);
         grunt.task.run([
             'shell:push'
         ]);
