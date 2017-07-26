@@ -202,6 +202,11 @@ void QnServerSettingsWidget::retranslateUi()
     updateFailoverLabel();
 }
 
+bool QnServerSettingsWidget::canApplyChanges() const
+{
+    return !ui->nameLineEdit->text().trimmed().isEmpty();
+}
+
 void QnServerSettingsWidget::loadDataToUi()
 {
     if (!m_server)

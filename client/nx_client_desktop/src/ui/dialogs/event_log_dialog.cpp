@@ -132,7 +132,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     m_resetFilterAction = new QAction(tr("Clear Filter"), this);
-    m_resetFilterAction->setShortcut(Qt::ControlModifier + Qt::Key_R); //TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
+    m_resetFilterAction->setShortcut(Qt::ControlModifier + Qt::Key_R); // TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
 
     installEventHandler(ui->gridEvents->viewport(), QEvent::MouseButtonRelease,
         this, &QnEventLogDialog::at_mouseButtonRelease);

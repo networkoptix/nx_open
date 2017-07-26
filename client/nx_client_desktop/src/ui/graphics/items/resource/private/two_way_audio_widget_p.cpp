@@ -366,7 +366,7 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!server || server->getStatus() != Qn::Online)
         return;
 
-    //TODO: #GDM What should we do if we cannot stop streaming?
+    // TODO: #GDM What should we do if we cannot stop streaming?
 
     /* Sending stop anyway, because we can get here in 'Streaming is not ready' error state. */
     server->restConnection()->twoWayAudioCommand(m_camera->getId(), false, rest::ServerConnection::GetCallback());

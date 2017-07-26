@@ -29,7 +29,7 @@
     "restorePassword":"重置密碼 -",
     "restorePasswordSuccess":"密碼已儲存 -",
     "restorePasswordCode":"重置密碼 -",
-    "view":"View cameras - ",
+    "view":"查看攝影機 - ",
     "contentPage":"",
     "debug":"除錯",
     "login":"登入 -",
@@ -117,7 +117,7 @@
     "cantEditAdmin":"此使用者具有管理員權限",
     "cantOpenClient":"{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
     "lostConnection":"與 {{systemName}} 的連線斷開了",
-    "thisSystem":"the system"
+    "thisSystem":"系統"
   },
   "passwordRequirements":{
     "minLengthMessage":"密碼必須包含至少 8 個字元",
@@ -136,7 +136,7 @@
   },
   "system":{
     "yourSystem":"您的系統",
-    "mySystemSearch":"IMeMyMine",
+    "mySystemSearch":"我的",
     "unavailable":"無法連接至系統",
     "offline":"系統處於離線狀態",
     "openClient":"在 {{VMS_NAME}} 中打開",
@@ -214,7 +214,7 @@
     "createAccount":"新建帳號"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"所有系統",
     "systems":"系統"
   }
 }

@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Yer İmi Günlüğü</translation>
     </message>

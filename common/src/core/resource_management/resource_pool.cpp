@@ -84,20 +84,20 @@ void QnResourcePool::commit()
     m_tmpResources.clear();
 }
 
-void QnResourcePool::addResource(const QnResourcePtr& resource, bool instantly)
+void QnResourcePool::addResource(const QnResourcePtr& resource, AddResourceFlags flags)
 {
-    if (!instantly && m_tranInProgress)
+    if (!flags.testFlag(SkipAddingTransaction) && m_tranInProgress)
         m_tmpResources << resource;
     else
-        addResources(QnResourceList() << resource);
+        addResources({{resource}}, flags);
 }
 
 void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& server)
 {
-    addResources(QnResourceList() << server, false);
+    addResources({{server}}, UseIncompatibleServerPool);
 }
 
-void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool)
+void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
 {
     QnMutexLocker resourcesLock( &m_resourcesMtx );
 
@@ -125,7 +125,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
             continue;
         }
 
-        if (mainPool)
+        if (!flags.testFlag(UseIncompatibleServerPool))
         {
             if (insertOrUpdateResource(resource, &m_resources))
             {
@@ -202,15 +202,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
     QnMutexLocker lk( &m_resourcesMtx );
 
-    for (const QnResourcePtr &resource: resources)
+    for (const QnResourcePtr& resource: resources)
     {
-        if (!resource)
+        if (!resource || resource->resourcePool() != this)
             continue;
 
-        disconnect(resource, nullptr, this, nullptr);
+        resource->disconnect(this);
 
         resource->addFlags(Qn::removed);
-        NX_EXPECT(resource->resourcePool() == this);
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&

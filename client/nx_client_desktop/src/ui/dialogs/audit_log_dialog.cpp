@@ -416,7 +416,7 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     else if(hasChecked)
         checkState = Qt::Checked;
 
-    //TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
+    // TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
     QSignalBlocker blocker(ui->selectAllCheckBox);
     ui->selectAllCheckBox->setCheckState(checkState);
 

@@ -24,6 +24,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/client/ptz/ptz_helpers.h>
 #include <utils/threaded_image_loader.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -161,9 +162,9 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
 
-    //TODO: implement preview receiving and displaying
+    // TODO: implement preview receiving and displaying
 
-    //TODO: think about forced refresh in some cases or even a button - low priority
+    // TODO: think about forced refresh in some cases or even a button - low priority
 }
 
 QnPtzManageDialog::~QnPtzManageDialog()
@@ -215,12 +216,9 @@ void QnPtzManageDialog::accept()
 
 void QnPtzManageDialog::loadData(const QnPtzData &data)
 {
-    QnPtzPresetList presets = data.presets;
+    const auto presets = nx::client::core::ptz::helpers::sortedPresets(
+        controller()->resource(), data.presets);
     QnPtzTourList tours = data.tours;
-    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-    {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
     std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r)
     {
         return nx::utils::naturalStringLess(l.name, r.name);
@@ -349,6 +347,10 @@ void QnPtzManageDialog::saveData()
 
     m_hotkeysDelegate->updateHotkeys(m_model->hotkeys());
 
+    QnPtzPresetList presets;
+    if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
+        m_model->setPresets(presets);
+
     // reset active ptz object if the current active ptz object is an empty tour
     QnPtzObject ptzObject;
     if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject)
@@ -374,14 +376,8 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields)
     if (fields & Qn::PresetsPtzField)
     {
         QnPtzPresetList presets;
-        if (controller()->getPresets(&presets))
-        {
-            std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-            {
-                return nx::utils::naturalStringLess(l.name, r.name);
-            });
+        if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
             m_model->setPresets(presets);
-        }
     }
 
     if (fields & Qn::ToursPtzField)
@@ -526,7 +522,7 @@ void QnPtzManageDialog::at_addTourButton_clicked()
     //bool wasEmpty = m_model->rowCount() == 0;
     m_model->addTour();
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
-    //if (wasEmpty) { //TODO: check if needed
+    //if (wasEmpty) { // TODO: check if needed
         // TODO: #Elric duplicate code with QnPtzTourWidget
     for (int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
         if (ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)

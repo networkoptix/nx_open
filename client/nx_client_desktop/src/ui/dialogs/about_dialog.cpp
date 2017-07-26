@@ -36,6 +36,10 @@
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
     QString versionString(const QString &version) {
         QString result = version;
@@ -53,7 +57,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    m_copyButton = new QPushButton(this);
+    m_copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
@@ -113,8 +117,6 @@ QString QnAboutDialog::connectedServers() const
 void QnAboutDialog::retranslateUi()
 {
     ui->retranslateUi(this);
-
-    m_copyButton->setText(tr("Copy to Clipboard"));
 
     QStringList version;
     version <<

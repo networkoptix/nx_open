@@ -39,7 +39,7 @@
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>Auto login</translation>
     </message>
     <message>
       <source>Connect</source>

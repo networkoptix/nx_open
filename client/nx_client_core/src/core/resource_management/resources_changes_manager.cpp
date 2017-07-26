@@ -198,7 +198,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
             emit saveChangesFailed(cameras);
         });
 
-    //TODO: #GDM SafeMode values are not rolled back
+    // TODO: #GDM SafeMode values are not rolled back
     propertyDictionary()->saveParamsAsync(idList);
 }
 
@@ -342,7 +342,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
             emit saveChangesFailed(servers);
         });
 
-    //TODO: #GDM SafeMode values are not rolled back
+    // TODO: #GDM SafeMode values are not rolled back
     propertyDictionary()->saveParamsAsync(idList);
 }
 
@@ -527,7 +527,7 @@ void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
 /************************************************************************/
 /* VideoWalls block                                                     */
 /************************************************************************/
-//TODO: #GDM #Safe Mode
+// TODO: #GDM #Safe Mode
 void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &videoWall,
     VideoWallChangesFunction applyChanges)
 {

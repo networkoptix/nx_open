@@ -1,10 +1,10 @@
-<h1>There is a new revision for {{ message.product }}</h1>
-<p>Click on the link to review draft {{ message.id }} for {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">Review Version</a>
-<h4>On this page you can</h4>
+<h1>{{ message.product }} egy újabb revíziója elérhető</h1>
+<p>Kattintson a linkre {{ message.product }} {{ message.id }} vázlatának megtekintéséhez</p>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">Verzió megtekintése</a>
+<h4>Ezen az oldalon</h4>
 <ul>
-	<li>Create a preview to see the most recent changes.</li>
-	<li>Publish this version which will update all content.</li>
-	<l1>Edit contexts by clicking on the edit record button.<br>
-		To see those changes you will need to create a new version</l1>
+	<li>Készíthet egy előnézetet a legutóbbi változtatások megtekintéséhez.</li>
+	<li>Kiadja ezt a verziót, amely frissíti az összes tartalmat.</li>
+	<l1>Kontextusok szerkesztése a rekord szerkesztése gombra kattintva. <br>
+A módosítások megtekintéséhez új verziót kell létrehoznia</l1>
 </ul>

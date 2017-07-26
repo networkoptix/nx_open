@@ -85,7 +85,7 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     }
 
     QnLayoutItemData item;
-    item.flags = 0x1; // Layout data item flags is declared in client module. //TODO: #GDM move to api
+    item.flags = 0x1; // Layout data item flags is declared in client module. // TODO: #GDM move to api
     item.uuid = QnUuid::createUuid();
     item.combinedGeometry = QRect(0, 0, 1, 1);
     item.resource.id = resource->getId();

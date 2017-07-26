@@ -636,7 +636,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     if (scope != action::TreeScope)
         return action::Parameters();
 
-    //TODO: #GDM #3.1 refactor to a simple switch by node type
+    // TODO: #GDM #3.1 refactor to a simple switch by node type
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();

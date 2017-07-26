@@ -214,7 +214,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     std::map<int, std::shared_ptr<detail::RDirSynchronizationOperation>>::iterator opIter = m_runningOperations.find( operation->id );
     if( opIter == m_runningOperations.end() )
     {
-        //TODO: unknown operation. What's the whooy?
+        // TODO: unknown operation. What's the whooy?
         NX_ASSERT( false );
         return;
     }
@@ -271,7 +271,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
         return;
     }
 
-    //TODO: #ak refactor rest of this function in default branch
+    // TODO: #ak refactor rest of this function in default branch
 
     if( operation->remoteSideFailure() )
     {

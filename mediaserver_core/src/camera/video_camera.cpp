@@ -175,7 +175,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
                 dstQueue.push(QnAbstractMediaDataPtr(newData));
             }
             else {
-                dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); //TODO: #ak remove const_cast
+                dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); // TODO: #ak remove const_cast
             }
         };
 

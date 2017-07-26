@@ -199,7 +199,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(
 {
     NX_ASSERT(layout);
 
-    //TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
+    // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
     auto checkReadOnly =
         [this](Qn::Permissions permissions)
         {

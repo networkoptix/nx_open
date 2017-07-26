@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Minden szerver offline. Nincs elérhető eseménylista.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Könyvjelző logok</translation>
     </message>
@@ -442,7 +437,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>@</translation>
     </message>
   </context>
   <context>
@@ -589,7 +584,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about: blank</translation>
     </message>
     <message>
       <location/>
@@ -722,7 +717,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Kamera beállítások optimalizálásának engedélyezése a rendszernek&quot; ki van kapcsolva a Rendszer Kezelésben.</translation>
     </message>
     <message>
       <location/>
@@ -732,17 +727,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ vezérlés</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>A natív presetek tiltása. Helyettük használja a rendszer preseteket</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Figyelem! A natív kamera presetek nem lesznek elérhetők.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Bemenet ID</translation>
     </message>
   </context>
   <context>
@@ -776,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Kimenet ID:</translation>
     </message>
   </context>
   <context>
@@ -910,7 +905,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1416,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Hozzárendelt hardver ID:</translation>
     </message>
   </context>
   <context>
@@ -1530,7 +1525,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Hardver ID</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1721,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Lejátszás felhasználóknak</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1739,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Nyugtázás kényszerítése</translation>
     </message>
   </context>
   <context>
@@ -1919,7 +1914,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
   </context>
   <context>
@@ -2256,7 +2251,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Nagy teljesítményű számítógép ajánlott a &quot;Legjobb&quot; minőség és felbontás használatához.</translation>
     </message>
     <message>
       <location/>
@@ -2322,7 +2317,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Beszéd felhasználókhoz</translation>
     </message>
   </context>
   <context>
@@ -2335,7 +2330,7 @@
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation>&amp;Globális Email beállítások...</translation>
+      <translation>&amp;Globális e-mail beállítások...</translation>
     </message>
   </context>
   <context>
@@ -2565,7 +2560,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2601,7 +2596,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation>Kimenő Email beállítások</translation>
+      <translation>Kimenő e-mail beállítások</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2657,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Elérhető:</translation>
     </message>
     <message>
       <location/>
@@ -2672,7 +2667,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikon</translation>
     </message>
   </context>
   <context>
@@ -2787,22 +2782,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Szerepkörök</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Összes felhasználó mutatása</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Felhasználók kiválasztása</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Nincs a keresésnek megfelelő találat.</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2833,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Idő szinkronizálása az Internettel</translation>
     </message>
   </context>
   <context>
@@ -2878,8 +2873,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Nincsenek egyéni felhasználói szerepkörök.
+Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     </message>
     <message>
       <location/>

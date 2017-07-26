@@ -6,7 +6,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-//TODO: #GDM make it template class if it will be required somewhere else
+// TODO: #GDM make it template class if it will be required somewhere else
 
 class QnOptionalBool {
 public:

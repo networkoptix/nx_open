@@ -13,7 +13,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
@@ -539,10 +538,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
 
-            /* Hide "Preview Search" layouts */
-            if (layout->data().contains(Qn::LayoutSearchStateRole)) //TODO: #GDM make it consistent with QnWorkbenchLayout::isSearchLayout
-                return true;
-
             if (layout->isServiceLayout())
                 return true;
 
@@ -565,10 +560,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         {
             return true;
         }
-
-        /* Hide storages. */
-        if (m_resource.dynamicCast<QnStorageResource>())
-            return true;
 
         /* Hide edge servers, camera will be displayed instead. */
         if (QnMediaServerResource::isHiddenServer(m_resource) &&
@@ -739,7 +730,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             result |= Qt::ItemIsDragEnabled;
         break;
     }
-    case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
+    case Qn::VideoWallItemNode: // TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
     case Qn::LayoutTourNode:
         result |= Qt::ItemIsDragEnabled;
@@ -913,7 +904,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
-        //TODO: #GDM #3.1 get rid of all this logic, just pass uuid
+        // TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;

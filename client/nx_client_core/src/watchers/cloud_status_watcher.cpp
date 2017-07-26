@@ -185,7 +185,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
             qnClientCoreSettings->save();
         });
 
-    //TODO: #GDM store temporary credentials
+    // TODO: #GDM store temporary credentials
     setCredentials(QnEncodedCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
 
@@ -599,7 +599,7 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
     params.timeouts.expirationPeriod = std::chrono::seconds(30);
     params.timeouts.prolongationPeriod = std::chrono::seconds(10);
 #else
-    //TODO: #ak make this constant accessible through API
+    // TODO: #ak make this constant accessible through API
     params.type = std::string("short");
 #endif
     auto callback = [this](api::ResultCode /*result*/, api::TemporaryCredentials credentials)
