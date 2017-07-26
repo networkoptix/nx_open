@@ -6,8 +6,8 @@ from cms.admin import CMSAdmin
 
 
 class AccountAdmin(CMSAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
-                    'subscribe', 'is_staff', 'is_superuser', 'language', 'customization')
+    list_display = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
+                    'subscribe', 'is_staff', 'language', 'customization')
     # forbid changing all fields which can be edited by user in cloud portal except sub
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
@@ -22,6 +22,12 @@ class AccountAdmin(CMSAdmin):
             obj.is_staff = True
 
         obj.save()
+
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(AccountAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        if not request.user.is_superuser:  # only superuser can watch full accounts list
+            qs = qs.filter(customization=settings.CUSTOMIZATION)
+        return qs
 
 
 admin.site.register(Account, AccountAdmin)

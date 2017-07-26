@@ -13,9 +13,9 @@ class CMSAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
-        return list(self.readonly_fields) + \
-               [field.name for field in obj._meta.fields] + \
-               [field.name for field in obj._meta.many_to_many]
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
 
     def has_add_permission(self, request):
         return request.user.is_superuser
@@ -50,7 +50,7 @@ admin.site.register(Context, ContextAdmin)
 
 
 class DataStructureAdmin(CMSAdmin):
-    list_display = ('context', 'name', 'description', 'translatable')
+    list_display = ('context', 'name', 'description', 'translatable', 'type')
 
 admin.site.register(DataStructure, DataStructureAdmin)
 
