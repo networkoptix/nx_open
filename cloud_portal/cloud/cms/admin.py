@@ -9,15 +9,13 @@ from cloud import settings
 class CMSAdmin(admin.ModelAdmin):
     # this class protects us from user error:
     # 1. only superuser can edit specific data in CMS (get_readonly_fields, has_add_permission, has_delete_permission)
-    # 2. customization admins cannot see anything in another customizations
-    # (get_queryset)
-
+    # 2. customization admins cannot see anything in another customizations (get_queryset)
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
-            return []
-        return list(self.readonly_fields) + \
-            [field.name for field in obj._meta.fields] + \
-            [field.name for field in obj._meta.many_to_many]
+            return list(self.readonly_fields)
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
 
     def has_add_permission(self, request):
         return request.user.is_superuser
@@ -56,7 +54,7 @@ admin.site.register(Context, ContextAdmin)
 
 
 class DataStructureAdmin(CMSAdmin):
-    list_display = ('context', 'name', 'description', 'translatable')
+    list_display = ('context', 'name', 'description', 'translatable', 'type')
 
 admin.site.register(DataStructure, DataStructureAdmin)
 

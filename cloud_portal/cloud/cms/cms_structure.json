@@ -3,7 +3,7 @@
   "contexts":[
     {
       "name":"branding",
-      "description":"common branding constants",
+      "description":"Common branding information",
       "translatable": false,
       "values":[
         ["{{PRODUCT_NAME}}","VMS Demo Cloud","Name for cloud"],
