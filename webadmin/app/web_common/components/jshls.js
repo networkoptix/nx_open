@@ -455,15 +455,15 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    this.hls.destroy();
+    return this.hls.destroy();
 };
 
 JsHlsAPI.prototype.play = function(offset){
-    this.video.play();
+    return this.video.play();
 };
 
 JsHlsAPI.prototype.pause = function(){
-    this.video.pause();
+    return this.video.pause();
 };
 
 JsHlsAPI.prototype.volume = function(volumeLevel){
@@ -478,23 +478,25 @@ JsHlsAPI.prototype.load = function(url){
 };
 
 JsHlsAPI.prototype.initVideoHandlers = function(){
-    this.video.addEventListener('resize', this.handleVideoEvent);
-    this.video.addEventListener('seeking', this.handleVideoEvent);
-    this.video.addEventListener('seeked', this.handleVideoEvent);
-    this.video.addEventListener('pause', this.handleVideoEvent);
-    this.video.addEventListener('play', this.handleVideoEvent);
-    this.video.addEventListener('canplay', this.handleVideoEvent);
-    this.video.addEventListener('canplaythrough', this.handleVideoEvent);
-    this.video.addEventListener('ended', this.handleVideoEvent);
-    this.video.addEventListener('playing', this.handleVideoEvent);
-    this.video.addEventListener('error', this.handleVideoEvent);
-    this.video.addEventListener('loadedmetadata', this.handleVideoEvent);
-    this.video.addEventListener('loadeddata', this.handleVideoEvent);
-    this.video.addEventListener('durationchange', this.handleVideoEvent);
+    this.addEventListener('resize', this.handleVideoEvent);
+    this.addEventListener('seeking', this.handleVideoEvent);
+    this.addEventListener('seeked', this.handleVideoEvent);
+    this.addEventListener('pause', this.handleVideoEvent);
+    this.addEventListener('play', this.handleVideoEvent);
+    this.addEventListener('canplay', this.handleVideoEvent);
+    this.addEventListener('canplaythrough', this.handleVideoEvent);
+    this.addEventListener('ended', this.handleVideoEvent);
+    this.addEventListener('playing', this.handleVideoEvent);
+    this.addEventListener('error', this.handleVideoEvent);
+    this.addEventListener('loadedmetadata', this.handleVideoEvent);
+    this.addEventListener('loadeddata', this.handleVideoEvent);
+    this.addEventListener('durationchange', this.handleVideoEvent);
 };
 
 JsHlsAPI.prototype.addEventListener = function(event, handler){
-    if(this.video){
+    this.handlers = this.handlers || {};
+    if(this.video && this.handlers[event] !== handler){
         this.video.addEventListener(event,handler);
+        this.handlers[event] = handler;
     }
 };

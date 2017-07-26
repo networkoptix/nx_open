@@ -3,7 +3,7 @@ from datetime import datetime
 from notifications.engines.email_engine import send
 
 from PIL import Image
-import base64, ast
+import base64
 
 from .filldata import fill_content
 from api.models import Account
@@ -60,13 +60,9 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 					continue
 
 				#Gets the meta_settings form the DataStructure to check if the sizes are valid
-				data_structure_meta_string = data_structure.meta_settings
 				#if the length is zero then there is no meta settings
-				if len(data_structure_meta_string):
-					#ast.literal_eval used to convert string to dict
-					data_structure_meta = ast.literal_eval(data_structure_meta_string)
-
-					size_errors = check_image_dimensions(data_structure_name, data_structure_meta, dimensions)
+				if len(data_structure.meta_settings):
+					size_errors = check_image_dimensions(data_structure_name, data_structure.meta_settings, dimensions)
 
 					if size_errors:
 						upload_errors.extend(size_errors)
@@ -80,15 +76,15 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 		else:
 			new_record_value = request_data[data_structure_name]
 
-
+		if not latest_unapproved_record.exists() and not latest_approved_record.exists():
+			if data_structure.default == new_record_value:
+				continue
 		if latest_unapproved_record.exists():
 			if new_record_value == latest_unapproved_record.latest('created_date').value:
 			   	continue
-		elif latest_approved_record.exists():
+		if latest_approved_record.exists():
 			if new_record_value == latest_approved_record.latest('created_date').value:
 				continue
-		elif data_structure.default == new_record_value:
-			continue
 
 		record = DataRecord(data_structure=data_structure,
 							language=language,

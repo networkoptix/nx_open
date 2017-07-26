@@ -666,11 +666,11 @@ module.exports = function (grunt) {
             updateTest:{
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
-            merge:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; python ../../../devtools/util/merge_dev.py -t default; hg push;'
-            },
             pull:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; hg push;'
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r <%= pull.branch %>'
+            },
+            push:{
+                command: 'python ../../../devtools/util/merge_dev.py -t <%= push.branch %>'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -720,7 +720,7 @@ module.exports = function (grunt) {
             'autoprefixer',
             'protractor_webdriver:notkeepalive',
             'shell:print_version',
-            'protractor:'+ specsuit,
+            'protractor:' + specsuit,
             'clean:server'
         );
     });
@@ -861,12 +861,24 @@ module.exports = function (grunt) {
         'shell:updateTest'
     ]);
 
+    grunt.registerTask('pull', function(branch){
+        grunt.config.set('pull.branch', branch);
+        grunt.task.run([
+            'shell:pull'
+        ]);
+    });
 
-    grunt.registerTask('merge', [
-        'shell:merge'
-    ]);
+    grunt.registerTask('push', function(branch){
+        grunt.config.set('push.branch', branch);
+        grunt.task.run([
+            'shell:push'
+        ]);
+    });
 
-    grunt.registerTask('pull', [
-        'shell:pull'
-    ]);
+    grunt.registerTask('merge', function(branch){
+        grunt.task.run([
+            'pull:' + branch,
+            'push:' + branch
+        ]);
+    });
 };
