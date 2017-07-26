@@ -83,18 +83,23 @@ def read_structure_json():
         for record in context_data["values"]:
             type = None
             description = None
+            meta = None
             if len(record) == 2:
                 name, value = record
             if len(record) == 3:
                 name, value, description = record
             if len(record) == 4:
                 name, value, description, type = record
+            if len(record) == 5:
+                name, value, description, type, meta = record
 
             data_structure = find_or_add_data_stucture(name, context.id, has_language)
             if description:
                 data_structure.description = description
             if type:
                 data_structure.type = DataStructure.get_type(type)
+            
+            data_structure.meta_settings = meta if meta else {}
             data_structure.default = value
             data_structure.save()
 

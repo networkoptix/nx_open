@@ -124,7 +124,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setNameInternal(tr("Layouts"));
         break;
     case Qn::LayoutToursNode:
-        setNameInternal(tr("Reels"));
+        setNameInternal(tr("Showreels"));
         break;
     case Qn::RecorderNode:
         m_state = Invalid;
