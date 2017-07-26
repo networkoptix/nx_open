@@ -408,8 +408,8 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
         };
 
     addDomainSuffixParam(&ss, domainParts, 0, domainParts.size() <= 1);
-    for (int i = 1; i < std::min((size_t)3, domainParts.size()); ++i)
-        addDomainSuffixParam(&ss, domainParts, i, i == domainParts.size() - 1);
+    for (int i = 1; i < (int)std::min((size_t)3, domainParts.size()); ++i)
+        addDomainSuffixParam(&ss, domainParts, i, i == (int)domainParts.size() - 1);
 
     if (domainParts.size() > 3)
     {

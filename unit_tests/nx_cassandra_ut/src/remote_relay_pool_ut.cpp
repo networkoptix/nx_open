@@ -275,9 +275,9 @@ protected:
         const std::vector<std::string>& candidates)
     {
         auto relayHost = m_relayPool->findRelayByDomain(domain).get();
-        for (const auto& candidates: candidates)
+        for (const auto& candidate: candidates)
         {
-            if (relayHost == candidates)
+            if (relayHost == candidate)
                 return true;
         }
 

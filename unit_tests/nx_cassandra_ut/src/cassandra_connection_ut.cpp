@@ -1,3 +1,4 @@
+#include <string.h>
 #include <gtest/gtest.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 #include "options.h"
@@ -7,6 +8,10 @@ namespace cassandra {
 namespace test {
 
 using namespace nx::utils;
+
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#   define stricmp strcasecmp
+#endif
 
 class Connection: public ::testing::Test
 {
@@ -222,7 +227,7 @@ protected:
     static void getRowValuesWithNullsAndCheckIfValidByName(
         const QueryResult& queryResult,
         std::string* key,
-        BasicStruct* basicStruct)
+        BasicStruct* /*basicStruct*/)
     {
         getValAndAssert(queryResult, "key", key);
         getNullValAndAssert<std::string>(queryResult, "string_val");
