@@ -89,7 +89,7 @@ class ServerFactory(object):
             log.debug('core file for server %s, %s is stored to %s', server.title, server, local_core_path)
 
     def perform_post_checks(self):
-        log.info('----- test is finished, performing post-test checks ------------------------>8 -----------------------------------------')
+        log.info('----- performing post-test checks for servers ------------------------>8 -----------------------------------------')
         core_dumped_servers = []
         for server in self._allocated_servers:
             if server.is_started() and not server.is_server_online():
