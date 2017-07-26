@@ -317,7 +317,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
-    const bool hasViewPermission = accessController()->hasPermissions(resource,
+    const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
 
     if (action->actionType() == vms::event::showOnAlarmLayoutAction)
