@@ -3,7 +3,7 @@ import QtQuick.Window 2.0
 
 import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils // todo: move
 
-Item
+BasePreloader
 {
     id: control
 

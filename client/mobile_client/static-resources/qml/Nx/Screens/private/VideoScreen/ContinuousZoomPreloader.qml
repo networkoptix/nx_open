@@ -1,13 +1,13 @@
 import QtQuick 2.6
 import QtQuick.Window 2.0
 
-Item
+BasePreloader
 {
     id: control
 
     property color color: Qt.rgba(1, 1, 1, 1)
-    property real thickness: 6
-    property int period: 2000
+    property real thickness: 4
+    property int period: 1500
     property int figuresCount: 4
     property bool zoomInIndicator: true
 

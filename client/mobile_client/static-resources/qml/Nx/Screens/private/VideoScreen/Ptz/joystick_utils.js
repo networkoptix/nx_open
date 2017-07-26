@@ -108,6 +108,11 @@ function getAngle(vector)
     return result
 }
 
+function getDegrees(vector)
+{
+    return getAngle(vector) * 180 / Math.PI
+}
+
 function getRadialVector(radius, angle)
 {
     return Qt.vector2d(radius * Math.cos(angle), radius * Math.sin(angle))

@@ -330,6 +330,8 @@ PageBase
         {
             id: ptzPanel
 
+            preloadersParent: videoScreen
+
             width: parent.width
             anchors.bottom: parent.bottom
 
@@ -397,41 +399,11 @@ PageBase
             visible: false
         }
 
-        FocusPreloader
-        {
-            id: focusPreloader
-            parent: videoScreen
-        }
-
-        ContinuousMovePreloader
-        {
-            id: movePreloader
-            parent: videoScreen
-            y: focusPreloader.height
-        }
-
-        ContinuousZoomPreloader
-        {
-            id: zoomPreloader
-            parent: videoScreen
-            y: movePreloader.y + movePreloader.height
-        }
-
-        ContinuousZoomPreloader
-        {
-            id: zoomOutPreloader
-            parent: videoScreen
-            y: zoomPreloader.y + zoomPreloader.height
-            zoomInIndicator: false
-        }
-
         MoveOnTapOverlay
         {
             id: moveOnTapOverlay
 
             parent: videoScreen
-            x: 300
-            y: 300
         }
 
         Loader
