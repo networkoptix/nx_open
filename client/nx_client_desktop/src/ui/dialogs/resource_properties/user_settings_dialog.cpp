@@ -28,11 +28,12 @@
 
 #include <utils/common/html.h>
 
-#include <nx/cloud/cdb/client/data/auth_data.h>
-
 using namespace nx::client::desktop::ui;
 
 namespace {
+
+// TODO: #ak #move to cdb api section
+static const QString cloudAuthInfoPropertyName(lit("cloudUserAuthenticationInfo"));
 
 class PermissionsInfoTable: public QnConnectionContextAware
 {
@@ -386,11 +387,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
         connect(m_user, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& propertyName)
             {
-                if (resource == m_user
-                    && propertyName == QLatin1String(nx::cdb::api::kVmsUserAuthInfoAttributeName))
-                {
+                if (resource == m_user && propertyName == cloudAuthInfoPropertyName)
                     forcedUpdate();
-                }
             });
     }
 
@@ -422,8 +420,7 @@ void QnUserSettingsDialog::loadDataToUi()
     if (m_user->userType() == QnUserType::Cloud
         && m_model->mode() == QnUserSettingsModel::OtherSettings)
     {
-        const auto auth = m_user->getProperty(QLatin1String(
-            nx::cdb::api::kVmsUserAuthInfoAttributeName));
+        const auto auth = m_user->getProperty(cloudAuthInfoPropertyName);
         if (auth.isEmpty())
         {
             ui->alertBar->setText(tr("This user has not yet signed up for %1",
