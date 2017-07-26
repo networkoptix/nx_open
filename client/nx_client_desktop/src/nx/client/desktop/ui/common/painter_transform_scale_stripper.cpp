@@ -1,5 +1,7 @@
 #include "painter_transform_scale_stripper.h"
 
+#include <cmath>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 
@@ -24,8 +26,8 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
     /* 2. More complicated case: with possible rotation. */
     if (m_type <= QTransform::TxRotate)
     {
-        const auto sx = std::hypot(m_originalTransform.m11(), m_originalTransform.m12());
-        const auto sy = std::hypot(m_originalTransform.m21(), m_originalTransform.m22());
+        const auto sx = hypot(m_originalTransform.m11(), m_originalTransform.m12());
+        const auto sy = hypot(m_originalTransform.m21(), m_originalTransform.m22());
 
         if (qFuzzyEquals(qAbs(sx), qAbs(sy))) //< uniform scale, no shear; possible mirroring
         {
