@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx/client/desktop/ui/actions/config.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -12,7 +13,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/extensions/workbench_analytics_controller.h>
+#include <ui/workbench/workbench_analytics_controller.h>
 #include <analytics/metadata_analytics_controller.h>
 
 #include <nx/utils/random.h>
@@ -160,8 +161,11 @@ QnWorkbenchAnalyticsHandler::QnWorkbenchAnalyticsHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::StartAnalyticsAction), &QAction::triggered, this,
-        &QnWorkbenchAnalyticsHandler::startAnalytics);
+    if (action::ini().enableAnalytics)
+    {
+        connect(action(action::StartAnalyticsAction), &QAction::triggered, this,
+            &QnWorkbenchAnalyticsHandler::startAnalytics);
+    }
 
     connect(workbench(), &QnWorkbench::layoutsChanged, this,
         &QnWorkbenchAnalyticsHandler::cleanupControllers);

@@ -10,7 +10,7 @@ namespace action {
 
 struct IniConfig: public nx::kit::IniConfig
 {
-    IniConfig(): nx::kit::IniConfig("client_analytics") { reload(); }
+    IniConfig(): nx::kit::IniConfig("client_analytics.ini") { reload(); }
 
     NX_INI_FLAG(0, enableAnalytics, "");
 };
