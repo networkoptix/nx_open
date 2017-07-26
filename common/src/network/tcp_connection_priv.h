@@ -57,6 +57,7 @@ public:
         authenticatedOnce(false),
         owner(nullptr),
         isSocketTaken(false),
+        requestEmptyContentLength(false),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -89,6 +90,7 @@ public:
     bool authenticatedOnce;
     QnTcpListener* owner;
     bool isSocketTaken;
+    bool requestEmptyContentLength;
 
 private:
     QByteArray interleavedMessageData;

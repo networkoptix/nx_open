@@ -271,7 +271,9 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
+    if (d->requestEmptyContentLength)
+        d->requestEmptyContentLength = false;
+    else if (!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->response.messageBody.length()) ) );
 
     QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
@@ -614,6 +616,12 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     }
 
     return result;
+}
+
+void QnTCPConnectionProcessor::requestEmptyContentLength()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->requestEmptyContentLength = true;
 }
 
 void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody)

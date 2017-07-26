@@ -4,6 +4,8 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <rest/server/json_rest_handler.h>
 
+class QnCommonModule;
+
 class QnModuleInformationRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
@@ -27,6 +29,15 @@ private slots:
     void changeModuleInformation();
 
 private:
+    void updateModuleImformation();
+    void sendModuleImformation(const QSharedPointer<AbstractStreamSocket>& socket);
+    void sendKeepAliveByTimer(const QSharedPointer<AbstractStreamSocket>& socket);
+
+private:
     nx::network::aio::BasicPollable m_pollable;
-    std::set<QSharedPointer<AbstractStreamSocket>> m_savedSockets;
+    std::set<QSharedPointer<AbstractStreamSocket>> m_socketsToKeepOpen;
+
+    QnCommonModule* m_commonModule = nullptr;
+    QByteArray m_moduleInformatiom;
+    std::set<QSharedPointer<AbstractStreamSocket>> m_socketsToUpdate;
 };
