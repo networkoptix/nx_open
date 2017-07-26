@@ -86,7 +86,7 @@ QString getCPUString()
 #endif
 }
 
-//TODO: #ak give up following Q_OS_MAC check
+// TODO: #ak give up following Q_OS_MAC check
 //TODO/ARM: sse analog
 
 #if defined(__arm__) || defined(Q_OS_IOS)
@@ -135,7 +135,7 @@ bool useSSSE3()
 
 bool useSSE41()
 {
-    //TODO: #ak we are compiling mac client with -msse4.1 - why is it forbidden here?
+    // TODO: #ak we are compiling mac client with -msse4.1 - why is it forbidden here?
     return false;
 }
 

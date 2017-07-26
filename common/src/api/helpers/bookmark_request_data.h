@@ -50,7 +50,6 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
 
     QnCameraBookmark bookmark;
     QnUuid businessRuleId;
-    nx::vms::event::EventType eventType;
 };
 
 struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData

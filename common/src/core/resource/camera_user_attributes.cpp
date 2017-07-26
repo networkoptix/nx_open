@@ -7,7 +7,7 @@
 
 #include <api/global_settings.h>
 
-#include <nx/streaming/config.h> //TODO: #GDM get rid of this dependency
+#include <nx/streaming/config.h> // TODO: #GDM get rid of this dependency
 
 QnCameraUserAttributes::QnCameraUserAttributes()
 :

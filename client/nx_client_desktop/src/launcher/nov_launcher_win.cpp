@@ -9,7 +9,7 @@ namespace {
 
 static const int IO_BUFFER_SIZE = 1024 * 1024;
 
-//TODO: #GDM #low move out to common place with launcher.exe
+// TODO: #GDM #low move out to common place with launcher.exe
 static const qint64 MAGIC = 0x73a0b934820d4055ll;
 
 bool appendFile(QFile& dstFile, const QString& srcFileName)

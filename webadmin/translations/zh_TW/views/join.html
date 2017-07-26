@@ -55,7 +55,7 @@
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>本系統即將被 <b>{{systems.systemName}}</b> 以下系統合併 <b>{{systems.joinSystemName}}</b></p>
+            <p>本系統 <b>{{systems.systemName}}</b> 即將被以下系統合併 <b>{{systems.joinSystemName}}</b></p>
             <p>
                 新系統將使用以下系統的名稱與密碼:<br/>
                 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>

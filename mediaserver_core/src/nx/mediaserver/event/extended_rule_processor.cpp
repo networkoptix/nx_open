@@ -599,7 +599,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     QnEmailAttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
-    EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
+    EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  // TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 

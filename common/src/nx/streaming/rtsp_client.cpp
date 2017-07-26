@@ -1884,7 +1884,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
     const size_t bufSizeBak = bufSize;
 
     //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
-    //TODO: #ak remove extra data copying
+    // TODO: #ak remove extra data copying
 
     for( ;; )
     {

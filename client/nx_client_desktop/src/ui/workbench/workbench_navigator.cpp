@@ -161,7 +161,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
 
-    //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
+    // TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
     QTimer* discardCacheTimer = new QTimer(this);
     discardCacheTimer->setInterval(kDiscardCacheIntervalMs);
@@ -170,7 +170,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();	//TODO:#GDM #bookmarks check if should be placed into camera manager
+            m_cameraDataManager->clearCache();	// TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
@@ -1082,7 +1082,7 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing)
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCentralWidget()
 {
-    //TODO: #GDM get rid of central widget - it is used ONLY as a previous/current value in the layout change process
+    // TODO: #GDM get rid of central widget - it is used ONLY as a previous/current value in the layout change process
     QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
     if (m_centralWidget == centralWidget)
         return;
@@ -1117,7 +1117,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
             for (auto widget: m_syncedWidgets)
-                updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
+                updateItemDataFromSlider(widget); // TODO: #GDM #Common ask #elric: should it be done at every selection change?
         }
         else
         {
@@ -1175,7 +1175,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         const auto callback =
             [this]()
             {
-                //TODO: #rvasilenko why should we make these delayed calls at all?
+                // TODO: #rvasilenko why should we make these delayed calls at all?
                 updatePlaying();
                 updateSpeed();
             };
@@ -1375,13 +1375,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
-#ifdef Q_OS_MAC
-    // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
-    // TODO: #ynikitenkov #high WTF? Get rid of timer and check in 3.1 if everything is Ok.
-    if (mode != UpdateSliderMode::ForcedUpdate && m_updateSliderTimer.elapsed() < 33)
-        return;
-    m_updateSliderTimer.restart();
-#endif
 
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
@@ -1420,7 +1413,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
                 startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
 
-                //TODO: #gdm refactor this safety check sometime
+                // TODO: #gdm refactor this safety check sometime
                 if (QnWorkbenchItem* item = m_currentMediaWidget->item())
                 {
                     /* And then try to read saved value - it was valid someday. */
@@ -1471,7 +1464,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
     if (!m_pausedOverride)
     {
-        //TODO: #GDM #vkutin #refactor logic in 3.1
+        // TODO: #GDM #vkutin #refactor logic in 3.1
         auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
         {
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())

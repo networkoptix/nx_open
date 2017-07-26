@@ -153,7 +153,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
             + L'\n' + releaseNotesLink);
 
 
-    QnMessageBox messageBox(QnMessageBoxIcon::Question,
+    QnMessageBox messageBox(QnMessageBoxIcon::Information,
         text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 

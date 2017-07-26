@@ -197,7 +197,7 @@ int VC1SequenceHeader::decode_sequence_header()
 		int res_rtm_flag = bitReader.getBit();
 		if (res_rtm_flag)
 			qWarning() << "Old WMV3 version detected.";
-        //TODO: figure out what they mean (always 0x402F)
+        // TODO: figure out what they mean (always 0x402F)
 		if(!res_fasttx) bitReader.skipBits(16);
 		return 0;
 	} catch (BitStreamException) {

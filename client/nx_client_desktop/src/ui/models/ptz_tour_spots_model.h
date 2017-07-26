@@ -35,7 +35,6 @@ public:
     const QnPtzTourSpotList &spots() const;
     Q_SLOT void setSpots(const QnPtzTourSpotList &spots);
 
-    QnPtzPresetList sortedPresets() const;
     const QnPtzPresetList &presets() const;
     Q_SLOT void setPresets(const QnPtzPresetList &presets);
 

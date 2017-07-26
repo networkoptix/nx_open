@@ -1,7 +1,7 @@
 #include "video_output_backend.h"
 
 #include <QtCore/QPointer>
-#include <QtCore/QMutex> //TODO: #dklychkov think about QnMutex replacement
+#include <QtCore/QMutex> // TODO: #dklychkov think about QnMutex replacement
 #include <QtGui/QOpenGLContext>
 #include <QtMultimedia/private/qmediapluginloader_p.h>
 #include <QtMultimedia/private/qsgvideonode_p.h>

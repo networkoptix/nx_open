@@ -208,7 +208,7 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
-    //TODO: #2.4 #rvasilenko #High Move to runtime data
+    // TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
     bool hasStatusFlags(Qn::CameraStatusFlag value) const;
     void setStatusFlags(Qn::CameraStatusFlags value);
@@ -242,7 +242,7 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
-    //TODO: #rvasilenko #High #2.4 get rid of this temporary solution
+    // TODO: #rvasilenko #High #2.4 get rid of this temporary solution
     /**
      * Temporary solution to correctly detach desktop cameras when user reconnects from one server to another.
      * Implemented in QnDesktopCameraResource.

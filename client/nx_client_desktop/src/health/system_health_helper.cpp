@@ -55,7 +55,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
 QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
     const QString& resourceName)
 {
-    //TODO: #GDM #3.1 elide on the widget level
+    // TODO: #GDM #3.1 elide on the widget level
     static const int kMaxNameLength = 30;
 
     switch (messageType)

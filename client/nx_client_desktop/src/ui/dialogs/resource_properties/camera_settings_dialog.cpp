@@ -197,7 +197,7 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged()
     m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
-    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
+    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  // TODO: #GDM implement
 }
 
 void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)

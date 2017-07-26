@@ -108,7 +108,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setTargetObject(this);
     m_frameColorAnimator->setAccessor(new QnVideowallItemWidgetHoverProgressAccessor());
-    m_frameColorAnimator->setTimeLimit(200); //TODO: #GDM check value
+    m_frameColorAnimator->setTimeLimit(200); // TODO: #GDM check value
     registerAnimation(m_frameColorAnimator);
 
     m_hoverProcessor = new HoverFocusProcessor(this);
@@ -218,13 +218,13 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     }
     else
     {
-        //TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
+        // TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
         QRectF bounding;
         foreach(const QnLayoutItemData &data, m_layout->getItems())
         {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
-                continue; //TODO: #GDM #VW some items can be not placed yet, wtf
+                continue; // TODO: #GDM #VW some items can be not placed yet, wtf
             bounding = bounding.united(itemRect);
         }
 
@@ -482,7 +482,7 @@ void QnVideowallItemWidget::updateInfo()
 {
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
     updateHud(false);
-    //TODO: #GDM #VW update layout in case of transition "long name -> short name"
+    // TODO: #GDM #VW update layout in case of transition "long name -> short name"
 }
 
 void QnVideowallItemWidget::updateHud(bool animate)

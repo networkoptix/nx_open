@@ -41,7 +41,7 @@ public:
         if (!m_delegate || m_delegate->isValid(id(proxyIndex)))
             return base_type::data(proxyIndex, role);
 
-        //TODO: #GDM #3.1 refactor to common delegate
+        // TODO: #GDM #3.1 refactor to common delegate
         // Handling only invalid rows here
         switch (role)
         {

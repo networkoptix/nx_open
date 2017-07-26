@@ -140,7 +140,7 @@ void QnToolTipSlider::hideToolTip(bool animated)
     qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
         Animations::Id::TimelineTooltipHide);
 
-    //TODO: #GDM we certainly need to find place for these constants
+    // TODO: #GDM we certainly need to find place for these constants
     const qreal kTransparent = 0.0;
     if (animated)
     {

@@ -10,8 +10,10 @@ import time
 import requests
 import datetime
 import traceback
+import json
 from functools import wraps
 import test_utils.utils as utils
+from test_utils.compare import compare_values
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
 from test_utils.utils import SimpleNamespace
@@ -22,7 +24,7 @@ import transaction_log
 log = logging.getLogger(__name__)
 
 
-MERGE_DONE_CHECK_PERIOD_SEC = 2.
+MERGE_DONE_CHECK_PERIOD_SEC = 10.
 SET_RESOURCE_STATUS_CMD = '202'
 
 
@@ -30,111 +32,44 @@ SET_RESOURCE_STATUS_CMD = '202'
 def config(test_config):
     return test_config.with_defaults(
         SERVER_COUNT=2,
+        USE_LIGHTWEIGHT_SERVERS=False,
         CAMERAS_PER_SERVER=1,
         STORAGES_PER_SERVER=1,
         USERS_PER_SERVER=1,
         RESOURCES_PER_CAMERA=2,
         MERGE_TIMEOUT=datetime.timedelta(seconds=MEDIASERVER_MERGE_TIMEOUT_SEC),
-        REST_API_TIMEOUT_SEC=60
+        REST_API_TIMEOUT_SEC=60,
         )
 
 @pytest.fixture
-def servers(metrics_saver, server_factory, config):
+def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
-    log.info('Creating %d servers:', config.SERVER_COUNT)
+    if not config.USE_LIGHTWEIGHT_SERVERS:
+        return []
+    log.info('Creating lightweight servers:')
+    start_time = utils.datetime_utc_now()
+    # at least one full/real server is required for testing
+    lws_list = lightweight_servers_factory(config.SERVER_COUNT - 1)
+    log.info('Created %d lightweight servers', len(lws_list))
+    metrics_saver.save('lws_server_init_duration', utils.datetime_utc_now() - start_time)
+    assert lws_list, 'No lightweight servers were created'
+    return lws_list
+
+@pytest.fixture
+def servers(metrics_saver, server_factory, lightweight_servers, config):
+    server_count = config.SERVER_COUNT - len(lightweight_servers)
+    log.info('Creating %d servers:', server_count)
     setup_settings = dict(autoDiscoveryEnabled=False)
     start_time = utils.datetime_utc_now()
     server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
                            rest_api_timeout_sec=config.REST_API_TIMEOUT_SEC)
-                       for idx in range(config.SERVER_COUNT)]
+                       for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
     return server_list
 
 
-def get_response(server, method, api_object, api_method):
-    try:
-        return server.rest_api.get_api_fn(method, api_object, api_method)()
-    except Exception, x:
-        log.error("%r call '%s/%s' error: %s" % (server, api_object, api_method, str(x)))
-        return None
-
-
-def compare_transaction_log(json_1, json_2):
-    # We have to filter 'setResourceStatus' transactions due to VMS-5969
-    def is_not_set_resource_status(transaction):
-        return transaction.command != SET_RESOURCE_STATUS_CMD
-
-    def clean(json):
-        return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
-
-    transactions_1 = clean(json_1)
-    transactions_2 = clean(json_2)
-    return transactions_1 == transactions_2
-
-
-def compare_full_info(json_1, json_2):
-    # We have to not check 'resStatusList' section due to VMS-5969
-    def clean(json):
-        return {k: v for k, v in json.iteritems() if k != 'resStatusList'}
-
-    full_info_1 = clean(json_1)
-    full_info_2 = clean(json_2)
-    return full_info_1 == full_info_2
-
-
-def compare_json_data(api_method, json_1, json_2):
-    comparators = {
-        'getFullInfo': compare_full_info,
-        'getTransactionLog': compare_transaction_log}
-    compare_fn = comparators.get(api_method)
-    if compare_fn:
-        return compare_fn(json_1, json_2)
-    return json_1 == json_2
-
-
-def wait_merge_done(servers, method, api_object, api_method, start_time, merge_timeout):
-    api_call_start_time = utils.datetime_utc_now()
-    while True:
-        result_expected = get_response(servers[0], method, api_object, api_method)
-
-        if result_expected is None:
-            if utils.datetime_utc_now() - start_time >= merge_timeout:
-                pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
-                    merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
-            continue
-
-        def check(servers, result_expected):
-            for srv in servers:
-                result = get_response(srv, method, api_object, api_method)
-                if not compare_json_data(api_method, result, result_expected):
-                    return srv
-            return None
-        first_unsynced_server = check(servers[1:], result_expected)
-        if not first_unsynced_server:
-            log.info('%s/%s merge duration: %s' % (api_object, api_method,
-                                                   utils.datetime_utc_now() - api_call_start_time))
-            return
-        if utils.datetime_utc_now() - start_time >= merge_timeout:
-            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
-                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
-        time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
-
-
-def measure_merge(servers, merge_timeout):
-    start_time = utils.datetime_utc_now()
-    for i in range(1, len(servers)):
-        servers[0].merge_systems(servers[i])
-    wait_merge_done(servers, 'GET', 'ec2', 'getUsers', start_time, merge_timeout)
-    wait_merge_done(servers, 'GET', 'ec2', 'getStorages', start_time, merge_timeout)
-    wait_merge_done(servers, 'GET', 'ec2', 'getLayouts', start_time, merge_timeout)
-    wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time, merge_timeout)
-    wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time, merge_timeout)
-    wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time, merge_timeout)
-    merge_duration = utils.datetime_utc_now() - start_time
-    log.info('Total merge duration: %s', merge_duration)
-    return merge_duration
-
+# resource creation  ================================================================================
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
     sequence = [(server, i) for i in range(size)]
@@ -211,8 +146,114 @@ def create_test_data(config, servers):
     pool.join()
 
 
-def test_scalability(metrics_saver, config, servers):
+# merge  ============================================================================================
+
+def get_response(server, method, api_object, api_method):
+    try:
+        return server.rest_api.get_api_fn(method, api_object, api_method)()
+    except Exception, x:
+        log.error("%r call '%s/%s' error: %s" % (server, api_object, api_method, str(x)))
+        return None
+
+
+def clean_transaction_log(json):
+    # We have to filter 'setResourceStatus' transactions due to VMS-5969
+    def is_not_set_resource_status(transaction):
+        return transaction.command != SET_RESOURCE_STATUS_CMD
+
+    return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
+
+def clean_full_info(json):
+    # We have to not check 'resStatusList' section due to VMS-5969
+    return {k: v for k, v in json.iteritems() if k !='resStatusList'}
+
+def clean_json(api_method, json):
+    cleaners = dict(
+        getFullInfo=clean_full_info,
+        getTransactionLog=clean_transaction_log,
+        )
+    cleaner = cleaners.get(api_method)
+    if json and cleaner:
+        return cleaner(json)
+    else:
+        return json
+
+
+def log_diffs(x, y):
+    lines = compare_values(x, y)
+    for line in lines:
+        log.debug(line)
+
+def save_json_artifact(artifact_factory, api_method, side_name, value):
+    file_path = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name),
+                                 ext='.json', type_name='json', content_type='application/json').produce_file_path()
+    with open(file_path, 'w') as f:
+        json.dump(value, f, indent=4)
+
+
+def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
+    api_call_start_time = utils.datetime_utc_now()
+    while True:
+        expected_result_dirty = get_response(servers[0], method, api_object, api_method)
+        if expected_result_dirty is None:
+            if utils.datetime_utc_now() - start_time >= merge_timeout:
+                pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                    merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
+            continue
+        expected_result = clean_json(api_method, expected_result_dirty)
+
+        def check(servers):
+            for srv in servers:
+                result = get_response(srv, method, api_object, api_method)
+                result_cleaned = clean_json(api_method, result)
+                if result_cleaned != expected_result:
+                    return (srv, result_cleaned)
+            return (None, None)
+    
+        first_unsynced_server, unmatched_result = check(servers[1:])
+        if not first_unsynced_server:
+            log.info('%s/%s merge duration: %s' % (api_object, api_method,
+                                                   utils.datetime_utc_now() - api_call_start_time))
+            return
+        if utils.datetime_utc_now() - start_time >= merge_timeout:
+            log.info('Servers %s and %s still has unmatched results for method %r:', servers[0], first_unsynced_server, api_method)
+            log_diffs(expected_result, unmatched_result)
+            save_json_artifact(artifact_factory, api_method, 'x', expected_result)
+            save_json_artifact(artifact_factory, api_method, 'y', unmatched_result)
+            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
+                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
+        time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
+
+
+def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
+    for api_method in [
+            'getUsers',
+            'getStorages',
+            'getLayouts',
+            'getCamerasEx',
+            'getFullInfo',
+            'getTransactionLog',
+            ]:
+        wait_for_method_matched(artifact_factory, servers, 'GET', 'ec2', api_method, start_time, merge_timeout)
+
+
+def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
-    create_test_data(config, servers)
-    merge_duration = measure_merge(servers, config.MERGE_TIMEOUT)
+
+    # lightweight servers create data themselves
+    if not lightweight_servers:
+        create_test_data(config, servers)
+
+    start_time = utils.datetime_utc_now()
+
+    if lightweight_servers:
+        lightweight_servers[0].wait_until_synced(config.MERGE_TIMEOUT)
+        for server in servers:
+            server.merge_systems(lightweight_servers[0], take_remote_settings=True)
+    else:
+        servers[0].merge(servers[1:])
+
+    wait_for_data_merged(artifact_factory, lightweight_servers[:1] + servers, config.MERGE_TIMEOUT, start_time)
+
+    merge_duration = utils.datetime_utc_now() - start_time
     metrics_saver.save('merge_duration', merge_duration)

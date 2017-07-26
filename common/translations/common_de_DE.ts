@@ -88,7 +88,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Systemereignis</translation>
     </message>
   </context>
   <context>
@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
   </context>
   <context>
@@ -668,7 +668,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Hardware-ID: %1</translation>
     </message>
   </context>
   <context>
