@@ -137,6 +137,9 @@ void QnModuleInformationRestHandler::changeModuleInformation()
             NX_DEBUG(this, lm("Close all %1 connections on moduleInformation change")
                 .arg(m_savedSockets.size()));
 
+            for (auto& socket : m_savedSockets)
+                socket->cancelIOSync(nx::network::aio::EventType::etNone);
+
             m_savedSockets.clear();
         });
 }

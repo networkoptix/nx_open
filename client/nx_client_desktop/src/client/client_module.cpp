@@ -443,8 +443,6 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             logFileNameSuffix = L'_' + QString::number(idx) + L'_';
     }
 
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
@@ -452,10 +450,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.level = nx::utils::log::levelFromString(logLevel);
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
+    logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     nx::utils::log::initialize(
         logSettings,
-        dataLocation,
         qApp->applicationName(),
         qApp->applicationFilePath(),
         lit("log_file") + logFileNameSuffix);
@@ -466,7 +464,6 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);
         nx::utils::log::initialize(
             logSettings,
-            dataLocation,
             qApp->applicationName(),
             qApp->applicationFilePath(),
             lit("ec2_tran") + logFileNameSuffix,

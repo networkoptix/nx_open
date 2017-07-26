@@ -27,6 +27,9 @@ public:
 
     /** Rewrites values from settings if specified */
     void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
+
+    /** Updates directory if it's not specified from @param dataDirectory */
+    void updateDirectoryIfEmpty(const QString dataDirectory);
 };
 
 } // namespace log
