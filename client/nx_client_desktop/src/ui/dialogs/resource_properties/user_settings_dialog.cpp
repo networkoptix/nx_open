@@ -28,6 +28,8 @@
 
 #include <utils/common/html.h>
 
+#include <nx/cloud/cdb/client/data/auth_data.h>
+
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -373,8 +375,24 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     if (!tryClose(false))
         return;
 
+    if (m_user)
+        m_user->disconnect(this);
+
     m_user = user;
     m_model->setUser(user);
+
+    if (m_user)
+    {
+        connect(m_user, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& propertyName)
+            {
+                if (resource == m_user
+                    && propertyName == QLatin1String(nx::cdb::api::kVmsUserAuthInfoAttributeName))
+                {
+                    forcedUpdate();
+                }
+            });
+    }
 
     /* Hide Apply button if cannot apply changes. */
     bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile
@@ -395,8 +413,24 @@ void QnUserSettingsDialog::loadDataToUi()
 
     base_type::loadDataToUi();
 
-    bool userIsEnabled = m_user && m_user->isEnabled();
+    if (!m_user)
+        return;
+
+    bool userIsEnabled = m_user->isEnabled();
     m_userEnabledButton->setChecked(userIsEnabled);
+
+    if (m_user->userType() == QnUserType::Cloud
+        && m_model->mode() == QnUserSettingsModel::OtherSettings)
+    {
+        const auto auth = m_user->getProperty(QLatin1String(
+            nx::cdb::api::kVmsUserAuthInfoAttributeName));
+        if (auth.isEmpty())
+        {
+            ui->alertBar->setText(tr("This user has not yet signed up for %1",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+            return;
+        }
+    }
     if (!userIsEnabled)
         ui->alertBar->setText(tr("User is disabled"));
 }
