@@ -7,6 +7,8 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/subscription.h>
+#include <nx/utils/thread/cf/async_queued_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -19,6 +21,7 @@ namespace conf { class Settings; };
 namespace model {
 class ClientSessionPool;
 class ListeningPeerPool;
+class RemoteRelayPeerPool;
 } // namespace model
 
 namespace controller {
@@ -100,6 +103,8 @@ private:
     std::list<RelaySession> m_relaySessions;
     QnMutex m_mutex;
     bool m_terminated = false;
+    std::unique_ptr<model::RemoteRelayPeerPool> m_remoteRelayPool;
+    std::set<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
     void saveServerConnection(
         const std::string& peerName,

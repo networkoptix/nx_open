@@ -52,9 +52,10 @@ struct CreateClientSessionResponse
 {
     std::string sessionId;
     std::chrono::seconds sessionTimeout;
+    std::string redirectHost;
 };
 
-#define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)
+#define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)(redirectHost)
 
 struct ConnectToPeerRequest
 {
