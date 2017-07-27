@@ -181,8 +181,11 @@ def clean_json(api_method, json):
 
 def log_diffs(x, y):
     lines = compare_values(x, y)
-    for line in lines:
-        log.debug(line)
+    if lines:
+        for line in lines:
+            log.debug(line)
+    else:
+        log.warning('Strange, no diffs are found...')
 
 def save_json_artifact(artifact_factory, api_method, side_name, value):
     file_path = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name),
