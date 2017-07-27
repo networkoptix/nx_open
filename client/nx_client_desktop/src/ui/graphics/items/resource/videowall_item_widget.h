@@ -30,7 +30,21 @@ class GraphicsLabel;
 class GraphicsWidget;
 class QGraphicsLinearLayout;
 
-class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWidget>>>, protected DragProcessHandler, public QnWorkbenchContextAware {
+namespace nx {
+namespace client {
+namespace desktop {
+
+class MimeData;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
+class QnVideowallItemWidget:
+    public Overlayed<Animated<Connective<QnClickableWidget>>>,
+    protected DragProcessHandler,
+    public QnWorkbenchContextAware
+{
     typedef Overlayed<Animated<Connective<QnClickableWidget>>> base_type;
     Q_OBJECT
 
@@ -73,6 +87,8 @@ private:
     /** \returns false if item image is still loading */
     bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
 
+    bool isDragValid() const;
+
 private:
     friend class QnVideowallScreenWidget;
     friend class QnVideowallItemWidgetHoverProgressAccessor;
@@ -98,10 +114,7 @@ private:
     QnLayoutResourcePtr m_layout;
 
     /** Drag'n'drop support structure. */
-    struct {
-        QnResourceList resources;
-        QnVideoWallItemIndexList videoWallItems;
-    } m_dragged;
+    std::unique_ptr<nx::client::desktop::MimeData> m_mimeData;
 
     QnResourceWidgetFrameColors m_frameColors;
 

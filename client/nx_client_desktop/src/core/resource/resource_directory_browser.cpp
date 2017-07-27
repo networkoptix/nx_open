@@ -177,9 +177,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     QnUuid layoutId = guidFromArbitraryData(filename);
-    QnLayoutResourcePtr existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
-    if (existingLayout)
-        return existingLayout;
+    if (resourcePool)
+    {
+        auto existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
+        if (existingLayout)
+            return existingLayout;
+    }
     layout->setId(layoutId);
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));

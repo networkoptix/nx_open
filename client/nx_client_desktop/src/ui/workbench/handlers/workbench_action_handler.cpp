@@ -556,20 +556,18 @@ void ActionHandler::submitDelayedDrops()
 
     for (const auto& data: m_delayedDrops)
     {
-        const auto ids = data.getIds();
-        resources.append(resourcePool()->getResources(ids));
-        for (const auto& tour: layoutTourManager()->tours(ids))
+        for (const auto& tour: layoutTourManager()->tours(data.entities()))
             tours.push_back(tour);
 
-        const auto urls = data.getUrls();
-        resources.append(QnFileProcessor::createResourcesForFiles(
-            QnFileProcessor::findAcceptedFiles(urls)));
+        resources.append(data.resources());
     }
 
     m_delayedDrops.clear();
 
     if (resources.empty() && tours.empty())
         return;
+
+    resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -855,7 +853,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
 
     MimeData data;
-    data.setIds({id});
+    data.setEntities({id});
     openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
@@ -1017,13 +1015,11 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
-        return;
+void ActionHandler::at_delayedDropResourcesAction_triggered()
+{
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    MimeData mimeData = MimeData::deserialized(data, resourcePool());
 
     m_delayedDrops.push_back(mimeData);
 
@@ -1032,25 +1028,23 @@ void ActionHandler::at_delayedDropResourcesAction_triggered() {
 
 void ActionHandler::at_instantDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    MimeData mimeData = MimeData::deserialized(data, resourcePool());
+
+    if (mimeData.resources().empty())
         return;
 
-    const auto ids = mimeData.getIds();
-    auto resources = resourcePool()->getResources(ids);
-
-    const auto urls = mimeData.getUrls();
-    resources.append(QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(urls)));
-
-    if (resources.empty())
-        return;
+    resourcePool()->addNewResources(mimeData.resources());
 
     workbench()->clear();
-    menu()->trigger(action::OpenInNewTabAction, resources);
+    bool dropped = menu()->triggerIfPossible(action::OpenInNewTabAction, mimeData.resources());
+    if (dropped)
+        action(action::ResourcesModeAction)->setChecked(true);
+
+    // Security check - just in case.
+    if (workbench()->layouts().empty())
+        menu()->trigger(action::OpenNewTabAction);
 }
 
 void ActionHandler::at_openFileAction_triggered() {
