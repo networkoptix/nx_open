@@ -310,9 +310,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
     auto hotkeysDelegate =
         new QnSingleCameraPtzHotkeysDelegate(res, context());
 
-    dialog->setResource(res);
+    dialog->setWidget(widget);
     dialog->setHotkeysDelegate(hotkeysDelegate);
-    dialog->setController(widget->ptzController());
     dialog->show();
 }
 

@@ -97,17 +97,22 @@ void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& serve
     addResources({{server}}, UseIncompatibleServerPool);
 }
 
+void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourceFlags flags)
+{
+    addResources(resources.filtered(
+        [](const QnResourcePtr& resource) { return resource->resourcePool() == nullptr; }));
+}
+
 void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
 {
-    QnMutexLocker resourcesLock( &m_resourcesMtx );
+    QnMutexLocker resourcesLock(&m_resourcesMtx);
 
-    for (const QnResourcePtr &resource: resources)
+    for (const auto& resource: resources)
     {
-        NX_ASSERT(resource->toSharedPointer()); /* Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer? */
+        // Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer?
+        NX_ASSERT(resource->toSharedPointer());
         NX_ASSERT(!resource->getId().isNull());
-
-        if(resource->resourcePool() != NULL)
-            qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
+        NX_ASSERT(!resource->resourcePool() || resource->resourcePool() == this);
         resource->setResourcePool(this);
     }
 

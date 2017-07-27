@@ -1,9 +1,13 @@
 #include "mime_data.h"
 
+#include <QtCore/QFile>
+
 #include <QtWidgets/QApplication>
 
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/file_processor.h>
 
 namespace {
 
@@ -82,18 +86,6 @@ QList<QnUuid> deserializeFromInternal(const QByteArray& data)
     return result;
 }
 
-QList<QUrl> serializeResourcesToUriList(const QnResourceList& resources)
-{
-    QList<QUrl> result;
-    for (const QnResourcePtr &resource : resources)
-    {
-        if (resource->hasFlags(Qn::url | Qn::local))
-            result.append(QUrl::fromLocalFile(resource->getUrl()));
-    }
-    return result;
-}
-
-
 } // namespace
 
 namespace nx {
@@ -104,9 +96,9 @@ MimeData::MimeData()
 {
 }
 
-MimeData::MimeData(const QMimeData* data)
+MimeData::MimeData(const QMimeData* data, QnResourcePool* resourcePool)
 {
-    load(data);
+    load(data, resourcePool);
 }
 
 QStringList MimeData::mimeTypes()
@@ -116,11 +108,18 @@ QStringList MimeData::mimeTypes()
 
 void MimeData::toMimeData(QMimeData* data) const
 {
-    for (const QString &format : data->formats())
+    for (const QString& format: data->formats())
         data->removeFormat(format);
 
-    for (const QString &format : this->formats())
+    for (const QString& format: this->formats())
         data->setData(format, this->data(format));
+}
+
+QMimeData* MimeData::createMimeData() const
+{
+    QMimeData* result = new QMimeData();
+    toMimeData(result);
+    return result;
 }
 
 QByteArray MimeData::data(const QString& mimeType) const
@@ -148,42 +147,26 @@ void MimeData::removeFormat(const QString& mimeType)
     m_data.remove(mimeType);
 }
 
+QnResourceList MimeData::resources() const
+{
+    return m_resources;
+}
+
 void MimeData::setResources(const QnResourceList& resources)
 {
-    QList<QnUuid> ids;
-    QList<QUrl> urls;
-    for (const auto& resource: resources)
-    {
-        ids << resource->getId();
-        if (resource->hasFlags(Qn::url | Qn::local))
-            urls.append(QUrl::fromLocalFile(resource->getUrl()));
-    }
-    setIds(ids);
-
-    if (!urls.empty())
-    {
-        QMimeData d;
-        d.setUrls(urls);
-        load(&d);
-    }
+    m_resources = resources.filtered(QnResourceAccessFilter::isDroppable);
+    updateInternalStorage();
 }
 
-QList<QnUuid> MimeData::getIds() const
+QList<QnUuid> MimeData::entities() const
 {
-    return deserializeFromInternal(data(kInternalMimeType));
+    return m_entities;
 }
 
-void MimeData::setIds(const QList<QnUuid>& ids)
+void MimeData::setEntities(const QList<QnUuid>& ids)
 {
-    if (!ids.empty())
-        setData(kInternalMimeType, serializeToInternal(ids));
-}
-
-QList<QUrl> MimeData::getUrls() const
-{
-    QMimeData mimeData;
-    toMimeData(&mimeData);
-    return mimeData.urls();
+    m_entities = ids;
+    updateInternalStorage();
 }
 
 QString MimeData::serialized() const
@@ -194,20 +177,69 @@ QString MimeData::serialized() const
     return QLatin1String(serializedData.toBase64());
 }
 
-void MimeData::load(const QMimeData* data)
+MimeData MimeData::deserialized(QByteArray data, QnResourcePool* resourcePool)
 {
-    for (const QString &format : data->formats())
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    MimeData result;
+    stream >> result.m_data;
+    if (stream.status() != QDataStream::Ok || result.formats().empty())
+        return result;
+
+    // Code reuse...
+    QMimeData mimeData;
+    result.toMimeData(&mimeData);
+    result.load(&mimeData, resourcePool);
+    return result;
+}
+
+bool MimeData::isEmpty() const
+{
+    return m_entities.empty() && m_resources.empty();
+}
+
+void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
+{
+    for (const QString &format: data->formats())
         setData(format, data->data(format));
+
+    auto ids = deserializeFromInternal(this->data(kInternalMimeType));
+    m_resources.clear();
+    if (resourcePool)
+        m_resources.append(resourcePool->getResources(ids));
+
+    if (data->hasUrls())
+    {
+        m_resources.append(QnFileProcessor::findOrCreateResourcesForFiles(data->urls(),
+            resourcePool));
+    }
+
+    for (const auto resource: m_resources)
+        ids.removeAll(resource->getId());
+    m_entities = ids;
+    m_resources = m_resources.filtered(QnResourceAccessFilter::isDroppable);
+
+    updateInternalStorage();
 }
 
-QDataStream& operator<<(QDataStream& stream, const MimeData& data)
+void MimeData::updateInternalStorage()
 {
-    return stream << data.m_data;
-}
+    QList<QnUuid> ids = m_entities;
+    QList<QUrl> urls;
+    for (const auto& resource: m_resources)
+    {
+        ids.append(resource->getId());
+        if (resource->hasFlags(Qn::url | Qn::local))
+            urls.append(QUrl::fromLocalFile(resource->getUrl()));
+    }
 
-QDataStream& operator>> (QDataStream& stream, MimeData& data)
-{
-    return stream >> data.m_data;
+    setData(kInternalMimeType, serializeToInternal(ids));
+
+    if (!urls.empty())
+    {
+        QMimeData d;
+        d.setUrls(urls);
+        setData(kUriListMimeType, d.data(kUriListMimeType));
+    }
 }
 
 } // namespace desktop

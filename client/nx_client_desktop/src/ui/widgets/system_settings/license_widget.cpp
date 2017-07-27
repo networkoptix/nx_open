@@ -21,6 +21,11 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/ui/common/line_edit_controls.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
 bool isValidSerialKey(const QString &key)
 {
@@ -84,12 +89,12 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             .arg(QnAppInfo::licensingEmailAddress()));
     }
 
-
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 
     connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, &QnLicenseWidget::updateControls);
-    connect(ui->browseLicenseFileButton, &QPushButton::clicked, this, &QnLicenseWidget::at_browseLicenseFileButton_clicked);
+    connect(ui->browseLicenseFileButton, &QPushButton::clicked,
+        this, &QnLicenseWidget::at_browseLicenseFileButton_clicked);
 
     setAccentStyle(ui->activateLicenseButton);
     connect(ui->activateLicenseButton, &QPushButton::clicked, this,
@@ -115,16 +120,26 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             setState(Waiting);
         });
 
-    connect(ui->copyHwidButton, &QPushButton::clicked, this, [this]
-    {
-        qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QnMessageBox::success(this, tr("Hardware Id copied to clipboard"));
-    });
+    auto copyHwidButton = new ClipboardButton(ClipboardButton::StandardType::copy, this);
+    copyHwidButton->setFocusPolicy(Qt::NoFocus);
+    copyHwidButton->setHidden(true);
+    LineEditControls::get(ui->hardwareIdEdit)->addControl(copyHwidButton);
 
-    connect(ui->pasteKeyButton, &QPushButton::clicked, this, [this]
-    {
-        ui->onlineKeyEdit->setText(qApp->clipboard()->text());
-    });
+    connect(copyHwidButton, &QPushButton::clicked, this,
+        [this]() { qApp->clipboard()->setText(ui->hardwareIdEdit->text()); });
+
+    connect(ui->hardwareIdEdit, &QLineEdit::textChanged, copyHwidButton,
+        [copyHwidButton](const QString& text) { copyHwidButton->setHidden(text.isEmpty()); });
+
+    auto pasteKeyButton = new ClipboardButton(ClipboardButton::StandardType::paste, this);
+    pasteKeyButton->setFocusPolicy(Qt::NoFocus);
+    LineEditControls::get(ui->onlineKeyEdit)->addControl(pasteKeyButton);
+
+    connect(pasteKeyButton, &QPushButton::clicked, this,
+        [this]() { ui->onlineKeyEdit->setText(qApp->clipboard()->text()); });
+
+    connect(qApp->clipboard(), &QClipboard::dataChanged, pasteKeyButton,
+        [pasteKeyButton]() { pasteKeyButton->setEnabled(!qApp->clipboard()->text().isEmpty()); });
 
     updateControls();
 }
@@ -178,7 +193,6 @@ void QnLicenseWidget::setFreeLicenseAvailable(bool available)
 void QnLicenseWidget::setHardwareId(const QString& hardwareId)
 {
     ui->hardwareIdEdit->setText(hardwareId);
-    ui->copyHwidButton->setEnabled(!hardwareId.isEmpty());
 }
 
 QString QnLicenseWidget::serialKey() const
