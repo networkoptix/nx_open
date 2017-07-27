@@ -1,4 +1,5 @@
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
+INCLUDEPATH += ${root.dir}/common_libs/nx_cassandra/src/
 
 INCLUDEPATH -= $$ROOT_DIR/common/src
 
