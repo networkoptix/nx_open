@@ -52,7 +52,7 @@ using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode erro
 using GenericCallbackFunction = std::function<void(bool)>;
 template<typename ResourceType, typename BackupType>
 ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
-    ResourceType resource,
+    QnSharedResourcePointer<ResourceType> resource,
     GenericCallbackFunction callback = GenericCallbackFunction())
 {
     QPointer<QnResourcesChangesManager> guard(manager);
@@ -425,7 +425,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         return;
     }
 
-    auto replyProcessor = makeReplyProcessor<QnUserResourcePtr, ec2::ApiUserData>(this, user,
+    auto replyProcessor = makeReplyProcessor<QnUserResource, ec2::ApiUserData>(this, user,
         callback);
 
     applyChanges(user);
@@ -575,7 +575,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnVideoWallResourcePtr, ec2::ApiVideowallData>(this,
+    auto replyProcessor = makeReplyProcessor<QnVideoWallResource, ec2::ApiVideowallData>(this,
         videoWall, callback);
 
     applyChanges(videoWall);
@@ -601,7 +601,7 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnLayoutResourcePtr, ec2::ApiLayoutData>(this,
+    auto replyProcessor = makeReplyProcessor<QnLayoutResource, ec2::ApiLayoutData>(this,
         layout, callback);
 
     applyChanges(layout);
@@ -626,7 +626,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnWebPageResourcePtr, ec2::ApiWebPageData>(this,
+    auto replyProcessor = makeReplyProcessor<QnWebPageResource, ec2::ApiWebPageData>(this,
         webPage, callback);
 
     applyChanges(webPage);
