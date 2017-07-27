@@ -254,15 +254,13 @@ ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& _response, boo
     qint32 sequence;
     while (!in.atEnd())
     {
-        in >> sequence;
-        if (in.atEnd())
-            return result; //< Error.
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error.
         fullId.id = QnUuid::fromRfc4122(tmpBuffer);
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error.
         fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+        in >> sequence;
 
         result.values.insert(fullId, sequence);
     }
