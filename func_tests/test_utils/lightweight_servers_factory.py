@@ -5,6 +5,7 @@ import logging
 import time
 from .template_renderer import TemplateRenderer
 from . import utils
+from .core_file_traceback import create_core_file_traceback
 from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
 
@@ -13,11 +14,12 @@ log = logging.getLogger(__name__)
 
 LWS_CTL_TEMPLATE_PATH = 'lws_ctl.sh.jinja2'
 LWS_PORT_BASE = 3000
+LWS_BINARY_NAME = 'appserver2_ut'
+LWS_START_TIMEOUT_SEC = 10*60  # timeout when waiting for lws become online (pingable)
+
 
 
 class LightweightServersFactory(object):
-
-    test_binary_name = 'appserver2_ut'
 
     def __init__(self, artifact_factory, physical_installation_ctl, test_binary_path):
         self._artifact_factory = artifact_factory
@@ -130,6 +132,8 @@ class LightweightServersHost(object):
             self._host, os.path.join(physical_installation_host.root_dir, 'lws'))
         self._template_renderer = TemplateRenderer()
         self._allocated = False
+        self._server0 = None
+        self._init()
 
     # server_count is ignored for now; all servers are allocated on first lightweight installation
     def allocate(self, server_count):
@@ -142,7 +146,6 @@ class LightweightServersHost(object):
         server_ctl = PhysicalHostServerCtl(self._host, lws_dir)
         if server_ctl.get_state():
             server_ctl.set_state(is_started=False)
-        self._cleanup_core_files()
         self._cleanup_log_files()
         self._host.put_file(self._test_binary_path, lws_dir)
         self._write_lws_ctl(server_dir, lws_dir, server_count)
@@ -152,15 +155,21 @@ class LightweightServersHost(object):
             rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
             server = LightweightServer('lws-%05d' % idx, self._host, self._installation, server_ctl, rest_api_url,
                                        internal_ip_port=server_port, timezone=self._timezone)
-            response = server.wait_for_server_become_online(check_interval_sec=2)
+            response = server.wait_for_server_become_online(timeout_sec=LWS_START_TIMEOUT_SEC, check_interval_sec=2)
             server.local_system_id = response['localSystemId']
+            if not self._server0:
+                self._server0 = server
             yield server
         self._allocated = True
 
     def release(self):
         if self._allocated:
             self._save_lws_artifacts()
+        self._server0 = None
         self._allocated = False
+
+    def _init(self):
+        self._cleanup_core_files()
 
     def _cleanup_core_files(self):
         for path in self._installation.list_core_files():
@@ -185,8 +194,9 @@ class LightweightServersHost(object):
         self._host.run_command(['chmod', '+x', lws_ctl_path])
 
     def _save_lws_artifacts(self):
+        self._check_server_is_online()
         self._save_lws_log()
-        self._save_core_files()
+        self._save_lws_core_files()
 
     def _save_lws_log(self):
         log_contents = self._host.read_file(self._installation.log_path_base + '.log').strip()
@@ -197,17 +207,33 @@ class LightweightServersHost(object):
                 f.write(log_contents)
             log.debug('log file for lws at %s is stored to %s', self._host_name, log_path)
 
-    def _save_core_files(self):
+    def _save_lws_core_files(self):
         for remote_core_path in self._installation.list_core_files():
             fname = os.path.basename(remote_core_path)
-            artifact_factory = self._artifact_factory(['lws', self._host_name, fname], name=fname, is_error=True, type_name='core')
+            artifact_factory = self._artifact_factory(
+                ['lws', self._host_name, fname], name=fname, is_error=True, type_name='core')
             local_core_path = artifact_factory.produce_file_path()
             self._host.get_file(remote_core_path, local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
+            traceback = create_core_file_traceback(
+                self._host, os.path.join(self._installation.dir, LWS_BINARY_NAME),
+                os.path.join(self._physical_installation_host.unpacked_mediaserver_dir, 'lib'), remote_core_path)
+            artifact_factory = self._artifact_factory(
+                ['lws', self._host_name, fname, 'traceback'],
+                name='%s-tb' % fname, is_error=True, type_name='core-traceback')
+            path = artifact_factory.write_file(traceback)
+            log.debug('core file traceback for lws at %s is stored to %s', self._host_name, path)
+
+    def _check_server_is_online(self):
+        if not self._allocated: return
+        if self._server0.is_started() and not self._server0.is_server_online():
+            log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
+            self._server0.make_core_dump()
 
     def perform_post_checks(self):
         log.info('----- performing post-test checks for lightweight servers at %s'
                      '---------------------->8 ---------------------------', self._host_name)
+        self._check_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %
                                         (self._host_name, len(core_file_list), ', '.join(core_file_list)))

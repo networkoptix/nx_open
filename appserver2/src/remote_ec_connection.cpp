@@ -42,6 +42,8 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications()
     {
+        m_connectionFactory->messageBus()->init(
+            m_connectionInfo.p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
         m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();

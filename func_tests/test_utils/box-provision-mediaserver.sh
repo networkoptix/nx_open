@@ -14,6 +14,7 @@ export DEBIAN_FRONTEND=noninteractive
 echo "kernel.core_pattern=core.%t.%p" > /etc/sysctl.d/60-core-pattern.conf
 service procps start
 
+# gdb is required for creating tracebacks for core dumps
 echo "Install mediaserver dependencies..."
 apt-get update
 apt-get -y install \
@@ -24,7 +25,8 @@ apt-get -y install \
         syslinux-common \
         nas \
         floppyd \
-        cifs-utils
+        cifs-utils \
+        gdb
 
 echo "Install mediaserver..."
 dpkg -i --force-depends "/vagrant/$MEDIASERVER_DIST_FNAME"
