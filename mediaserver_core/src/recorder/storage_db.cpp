@@ -48,7 +48,7 @@ public:
 
     void handleRecordWrite(nx::media_db::Error error) override
     {
-        if (error != nx::media_db::Error::NoError)
+        if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
             NX_LOG(lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
         m_error = error;
     }
