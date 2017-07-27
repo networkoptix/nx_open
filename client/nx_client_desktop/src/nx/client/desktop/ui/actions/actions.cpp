@@ -1539,7 +1539,7 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(CloseLayoutAction)
-        .flags(TitleBar | ScopelessHotkey | SingleTarget)
+        .flags(GlobalHotkey | TitleBar | ScopelessHotkey | SingleTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Close"))
         .shortcut(lit("Ctrl+W"))
