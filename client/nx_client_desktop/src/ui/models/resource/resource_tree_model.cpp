@@ -418,7 +418,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (!isAdmin)
             return bastardNode;
 
-        return m_systemHasManyServers
+        return m_systemHasManyServers || m_scope == CamerasScope
             ? m_rootNodes[Qn::ServersNode]
             : rootNode;
     }
