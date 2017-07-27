@@ -20,7 +20,7 @@ from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from test_utils.server_factory import ServerFactory
 from test_utils.camera import SampleMediaFile, CameraFactory
-from test_utils.lightweight_servers_factory import LightweightServersFactory
+from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
@@ -257,7 +257,7 @@ def server_factory(run_options, init_logging, artifact_factory, customization_co
 
 @pytest.fixture
 def lightweight_servers_factory(run_options, artifact_factory, physical_installation_ctl):
-    test_binary_path = os.path.join(run_options.bin_dir, LightweightServersFactory.test_binary_name)
+    test_binary_path = os.path.join(run_options.bin_dir, LWS_BINARY_NAME)
     assert os.path.isfile(test_binary_path), 'Test binary for lightweight servers is missing at %s' % test_binary_path
     lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path)
     yield lwsf
