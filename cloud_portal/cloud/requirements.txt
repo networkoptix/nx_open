@@ -6,7 +6,7 @@ amqp==2.1.4
 anyjson==0.3.3
 argparse==1.2.1
 billiard==3.5.0.2
-boto
+boto3==1.4.4
 celery==4.0.2
 cssutils==1.0.1
 django-celery-results==1.0.1
