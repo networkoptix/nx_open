@@ -133,6 +133,7 @@ class LightweightServersHost(object):
         self._template_renderer = TemplateRenderer()
         self._allocated = False
         self._server0 = None
+        self._init()
 
     # server_count is ignored for now; all servers are allocated on first lightweight installation
     def allocate(self, server_count):
@@ -145,7 +146,6 @@ class LightweightServersHost(object):
         server_ctl = PhysicalHostServerCtl(self._host, lws_dir)
         if server_ctl.get_state():
             server_ctl.set_state(is_started=False)
-        self._cleanup_core_files()
         self._cleanup_log_files()
         self._host.put_file(self._test_binary_path, lws_dir)
         self._write_lws_ctl(server_dir, lws_dir, server_count)
@@ -167,6 +167,9 @@ class LightweightServersHost(object):
             self._save_lws_artifacts()
         self._server0 = None
         self._allocated = False
+
+    def _init(self):
+        self._cleanup_core_files()
 
     def _cleanup_core_files(self):
         for path in self._installation.list_core_files():
