@@ -88,6 +88,7 @@ public:
 
     virtual QUrl remoteAddr() const override;
     const nx::network::WebSocket* webSocket() const;
+    void stopWhileInAioThread();
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);

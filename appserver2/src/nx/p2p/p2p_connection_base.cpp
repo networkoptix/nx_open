@@ -77,29 +77,35 @@ ConnectionBase::ConnectionBase(
     m_timer.bindToAioThread(m_webSocket->getAioThread());
 }
 
+void ConnectionBase::stopWhileInAioThread()
+{
+    // All objects in the same AIO thread
+    m_timer.pleaseStopSync();
+    m_webSocket.reset();
+    m_httpClient.reset();
+}
+
 ConnectionBase::~ConnectionBase()
 {
     if (m_timer.isInSelfAioThread())
     {
-        // All objects in the same AIO thread
-        m_timer.pleaseStopSync();
-        m_webSocket.reset();
-        m_httpClient.reset();
-        return;
+        stopWhileInAioThread();
     }
-
-    std::promise<void> waitToStop;
-    m_timer.pleaseStop(
-        [&]()
-        {
-            if (m_webSocket)
-                m_webSocket->pleaseStopSync();
-            if (m_httpClient)
-                m_httpClient->pleaseStopSync();
-            waitToStop.set_value();
-        }
-    );
-    waitToStop.get_future().wait();
+    else
+    {
+        std::promise<void> waitToStop;
+        m_timer.pleaseStop(
+            [&]()
+            {
+                if (m_webSocket)
+                    m_webSocket->pleaseStopSync();
+                if (m_httpClient)
+                    m_httpClient->pleaseStopSync();
+                waitToStop.set_value();
+            }
+        );
+        waitToStop.get_future().wait();
+    }
 }
 
 QUrl ConnectionBase::remoteAddr() const

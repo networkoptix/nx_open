@@ -31,7 +31,6 @@ public:
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         ::ec2::ApiPeerDataEx localPeerData,
         ::ec2::ApiPeerDataEx remotePeerData);
-    virtual ~WebSocketTransactionTransport() override;
 
     virtual SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;

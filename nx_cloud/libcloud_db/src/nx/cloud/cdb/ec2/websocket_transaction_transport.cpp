@@ -48,11 +48,6 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     startReading();
 }
 
-WebSocketTransactionTransport::~WebSocketTransactionTransport()
-{
-    stopWhileInAioThread();
-}
-
 void WebSocketTransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractTransactionTransport::bindToAioThread(aioThread);
@@ -63,7 +58,7 @@ void WebSocketTransactionTransport::bindToAioThread(nx::network::aio::AbstractAi
 void WebSocketTransactionTransport::stopWhileInAioThread()
 {
     AbstractTransactionTransport::stopWhileInAioThread();
-    // nx::p2p::ConnectionBase is able to stop from any thread
+    nx::p2p::ConnectionBase::stopWhileInAioThread();
     m_transactionLogReader.reset();
 }
 
