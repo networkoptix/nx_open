@@ -15,11 +15,13 @@
 
     <properties>
         <guid>${nx_cassandra.guid}</guid>
-        <product.title>${company.name} nx_cassandra</product.title>
+        <template>lib</template>
+
 
         <qt.libs>core</qt.libs>
         <global.libs>-lnx_utils</global.libs>
 
+        <buildLib>sharedLib</buildLib>
         <rdep.windows.packages>cassandra-2.7.0</rdep.windows.packages>
         <rdep.linux.packages>cassandra-2.7.0</rdep.linux.packages>
     </properties>
@@ -34,32 +36,5 @@
             <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-
-    </profiles>
 
 </project>
