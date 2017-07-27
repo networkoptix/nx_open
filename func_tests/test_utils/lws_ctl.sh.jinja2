@@ -13,7 +13,6 @@ BIN_PATH="$BIN_DIR/appserver2_ut"
 ARGS_LIST=(
 	--log-file=$LOG_PATH_BASE
 	--log-level=WARNING
-	--log-exception-filters=nx::p2p
 	--gtest_filter=P2pMessageBusTest.FullConnect
 	--standaloneMode
 	--serverCount=$SERVER_COUNT
