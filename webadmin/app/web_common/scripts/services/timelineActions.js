@@ -79,7 +79,8 @@ TimelineActions.prototype.updatePosition = function(){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
                 self.nextPlayedPosition = false;
             }
-
+            // Update live position anyways
+            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
             return; // ignore changes until played position wasn't changed
         }
 
@@ -88,6 +89,8 @@ TimelineActions.prototype.updatePosition = function(){
         var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
 
         if(intervalMs == 0){
+            // Update live position anyways
+            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
