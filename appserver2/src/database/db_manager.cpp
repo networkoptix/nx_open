@@ -4305,6 +4305,8 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
 {
     if (!m_dbJustCreated)
         m_resyncFlags |= flags;
+    if (flags.testFlag(ResyncWebPages))
+        m_resyncFlags |= ResyncWebPages; //< Resync web pages always. Media servers could have different list even it started with empty DB.
     return true;
 }
 

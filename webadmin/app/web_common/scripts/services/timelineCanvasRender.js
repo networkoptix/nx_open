@@ -493,10 +493,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         else if(levelIndex != chunk.level || !chunk.level){
             //Show loading color under loading texture
             context.fillStyle = blurColor(timelineConfig.loadingChunkColor, blur);
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
-            top,
-                (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-            height);
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
             
             //Load the loading texture
             if(chunkLoadingTexture){
@@ -512,7 +510,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     img.src = Config.viewsDirCommon + '../images/chunkloading.png';
                     chunkLoadingTextureImg = img;
                 }
-                context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
+                context.fillStyle = blurColor(timelineConfig.loadingChunkColor,1);
             }
 
             //Give the texture the appearance of moving
@@ -524,18 +522,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             context.save();
             context.translate(offset_x, 0);
 
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x,
-                top,
-                    (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-                height);
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
             context.restore();
         }
         else{
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
-                top,
-                    (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-                height);
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
         }
     }
 
@@ -580,10 +574,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.save();
         context.translate(offset_x, 0);
 
-        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x,
-            top,
-                (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-            height);
+        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
+                        (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
         context.restore();
     }
