@@ -21,8 +21,7 @@ static constexpr auto kRetryRequestDelay = std::chrono::seconds(1);
 } // namespace
 
 class FtConnectSystemToCloud:
-    public MediaServerCloudIntegrationTest,
-    public ::testing::Test
+    public MediaServerCloudIntegrationTest
 {
 protected:
     void whenSetCloudSystemIdToEmptyString()
@@ -121,7 +120,7 @@ protected:
 };
 
 // TODO: #ak CLOUD-734
-TEST_F(FtConnectSystemToCloudOnlyCloudOwner, DISABLED_removing_cloud_system_id_resets_system_to_new_state)
+TEST_P(FtConnectSystemToCloudOnlyCloudOwner, DISABLED_removing_cloud_system_id_resets_system_to_new_state)
 {
     givenServerConnectedToTheCloud();
 
@@ -147,7 +146,7 @@ protected:
 };
 
 // TODO: #ak CLOUD-734
-TEST_F(FtConnectSystemToCloudWithLocalOwner, DISABLED_removing_cloud_system_id_cleans_up_cloud_data)
+TEST_P(FtConnectSystemToCloudWithLocalOwner, DISABLED_removing_cloud_system_id_cleans_up_cloud_data)
 {
     givenServerConnectedToTheCloud();
 
@@ -250,7 +249,7 @@ private:
     }
 };
 
-TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_local_admin_present)
+TEST_P(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_local_admin_present)
 {
     givenServerWithLocalAdminConnectedToTheCloud();
 
@@ -260,7 +259,7 @@ TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_loca
     thenCloudAttributesShouldBeRemoved();
 }
 
-TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_cloud_owner_only)
+TEST_P(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_cloud_owner_only)
 {
     givenServerConnectedToTheCloudWithCloudOwnerOnly();
 
@@ -272,7 +271,7 @@ TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_clou
     thenSystemStateShouldBecomeNew();
 }
 
-TEST_F(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
+TEST_P(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
 {
     givenServerConnectedToTheCloudWithCloudOwnerOnly();
     thenAnyRequestShouldAuthWithCloudNonce();
@@ -280,3 +279,7 @@ TEST_F(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
     whenInvokedDetachFromCloudRestMethod();
     thenAnyRequestShouldAuthWithNONCloudNonce();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, FtDisconnectSystemFromCloud,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
