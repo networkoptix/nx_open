@@ -51,6 +51,7 @@ class QnVideowallItemWidget:
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
 public:
     explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QnUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags = 0);
+    virtual ~QnVideowallItemWidget() override;
 
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);

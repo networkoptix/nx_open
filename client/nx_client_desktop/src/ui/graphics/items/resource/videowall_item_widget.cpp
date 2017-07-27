@@ -147,6 +147,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(
 }
 
 
+QnVideowallItemWidget::~QnVideowallItemWidget()
+{
+}
+
 void QnVideowallItemWidget::initInfoOverlay()
 {
     /* Set up overlay widgets. */
