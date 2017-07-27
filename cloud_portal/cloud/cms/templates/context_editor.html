@@ -29,13 +29,12 @@
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
                 <div>
-                    <div>
-                        <label for="Remove_{{field.label}}" style="width:100px;">Remove Image:</label>
-                        <input id="Remove_{{field.label}}" style="margin-top:11px"
-                               type="checkbox" name="Remove_{{field.label}}">
-                    </div>
                     <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}"
                          onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+                    <div>
+                        <label><input id="Remove_{{field.label}}"
+                               type="checkbox" name="Remove_{{field.label}}"> Remove Image</label>
+                    </div>
                 </div>
                 {{ field }}
                 
