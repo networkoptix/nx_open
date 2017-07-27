@@ -27,21 +27,20 @@
     {% for field in form %}
         <div class="form-row">
             {{ field.label_tag }}
-            {{ field }}
-            
-            {% if field.help_text %}
-            <p class="help">{{ field.help_text }}</p>
-            {% endif %}
-            
-            <div>
-                <br>
+            <div id="{{field.label}}" style="display:inline-block;">
                 <div>
-                    <label for="Remove_{{field.label}}">Remove Image</label>
-                    <input id="Remove_{{field.label}}" type="checkbox" name="Remove_{{field.label}}">
+                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}"
+                         onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+                    <div>
+                        <label><input id="Remove_{{field.label}}"
+                               type="checkbox" name="Remove_{{field.label}}"> Remove Image</label>
+                    </div>
                 </div>
-                <h4>Preview for {{field.label}}</h4>
-                <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}"
-                     onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+                {{ field }}
+                
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text }}</p>
+                {% endif %}
             </div>
         </div>
     {% endfor %}
