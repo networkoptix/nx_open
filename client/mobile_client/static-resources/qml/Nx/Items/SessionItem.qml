@@ -14,8 +14,9 @@ Pane
     property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
-    property alias online: informationBlock.online
+    property alias run: informationBlock.online
     property alias ownerDescription: informationBlock.ownerDescription
+    property bool reachable: false
     property bool compatible: true
     property string invalidVersion
 
@@ -119,6 +120,9 @@ Pane
     IssueLabel
     {
         id: issueLabel
+
+        visible: text !== ""
+
         anchors
         {
             bottom: parent.bottom
@@ -126,17 +130,29 @@ Pane
             right: parent.right
             rightMargin: 12
         }
-        color: cloudSystem ? ColorTheme.base14 : ColorTheme.red_main
-        visible: text !== ""
+
+        color:
+        {
+            if (!compatible)
+                return invalidVersion ? ColorTheme.yellow_main : ColorTheme.red_main
+
+            return ColorTheme.base14
+        }
+
+        textColor: compatible ? ColorTheme.contrast8 : ColorTheme.base4
+
         text:
         {
-            if (cloudSystem)
-            {
-                return !online && cloudStatusWatcher.status === QnCloudStatusWatcher.Online
-                    ? qsTr("OFFLINE") : ""
-            }
+            if (!compatible)
+                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE");
 
-            return compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
+            if (!run)
+                return qsTr("OFFLINE")
+
+            if (!reachable)
+                return qsTr("UNREACHABLE")
+
+            return ""
         }
     }
 
