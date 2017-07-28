@@ -12,6 +12,7 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
+#include "multiple_address_connector.h"
 
 namespace nx {
 namespace network {
@@ -92,15 +93,11 @@ private:
         std::deque<AddressEntry> dnsEntries, int port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
-    void connectToEntryAsync(
-        const AddressEntry& dnsEntry, int port,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-
     SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
-    void onDirectConnectDone(SystemError::ErrorCode errorCode);
-    void onCloudConnectDone(
+
+    void onConnectDone(
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> cloudConnection);
+        std::unique_ptr<AbstractStreamSocket> connection);
 
     void cancelIoWhileInAioThread(aio::EventType eventType);
     void stopWhileInAioThread();
@@ -114,6 +111,7 @@ private:
     aio::BasicPollable m_readIoBinder;
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
+    std::unique_ptr<MultipleAddressConnector> m_multipleAddressConnector;
 
     QnMutex m_mutex;
     bool m_terminated;
