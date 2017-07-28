@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from notifications.engines.email_engine import send
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 from PIL import Image
 import base64
@@ -32,12 +34,15 @@ def accept_latest_draft(customization, user):
 
 
 def notify_version_ready(customization, version_id, product_name):
-    super_users = Account.objects.filter(
-        customization=customization, is_superuser=1)
-    for user in super_users:
+    perm = Permission.objects.get(codename='publish_version')
+    users = Account.objects.\
+        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
+        filter(customization=customization, subscribe=True).distinct()
+
+    for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             settings.CUSTOMIZATION)
+             customization)
 
 
 def save_unrevisioned_records(customization, language, data_structures,
