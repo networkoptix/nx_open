@@ -951,8 +951,14 @@ bool QnWorkbenchUi::isTitleVisible() const
 
 void QnWorkbenchUi::setTitleUsed(bool used)
 {
-    if (m_title)
-        m_title->setUsed(used);
+    if (!m_title)
+        return;
+
+    if (m_title->isUsed() == used)
+        return;
+
+    m_title->setUsed(used);
+    updateControlsVisibility(false);
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate)
@@ -1332,7 +1338,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         });
 
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+        [this](){ updateControlsVisibility(false); });
 }
 
 #pragma endregion Timeline methods

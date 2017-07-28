@@ -1497,8 +1497,8 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         && !workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::FillViewport);
 
     static const qreal d = 0.015;
-    if (adjustSpace)
-        sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
+     if (adjustSpace)
+         sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
 
     return workbench()->mapper()->mapFromGridF(sceneBoundingRect);
 }
