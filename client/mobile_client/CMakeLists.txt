@@ -220,19 +220,6 @@ if(IOS)
         COMMENT "Copying QML imports"
     )
 
-    set(ipa_file_name "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
-    set(payload_dir "$<CONFIGURATION>/Payload/mobile_client.app")
-
-    add_custom_target(mobile_client_ipa ALL
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${payload_dir}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${payload_dir}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${app_dir}" "${payload_dir}"
-        COMMAND
-            cd "$<CONFIGURATION>"
-                && ${CMAKE_COMMAND} -E tar cfv "${ipa_file_name}" --format=zip "Payload"
-        DEPENDS mobile_client
-        BYPRODUCTS "${ipa_file_name}"
-        VERBATIM
-        COMMENT "Creating ${ipa_file_name}"
-    )
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client
+        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
 endif()
