@@ -1519,11 +1519,22 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     videoWall->setId(QnUuid::createUuid());
     videoWall->setName(proposedName);
 
-    qnResourcesChangesManager->saveVideoWall(videoWall,
-        [](const QnVideoWallResourcePtr &videoWall)
+    // No need to backup newly created videowall.
+    auto applyChangesFunction = QnResourcesChangesManager::VideoWallChangesFunction();
+    auto callbackFunction =
+        [this](bool success, const QnVideoWallResourcePtr& videoWall)
         {
-            Q_UNUSED(videoWall);
-        });
+            // Cannot capture the resource directly because real resource pointer may differ if the
+            // transaction will be received before the request callback.
+            NX_EXPECT(videoWall);
+            if (success && videoWall)
+            {
+                menu()->trigger(action::SelectNewItemAction, videoWall);
+                menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            }
+        };
+
+    qnResourcesChangesManager->saveVideoWall(videoWall, applyChangesFunction, callbackFunction);
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
@@ -2763,7 +2774,7 @@ void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& vi
     if (saveLayout && QnWorkbenchLayout::instance(videowall))
         saveVideowallAndReviewLayout(videowall);
     else
-        qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
+        qnResourcesChangesManager->saveVideoWall(videowall);
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout)
@@ -3121,5 +3132,5 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
             return;
     }
 
-    qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
+    qnResourcesChangesManager->saveVideoWall(videowall);
 }

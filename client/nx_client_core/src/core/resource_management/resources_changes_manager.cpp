@@ -49,11 +49,14 @@ QPointer<QThread> threadGuard()
 }
 
 using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode errorCode)>;
-using GenericCallbackFunction = std::function<void(bool)>;
+
+template<typename ResourceType>
+using ResourceCallbackFunction = std::function<void(bool, const QnSharedResourcePointer<ResourceType>&)>;
+
 template<typename ResourceType, typename BackupType>
 ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
     QnSharedResourcePointer<ResourceType> resource,
-    GenericCallbackFunction callback = GenericCallbackFunction())
+    ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
 {
     QPointer<QnResourcesChangesManager> guard(manager);
     const auto sessionGuid = manager->commonModule()->runningInstanceGUID();
@@ -89,7 +92,25 @@ ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
             }
 
             if (thread && callback)
-                executeInThread(thread, [callback, success]() { callback(success); });
+            {
+                executeInThread(thread,
+                    [guard, sessionGuid ,callback, success, resource]()
+                    {
+                        if (!guard)
+                            return;
+
+                        // Check if we have already changed session.
+                        if (guard->commonModule()->runningInstanceGUID() != sessionGuid)
+                            return;
+
+                        // Resource could be added by transaction message bus, so shared pointer
+                        // will differ (if we have created a new resource).
+                        auto updatedResource = guard->resourcePool()->
+                            getResourceById<ResourceType>(resource->getId());
+
+                        callback(success, updatedResource);
+                    });
+            }
 
             if (!success)
                 emit guard->saveChangesFailed({{resource}});
@@ -404,13 +425,13 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
 void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     UserChangesFunction applyChanges,
-    GenericCallbackFunction callback)
+    UserCallbackFunction callback)
 {
     const auto safeCallback = safeProcedure(callback);
 
     if (!applyChanges)
     {
-        safeCallback(false);
+        safeCallback(false, user);
         return;
     }
 
@@ -421,7 +442,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     auto connection = commonModule()->ec2Connection();
     if (!connection)
     {
-        safeCallback(false);
+        safeCallback(false, user);
         return;
     }
 
@@ -562,11 +583,8 @@ void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
 
 void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
     VideoWallChangesFunction applyChanges,
-    GenericCallbackFunction callback)
+    VideoWallCallbackFunction callback)
 {
-    if (!applyChanges)
-        return;
-
     NX_ASSERT(videoWall);
     if (!videoWall)
         return;
@@ -578,7 +596,8 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
     auto replyProcessor = makeReplyProcessor<QnVideoWallResource, ec2::ApiVideowallData>(this,
         videoWall, callback);
 
-    applyChanges(videoWall);
+    if (applyChanges)
+        applyChanges(videoWall);
     ec2::ApiVideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
@@ -588,7 +607,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
 
 void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
     LayoutChangesFunction applyChanges,
-    GenericCallbackFunction callback)
+    LayoutCallbackFunction callback)
 {
     if (!applyChanges)
         return;
@@ -613,11 +632,8 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
 
 void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     WebPageChangesFunction applyChanges,
-    GenericCallbackFunction callback)
+    WebPageCallbackFunction callback)
 {
-    if (!applyChanges)
-        return;
-
     NX_ASSERT(webPage);
     if (!webPage)
         return;
@@ -629,7 +645,8 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     auto replyProcessor = makeReplyProcessor<QnWebPageResource, ec2::ApiWebPageData>(this,
         webPage, callback);
 
-    applyChanges(webPage);
+    if (applyChanges)
+        applyChanges(webPage);
     ec2::ApiWebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
 
