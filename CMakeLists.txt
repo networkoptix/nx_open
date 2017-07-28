@@ -138,7 +138,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    add_subdirectory(traytool)
     add_subdirectory(wixsetup)
 endif()
 
@@ -157,13 +156,17 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTrayTool)
+    add_subdirectory(traytool)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
 if(withTests)
-#    add_subdirectory(unit_tests)
-#    add_subdirectory(tests)
+    #add_subdirectory(unit_tests)
+    #add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)
