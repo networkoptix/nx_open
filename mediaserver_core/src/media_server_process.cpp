@@ -2339,7 +2339,7 @@ void MediaServerProcess::serviceModeInit()
         cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
