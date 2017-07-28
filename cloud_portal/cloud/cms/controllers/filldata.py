@@ -51,7 +51,7 @@ def iterate_cms_files(customization_name, ignore_not_english):
 
 
 def process_context_structure(customization, context, content,
-                              language, version_id):
+                              language, version_id, preview):
     for record in context.datastructure_set.all():
         content_record = None
         content_value = None
@@ -94,8 +94,10 @@ def process_context_structure(customization, context, content,
             content = content.replace(record.name, content_value)
         elif content_record.exists():
             image_storage = os.path.join('static', customization.name)
-            convert_b64_image_to_png(
-                content_record.latest('version_id'), image_storage)
+            if preview:
+                image_storage = os.path.join(image_storage, 'preview')
+
+            convert_b64_image_to_png(content_value, record.name, image_storage)
     return content
 
 
@@ -118,13 +120,13 @@ def process_file(source_file, customization, product_id, preview, version_id):
 
     if context.exists() and language:
         content = process_context_structure(
-            customization, context.first(), content, language, version_id)
+            customization, context.first(), content, language, version_id, preview)
     if branding_context.exists():
         content = process_context_structure(
-            customization, branding_context.first(), content, None, version_id)
+            customization, branding_context.first(), content, None, version_id, preview)
     if email_context.exists():
         content = process_context_structure(
-            customization, email_context.first(), content, None, version_id)
+            customization, email_context.first(), content, None, version_id, preview)
 
     filename = context_name
     if language_code:
@@ -192,13 +194,13 @@ def fill_content(customization_name='default', product='cloud_portal',
     generate_languages_json(customization_name, preview)
 
 
-def convert_b64_image_to_png(record, storage_location):
-    if not record.value:
+def convert_b64_image_to_png(value, filename, storage_location):
+    if not value:
         return
 
-    file_name = os.path.join(storage_location, record.data_structure.name)
+    file_name = os.path.join(storage_location, filename)
     make_dir(file_name)
-    image_png = base64.b64decode(record.value)
+    image_png = base64.b64decode(value)
 
     with open(file_name, 'wb') as f:
         f.write(image_png)
