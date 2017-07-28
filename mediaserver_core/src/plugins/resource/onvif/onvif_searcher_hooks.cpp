@@ -1,6 +1,11 @@
 #include "onvif_searcher_hooks.h"
 #if defined(ENABLE_ONVIF)
 
+#include <core/resource/param.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 namespace nx {
 namespace plugins {
 namespace onvif {
@@ -117,6 +122,37 @@ void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo)
     }
 }
 
+void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo)
+{
+    auto& currentManufacturer = outInfo->manufacturer;
+    const auto& model = outInfo->name;
+
+    auto resourceData = qnStaticCommon->dataPool()->data(currentManufacturer, model);
+    auto manufacturerReplacement = resourceData.value(Qn::ONVIF_MANUFACTURER_REPLACEMENT, QString());
+
+    if (manufacturerReplacement.isEmpty())
+        return;
+
+    currentManufacturer = manufacturerReplacement;
+}
+
+void pelcoModelNormalization(EndpointAdditionalInfo* outInfo)
+{
+    const auto& manufacturer = outInfo->manufacturer;
+    auto& model = outInfo->name;
+
+    bool isPelcoOptera = manufacturer.toLower() == lit("pelcooptera")
+        && model.toLower().startsWith(lit("imm"));
+
+    if (!isPelcoOptera)
+        return;
+
+    auto split =  model.split(L'-');
+    if (split.size() < 2)
+        return;
+
+    model = split[0];
+}
 
 } // namespace searcher_hooks
 } // namespace onvif
