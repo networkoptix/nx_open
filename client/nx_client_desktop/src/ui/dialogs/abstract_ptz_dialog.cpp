@@ -178,7 +178,7 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
     if (m_commands.isEmpty())
         return;
 
-    //TODO: #GDM #PTZ check against validity of data, show error message later if not valid.
+    // TODO: #GDM #PTZ check against validity of data, show error message later if not valid.
     auto pos = m_commands.find(command);
     if (pos == m_commands.end())
         return;

@@ -169,7 +169,7 @@ public:
 
     QRectF rect;
     QRect sceneBoundingRect;
-    QHash<QString, QImage> imagesMemCache;  //TODO: #GDM #Common #High replace with QCache
+    QHash<QString, QImage> imagesMemCache;  // TODO: #GDM #Common #High replace with QCache
 
     #if defined(NATIVE_PAINT_BACKGROUND)
         bool imgUploaded = false;
@@ -504,7 +504,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 
     //adding stride to source data
-    //TODO: #ak it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
+    // TODO: #ak it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
     const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)imgToLoad->width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
     quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*imgToLoad->height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
     //copying image data to aligned buffer

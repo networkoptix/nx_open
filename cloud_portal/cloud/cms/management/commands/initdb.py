@@ -44,19 +44,24 @@ def init_cms_db():
             continue
         if os.path.isdir(os.path.join(STATIC_DIR, custom)):
             # read languages and languages in customizations
-            language_json_filename = os.path.join(STATIC_DIR, custom, 'source/static/languages.json')
+            language_json_filename = os.path.join(
+                STATIC_DIR, custom, 'source/static/languages.json')
             with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
                 data = json.load(file_descriptor)
 
                 for lang in data:
-                    language = find_or_add_language(lang["name"], lang["language"])
+                    language = find_or_add_language(
+                        lang["name"], lang["language"])
                     customization = find_or_add_customization(custom, language)
-                    find_or_add_language_to_customization(language, customization)
+                    find_or_add_language_to_customization(
+                        language, customization)
 
 
 class Command(BaseCommand):
-    help = 'Creates initial records for CMS in the database (customizations, languages, products)'
+    help = 'Creates initial records for CMS in the\
+     database (customizations, languages, products)'
 
     def handle(self, *args, **options):
         init_cms_db()
-        self.stdout.write(self.style.SUCCESS('Successfully initiated database records for CMS'))
+        self.stdout.write(self.style.SUCCESS(
+            'Successfully initiated database records for CMS'))

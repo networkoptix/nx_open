@@ -19,8 +19,9 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/actions/common_action.h>
-
 #include <utils/common/synctime.h>
 
 namespace
@@ -248,7 +249,7 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
 
 
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
-    QnCommonModule* /*commonModule*/,
+    QnCommonModule* commonModule,
     QnUpdateBookmarkRequestContext &context,
     const QnUuid& authorityUser)
 {
@@ -261,18 +262,23 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     if (!qnServerDb->addBookmark(bookmark))
         return false;
 
-    if (context.request().businessRuleId.isNull())
+    const auto ruleId = context.request().businessRuleId;
+    const auto rule = commonModule->eventRuleManager()->rule(ruleId);
+    if (!rule)
         return true;
 
     nx::vms::event::EventParameters runtimeParams;
     runtimeParams.eventResourceId = bookmark.cameraId;
     runtimeParams.eventTimestampUsec = bookmark.startTimeMs * 1000;
-    runtimeParams.eventType = context.request().eventType;
+
+    runtimeParams.eventType = rule
+        ? rule->eventType()
+        : nx::vms::event::EventType::undefinedEvent;
 
     const auto action = nx::vms::event::CommonAction::create(
         nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
 
-    action->setRuleId(context.request().businessRuleId);
+    action->setRuleId(ruleId);
 
     auto& actionParams = action->getParams();
     actionParams.actionResourceId = authorityUser;

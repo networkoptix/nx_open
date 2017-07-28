@@ -337,8 +337,6 @@ protected:
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
-    void updateWidgetsFrameOpacity();
-
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
 protected slots:

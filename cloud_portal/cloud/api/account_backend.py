@@ -2,13 +2,14 @@ from django.utils import timezone
 from django import db
 import models
 from api.controllers.cloud_api import Account
+from django.contrib.auth.backends import ModelBackend
 from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 
 from cloud import settings
 
 
-class AccountBackend(object):
+class AccountBackend(ModelBackend):
     @staticmethod
     def check_email_in_portal(email, check_email_exists):
         mail_exists = models.Account.objects.filter(email=email.lower()).count() > 0

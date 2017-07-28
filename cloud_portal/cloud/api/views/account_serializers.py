@@ -49,7 +49,7 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
 class AccountSerializer(serializers.ModelSerializer):  # ModelSerializer
     class Meta:
         model = Account
-        fields = ('email', 'first_name', 'last_name', 'subscribe', 'language')
+        fields = ('email', 'first_name', 'last_name', 'subscribe', 'language', 'is_staff')
 
 
 class AccountUpdateSerializer(serializers.ModelSerializer):  # ModelSerializer

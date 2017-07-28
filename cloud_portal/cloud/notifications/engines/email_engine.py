@@ -4,7 +4,8 @@ from django.core.mail import EmailMultiAlternatives
 # from email.mime.image import MIMEImage  # python 3
 from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
-import json, os
+import json
+import os
 from util.config import get_config
 from util.helpers import get_language_for_email
 
@@ -13,13 +14,15 @@ titles_cache = {}
 templates_cache = {}
 configs_cache = {}
 logos_cache = {}
+modified_file_time_cache = {}
 
 
 def send(email, msg_type, message, customization):
     custom_config = get_custom_config(customization)
     lang = get_language_for_email(email, custom_config['languages'])
 
-    templates_root = os.path.join(settings.STATIC_LOCATION, customization, "templates")
+    templates_root = os.path.join(
+        settings.STATIC_LOCATION, customization, "templates")
     templates_location = os.path.join(templates_root, "lang_" + lang)
     subject = msg_type
 
@@ -27,17 +30,21 @@ def send(email, msg_type, message, customization):
         'portal_url': custom_config['cloud_portal']['url']
     }
 
-    subject = custom_config["mail_prefix"] + ' ' + get_email_title(customization, lang, msg_type, templates_location)
+    subject = custom_config["mail_prefix"] + ' ' + \
+        get_email_title(customization, lang, msg_type, templates_location)
     subject = pystache.render(subject, {"message": message, "config": config})
 
     message_html_template = read_template(msg_type, templates_location, True)
     message_txt_template = read_template(msg_type, templates_location, False)
 
-    email_html_body = pystache.render(message_html_template, {"message": message, "config": config})
-    email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
+    email_html_body = pystache.render(
+        message_html_template, {"message": message, "config": config})
+    email_txt_body = pystache.render(
+        message_txt_template, {"message": message, "config": config})
     email_from = custom_config["mail_from"]
 
-    msg = EmailMultiAlternatives(subject, email_txt_body, email_from, to=(email,))
+    msg = EmailMultiAlternatives(
+        subject, email_txt_body, email_from, to=(email,))
     msg.content_subtype = 'plain'  # Main content is now text/html
     msg.attach_alternative(email_html_body, "text/html")
 
@@ -63,7 +70,8 @@ def get_email_title(customization, lang, event, templates_location):
     if customization not in titles_cache:
         titles_cache[customization] = {}
     if lang not in titles_cache[customization]:
-        filename = os.path.join(templates_location, "notifications-language.json")
+        filename = os.path.join(
+            templates_location, "notifications-language.json")
         with open(filename) as data_file:
             titles_cache[customization][lang] = json.load(data_file)
     return titles_cache[customization][lang][event]["emailSubject"]
@@ -85,7 +93,17 @@ def read_template(name, location, html):
 
 
 def read_logo(filename):
-    if filename not in logos_cache:
+    global modified_file_time_cache, logos_cache
+
+    # os.stat(filename)[8] gets the modified time for the file
+    # If the file is not cached then it needs to be added
+    # If the file is cached but the modified time is different from the time
+    # that was saved then it needs to be updated
+    if filename not in logos_cache or filename in modified_file_time_cache\
+            and os.stat(filename)[8] != modified_file_time_cache[filename]:
         with open(filename, 'rb') as fp:
             logos_cache[filename] = fp.read()
+        # After the file has been updated safe the modified time to the
+        # modified_file_time_cache
+        modified_file_time_cache[filename] = os.stat(filename)[8]
     return logos_cache[filename]

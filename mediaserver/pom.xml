@@ -126,7 +126,6 @@
                 <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lquazip -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lFestival -lestools -leststring -lestbase</global.libs>
                 <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
                 <linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar -lldap</linux.arm.oslibs>
-	        <rdep.linux.packages>festival-2.1 any/festival-vox-2.1x</rdep.linux.packages>
             </properties>
         </profile>
     </profiles>

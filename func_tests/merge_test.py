@@ -5,8 +5,8 @@
 import time
 import logging
 import pytest
-from test_utils.utils import bool_to_str, str_to_bool
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.server_rest_api import ServerRestApiError, HttpError
 import server_api_data_generators as generator
 
@@ -36,8 +36,8 @@ def change_bool_setting(server, setting):
 
 
 def wait_for_settings_merge(one, two):
-    t = time.time()
-    while time.time() - t < MEDIASERVER_MERGE_TIMEOUT_SEC:
+    start_time = datetime_utc_now()
+    while datetime_utc_now() - start_time < MEDIASERVER_MERGE_TIMEOUT:
         one.load_system_settings()
         two.load_system_settings()
         if one.settings == two.settings:
@@ -176,7 +176,7 @@ def test_cloud_merge_after_disconnect(server_factory, cloud_host, test_system_se
 
 
 def wait_entity_merge_done(one, two, method, api_object, api_method, expected_resources):
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         result_1 = one.rest_api.get_api_fn(method, api_object, api_method)()
         result_2 = two.rest_api.get_api_fn(method, api_object, api_method)()
@@ -184,9 +184,9 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
             got_resources = [v['id'] for v in result_1 if v['id'] in expected_resources]
             assert got_resources == expected_resources
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             assert result_1 == result_2
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 def test_merge_resources(server_factory):
     one = server_factory('one')

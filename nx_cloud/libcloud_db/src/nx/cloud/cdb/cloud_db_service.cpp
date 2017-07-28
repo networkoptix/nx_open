@@ -67,9 +67,10 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
+    auto logSettings = settings.vmsSynchronizationLogging();
+    logSettings.updateDirectoryIfEmpty(settings.dataDir());
     nx::utils::log::initialize(
-        settings.vmsSynchronizationLogging(), settings.dataDir(),
-        QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
+        logSettings, QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
         "sync_log", nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     const auto& httpAddrToListenList = settings.endpointsToListen();

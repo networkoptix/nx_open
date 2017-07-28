@@ -62,12 +62,12 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
         return Qn::kValidResult;
     });
 
-    //TODO: #GDM #tr strings duplication
+    // TODO: #GDM #tr strings duplication
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Password cannot be empty.")));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
 
-    //TODO: #GDM #tr strings duplication
+    // TODO: #GDM #tr strings duplication
     ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short System description here."));
     ui->supportInputField->setTitle(tr("Support Signature"));

@@ -251,7 +251,7 @@ IP_WHITELISTS = {
 }
 
 AUTH_USER_MODEL = 'api.Account'
-AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend',)
+AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
@@ -315,3 +315,5 @@ DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
 
 MAX_RETRIES = conf['max_retries']
+
+SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions

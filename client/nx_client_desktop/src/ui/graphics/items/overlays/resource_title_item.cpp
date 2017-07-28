@@ -33,7 +33,7 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     setAcceptedMouseButtons(Qt::NoButton);
     setAutoFillBackground(true);
 
-    static const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); //TODO: #gdm #vkutin #customization
+    static const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #gdm #vkutin #customization
     setPaletteColor(this, QPalette::Window, overlayBackgroundColor);
 
     static const QSizeF kButtonsSize(24, 24);

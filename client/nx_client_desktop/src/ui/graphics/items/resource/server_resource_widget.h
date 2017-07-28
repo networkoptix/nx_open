@@ -86,7 +86,7 @@ private:
 
     bool isLegendVisible() const;
 private:
-    //TODO: #GDM #Common move all required fields to inner class
+    // TODO: #GDM #Common move all required fields to inner class
     friend class StatisticsOverlayWidget;
 
     QnStatisticsColors m_colors;

@@ -40,3 +40,6 @@ QString escapeHtml(const QString& input);
 QString unescapeHtml(const QString& escaped);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
+
+bool mightBeHtml(const QString& text);
+bool mightBeHtml(const QStringList& lines);

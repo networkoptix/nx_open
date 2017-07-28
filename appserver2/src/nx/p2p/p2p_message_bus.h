@@ -391,6 +391,7 @@ public:
     QMap<ApiPersistentIdData, ApiRuntimeData> runtimeInfo() const;
 
     void updateOfflineDistance(
+        const P2pConnectionPtr& connection,
         const ApiPersistentIdData& to,
         int sequence);
 private:

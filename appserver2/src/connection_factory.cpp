@@ -1710,8 +1710,6 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
-    m_bus->init(connectionInfo.p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
-
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         this,
         connectionInfo.serverId(),

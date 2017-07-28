@@ -31,7 +31,7 @@
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>Cloud Account</translation>
     </message>
   </context>
   <context>
@@ -333,7 +333,7 @@
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Videokwaliteit</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -544,7 +544,7 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Knippen</translation>
     </message>
     <message>
       <source>Copy</source>

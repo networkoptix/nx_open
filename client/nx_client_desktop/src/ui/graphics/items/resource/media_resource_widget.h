@@ -45,7 +45,7 @@ class SoftwareTriggerButton;
 } // namespace client
 } // namespace nx
 
-//TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
+// TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
 
 class QnResourceDisplay;
@@ -272,6 +272,11 @@ private:
 
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
+
+    Qn::RenderStatus paintVideoTexture(QPainter* painter,
+        int channel,
+        const QRectF& sourceSubRect,
+        const QRectF& targetRect);
 
 private:
     struct SoftwareTriggerInfo

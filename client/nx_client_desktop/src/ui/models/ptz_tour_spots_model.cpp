@@ -8,7 +8,6 @@
 
 #include <ui/style/globals.h>
 
-#include <nx/client/ptz/ptz_helpers.h>
 #include <nx/utils/collection.h>
 
 namespace {
@@ -105,11 +104,6 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
     endResetModel();
 }
 
-QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const
-{
-    return nx::client::core::ptz::helpers::sortedPresets(m_presets);
-}
-
 const QnPtzPresetList& QnPtzTourSpotsModel::presets() const {
     return m_presets;
 }
@@ -193,7 +187,7 @@ Qt::ItemFlags QnPtzTourSpotsModel::flags(const QModelIndex &index) const {
     case NumberColumn:
         return base_type::flags(index);
     default:
-        return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM #PTZ drag'n'drop?
+        return base_type::flags(index) | Qt::ItemIsEditable; // TODO: #GDM #PTZ drag'n'drop?
     }
 }
 

@@ -168,7 +168,7 @@ Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
 QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourcePtr& camera,
     const QSize& limit)
 {
-    //TODO: #GDM process camera rotation?
+    // TODO: #GDM process camera rotation?
     qreal aspectRatio = kDefaultAspectRatio;
     if (camera)
     {

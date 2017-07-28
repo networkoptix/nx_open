@@ -85,7 +85,7 @@ int MotionDataPicture::planeCount() const
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    //TODO: #ak why are the fields are declared as size_t and getters as int?
+    // TODO: #ak why are the fields are declared as size_t and getters as int?
     return static_cast<int>(m_width);
 }
 
@@ -152,7 +152,7 @@ void MotionDataPicture::setPixel( int x, int y, int val )
 
 void MotionDataPicture::fillRect( int left, int top, int width, int height, int val )
 {
-    //TODO: #ak implementation is not efficient at all
+    // TODO: #ak implementation is not efficient at all
     for( int y = top; y < top + height; ++y )
         for( int x = left; x < left + width; ++x )
             setPixel( x, y, val );

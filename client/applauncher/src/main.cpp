@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
         settings.maxBackupCount = 5;
 
         nx::utils::log::initialize(
-            settings, QString(), QnApplauncherAppInfo::applicationName(), QString(), logFilePath);
+            settings, QnApplauncherAppInfo::applicationName(), QString(), logFilePath);
     }
 
     InstallationManager installationManager;

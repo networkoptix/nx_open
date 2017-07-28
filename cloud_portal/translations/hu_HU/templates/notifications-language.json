@@ -1,6 +1,6 @@
 {
   "activate_account":{
-    "emailSubject":"Fiók nyugtásása"
+    "emailSubject":"Fiók nyugtázása"
   },
   "restore_password":{
     "emailSubject":"Jelszó visszaállítása"
@@ -12,6 +12,6 @@
     "emailSubject":"Hozzáférést kapott {{message.system_name}} videó rendszerhez"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"{{message.id}} verzió készen áll a felülvizsgálatra"
   }
 }

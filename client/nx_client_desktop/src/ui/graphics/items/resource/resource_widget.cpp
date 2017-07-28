@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
@@ -56,6 +57,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 #include <nx/utils/string.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 const qreal kButtonsSize = 24.0;
@@ -213,7 +216,7 @@ QnResourceWidget::~QnResourceWidget()
     ensureAboutToBeDestroyedEmitted();
 }
 
-//TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
+// TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
     addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
@@ -877,7 +880,9 @@ bool QnResourceWidget::isHovered() const
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+void QnResourceWidget::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
     const bool animate = display()->animationAllowed();
 
@@ -912,6 +917,9 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
     updateStatusOverlay(animate);
+
+    if (qFuzzyIsNull(item()->layout()->cellSpacing()))
+        paintInnerFrame(painter);
 
     emit painted();
 }
@@ -986,23 +994,43 @@ void QnResourceWidget::paintWindowFrame(
     const QStyleOptionGraphicsItem* option,
     QWidget* /*widget*/)
 {
-    const auto paintRect = option->exposedRect & rect();
-    if (!paintRect.isEmpty())
-        painter->fillRect(paintRect, palette().window());
-
-    if (qFuzzyIsNull(m_frameOpacity))
+    if (qFuzzyIsNull(m_frameOpacity) || qFuzzyIsNull(item()->layout()->cellSpacing()))
         return;
 
+    int mainBorderWidth = 1;
+
+    switch (m_selectionState)
+    {
+        case SelectionState::invalid:
+        case SelectionState::notSelected:
+            return;
+
+        case SelectionState::inactiveFocused:
+        case SelectionState::focused:
+        case SelectionState::focusedAndSelected:
+            mainBorderWidth = 2;
+            break;
+        case SelectionState::selected:
+            break;
+    }
+
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
-    static const int kFramePadding = 1;
+
+    // Dark outer border right near the camera.
+    static const int kSpacerBorderWidth = 1;
+    const QColor spacerBorderColor = qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(3);
+    QnNxStyle::paintCosmeticFrame(painter, rect(), spacerBorderColor, kSpacerBorderWidth,
+        -kSpacerBorderWidth);
+
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
-        -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
+        mainBorderWidth, -kSpacerBorderWidth - mainBorderWidth);
 }
 
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
     const QRectF& /*channelRect*/, const QRectF& paintRect)
 {
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
+    const PainterTransformScaleStripper scaleStripper(painter);
+    painter->fillRect(scaleStripper.mapRect(paintRect), palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
 }
 
@@ -1016,6 +1044,33 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
 
     painter->fillRect(rect,
         toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), kSelectionOpacity));
+}
+
+void QnResourceWidget::paintInnerFrame(QPainter* painter)
+{
+    if (qFuzzyIsNull(m_frameOpacity))
+        return;
+
+    NX_EXPECT(qFuzzyIsNull(item()->layout()->cellSpacing()));
+
+    static const int kInnerBorderWidth = 2;
+
+    switch (m_selectionState)
+    {
+        case SelectionState::invalid:
+        case SelectionState::notSelected:
+        case SelectionState::selected:
+            return;
+
+        case SelectionState::inactiveFocused:
+        case SelectionState::focused:
+        case SelectionState::focusedAndSelected:
+            break;
+    }
+
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
+    QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
+        kInnerBorderWidth, 0);
 }
 
 float QnResourceWidget::defaultAspectRatio() const

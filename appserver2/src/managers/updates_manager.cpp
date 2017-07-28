@@ -34,7 +34,7 @@ namespace ec2 {
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction, NotificationSource /*source*/)
     {
         NX_ASSERT(transaction.command == ApiCommand::installUpdate);
-        //TODO: #2.4 #rvasilenko #dklychkov Implement a mechanism to determine the transaction was successfully sent to the other peers, then emit this signal.
+        // TODO: #2.4 #rvasilenko #dklychkov Implement a mechanism to determine the transaction was successfully sent to the other peers, then emit this signal.
         emit updateInstallationRequested(transaction.params.updateId);
     }
 
