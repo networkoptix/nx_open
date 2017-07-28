@@ -32,5 +32,10 @@ class AccountAdmin(CMSAdmin):
             qs = qs.filter(customization=settings.CUSTOMIZATION)
         return qs
 
+    def has_add_permission(self, request):  # No adding users in admin
+        return False
+
+    def has_delete_permission(self, request, obj=None):  # No deleting users at all
+        return False
 
 admin.site.register(Account, AccountAdmin)
