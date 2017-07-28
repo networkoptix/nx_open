@@ -1724,12 +1724,11 @@ void QnTimeSlider::updateToolTipText()
     {
         static const QString tooltipFormatDate = lit("dd MMMM yyyy");
         static const QString tooltipFormatTimeLong = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeLongAP = lit("h:mm:ss ap");
         static const QString tooltipFormatTimeShort = lit("mm:ss");
 
         const bool ampm = m_locale.timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
-        const QString tooltipFormatTime = ampm
-            ? lit("h:mm:ss ap")
-            : tooltipFormatTimeLong;
+        const auto tooltipFormatTime = ampm ? tooltipFormatTimeLongAP : tooltipFormatTimeLong;
 
         if (m_options.testFlag(UseUTC))
         {

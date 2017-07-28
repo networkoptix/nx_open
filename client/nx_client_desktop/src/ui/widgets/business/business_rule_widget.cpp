@@ -352,39 +352,38 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
     {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
 
-        MimeData data(de->mimeData());
-        m_dropResources = resourcePool()->getResources(data.getIds());
-        if (!m_dropResources.empty())
+        m_mimeData.reset(new MimeData{de->mimeData(), resourcePool()});
+        if (!m_mimeData->resources().empty())
             de->acceptProposedAction();
         return true;
     }
     else if (event->type() == QEvent::Drop)
     {
         QDropEvent* de = static_cast<QDropEvent*>(event);
-        if (!m_dropResources.empty())
+        if (!m_mimeData->resources().empty())
         {
             if (object == ui->eventDefinitionGroupBox)
             {
                 auto resources = m_model->eventResources();
-                for (const auto &res: m_dropResources)
+                for (const auto &res: m_mimeData->resources())
                     resources << res->getId();
                 m_model->setEventResources(resources);
             }
             else if (object == ui->actionDefinitionGroupBox)
             {
                 auto resources = m_model->actionResources();
-                for (const auto& res: m_dropResources)
+                for (const auto& res: m_mimeData->resources())
                     resources << res->getId();
                 m_model->setActionResources(resources);
             }
-            m_dropResources = QnResourceList();
+            m_mimeData.reset();
             de->acceptProposedAction();
         }
         return true;
     }
     else if (event->type() == QEvent::DragLeave)
     {
-        m_dropResources = QnResourceList();
+        m_mimeData.reset();
         return true;
     }
 

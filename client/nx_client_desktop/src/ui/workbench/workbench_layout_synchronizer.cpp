@@ -216,20 +216,27 @@ void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
     m_layout->setName(m_resource->getName());
 }
 
-void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &itemData) {
-    if(!m_update)
+void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResourcePtr& /*layout*/,
+    const QnLayoutItemData& itemData)
+{
+    if (!m_update)
         return;
 
-    if(m_layout->item(itemData.uuid) != NULL)
-        return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
+    /*
+     * Check if was called back from at_layout_itemAdded because of layout resource living in a
+     * different thread.
+     */
+    if (m_layout->item(itemData.uuid))
+        return;
 
-    if (!resourcePool()->getResourceByDescriptor(itemData.resource))
+    const auto resource = resourcePool()->getResourceByDescriptor(itemData.resource);
+    if (!resource)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
-    QnWorkbenchItem *item = new QnWorkbenchItem(itemData, this);
+    auto item = new QnWorkbenchItem(resource, itemData, this);
     m_layout->addItem(item);
-    if(QnWorkbenchItem *zoomTargetItem = m_layout->item(itemData.zoomTargetUuid))
+    if (auto zoomTargetItem = m_layout->item(itemData.zoomTargetUuid))
         m_layout->addZoomLink(item, zoomTargetItem);
 }
 

@@ -59,9 +59,16 @@ public:
     /**
      * This function will add or update existing resources.
      * By default it add resources to the mainPool. if mainPoos parameter is false then resources are put to
-     * the incompatible resource pool.
+     * the incompatible resource pool. Adding transaction is always skipped here.
      */
     void addResources(const QnResourceList &resources, AddResourceFlags flags = NoAddResourceFlags);
+
+    /**
+     * Add only those resources which are not belong to any resource pool. Existing resources are
+     * not updated.
+     */
+    void addNewResources(const QnResourceList &resources,
+        AddResourceFlags flags = NoAddResourceFlags);
 
     void addResource(const QnResourcePtr& resource, AddResourceFlags flags = NoAddResourceFlags);
 

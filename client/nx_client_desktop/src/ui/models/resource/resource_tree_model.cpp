@@ -418,7 +418,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (!isAdmin)
             return bastardNode;
 
-        return m_systemHasManyServers
+        return m_systemHasManyServers || m_scope == CamerasScope
             ? m_rootNodes[Qn::ServersNode]
             : rootNode;
     }
@@ -678,7 +678,8 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
      */
     bool pureTreeResourcesOnly = true;
 
-    QSet<QnUuid> ids;
+    QSet<QnUuid> entities;
+    QSet<QnResourcePtr> resources;
 
     for (const auto& index: indexes)
     {
@@ -690,32 +691,31 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
         {
             case Qn::RecorderNode:
             {
-                for (auto child : node->children())
+                for (auto child: node->children())
                 {
                     if (auto res = child->resource())
-                        ids.insert(res->getId());
+                        resources.insert(res);
                 }
                 break;
             }
             case Qn::VideoWallItemNode:
             case Qn::LayoutTourNode:
-                ids << node->uuid();
+                entities << node->uuid();
                 break;
             case Qn::LayoutItemNode:
                 pureTreeResourcesOnly = false;
                 break;
         }
 
-        if (node->resource())
-            ids.insert(node->resource()->getId());
+        if (auto res = node->resource())
+            resources.insert(res);
     }
 
-    MimeData data(mimeData);
-    data.setIds(ids.toList());
-    data.toMimeData(mimeData);
-
-    mimeData->setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
-    return mimeData;
+    MimeData data(mimeData, resourcePool());
+    data.setEntities(entities.toList());
+    data.setResources(resources.toList());
+    data.setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
+    return data.createMimeData();
 }
 
 bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
@@ -773,13 +773,13 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
 
     /* Decode. */
     // Resource tree drop is working only for resources that are already in the pool.
-    MimeData data(mimeData);
-    const auto ids = data.getIds();
+    MimeData data(mimeData, resourcePool());
+    resourcePool()->addNewResources(data.resources());
 
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
-        const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
+        const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(data.entities());
 
         action::Parameters parameters;
         if (!videoWallItems.empty())
@@ -788,14 +788,14 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         }
         else
         {
-            parameters = resourcePool()->getResources(ids);
+            parameters = data.resources();
         }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == Qn::RoleNode)
     {
-        auto layoutsToShare = resourcePool()->getResources(ids).filtered<QnLayoutResource>(
+        auto layoutsToShare = data.resources().filtered<QnLayoutResource>(
             [](const QnLayoutResourcePtr& layout)
             {
                 return !layout->isFile();
@@ -814,7 +814,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     }
     else
     {
-        handleDrop(resourcePool()->getResources(ids), node->resource(), mimeData);
+        handleDrop(data.resources(), node->resource(), mimeData);
     }
 
     return true;
@@ -989,7 +989,10 @@ void QnResourceTreeModel::rebuildTree()
     }
 }
 
-void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)
+void QnResourceTreeModel::handleDrop(
+    const QnResourceList& sourceResources,
+    const QnResourcePtr& targetResource,
+    const QMimeData* mimeData)
 {
     if (sourceResources.isEmpty() || !targetResource)
         return;

@@ -336,9 +336,9 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
                     camera->setPreferredServerId(camera->getParentId());
         };
 
-    auto rollback = [this, cameras]()
+    auto callback = [this, cameras](bool success)
         {
-            if (!isVisible())
+            if (!isVisible() || success)
                 return;
 
             if (m_settingsWidget->cameras() != cameras)
@@ -347,7 +347,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
             m_settingsWidget->updateFromResources();
         };
 
-    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, rollback);
+    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, callback);
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked()

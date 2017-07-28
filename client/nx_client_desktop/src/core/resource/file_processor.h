@@ -1,5 +1,4 @@
-#ifndef QN_FILE_PROCESSOR_H
-#define QN_FILE_PROCESSOR_H
+#pragma once
 
 #include <QtCore/QList>
 #include <QtCore/QUrl>
@@ -20,7 +19,13 @@ public:
     static QnResourcePtr createResourcesForFile(const QString& fileName);
     static QnResourceList createResourcesForFiles(const QStringList &files);
 
+    /**
+     * Function creates a set of resources for the given filepaths. If resource pool is provided,
+     * existing resources can be returned. Resources are not added to the pool automatically.
+     */
+    static QnResourceList findOrCreateResourcesForFiles(
+        const QList<QUrl>& urls,
+        QnResourcePool* resourcePool);
+
     static void deleteLocalResources(const QnResourceList &resources);
 };
-
-#endif // QN_FILE_PROCESSOR_H

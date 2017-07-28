@@ -13,6 +13,7 @@
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
@@ -109,7 +110,7 @@ public:
     QnToolButton* newTabButton;
     QnToolButton* currentLayoutsButton;
     QnCloudStatusPanel* cloudPanel;
-    QnResourceList dropResources;
+    std::unique_ptr<MimeData> mimeData;
     bool skipDoubleClickFlag;
     QSharedPointer<QMenu> mainMenuHolder;
 };
@@ -285,17 +286,9 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 
 void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-    // Scene drop is working only for resources that are already in the pool.
-    MimeData data(event->mimeData());
-    const auto ids = data.getIds();
-
-    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto resources = resourcePool->getResources(ids);
-
     Q_D(QnMainWindowTitleBarWidget);
-    d->dropResources = resources.filtered(QnResourceAccessFilter::isDroppable);
-
-    if (d->dropResources.empty())
+    d->mimeData.reset(new MimeData{event->mimeData(), resourcePool()});
+    if (d->mimeData->isEmpty())
         return;
 
     event->acceptProposedAction();
@@ -304,7 +297,7 @@ void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 void QnMainWindowTitleBarWidget::dragMoveEvent(QDragMoveEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    if (d->dropResources.empty())
+    if (d->mimeData->isEmpty())
         return;
 
     if (!qBetween(d->tabBar->pos().x(), event->pos().x(), d->cloudPanel->pos().x()))
@@ -313,17 +306,27 @@ void QnMainWindowTitleBarWidget::dragMoveEvent(QDragMoveEvent* event)
     event->acceptProposedAction();
 }
 
-void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* event)
+void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/)
 {
-    Q_UNUSED(event);
     Q_D(QnMainWindowTitleBarWidget);
-    d->dropResources = QnResourceList();
+    d->mimeData.reset();
 }
 
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    menu()->trigger(action::OpenInNewTabAction, d->dropResources);
+    if (d->mimeData->isEmpty())
+        return;
+
+    const auto layoutTours = layoutTourManager()->tours(d->mimeData->entities());
+    for (const auto& tour: layoutTours)
+        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
+
+    resourcePool()->addNewResources(d->mimeData->resources());
+
+    menu()->triggerIfPossible(action::OpenInNewTabAction, d->mimeData->resources());
+
+    d->mimeData.reset();
     event->acceptProposedAction();
 }
 
