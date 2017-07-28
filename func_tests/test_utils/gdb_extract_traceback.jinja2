@@ -1,0 +1,14 @@
+set solib-search-path {{ LIB_DIR }}
+file {{ BIN_PATH }}
+core {{ CORE_PATH }}
+set print static-members off
+echo \n
+echo -- current thread backtrace --\n
+bt
+echo \n
+echo -- backtraces of all threads --\n
+thread apply all backtrace
+echo \n
+echo -- full backtraces of all threads --\n
+thread apply all backtrace full
+quit

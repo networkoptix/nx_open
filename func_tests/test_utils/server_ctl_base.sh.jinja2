@@ -37,15 +37,15 @@ function stop() {
 	if kill -0 $PID 2> /dev/null; then
 		echo "Sending SIGTERM to server PID $PID..."
 		kill -SIGTERM $PID
-		if wait_until_process_is_dead $PID 10; then
+		if wait_until_process_is_dead $PID $STOP_TIMEOUT_SEC; then
 			echo "Server is dead now"
 		else
-			echo "Server still alive after 10 seconds, sending SIGKILL..."
+			echo "Server still alive after $STOP_TIMEOUT_SEC seconds, sending SIGKILL..."
 			kill -SIGKILL $PID
-			if wait_until_process_is_dead $PID 10; then
+			if wait_until_process_is_dead $PID $STOP_TIMEOUT_SEC; then
 				echo "Server is dead now"
 			else
-				echo "Unable to kill server, bailing out."
+				echo "Unable to kill server, it still alive after $STOP_TIMEOUT_SEC seconds; bailing out."
 				return 1;
 			fi
 		fi
@@ -66,10 +66,10 @@ function make_core_dump() {
 	if kill -0 $PID 2> /dev/null; then
 		echo "Sending SIGTRAP to server PID $PID..."
 		kill -SIGTRAP $PID
-		if wait_until_process_is_dead $PID 30; then
+		if wait_until_process_is_dead $PID $CORE_DUMP_TIMEOUT_SEC; then
 			echo "Server is dead now."
 		else
-			echo "Server still alive, bailing out."
+			echo "Server still alive after $CORE_DUMP_TIMEOUT_SEC seconds, bailing out."
 			return 1;
 		fi
 	else
