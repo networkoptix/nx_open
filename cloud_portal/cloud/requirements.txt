@@ -18,6 +18,7 @@ gunicorn==19.7.1
 htmlmin==0.1.10
 inlinestyler==0.2.1
 jsonfield==1.0.3
+kombu==4.1
 lxml==3.6.1
 py2-ipaddress==3.4.1
 pycurl==7.43.0
