@@ -238,7 +238,9 @@
         </div>
 
         <div class="form-group"
-             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) && !forms.localForm.passwordInput.$dirty">
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) &&
++                    !forms.localForm.passwordInput.$dirty &&
++                    !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
                 Password must contain different types of characters and have at least 8 symbols
             </div>
