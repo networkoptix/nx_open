@@ -1,0 +1,9 @@
+{{event}} {{#source}}on {{source}}{{/source}} 
+{{#aggregated}}
+
+Number: {{number}}
+Server IP: {{ip}}
+Camera Physical ID: {{mac}}
+
+{{timestampDate}} {{timestampTime}}
+{{/aggregated}}

@@ -66,7 +66,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     {
         return makeError(
             nx_http::StatusCode::badRequest
-            , lit("Invalid request") //TODO: #GDM think about more detailed error
+            , lit("Invalid request") // TODO: #GDM think about more detailed error
             , &result
             , &contentType
             , request.format
@@ -121,7 +121,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     else if (request.imageFormat == QnThumbnailRequestData::RawFormat)
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemeted");
-        //TODO: #rvasilenko implement me!!!
+        // TODO: #rvasilenko implement me!!!
     }
     else
     {
@@ -165,7 +165,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     QnThumbnailRequestData modifiedRequest(request);
     modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
-    //TODO: #rvasilenko implement raw format here
+    // TODO: #rvasilenko implement raw format here
 
     auto requestCompletionFunc = [&context, &result] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
 

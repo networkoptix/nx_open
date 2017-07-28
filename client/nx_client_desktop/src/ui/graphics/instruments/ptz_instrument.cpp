@@ -87,8 +87,8 @@ private:
     void onTimeout();
 
 private:
-    PtzInstrument * const m_parent = nullptr;
-    QnMediaResourceWidget * const m_widget = nullptr;
+    PtzInstrument* const m_parent = nullptr;
+    QnMediaResourceWidget* const m_widget = nullptr;
     QTimer m_filteringTimer;
     QVector3D m_targetSpeed;
     QVector3D m_filteringSpeed;
@@ -132,7 +132,7 @@ void PtzInstrument::MovementFilter::updateFilteringSpeed(const QVector3D& speed)
         return;
 
     m_filteringSpeed = truncatedSpeed;
-    m_filteringTimer.start(); // Restarts in case of it's started already
+    m_filteringTimer.start(); //< Restarts if it's started already.
 }
 
 void PtzInstrument::MovementFilter::setMovementSpeed(const QVector3D& speed)

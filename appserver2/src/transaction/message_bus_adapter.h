@@ -11,6 +11,7 @@ namespace ec2
 
     enum class MessageBusType
     {
+        None,
         LegacyMode,
         P2pMode
     };

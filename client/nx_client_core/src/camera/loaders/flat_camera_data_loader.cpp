@@ -112,14 +112,14 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs)
     if (!m_server)
     {
         trace(lit("There is no current server, cannot send request"));
-        return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+        return 0;   // TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
     auto connection = m_server->apiConnection();
     if (!connection)
     {
         trace(lit("There is no server api connection, cannot send request"));
-        return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+        return 0;   // TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
     QnChunksRequestData requestData;

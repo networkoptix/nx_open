@@ -196,7 +196,7 @@ void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
         else
         {
             NX_ASSERT( false );
-            //TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
+            // TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
         }
 
         ++it;
@@ -450,7 +450,7 @@ void DeviceSearcher::startFetchDeviceXml(
             return;
         }
 
-        //TODO: #ak linear search is not among fastest ones known to humanity
+        // TODO: #ak linear search is not among fastest ones known to humanity
         for( auto
             it = m_httpClients.begin();
             it != m_httpClients.end();
@@ -571,7 +571,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
 
     if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
-        //TODO: #ak check content type. Must be text/xml; charset="utf-8"
+        // TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
         const nx_http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
         processDeviceXml( *ctx, msgBody );

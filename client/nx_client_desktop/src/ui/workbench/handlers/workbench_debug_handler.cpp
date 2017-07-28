@@ -210,7 +210,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     QnWorkbenchContextAware(parent)
 {
 #ifdef DEBUG_ACTIONS
-    //TODO: #GDM #High remove before release
+    // TODO: #GDM #High remove before release
     qDebug() << "------------- Debug actions ARE ACTIVE -------------";
     connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);

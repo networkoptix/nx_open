@@ -83,7 +83,7 @@ struct SmtpOperationResult
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SmtpOperationResult), (metatype)(lexical)(json))
 
-//TODO: #GDM move other methods to this namespace, then move module to nx/email (?) lib
+// TODO: #GDM move other methods to this namespace, then move module to nx/email (?) lib
 namespace nx {
 namespace email {
 
@@ -125,7 +125,7 @@ struct QnEmailSettings {
     int port;                           /**< Smtp server port. */
     int timeout;                        /**< Connection timeout. */
 
-    //TODO: #GDM #Common think where else we can store it
+    // TODO: #GDM #Common think where else we can store it
     bool simple;                        /**< Flag that we are using simple view. */
 
     bool isValid() const;

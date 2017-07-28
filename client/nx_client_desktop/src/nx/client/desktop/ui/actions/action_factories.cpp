@@ -88,6 +88,13 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
         if (layout->isServiceLayout())
             continue;
 
+        // TODO: #GDM do not add preview search layouts to the resource pool
+        if (layout->data().contains(Qn::LayoutSearchStateRole))
+        {
+            if (!QnWorkbenchLayout::instance(layout))
+                continue; /* Not opened. */
+        }
+
         if (!accessController()->hasPermissions(layout, Qn::ReadPermission))
             continue;
 

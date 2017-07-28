@@ -248,7 +248,7 @@ void QnAxClientWindow::createMainWindow() {
     m_accessController.reset(new QnWorkbenchAccessController());
     m_context.reset(new QnWorkbenchContext(m_accessController.data()));
 
-    //TODO: #GDM is it really needed here?
+    // TODO: #GDM is it really needed here?
     auto effectiveMaximizeActionId = action::FullscreenAction;
     m_context->menu()->registerAlias(action::EffectiveMaximizeAction, effectiveMaximizeActionId);
 

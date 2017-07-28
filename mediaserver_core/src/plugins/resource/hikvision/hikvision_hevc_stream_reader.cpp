@@ -1,3 +1,5 @@
+#if defined(ENABLE_ONVIF)
+
 #include "hikvision_hevc_stream_reader.h"
 
 #include <algorithm>
@@ -338,3 +340,5 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

@@ -19,7 +19,7 @@
 #include <ui/help/help_topics.h>
 
 namespace {
-    //TODO: #GDM move timeout constant to more common module
+    // TODO: #GDM move timeout constant to more common module
     const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 
     /** Special value, used when the user has pressed "Test" button. */

@@ -365,7 +365,8 @@ TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.catchScrollSlider = this.scaleManager.scrollSlider();
 };
 TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
-    if(!this.catchScrollSlider.scrollingWidth){ // Do not scroll on full zoom out
+    if(!this.catchScrollSlider || !this.catchScrollSlider.scrollingWidth){
+        // Do not scroll if there is no caught position and on full zoom out
         return;
     }
     if(this.catchScrollBar) {

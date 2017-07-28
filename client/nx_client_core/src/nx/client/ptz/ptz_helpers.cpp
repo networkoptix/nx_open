@@ -45,7 +45,7 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
     const auto getPtzPresetName =
         [presetIdHotkeyHash](const QnPtzPreset& preset) -> QString
         {
-            const auto it = presetIdHotkeyHash. find(preset.id);
+            const auto it = presetIdHotkeyHash.find(preset.id);
             if (it == presetIdHotkeyHash.end())
                 return preset.name;
 

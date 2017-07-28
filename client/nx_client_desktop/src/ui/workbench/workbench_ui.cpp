@@ -1205,7 +1205,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
 
     /* Small hack. We have a signal that updates visibility if a calendar receive new data */
     bool calendarEmpty = navigator()->calendar()->isEmpty();
-    //TODO: #GDM refactor to the same logic as timeline
+    // TODO: #GDM refactor to the same logic as timeline
 
     bool calendarEnabled = !calendarEmpty
         && navigator()->currentWidget()
@@ -1240,7 +1240,7 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     connect(m_calendar, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateNotificationsGeometry);
 
-    //TODO: #GDM refactor indirect dependency
+    // TODO: #GDM refactor indirect dependency
     connect(navigator()->calendar(), &QnCalendarWidget::emptyChanged, this,
         &QnWorkbenchUi::updateCalendarVisibilityAnimated);
 

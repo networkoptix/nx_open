@@ -1,3 +1,7 @@
+if(IOS)
+    set(codesignKeychain "nx_build" CACHE STRING "Keychain name to be used to sign binaries.")
+endif()
+
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
 set(product.title "${mobile_client.name}")
@@ -12,12 +16,24 @@ nx_configure_file(
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+set(resources)
+
 if(IOS)
+    if(NOT mobile_client_ios_launch_screen)
+        set(mobile_client_ios_launch_screen "${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib")
+    endif()
+
     set(ios_sources
         src/nx/mobile_client/settings/settings_migration_ios.mm
         src/ui/window_utils_ios.mm
         src/utils/app_delegate.mm
     )
+
+    set(icons_dir "${customization_dir}/icons/ios/ios/images")
+    file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+
+    list(APPEND resources ${mobile_client_ios_launch_screen})
+    list(APPEND resources "${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf")
 else()
     set(ios_sources)
 endif()
@@ -30,6 +46,7 @@ set(target_args
         "${customization_dir}/mobile_client/resources"
     OTHER_SOURCES
         ${QML_FILES}
+        ${resources}
     PUBLIC_LIBS
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
@@ -79,8 +96,6 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    configure_file("maven/filter-resources/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-
     set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
 
     if(beta)
@@ -105,19 +120,40 @@ if(IOS)
 
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
+        RESOURCE "${resources}"
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+        XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codesignKeychain}.keychain"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
     )
 
-    set(static_plugins_args_file "${CMAKE_CURRENT_BINARY_DIR}/qml_static_plugins.parameters")
+    set(additional_plugins
+        qios
+        qtmedia_audioengine
+        qtaudio_coreaudio
+    )
+
+    if(qml_debug)
+        list(APPEND additional_plugins
+            qmldbg_debugger
+            qmldbg_inspector
+            qmldbg_local
+            qmldbg_native
+            qmldbg_profiler
+            qmldbg_server
+            qmldbg_tcp
+        )
+    endif()
+
+    set(static_plugins_args_file "${CMAKE_CURRENT_BINARY_DIR}/static_plugins.parameters")
 
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
             --print-static-plugins
-            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
-        OUTPUT_FILE ${static_plugins_args_file}
+            --qt-root "${QT_DIR}" --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+            --additional-plugins ${additional_plugins}
+            --output "${static_plugins_args_file}"
         RESULT_VARIABLE result
     )
     if(NOT result EQUAL 0)
@@ -125,21 +161,9 @@ if(IOS)
     endif()
 
     set_property(TARGET mobile_client APPEND_STRING PROPERTY
-        LINK_FLAGS "@${static_plugins_args_file}")
-
-    if(qml_debug)
-        set(qml_debug_libs
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_debugger.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_inspector.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_local.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_native.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_profiler.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_server.a"
-            "${QT_DIR}/plugins/qmltooling/libqmldbg_tcp.a"
-        )
-    else()
-        set(qml_debug_libs)
-    endif()
+        LINK_FLAGS " -Wl,-e,_qt_main_wrapper")
+    set_property(TARGET mobile_client APPEND_STRING PROPERTY
+        LINK_FLAGS " @${static_plugins_args_file}")
 
     # So far Qt does not export dependent libraries for CMake, so we have to specify them manually.
     target_link_libraries(mobile_client PRIVATE
@@ -165,12 +189,33 @@ if(IOS)
         "-framework AssetsLibrary"
         "-L${QT_DIR}/lib"
         qtharfbuzzng qtpcre qtfreetype
-        "${QT_DIR}/plugins/platforms/libqios.a"
         Qt5PlatformSupport
-        "${QT_DIR}/plugins/mediaservice/libqtmedia_audioengine.a"
-        "${QT_DIR}/plugins/audio/libqtaudio_coreaudio.a"
-        ${qml_debug_libs}
         Qt5LabsControls Qt5LabsTemplates
+        Qt5WebView
         z
+    )
+
+    set(plugins_import_cpp "${CMAKE_CURRENT_BINARY_DIR}/qt_plugins_import.cpp")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
+            --generate-import-cpp
+            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+            --additional-plugins ${additional_plugins}
+            --output ${plugins_import_cpp}
+        RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot generate plugins import file.")
+    endif()
+
+    set_property(TARGET mobile_client APPEND PROPERTY SOURCES "${plugins_import_cpp}")
+
+    set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
+
+    add_custom_command(TARGET mobile_client PRE_LINK
+        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
+            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+            --output "${app_dir}/qt_qml"
+        COMMENT "Copying QML imports"
     )
 endif()

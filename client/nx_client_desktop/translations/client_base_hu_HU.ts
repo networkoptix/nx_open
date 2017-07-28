@@ -37,6 +37,18 @@ to view more bookmarks</source>
       <translation>Zoomoljon az idővonalon
 több könyvjelző megjelenítéséhez</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1019,11 +1031,11 @@ több könyvjelző megjelenítéséhez</translation>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>A &quot;%1&quot; elérési út érvénytelen. Próbálkozzon egy másik úton.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>&quot;%1&quot; fájlt már létezik. Próbáljon más nevet.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
@@ -1170,10 +1182,6 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 a következő külső mappákat kasználja:</translation>
@@ -1720,7 +1728,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Könyvjelzők kezelése</translation>
     </message>
   </context>
   <context>
@@ -2118,10 +2126,6 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
@@ -3690,10 +3694,6 @@ to %1</source>
       <translation>Archív streamek engedélyezve:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>Általános:</translation>
     </message>
@@ -3995,7 +3995,7 @@ to %1</source>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
     </message>
   </context>
   <context>
@@ -4598,7 +4598,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Könyvjelzők kezelése</translation>
     </message>
   </context>
   <context>
@@ -4950,37 +4950,37 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>%1 szerepkörnek nincs %2 engedélye</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>A kiválasztott szerepköröknek nincs %1 engedélye</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n/%1 szerepkörnek nincs %2 engedélye</numerusform>
+        <numerusform>%n/%1 szerepkörnek nincs %2 engedélye</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>%1 felhasználónak nincs %2 engedélye</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>A kiválasztott felhasználónak nincs %1 engedélye</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
+        <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
       </translation>
     </message>
   </context>
@@ -6312,27 +6312,27 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>A rögzített videók távoli szinkronizálása elindult</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>A rögzített videók távoli szinkronizálása befejeződött</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>A rögzített videók távoli szinkronizálása folyamatban</translation>
     </message>
     <message>
       <source>Error occured during remote archive synchronization</source>
-      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+      <translation>Hiba történt a rögzített videók távoli szinkronizálása közben</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>A rögzített videók távoli szinkronizálása elindult a következő eszközön:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>A rögzített videók távoli szinkronizálása befejeződött a következő eszközön:</translation>
     </message>
   </context>
   <context>
@@ -7706,6 +7706,37 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Másolás</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Másolás vágólapra</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Beillesztés</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Beillesztés vágólapról</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
     <message>
       <source>NO DATA</source>
@@ -8008,7 +8039,7 @@ to %1</source>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
+      <translation>Kamerák váltásához használja a nyilakat. Kilépés a túrából az Esc billentyűvel.</translation>
     </message>
   </context>
   <context>

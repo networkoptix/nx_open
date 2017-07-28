@@ -110,7 +110,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return resourceFromFile(filename, resourcePool); //TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
+    return resourceFromFile(filename, resourcePool); // TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
 }
 
 // =============================================================================================
@@ -177,9 +177,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     QnUuid layoutId = guidFromArbitraryData(filename);
-    QnLayoutResourcePtr existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
-    if (existingLayout)
-        return existingLayout;
+    if (resourcePool)
+    {
+        auto existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
+        if (existingLayout)
+            return existingLayout;
+    }
     layout->setId(layoutId);
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));

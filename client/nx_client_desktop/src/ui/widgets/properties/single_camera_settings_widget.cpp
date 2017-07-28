@@ -12,7 +12,7 @@
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
-//TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -100,7 +100,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     setHelpTopic(ui->nameLabel, ui->nameEdit, Qn::CameraSettings_General_Name_Help);
     setHelpTopic(ui->modelLabel, ui->modelEdit, Qn::CameraSettings_General_Model_Help);
     setHelpTopic(ui->firmwareLabel, ui->firmwareEdit, Qn::CameraSettings_General_Firmware_Help);
-    //TODO: #Elric add context help for vendor field
+    // TODO: #Elric add context help for vendor field
     setHelpTopic(ui->addressGroupBox, Qn::CameraSettings_General_Address_Help);
     setHelpTopic(ui->enableAudioCheckBox, Qn::CameraSettings_General_Audio_Help);
     setHelpTopic(ui->authenticationGroupBox, Qn::CameraSettings_General_Auth_Help);
@@ -366,7 +366,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
     {
         QString name = ui->nameEdit->text().trimmed();
         if (!name.isEmpty())
-            m_camera->setName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
+            m_camera->setName(name);  // TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
         if (ui->passwordEdit->hasFocus() && ui->passwordEdit->echoMode() == QLineEdit::PasswordEchoOnEdit)

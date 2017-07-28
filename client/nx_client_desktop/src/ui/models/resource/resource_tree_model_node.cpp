@@ -124,7 +124,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setNameInternal(tr("Layouts"));
         break;
     case Qn::LayoutToursNode:
-        setNameInternal(tr("Layout Tours"));
+        setNameInternal(tr("Showreels"));
         break;
     case Qn::RecorderNode:
         m_state = Invalid;
@@ -331,7 +331,7 @@ void QnResourceTreeModelNode::update()
         case Qn::LayoutTourNode:
         {
             auto tour = layoutTourManager()->tour(m_uuid);
-            setNameInternal(tour.name.isEmpty() ? tr("Layout Tour") : tour.name);
+            setNameInternal(tour.name.isEmpty() ? tr("Showreel") : tour.name);
             break;
         }
         case Qn::CurrentSystemNode:
@@ -538,10 +538,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 return true;
 
-            /* Hide "Preview Search" layouts */
-            if (layout->data().contains(Qn::LayoutSearchStateRole)) //TODO: #GDM make it consistent with QnWorkbenchLayout::isSearchLayout
-                return true;
-
             if (layout->isServiceLayout())
                 return true;
 
@@ -734,7 +730,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             result |= Qt::ItemIsDragEnabled;
         break;
     }
-    case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
+    case Qn::VideoWallItemNode: // TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
     case Qn::LayoutTourNode:
         result |= Qt::ItemIsDragEnabled;
@@ -908,7 +904,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
-        //TODO: #GDM #3.1 get rid of all this logic, just pass uuid
+        // TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;

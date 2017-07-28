@@ -255,7 +255,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     {
         if (resourceDisplay->archiveReader())
         {
-            //resourceDisplay->archiveReader()->pauseMedia(); //TODO: #GDM make sure this magic is required
+            //resourceDisplay->archiveReader()->pauseMedia(); // TODO: #GDM make sure this magic is required
             resourceDisplay->archiveReader()->setSpeed(1.0);
             resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
             resourceDisplay->archiveReader()->resumeMedia();

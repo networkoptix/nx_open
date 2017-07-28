@@ -219,13 +219,6 @@ QnResourceItemColors::QnResourceItemColors() :
 {
 }
 
-QnPasswordStrengthColors::QnPasswordStrengthColors() :
-    inacceptable(Qt::red),
-    acceptable(Qt::yellow),
-    good(Qt::green)
-{
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json)(eq),

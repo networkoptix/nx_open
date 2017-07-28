@@ -12,9 +12,16 @@ cssutils.log.setLevel(logging.ERROR)
 containter_text = open('container.mustache.template').read()
 containter_text = containter_text.replace('{{>style_css}}', open('style.css').read())
 
+containter_text_plain = open('container_plain.mustache.template').read()
+
 for file in os.listdir("."):
-    if file.endswith(".mustache.body"):
+    if file.endswith("_plain.mustache.body"):
         f = file.replace('.mustache.body', '')
-        newf = open(f + '.mustache', 'w')
+        text = containter_text_plain.replace('{{>body}}', open(f + '.mustache.body').read())
+        with open(f + '.mustache', 'w') as newf:
+            print >> newf, text
+    elif file.endswith(".mustache.body"):
+        f = file.replace('.mustache.body', '')
         text = containter_text.replace('{{>body}}', open(f + '.mustache.body').read())
-        print >> newf, inline_css(text).encode('utf-8','replace')
+        with open(f + '.mustache', 'w') as newf:
+            print >> newf, inline_css(text).encode('utf-8','replace')

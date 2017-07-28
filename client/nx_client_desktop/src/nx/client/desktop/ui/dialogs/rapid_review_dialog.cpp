@@ -7,6 +7,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/helper.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/qtimespan.h>
@@ -36,13 +37,18 @@ namespace dialogs {
 qint64 ExportRapidReview::kMinimalSourcePeriodLength = ExportRapidReviewPrivate::kMinimalLengthMs
     * ExportRapidReviewPrivate::kMinimalSpeed;
 
-ExportRapidReview::ExportRapidReview(QWidget *parent, Qt::WindowFlags windowFlags) :
+ExportRapidReview::ExportRapidReview(QWidget* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     d_ptr(new ExportRapidReviewPrivate()),
     ui(new Ui::ExportRapidReviewDialog),
     m_updating(false)
 {
     ui->setupUi(this);
+    ui->speedSlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+
+    ui->initialLengthLabel->setForegroundRole(QPalette::Text);
+    ui->framesLabel->setForegroundRole(QPalette::Text);
 
     Q_D(ExportRapidReview);
 

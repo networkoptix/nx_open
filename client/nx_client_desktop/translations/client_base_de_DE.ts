@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>In Zeitachse hineinzoomen, um mehrere Lesezeichen anzuzeigen</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation type="unfinished">Edit bookmark</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation type="unfinished">Delete bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1170,10 +1182,6 @@ to view more bookmarks</source>
   <context>
     <name>QnAboutDialog</name>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
-    <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 verwendet folgende externe Libraries:</translation>
     </message>
@@ -2117,10 +2125,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
@@ -3685,10 +3689,6 @@ to %1</source>
     <message>
       <source>Archive Streams Allowed:</source>
       <translation>Archivstreams erlaubt:</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -7700,6 +7700,37 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Um lokale Dateien auf der Videowand anzuzeigen, bitte auf dem Computer hinzufügen auf dem die Videowand gehostet wird.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopieren</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>In Zwischenablage kopieren</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Einfügen</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Aus Zwischenablage einfügen</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>

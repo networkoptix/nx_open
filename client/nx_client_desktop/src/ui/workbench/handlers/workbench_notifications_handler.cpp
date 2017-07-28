@@ -77,7 +77,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
     static_cast<void>(sessionDelegate); //< Debug?
 
-    //TODO: #GDM #future
+    // TODO: #GDM #future
     /*
      * Some messages must be displayed before bunch of 'user email is invalid'.
      * Correct approach is to extend QnNotificationListWidget functionality with reordering.

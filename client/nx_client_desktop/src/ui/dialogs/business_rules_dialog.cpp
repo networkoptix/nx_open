@@ -272,7 +272,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
         &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
 
-    //TODO: #GDM #Business show description label if no rules are loaded
+    // TODO: #GDM #Business show description label if no rules are loaded
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         &QnBusinessRulesDialog::saveAll);
@@ -403,14 +403,14 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
-    m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
+    m_pendingDeleteRules.removeOne(id); // TODO: #GDM #Business ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     const int kInvalidSortingColumn = -1;
 
     m_rulesViewModel->createRule();
-    //TODO: #GDM correct way will be return index and proxy it via sort model,
+    // TODO: #GDM correct way will be return index and proxy it via sort model,
     //but without dynamic sorting it just works this way
     ui->tableView->selectRow(ui->tableView->model()->rowCount() - 1);
     ui->tableView->horizontalHeader()->setSortIndicator(kInvalidSortingColumn, Qt::AscendingOrder);
@@ -569,7 +569,7 @@ bool QnBusinessRulesDialog::saveAll()
         m_rulesViewModel->saveRule(idx);
     }
 
-    //TODO: #GDM #Business replace with QnAppServerReplyProcessor
+    // TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
         int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
@@ -641,7 +641,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
         || !m_pendingDeleteRules.isEmpty()
-        ); //TODO: #GDM #Business calculate once and use anywhere
+        ); // TODO: #GDM #Business calculate once and use anywhere
     if (!hasChanges)
         return true;
 

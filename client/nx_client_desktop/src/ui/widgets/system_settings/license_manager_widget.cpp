@@ -464,7 +464,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).value<QUrl>();
         if (!redirectUrl.isEmpty())
         {
-            updateFromServer(licenseKey, infoMode, redirectUrl);    //TODO: #GDM add possible redirect loop check
+            updateFromServer(licenseKey, infoMode, redirectUrl);    // TODO: #GDM add possible redirect loop check
             return;
         }
         processReply(reply, licenseKey, url, infoMode);

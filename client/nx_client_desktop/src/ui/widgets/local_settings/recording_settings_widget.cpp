@@ -104,7 +104,7 @@ void QnRecordingSettingsWidget::applyChanges()
 
 bool QnRecordingSettingsWidget::hasChanges() const
 {
-    //TODO: #GDM refactor and emit hasChangesChanged correctly
+    // TODO: #GDM refactor and emit hasChangesChanged correctly
 
     if (m_settings->captureMode() != captureMode())
         return true;
@@ -135,7 +135,7 @@ void QnRecordingSettingsWidget::initScreenComboBox()
     {
         bool isPrimaryScreen = (i == desktop->primaryScreen());
         if (!m_dwm->isSupported() && !isPrimaryScreen)
-            continue; //TODO: #GDM can we record from secondary screen without DWM?
+            continue; // TODO: #GDM can we record from secondary screen without DWM?
 
         QRect geometry = desktop->screenGeometry(i);
         QString item = tr("Screen %1 - %2x%3")

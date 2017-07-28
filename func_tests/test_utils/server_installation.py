@@ -32,9 +32,7 @@ class ServerInstallation(object):
         self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
 
     def list_core_files(self):
-        return (self.host.run_command(
-            ['ls', os.path.join(self.dir, 'bin/*core*')], check_retcode=False)
-            .splitlines())
+        return self.host.expand_glob(os.path.join(self.dir, 'bin/*core*'))
 
     def cleanup_core_files(self):
         for path in self.list_core_files():

@@ -93,7 +93,7 @@ ActionType Rule::actionType() const
 void Rule::setActionType(ActionType actionType)
 {
     m_actionType = actionType;
-    //TODO: #GDM #Business fill action params with default values? filter action resources?
+    // TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
 QVector<QnUuid> Rule::actionResources() const

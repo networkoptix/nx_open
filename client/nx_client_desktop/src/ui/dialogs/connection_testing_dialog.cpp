@@ -32,7 +32,7 @@ namespace
 {
     const int timerIntervalMs = 100;
 
-    //TODO: #GDM move timeout constant to more common module
+    // TODO: #GDM move timeout constant to more common module
     const int connectionTimeoutMs = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 }
 

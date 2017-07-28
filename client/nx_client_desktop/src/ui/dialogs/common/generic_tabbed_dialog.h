@@ -15,7 +15,7 @@ class QnAbstractPreferencesWidget;
  *
  *  Derived dialogs basically should implement the following behavior model:
  *  *   create pages in constructor
- *  *   call loadDataToUi method every time the source model changes //TODO: #GDM make more strict way
+ *  *   call loadDataToUi method every time the source model changes // TODO: #GDM make more strict way
  *  *   every page must implement loadDataToUi / hasChanges / applyChanges methods
  *  *   every page should emit hasChangesChanged in all cases where new changes can appear
  */
@@ -43,7 +43,7 @@ public:
       * @brief reject                           Overriding default reject method. Here the dialog will try to revert
       *                                         all changes (if any were applied instantly). If any page cannot revert
       *                                         its changes, dialog will not be closed. Otherwise, dialog will close
-      *                                         and all its contents will be reloaded. //TODO: #GDM why not on display?
+      *                                         and all its contents will be reloaded. // TODO: #GDM why not on display?
       */
     virtual void reject() override;
 

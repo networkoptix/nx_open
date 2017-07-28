@@ -47,67 +47,67 @@ struct ButtonWithConfirmation::Private
 
 ButtonWithConfirmation::ButtonWithConfirmation(QWidget* parent):
     base_type(parent),
-    m_d(new Private())
+    d(new Private())
 {
     setFlat(true);
 
-    m_d->opacityEffect = new QGraphicsOpacityEffect(this);
-    setGraphicsEffect(m_d->opacityEffect);
+    d->opacityEffect = new QGraphicsOpacityEffect(this);
+    setGraphicsEffect(d->opacityEffect);
 
     static const auto kOpacityPropertyName = "opacity";
 
-    m_d->confirmationAnimation = new QPauseAnimation(this);
-    m_d->confirmationAnimation->setDuration(milliseconds(kDefaultConfirmationDuration).count());
-    connect(m_d->confirmationAnimation, &QAbstractAnimation::finished,
+    d->confirmationAnimation = new QPauseAnimation(this);
+    d->confirmationAnimation->setDuration(milliseconds(kDefaultConfirmationDuration).count());
+    connect(d->confirmationAnimation, &QAbstractAnimation::finished,
         [this]() //< Initialize fade-out.
         {
-            if (m_d->opacityEffect)
-                m_d->opacityEffect->setEnabled(true);
+            if (d->opacityEffect)
+                d->opacityEffect->setEnabled(true);
         });
 
-    m_d->fadeOutAnimation = new QPropertyAnimation(m_d->opacityEffect, kOpacityPropertyName, this);
-    m_d->fadeOutAnimation->setDuration(milliseconds(kDefaultFadeOutDuration).count());
-    m_d->fadeOutAnimation->setStartValue(1.0);
-    m_d->fadeOutAnimation->setEndValue(0.0);
-    connect(m_d->fadeOutAnimation, &QAbstractAnimation::finished,
+    d->fadeOutAnimation = new QPropertyAnimation(d->opacityEffect, kOpacityPropertyName, this);
+    d->fadeOutAnimation->setDuration(milliseconds(kDefaultFadeOutDuration).count());
+    d->fadeOutAnimation->setStartValue(1.0);
+    d->fadeOutAnimation->setEndValue(0.0);
+    connect(d->fadeOutAnimation, &QAbstractAnimation::finished,
         [this]() //< Switch button appearance.
         {
-            m_d->state = Private::State::button;
-            setText(m_d->mainText);
-            setIcon(m_d->mainIcon);
+            d->state = Private::State::button;
+            setText(d->mainText);
+            setIcon(d->mainIcon);
         });
 
-    m_d->fadeInAnimation = new QPropertyAnimation(m_d->opacityEffect, kOpacityPropertyName, this);
-    m_d->fadeInAnimation->setDuration(milliseconds(kDefaultFadeInDuration).count());
-    m_d->fadeInAnimation->setStartValue(0.0);
-    m_d->fadeInAnimation->setEndValue(1.0);
-    connect(m_d->fadeInAnimation, &QAbstractAnimation::finished,
+    d->fadeInAnimation = new QPropertyAnimation(d->opacityEffect, kOpacityPropertyName, this);
+    d->fadeInAnimation->setDuration(milliseconds(kDefaultFadeInDuration).count());
+    d->fadeInAnimation->setStartValue(0.0);
+    d->fadeInAnimation->setEndValue(1.0);
+    connect(d->fadeInAnimation, &QAbstractAnimation::finished,
         [this]() //< Finalize fade-in.
         {
-            if (m_d->opacityEffect)
-                m_d->opacityEffect->setEnabled(false);
+            if (d->opacityEffect)
+                d->opacityEffect->setEnabled(false);
         });
 
-    m_d->animations = new QSequentialAnimationGroup(this);
-    m_d->animations->addAnimation(m_d->confirmationAnimation);
-    m_d->animations->addAnimation(m_d->fadeOutAnimation);
-    m_d->animations->addAnimation(m_d->fadeInAnimation);
+    d->animations = new QSequentialAnimationGroup(this);
+    d->animations->addAnimation(d->confirmationAnimation);
+    d->animations->addAnimation(d->fadeOutAnimation);
+    d->animations->addAnimation(d->fadeInAnimation);
 
     connect(this, &QPushButton::clicked,
         [this]()
         {
-            m_d->animations->stop();
-            if (m_d->opacityEffect)
+            d->animations->stop();
+            if (d->opacityEffect)
             {
-                m_d->opacityEffect->setEnabled(false);
-                m_d->opacityEffect->setOpacity(1.0);
+                d->opacityEffect->setEnabled(false);
+                d->opacityEffect->setOpacity(1.0);
             }
 
-            m_d->state = Private::State::confirmation;
-            setText(m_d->confirmationText);
-            setIcon(m_d->confirmationIcon);
+            d->state = Private::State::confirmation;
+            setText(d->confirmationText);
+            setIcon(d->confirmationIcon);
 
-            m_d->animations->start();
+            d->animations->start();
         });
 }
 
@@ -132,85 +132,85 @@ ButtonWithConfirmation::~ButtonWithConfirmation()
 
 QString ButtonWithConfirmation::mainText() const
 {
-    return m_d->mainText;
+    return d->mainText;
 }
 
 void ButtonWithConfirmation::setMainText(const QString& value)
 {
-    m_d->mainText = value;
-    if (m_d->state == Private::State::button)
+    d->mainText = value;
+    if (d->state == Private::State::button)
         setText(value);
 }
 
 QString ButtonWithConfirmation::confirmationText() const
 {
-    return m_d->confirmationText;
+    return d->confirmationText;
 }
 
 void ButtonWithConfirmation::setConfirmationText(const QString& value)
 {
-    m_d->confirmationText = value;
-    if (m_d->state == Private::State::confirmation)
+    d->confirmationText = value;
+    if (d->state == Private::State::confirmation)
         setText(value);
 }
 
 QIcon ButtonWithConfirmation::mainIcon() const
 {
-    return m_d->mainIcon;
+    return d->mainIcon;
 }
 
 void ButtonWithConfirmation::setMainIcon(const QIcon& value)
 {
-    m_d->mainIcon = value;
-    if (m_d->state == Private::State::button)
+    d->mainIcon = value;
+    if (d->state == Private::State::button)
         setIcon(value);
 }
 
 QIcon ButtonWithConfirmation::confirmationIcon() const
 {
-    return m_d->confirmationIcon;
+    return d->confirmationIcon;
 }
 
 void ButtonWithConfirmation::setConfirmationIcon(const QIcon& value)
 {
-    m_d->confirmationIcon = value;
-    if (m_d->state == Private::State::confirmation)
+    d->confirmationIcon = value;
+    if (d->state == Private::State::confirmation)
         setIcon(value);
 }
 
 milliseconds ButtonWithConfirmation::confirmationDuration() const
 {
-    return milliseconds(m_d->confirmationAnimation->duration());
+    return milliseconds(d->confirmationAnimation->duration());
 }
 
 void ButtonWithConfirmation::setConfirmationDuration(milliseconds value)
 {
-    return m_d->confirmationAnimation->setDuration(value.count());
+    return d->confirmationAnimation->setDuration(value.count());
 }
 
 milliseconds ButtonWithConfirmation::fadeOutDuration() const
 {
-    return milliseconds(m_d->fadeOutAnimation->duration());
+    return milliseconds(d->fadeOutAnimation->duration());
 }
 
 void ButtonWithConfirmation::setFadeOutDuration(milliseconds value)
 {
-    return m_d->fadeOutAnimation->setDuration(value.count());
+    return d->fadeOutAnimation->setDuration(value.count());
 }
 
 milliseconds ButtonWithConfirmation::fadeInDuration() const
 {
-    return milliseconds(m_d->fadeInAnimation->duration());
+    return milliseconds(d->fadeInAnimation->duration());
 }
 
 void ButtonWithConfirmation::setFadeInDuration(milliseconds value)
 {
-    return m_d->fadeInAnimation->setDuration(value.count());
+    return d->fadeInAnimation->setDuration(value.count());
 }
 
 bool ButtonWithConfirmation::event(QEvent* event)
 {
-    if (m_d->state == Private::State::button || !dynamic_cast<QInputEvent*>(event))
+    if (d->state == Private::State::button || !dynamic_cast<QInputEvent*>(event))
         return base_type::event(event);
 
     event->accept();
