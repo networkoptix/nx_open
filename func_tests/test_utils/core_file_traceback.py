@@ -1,9 +1,10 @@
 import os
 import os.path
+import datetime
 from .template_renderer import TemplateRenderer
 
 
-GDB_TIMEOUT_SEC = 10*60  # Error in gdb commands cause gdb to not quit
+GDB_TIMEOUT = datetime.timedelta(minutes=10)  # Error in gdb commands cause gdb to not quit
 WORK_DIR = '/tmp/gdb-extract-tb'
 
 
@@ -19,5 +20,5 @@ def create_core_file_traceback(host, bin_path, lib_dir, core_path):
     host.mk_dir(WORK_DIR)
     commands_path = os.path.join(WORK_DIR, 'gdb_commands.%s' % os.urandom(3).encode('hex'))
     host.write_file(commands_path, gdb_commands)
-    traceback = host.run_command(['gdb',  '--quiet', '-x', commands_path], cwd=WORK_DIR, timeout=GDB_TIMEOUT_SEC)
+    traceback = host.run_command(['gdb',  '--quiet', '-x', commands_path], cwd=WORK_DIR, timeout=GDB_TIMEOUT)
     return traceback

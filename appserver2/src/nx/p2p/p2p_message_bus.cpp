@@ -691,7 +691,7 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
                 auto connection = findConnectionById(via);
                 NX_ASSERT(connection);
                 if (!connection)
-                    return true; //< Best route via local DB. Some race condition. Don't change subscription so far.
+                    return true; //< Best route via local DB. It shouldn't be.
                 return context(connection)->isRemotePeerSubscribedTo(peer);
             }))
             {

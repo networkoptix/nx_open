@@ -2,7 +2,9 @@
 
 import os.path
 import logging
+import datetime
 import time
+from requests.exceptions import ReadTimeout
 from .template_renderer import TemplateRenderer
 from . import utils
 from .core_file_traceback import create_core_file_traceback
@@ -15,7 +17,8 @@ log = logging.getLogger(__name__)
 LWS_CTL_TEMPLATE_PATH = 'lws_ctl.sh.jinja2'
 LWS_PORT_BASE = 3000
 LWS_BINARY_NAME = 'appserver2_ut'
-LWS_START_TIMEOUT_SEC = 10*60  # timeout when waiting for lws become online (pingable)
+LWS_START_TIMEOUT = datetime.timedelta(minutes=10)  # timeout when waiting for lws become online (pingable)
+LWS_SYNC_CHECK_TIMEOUT = datetime.timedelta(minutes=1)  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
 
 
@@ -111,7 +114,12 @@ class LightweightServer(Server):
         log.info('Waiting for lightweight servers to merge between themselves')
         start_time = utils.datetime_utc_now()
         while utils.datetime_utc_now() - start_time < timeout:
-            response = self.rest_api.api.moduleInformation.GET()
+            try:
+                response = self.rest_api.api.moduleInformation.GET(timeout=LWS_SYNC_CHECK_TIMEOUT)
+            except ReadTimeout:
+                #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
+                #self.make_core_dump()
+                raise
             if response['serverFlags'] == 'SF_P2pSyncDone':
                 log.info('Lightweight servers merged between themselves in %s' % (utils.datetime_utc_now() - start_time))
                 return
@@ -132,7 +140,7 @@ class LightweightServersHost(object):
             self._host, os.path.join(physical_installation_host.root_dir, 'lws'))
         self._template_renderer = TemplateRenderer()
         self._allocated = False
-        self._server0 = None
+        self._first_server = None
         self._init()
 
     # server_count is ignored for now; all servers are allocated on first lightweight installation
@@ -155,17 +163,17 @@ class LightweightServersHost(object):
             rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
             server = LightweightServer('lws-%05d' % idx, self._host, self._installation, server_ctl, rest_api_url,
                                        internal_ip_port=server_port, timezone=self._timezone)
-            response = server.wait_for_server_become_online(timeout_sec=LWS_START_TIMEOUT_SEC, check_interval_sec=2)
+            response = server.wait_for_server_become_online(timeout=LWS_START_TIMEOUT, check_interval_sec=2)
             server.local_system_id = response['localSystemId']
-            if not self._server0:
-                self._server0 = server
+            if not self._first_server:
+                self._first_server = server
             yield server
         self._allocated = True
 
     def release(self):
         if self._allocated:
             self._save_lws_artifacts()
-        self._server0 = None
+        self._first_server = None
         self._allocated = False
 
     def _init(self):
@@ -194,7 +202,7 @@ class LightweightServersHost(object):
         self._host.run_command(['chmod', '+x', lws_ctl_path])
 
     def _save_lws_artifacts(self):
-        self._check_server_is_online()
+        self._check_if_server_is_online()
         self._save_lws_log()
         self._save_lws_core_files()
 
@@ -224,16 +232,16 @@ class LightweightServersHost(object):
             path = artifact_factory.write_file(traceback)
             log.debug('core file traceback for lws at %s is stored to %s', self._host_name, path)
 
-    def _check_server_is_online(self):
+    def _check_if_server_is_online(self):
         if not self._allocated: return
-        if self._server0.is_started() and not self._server0.is_server_online():
+        if self._first_server.is_started() and not self._first_server.is_server_online():
             log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
-            self._server0.make_core_dump()
+            self._first_server.make_core_dump()
 
     def perform_post_checks(self):
         log.info('----- performing post-test checks for lightweight servers at %s'
                      '---------------------->8 ---------------------------', self._host_name)
-        self._check_server_is_online()
+        self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %
                                         (self._host_name, len(core_file_list), ', '.join(core_file_list)))

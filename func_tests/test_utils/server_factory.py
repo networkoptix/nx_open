@@ -64,6 +64,7 @@ class ServerFactory(object):
                 server.setup_local_system(**config.setup_settings)
 
     def release(self):
+        self._check_if_servers_are_online()
         for server in self._allocated_servers:
             self._save_server_artifacts(server)
         if self._physical_installation_ctl:
@@ -103,13 +104,17 @@ class ServerFactory(object):
             path = artifact_factory.write_file(traceback)
             log.debug('core file traceback for server %s, %s is stored to %s', server.title, server, path)
 
-    def perform_post_checks(self):
-        log.info('----- performing post-test checks for servers ------------------------>8 -----------------------------------------')
-        core_dumped_servers = []
+    def _check_if_servers_are_online(self):
         for server in self._allocated_servers:
             if server.is_started() and not server.is_server_online():
                 log.warning('Server %s is started but does not respond to ping - making core dump', server)
                 server.make_core_dump()
+
+    def perform_post_checks(self):
+        log.info('----- performing post-test checks for servers ------------------------>8 -----------------------------------------')
+        self._check_if_servers_are_online()
+        core_dumped_servers = []
+        for server in self._allocated_servers:
             if server.list_core_files():
                 core_dumped_servers.append(server.title)
         assert not core_dumped_servers, 'Following server(s) left core dump(s): %s' % ', '.join(core_dumped_servers)

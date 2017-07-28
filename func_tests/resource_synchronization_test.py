@@ -7,8 +7,8 @@ import pytest
 import time
 import itertools
 from multiprocessing.dummy import Pool as ThreadPool
-from test_utils.utils import SimpleNamespace
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.utils import SimpleNamespace, datetime_utc_now
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 import server_api_data_generators as generator
 import transaction_log
 
@@ -139,7 +139,7 @@ def get_response(server, method, api_object, api_method):
 
 def wait_entity_merge_done(servers, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method, api_object, api_method)
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
@@ -153,11 +153,11 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
         result = check(servers[1:], result_expected)
         if not result:
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
-            log.error("'%s' was not synchronized in %d seconds: '%r' and '%r'" % (
-                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0], result[0]))
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
+            log.error("'%s' was not synchronized in %s: '%r' and '%r'" % (
+                api_method, MEDIASERVER_MERGE_TIMEOUT, servers[0], result[0]))
             assert result[1] == result_expected
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
 def check_api_calls(env, calls):
@@ -174,7 +174,7 @@ def check_transaction_log(env):
     def transactions_to_str(transactions):
         return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
 
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         srv_transactions = {}
         for srv in env.servers:
@@ -186,9 +186,9 @@ def check_transaction_log(env):
                                   if len(l) != len(env.servers)}
         if not unmatched_transactions:
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             assert False, "Unmatched transaction:\n  %s" % transactions_to_str(unmatched_transactions)
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
 def server_api_post((server, api_method, data)):
