@@ -57,18 +57,21 @@ public:
     const ListeningPeer& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
+    const QString& cassandraHost() const;
 
 private:
     utils::log::Settings m_logging;
     Http m_http;
     ListeningPeer m_listeningPeer;
     ConnectingPeer m_connectingPeer;
+    QString m_cassandraHost;
 
     virtual void loadSettings() override;
 
     void loadHttp();
     void loadListeningPeer();
     void loadConnectingPeer();
+    void loadCassandraHost();
 };
 
 } // namespace conf

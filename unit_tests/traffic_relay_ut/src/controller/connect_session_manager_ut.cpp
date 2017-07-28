@@ -16,6 +16,7 @@
 #include <controller/traffic_relay.h>
 #include <model/client_session_pool.h>
 #include <model/listening_peer_pool.h>
+#include <model/remote_relay_peer_pool.h>
 #include <settings.h>
 
 #include "../settings_loader.h"
@@ -276,7 +277,9 @@ protected:
                     m_settingsLoader.settings(),
                     &clientSessionPool(),
                     &listeningPeerPool(),
-                    &m_trafficRelayStub);
+                    &m_trafficRelayStub,
+                    std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
+                        new model::RemoteRelayPeerPool("127.0.0.1")));
         }
 
         return *m_connectSessionManager;

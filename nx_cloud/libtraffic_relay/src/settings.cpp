@@ -34,7 +34,7 @@ constexpr int kDefaultRecommendedPreemptiveConnectionCount = 7;
 
 static const QLatin1String kMaxPreemptiveConnectionCount(
     "listeningPeer/maxPreemptiveConnectionCount");
-constexpr int kDefaultMaxPreemptiveConnectionCount = 
+constexpr int kDefaultMaxPreemptiveConnectionCount =
     kDefaultRecommendedPreemptiveConnectionCount * 2;
 
 static const QLatin1String kDisconnectedPeerTimeout("listeningPeer/disconnectedPeerTimeout");
@@ -68,6 +68,9 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
 //-------------------------------------------------------------------------------------------------
 
 static const QString kModuleName = lit("traffic_relay");
+
+static const QString kCassandraHost("cassandra_host");
+static const QString kDefaultCassandraHost("127.0.0.1");
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize)
@@ -139,12 +142,18 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const QString& Settings::cassandraHost() const
+{
+    return m_cassandraHost;
+}
+
 void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
     loadHttp();
     loadListeningPeer();
     loadConnectingPeer();
+    loadCassandraHost();
 }
 
 void Settings::loadHttp()
@@ -210,10 +219,15 @@ void Settings::loadListeningPeer()
 
 void Settings::loadConnectingPeer()
 {
-    m_connectingPeer.connectSessionIdleTimeout = 
+    m_connectingPeer.connectSessionIdleTimeout =
         nx::utils::parseTimerDuration(
             settings().value(kConnectSessionIdleTimeout).toString(),
             kDefaultConnectSessionIdleTimeout);
+}
+
+void Settings::loadCassandraHost()
+{
+    m_cassandraHost = settings().value(kCassandraHost, kDefaultCassandraHost).toString();
 }
 
 } // namespace conf

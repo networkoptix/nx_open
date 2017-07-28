@@ -5,6 +5,7 @@
 #include <utility>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
+#include "abstract_remote_relay_peer_pool.h"
 
 namespace nx {
 
@@ -17,15 +18,22 @@ namespace cloud {
 namespace relay {
 namespace model {
 
-class RemoteRelayPeerPool
+class RemoteRelayPeerPool: public AbstractRemoteRelayPeerPool
 {
 public:
     RemoteRelayPeerPool(const char* cassandraHost);
     ~RemoteRelayPeerPool();
 
-    cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
-    cf::future<bool> addPeer(const std::string& domainName, const std::string& relayHost);
-    cf::future<bool> removePeer(const std::string& domainName, const std::string& relayHost);
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& domainName) const override;
+
+    virtual cf::future<bool> addPeer(
+        const std::string& domainName,
+        const std::string& relayHost) override;
+
+    virtual cf::future<bool> removePeer(
+        const std::string& domainName,
+        const std::string& relayHost) override;
 
 protected:
     cassandra::AsyncConnection* getConnection();

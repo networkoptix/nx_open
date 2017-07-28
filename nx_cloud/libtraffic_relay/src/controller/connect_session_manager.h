@@ -21,7 +21,7 @@ namespace conf { class Settings; };
 namespace model {
 class ClientSessionPool;
 class ListeningPeerPool;
-class RemoteRelayPeerPool;
+class AbstractRemoteRelayPeerPool;
 } // namespace model
 
 namespace controller {
@@ -69,7 +69,8 @@ public:
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
-        controller::AbstractTrafficRelay* trafficRelay);
+        controller::AbstractTrafficRelay* trafficRelay,
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool);
     ~ConnectSessionManager();
 
     virtual void beginListening(
@@ -103,7 +104,7 @@ private:
     std::list<RelaySession> m_relaySessions;
     QnMutex m_mutex;
     bool m_terminated = false;
-    std::unique_ptr<model::RemoteRelayPeerPool> m_remoteRelayPool;
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPool;
     std::set<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
     void saveServerConnection(

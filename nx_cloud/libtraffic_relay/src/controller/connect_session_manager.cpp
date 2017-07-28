@@ -23,13 +23,14 @@ ConnectSessionManager::ConnectSessionManager(
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
-    controller::AbstractTrafficRelay* trafficRelay)
+    controller::AbstractTrafficRelay* trafficRelay,
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool)
     :
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
     m_trafficRelay(trafficRelay),
-    m_remoteRelayPool(new model::RemoteRelayPeerPool("127.0.1.1"))
+    m_remoteRelayPool(std::move(remoteRelayPool))
 {
     nx::utils::SubscriptionId subscriptionId;
     m_listeningPeerPool->peerConnectedSubscription().subscribe(
@@ -358,8 +359,11 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
 {
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
+
     return std::make_unique<ConnectSessionManager>(
-        settings, clientSessionPool, listeningPeerPool, trafficRelay);
+        settings, clientSessionPool, listeningPeerPool, trafficRelay,
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
+            new model::RemoteRelayPeerPool(settings.cassandraHost().toLatin1().constData())));
 }
 
 ConnectSessionManagerFactory::FactoryFunc
