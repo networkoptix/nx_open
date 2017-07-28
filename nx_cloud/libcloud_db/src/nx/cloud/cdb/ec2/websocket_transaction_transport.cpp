@@ -63,7 +63,7 @@ void WebSocketTransactionTransport::stopWhileInAioThread()
 }
 
 void WebSocketTransactionTransport::onGotMessage(
-    QWeakPointer<nx::p2p::ConnectionBase> connection,
+    QWeakPointer<nx::p2p::ConnectionBase> /*connection*/,
     nx::p2p::MessageType messageType,
     const QByteArray& payload)
 {
@@ -187,7 +187,7 @@ const TransactionTransportHeader&
 }
 
 void WebSocketTransactionTransport::sendTransaction(
-    TransactionTransportHeader transportHeader,
+    TransactionTransportHeader /*transportHeader*/,
     const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
 {
     if (!m_sendHandshakeDone)
