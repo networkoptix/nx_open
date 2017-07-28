@@ -18,13 +18,13 @@ import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
 from test_utils.utils import SimpleNamespace
 from multiprocessing import Pool as ThreadPool
-from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT
 import transaction_log
 
 log = logging.getLogger(__name__)
 
 
-MERGE_DONE_CHECK_PERIOD_SEC = 10.
+MERGE_DONE_CHECK_PERIOD = datetime.timedelta(seconds=10)
 SET_RESOURCE_STATUS_CMD = '202'
 
 
@@ -37,8 +37,8 @@ def config(test_config):
         STORAGES_PER_SERVER=1,
         USERS_PER_SERVER=1,
         RESOURCES_PER_CAMERA=2,
-        MERGE_TIMEOUT=datetime.timedelta(seconds=MEDIASERVER_MERGE_TIMEOUT_SEC),
-        REST_API_TIMEOUT_SEC=60,
+        MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
+        REST_API_TIMEOUT=datetime.timedelta(minutes=1),
         )
 
 @pytest.fixture
@@ -63,7 +63,7 @@ def servers(metrics_saver, server_factory, lightweight_servers, config):
     start_time = utils.datetime_utc_now()
     server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
-                           rest_api_timeout_sec=config.REST_API_TIMEOUT_SEC)
+                           rest_api_timeout=config.REST_API_TIMEOUT)
                        for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
     return server_list
@@ -225,7 +225,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
             save_json_artifact(artifact_factory, api_method, 'y', unmatched_result)
             pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
                 merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
-        time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
+        time.sleep(MERGE_DONE_CHECK_PERIOD.total_seconds())
 
 
 def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
