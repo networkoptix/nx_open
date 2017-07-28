@@ -2308,8 +2308,8 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.updateDirectoryIfEmpty(getDataDirectory());
-    logSettings.level.parse(
-    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
+    logSettings.level.parse(cmdLineArguments().logLevel,
+        settings->value("logLevel").toString());
 
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath);
