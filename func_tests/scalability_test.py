@@ -181,14 +181,17 @@ def clean_json(api_method, json):
 
 def log_diffs(x, y):
     lines = compare_values(x, y)
-    for line in lines:
-        log.debug(line)
+    if lines:
+        for line in lines:
+            log.debug(line)
+    else:
+        log.warning('Strange, no diffs are found...')
 
 def save_json_artifact(artifact_factory, api_method, side_name, value):
     file_path = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name),
                                  ext='.json', type_name='json', content_type='application/json').produce_file_path()
     with open(file_path, 'w') as f:
-        json.dump(value, f, indent=4)
+        json.dump(value, f, indent=4, cls=transaction_log.TransactionJsonEncoder)
 
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):

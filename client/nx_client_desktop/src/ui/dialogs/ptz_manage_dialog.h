@@ -26,6 +26,7 @@ class LocalFileCache;
 class QnPtzManageModel;
 class QnPtzHotkeysResourcePropertyAdaptor;
 class QnAbstractPtzHotkeyDelegate;
+class QnMediaResourceWidget;
 
 // TODO: #GDM #PTZ remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
@@ -36,14 +37,18 @@ public:
     explicit QnPtzManageDialog(QWidget *parent = 0);
     ~QnPtzManageDialog();
 
-    QnResourcePtr resource() const;
-    void setResource(const QnResourcePtr &resource);
+    QPointer<QnMediaResourceWidget> widget() const;
+    void setWidget(QnMediaResourceWidget* widget);
 
     bool isModified() const;
 
     virtual bool tryClose(bool force) override;
 
     bool askToSaveChanges(bool cancelIsAllowed = true);
+
+    /**
+     * Note: dialog will take ownership of delegate.
+     */
 	void setHotkeysDelegate(QnAbstractPtzHotkeyDelegate* hotkeysDelegate);
 
 protected:
@@ -81,6 +86,9 @@ private slots:
     void at_model_modelReset();
 
 private:
+    bool isValid() const;
+    void updateCanSaveCurrentPosition();
+
     bool savePresets();
     bool saveTours();
     bool saveHomePosition();
@@ -93,7 +101,7 @@ private:
 
     QnPtzManageModel *m_model;
 	QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
-    QnResourcePtr m_resource;
+    QPointer<QnMediaResourceWidget> m_widget;
 
     nx::client::desktop::LocalFileCache *m_cache;
     QSet<QString> m_pendingPreviews;

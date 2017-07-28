@@ -1,6 +1,8 @@
 #include "camera_advanced_settings_widget.h"
 #include "ui_camera_advanced_settings_widget.h"
 
+#include <QtGui/QClipboard>
+#include <QtWidgets/QApplication>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkReply>
 
@@ -23,6 +25,11 @@
 
 #include <vms_gateway_embeddable.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/ui/common/line_edit_controls.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 bool isStatusValid(Qn::ResourceStatus status)
@@ -30,7 +37,22 @@ bool isStatusValid(Qn::ResourceStatus status)
     return status == Qn::Online || status == Qn::Recording;
 }
 
+// TODO: #vkutin Make this public utility.
+void setupCopyButton(QLineEdit* lineEdit)
+{
+    auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copy);
+    copyButton->setFocusPolicy(Qt::NoFocus);
+    copyButton->setHidden(true);
+    LineEditControls::get(lineEdit)->addControl(copyButton);
+
+    QObject::connect(copyButton, &QPushButton::clicked, lineEdit,
+        [lineEdit]() { qApp->clipboard()->setText(lineEdit->text()); });
+
+    QObject::connect(lineEdit, &QLineEdit::textChanged, copyButton,
+        [copyButton](const QString& text) { copyButton->setHidden(text.isEmpty()); });
 }
+
+} // namespace
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
@@ -46,6 +68,13 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     ui->secondaryStreamUrlInputField->setTitle(tr("Secondary Stream"));
     ui->secondaryStreamUrlInputField->setReadOnly(true);
+
+    auto primaryLineEdit = ui->primaryStreamUrlInputField->findChild<QLineEdit*>();
+    auto secondaryLineEdit = ui->secondaryStreamUrlInputField->findChild<QLineEdit*>();
+    NX_ASSERT(primaryLineEdit && secondaryLineEdit);
+
+    setupCopyButton(primaryLineEdit);
+    setupCopyButton(secondaryLineEdit);
 
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());

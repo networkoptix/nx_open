@@ -891,7 +891,10 @@ void LayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
 
 void LayoutsHandler::at_closeLayoutAction_triggered()
 {
-    closeLayouts(menu()->currentParameters(sender()).layouts());
+    auto layouts = menu()->currentParameters(sender()).layouts();
+    if (layouts.empty() && workbench()->layouts().size() > 1)
+        layouts.push_back(workbench()->currentLayout());
+    closeLayouts(layouts);
 }
 
 void LayoutsHandler::at_closeAllButThisLayoutAction_triggered()
