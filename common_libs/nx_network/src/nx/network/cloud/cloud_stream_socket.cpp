@@ -371,7 +371,6 @@ void CloudStreamSocket::connectToEntriesAsync(
 {
     using namespace std::placeholders;
 
-
     unsigned int sendTimeoutMillis = 0;
     if (!getSendTimeout(&sendTimeoutMillis))
         return handler(SystemError::getLastOSErrorCode());
@@ -400,7 +399,7 @@ void CloudStreamSocket::connectToEntriesAsync(
     m_multipleAddressConnector->connectAsync(
         std::chrono::milliseconds(sendTimeoutMillis),
         getSocketAttributes(),
-        std::bind(&CloudStreamSocket::onConnectDone, this, _1, _2));
+        std::bind(&CloudStreamSocket::onConnectDone, this, _1, _2, _3));
 }
 
 SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
@@ -423,15 +422,18 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
 
 void CloudStreamSocket::onConnectDone(
     SystemError::ErrorCode errorCode,
+    boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
-    NX_LOGX(lm("Connect completed with result %1").str(errorCode), cl_logDEBUG2);
+    NX_LOGX(lm("Connect completed with result %1").arg(errorCode), cl_logDEBUG2);
 
     if (errorCode == SystemError::noError)
     {
         errorCode = applyRealNonBlockingMode(connection.get());
         if (errorCode != SystemError::noError)
             connection.reset();
+        if (cloudTunnelAttributes)
+            m_cloudTunnelAttributes = std::move(*cloudTunnelAttributes);
     }
 
     if (errorCode == SystemError::noError)

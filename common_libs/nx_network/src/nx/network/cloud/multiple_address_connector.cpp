@@ -55,7 +55,13 @@ void MultipleAddressConnector::connectAsync(
                 connectToEntryAsync(entry);
 
             if (m_awaitedConnectOperationCount == 0)
-                return nx::utils::swapAndCall(m_handler, SystemError::invalidData, nullptr);
+            {
+                return nx::utils::swapAndCall(
+                    m_handler,
+                    SystemError::invalidData,
+                    boost::none,
+                    nullptr);
+            }
 
             if (m_timeout > std::chrono::milliseconds::zero())
                 m_timer.start(m_timeout, std::bind(&MultipleAddressConnector::onTimeout, this));
@@ -115,7 +121,7 @@ bool MultipleAddressConnector::establishDirectConnection(const SocketAddress& en
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying direct connection to %1").str(endpoint), cl_logDEBUG2);
+    NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -143,11 +149,12 @@ void MultipleAddressConnector::onDirectConnectDone(
     else
         tcpSocket->cancelIOSync(aio::etNone);
 
-    onConnectDone(sysErrorCode, std::move(tcpSocket));
+    onConnectDone(sysErrorCode, boost::none, std::move(tcpSocket));
 }
 
 void MultipleAddressConnector::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
+    boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
     NX_LOGX(lm("Connection completed with result %1")
@@ -169,14 +176,17 @@ void MultipleAddressConnector::onConnectDone(
     if (connection)
         m_socketAttributes.applyTo(connection.get());
 
-    cleanUpAndReportResult(sysErrorCode, std::move(connection));
+    cleanUpAndReportResult(
+        sysErrorCode,
+        std::move(cloudTunnelAttributes),
+        std::move(connection));
 }
 
 void MultipleAddressConnector::establishCloudConnection(const AddressEntry& dnsEntry)
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying cloud connection to %1").str(dnsEntry.host), cl_logDEBUG2);
+    NX_LOGX(lm("Trying cloud connection to %1").arg(dnsEntry.host), cl_logDEBUG2);
 
     auto cloudConnector = std::make_unique<CloudAddressConnector>(
         dnsEntry,
@@ -188,11 +198,12 @@ void MultipleAddressConnector::establishCloudConnection(const AddressEntry& dnsE
 
     cloudConnectorPtr->connectAsync(
         std::bind(&MultipleAddressConnector::onCloudConnectDone, this,
-            _1, _2, --m_cloudConnectors.end()));
+            _1, _2, _3, --m_cloudConnectors.end()));
 }
 
 void MultipleAddressConnector::onCloudConnectDone(
     SystemError::ErrorCode sysErrorCode,
+    TunnelAttributes cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<CloudAddressConnector>>::iterator connectorIter)
 {
@@ -200,11 +211,15 @@ void MultipleAddressConnector::onCloudConnectDone(
 
     m_cloudConnectors.erase(connectorIter);
 
-    onConnectDone(sysErrorCode, std::move(connection));
+    onConnectDone(
+        sysErrorCode,
+        std::move(cloudTunnelAttributes),
+        std::move(connection));
 }
 
 void MultipleAddressConnector::cleanUpAndReportResult(
     SystemError::ErrorCode sysErrorCode,
+    boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
     if (sysErrorCode == SystemError::noError)
@@ -226,12 +241,16 @@ void MultipleAddressConnector::cleanUpAndReportResult(
     m_cloudConnectors.clear();
     m_awaitedConnectOperationCount = 0;
 
-    nx::utils::swapAndCall(m_handler, sysErrorCode, std::move(connection));
+    nx::utils::swapAndCall(
+        m_handler,
+        sysErrorCode,
+        std::move(cloudTunnelAttributes),
+        std::move(connection));
 }
 
 void MultipleAddressConnector::onTimeout()
 {
-    cleanUpAndReportResult(SystemError::timedOut, nullptr);
+    cleanUpAndReportResult(SystemError::timedOut, boost::none, nullptr);
 }
 
 } // namespace cloud

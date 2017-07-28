@@ -34,6 +34,7 @@ void CloudAddressConnector::connectAsync(ConnectHandler handler)
         m_socketAttributes,
         [this, sharedOperationGuard](
             SystemError::ErrorCode errorCode,
+            TunnelAttributes tunnelAttributes,
             std::unique_ptr<AbstractStreamSocket> cloudConnection)
         {
             // NOTE: this handler is called from unspecified thread.
@@ -42,9 +43,14 @@ void CloudAddressConnector::connectAsync(ConnectHandler handler)
                 return; //< Operation has been cancelled.
 
             dispatch(
-                [this, errorCode, cloudConnection = std::move(cloudConnection)]() mutable
+                [this, errorCode, tunnelAttributes = std::move(tunnelAttributes),
+                    cloudConnection = std::move(cloudConnection)]() mutable
                 {
-                    nx::utils::swapAndCall(m_handler, errorCode, std::move(cloudConnection));
+                    nx::utils::swapAndCall(
+                        m_handler,
+                        errorCode,
+                        std::move(tunnelAttributes),
+                        std::move(cloudConnection));
                 });
         });
 }

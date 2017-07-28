@@ -4,6 +4,8 @@
 #include <deque>
 #include <list>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/address_resolver.h>
@@ -12,6 +14,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include "cloud_address_connector.h"
+#include "tunnel/tunnel_attributes.h"
 
 namespace nx {
 namespace network {
@@ -28,6 +31,7 @@ class NX_NETWORK_API MultipleAddressConnector:
 public:
     using ConnectHandler = nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode /*sysErrorCode*/,
+        boost::optional<TunnelAttributes> /*cloudTunnelAttributes*/,
         std::unique_ptr<AbstractStreamSocket>)>;
 
     MultipleAddressConnector(
@@ -69,14 +73,17 @@ private:
         std::list<std::unique_ptr<AbstractStreamSocket>>::iterator directConnectionIter);
     void onConnectDone(
         SystemError::ErrorCode sysErrorCode,
+        boost::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
     void cleanUpAndReportResult(
         SystemError::ErrorCode sysErrorCode,
+        boost::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
 
     void establishCloudConnection(const AddressEntry& dnsEntry);
     void onCloudConnectDone(
         SystemError::ErrorCode sysErrorCode,
+        TunnelAttributes cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection,
         std::list<std::unique_ptr<CloudAddressConnector>>::iterator connectorIter);
 };

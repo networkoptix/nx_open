@@ -77,42 +77,6 @@ protected:
 using FailingHostConnector = ConnectorStub<FailingRemoteHostTcpSocketStub>;
 using UnresponsiveHostConnector = ConnectorStub<UnresponsiveRemoteHostTcpSocketStub>;
 
-// TODO: #ak in 3.1 remove following methods.
-
-template<typename Value>
-bool verifyAttribute(
-    const AbstractSocket& socket,
-    bool (AbstractSocket::*getAttributeFunc)(Value*) const,
-    const boost::optional<Value>& expected)
-{
-    if (!expected)
-        return true;
-
-    Value actual{};
-    if (!(socket.*getAttributeFunc)(&actual))
-        return false;
-
-    return *expected == actual;
-}
-
-bool verifySocketAttributes(
-    const AbstractSocket& socket,
-    const SocketAttributes& attributes)
-{
-    if (attributes.aioThread)
-    {
-        if (socket.getAioThread() != *attributes.aioThread)
-            return false;
-    }
-
-    return verifyAttribute(socket, &AbstractSocket::getReuseAddrFlag, attributes.reuseAddrFlag)
-        && verifyAttribute(socket, &AbstractSocket::getNonBlockingMode, attributes.nonBlockingMode)
-        && verifyAttribute(socket, &AbstractSocket::getSendBufferSize, attributes.sendBufferSize)
-        && verifyAttribute(socket, &AbstractSocket::getRecvBufferSize, attributes.recvBufferSize)
-        && verifyAttribute(socket, &AbstractSocket::getRecvTimeout, attributes.recvTimeout)
-        && verifyAttribute(socket, &AbstractSocket::getSendTimeout, attributes.sendTimeout);
-}
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -246,7 +210,7 @@ private:
         m_connector->connectAsync(
             m_timeout,
             m_socketAttributes,
-            std::bind(&MultipleAddressConnector::onConnectCompletion, this, _1, _2));
+            std::bind(&MultipleAddressConnector::onConnectCompletion, this, _1, _2, _3));
     }
 
     std::deque<AddressEntry> prepareEntries()
@@ -259,6 +223,7 @@ private:
 
     void onConnectCompletion(
         SystemError::ErrorCode sysErrorCode,
+        boost::optional<TunnelAttributes> /*tunnelAttributes*/,
         std::unique_ptr<AbstractStreamSocket> connection)
     {
         m_connectResultQueue.push(Result(sysErrorCode, std::move(connection)));
