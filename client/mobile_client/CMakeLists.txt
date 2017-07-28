@@ -1,11 +1,9 @@
-if(IOS)
-    set(codesignKeychain "nx_build" CACHE STRING "Keychain name to be used to sign binaries.")
-endif()
-
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
 set(product.title "${mobile_client.name}")
 set(product.display.title "${mobile_client.display.name}")
+set(project.version.code "${buildNumber}")
+set(project.version.name "${mobileClientVersion}")
 
 nx_configure_file(
     maven/filter-resources/version.h
@@ -68,9 +66,6 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    set(project.version.name "${mobileClientVersion}")
-    set(project.version.code "${buildNumber}")
-
     file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     file(COPY "${customization_dir}/icons/android/android"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -124,8 +119,8 @@ if(IOS)
         RESOURCE "${resources}"
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
-        XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codesignKeychain}.keychain"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
     )
 
     set(additional_plugins
@@ -153,12 +148,18 @@ if(IOS)
             --print-static-plugins
             --qt-root "${QT_DIR}" --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
             --additional-plugins ${additional_plugins}
-            --output "${static_plugins_args_file}"
+            --output "${static_plugins_args_file}.copy"
         RESULT_VARIABLE result
     )
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "Cannot get list of static qml plugins.")
     endif()
+
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${static_plugins_args_file}.copy" "${static_plugins_args_file}"
+        RESULT_VARIABLE result
+    )
 
     set_property(TARGET mobile_client APPEND_STRING PROPERTY
         LINK_FLAGS " -Wl,-e,_qt_main_wrapper")
@@ -217,5 +218,21 @@ if(IOS)
             --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
             --output "${app_dir}/qt_qml"
         COMMENT "Copying QML imports"
+    )
+
+    set(ipa_file_name "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
+    set(payload_dir "$<CONFIGURATION>/Payload/mobile_client.app")
+
+    add_custom_target(mobile_client_ipa ALL
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${payload_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${payload_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${app_dir}" "${payload_dir}"
+        COMMAND
+            cd "$<CONFIGURATION>"
+                && ${CMAKE_COMMAND} -E tar cfv "${ipa_file_name}" --format=zip "Payload"
+        DEPENDS mobile_client
+        BYPRODUCTS "${ipa_file_name}"
+        VERBATIM
+        COMMENT "Creating ${ipa_file_name}"
     )
 endif()

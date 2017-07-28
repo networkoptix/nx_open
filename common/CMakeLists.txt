@@ -1,3 +1,5 @@
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources")
+
 if(NOT IOS)
     nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
         ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
