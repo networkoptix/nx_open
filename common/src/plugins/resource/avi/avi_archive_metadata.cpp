@@ -102,7 +102,7 @@ QString tagValue(const AVFormatContext* context, Tag tag, const QString& format)
     return QString::fromUtf8(tagValueRaw(context, tag, format));
 }
 
-//TODO: #rvasilenko we have two independent and non-standard ways to (de)serialize such layout. Looks like hell.
+// TODO: #rvasilenko we have two independent and non-standard ways to (de)serialize such layout. Looks like hell.
 bool deserializeLayout(const QString& layout, QnAviArchiveMetadata& metadata)
 {
     QStringList info = layout.split(L';');

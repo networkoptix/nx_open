@@ -13,7 +13,7 @@ struct QnBackupStatusData
     Qn::BackupState state;
     qreal progress;
 
-    //TODO: #rvasilenko why start time? Should we automatically add 2 minutes on the client side?
+    // TODO: #rvasilenko why start time? Should we automatically add 2 minutes on the client side?
     qint64 backupTimeMs; /**< Synchronized utc start time of the last chunk, that was backed up. */     
 };
 #define QnBackupStatusData_Fields (state)(progress)(backupTimeMs)

@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>ブックマークログ</translation>
     </message>

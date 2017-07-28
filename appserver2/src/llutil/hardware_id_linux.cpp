@@ -131,9 +131,10 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
         QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
         QString xclass = QDir(subsystemFileInfo.symLinkTarget()).dirName().toUpper();
 
-        if (classes.contains(xclass)) {
+        if (classes.contains(xclass))
             devices.push_back(QnMacAndDeviceClass(xclass, mac));
-        }
+        else
+            devices.push_back(QnMacAndDeviceClass("XXX", mac));
     }
 }
 

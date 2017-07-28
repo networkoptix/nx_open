@@ -49,6 +49,12 @@ class ArtifactFactory(object):
         self._artifact_set.add(self._artifact)
         return self._artifact.path
 
+    def write_file(self, contents):
+        path = self.produce_file_path()
+        with open(path, 'w') as f:
+            f.write(contents)
+        return path
+
     def release(self):
         repo = self._db_capture_repository
         if not repo: return
@@ -60,5 +66,5 @@ class ArtifactFactory(object):
                 continue
             with open(artifact.path, 'rb') as f:
                 data = f.read()
-            at = repo.artifact_type(artifact.type_name, artifact.content_type)
+            at = repo.artifact_type(artifact.type_name, artifact.content_type, artifact.ext)
             repo.add_artifact_with_session(self._current_test_run, artifact.name, at, data, artifact.is_error or False)

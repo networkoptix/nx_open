@@ -64,7 +64,7 @@ QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const
     return m_imageProvider.data();
 }
 
-//TODO: #GDM change to QnCameraThumbnailManager
+// TODO: #GDM change to QnCameraThumbnailManager
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
 {
     m_inLoading = false;

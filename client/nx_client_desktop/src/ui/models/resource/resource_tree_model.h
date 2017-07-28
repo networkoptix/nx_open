@@ -156,7 +156,7 @@ private:
     bool m_systemHasManyServers = false;
 
     /** Node managers. */
-    //TODO: Make them registerable by type.
+    // TODO: Make them registerable by type.
     //Probably turn QnResourceTreeModelUserNodes into such manager too.
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;

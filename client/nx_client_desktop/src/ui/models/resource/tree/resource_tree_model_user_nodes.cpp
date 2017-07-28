@@ -657,7 +657,7 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     auto subjectNode = ensureSubjectNode(subject);
     removeNode(subjectNode);
 
-    //TODO: #GDM really we need only handle permissions change that modifies placeholders
+    // TODO: #GDM really we need only handle permissions change that modifies placeholders
     rebuildSubjectTree(subject);
     cleanupRecorders();
 }

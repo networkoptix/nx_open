@@ -255,7 +255,7 @@ void CLServerPushStreamReader::beforeRun()
 
     if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
         m_cameraAudioEnabled = camera->isAudioEnabled();
-        //TODO: #GDM get rid of resourceChanged
+        // TODO: #GDM get rid of resourceChanged
         connect(camera.data(),  &QnResource::resourceChanged, this,
             &CLServerPushStreamReader::at_resourceChanged, Qt::DirectConnection);
     }

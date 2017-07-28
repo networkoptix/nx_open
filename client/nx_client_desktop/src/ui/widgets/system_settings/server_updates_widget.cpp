@@ -482,13 +482,13 @@ bool QnServerUpdatesWidget::hasChanges() const
 
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from saving their changes
+    // TODO: #GDM now this prevents other tabs from saving their changes
     return !isUpdating();
 }
 
 bool QnServerUpdatesWidget::canDiscardChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from discarding their changes
+    // TODO: #GDM now this prevents other tabs from discarding their changes
     return canCancelUpdate();
 }
 

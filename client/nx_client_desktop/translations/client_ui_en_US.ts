@@ -393,11 +393,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Bookmark Log</source>
         <translation type="unfinished"></translation>
     </message>

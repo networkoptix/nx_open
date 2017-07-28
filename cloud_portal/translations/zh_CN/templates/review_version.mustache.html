@@ -1,10 +1,10 @@
-<h1>There is a new revision for {{ message.product }}</h1>
-<p>Click on the link to review draft {{ message.id }} for {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">Review Version</a>
-<h4>On this page you can</h4>
+<h1>{{ message.product }}有一个新版本</h1>
+<p>点击链接查看{{ message.product }}的{{ message.id }}草案</p>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">审查的版本</a>
+<h4>你可以在此页</h4>
 <ul>
-	<li>Create a preview to see the most recent changes.</li>
-	<li>Publish this version which will update all content.</li>
-	<l1>Edit contexts by clicking on the edit record button.<br>
-		To see those changes you will need to create a new version</l1>
+	<li>创建预览以查看最近的更改。</li>
+	<li>发布此更新版本。</li>
+	<l1>通过单击编辑记录按钮编辑上下文。<br>
+要查看这些更改，您需要创建一个新版本</l1>
 </ul>

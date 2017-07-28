@@ -16,8 +16,8 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp
-from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
+from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import make_schedule_task, Camera, SampleMediaFile
@@ -32,10 +32,10 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
-MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
-MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC  # timeout for local system ids become the same
-MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC = 90  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT_SEC = 60  # timeout when waiting for server become online (pingable)
+MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
+MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
+MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=1)  # timeout when waiting for server become online (pingable)
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -70,7 +70,7 @@ class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
                  box=None, config_file_params=None, setup_settings=None, setup_cloud_host=None,
-                 http_schema=None, rest_api_timeout_sec=None):
+                 http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
         assert config_file_params is None or isinstance(config_file_params, dict), repr(config_file_params)
@@ -90,7 +90,7 @@ class ServerConfig(object):
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_host = setup_cloud_host  # CloudHost or None
         self.http_schema = http_schema or DEFAULT_HTTP_SCHEMA  # 'http' or 'https'
-        self.rest_api_timeout_sec = rest_api_timeout_sec
+        self.rest_api_timeout = rest_api_timeout
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
@@ -103,7 +103,7 @@ class Server(object):
     _st_starting = object()
 
     def __init__(self, name, host, installation, server_ctl, rest_api_url,
-                 rest_api_timeout_sec=None, internal_ip_port=None, timezone=None):
+                 rest_api_timeout=None, internal_ip_port=None, timezone=None):
         assert name, repr(name)
         assert isinstance(host, Host), repr(host)
         self.title = name.upper()
@@ -114,7 +114,7 @@ class Server(object):
         self.rest_api_url = rest_api_url
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password, rest_api_timeout_sec)
+        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password, rest_api_timeout)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -203,23 +203,22 @@ class Server(object):
         if self._state != self._bool2final_state(is_started):
             self.set_service_status(is_started)
 
-    def wait_for_server_become_online(self):
-        wait_time_sec = MEDIASERVER_START_TIMEOUT_SEC
-        start_time = time.time()
-        while time.time() < start_time + wait_time_sec:
-            if self.is_server_online():
+    def wait_for_server_become_online(self, timeout=MEDIASERVER_START_TIMEOUT, check_interval_sec=0.5):
+        start_time = datetime_utc_now()
+        while datetime_utc_now() < start_time + timeout:
+            response = self.is_server_online()
+            if response:
                 log.info('Server is online now.')
-                return
+                return response
             else:
                 log.debug('Server is still offline...')
-                time.sleep(0.5)
+                time.sleep(check_interval_sec)
         else:
-            raise RuntimeError('Server %s has not went online in %d seconds' % (self, wait_time_sec))
+            raise RuntimeError('Server %s has not went online in %s' % (self, timeout))
 
     def is_server_online(self):
         try:
-            self.rest_api.api.ping.GET(timeout_sec=10)
-            return True
+            return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 
@@ -279,6 +278,7 @@ class Server(object):
 
     def make_core_dump(self):
         self._server_ctl.make_core_dump()
+        self._state = self._st_stopped
 
     def get_uptime(self):
         response = self.rest_api.api.statistics.GET()
@@ -311,7 +311,7 @@ class Server(object):
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
             cloudAccountName=cloud_host.user,
-            timeout_sec=60*5,
+            timeout=datetime.timedelta(minutes=5),
             **kw)
         settings = setup_response['settings']
         self.set_user_password(cloud_host.user, cloud_host.password)
@@ -344,7 +344,7 @@ class Server(object):
             getKey=make_key('GET'),
             postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings,
-            timeout_sec=MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC,
+            timeout=MEDIASERVER_MERGE_REQUEST_TIMEOUT,
             )
         if take_remote_settings:
             self.set_user_password(other_server.user, other_server.password)
@@ -354,8 +354,8 @@ class Server(object):
         time.sleep(5)  # servers still need some time to settle down; hope this time will be enough
 
     def _wait_for_servers_to_merge(self, other_server):
-        t = time.time()
-        while time.time() - t < MEDIASERVER_MERGE_TIMEOUT_SEC:
+        start_time = datetime_utc_now()
+        while datetime_utc_now() - start_time < MEDIASERVER_MERGE_TIMEOUT:
             self.load_system_settings()
             other_server.load_system_settings()
             if self.local_system_id == other_server.local_system_id:
@@ -363,8 +363,8 @@ class Server(object):
                 return
             log.debug('Servers are not merged yet, waiting...')
             time.sleep(0.5)
-        pytest.fail('Timed out in %s seconds waiting for servers %s and %s to be merged'
-                    % (MEDIASERVER_MERGE_TIMEOUT_SEC, self, other_server))
+        pytest.fail('Timed out in %s waiting for servers %s and %s to be merged'
+                    % (MEDIASERVER_MERGE_TIMEOUT, self, other_server))
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
@@ -376,18 +376,19 @@ class Server(object):
 
     # wait until existing server credentials become valid
     def _wait_for_credentials_accepted(self):
+        start_time = datetime_utc_now()
         t = time.time()
-        while time.time() - t < MEDIASERVER_CREDENTIALS_TIMEOUT_SEC:
+        while datetime_utc_now() - start_time < MEDIASERVER_CREDENTIALS_TIMEOUT:
             try:
                 self.rest_api.ec2.testConnection.GET()
-                log.info('Server accepted new credentials in %s seconds', time.time() - t)
+                log.info('Server accepted new credentials in %s', datetime_utc_now() - start_time)
                 return
             except HttpError as x:
                 if x.status_code != 401:
                     raise
             time.sleep(1)
-        pytest.fail('Timed out in %s seconds waiting for server %s to accept credentials: user=%r, password=%r'
-                    % (MEDIASERVER_CREDENTIALS_TIMEOUT_SEC, self, self.user, self.password))
+        pytest.fail('Timed out in %s waiting for server %s to accept credentials: user=%r, password=%r'
+                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.user, self.password))
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.GET()

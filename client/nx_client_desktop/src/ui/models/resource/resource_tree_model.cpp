@@ -418,7 +418,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (!isAdmin)
             return bastardNode;
 
-        return m_systemHasManyServers
+        return m_systemHasManyServers || m_scope == CamerasScope
             ? m_rootNodes[Qn::ServersNode]
             : rootNode;
     }
@@ -456,10 +456,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         return bastardNode;
     }
 
-    /* Storages are not to be displayed to users. */
-    if (node->resource().dynamicCast<QnStorageResource>())
-        return bastardNode;
-
     /* Checking local resources. */
     auto parentResource = node->resource()->getParentResource();
     if (!parentResource || parentResource->flags().testFlag(Qn::local_server))
@@ -470,14 +466,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
                 return m_rootNodes[Qn::LocalResourcesNode];
             return rootNode;
         }
-        return bastardNode;
-    }
-
-    /* Checking cameras in the exported nov-files. */
-    if (parentResource->flags().testFlag(Qn::local_layout))
-    {
-        if (node->resourceFlags().testFlag(Qn::local))
-            return ensureResourceNode(parentResource);
         return bastardNode;
     }
 
@@ -546,7 +534,7 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
 
     auto notifyCustomColumnChanged = [this]()
         {
-            //TODO: #GDM update only custom column and changed rows
+            // TODO: #GDM update only custom column and changed rows
             const auto root = m_rootNodes[rootNodeTypeForScope()];
             NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
                 .arg(m_scope).arg(rootNodeTypeForScope()));
@@ -690,7 +678,8 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
      */
     bool pureTreeResourcesOnly = true;
 
-    QSet<QnUuid> ids;
+    QSet<QnUuid> entities;
+    QSet<QnResourcePtr> resources;
 
     for (const auto& index: indexes)
     {
@@ -702,32 +691,31 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
         {
             case Qn::RecorderNode:
             {
-                for (auto child : node->children())
+                for (auto child: node->children())
                 {
                     if (auto res = child->resource())
-                        ids.insert(res->getId());
+                        resources.insert(res);
                 }
                 break;
             }
             case Qn::VideoWallItemNode:
             case Qn::LayoutTourNode:
-                ids << node->uuid();
+                entities << node->uuid();
                 break;
             case Qn::LayoutItemNode:
                 pureTreeResourcesOnly = false;
                 break;
         }
 
-        if (node->resource())
-            ids.insert(node->resource()->getId());
+        if (auto res = node->resource())
+            resources.insert(res);
     }
 
-    MimeData data(mimeData);
-    data.setIds(ids.toList());
-    data.toMimeData(mimeData);
-
-    mimeData->setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
-    return mimeData;
+    MimeData data(mimeData, resourcePool());
+    data.setEntities(entities.toList());
+    data.setResources(resources.toList());
+    data.setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
+    return data.createMimeData();
 }
 
 bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
@@ -785,13 +773,13 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
 
     /* Decode. */
     // Resource tree drop is working only for resources that are already in the pool.
-    MimeData data(mimeData);
-    const auto ids = data.getIds();
+    MimeData data(mimeData, resourcePool());
+    resourcePool()->addNewResources(data.resources());
 
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
-        const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
+        const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(data.entities());
 
         action::Parameters parameters;
         if (!videoWallItems.empty())
@@ -800,14 +788,14 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         }
         else
         {
-            parameters = resourcePool()->getResources(ids);
+            parameters = data.resources();
         }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == Qn::RoleNode)
     {
-        auto layoutsToShare = resourcePool()->getResources(ids).filtered<QnLayoutResource>(
+        auto layoutsToShare = data.resources().filtered<QnLayoutResource>(
             [](const QnLayoutResourcePtr& layout)
             {
                 return !layout->isFile();
@@ -826,7 +814,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     }
     else
     {
-        handleDrop(resourcePool()->getResources(ids), node->resource(), mimeData);
+        handleDrop(data.resources(), node->resource(), mimeData);
     }
 
     return true;
@@ -858,6 +846,23 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         return;
 
     if (resource->hasFlags(Qn::user))
+        return;
+
+    if (resource.dynamicCast<QnStorageResource>())
+        return;
+
+    // Ignore "Preview Search" layouts.
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        // TODO: #GDM do not add preview search layouts to the resource pool
+        if (layout->data().contains(Qn::LayoutSearchStateRole))
+            return;
+    }
+
+    // Skip cameras inside the exported layouts. Only layout items are to be displayed there.
+    const bool isExportedCamera = resource->hasFlags(Qn::local_video)
+        && !resource->getParentId().isNull();
+    if (isExportedCamera)
         return;
 
     connect(resource, &QnResource::parentIdChanged, this,
@@ -984,7 +989,10 @@ void QnResourceTreeModel::rebuildTree()
     }
 }
 
-void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)
+void QnResourceTreeModel::handleDrop(
+    const QnResourceList& sourceResources,
+    const QnResourcePtr& targetResource,
+    const QMimeData* mimeData)
 {
     if (sourceResources.isEmpty() || !targetResource)
         return;
@@ -1142,7 +1150,7 @@ void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallRes
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, matrix.uuid, Qn::VideoWallMatrixNode);
-    node->update(); //TODO: #GDM what for?
+    node->update(); // TODO: #GDM what for?
 }
 
 void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)

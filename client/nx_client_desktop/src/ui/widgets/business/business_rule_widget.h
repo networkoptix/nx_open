@@ -22,6 +22,16 @@ class QStateMachine;
 class QStandardItemModel;
 class QnAligner;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class MimeData;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class QnBusinessRuleWidget : public Connective<QnPanel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -79,7 +89,7 @@ private:
     QMap<nx::vms::event::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
     QMap<nx::vms::event::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
-    QnResourceList m_dropResources;
+    std::unique_ptr<nx::client::desktop::MimeData> m_mimeData;
 
     bool m_updating;
 

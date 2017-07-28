@@ -25,7 +25,7 @@ void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const 
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter());
     }
-    //TODO: #GDM #PTZ invalid rows highlight
+    // TODO: #GDM #PTZ invalid rows highlight
 }
 
 QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
@@ -37,7 +37,7 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
     switch (index.column()) {
     case QnPtzTourSpotsModel::NameColumn:
         comboBox = new QComboBox(parent);
-        foreach (const QnPtzPreset &preset, model->sortedPresets())
+        foreach (const QnPtzPreset &preset, model->presets())
             comboBox->addItem(preset.name, preset.id);
         break;
     case QnPtzTourSpotsModel::TimeColumn:

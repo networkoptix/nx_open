@@ -53,7 +53,7 @@ public:
     void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
-    //TODO: #GDM Refactor parameter set to the structure
+    // TODO: #GDM Refactor parameter set to the structure
     void exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
         const QString& fileName, const QString& format,
         QnStorageResourcePtr storage,
@@ -80,10 +80,10 @@ public slots:
 private:
     mutable QnMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
-    QnCamDisplay m_camdispay;   //TODO: #GDM refactor to scoped pointer
-    QPointer<QnAbstractMediaStreamDataProvider> m_reader;   //TODO: #GDM refactor to unique pointer or 'owner' template
+    QnCamDisplay m_camdispay;   // TODO: #GDM refactor to scoped pointer
+    QPointer<QnAbstractMediaStreamDataProvider> m_reader;   // TODO: #GDM refactor to unique pointer or 'owner' template
 
-    QnlTimeSource* m_extTimeSrc;    //TODO: #GDM refactor to weak pointer
+    QnlTimeSource* m_extTimeSrc;    // TODO: #GDM refactor to weak pointer
     QPointer<QnStreamRecorder> m_exportRecorder;
     QPointer<QnAbstractMediaStreamDataProvider> m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];

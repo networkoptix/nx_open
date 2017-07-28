@@ -295,7 +295,7 @@ static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudi
         outFormat->setSampleRate(wave.sample_rate());
         outFormat->setChannelCount(wave.num_channels());
 
-        //TODO: #dmishin set format properties according to EST_Wave's sample_type info.
+        // TODO: #dmishin set format properties according to EST_Wave's sample_type info.
         outFormat->setCodec(QString("audio/pcm"));
         outFormat->setByteOrder(QnAudioFormat::LittleEndian);
 

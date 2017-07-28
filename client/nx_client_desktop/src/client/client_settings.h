@@ -61,7 +61,7 @@ public:
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
 
-        /** ??? //TODO: #dklychkov */
+        /** ??? // TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
 
 
@@ -216,7 +216,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
-        //TODO: #GDM #3.1 replace with full set of export parameters in json
+        // TODO: #GDM #3.1 replace with full set of export parameters in json
         //QN_DECLARE_RW_PROPERTY(Qt::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())

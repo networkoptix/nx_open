@@ -103,6 +103,8 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule*
 
     m_hookChain.registerHook(searcher_hooks::commonHooks);
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
+    m_hookChain.registerHook(searcher_hooks::manufacturerReplacementByModel);
+    m_hookChain.registerHook(searcher_hooks::pelcoModelNormalization);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -201,7 +203,7 @@ void OnvifResourceInformationFetcher::findResources(
     QString model = info.name;
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
@@ -400,7 +402,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     return response.HardwareId.empty()
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +

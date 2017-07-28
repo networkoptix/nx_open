@@ -61,13 +61,13 @@
   <String Id="InstallLicenseText">按一下 \"接受並安裝\" 表示您同意</String>
   <String Id="Options">選項</String>
   <String Id="SelectApps">選擇要安裝的應用程式︰</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">無法連結 Windows 防火牆.  ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">設定 Windows 防火牆</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">設定 Windows 防火牆</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">回復 Windows 防火牆設定</String>
+  <String Id="WixExecFirewallExceptionsInstall">安裝 Windows 防火牆設定</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">回復 Windows 防火牆設定</String>
+  <String Id="WixExecFirewallExceptionsUninstall">移除 Windows 防火牆設定</String>
+  <String Id="Product_ArchMismatch_x86">此安裝包是為 32 位元作業系統設計的. 安裝程式將立即退出.</String>
+  <String Id="Product_ArchMismatch_x64">此安裝包是為 64 位元作業系統設計的. 安裝程式將立即退出.</String>
 </WixLocalization>

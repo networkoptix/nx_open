@@ -5,7 +5,6 @@
 using namespace nx;
 
 namespace {
-    const QString namePtzHotkeys(lit("ptzHotkeys"));
     const QString nameWatchedEventTypes(lit("showBusinessEvents"));
 
 
@@ -68,12 +67,3 @@ bool QnBusinessEventsFilterResourcePropertyAdaptor::isAllowed( vms::event::Event
     return watchedEvents().contains(eventType);
 }
 
-/************************************************************************/
-/* QnBusinessEventsFilterResourcePropertyAdaptor                        */
-/************************************************************************/
-
-QnPtzHotkeysResourcePropertyAdaptor::QnPtzHotkeysResourcePropertyAdaptor( QObject *parent /*= NULL*/ ) :
-    base_type(namePtzHotkeys, QnPtzHotkeyHash(), parent)
-{
-
-}

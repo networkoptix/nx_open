@@ -193,7 +193,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                         }
                     }
 
-                    //TODO: #dmishin move this somewhere.
+                    // TODO: #dmishin move this somewhere.
                     if (dependency.type == DependencyType::Show)
                     {
                         if (allConditionsSatisfied)

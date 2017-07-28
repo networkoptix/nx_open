@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-//TODO: #GDM get rid of this class
+// TODO: #GDM get rid of this class
 class QnEnvironment
 {
 public:

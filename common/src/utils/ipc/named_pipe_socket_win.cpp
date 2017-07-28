@@ -51,7 +51,7 @@ SystemError::ErrorCode NamedPipeSocket::connectToServerSync( const QString& pipe
 
     const QString win32PipeName = lit("\\\\.\\pipe\\%1").arg(pipeName);
 
-    //TODO: use WaitNamedPipe
+    // TODO: use WaitNamedPipe
 
     m_impl->hPipe = CreateFile(
         reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),             // pipe name 

@@ -65,9 +65,11 @@ void DragInstrument::startDrag(DragInfo* info)
     }
 
     QnResourceList resources;
-    foreach(QGraphicsItem *item, scene()->selectedItems())
-        if (QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item))
+    for (auto item: scene()->selectedItems())
+    {
+        if (auto widget = dynamic_cast<QnResourceWidget*>(item))
             resources.push_back(widget->resource());
+    }
 
     if (resources.isEmpty())
     {
@@ -80,11 +82,8 @@ void DragInstrument::startDrag(DragInfo* info)
     MimeData data;
     data.setResources(resources);
 
-    auto mimeData = new QMimeData();
-    data.toMimeData(mimeData);
-
     auto drag = new QDrag(info->view());
-    drag->setMimeData(mimeData);
+    drag->setMimeData(data.createMimeData());
     drag->exec(Qt::CopyAction, Qt::CopyAction);
 
     emit dragFinished(info->view());
