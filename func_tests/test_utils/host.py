@@ -6,6 +6,7 @@ Allows running commands or working with files on local or remote hosts transpare
 import abc
 import os
 import os.path
+import datetime
 import logging
 import threading
 import subprocess
@@ -20,7 +21,7 @@ from .utils import quote, is_list_inst
 log = logging.getLogger(__name__)
 
 
-PROCESS_TIMEOUT_SEC = 60*60  # 1 hour
+PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
 class ProcessError(subprocess.CalledProcessError):
@@ -39,7 +40,7 @@ class ProcessTimeoutError(subprocess.CalledProcessError):
         self.timeout = timeout
 
     def __str__(self):
-        return 'Command "%s" was timed out (timeout is %s seconds)' % (self.cmd, self.timeout)
+        return 'Command "%s" was timed out (timeout is %s)' % (self.cmd, self.timeout)
 
     def __repr__(self):
         return 'ProcessTimeoutError(%s)' % self
@@ -167,7 +168,7 @@ class LocalHost(Host):
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         assert is_list_inst(args, (str, unicode)), repr(args)
-        timeout = timeout or PROCESS_TIMEOUT_SEC
+        timeout = timeout or PROCESS_TIMEOUT
         args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
@@ -206,9 +207,9 @@ class LocalHost(Host):
                             raise
                     pipe.stdin.close()
             finally:
-                stdout_thread.join(timeout=timeout)
+                stdout_thread.join(timeout=timeout.total_seconds())
                 if not stdout_thread.isAlive():
-                    stderr_thread.join(timeout=timeout)
+                    stderr_thread.join(timeout=timeout.total_seconds())
                 if stdout_thread.isAlive() or stderr_thread.isAlive():
                     pipe.kill()
                     raise ProcessTimeoutError(subprocess.list2cmdline(args), timeout)

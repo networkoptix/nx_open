@@ -16,7 +16,7 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
@@ -35,7 +35,7 @@ MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC = 90  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT_SEC = 60  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=1)  # timeout when waiting for server become online (pingable)
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -203,9 +203,9 @@ class Server(object):
         if self._state != self._bool2final_state(is_started):
             self.set_service_status(is_started)
 
-    def wait_for_server_become_online(self, timeout_sec=MEDIASERVER_START_TIMEOUT_SEC, check_interval_sec=0.5):
-        start_time = time.time()
-        while time.time() < start_time + timeout_sec:
+    def wait_for_server_become_online(self, timeout=MEDIASERVER_START_TIMEOUT, check_interval_sec=0.5):
+        start_time = datetime_utc_now()
+        while datetime_utc_now() < start_time + timeout:
             response = self.is_server_online()
             if response:
                 log.info('Server is online now.')
@@ -214,7 +214,7 @@ class Server(object):
                 log.debug('Server is still offline...')
                 time.sleep(check_interval_sec)
         else:
-            raise RuntimeError('Server %s has not went online in %d seconds' % (self, timeout_sec))
+            raise RuntimeError('Server %s has not went online in %s' % (self, timeout))
 
     def is_server_online(self):
         try:
