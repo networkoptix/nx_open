@@ -129,7 +129,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -491,7 +491,7 @@ void ActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
 
 void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
 {
-    //TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
+    // TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
     // There at_workbench_cellSpacingChanged will also use this method
     auto actionId = [spacing]
         {
@@ -556,20 +556,18 @@ void ActionHandler::submitDelayedDrops()
 
     for (const auto& data: m_delayedDrops)
     {
-        const auto ids = data.getIds();
-        resources.append(resourcePool()->getResources(ids));
-        for (const auto& tour: layoutTourManager()->tours(ids))
+        for (const auto& tour: layoutTourManager()->tours(data.entities()))
             tours.push_back(tour);
 
-        const auto urls = data.getUrls();
-        resources.append(QnFileProcessor::createResourcesForFiles(
-            QnFileProcessor::findAcceptedFiles(urls)));
+        resources.append(data.resources());
     }
 
     m_delayedDrops.clear();
 
     if (resources.empty() && tours.empty())
         return;
+
+    resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -855,7 +853,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
 
     MimeData data;
-    data.setIds({id});
+    data.setEntities({id});
     openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
@@ -1017,13 +1015,11 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
-        return;
+void ActionHandler::at_delayedDropResourcesAction_triggered()
+{
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    MimeData mimeData = MimeData::deserialized(data, resourcePool());
 
     m_delayedDrops.push_back(mimeData);
 
@@ -1032,25 +1028,23 @@ void ActionHandler::at_delayedDropResourcesAction_triggered() {
 
 void ActionHandler::at_instantDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    MimeData mimeData = MimeData::deserialized(data, resourcePool());
+
+    if (mimeData.resources().empty())
         return;
 
-    const auto ids = mimeData.getIds();
-    auto resources = resourcePool()->getResources(ids);
-
-    const auto urls = mimeData.getUrls();
-    resources.append(QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(urls)));
-
-    if (resources.empty())
-        return;
+    resourcePool()->addNewResources(mimeData.resources());
 
     workbench()->clear();
-    menu()->trigger(action::OpenInNewTabAction, resources);
+    bool dropped = menu()->triggerIfPossible(action::OpenInNewTabAction, mimeData.resources());
+    if (dropped)
+        action(action::ResourcesModeAction)->setChecked(true);
+
+    // Security check - just in case.
+    if (workbench()->layouts().empty())
+        menu()->trigger(action::OpenNewTabAction);
 }
 
 void ActionHandler::at_openFileAction_triggered() {
@@ -1505,6 +1499,12 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
+    /**
+     * TODO: #GDM #3.2
+     * Adding layout to the resource pool is not needed, moreover it requires to add a lot of
+     * additional checks in different places. But to remove this line we need to implement a
+     * mechanism to cleanup QnResourceRuntimeDataManager layout item data.
+    */
     resourcePool()->addResource(layout);
     menu()->trigger(action::OpenInNewTabAction, layout);
 }
@@ -1902,7 +1902,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
             //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),

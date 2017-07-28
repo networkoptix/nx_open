@@ -64,10 +64,9 @@ int Service::runMainLoop()
 
 void Service::initializeLog(const AbstractServiceSettings& settings)
 {
-    utils::log::initialize(
-        settings.logging(),
-        settings.dataDir(),
-        m_applicationDisplayName);
+    auto logSettings = settings.logging();
+    logSettings.updateDirectoryIfEmpty(settings.dataDir());
+    utils::log::initialize(logSettings, m_applicationDisplayName);
 }
 
 void Service::reportStartupResult(bool result)

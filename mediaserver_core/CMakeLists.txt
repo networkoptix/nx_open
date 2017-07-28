@@ -13,6 +13,10 @@ nx_copy(IF_NEWER "${NX_SDK_PACKAGE}"
 nx_copy(IF_NEWER "${NX_STORAGE_SDK_PACKAGE}"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
+nx_configure_file(
+    maven/filter-resources/resources/serverProperties.json
+    ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 execute_process(

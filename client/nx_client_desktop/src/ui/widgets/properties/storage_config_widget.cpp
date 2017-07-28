@@ -410,7 +410,7 @@ void QnStorageConfigWidget::restoreCamerasToBackup()
 void QnStorageConfigWidget::setReadOnlyInternal(bool readOnly)
 {
     m_model->setReadOnly(readOnly);
-    //TODO: #GDM #Safe Mode
+    // TODO: #GDM #Safe Mode
 }
 
 void QnStorageConfigWidget::showEvent(QShowEvent* event)
@@ -777,8 +777,8 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     }
 
 
-    //TODO: #GDM what if there is only one storage - and it is backup?
-    //TODO: #GDM what if there are no storages at all?
+    // TODO: #GDM what if there is only one storage - and it is backup?
+    // TODO: #GDM what if there are no storages at all?
 
     if (validStorages.size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
@@ -789,7 +789,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
             return storage.isUsed && storage.isBackup;
         };
 
-    //TODO: #GDM what if storage is not used, so we should just enable it?
+    // TODO: #GDM what if storage is not used, so we should just enable it?
     if (!any_of(validStorages, isEnabledBackupStorage))
         return error(tr("Change \"Main\" to \"Backup\" for some of the storage above to enable backup."));
 

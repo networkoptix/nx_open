@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_ONVIF)
+
 #include <QtXml/QDomElement>
 
 #include <nx/network/http/http_client.h>
@@ -72,3 +74,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

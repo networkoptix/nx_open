@@ -26,7 +26,7 @@ SystemError::ErrorCode startProcessDetached(
 {
     return QProcess::startDetached(executablePath, arguments, workingDirectory, pid)
         ? SystemError::noError
-        : SystemError::fileNotFound; //TODO: #ak get proper error code.
+        : SystemError::fileNotFound; // TODO: #ak get proper error code.
 }
 
 bool checkProcessExists(qint64 pid)

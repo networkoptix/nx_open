@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>북마크 로그</translation>
     </message>

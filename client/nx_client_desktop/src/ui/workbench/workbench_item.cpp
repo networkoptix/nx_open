@@ -27,12 +27,15 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uu
         m_rotation = forcedRotation.toInt();
 }
 
-QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData& data, QObject* parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
+    const QnLayoutItemData& data,
+    QObject* parent)
+    :
     QObject(parent),
     m_uuid(data.uuid),
-    m_resource(resourcePool()->getResourceByDescriptor(data.resource))
+    m_resource(resource)
 {
-    NX_ASSERT(m_resource);
+    NX_EXPECT(m_resource && m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);

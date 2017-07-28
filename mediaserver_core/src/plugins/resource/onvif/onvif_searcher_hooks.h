@@ -12,6 +12,10 @@ void commonHooks(EndpointAdditionalInfo* outInfo);
 
 void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo);
 
+void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo);
+
+void pelcoModelNormalization(EndpointAdditionalInfo* outInfo);
+
 } // namespace searcher_hooks
 } // namespace onvif
 } // namespace plugins

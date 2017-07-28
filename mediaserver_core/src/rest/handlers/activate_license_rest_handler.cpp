@@ -67,7 +67,7 @@ QString activationMessage(const QJsonObject& errorMessage)
 
     if (messageId == lit("InvalidBrand"))
     {
-        return lit("You are trying to activate an incompatible license with your software. Please "
+        return lit("You are trying to activate a license incompatible with your software. Please "
             "contact the support team to obtain a valid License Key.");
     }
 
@@ -103,7 +103,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);
     params.addQueryItem(kBrand, runtimeData.brand);
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
     if(QnAppInfo::isBpi() || QnAppInfo::isNx1())

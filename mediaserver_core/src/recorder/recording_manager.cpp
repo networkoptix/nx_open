@@ -656,7 +656,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
-        //TODO: #gdm move (de)serializing of encoded reason params to common place
+        // TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }
 }

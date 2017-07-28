@@ -118,7 +118,7 @@ angular.module('nxCommon')
                 function initTimeline(){
                     var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(timeManager.nowToDisplay());
+                    scope.scaleManager.setEnd();
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }
@@ -279,7 +279,8 @@ angular.module('nxCommon')
                 function canvasDrag(event){
                     updateMouseCoordinate(event);
                     dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
-                              timelineActions.timelineDrag (mouseXOverTimeline);
+                              timelineActions.timelineDrag (mouseXOverTimeline) || dragged;
+                              // dragged is true if it was actually dragged at least once during interaction
                 }
 
                 var preventClick = false;

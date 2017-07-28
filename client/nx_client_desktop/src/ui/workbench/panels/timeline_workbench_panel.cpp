@@ -145,7 +145,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         {
             if (!isPinned() && !isOpened())
             {
-                //TODO: #GDM #high process handlers
+                // TODO: #GDM #high process handlers
                 setOpened(true);
 
                 /* So that the click that may follow won't hide it. */
@@ -176,7 +176,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         {
             /* Do not auto-hide slider if we have opened context menu. */
             if (!isPinned() && isOpened() && !menu()->isMenuVisible())
-                setOpened(false); //TODO: #GDM #high process handlers
+                setOpened(false); // TODO: #GDM #high process handlers
         });
     connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);

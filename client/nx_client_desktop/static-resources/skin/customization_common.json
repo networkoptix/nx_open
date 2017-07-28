@@ -316,7 +316,8 @@
         "colors": {
             "inacceptable":      "red_core",
             "acceptable":        "yellow_core",
-            "good":              "green_core"
+            "good":              "green_core",
+            "text":              "dark5"
         }
     },
 

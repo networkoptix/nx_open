@@ -75,24 +75,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.packages></rdep.packages>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-rpi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>rpi</value>
-                </property>
-            </activation>
-            <properties>
-                <rdep.packages>festival-2.1</rdep.packages>
+                <rdep.packages><!-- No festival support on edge1. --></rdep.packages>
             </properties>
         </profile>
     </profiles>

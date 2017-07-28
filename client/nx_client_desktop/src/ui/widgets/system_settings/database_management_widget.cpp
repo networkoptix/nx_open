@@ -77,7 +77,7 @@ void QnDatabaseManagementWidget::backupDb()
         return;
     }
 
-    //TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
+    // TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog());
     dialog->setMinimum(0);
     dialog->setMaximum(0);
@@ -98,7 +98,7 @@ void QnDatabaseManagementWidget::backupDb()
     commonModule()->ec2Connection()->dumpDatabaseAsync(dialog.data(), dumpDatabaseHandler);
     dialog->exec();
     if (dialog->wasCanceled())
-        return;    //TODO: #ak is running request finish OK?
+        return;    // TODO: #ak is running request finish OK?
 
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -154,7 +154,7 @@ void QnDatabaseManagementWidget::restoreDb()
     data.data = file.readAll();
     file.close();
 
-    //TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
+    // TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog);
     dialog->setMinimum(0);
     dialog->setMaximum(0);

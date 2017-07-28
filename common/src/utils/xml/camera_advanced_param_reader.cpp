@@ -113,7 +113,7 @@ void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resourc
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
-    //TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
+    // TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
     return true;
 
     QnIODeviceRAAI guard(xmlSource);

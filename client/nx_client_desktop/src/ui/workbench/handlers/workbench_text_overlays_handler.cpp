@@ -4,6 +4,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
+
 #include <QtGui/QTextDocument>
 
 #include <nx/vms/event/actions/abstract_action.h>
@@ -175,10 +176,16 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
         if (text.isEmpty())
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto caption = m_helper->eventAtResource(
-                runtimeParams, Qn::RI_WithUrl).toHtmlEscaped();
-            const auto description = m_helper->eventDetails(
-                runtimeParams).join(L'\n').toHtmlEscaped();
+            const auto rawCaption = m_helper->eventAtResource(runtimeParams, Qn::RI_WithUrl);
+            const auto caption = mightBeHtml(rawCaption)
+                ? rawCaption
+                : rawCaption.toHtmlEscaped();
+
+            // NewLine symbols will be replaced with html tag later.
+            const auto rawDescription = m_helper->eventDetails(runtimeParams);
+            const auto description = mightBeHtml(rawDescription)
+                ? rawDescription.join(lit("<br>"))
+                : rawDescription.join(L'\n').toHtmlEscaped();
 
             const auto captionHtml = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
             const auto descriptionHtml = htmlFormattedParagraph(description, kDescriptionPixelFontSize);
@@ -190,7 +197,7 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
         }
         else
         {
-            const auto rich = Qt::mightBeRichText(text) ? text : Qt::convertFromPlainText(text);
+            const auto rich = mightBeHtml(text) ? text : Qt::convertFromPlainText(text);
             textHtml = elideHtml(
                 htmlFormattedParagraph(rich, kDescriptionPixelFontSize),
                 kDescriptionMaxLength);

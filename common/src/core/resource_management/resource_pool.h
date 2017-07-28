@@ -48,15 +48,30 @@ public:
     QnResourcePool(QObject* parent);
     ~QnResourcePool();
 
+    enum AddResourceFlag
+    {
+        NoAddResourceFlags = 0x00,
+        UseIncompatibleServerPool = 0x01,   //< TODO: #GDM Remove when implement VMS-6789
+        SkipAddingTransaction = 0x02,       //< Add resource instantly even if transaction is open.
+    };
+    Q_DECLARE_FLAGS(AddResourceFlags, AddResourceFlag);
+
     /**
      * This function will add or update existing resources.
      * By default it add resources to the mainPool. if mainPoos parameter is false then resources are put to
-     * the incompatible resource pool.
+     * the incompatible resource pool. Adding transaction is always skipped here.
      */
+    void addResources(const QnResourceList &resources, AddResourceFlags flags = NoAddResourceFlags);
 
-    void addResources(const QnResourceList &resources, bool mainPool = true);
+    /**
+     * Add only those resources which are not belong to any resource pool. Existing resources are
+     * not updated.
+     */
+    void addNewResources(const QnResourceList &resources,
+        AddResourceFlags flags = NoAddResourceFlags);
 
-    void addResource(const QnResourcePtr& resource, bool instantly = false);
+    void addResource(const QnResourcePtr& resource, AddResourceFlags flags = NoAddResourceFlags);
+
     // TODO: We need to remove this function. Client should use separate instance of resource pool instead
     void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 

@@ -4,7 +4,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QScopedValueRollback>
 
-//TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -909,7 +909,7 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         ui->gridWidget->setBrush(brush);
     }
 
-    //TODO: #GDM is it really needed here?
+    // TODO: #GDM is it really needed here?
     updateMaxFPS();
 
     if (m_updating)
@@ -1204,7 +1204,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         camera->setScheduleDisabled(!recordingEnabled);
         int maxFps = camera->getMaxFps();
 
-        //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+        // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
         // or just use camera->reservedSecondStreamFps();
 
         int decreaseAlways = 0;

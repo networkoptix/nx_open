@@ -19,7 +19,7 @@ QDateTime rtu::convertUtcToTimeZone(qint64 utcTimeMs
     const int offsetFromUtc = timeZone.offsetFromUtc(QDateTime::fromMSecsSinceEpoch(utcTimeMs));
     const QDateTime pseudoDateTime = QDateTime::fromMSecsSinceEpoch(
         utcTimeMs +  offsetFromUtc * kMSecFactor, Qt::UTC);
-    //TODO: #ynikitenkov are you sure it should work this way?
+    // TODO: #ynikitenkov are you sure it should work this way?
     return QDateTime(pseudoDateTime.date(), pseudoDateTime.time());
 }
 

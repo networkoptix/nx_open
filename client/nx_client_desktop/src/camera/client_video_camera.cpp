@@ -318,7 +318,7 @@ void QnClientVideoCamera::stopExport()
     if (m_exportRecorder)
     {
         // clean signature flag; in other case file will be recreated on writing finish
-        //TODO: #vasilenko get rid of this magic
+        // TODO: #vasilenko get rid of this magic
         m_exportRecorder->setNeedCalcSignature(false);
 
         connect(m_exportRecorder, &QnStreamRecorder::finished, this, &QnClientVideoCamera::exportStopped);

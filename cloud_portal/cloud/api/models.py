@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from account_backend import AccountManager
+from django.utils.deprecation import CallableFalse, CallableTrue
+
 
 from cms.models import Customization
 from cloud import settings
@@ -40,10 +42,10 @@ class Account(PermissionsMixin):
     def __str__(self):
         return self.get_username()
 
-    @staticmethod
-    def is_authenticated():
-        return True
+    @property
+    def is_authenticated(self):
+        return CallableTrue
 
-    @staticmethod
-    def is_anonymous():
-        return False
+    @property
+    def is_anonymous(self):
+        return CallableFalse

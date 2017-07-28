@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/ptz/ptz_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 namespace nx {
 namespace client {
@@ -8,10 +9,10 @@ namespace core {
 namespace ptz {
 namespace helpers {
 
-QnPtzPresetList getSortedPresets(const QnAbstractPtzController* controller);
-QnPtzPresetList getSortedPresets(const QnPtzControllerPtr& controller);
+bool getSortedPresets(const QnAbstractPtzController* controller, QnPtzPresetList& presets);
+bool getSortedPresets(const QnPtzControllerPtr& controller, QnPtzPresetList& presets);
 
-QnPtzPresetList sortedPresets(QnPtzPresetList presets);
+QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList presets);
 
 } // namespace helpers
 } // namespace ptz

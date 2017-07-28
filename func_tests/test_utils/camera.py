@@ -13,6 +13,7 @@ created using 'camera' or 'camera_factory' fixtures.
 '''
 
 import logging
+import datetime
 import hashlib
 import time
 import socket
@@ -24,6 +25,7 @@ import hachoir_core.config
 hachoir_core.config.unicode_stdout = False
 import hachoir_parser
 import hachoir_metadata
+from .utils import datetime_utc_now
 
 log = logging.getLogger(__name__)
         
@@ -31,7 +33,7 @@ log = logging.getLogger(__name__)
 DEFAULT_CAMERA_MAC_ADDR = '11:22:33:44:55:66'
 TEST_CAMERA_NAME = 'TestCameraLive'  # hardcoded to server, mandatory for auto-discovered cameras
 
-CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC = 60
+CAMERA_DISCOVERY_WAIT_TIMEOUT = datetime.timedelta(minutes=1)
 
 TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
 TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
@@ -100,11 +102,11 @@ class Camera(object):
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
-    def wait_until_discovered_by_server(self, server_list, timeout_sec=CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC):
+    def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
         #assert is_list_inst(server_list, Server), repr(server_list)
         log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
-        t = time.time()
-        while time.time() - t < timeout_sec:
+        start_time = datetime_utc_now()
+        while datetime_utc_now() - start_time < timeout:
             for server in server_list:
                 for d in server.rest_api.ec2.getCamerasEx.GET():
                     if d['physicalId'].replace('-', ':') == self.mac_addr:
@@ -112,8 +114,8 @@ class Camera(object):
                         log.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
                         return
             time.sleep(5)
-        pytest.fail('Camera %s was not discovered by servers %s in %s seconds'
-                    % (self, ', '.join(map(str, server_list)), CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC))
+        pytest.fail('Camera %s was not discovered by servers %s in %s'
+                    % (self, ', '.join(map(str, server_list)), CAMERA_DISCOVERY_WAIT_TIMEOUT))
 
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self

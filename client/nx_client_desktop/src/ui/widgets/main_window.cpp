@@ -578,10 +578,12 @@ void MainWindow::minimize() {
     showMinimized();
 }
 
-bool MainWindow::handleMessage(const QString &message) {
+bool MainWindow::handleMessage(const QString &message)
+{
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 
-    QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+    QnResourceList resources = QnFileProcessor::createResourcesForFiles(
+        QnFileProcessor::findAcceptedFiles(files));
     if (resources.isEmpty())
         return false;
 

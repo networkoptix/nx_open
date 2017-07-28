@@ -38,7 +38,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
 #ifdef ENABLE_DESKTOP_CAMERA
     m_searchers << new QnDesktopCameraResourceSearcher(commonModule);
 
-    //TODO: #GDM it this the best place for this class instance? Why not place it directly to the searcher?
+    // TODO: #GDM it this the best place for this class instance? Why not place it directly to the searcher?
     QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
