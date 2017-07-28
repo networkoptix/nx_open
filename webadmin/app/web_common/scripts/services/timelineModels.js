@@ -985,8 +985,6 @@ ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline.
     var end = timeManager.nowToDisplay();
     if(this.playedPosition > this.end && liveMode){
         end = this.playedPosition;
-    }else if(end > this.end){
-        end = end;
     }
 
     this.end = end;
