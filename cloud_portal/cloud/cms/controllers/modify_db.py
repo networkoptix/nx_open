@@ -33,11 +33,13 @@ def accept_latest_draft(customization, user):
     unaccepted_version.save()
 
 
-def notify_version_ready(customization, version_id, product_name):
+def notify_version_ready(customization, version_id, product_name, exclude_user):
     perm = Permission.objects.get(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
-        filter(customization=customization, subscribe=True).distinct()
+        filter(customization=customization, subscribe=True).\
+        exclude(pk=exclude_user.pk).\
+        distinct()
 
     for user in users:
         send(user.email, "review_version",
@@ -164,7 +166,7 @@ def send_version_for_review(customization, language, data_structures,
 
     alter_records_version(Context.objects.filter(
         product=product), customization, None, version)
-    notify_version_ready(customization, version.id, product.name)
+    notify_version_ready(customization, version.id, product.name, user)
     return upload_errors
 
 
