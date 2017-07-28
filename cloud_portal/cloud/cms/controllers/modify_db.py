@@ -138,7 +138,7 @@ def alter_records_version(contexts, customization, old_version, new_version):
 
 def generate_preview(context=None):
     fill_content(customization_name=settings.CUSTOMIZATION)
-    return '/' + context.url + "?preview" if context else "/?preview"
+    return context.url + "?preview" if context else "?preview"
 
 
 def publish_latest_version(customization, user):

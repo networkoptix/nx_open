@@ -95,7 +95,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
         upload_errors = save_unrevisioned_records(
             customization, language, context.datastructure_set.all(),
             request_data, request_files, user)
-        preview_link = generate_preview(context)
+        preview_link = request.get_host() + generate_preview(context)
 
         if upload_errors:
             add_upload_error_messages(request._request, upload_errors)
@@ -166,7 +166,7 @@ def context_edit_view(request, context=None, language=None):
 @api_view(["POST"])
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
-        preview_link = generate_preview()
+        preview_link = request.get_host() + generate_preview()
         return redirect(preview_link)
     elif "Publish" in request.data:
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
