@@ -24,6 +24,7 @@
         <buildLib>sharedLib</buildLib>
         <rdep.windows.packages>cassandra-2.7.0</rdep.windows.packages>
         <rdep.linux.packages>cassandra-2.7.0</rdep.linux.packages>
+        <rdep.mac.packages>cassandra-2.7.0</rdep.mac.packages>
     </properties>
 
     <dependencies>
