@@ -72,7 +72,6 @@ copyLibsWithoutQt()
         libswresample.so
         libswscale.so
         libpostproc.so
-        libvmux.so
     )
 
     [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=( libvpx.so )
@@ -127,7 +126,6 @@ copyBins()
     cp "$BINS_DIR/external.dat" "$INSTALL_DIR/$MODULE/bin/"
 
     mkdir -p "$INSTALL_DIR/$MODULE/bin/plugins/"
-    cp "$LIBS_DIR/libisd_native_plugin.so.DIMA" "$INSTALL_DIR/$MODULE/bin/plugins/libisd_native_plugin.so"
     cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
 }
 
