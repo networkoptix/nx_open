@@ -99,7 +99,6 @@ private:
     void handlePingTimer();
     void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
-    void resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> afterHandler);
     void resetPingTimeoutBySocketTimeoutSync();
     void setPingTimeout();
     void reportErrorIfAny(
