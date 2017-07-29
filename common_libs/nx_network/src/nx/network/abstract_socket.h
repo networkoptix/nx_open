@@ -256,6 +256,10 @@ public:
      */
     virtual SocketAddress getForeignAddress() const = 0;
     /**
+     * @return Text name of the remote host. By default, getForeignAddress().address.toString().
+     */
+    virtual QString getForeignHostName() const;
+    /**
      * Returns true, if connection has been established, false otherwise.
      */
     virtual bool isConnected() const = 0;
