@@ -192,6 +192,13 @@ void EpollWin32::prepareOutEvents(
             continue;
         }
         (*socketsAvailableForReading)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
+
+        // TODO: #ak Rollback after fixing issue VMS-6814.
+        if ((m_socketDescriptorToEventMask[m_readfds->fd_array[i]] & UDT_EPOLL_IN) == 0)
+        {
+            int* x = nullptr;
+            *x = 1234567;
+        }
     }
 
     for (size_t i = 0; i < m_writefds->fd_count; ++i)
