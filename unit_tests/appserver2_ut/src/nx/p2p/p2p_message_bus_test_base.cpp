@@ -11,6 +11,8 @@ namespace nx {
 namespace p2p {
 namespace test {
 
+static const int kMaxInstancesWithTimeManager = 100;
+
 int P2pMessageBusTestBase::m_instanceCounter = 0;
 static const QString kP2pTestSystemName(lit("P2pTestSystem"));
 
@@ -47,6 +49,13 @@ void P2pMessageBusTestBase::createData(
     const auto settings = connection->commonModule()->globalSettings();
     settings->setSystemName(kP2pTestSystemName);
     settings->setLocalSystemId(guidFromArbitraryData(kP2pTestSystemName));
+    const bool disableTimeManager = m_servers.size() > kMaxInstancesWithTimeManager;
+    if (disableTimeManager)
+    {
+        settings->setTimeSynchronizationEnabled(false);
+        settings->setSynchronizingTimeWithInternet(false);
+    }
+
     settings->synchronizeNow();
 
     //read server list
@@ -128,7 +137,9 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 baseTcpPort)
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(
+    bool keepDbFile,
+    quint16 baseTcpPort)
 {
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
