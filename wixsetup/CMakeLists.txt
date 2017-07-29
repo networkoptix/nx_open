@@ -26,9 +26,8 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
 add_custom_target(wixsetup ALL
-    #DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions
-    DEPENDS customactions
+    DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions
     COMMENT "Creating installer..."
-    #COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
-    #COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
+    COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
+    COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
