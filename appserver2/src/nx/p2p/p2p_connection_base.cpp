@@ -117,7 +117,7 @@ QUrl ConnectionBase::remoteAddr() const
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
-    NX_VERBOSE(
+    NX_DEBUG(
         this,
         lit("Connection to peer %1 canceled from state %2. Reason: %3")
         .arg(m_remotePeer.id.toString())
