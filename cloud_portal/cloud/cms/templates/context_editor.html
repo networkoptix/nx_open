@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
 {% load static %}
+{% load cms_filters %}
 
 {% block extrahead %}
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
@@ -28,14 +29,15 @@
         <div class="form-row">
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
+                {% if field|is_ImageField and field.value%}
                 <div>
-                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}"
-                         onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
                     <div>
                         <label><input id="Remove_{{field.label}}"
                                type="checkbox" name="Remove_{{field.label}}"> Remove Image</label>
                     </div>
                 </div>
+                {% endif %}
                 {{ field }}
                 
                 {% if field.help_text %}
