@@ -18,7 +18,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
-from cms.admin import admin_site
 
 
 def redirect_login(request):
@@ -30,7 +29,7 @@ def redirect_login(request):
 urlpatterns = [
     url(r'^admin/login/', redirect_login),
     url(r'^admin/cms/', include('cms.urls')),
-    url(r'^admin/', include(admin_site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
 
