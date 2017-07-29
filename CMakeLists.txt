@@ -41,9 +41,6 @@ set(releaseVersion.full ${releaseVersion}.${buildNumber})
 set(mobileClientVersion 17.2)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
-#TODO: move Custom Actions build to Cmake
-set(VCVars "VS140COMNTOOLS")
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 list(APPEND CMAKE_MODULE_PATH
@@ -169,8 +166,8 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
-    #add_subdirectory(unit_tests)
-    #add_subdirectory(tests)
+    add_subdirectory(unit_tests)
+    add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)

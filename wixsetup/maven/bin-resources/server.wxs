@@ -6,7 +6,7 @@
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="$(var.customization)MediaServerDir" Name="MediaServer">
+            <Directory Id="MediaServerDir" Name="MediaServer">
                 <Component Id="ServerExecutable">
                     <File Id="mediaserver.exe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes" DiskId="11">
                         <fire:FirewallException Id="FirewallExceptionMediaServer" Name="$(var.mediaserverName)" Scope="any" IgnoreFailure="yes"/>
