@@ -7,6 +7,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
 
+#include <core/resource/resource.h>
+
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -87,6 +89,9 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
             QSignalBlocker blocker(widget);
             widget->clearSelection();
         });
+
+    connect(action(action::SelectNewItemAction), &QAction::triggered, this,
+        &ResourceTreeWorkbenchPanel::at_selectNewItemAction_triggered);
 
     QPalette defaultPalette = widget->palette();
     setPaletteColor(widget, QPalette::Window, Qt::transparent);
@@ -390,6 +395,26 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
 
     m_hidingProcessor->forceHoverEnter();
     m_opacityProcessor->forceHoverEnter();
+}
+
+void ResourceTreeWorkbenchPanel::at_selectNewItemAction_triggered()
+{
+    NX_ASSERT(!m_inSelection);
+    QScopedValueRollback<bool> guard(m_inSelection, true);
+
+    // Blocking signals to avoid SelectionChanged action call
+    QSignalBlocker blocker(widget);
+
+    const auto parameters = menu()->currentParameters(sender());
+    if (parameters.hasArgument(Qn::UuidRole))
+    {
+        const auto id = parameters.argument(Qn::UuidRole).value<QnUuid>();
+        widget->selectNodeByUuid(id);
+    }
+    else if (const auto resource = parameters.resource())
+    {
+        widget->selectResource(resource);
+    }
 }
 
 void ResourceTreeWorkbenchPanel::updateControlsGeometry()

@@ -280,7 +280,7 @@ class VagrantBox(object):
         assert self.host, 'Not initialized (init method was not called)'
         rest_api_url = '%s://%s:%d/' % (server_config.http_schema, self._vm_host.host, self.config.rest_api_forwarded_port)
         return Server(server_config.name, self.host, self._installation, self._server_ctl,
-                      rest_api_url, server_config.rest_api_timeout_sec, timezone=self.timezone)
+                      rest_api_url, server_config.rest_api_timeout, timezone=self.timezone)
         
     def _box_host(self, user, ssh_config_path=None):
         return RemoteSshHost(self.name, user, self._vagrant_private_key_path,

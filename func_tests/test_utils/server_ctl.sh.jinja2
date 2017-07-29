@@ -3,6 +3,8 @@
 {% block variables %}
 {{ super() }}
 BIN_DIR="$SERVER_DIR/bin/"
+STOP_TIMEOUT_SEC=10
+CORE_DUMP_TIMEOUT_SEC=30
 BIN_PATH="$BIN_DIR/mediaserver-bin"
 CONF_PATH="$SERVER_DIR/etc/mediaserver.conf"
 RUNTIME_CONF_PATH="$SERVER_DIR/etc/mediaserver_runtime.conf"

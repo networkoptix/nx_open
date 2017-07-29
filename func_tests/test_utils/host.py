@@ -6,6 +6,7 @@ Allows running commands or working with files on local or remote hosts transpare
 import abc
 import os
 import os.path
+import datetime
 import logging
 import threading
 import subprocess
@@ -20,7 +21,7 @@ from .utils import quote, is_list_inst
 log = logging.getLogger(__name__)
 
 
-PROCESS_TIMEOUT_SEC = 60*60  # 1 hour
+PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
 class ProcessError(subprocess.CalledProcessError):
@@ -34,11 +35,12 @@ class ProcessError(subprocess.CalledProcessError):
 
 class ProcessTimeoutError(subprocess.CalledProcessError):
 
-    def __init__(self, cmd):
+    def __init__(self, cmd, timeout):
         subprocess.CalledProcessError.__init__(self, returncode=None, cmd=cmd)
+        self.timeout = timeout
 
     def __str__(self):
-        return 'Command "%s" was timed out (timeout is %s seconds)' % (self.cmd, PROCESS_TIMEOUT_SEC)
+        return 'Command "%s" was timed out (timeout is %s)' % (self.cmd, self.timeout)
 
     def __repr__(self):
         return 'ProcessTimeoutError(%s)' % self
@@ -93,7 +95,7 @@ class Host(object):
         pass
 
     @abc.abstractmethod
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         pass
 
     @abc.abstractmethod
@@ -164,8 +166,9 @@ class LocalHost(Host):
     def host(self):
         return 'localhost'
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         assert is_list_inst(args, (str, unicode)), repr(args)
+        timeout = timeout or PROCESS_TIMEOUT
         args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
@@ -204,12 +207,12 @@ class LocalHost(Host):
                             raise
                     pipe.stdin.close()
             finally:
-                stdout_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                stdout_thread.join(timeout=timeout.total_seconds())
                 if not stdout_thread.isAlive():
-                    stderr_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                    stderr_thread.join(timeout=timeout.total_seconds())
                 if stdout_thread.isAlive() or stderr_thread.isAlive():
                     pipe.kill()
-                    raise ProcessTimeoutError(subprocess.list2cmdline(args))
+                    raise ProcessTimeoutError(subprocess.list2cmdline(args), timeout)
         finally:
             stdout_thread.join()
             stderr_thread.join()
@@ -315,11 +318,11 @@ class RemoteSshHost(Host):
     def host(self):
         return self._host
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
-        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output)
+        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
 
     def file_exists(self, path):
         output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()

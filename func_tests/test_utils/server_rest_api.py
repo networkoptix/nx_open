@@ -9,6 +9,7 @@ But for POST method keyword parameters are translated to json request body.
 
 import json
 import logging
+import datetime
 import warnings
 import requests
 import requests.exceptions
@@ -18,7 +19,7 @@ from requests.auth import HTTPDigestAuth
 
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'
-REST_API_TIMEOUT_SEC = 10
+REST_API_TIMEOUT = datetime.timedelta(seconds=10)
 
 log = logging.getLogger(__name__)
 
@@ -41,27 +42,28 @@ class ServerRestApiError(RuntimeError):
 
 class ServerRestApiProxy(object):
 
-    def __init__(self, server_name, url, user, password, timeout_sec):
+    def __init__(self, server_name, url, user, password, timeout):
+        assert isinstance(timeout, datetime.timedelta), repr(timeout)
         self._server_name = server_name
         self._url = url
         self._user = user
         self._password = password
-        self._timeout_sec = timeout_sec
+        self._timeout = timeout
 
     def __getattr__(self, name):
-        return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password, self._timeout_sec)
+        return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password, self._timeout)
 
-    def GET(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
+    def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
         self._log_request('GET', kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
-        return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
+        return self._make_request(raise_exception, timeout, requests.get, self._url, headers=headers, params=params)
 
-    def POST(self, raise_exception=True, timeout_sec=None, headers=None, json=None, **kw):
+    def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
         self._log_request('POST', json)
-        return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=json)
+        return self._make_request(raise_exception, timeout, requests.post, self._url, headers=headers, json=json)
 
     def _log_request(self, method, data):
         log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, self._password, method, self._url, data)
@@ -71,12 +73,13 @@ class ServerRestApiProxy(object):
             return value and 'true' or 'false'
         return str(value)
 
-    def _make_request(self, raise_exception, timeout_sec, fn, url, *args, **kw):
+    def _make_request(self, raise_exception, timeout, fn, url, *args, **kw):
+        timeout_sec = (timeout or self._timeout).total_seconds()
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore', InsecureRequestWarning)
                 response = fn(url, auth=HTTPDigestAuth(self._user, self._password),
-                              timeout=timeout_sec or self._timeout_sec, verify=False, *args, **kw)
+                              timeout=timeout_sec, verify=False, *args, **kw)
         except requests.exceptions.RequestException as x:
             log.debug('\t--> %s: %s', x.__class__.__name__, x)
             raise
@@ -103,13 +106,13 @@ class ServerRestApiProxy(object):
 
 class RestApiBase(object):
 
-    def __init__(self, server_name, url, user, password, timeout_sec=None):
+    def __init__(self, server_name, url, user, password, timeout=None):
         assert url.endswith('/'), repr(url)  # http://localhost:7001/
         self.server_name = server_name
         self.url = url
         self.user = user
         self.password = password
-        self.timeout_sec = timeout_sec or REST_API_TIMEOUT_SEC
+        self.timeout = timeout or REST_API_TIMEOUT
 
     def set_credentials(self, user, password):
         self.user = user
@@ -121,7 +124,7 @@ class RestApiBase(object):
         return getattr(function, method)       # server.rest_api.ec2.getUsers.GET
 
     def _make_proxy(self, path):
-        return ServerRestApiProxy(self.server_name, self.url + path, self.user, self.password, self.timeout_sec)
+        return ServerRestApiProxy(self.server_name, self.url + path, self.user, self.password, self.timeout)
 
 
 class ServerRestApi(RestApiBase):

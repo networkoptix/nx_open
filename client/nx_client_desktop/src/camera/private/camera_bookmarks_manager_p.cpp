@@ -585,10 +585,15 @@ void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBo
 
             auto it = findBookmark(bookmarks, info.bookmark.guid);
             if (it != bookmarks.end())
-                bookmarks.erase(it);
+            {
+                *it = info.bookmark;
+            }
+            else
+            {
+                it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
+                bookmarks.insert(it, info.bookmark);
+            }
 
-            it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
-            bookmarks.insert(it, info.bookmark);
         }
     }
 }

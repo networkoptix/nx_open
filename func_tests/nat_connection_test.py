@@ -2,9 +2,9 @@ import time
 import logging
 import pytest
 from datetime import datetime
-from test_utils.utils import SimpleNamespace
+from test_utils.utils import SimpleNamespace, datetime_utc_now
 from test_utils.server import TimePeriod
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 import pytz
 
 
@@ -48,15 +48,15 @@ def nat_env(box, server_factory, http_schema):
 
 def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method, api_object, api_method)
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         result_in_front = env.in_front.rest_api.get_api_fn(method, api_object, api_method)()
         result_behind = env.behind.rest_api.get_api_fn(method, api_object, api_method)()
         if result_in_front == result_behind:
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             assert result_in_front == result_behind
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):

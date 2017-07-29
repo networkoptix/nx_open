@@ -63,6 +63,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 usedNames, tr("Showreel"), tr("Showreel %1"));
             layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
+            menu()->trigger(action::SelectNewItemAction, {Qn::UuidRole, tour.id});
             menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
         });
 

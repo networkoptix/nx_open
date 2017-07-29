@@ -2,6 +2,9 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>

@@ -104,6 +104,8 @@ set(qt.dir ${QT_DIR})
 
 if(ANDROID)
     include(android-apk)
+elseif(IOS)
+    include(ios_app)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")

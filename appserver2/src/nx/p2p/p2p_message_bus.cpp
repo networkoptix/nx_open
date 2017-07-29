@@ -690,6 +690,8 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
             {
                 auto connection = findConnectionById(via);
                 NX_ASSERT(connection);
+                if (!connection)
+                    return true; //< Best route via local DB. It shouldn't be.
                 return context(connection)->isRemotePeerSubscribedTo(peer);
             }))
             {
@@ -1263,17 +1265,24 @@ void MessageBus::proxyFillerTransaction(
 }
 
 void MessageBus::updateOfflineDistance(
+    const P2pConnectionPtr& connection,
     const ApiPersistentIdData& to,
     int sequence)
 {
     const qint32 offlineDistance = kMaxDistance - sequence;
-    const auto via = localPeer();
-    const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
-    if (offlineDistance < toDistance)
-    {
-        nx::p2p::RoutingRecord record(offlineDistance);
-        m_peers->addRecord(via, to, record);
-    }
+
+    const auto updateDistance =
+        [&](const ApiPeerData& via)
+        {
+            const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
+            if (offlineDistance < toDistance)
+            {
+                nx::p2p::RoutingRecord record(offlineDistance);
+                m_peers->addRecord(via, to, record);
+            }
+        };
+    updateDistance(connection->remotePeer());
+    updateDistance(localPeer());
 }
 
 void MessageBus::gotTransaction(
@@ -1288,7 +1297,7 @@ void MessageBus::gotTransaction(
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
-    updateOfflineDistance(peerId, tran.persistentInfo.sequence);
+    updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
 
     if (!m_db)
         return;
@@ -1385,7 +1394,7 @@ void MessageBus::gotTransaction(
     {
         if (transactionDescriptor->isPersistent)
         {
-            updateOfflineDistance(peerId, tran.persistentInfo.sequence);
+            updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
             std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
             dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
 

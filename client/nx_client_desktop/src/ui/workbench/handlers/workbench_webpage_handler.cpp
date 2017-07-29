@@ -53,7 +53,22 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     if (!dialog->name().isEmpty())
         webPage->setName(dialog->name());
 
-    qnResourcesChangesManager->saveWebPage(webPage, [](const QnWebPageResourcePtr& /*webPage*/) {});
+    // No need to backup newly created webpage.
+    auto applyChangesFunction = QnResourcesChangesManager::WebPageChangesFunction();
+    auto callbackFunction =
+        [this](bool success, const QnWebPageResourcePtr& webPage)
+        {
+            // Cannot capture the resource directly because real resource pointer may differ if the
+            // transaction will be received before the request callback.
+            NX_EXPECT(webPage);
+            if (success && webPage)
+            {
+                menu()->trigger(action::SelectNewItemAction, webPage);
+                menu()->trigger(action::DropResourcesAction, webPage);
+            }
+        };
+
+    qnResourcesChangesManager->saveWebPage(webPage, applyChangesFunction, callbackFunction);
 }
 
 void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
