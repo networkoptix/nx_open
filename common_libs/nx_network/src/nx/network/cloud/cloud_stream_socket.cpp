@@ -363,7 +363,7 @@ QString CloudStreamSocket::idForToStringFromPtr() const
     return m_socketDelegate ? m_socketDelegate->idForToStringFromPtr() : QString();
 }
 
-QString CloudStreamSocket::getForeignHostFullCloudName() const
+QString CloudStreamSocket::getForeignHostName() const
 {
     return m_cloudTunnelAttributes.remotePeerName;
 }

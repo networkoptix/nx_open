@@ -197,6 +197,11 @@ public:
         return this->m_target->getForeignAddress();
     }
 
+    virtual QString getForeignHostName() const override
+    {
+        return this->m_target->getForeignHostName();
+    }
+
     virtual bool isConnected() const override
     {
         return this->m_target->isConnected();
