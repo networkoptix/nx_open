@@ -106,7 +106,6 @@ def process_file(source_file, customization, product_id, preview, version_id):
         source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
-    email_context = Context.objects.filter(name="Email templates")
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
     if language_code:
@@ -124,9 +123,6 @@ def process_file(source_file, customization, product_id, preview, version_id):
     if branding_context.exists():
         content = process_context_structure(
             customization, branding_context.first(), content, None, version_id, preview)
-    if email_context.exists():
-        content = process_context_structure(
-            customization, email_context.first(), content, None, version_id, preview)
 
     filename = context_name
     if language_code:
