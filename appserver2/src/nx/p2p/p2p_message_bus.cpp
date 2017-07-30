@@ -686,12 +686,14 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
             // If any of connections with min distance subscribed to us then postpone our subscription.
             // It could happen if neighbor(or closer) peer just goes offline
             if (std::any_of(viaList.begin(), viaList.end(),
-                [this, &peer](const ApiPersistentIdData& via)
+                [this, &peer, &localPeer](const ApiPersistentIdData& via)
             {
+                if (via == localPeer)
+                    return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
                 auto connection = findConnectionById(via);
                 NX_ASSERT(connection);
                 if (!connection)
-                    return true; //< Best route via local DB. It shouldn't be.
+                    return true; //< It shouldn't be.
                 return context(connection)->isRemotePeerSubscribedTo(peer);
             }))
             {
