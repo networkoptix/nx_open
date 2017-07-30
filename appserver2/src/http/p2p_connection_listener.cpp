@@ -72,7 +72,8 @@ QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
     localPeer.peerType = Qn::PT_Server;
     localPeer.cloudHost = nx::network::AppInfo::defaultCloudHost();
     localPeer.identityTime = commonModule()->systemIdentityTime();
-    localPeer.keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout().count();
+    localPeer.keepAliveTimeout = std::chrono::duration_cast<std::chrono::milliseconds>(
+        commonModule()->globalSettings()->aliveUpdateInterval()).count();
     localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
     if (dataFormat == Qn::JsonFormat)
