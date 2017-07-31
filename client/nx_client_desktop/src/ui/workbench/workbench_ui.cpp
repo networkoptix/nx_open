@@ -2,13 +2,19 @@
 
 #include <cmath> /* For std::floor. */
 
+#include <QtCore/QMargins>
+
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <client/client_meta_types.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
@@ -245,6 +251,19 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
                 this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
             updateControlsVisibilityAnimated();
             updateLayoutPanelGeometry();
+
+            if (auto resource = layout->resource())
+            {
+                const auto oldMargins = display()->viewportMargins(Qn::LayoutMargins);
+                const auto margins = resource->data(Qn::LayoutMarginsRole).value<QMargins>();
+
+                if (margins != oldMargins)
+                {
+                    display()->setViewportMargins(margins, Qn::LayoutMargins);
+                    display()->fitInView(true);
+                }
+            }
+
         });
 }
 
@@ -513,7 +532,7 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
         ? m_timeline->effectiveGeometry()
         : QRectF();
 
-    auto oldMargins = display()->viewportMargins();
+    auto oldMargins = display()->viewportMargins(Qn::PanelMargins);
 
     QMargins newMargins(0, 0, 0, 0);
     if (m_flags.testFlag(AdjustMargins))
@@ -529,7 +548,8 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
 
     if (oldMargins == newMargins)
         return;
-    display()->setViewportMargins(newMargins);
+
+    display()->setViewportMargins(newMargins, Qn::PanelMargins);
     display()->fitInView(animate);
 }
 
