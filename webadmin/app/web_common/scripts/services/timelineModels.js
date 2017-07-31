@@ -983,7 +983,7 @@ ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline.
     var needZoomOut = !this.checkZoomOut();
 
     var end = timeManager.nowToDisplay();
-    if(this.playedPosition > this.end && liveMode){
+    if(this.playedPosition > this.end && this.liveMode){
         end = this.playedPosition;
     }
 
