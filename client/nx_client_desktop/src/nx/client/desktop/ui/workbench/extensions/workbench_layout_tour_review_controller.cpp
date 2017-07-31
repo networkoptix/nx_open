@@ -5,6 +5,7 @@
 
 #include <client_core/client_core_module.h>
 
+#include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -46,6 +47,8 @@ static constexpr int kSaveTourIntervalMs = 5000;
 static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
 
 static const QSize kCellSize{1, 1};
+
+static const QMargins kReviewMargins(16, 16, 16, 16);
 
 QRect createItemGrid(int itemCount)
 {
@@ -242,7 +245,10 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::LayoutTour));
     layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
         | QnLayoutFlag::NoResize
-        | QnLayoutFlag::NoTimeline));
+        | QnLayoutFlag::NoTimeline
+        | QnLayoutFlag::FillViewport
+    ));
+    layout->setData(Qn::LayoutMarginsRole, qVariantFromValue(kReviewMargins));
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
         | Qn::AddRemoveItemsPermission));
@@ -371,9 +377,7 @@ void LayoutTourReviewController::updatePlaceholders()
         }
     }
 
-    // Additionally adjust bounding rect to give the tour some more space.
-    static const qreal d = 0.05;
-    layout->setData(Qn::LayoutMinimalBoundingRectRole, QRectF(boundingRect).adjusted(-d, 0, d, d));
+    layout->setData(Qn::LayoutMinimalBoundingRectRole, boundingRect);
     const bool animate = display()->animationAllowed() && layout->items().size() > 0;
     display()->fitInView(animate);
 }

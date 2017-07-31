@@ -563,7 +563,7 @@ void QnGridBackgroundItem::paint(
     if (d->backgroundType == BackgroundType::Special)
     {
         painter->setBrush(m_panelColor);
-        painter->drawRect(display()->boundedViewportGeometry());
+        painter->drawRect(display()->boundedViewportGeometry(Qn::PanelMargins));
         return;
     }
 

@@ -49,6 +49,8 @@ private:
     void loadServersFromSettings();
     bool tryNextServer();
 
+    void clear();
+
 private slots:
     void at_updateReply_finished(QnAsyncHttpClientReply *reply);
     void at_buildReply_finished(QnAsyncHttpClientReply *reply);
@@ -74,6 +76,7 @@ private:
     bool m_clientRequiresInstaller;
 
     QUrl m_releaseNotesUrl;
+    QString m_description;
     QString m_cloudHost;
 
     QSet<QnAsyncHttpClientReply*> m_runningRequests;

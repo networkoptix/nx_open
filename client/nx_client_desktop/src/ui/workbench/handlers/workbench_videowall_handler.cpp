@@ -1525,7 +1525,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
         [this](bool success, const QnVideoWallResourcePtr& videoWall)
         {
             // Cannot capture the resource directly because real resource pointer may differ if the
-            // transaction will be received before the request callback.
+            // transaction is received before the request callback.
             NX_EXPECT(videoWall);
             if (success && videoWall)
             {

@@ -1301,17 +1301,17 @@ bool QnWorkbenchDisplay::removeZoomLinksInternal(QnWorkbenchItem *item)
     return true;
 }
 
-QMargins QnWorkbenchDisplay::viewportMargins() const
+QMargins QnWorkbenchDisplay::viewportMargins(Qn::MarginTypes marginTypes) const
 {
-    return m_viewportAnimator->viewportMargins();
+    return m_viewportAnimator->viewportMargins(marginTypes);
 }
 
-void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins)
+void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins, Qn::MarginType marginType)
 {
-    if (viewportMargins() == margins)
+    if (viewportMargins(marginType) == margins)
         return;
 
-    m_viewportAnimator->setViewportMargins(margins);
+    m_viewportAnimator->setViewportMargins(margins, marginType);
 
     synchronizeSceneBoundsExtension();
 }
@@ -1487,7 +1487,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    QRectF minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRectF>();
+    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
     if (!minimalBoundingRect.isEmpty())
         sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
@@ -1497,8 +1497,8 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         && !workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::FillViewport);
 
     static const qreal d = 0.015;
-     if (adjustSpace)
-         sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
+    if (adjustSpace)
+        sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
 
     return workbench()->mapper()->mapFromGridF(sceneBoundingRect);
 }
@@ -1510,12 +1510,13 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const
         : QRectF();
 }
 
-QRectF QnWorkbenchDisplay::boundedViewportGeometry() const
+QRectF QnWorkbenchDisplay::boundedViewportGeometry(Qn::MarginTypes marginTypes) const
 {
     if (m_view == NULL)
         return QRectF();
 
-    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    const auto boundedRect = QnGeometry::eroded(m_view->viewport()->rect(),
+        viewportMargins(marginTypes));
     return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
 

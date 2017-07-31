@@ -1088,7 +1088,7 @@ void QnResourceBrowserWidget::selectIndices(const QModelIndexList& indices)
     if (indices.empty())
         return;
 
-    for (const auto index : indices)
+    for (const auto& index: indices)
     {
         auto parent = index.parent();
         while (parent.isValid())
@@ -1101,7 +1101,7 @@ void QnResourceBrowserWidget::selectIndices(const QModelIndexList& indices)
     if (auto selection = ui->resourceTreeWidget->selectionModel())
     {
         selection->clear();
-        for (const auto index : indices)
+        for (const auto& index: indices)
             selection->select(index, QItemSelectionModel::Select);
     }
 }

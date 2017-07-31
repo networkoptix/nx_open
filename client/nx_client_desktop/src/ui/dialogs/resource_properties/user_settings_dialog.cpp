@@ -510,7 +510,7 @@ void QnUserSettingsDialog::applyChanges()
                 return;
 
             // Cannot capture the resource directly because real resource pointer may differ if the
-            // transaction will be received before the request callback.
+            // transaction is received before the request callback.
             NX_EXPECT(user);
             if (success && user)
                 menu()->trigger(action::SelectNewItemAction, user);

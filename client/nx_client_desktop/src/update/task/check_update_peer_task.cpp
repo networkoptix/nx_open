@@ -39,11 +39,12 @@ namespace {
         QString current_release;
         QString updates_prefix;
         QString release_notes;
+        QString description;
         QMap<QString, QnSoftwareVersion> releases;
     };
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
         CustomizationInfo, (json),
-        (current_release)(updates_prefix)(release_notes)(releases))
+        (current_release)(updates_prefix)(release_notes)(description)(releases))
 
     struct UpdateFileInformation
     {
@@ -237,9 +238,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline()
 
 void QnCheckForUpdatesPeerTask::checkOnlineUpdates()
 {
-    m_updateFiles.clear();
-    m_clientUpdateFile.clear();
-    m_releaseNotesUrl.clear();
+    clear();
 
     loadServersFromSettings();
     UpdateServerInfo serverInfo;
@@ -258,10 +257,8 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates()
 
 void QnCheckForUpdatesPeerTask::checkLocalUpdates()
 {
-    m_updateFiles.clear();
-    m_clientUpdateFile.clear();
+    clear();
     m_targetMustBeNewer = false;
-    m_releaseNotesUrl.clear();
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking local update [%1]")
         .arg(m_target.fileName), cl_logDEBUG1);
@@ -346,6 +343,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
 
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = customizationInfo.release_notes;
+    m_description = customizationInfo.description;
 
     checkBuildOnline();
 }
@@ -565,6 +563,7 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value)
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.releaseNotesUrl = m_releaseNotesUrl;
+    result.description = m_description;
     result.cloudHost = m_cloudHost;
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Check finished [%1, %2].")
@@ -609,6 +608,14 @@ bool QnCheckForUpdatesPeerTask::tryNextServer()
     httpClient->doGet(m_currentUpdateUrl);
     m_runningRequests.insert(reply);
     return true;
+}
+
+void QnCheckForUpdatesPeerTask::clear()
+{
+    m_updateFiles.clear();
+    m_clientUpdateFile.clear();
+    m_releaseNotesUrl.clear();
+    m_description.clear();
 }
 
 void QnCheckForUpdatesPeerTask::start()
