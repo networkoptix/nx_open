@@ -17,7 +17,10 @@
         ["{{IOS_APP_LINK}}","disabled","Link for iOS application in Apple AppStore"],
         ["{{ANDROID_APP_LINK}}","disabled","Link for Android application in Google Play"],
         ["{{COMPANY_NAME}}", "Network Optix", "The name of the company itself"],
-        ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}]
+        ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
+        ["templates/email_logo.png", "",
+          "Logo for email. Height must be not more than 40px, width - not more than 100px",
+          "Image", {"height_le": 40, "width_le": 100}]
       ]
     },
     {
@@ -26,7 +29,7 @@
       "url": "/content/about",
       "translatable": true,
       "values":[
-        ["static/images/promo/cloud.png", "", "Cloud image", "Image"],
+        ["static/images/promo/cloud.png", "", "Image for front page", "Image"],
         ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
         ["%BLOCK1_TITLE%","Connect from Anywhere"],
         ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password","","Long Text"],
@@ -44,16 +47,6 @@
       "translatable": true,
       "values":[
         ["%CONTENT%","End user licence agreement.","End user license agreement", "HTML"]
-      ]
-    },
-    {
-      "name": "Email templates",
-      "description": "Content for emails",
-      "translatable": false,
-      "values": [
-        ["templates/email_logo.png", "",
-          "Logo for email. Height must be not more than 40px, width - not more than 100px",
-          "Image", {"height_le": 40, "width_le": 100}]
       ]
     }
   ]
