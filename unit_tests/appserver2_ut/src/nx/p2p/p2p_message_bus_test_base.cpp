@@ -49,6 +49,7 @@ void P2pMessageBusTestBase::createData(
     const auto settings = connection->commonModule()->globalSettings();
     settings->setSystemName(kP2pTestSystemName);
     settings->setLocalSystemId(guidFromArbitraryData(kP2pTestSystemName));
+    settings->setAutoDiscoveryEnabled(false);
     const bool disableTimeManager = m_servers.size() > kMaxInstancesWithTimeManager;
     if (disableTimeManager)
     {
