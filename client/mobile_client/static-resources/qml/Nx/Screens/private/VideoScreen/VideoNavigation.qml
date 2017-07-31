@@ -474,7 +474,7 @@ Item
             anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
+            loading: videoScreenController.mediaPlayer.loading || timeline.dragging
             paused: videoNavigation.paused
 
             opacity: d.controlsOpacity

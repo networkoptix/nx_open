@@ -31,7 +31,9 @@ MediaPlayer::MediaPlayer(QObject* parent):
                 emit failedChanged();
             }
 
-            const bool loading = (state == State::Playing && status == MediaStatus::Loading);
+            const bool loading = status == MediaStatus::Loading
+                && (state == State::Playing || state == State::Paused);
+
             if (m_loading != loading)
             {
                 m_loading = loading;

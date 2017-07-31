@@ -462,7 +462,6 @@ void PlayerPrivate::presentNextFrame()
     if (!videoFrameToRender)
         return;
 
-    setMediaStatus(Player::MediaStatus::Loaded);
     gotDataTimer.restart();
 
     updateCurrentResolution(videoFrameToRender->size());
@@ -498,6 +497,8 @@ void PlayerPrivate::presentNextFrame()
 
     if (videoSurface && videoSurface->isActive() && !skipFrame)
     {
+        setMediaStatus(Player::MediaStatus::Loaded);
+
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
@@ -820,6 +821,7 @@ void Player::setPosition(qint64 value)
     }
 
     d->setLiveMode(value == kLivePosition);
+    d->setMediaStatus(MediaStatus::Loading);
     d->clearCurrentFrame();
     d->at_hurryUp(); //< renew receiving frames
 
