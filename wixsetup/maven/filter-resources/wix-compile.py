@@ -12,23 +12,24 @@ build_nxtool = '${nxtool}' == 'true'
 build_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
 bin_source_dir = '${bin_source_dir}'
+installer_target_dir = '${installer.target.dir}'
 
-server_msi_folder = 'bin/msi'
-server_msi_strip_folder = 'bin/strip'
-server_exe_folder = 'bin/exe'
+server_msi_folder = '${installer.target.dir}/msi'
+server_msi_strip_folder = '${installer.target.dir}/strip'
+server_exe_folder = '${installer.target.dir}/exe'
 
-client_msi_folder = 'bin/msi'
-client_msi_strip_folder = 'bin/strip'
-client_exe_folder = 'bin/exe'
+client_msi_folder = '${installer.target.dir}/msi'
+client_msi_strip_folder = '${installer.target.dir}/strip'
+client_exe_folder = '${installer.target.dir}/exe'
 
-full_exe_folder = 'bin/exe'
-nxtool_exe_folder = 'bin/exe'
+full_exe_folder = '${installer.target.dir}/exe'
+nxtool_exe_folder = '${installer.target.dir}/exe'
 
-paxton_msi_folder = 'bin/msi'
-paxton_msi_strip_folder = 'bin/strip'
-paxton_exe_folder = 'bin/exe'
+paxton_msi_folder = '${installer.target.dir}/msi'
+paxton_msi_strip_folder = '${installer.target.dir}/strip'
+paxton_exe_folder = '${installer.target.dir}/exe'
 
-nxtool_msi_folder = 'bin/msi'
+nxtool_msi_folder = '${installer.target.dir}/msi'
 
 
 wix_pdb = 'wixsetup.wixpdb'
@@ -84,6 +85,7 @@ def get_candle_command(project, suffix, args, components):
     command.append('-dServerMsiName={}'.format(server_msi_name))
     command.append('-dNxtoolMsiName={}'.format(nxtool_msi_name))
     command.append('-dPaxtonMsiName={}'.format(paxton_msi_name))
+    command.append('-dInstallerTargetDir={}'.format(installer_target_dir))
 
     add_components(command, components)
 

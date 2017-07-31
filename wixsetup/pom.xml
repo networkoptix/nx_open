@@ -24,8 +24,8 @@
         <ClientFontsDir>${target_bin_path}\fonts</ClientFontsDir>
         <ClientQmlDir>${target_bin_path}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
+        <installer.target.dir>bin</installer.target.dir>
         <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help</rdep.packages>
-        <bin_source_dir>${libdir}/bin/${build.configuration}</bin_source_dir>
     </properties>
 
     <dependencies>

@@ -14,6 +14,7 @@ set(environment.dir "$ENV{environment}")
 set(root.dir ${CMAKE_SOURCE_DIR})
 set(qt.dir ${QT_DIR})
 set(customization.dir ${customization_dir})
+set(installer.target.dir ${build.configuration})
 set(bin_source_dir "${CMAKE_BINARY_DIR}/${config}/bin")
 
 #artifact names
