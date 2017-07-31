@@ -98,7 +98,7 @@ Page
                 localId: model.localId
                 cloudSystem: model.isCloudSystem
                 ownerDescription: cloudSystem ? model.ownerDescription : ""
-                run: model.isRunning
+                running: model.isRunning
                 reachable: model.isReachable
                 compatible: model.isCompatible
 

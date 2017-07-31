@@ -14,7 +14,7 @@ Pane
     property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
-    property alias run: informationBlock.online
+    property alias running: informationBlock.online
     property alias ownerDescription: informationBlock.ownerDescription
     property bool reachable: false
     property bool compatible: true
@@ -146,7 +146,7 @@ Pane
             if (!compatible)
                 return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE");
 
-            if (!run)
+            if (!running)
                 return qsTr("OFFLINE")
 
             if (!reachable)
