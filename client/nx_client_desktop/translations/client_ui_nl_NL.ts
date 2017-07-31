@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Bijdragen</translation>
     </message>
     <message>
       <location/>
@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Systeem Servers</translation>
     </message>
   </context>
   <context>
@@ -239,7 +239,7 @@
     <message>
       <location/>
       <source>Email settings</source>
-      <translation type="unfinished">Email settings</translation>
+      <translation>Email instellingen</translation>
     </message>
     <message>
       <location/>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Backup Kwaliteit</translation>
     </message>
   </context>
   <context>
@@ -390,11 +390,6 @@
       <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Verversen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
     </message>
     <message>
       <location/>
@@ -498,7 +493,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <location/>
@@ -617,7 +612,7 @@
     <message>
       <location/>
       <source>Secondary Stream Control</source>
-      <translation type="unfinished">Secondary Stream Control</translation>
+      <translation>Secundaire Stream Control</translation>
     </message>
     <message>
       <location/>
@@ -702,7 +697,7 @@
     <message>
       <location/>
       <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
+      <translation>Bewegingsdetectie instellingen</translation>
     </message>
     <message>
       <location/>
@@ -784,7 +779,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Schema Instellingen</translation>
     </message>
     <message>
       <location/>
@@ -834,7 +829,7 @@
     <message>
       <location/>
       <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
+      <translation>Bewegingsopname</translation>
     </message>
     <message>
       <location/>
@@ -1510,7 +1505,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Internet Activering</translation>
     </message>
     <message>
       <location/>
@@ -1627,7 +1622,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation type="unfinished">Time Mode</translation>
+      <translation>Tijdmodus</translation>
     </message>
     <message>
       <location/>
@@ -1642,7 +1637,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensiteit</translation>
     </message>
     <message>
       <location/>
@@ -1652,7 +1647,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Tour cyclus</translation>
     </message>
     <message>
       <location/>
@@ -1678,7 +1673,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Authenticatie</translation>
     </message>
     <message>
       <location/>
@@ -2065,7 +2060,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systeem Administratie</translation>
     </message>
   </context>
   <context>
@@ -2289,7 +2284,7 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Bronbestanden</translation>
     </message>
     <message>
       <location/>
@@ -2363,7 +2358,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP Adres</translation>
     </message>
     <message>
       <location/>
@@ -2455,7 +2450,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Authenticatie</translation>
     </message>
     <message>
       <location/>
@@ -2465,7 +2460,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Beweging</translation>
     </message>
     <message>
       <location/>
@@ -2540,7 +2535,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP Adres</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2887,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>Gebruikerstype</translation>
     </message>
     <message>
       <location/>
@@ -2918,7 +2913,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Schema Instellingen</translation>
     </message>
     <message>
       <location/>

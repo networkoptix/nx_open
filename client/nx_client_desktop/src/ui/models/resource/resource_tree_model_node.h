@@ -135,7 +135,7 @@ private:
     void handlePermissionsChanged();
 
 private:
-    //TODO: #GDM #vkutin need complete recorder nodes structure refactor to get rid of this shit
+    // TODO: #GDM #vkutin need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourceTreeModel;
     friend class QnResourceTreeModelNodeManager;
 
@@ -197,7 +197,7 @@ private:
     int m_uncheckedChildren;
     int m_checkedChildren;
 
-    //TODO: #GDM #Common implement cache invalidating in case of permissions change
+    // TODO: #GDM #Common implement cache invalidating in case of permissions change
     /** Whether this resource can be renamed, cached value. */
     mutable struct {
         bool value;

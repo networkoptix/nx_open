@@ -64,6 +64,8 @@ namespace LLUtil {
         if (devices.empty())
             return QStringList();
 
+        // Here we first sort by device class, then by mac address
+        // So, PCI comes first, then USB, then XXX (Others).
         QnMacAndDeviceClassList devicesCopy(devices);
         std::sort(devicesCopy.begin(), devicesCopy.end(), [](const QnMacAndDeviceClass& device1, const QnMacAndDeviceClass& device2)
         {

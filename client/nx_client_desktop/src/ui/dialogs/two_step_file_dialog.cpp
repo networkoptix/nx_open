@@ -11,6 +11,7 @@
 #include <ui/dialogs/common/file_dialog.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -186,6 +187,12 @@ void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
                                                         tr("Select folder..."),
                                                         ui->directoryLabel->text(),
                                                         directoryDialogOptions());
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround for bug QTBUG-34767
+        raise();
+    }
+
     if (dirName.isEmpty())
         return;
 
@@ -199,6 +206,12 @@ void QnTwoStepFileDialog::at_browseFileButton_clicked() {
                                                     m_filter,
                                                     &m_selectedExistingFilter,
                                                     fileDialogOptions());
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround for bug QTBUG-34767
+        raise();
+    }
+
     if (fileName.isEmpty()) {
         if (ui->existingFileLabel->text().isEmpty())
             QTimer::singleShot(1, this, SLOT(reject()));

@@ -979,8 +979,14 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.start = start; //Start is always right
     this.updateTotalInterval();
 };
-ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
+
+    var end = timeManager.nowToDisplay();
+    if(this.playedPosition > this.end && liveMode){
+        end = this.playedPosition;
+    }
+
     this.end = end;
 
     this.updateTotalInterval();
@@ -1076,25 +1082,22 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
 };
 
 ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
-    this.playedPosition = playing;
+    if(playing !== null){
+        this.playedPosition = playing;
+    }
     this.liveMode = liveMode;
 
     if(this.anchorDate == playing){
         return;
     }
 
-    var end = timeManager.nowToDisplay();
-    if(playing > this.end && liveMode){
-        this.setEnd(playing);
-    }else if(end > this.end){
-        this.setEnd(end);
-    }
+    this.setEnd();
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(playing, liveMode);
+        this.checkWatchPlaying(this.playedPosition, liveMode);
     }
     if(this.watchPlayingPosition){
-        this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
+        this.setAnchorDateAndPoint(this.playedPosition, liveMode ? 1:this.anchorPoint);
     }
 };
 

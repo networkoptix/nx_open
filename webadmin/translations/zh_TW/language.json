@@ -39,7 +39,7 @@
     "unavailable":"不可用的",
     "unsafePortConfirm":"使用小於1025的埠號不安全. 伺服器將可能無法被存取. 是否仍繼續?",
     "confirmDisconnectFromCloud":"從 {{CLOUD_NAME}} 斷開系統",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 所有雲端使用者都將被刪除.</span><br><br>系統將可被本地管理者帳號存取.",
+    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 所有雲帳號都將被刪除.</span><br><br>系統將可被本地管理者帳號存取.",
     "confirmDisconnectFromCloudAction":"斷線",
     "disconnectedSuccess":"系統已成功斷線",
     "connectedSuccess":"系統已成功連接",
@@ -109,6 +109,6 @@
     "reserved":"保留"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} web 介面"
   }
 }

@@ -106,7 +106,7 @@ function TimelineConfig(){
         chunksBgColor:[235,239,241],  //$light3
         chunksBgBorderColor: [225,231,234],  //$light4
         exactChunkColor: [76,188,40], //Archive  //$green_l2
-        loadingChunkColor: [0,255,255,0.3], //#00FFFF this is not in palette
+        loadingChunkColor: [76,188,40, 0.7], //#00FFFF this is not in palette
         blindChunkColor:  [255,0,255,0.3],  //#FF00FF this is not in palette
         highlighChunkColor: [255,255,0,1],  //#FFFF00 this is not in palette
         lastMinuteColor: [58,145,30,0.3],   //$green_main

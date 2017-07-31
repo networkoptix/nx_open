@@ -108,6 +108,9 @@ bool updateUserCredentials(
         return false;
     }
 
+    ec2::ApiUserData apiOldUser;
+    fromResourceToApi(userRes, apiOldUser);
+
     //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
         data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
@@ -145,6 +148,10 @@ bool updateUserCredentials(
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
+
+    if (apiOldUser == apiUser)
+        return true; //< Nothing to update.
+
     auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)

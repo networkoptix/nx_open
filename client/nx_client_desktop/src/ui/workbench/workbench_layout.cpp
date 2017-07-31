@@ -178,9 +178,14 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
     {
         auto item = this->item(data.uuid);
         if (!item)
-            addItem(new QnWorkbenchItem(data, this));
+        {
+            if (const auto resource = resourcePool()->getResourceByDescriptor(data.resource))
+                addItem(new QnWorkbenchItem(resource, data, this));
+        }
         else
+        {
             result &= item->update(data);
+        }
     }
 
     /* Some items may have been removed. */

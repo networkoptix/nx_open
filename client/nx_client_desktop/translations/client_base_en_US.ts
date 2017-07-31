@@ -36,6 +36,18 @@ to view more bookmarks</source>
         <comment>It is highly recommended to split message in two lines</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Play bookmark from the beginning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -1015,6 +1027,21 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>LocalFiles</name>
+    <message>
+        <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PasswordInformation</name>
     <message>
         <source>Good</source>
@@ -1077,6 +1104,37 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>Ptz</name>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to get current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to set current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset used by some tours. Delete it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -1123,10 +1181,6 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnAboutDialog</name>
-    <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
     <message>
         <source>%1 uses the following external libraries:</source>
         <translation type="unfinished"></translation>
@@ -1670,6 +1724,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+        <source>Manage Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -2064,10 +2125,6 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
     <message>
         <source>OK</source>
         <translation></translation>
@@ -3634,10 +3691,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Generic:</source>
         <translation></translation>
     </message>
@@ -3877,10 +3930,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If the problem presists please contact Customer Support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License deactivated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3939,6 +3988,10 @@ to %1</source>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the problem persists please contact Customer Support.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4539,6 +4592,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+        <source>Manage Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -4880,6 +4940,45 @@ to %1</source>
     <message>
         <source>Motion + Lo-Res</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+        <source>Role %1 has no %2 permission</source>
+        <comment>%1 is the name of selected role, %2 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected roles have no %1 permission</source>
+        <comment>%1 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 selected roles have no %2 permission</source>
+        <comment>%1 is number of selected roles, %2 is permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User %1 has no %2 permission</source>
+        <comment>%1 is the name of selected user, %2 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected users have no %1 permission</source>
+        <comment>%1 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 selected users have no %2 permission</source>
+        <comment>%1 is number of selected users, %2 is permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5734,38 +5833,8 @@ to %1</source>
 <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-        <source>Role %1 has no User Input permission</source>
-        <comment>%1 is the name of selected role</comment>
+        <source>User Input</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected roles have no User Input permission</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected roles have no User Input permission</source>
-        <comment>%1 is number of selected roles</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>User %1 has no User Input permission</source>
-        <comment>%1 is the name of selected user</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected users have no User Input permission</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected users have no User Input permission</source>
-        <comment>%1 is number of selected users</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -6235,6 +6304,30 @@ to %1</source>
     </message>
     <message>
         <source>Error while sending email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization is in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error occured during remote archive synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been started for the following device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been finished for the following device:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7394,6 +7487,184 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>Resources</name>
+    <message>
+        <source>There is another layout with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permission to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is another layout with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing layout tour?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is another layout tour with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will still have access to %n removed resources:</source>
+        <translation type="unfinished">
+            <numerusform>User will still have access to %n removed resource:</numerusform>
+            <numerusform>User will still have access to %n removed resources:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to User Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will get access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform>All users with this role will get access to %n resource:</numerusform>
+            <numerusform>All users with this role will get access to %n resources:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to Role Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will still have access to %n removed resources:</source>
+        <translation type="unfinished">
+            <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
+            <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Changes will affect other users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This layout is shared with other users, so you change it for them too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will lose access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform>User will lose access to %n resource:</numerusform>
+            <numerusform>User will lose access to %n resources:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will lose access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform>All users with this role will lose access to %n resource:</numerusform>
+            <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n shared layouts?</source>
+        <translation type="unfinished">
+            <numerusform>Delete %n shared layout?</numerusform>
+            <numerusform>Delete %n shared layouts?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+        <translation type="unfinished">
+            <numerusform>This layout is shared with other users, so it will be deleted from their accounts as well.</numerusform>
+            <numerusform>These %n layouts are shared with other users, so they will be deleted from their accounts as well.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from layout?</source>
+        <translation type="unfinished">
+            <numerusform>Remove %n item from layout?</numerusform>
+            <numerusform>Remove %n items from layout?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from layout tour?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will lose access to following resources:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n users?</source>
+        <translation type="unfinished">
+            <numerusform>Delete %n user?</numerusform>
+            <numerusform>Delete %n users?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n devices?</source>
+        <translation type="unfinished">
+            <numerusform>Delete %n device?</numerusform>
+            <numerusform>Delete %n devices?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n cameras?</source>
+        <translation type="unfinished">
+            <numerusform>Delete %n camera?</numerusform>
+            <numerusform>Delete %n cameras?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n I/O Modules?</source>
+        <translation type="unfinished">
+            <numerusform>Delete %n I/O Module?</numerusform>
+            <numerusform>Delete %n I/O Modules?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n items?</source>
+        <translation type="unfinished">
+            <numerusform>Delete item?</numerusform>
+            <numerusform>Delete %n items?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of them are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform>%n of them is auto-discovered.</numerusform>
+            <numerusform>%n of them are auto-discovered.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform>%n camera is auto-discovered.</numerusform>
+            <numerusform>%n cameras are auto-discovered.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform>%n I/O module is auto-discovered.</numerusform>
+            <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
         <source>%n users</source>
@@ -7401,6 +7672,64 @@ to %1</source>
             <numerusform>%n user</numerusform>
             <numerusform>%n users</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>Videowall</name>
+    <message>
+        <source>There is another video wall with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close %1 before starting Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+        <source>Copy</source>
+        <comment>to Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <comment>from Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste from Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <comment>to Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pasted</source>
+        <comment>from Clipboard</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7507,242 +7836,6 @@ to %1</source>
     <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
     <message>
         <source>Go to Live</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-        <source>Cannot get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot set the current position for camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to set current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset used by some tours. Delete it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::resources</name>
-    <message>
-        <source>There is another layout with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You do not have permission to overwrite it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overwrite existing layout?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will still have access to %n removed resource:</numerusform>
-            <numerusform>User will still have access to %n removed resources:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to User Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will get access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will get access to %n resource:</numerusform>
-            <numerusform>All users with this role will get access to %n resources:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to Role Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-            <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Changes will affect other users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This layout is shared with other users, so you change it for them too.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will lose access to %n resource:</numerusform>
-            <numerusform>User will lose access to %n resources:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will lose access to %n resource:</numerusform>
-            <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n shared layouts?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n shared layout?</numerusform>
-            <numerusform>Delete %n shared layouts?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation type="unfinished">
-            <numerusform>This layout is shared with other users, so it will be deleted from their accounts as well.</numerusform>
-            <numerusform>These %n layouts are shared with other users, so they will be deleted from their accounts as well.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Remove %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform>Remove %n item from layout?</numerusform>
-            <numerusform>Remove %n items from layout?</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You will lose access to following resources:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n user?</numerusform>
-            <numerusform>Delete %n users?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n devices?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n device?</numerusform>
-            <numerusform>Delete %n devices?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n cameras?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n camera?</numerusform>
-            <numerusform>Delete %n cameras?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n I/O Modules?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n I/O Module?</numerusform>
-            <numerusform>Delete %n I/O Modules?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform>Delete item?</numerusform>
-            <numerusform>Delete %n items?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of them are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n of them is auto-discovered.</numerusform>
-            <numerusform>%n of them are auto-discovered.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n camera is auto-discovered.</numerusform>
-            <numerusform>%n cameras are auto-discovered.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n I/O modules are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n I/O module is auto-discovered.</numerusform>
-            <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overwrite existing layout tour?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout tour with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Remove %n items from layout tour?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::videowall</name>
-    <message>
-        <source>There is another video wall with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close %1 before starting Video Wall?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Keep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7938,6 +8031,10 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
         <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

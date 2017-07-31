@@ -395,7 +395,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
         Qt::QueuedConnection);
-    
+
     QnGlobalSettings::AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -857,6 +857,11 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 bool QnGlobalSettings::isTimeSynchronizationEnabled() const
 {
     return m_timeSynchronizationEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setTimeSynchronizationEnabled(bool value)
+{
+    m_timeSynchronizationEnabledAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isSynchronizingTimeWithInternet() const

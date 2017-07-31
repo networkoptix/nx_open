@@ -5,7 +5,7 @@
 
 #include <nx/utils/string.h>
 
-//TODO: #GDM include and use <ui/workaround/cancel_drag.h>
+// TODO: #GDM include and use <ui/workaround/cancel_drag.h>
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter),
     m_currentColumn(0)

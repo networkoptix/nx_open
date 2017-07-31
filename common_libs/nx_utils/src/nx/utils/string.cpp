@@ -452,7 +452,7 @@ QByteArray generateRandomName(int length)
 static const double kByteSuffixLimit = 1024;
 static const std::vector<char> kByteSuffexes = { 'K', 'M', 'G', 'T' };
 
-//TODO: #GDM #3.1 move out strings and logic to separate class
+// TODO: #GDM #3.1 move out strings and logic to separate class
 QString bytesToString(uint64_t bytes, int precision)
 {
     double number = static_cast<double>(bytes);

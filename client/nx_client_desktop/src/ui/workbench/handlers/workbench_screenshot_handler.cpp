@@ -373,7 +373,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
-   // parameters.timestampPosition = qnSettings->timestampCorner(); //TODO: #GDM #3.1 store full screenshot settings
+   // parameters.timestampPosition = qnSettings->timestampCorner(); // TODO: #GDM #3.1 store full screenshot settings
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
@@ -474,7 +474,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         /* Check if we were disconnected (server shut down) while the dialog was open.
         * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
-            return false; //TODO: #GDM triple check...
+            return false; // TODO: #GDM triple check...
 
         break;
     }
@@ -491,7 +491,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 }
 
 
-//TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
+// TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QnScreenshotLoader* loader = dynamic_cast<QnScreenshotLoader*>(sender());
     if (!loader)
@@ -509,7 +509,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        //TODO: #GDM looks like total mess
+        // TODO: #GDM looks like total mess
         parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
@@ -525,7 +525,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         if (!filters.isEmpty()) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-            //TODO: #GDM how is this supposed to work with latestScreenshotTime?
+            // TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
             for(auto filter: filters)
             {
@@ -652,7 +652,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
         loader->setParameters(localParameters); //update changed fields
         qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
-        //TODO: #GDM #3.1 store screenshot settings
+        // TODO: #GDM #3.1 store screenshot settings
         //qnSettings->setTimestampCorner(localParameters.timestampPosition);
 
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));

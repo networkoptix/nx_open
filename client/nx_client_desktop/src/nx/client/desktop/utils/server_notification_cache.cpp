@@ -18,7 +18,7 @@ namespace {
 
 const QLatin1String folder("notifications");
 const QLatin1String targetContainter("mp3");
-const QLatin1String titleTag("Title");  //TODO: #GDM replace with database field
+const QLatin1String titleTag("Title");  // TODO: #GDM replace with database field
 
 }
 
@@ -176,7 +176,7 @@ void ServerNotificationCache::at_fileAdded(const QString &filename, OperationRes
     if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
-    //TODO: #GDM #Business think about getTagValueAsync
+    // TODO: #GDM #Business think about getTagValueAsync
     QString title = AudioPlayer::getTagValue(getFullPath(filename), titleTag);
     if (!title.isEmpty())
         m_model->updateTitle(filename, title);

@@ -1,5 +1,7 @@
-nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
-    ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
+if(NOT IOS)
+    nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
+        ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
+endif()
 
 nx_configure_file(
     maven/filter-resources/app_info_impl.cpp

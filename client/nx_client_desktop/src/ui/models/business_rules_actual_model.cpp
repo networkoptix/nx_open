@@ -44,7 +44,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
 
     vms::event::RulePtr rule = ruleModel->createRule();
 
-    //TODO: #GDM SafeMode
+    // TODO: #GDM SafeMode
     int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;
@@ -71,7 +71,7 @@ void QnBusinessRulesActualModel::at_ruleAddedOrUpdated(const vms::event::RulePtr
 
 void QnBusinessRulesActualModel::at_ruleRemoved(const QnUuid& id)
 {
-    deleteRule(ruleModelById(id));  //TODO: #GDM #Business ask user
+    deleteRule(ruleModelById(id));  // TODO: #GDM #Business ask user
     emit eventRuleDeleted(id);
 }
 

@@ -292,6 +292,11 @@ protected:
 
     void paintSelection(QPainter *painter, const QRectF &rect);
 
+    /**
+     * Inner frame is painted when there is no layout cell spacing.
+     */
+    void paintInnerFrame(QPainter* painter);
+
     virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 

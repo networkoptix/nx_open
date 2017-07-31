@@ -21,14 +21,4 @@ public:
     void setWatchedEvents( const QList<nx::vms::event::EventType> &events );
 };
 
-
-class QnPtzHotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<QnPtzHotkeyHash> {
-    Q_OBJECT
-    typedef QnJsonResourcePropertyAdaptor<QnPtzHotkeyHash> base_type;
-
-public:
-    QnPtzHotkeysResourcePropertyAdaptor(QObject *parent = NULL);
-};
-
-
 #endif // QN_RESOURCE_PROPERTY_ADAPTORS_H

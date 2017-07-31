@@ -380,12 +380,17 @@ void QnWorkbench::submit(QnWorkbenchState& state)
 {
     auto isLayoutSupported = [](const QnLayoutResourcePtr& layout)
         {
+            // Support layout tours.
+            if (!layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull())
+                return true;
+
+            // Ignore other service layouts, e.g. videowall control layouts.
             if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
                 return false;
             return true;
         };
 
-    //TODO: #GDM support videowall reviews
+    // TODO: #GDM support videowall reviews
     auto sourceId = [](const QnLayoutResourcePtr& layout)
         {
             const auto tourId = layout->data(Qn::LayoutTourUuidRole).value<QnUuid>();

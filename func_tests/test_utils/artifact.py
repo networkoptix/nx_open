@@ -49,6 +49,12 @@ class ArtifactFactory(object):
         self._artifact_set.add(self._artifact)
         return self._artifact.path
 
+    def write_file(self, contents):
+        path = self.produce_file_path()
+        with open(path, 'w') as f:
+            f.write(contents)
+        return path
+
     def release(self):
         repo = self._db_capture_repository
         if not repo: return

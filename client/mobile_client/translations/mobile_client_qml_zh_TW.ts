@@ -31,7 +31,7 @@
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation>雲端帳號</translation>
+      <translation>雲帳號</translation>
     </message>
   </context>
   <context>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正確的電子郵件或密碼</translation>
     </message>
   </context>
   <context>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>刪除帳號 &quot;%1&quot;？</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>點擊圖像以放置攝影機</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>取消</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>預設點</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ預設點</translation>
     </message>
   </context>
   <context>
@@ -447,7 +447,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>請檢查您的網路連接或按 &quot;%1&quot; 按鈕來輸入已知的伺服器位址.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -467,7 +467,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>無法連接到系統 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -598,7 +598,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>d MMMM yyyy</translation>
     </message>
   </context>
   <context>

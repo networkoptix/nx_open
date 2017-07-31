@@ -108,7 +108,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setTargetObject(this);
     m_frameColorAnimator->setAccessor(new QnVideowallItemWidgetHoverProgressAccessor());
-    m_frameColorAnimator->setTimeLimit(200); //TODO: #GDM check value
+    m_frameColorAnimator->setTimeLimit(200); // TODO: #GDM check value
     registerAnimation(m_frameColorAnimator);
 
     m_hoverProcessor = new HoverFocusProcessor(this);
@@ -146,6 +146,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     updateInfo();
 }
 
+
+QnVideowallItemWidget::~QnVideowallItemWidget()
+{
+}
 
 void QnVideowallItemWidget::initInfoOverlay()
 {
@@ -218,13 +222,13 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     }
     else
     {
-        //TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
+        // TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
         QRectF bounding;
         foreach(const QnLayoutItemData &data, m_layout->getItems())
         {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
-                continue; //TODO: #GDM #VW some items can be not placed yet, wtf
+                continue; // TODO: #GDM #VW some items can be not placed yet, wtf
             bounding = bounding.united(itemRect);
         }
 
@@ -317,17 +321,8 @@ void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRec
 
 void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    const QMimeData *mimeData = event->mimeData();
-
-    // Scene drop is working only for resources that are already in the pool.
-    MimeData data(mimeData);
-    const auto ids = data.getIds();
-
-    const auto resources = resourcePool()->getResources(ids);
-    m_dragged.resources = resources.filtered(QnResourceAccessFilter::isDroppable);
-    m_dragged.videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
-
-    if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+    m_mimeData.reset(new MimeData{event->mimeData(), resourcePool()});
+    if (!isDragValid())
         return;
 
     event->acceptProposedAction();
@@ -335,31 +330,40 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 
 void QnVideowallItemWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+    if (!isDragValid())
         return;
 
     m_hoverProcessor->forceHoverEnter();
     event->acceptProposedAction();
 }
 
-void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent* /*event*/)
 {
-    Q_UNUSED(event)
-        m_hoverProcessor->forceHoverLeave();
+    m_mimeData.reset();
+    m_hoverProcessor->forceHoverLeave();
 }
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
     action::Parameters parameters;
-    if (!m_dragged.videoWallItems.isEmpty())
-        parameters = m_dragged.videoWallItems;
+
+    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_mimeData->entities());
+    if (!videoWallItems.isEmpty())
+    {
+        parameters = videoWallItems;
+    }
     else
-        parameters = m_dragged.resources;
+    {
+        parameters = m_mimeData->resources();
+        resourcePool()->addNewResources(m_mimeData->resources());
+    }
+
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
     menu()->trigger(action::DropOnVideoWallItemAction, parameters);
 
+    m_mimeData.reset();
     event->acceptProposedAction();
 }
 
@@ -391,14 +395,11 @@ void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void QnVideowallItemWidget::startDrag(DragInfo *info)
 {
     MimeData data;
-    data.setIds({m_itemUuid});
-
-    auto mimeData = new QMimeData();
-    data.toMimeData(mimeData);
-    mimeData->setData(Qn::NoSceneDrop, QByteArray());
+    data.setEntities({m_itemUuid});
+    data.setData(Qn::NoSceneDrop, QByteArray());
 
     auto drag = new QDrag(this);
-    drag->setMimeData(mimeData);
+    drag->setMimeData(data.createMimeData());
 
     Qt::DropAction dropAction = Qt::MoveAction;
     if (info && info->modifiers() & Qt::ControlModifier)
@@ -482,7 +483,7 @@ void QnVideowallItemWidget::updateInfo()
 {
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
     updateHud(false);
-    //TODO: #GDM #VW update layout in case of transition "long name -> short name"
+    // TODO: #GDM #VW update layout in case of transition "long name -> short name"
 }
 
 void QnVideowallItemWidget::updateHud(bool animate)
@@ -574,4 +575,9 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
     }
 
     return true;
+}
+
+bool QnVideowallItemWidget::isDragValid() const
+{
+    return !m_mimeData->isEmpty();
 }

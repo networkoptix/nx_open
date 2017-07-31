@@ -65,7 +65,7 @@ private:
 private:
     QnLayoutResourcePtr m_layout;
 
-    //TODO: #GDM #3.1 singletons are not safe in such cases
+    // TODO: #GDM #3.1 singletons are not safe in such cases
     QnCameraThumbnailManager* m_thumbnailManager;
 
     QColor m_frameColor;

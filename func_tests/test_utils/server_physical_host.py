@@ -153,7 +153,7 @@ class PhysicalInstallationHost(object):
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self._host.host, server_port)
         server_ctl = PhysicalHostServerCtl(self._host, installation.dir)
         server = Server(config.name, self._host, installation, server_ctl, rest_api_url,
-                        config.rest_api_timeout_sec, internal_ip_port=server_port, timezone=self._timezone)
+                        config.rest_api_timeout, internal_ip_port=server_port, timezone=self._timezone)
         self._allocated_server_list.append(server)
         return server
 

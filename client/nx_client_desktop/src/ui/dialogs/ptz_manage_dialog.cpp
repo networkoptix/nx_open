@@ -23,7 +23,10 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/client/ptz/ptz_helpers.h>
 #include <utils/threaded_image_loader.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -161,14 +164,45 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
 
-    //TODO: implement preview receiving and displaying
+    // TODO: implement preview receiving and displaying
 
-    //TODO: think about forced refresh in some cases or even a button - low priority
+    // TODO: think about forced refresh in some cases or even a button - low priority
 }
 
 QnPtzManageDialog::~QnPtzManageDialog()
 {
-    return;
+}
+
+QPointer<QnMediaResourceWidget> QnPtzManageDialog::widget() const
+{
+    return m_widget;
+}
+
+void QnPtzManageDialog::setWidget(QnMediaResourceWidget* widget)
+{
+    if (m_widget == widget)
+        return;
+
+    if (m_widget)
+        m_widget->disconnect(this);
+
+    clear();
+    m_widget = widget;
+
+    if (m_widget)
+    {
+        setController(m_widget->ptzController());
+        connect(m_widget, &QnMediaResourceWidget::dewarpingParamsChanged, this,
+            &QnPtzManageDialog::updateCanSaveCurrentPosition);
+
+        if (const auto resource = m_widget->resource()->toResourcePtr())
+        {
+            setWindowTitle(tr("Manage PTZ for %1...").arg(
+                QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree())));
+        }
+    }
+
+    updateCanSaveCurrentPosition();
 }
 
 void QnPtzManageDialog::setupTableChangesConfirmation()
@@ -215,16 +249,14 @@ void QnPtzManageDialog::accept()
 
 void QnPtzManageDialog::loadData(const QnPtzData &data)
 {
-    QnPtzPresetList presets = data.presets;
+    const auto presets = nx::client::core::ptz::helpers::sortedPresets(
+        controller()->resource(), data.presets);
     QnPtzTourList tours = data.tours;
-    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-    {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
-    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r)
-    {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
+    std::sort(tours.begin(), tours.end(),
+        [](const QnPtzTour& l, const QnPtzTour& r)
+        {
+            return nx::utils::naturalStringLess(l.name, r.name);
+        });
 
     m_model->setTours(tours);
     m_model->setPresets(presets);
@@ -240,13 +272,26 @@ void QnPtzManageDialog::loadData(const QnPtzData &data)
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
 }
 
+bool QnPtzManageDialog::isValid() const
+{
+    return m_widget && m_widget->resource() && controller();
+}
+
+void QnPtzManageDialog::updateCanSaveCurrentPosition()
+{
+    const auto condition = action::condition::canSavePtzPosition();
+    const auto parameters = action::Parameters({m_widget.data()});
+    ui->savePositionButton->setEnabled(isValid()
+        && condition->check(parameters, context()) == action::EnabledAction);
+}
+
 bool QnPtzManageDialog::savePresets()
 {
     bool result = true;
 
     QStringList removedPresets = m_model->removedPresets();
 
-    foreach(const QnPtzPresetItemModel &model, m_model->presetModels())
+    for (const QnPtzPresetItemModel& model: m_model->presetModels())
     {
         if (!model.modified)
             continue;
@@ -257,7 +302,7 @@ bool QnPtzManageDialog::savePresets()
             result &= updatePreset(model.preset);
     }
 
-    foreach(const QString &id, removedPresets)
+    for (const QString& id: removedPresets)
         result &= removePreset(id);
 
     return result;
@@ -309,19 +354,14 @@ bool QnPtzManageDialog::saveHomePosition()
 
 void QnPtzManageDialog::enableDewarping()
 {
-    QList<QnResourceWidget *> widgets = display()->widgets(m_resource);
-    if (widgets.isEmpty())
+    if (!m_widget)
         return;
 
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets.first());
-    if (!widget)
-        return;
-
-    if (widget->dewarpingParams().enabled)
+    if (m_widget->dewarpingParams().enabled)
     {
-        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        auto params = m_widget->item()->dewarpingParams();
         params.enabled = true;
-        widget->item()->setDewarpingParams(params);
+        m_widget->item()->setDewarpingParams(params);
     }
 }
 
@@ -349,6 +389,10 @@ void QnPtzManageDialog::saveData()
 
     m_hotkeysDelegate->updateHotkeys(m_model->hotkeys());
 
+    QnPtzPresetList presets;
+    if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
+        m_model->setPresets(presets);
+
     // reset active ptz object if the current active ptz object is an empty tour
     QnPtzObject ptzObject;
     if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject)
@@ -374,14 +418,8 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields)
     if (fields & Qn::PresetsPtzField)
     {
         QnPtzPresetList presets;
-        if (controller()->getPresets(&presets))
-        {
-            std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r)
-            {
-                return nx::utils::naturalStringLess(l.name, r.name);
-            });
+        if (nx::client::core::ptz::helpers::getSortedPresets(controller(), presets))
             m_model->setPresets(presets);
-        }
     }
 
     if (fields & Qn::ToursPtzField)
@@ -444,12 +482,13 @@ void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &curren
 
 void QnPtzManageDialog::at_savePositionButton_clicked()
 {
-    if (!m_resource || !controller())
+    if (!isValid())
         return;
 
-    if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
+    const auto resource = m_widget->resource()->toResourcePtr();
+    if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        ui::messages::Ptz::failedToGetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToGetPosition(this, resource->getName());
         return;
     }
 
@@ -459,16 +498,18 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
 void QnPtzManageDialog::at_goToPositionButton_clicked()
 {
+    if (!isValid())
+        return;
+
     QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
-    if (!m_resource || !controller())
-        return;
+    const auto resource = m_widget->resource()->toResourcePtr();
 
-    if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
+    if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        ui::messages::Ptz::failedToSetPosition(this, m_resource->getName());
+        ui::messages::Ptz::failedToSetPosition(this, resource->getName());
         return;
     }
 
@@ -500,16 +541,18 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
 void QnPtzManageDialog::at_startTourButton_clicked()
 {
+    if (!isValid())
+        return;
+
     QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
-    if (!m_resource || !controller())
-        return;
+    const auto resource = m_widget->resource()->toResourcePtr();
 
-    if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
+    if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        messages::Ptz::failedToSetPosition(this, m_resource->getName());
+        messages::Ptz::failedToSetPosition(this, resource->getName());
         return;
     }
 
@@ -526,7 +569,7 @@ void QnPtzManageDialog::at_addTourButton_clicked()
     //bool wasEmpty = m_model->rowCount() == 0;
     m_model->addTour();
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
-    //if (wasEmpty) { //TODO: check if needed
+    //if (wasEmpty) { // TODO: check if needed
         // TODO: #Elric duplicate code with QnPtzTourWidget
     for (int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
         if (ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)
@@ -580,8 +623,8 @@ void QnPtzManageDialog::at_deleteButton_clicked()
 
 void QnPtzManageDialog::at_getPreviewButton_clicked()
 {
-    if (!controller() || !m_resource)
-        return;
+    if (!isValid())
+        return;;
 
     QnPtzManageModel::RowData rowData = m_model->rowData(ui->tableView->currentIndex().row());
     if (rowData.rowType != QnPtzManageModel::PresetRow)
@@ -635,18 +678,13 @@ void QnPtzManageDialog::at_cache_imageLoaded(const QString &filename)
     loader->start();
 }
 
-void QnPtzManageDialog::storePreview(const QString &id)
+void QnPtzManageDialog::storePreview(const QString& id)
 {
-    QList<QnResourceWidget *> widgets = display()->widgets(m_resource);
-    if (widgets.isEmpty())
-        return;
-
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets.first());
-    if (!widget)
+    if (!m_widget)
         return;
 
     // TODO: #dklychkov get image from the resource
-//    widget->display()->mediaResource()->getImage(...);
+    // widget->display()->mediaResource()->getImage(...);
     QImage image;
     m_cache->storeImageData(id, image);
 }
@@ -694,25 +732,6 @@ void QnPtzManageDialog::at_model_modelReset()
             ui->tableView->setEditTriggers(oldEditTriggers);
         }
     }
-}
-
-QnResourcePtr QnPtzManageDialog::resource() const
-{
-    return m_resource;
-}
-
-void QnPtzManageDialog::setResource(const QnResourcePtr &resource)
-{
-    if (m_resource == resource)
-        return;
-
-    if (m_resource)
-        clear();
-
-    m_resource = resource;
-
-    setWindowTitle(tr("Manage PTZ for %1...").arg(
-        QnResourceDisplayInfo(m_resource).toString(qnSettings->extraInfoInTree())));
 }
 
 bool QnPtzManageDialog::isModified() const
