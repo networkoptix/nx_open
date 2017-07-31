@@ -23,7 +23,8 @@ MediaPlayer::MediaPlayer(QObject* parent):
                 emit noVideoStreamsChanged();
             }
 
-            const bool failed = ((m_loading || m_playing) && status == MediaStatus::NoMedia);
+            const bool failed = (m_loading || m_playing) &&
+                (status == MediaStatus::NoMedia || noVideoStreams);
             if (m_failed != failed)
             {
                 m_failed = failed;
