@@ -41,6 +41,7 @@ public:
 
 
     bool bind(const std::string& key, const std::string& value);
+    bool bind(const std::string& key, const char* value);
     bool bind(const std::string& key, bool value);
     bool bind(const std::string& key, double value);
     bool bind(const std::string& key, float value);

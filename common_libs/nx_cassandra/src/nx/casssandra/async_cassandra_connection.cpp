@@ -165,17 +165,19 @@ Query::~Query()
         cass_prepared_free(m_prepared);
 }
 
-bool Query::bind(const std::string& key, const std::string& value)
+bool Query::bind(const std::string& key, const char* value)
 {
     if (!m_statement)
         return false;
 
-    auto result = cass_statement_bind_string_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        value.data(), value.size());
+    auto result = cass_statement_bind_string_by_name(m_statement, key.data(), value);
 
     return result == CASS_OK;
+}
+
+bool Query::bind(const std::string& key, const std::string& value)
+{
+    return bind(key, value.data());
 }
 
 #define NX_CASS_BIND_BASIC_VALUE(type) \

@@ -70,8 +70,8 @@ void RemoteRelayPeerPool::prepareDbStructure()
                         domain_suffix_2     text, \
                         domain_suffix_3     text, \
                         domain_name_tail    text, \
-                        PRIMARY KEY (relay_id, relay_host, domain_suffix_1, domain_suffix_2, \
-                            domain_suffix_3, domain_name_tail) \
+                        PRIMARY KEY (domain_suffix_1, domain_suffix_2, domain_suffix_3, \
+                            domain_name_tail) \
                     );");
             })
         .then(
@@ -284,9 +284,7 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
             });
 }
 
-cf::future<bool> RemoteRelayPeerPool::removePeer(
-    const std::string& domainName,
-    const std::string& relayHost)
+cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
 {
     if (!m_dbReady)
         return cf::make_ready_future(false);
@@ -301,15 +299,13 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(
 
                 return m_cassConnection->prepareQuery(
                     "DELETE FROM cdb.relay_peers WHERE \
-                        relay_id=? AND \
-                        relay_host=? AND \
                         domain_suffix_1=? AND \
                         domain_suffix_2=? AND \
                         domain_suffix_3=? AND \
                         domain_name_tail = ?;");
             })
         .then(
-            [this, domainName, relayHost](
+            [this, domainName](
                 cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
             {
                 auto prepareResult = prepareFuture.get();
@@ -319,7 +315,7 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
-                if (!bindUpdateParameters(&prepareResult.second, domainName, relayHost))
+                if (!bindUpdateParameters(&prepareResult.second, domainName))
                 {
                     NX_VERBOSE(this, "Bind parameters for delete from cdb.relay_peers failed");
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
@@ -344,7 +340,7 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(
 bool RemoteRelayPeerPool::bindUpdateParameters(
     cassandra::Query* query,
     const std::string& domainName,
-    const std::string& relayHost) const
+    const boost::optional<std::string>& relayHost) const
 {
     auto reversedDomainName = nx::utils::reverseWords(domainName, ".");
     std::vector<std::string> domainParts;
@@ -353,14 +349,18 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
     NX_ASSERT(!domainParts.empty());
 
     bool bindResult = true;
-    cassandra::Uuid localHostId;
+    if (relayHost.is_initialized())
     {
-        QnMutexLocker lock(&m_mutex);
-        localHostId.uuidString = m_hostId;
+        cassandra::Uuid localHostId;
+        {
+            QnMutexLocker lock(&m_mutex);
+            localHostId.uuidString = m_hostId;
+        }
+        bindResult &= query->bind("relay_id", localHostId);
     }
 
-    bindResult &= query->bind("relay_id", localHostId);
-    bindResult &= query->bind("relay_host", relayHost);
+    if (relayHost.is_initialized())
+        bindResult &= query->bind("relay_host", relayHost.get());
     bindResult &= query->bind("domain_suffix_1", domainParts[0]);
     bindResult &= query->bind("domain_suffix_2", domainParts.size() > 1 ? domainParts[1] : "");
     bindResult &= query->bind("domain_suffix_3", domainParts.size() > 2 ? domainParts[2] : "");
@@ -413,16 +413,17 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
 
     if (domainParts.size() > 3)
     {
-        ss << " domain_name_tail = ";
+        ss << " domain_name_tail = '";
         for (int i = 3; i < partsCount; ++i)
         {
             ss << domainParts[i];
             if (i != partsCount - 1)
                 ss << ".";
         }
+        ss << "'";
     }
 
-    ss << " ALLOW FILTERING;";
+    ss << ";";
     return ss.str();
 }
 

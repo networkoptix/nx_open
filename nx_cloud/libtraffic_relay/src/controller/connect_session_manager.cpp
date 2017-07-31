@@ -61,7 +61,7 @@ ConnectSessionManager::ConnectSessionManager(
     m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
         [this](std::string peer)
         {
-            m_remoteRelayPool->removePeer(peer, "This_Relay_Host")
+            m_remoteRelayPool->removePeer(peer)
                 .then(
                     [this, peer](cf::future<bool> removePeerFuture)
                     {

@@ -11,15 +11,14 @@ namespace model {
 class AbstractRemoteRelayPeerPool
 {
 public:
-    virtual cf::future<std::string> findRelayByDomain(const std::string& domainName) const = 0;
+    virtual ~AbstractRemoteRelayPeerPool() {}
 
+    virtual cf::future<std::string> findRelayByDomain(const std::string& domainName) const = 0;
     virtual cf::future<bool> addPeer(
         const std::string& domainName,
         const std::string& relayHost) = 0;
 
-    virtual cf::future<bool> removePeer(
-        const std::string& domainName,
-        const std::string& relayHost) = 0;
+    virtual cf::future<bool> removePeer(const std::string& domainName) = 0;
 };
 
 } // namespace model

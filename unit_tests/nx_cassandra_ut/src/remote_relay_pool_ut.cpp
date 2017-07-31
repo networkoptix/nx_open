@@ -80,8 +80,7 @@ protected:
     void whenFivePeersHaveBeenRemoved()
     {
         for (const auto& relayToDomain : m_relayToDomainTestData)
-            ASSERT_TRUE(m_relayPool->removePeer(
-                std::get<2>(relayToDomain), std::get<1>(relayToDomain)).get());
+            ASSERT_TRUE(m_relayPool->removePeer(std::get<2>(relayToDomain)).get());
     }
 
     void whenTableIsFilledWithTestData()
@@ -143,6 +142,38 @@ protected:
                                     });
                         });
             }).wait();
+    }
+
+    void whenOneRecordIsReplacedWithDifferentRelayHostAndId()
+    {
+        auto replaceResult = m_relayPool->getConnection()->prepareQuery(
+            "INSERT INTO cdb.relay_peers ( \
+                relay_id, \
+                relay_host, \
+                domain_suffix_1, \
+                domain_suffix_2, \
+                domain_suffix_3, \
+                domain_name_tail ) VALUES(?, ?, ?, ?, ?, ?);")
+            .then(
+                [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
+                {
+                    auto prepareResult = prepareFuture.get();
+                    NX_ASSERT(prepareResult.first == CASS_OK);
+
+                    auto& query = prepareResult.second;
+                    NX_ASSERT(query.bind(
+                        "relay_id",
+                        cassandra::Uuid("74DFEB4A-1FBD-49AD-B840-5F477A7B4A72")));
+                    NX_ASSERT(query.bind("relay_host", "new_host"));
+                    NX_ASSERT(query.bind("domain_suffix_1", "com"));
+                    NX_ASSERT(query.bind("domain_suffix_2", "nx"));
+                    NX_ASSERT(query.bind("domain_suffix_3", "someServer"));
+                    NX_ASSERT(query.bind("domain_name_tail", ""));
+
+                    return m_relayPool->getConnection()->executeUpdate(std::move(query));
+                }).get();
+
+        NX_ASSERT(replaceResult == CASS_OK);
     }
 
     void assertSelectFromTablesResult(
@@ -213,12 +244,12 @@ protected:
         while (selectResult.second.next())
         {
             ++rowCount;
-            ASSERT_TRUE(selectResult.second.get(0, &relayId));
-            ASSERT_TRUE(selectResult.second.get(1, &relayHost));
-            ASSERT_TRUE(selectResult.second.get(2, &suffix1));
-            ASSERT_TRUE(selectResult.second.get(3, &suffix2));
-            ASSERT_TRUE(selectResult.second.get(4, &suffix3));
-            ASSERT_TRUE(selectResult.second.get(5, &domainTail));
+            ASSERT_TRUE(selectResult.second.get(0, &suffix1));
+            ASSERT_TRUE(selectResult.second.get(1, &suffix2));
+            ASSERT_TRUE(selectResult.second.get(2, &suffix3));
+            ASSERT_TRUE(selectResult.second.get(3, &domainTail));
+            ASSERT_TRUE(selectResult.second.get(4, &relayHost));
+            ASSERT_TRUE(selectResult.second.get(5, &relayId));
 
             ASSERT_TRUE((bool)relayId);
             ASSERT_TRUE((bool)relayHost);
@@ -287,6 +318,16 @@ protected:
     void thenRelaysShouldBeFoundCorrectly()
     {
         ASSERT_TRUE(verifyFindRelayResult("com", {"relayHost1", "relayHost2", "relayHost4"}));
+        ASSERT_TRUE(verifyFindRelayResult("network.ru", {"relayHost3"}));
+        ASSERT_TRUE(verifyFindRelayResult("someServer4.subdomain.nx.network.org", {"relayHost5"}));
+        ASSERT_TRUE(verifyFindRelayResult("someServer2.nx.network.ru", {"relayHost3"}));
+    }
+
+    void thenNewRelayInfoShouldBeFound()
+    {
+        auto relayHost = m_relayPool->findRelayByDomain("someServer.nx.com").get();
+        ASSERT_FALSE(relayHost.empty());
+        ASSERT_EQ(relayHost, "new_host");
     }
 
 private:
@@ -337,6 +378,16 @@ TEST_F(RemoteRelayPeerPool, getRelayByDomain)
     whenTableIsFilledWithTestData();
 
     thenRelaysShouldBeFoundCorrectly();
+}
+
+TEST_F(RemoteRelayPeerPool, relayIdAndHostReplacedIfAddedFromAnotherRelay)
+{
+    givenDbWithNotExistentCdbKeyspace();
+    whenRelayPoolObjectHasBeenCreated();
+    whenTableIsFilledWithTestData();
+    whenOneRecordIsReplacedWithDifferentRelayHostAndId();
+
+    thenNewRelayInfoShouldBeFound();
 }
 
 } // namespace test

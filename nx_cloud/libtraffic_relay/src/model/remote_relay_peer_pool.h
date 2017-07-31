@@ -31,9 +31,7 @@ public:
         const std::string& domainName,
         const std::string& relayHost) override;
 
-    virtual cf::future<bool> removePeer(
-        const std::string& domainName,
-        const std::string& relayHost) override;
+    virtual cf::future<bool> removePeer(const std::string& domainName) override;
 
 protected:
     cassandra::AsyncConnection* getConnection();
@@ -49,7 +47,7 @@ private:
     bool bindUpdateParameters(
         cassandra::Query* query,
         const std::string& domainName,
-        const std::string& relayHost) const;
+        const boost::optional<std::string>& relayHost = boost::none) const;
     cf::future<int> getLocalHostId() const;
 };
 
