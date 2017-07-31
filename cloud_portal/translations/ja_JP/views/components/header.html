@@ -12,7 +12,7 @@
         </ul>
 
         <div class="navbar-header">
-            <a class="navbar-brand product-name add-version" href="/"><img src="static/images/logo.png"></a>
+            <a class="navbar-brand product-name add-version" href="/"><img ng-src="{{$root.C.previewPath}}/static/images/logo.png"></a>{{$root.C.previewPath}}
         </div>
 
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
@@ -58,6 +58,9 @@
                     <li><a href="/account/">アカウント設定</a></li>
                     <li><a href="/account/password/">パスワードを変更</a></li>
                     <li><a href="" ng-click="logout()">ログアウト</a></li>
+
+                    <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
+                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

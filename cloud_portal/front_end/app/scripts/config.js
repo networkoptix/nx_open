@@ -2,6 +2,7 @@
 
 var Config = {
     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+    previewPath: '',
     viewsDirCommon: 'static/web_common/views/',
     gatewayUrl: '/gateway',
     googleTagsCode: 'GTM-5MRNWP',

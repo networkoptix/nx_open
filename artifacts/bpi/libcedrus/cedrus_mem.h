@@ -46,6 +46,7 @@ struct cedrus_allocator *cedrus_allocator_ion_new(void);
 struct cedrus_allocator *cedrus_allocator_ump_new(void);
 #endif
 
+// ATTENTION: Defined in cedrus.c.
 uint32_t phys2bus(uint32_t phys);
 uint32_t bus2phys(uint32_t bus);
 

@@ -25,8 +25,8 @@ private:
     LineBreaks m_lineBreaks;
 };
 
-
-QString htmlBold(const QString &source);
+QString makeHtml(const QString& source);
+QString htmlBold(const QString& source);
 QString htmlFormattedParagraph(const QString &text
     , int pixelSize
     , bool isBold = false

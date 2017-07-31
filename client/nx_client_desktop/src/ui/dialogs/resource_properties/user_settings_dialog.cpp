@@ -16,6 +16,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
@@ -491,16 +492,31 @@ void QnUserSettingsDialog::applyChanges()
         return;
 
     // TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
-    // TODO: #GDM #access SafeMode what to rollback if we were creating new user
-    qnResourcesChangesManager->saveUser(m_user,
-        [this, mode](const QnUserResourcePtr& /*user*/)
+
+    auto applyChangesFunction =
+        [this](const QnUserResourcePtr& /*user*/)
         {
             //here accessible resources will also be filled to model
             applyChangesInternal();
-
             if (m_user->getId().isNull())
                 m_user->fillId();
-        });
+        };
+
+    // Handle new user creating.
+    auto callbackFunction =
+        [this, mode](bool success, const QnUserResourcePtr& user)
+        {
+            if (mode != QnUserSettingsModel::NewUser)
+                return;
+
+            // Cannot capture the resource directly because real resource pointer may differ if the
+            // transaction is received before the request callback.
+            NX_EXPECT(user);
+            if (success && user)
+                menu()->trigger(action::SelectNewItemAction, user);
+        };
+
+    qnResourcesChangesManager->saveUser(m_user, applyChangesFunction, callbackFunction);
 
     if (m_user->userRole() == Qn::UserRole::CustomPermissions)
     {

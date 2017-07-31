@@ -1,11 +1,9 @@
-if(IOS)
-    set(codesignKeychain "nx_build" CACHE STRING "Keychain name to be used to sign binaries.")
-endif()
-
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
 set(product.title "${mobile_client.name}")
 set(product.display.title "${mobile_client.display.name}")
+set(project.version.code "${buildNumber}")
+set(project.version.name "${mobileClientVersion}")
 
 nx_configure_file(
     maven/filter-resources/version.h
@@ -68,9 +66,6 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    set(project.version.name "${mobileClientVersion}")
-    set(project.version.code "${buildNumber}")
-
     file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     file(COPY "${customization_dir}/icons/android/android"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -124,98 +119,25 @@ if(IOS)
         RESOURCE "${resources}"
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
-        XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codesignKeychain}.keychain"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
     )
 
-    set(additional_plugins
-        qios
-        qtmedia_audioengine
-        qtaudio_coreaudio
+    setup_ios_application(mobile_client
+        ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio
+        QML_ROOT "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
     )
 
-    if(qml_debug)
-        list(APPEND additional_plugins
-            qmldbg_debugger
-            qmldbg_inspector
-            qmldbg_local
-            qmldbg_native
-            qmldbg_profiler
-            qmldbg_server
-            qmldbg_tcp
-        )
-    endif()
-
-    set(static_plugins_args_file "${CMAKE_CURRENT_BINARY_DIR}/static_plugins.parameters")
-
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
-            --print-static-plugins
-            --qt-root "${QT_DIR}" --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
-            --additional-plugins ${additional_plugins}
-            --output "${static_plugins_args_file}"
-        RESULT_VARIABLE result
-    )
-    if(NOT result EQUAL 0)
-        message(FATAL_ERROR "Cannot get list of static qml plugins.")
-    endif()
-
-    set_property(TARGET mobile_client APPEND_STRING PROPERTY
-        LINK_FLAGS " -Wl,-e,_qt_main_wrapper")
-    set_property(TARGET mobile_client APPEND_STRING PROPERTY
-        LINK_FLAGS " @${static_plugins_args_file}")
-
-    # So far Qt does not export dependent libraries for CMake, so we have to specify them manually.
     target_link_libraries(mobile_client PRIVATE
-        "-framework MobileCoreServices"
-        "-framework Foundation"
-        "-framework UIKit"
-        "-framework CoreText"
-        "-framework CoreGraphics"
-        "-framework MobileCoreServices"
-        "-framework Foundation"
-        "-framework UIKit"
-        "-framework CoreFoundation"
-        "-framework Security"
-        "-framework SystemConfiguration"
-        "-framework OpenGLES"
         "-framework VideoToolbox"
         "-framework AudioToolbox"
         "-framework CoreAudio"
         "-framework CoreVideo"
         "-framework CoreMedia"
         "-framework AVFoundation"
-        "-framework QuartzCore"
-        "-framework AssetsLibrary"
-        "-L${QT_DIR}/lib"
-        qtharfbuzzng qtpcre qtfreetype
-        Qt5PlatformSupport
-        Qt5LabsControls Qt5LabsTemplates
         Qt5WebView
-        z
     )
 
-    set(plugins_import_cpp "${CMAKE_CURRENT_BINARY_DIR}/qt_plugins_import.cpp")
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
-            --generate-import-cpp
-            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
-            --additional-plugins ${additional_plugins}
-            --output ${plugins_import_cpp}
-        RESULT_VARIABLE result
-    )
-    if(NOT result EQUAL 0)
-        message(FATAL_ERROR "Cannot generate plugins import file.")
-    endif()
-
-    set_property(TARGET mobile_client APPEND PROPERTY SOURCES "${plugins_import_cpp}")
-
-    set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
-
-    add_custom_command(TARGET mobile_client PRE_LINK
-        COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
-            --qt-root ${QT_DIR} --qml-root "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
-            --output "${app_dir}/qt_qml"
-        COMMENT "Copying QML imports"
-    )
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client
+        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
 endif()

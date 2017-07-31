@@ -216,17 +216,21 @@ public:
     /**
      * \returns                         Current viewport geometry, in scene coordinates, calculated taking viewport margins into account.
      */
-    QRectF boundedViewportGeometry() const;
+    QRectF boundedViewportGeometry(Qn::MarginTypes marginTypes= Qn::CombinedMargins) const;
 
     /**
      * This function can be used in case the "actual" viewport differs from the
      * "real" one. This can be the case if control panels are drawn on the scene.
+     * Some layouts can have additional viewport margins, that are changed independently of panels.
+     * For example, these are tour review layouts. Different fields are required to correctly
+     * calculate background rect.
      *
      * \param margins                   New viewport margins.
+     * \param marginType                Type of margins to be set.
      */
-    void setViewportMargins(const QMargins &margins);
+    void setViewportMargins(const QMargins& margins, Qn::MarginType marginType);
 
-    QMargins viewportMargins() const;
+    QMargins viewportMargins(Qn::MarginTypes marginTypes = Qn::CombinedMargins) const;
 
     Qn::MarginFlags currentMarginFlags() const;
 
