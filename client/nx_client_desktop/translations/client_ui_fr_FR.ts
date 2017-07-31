@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Coller du Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Sélectionner un fichier licence...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Cycle de tour</translation>
+      <source>seconds</source>
+      <translation>secondes</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>secondes</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

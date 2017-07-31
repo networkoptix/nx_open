@@ -39,15 +39,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>從頭播放此書籤</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>編輯書籤</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>刪除書籤</translation>
     </message>
   </context>
   <context>
@@ -181,14 +181,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>新 Web 頁面...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation>佈局輪巡</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation>新增佈局輪巡</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -566,10 +558,6 @@ to view more bookmarks</source>
       <translation>從佈局移除</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation>從輪巡中移除</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>停止共用佈局</translation>
     </message>
@@ -742,18 +730,6 @@ to view more bookmarks</source>
       <translation>大</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>開始輪跳</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>停止輪跳</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation>製作佈局輪巡</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>設定</translation>
     </message>
@@ -880,6 +856,30 @@ to view more bookmarks</source>
     <message>
       <source>Bookmark Log...</source>
       <translation>書籤日誌</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation type="unfinished">Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation type="unfinished">New Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation type="unfinished">Remove from Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
   </context>
   <context>
@@ -2328,6 +2328,10 @@ to view more bookmarks</source>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>此攝影機最大位移區域數量為 %1, 已選取 %2 個位移區域.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
     </message>
   </context>
   <context>
@@ -3986,10 +3990,6 @@ to %1</source>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>請將授權及硬體 Id 提供到 %1 以取得離線授權檔.</translation>
     </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation>複製硬體 Id 至剪貼簿</translation>
-    </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
@@ -5024,12 +5024,12 @@ to %1</source>
       <translation>本機檔案</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation>佈局輪巡</translation>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation>佈局輪巡</translation>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
     </message>
   </context>
   <context>
@@ -6361,11 +6361,6 @@ to %1</source>
       <translation>hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh: mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation>h ap</translation>
@@ -6391,11 +6386,6 @@ to %1</source>
       <translation>dd日 MMMM yyyy hh: mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy hh: mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation>dd日 MMMM yyyy hh: mm</translation>
@@ -6419,6 +6409,16 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation type="unfinished">h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6732,6 +6732,11 @@ to %1</source>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation>在切換到另一個使用者之前套用變更嗎?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
   </context>
   <context>
@@ -7433,14 +7438,6 @@ to %1</source>
       <source>There is another layout with the same name.</source>
       <translation>有另一個具有相同名稱的佈局.</translation>
     </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation>覆蓋現有的佈局輪巡?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation>有另一個具有相同名稱的佈局輪巡.</translation>
-    </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
@@ -7509,12 +7506,6 @@ to %1</source>
       <source>Remove</source>
       <translation>移除</translation>
     </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation>
-        <numerusform>從佈局輪巡中刪除 %n 項目嗎?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
       <translation>您將刪除某些您只有電視牆權限的資源. 您將無法在資源列表上看到他們且無法再加到電視牆.</translation>
@@ -7574,6 +7565,20 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>刪除後可能會再被自動加回來.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7635,12 +7640,12 @@ to %1</source>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>已複製</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>貼上</translation>
     </message>
   </context>
   <context>
@@ -7653,8 +7658,8 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation>拖曳佈局或攝影機到這裡以加入輪巡</translation>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
@@ -7934,12 +7939,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation>使用鍵盤的方向鍵切換佈局. 退出請按Esc鍵.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation>使用鍵盤的方向鍵切換攝影機. 退出請按Esc鍵.</translation>
+      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
     </message>
   </context>
   <context>
@@ -7960,16 +7965,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation>佈局輪巡</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation>佈局輪巡 %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation>刪除佈局輪巡%1？</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
   </context>
   <context>

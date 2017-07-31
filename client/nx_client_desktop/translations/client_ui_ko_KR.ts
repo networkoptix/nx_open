@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>클립보드 붙여넣기</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>클립보드 복사</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>인증 파일 선택...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>투어 사이클</translation>
+      <source>seconds</source>
+      <translation>초</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>초</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>
