@@ -369,6 +369,7 @@ Item
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("LIVE")
+                labelPadding: 12
                 flat: true
                 onClicked:
                 {
