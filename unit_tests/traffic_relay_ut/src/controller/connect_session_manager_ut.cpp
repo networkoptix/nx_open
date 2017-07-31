@@ -278,8 +278,7 @@ protected:
                     &clientSessionPool(),
                     &listeningPeerPool(),
                     &m_trafficRelayStub,
-                    std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
-                        new model::RemoteRelayPeerPool("127.0.0.1")));
+                    std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
         }
 
         return *m_connectSessionManager;

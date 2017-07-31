@@ -362,8 +362,8 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
 
     return std::make_unique<ConnectSessionManager>(
         settings, clientSessionPool, listeningPeerPool, trafficRelay,
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
-            new model::RemoteRelayPeerPool(settings.cassandraHost().toLatin1().constData())));
+        std::make_unique<model::RemoteRelayPeerPool>(
+            settings.cassandraHost().toLatin1().constData()));
 }
 
 ConnectSessionManagerFactory::FactoryFunc
