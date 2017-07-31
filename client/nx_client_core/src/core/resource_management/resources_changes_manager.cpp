@@ -94,7 +94,7 @@ ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
             if (thread && callback)
             {
                 executeInThread(thread,
-                    [guard, sessionGuid ,callback, success, resource]()
+                    [guard, sessionGuid, callback, success, resource]()
                     {
                         if (!guard)
                             return;
