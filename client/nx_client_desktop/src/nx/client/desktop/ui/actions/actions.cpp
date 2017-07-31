@@ -92,6 +92,9 @@ void initialize(Manager* manager, Action* root)
     factory(SelectionChangeAction)
         .flags(NoTarget);
 
+    factory(SelectNewItemAction)
+        .flags(NoTarget | SingleTarget | ResourceTarget);
+
     factory(PreferencesLicensesTabAction)
         .flags(NoTarget)
         .requiredGlobalPermission(Qn::GlobalAdminPermission);

@@ -206,6 +206,7 @@ namespace Qn
         IsSpecialLayoutRole,
         LayoutIconRole,
         LayoutFlagsRole,                            //< Role for additional QnLayoutFlags value
+        LayoutMarginsRole,                          //< Role for additional QMargins (in pixels)
         CustomPanelTitleRole,
         CustomPanelDescriptionRole,
         CustomPanelActionsRole,
@@ -303,7 +304,15 @@ namespace Qn
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
+    enum MarginType
+    {
+        PanelMargins = 0x1,     //< Margins from panels, e.g. resource tree or timeline.
+        LayoutMargins = 0x2,    //< Margins from layout, e.g. tour review.
 
+        CombinedMargins = PanelMargins | LayoutMargins
+    };
+    Q_DECLARE_FLAGS(MarginTypes, MarginType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MarginTypes)
 
     enum class CellSpacing
     {

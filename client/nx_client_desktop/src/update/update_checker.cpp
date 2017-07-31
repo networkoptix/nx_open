@@ -49,6 +49,7 @@ void QnUpdateChecker::at_networkReply_finished() {
     info.releaseNotesUrl = map.value(lit("release_notes")).toUrl();
     info.releaseDateMs =  map.value(lit("release_date")).toLongLong();
     info.releaseDeliveryDays = map.value(lit("release_delivery")).toInt();
+    info.description = map.value(lit("description")).toString();
 
     QVariantMap releases = map.value(lit("releases")).toMap();
     info.currentRelease = QnSoftwareVersion(releases.value(currentRelease).toString());

@@ -1040,3 +1040,68 @@ void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
     NX_EXPECT(typeIndex >= 0);
     ui->typeComboBox->setCurrentIndex(typeIndex);
 }
+
+void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(!id.isNull());
+    if (id.isNull())
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::UuidRole,
+        qVariantFromValue(id),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectResource(const QnResourcePtr& resource)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(resource);
+    if (!resource)
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::ResourceRole,
+        qVariantFromValue(resource),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectIndices(const QModelIndexList& indices)
+{
+    if (indices.empty())
+        return;
+
+    for (const auto& index: indices)
+    {
+        auto parent = index.parent();
+        while (parent.isValid())
+        {
+            ui->resourceTreeWidget->expand(parent);
+            parent = parent.parent();
+        }
+    }
+
+    if (auto selection = ui->resourceTreeWidget->selectionModel())
+    {
+        selection->clear();
+        for (const auto& index: indices)
+            selection->select(index, QItemSelectionModel::Select);
+    }
+}

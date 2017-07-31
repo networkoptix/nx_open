@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Aus Zwischenablage einfügen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Lizenzdatei auswählen...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Tourzyklus</translation>
+      <source>seconds</source>
+      <translation>Sekunden</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>Sekunden</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

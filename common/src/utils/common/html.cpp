@@ -118,9 +118,14 @@ QnHtmlTag::~QnHtmlTag()
         m_result.append(L'\n');
 }
 
-QString htmlBold(const QString &source)
+QString makeHtml(const QString& source)
 {
-    return lit("<b>%1</b>").arg(source);
+    return lit("<html>") + source + lit("</html>");
+}
+
+QString htmlBold(const QString& source)
+{
+    return lit("<b>") + source + lit("</b>");
 }
 
 QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /*= false */, bool isItalic /*= false*/)

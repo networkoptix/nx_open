@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Lesezeichen von Anfang an anzeigen</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Lesezeichen löschen</translation>
     </message>
   </context>
   <context>
@@ -180,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>Neue Webseite...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation>Layout-Tour...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation>Neue Layout-Tour...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -565,10 +557,6 @@ to view more bookmarks</source>
       <translation>Aus Layout entfernen</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation>Von Tour entfernen</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>Layoutfreigabe stoppen</translation>
     </message>
@@ -741,18 +729,6 @@ to view more bookmarks</source>
       <translation>Groß</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>Tour starten</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Tour stoppen</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation>Layout-Tour machen</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Einstellungen</translation>
     </message>
@@ -879,6 +855,30 @@ to view more bookmarks</source>
     <message>
       <source>Bookmark Log...</source>
       <translation>Lesezeichenprotokoll...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation type="unfinished">Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation type="unfinished">New Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation type="unfinished">Remove from Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
   </context>
   <context>
@@ -1030,11 +1030,11 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Pfad &quot;%1&quot; ist ungültig. Bitte versuchen Sie einen anderen Pfad.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Datei &quot;%1&quot; ist bereits vorhanden. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
@@ -1727,7 +1727,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Lesezeichen verwalten</translation>
     </message>
   </context>
   <context>
@@ -2348,6 +2348,10 @@ to view more bookmarks</source>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>Die maximale Anzahl an Bewegungsbereichen der aktuellen Kamera beträgt %1, und %2 Bewegungsbereiche sind derzeit ausgewählt.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
     </message>
   </context>
   <context>
@@ -3992,7 +3996,7 @@ to %1</source>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
     </message>
   </context>
   <context>
@@ -4024,10 +4028,6 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
-    </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation>Hardware-ID in die Zwischenablage kopiert</translation>
     </message>
   </context>
   <context>
@@ -4595,7 +4595,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Lesezeichen verwalten</translation>
     </message>
   </context>
   <context>
@@ -4947,37 +4947,37 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>Rolle %1 hat keine %2 Berechtigung</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>Ausgewählte Rollen haben keine %1 Berechtigung</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n von %1 ausgewählte Rolle hat keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählte Rollen haben keine %2 Berechtigungen</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>Benutzer %1 hat keine %2 Berechtigung</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>Ausgewählte Benutzer haben keine %1 Berechtigung</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n von %1 ausgewählter Benutzer hat keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählte Benutzer haben keine %2 Berechtigungen</numerusform>
       </translation>
     </message>
   </context>
@@ -5076,12 +5076,12 @@ to %1</source>
       <translation>Lokale Dateien</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation>Layout-Tour</translation>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation>Layout-Tour</translation>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
     </message>
   </context>
   <context>
@@ -6309,27 +6309,27 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>Die Remote-Archivsynchronisation wurde gestartet</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>Die Remote-Archivsynchronisation wurde beendet</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>Die Remote-Archivsynchronisation ist im Gange</translation>
     </message>
     <message>
       <source>Error occured during remote archive synchronization</source>
-      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+      <translation>Bei der Remote-Archivsynchronisation ist ein Fehler aufgetreten</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät gestartet:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät abgeschlossen:</translation>
     </message>
   </context>
   <context>
@@ -6420,11 +6420,6 @@ to %1</source>
       <translation>hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation>h ap</translation>
@@ -6450,11 +6445,6 @@ to %1</source>
       <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation>dd MMMM yyyy hh:mm</translation>
@@ -6478,6 +6468,16 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation type="unfinished">h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6797,6 +6797,11 @@ to %1</source>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation>Übernehmen Sie die Änderungen vor dem Wechsel zu einem anderen Benutzer?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
   </context>
   <context>
@@ -7505,14 +7510,6 @@ to %1</source>
       <source>There is another layout with the same name.</source>
       <translation>Es gibt ein anderes Layout mit dem gleichen Namen.</translation>
     </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation>Vorhandene Layout-Tour überschreiben?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation>Es gibt eine andere Layout-Tour mit dem gleichen Namen.</translation>
-    </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
@@ -7589,13 +7586,6 @@ to %1</source>
       <source>Remove</source>
       <translation>Löschen</translation>
     </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation>
-        <numerusform>%n Items von Layout-Tour entfernen?</numerusform>
-        <numerusform>%n Items von Layout-Tour entfernen?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
       <translation>Sie sind dabei Ressourcen zu löschen auf welche Sie nur von der Videowand Zugriff haben. Danach werden Sie sie nicht mehr in der Ressourcenliste sehen und es wird auch nicht möglich sein diese der Videowand neu hinzuzufügen.</translation>
@@ -7636,7 +7626,7 @@ to %1</source>
       <source>Delete %n items?</source>
       <translation>
         <numerusform>%n Item löschen?</numerusform>
-        <numerusform>%n Item löschen?</numerusform>
+        <numerusform>%n Items löschen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7663,6 +7653,21 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>Sie können nach dem Entfernen wieder automatisch erkannt werden.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7725,12 +7730,12 @@ to %1</source>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopiert</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>Eingefügt</translation>
     </message>
   </context>
   <context>
@@ -7743,8 +7748,8 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation>Ziehen Sie das Layout oder die Kamera hierher, um es der Tour hinzuzufügen</translation>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
@@ -8031,12 +8036,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Die Tour kann durch drücken von ESC beendet werden.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
     </message>
   </context>
   <context>
@@ -8057,16 +8062,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation>Layout-Tour</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation>Layout-Tour %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation>Layout-Tour %1 löschen?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
   </context>
   <context>

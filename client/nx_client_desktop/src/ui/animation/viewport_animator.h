@@ -33,9 +33,9 @@ public:
 
     void setView(QGraphicsView *view);
 
-    const QMargins &viewportMargins() const;
+    QMargins viewportMargins(Qn::MarginTypes marginTypes = Qn::CombinedMargins) const;
 
-    void setViewportMargins(const QMargins &margins);
+    void setViewportMargins(const QMargins& margins, Qn::MarginType marginType);
 
     Qn::MarginFlags marginFlags() const;
 
@@ -75,7 +75,9 @@ private:
     /** Accessor for viewport rect. */
     ViewportGeometryAccessor *m_accessor;
 
-    QMargins m_margins;
+    QMargins m_panelMargins;
+    QMargins m_layoutMargins;
+
     Qn::MarginFlags m_marginFlags;
 
     QRectF m_adjustedTargetRect;

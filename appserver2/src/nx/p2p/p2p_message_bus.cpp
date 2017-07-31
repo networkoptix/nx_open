@@ -779,7 +779,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
     result.peerType = m_localPeerType;
     result.cloudHost = nx::network::AppInfo::defaultCloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
-    result.keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout().count();
+    result.aliveUpdateInterval = commonModule()->globalSettings()->aliveUpdateInterval().count();
     result.protoVersion = nx_ec::EC2_PROTO_VERSION;
     result.dataFormat = Qn::UbjsonFormat;
     return result;

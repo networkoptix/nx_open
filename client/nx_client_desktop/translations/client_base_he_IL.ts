@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>נגן סימנייה מההתחלה</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>ערוך סימניה</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>מחק סימניה</translation>
     </message>
   </context>
   <context>
@@ -180,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>דף אינטרנט חדש...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation>סיור פריסה...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation>סיור פריסה חדש...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -565,10 +557,6 @@ to view more bookmarks</source>
       <translation>הסר מהפריסה</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation>הסר מהסיור</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>הפסק שיתוף פריסה</translation>
     </message>
@@ -741,18 +729,6 @@ to view more bookmarks</source>
       <translation>גדול</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>התחל סיור</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>עצור סיור</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation>הפוך לסיור פריסה</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>הגדרות</translation>
     </message>
@@ -879,6 +855,30 @@ to view more bookmarks</source>
     <message>
       <source>Bookmark Log...</source>
       <translation>יומן סימניות...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation type="unfinished">Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation type="unfinished">New Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation type="unfinished">Remove from Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
   </context>
   <context>
@@ -2390,6 +2390,10 @@ to view more bookmarks</source>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>המספר המרבי של אזורי תנועה למצלמה הנוכחית הוא %1, %2 אזורי תנועה נבחרו כעת.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
     </message>
   </context>
   <context>
@@ -4114,10 +4118,6 @@ to %1</source>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
     </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation>מזהה החומרה הועתק אל הלוח</translation>
-    </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
@@ -5191,12 +5191,12 @@ to %1</source>
       <translation>קבצים מקומיים</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation>סיורי פריסה</translation>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation>סיור פריסה</translation>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
     </message>
   </context>
   <context>
@@ -6549,11 +6549,6 @@ to %1</source>
       <translation>hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation>h ap</translation>
@@ -6579,11 +6574,6 @@ to %1</source>
       <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation>dd MMMM yyyy hh:mm</translation>
@@ -6607,6 +6597,16 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation type="unfinished">h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6938,6 +6938,11 @@ to %1</source>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation>האם להחיל שינויים לפני המעבר למשתמש אחר?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
   </context>
   <context>
@@ -7660,14 +7665,6 @@ to %1</source>
       <source>There is another layout with the same name.</source>
       <translation>ישנה פריסה נוספת עם אותו שם.</translation>
     </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation>האם להחליף את סיור הפריסה הקיימת?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation>ישנה פריסת סיור נוספת עם אותו שם.</translation>
-    </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
@@ -7760,15 +7757,6 @@ to %1</source>
       <source>Remove</source>
       <translation>הסר</translation>
     </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסת סיור?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
       <translation>אתה הולך למחוק כמה משאבים שיש לך גישה מקיר הוידאו בלבד. אתה לא תראה אותם ברשימת המשאבים שלך ולא תוכל להוסיף אותם שוב לקיר הוידאו.</translation>
@@ -7853,6 +7841,23 @@ to %1</source>
       <source>They may be auto-discovered again after removing.</source>
       <translation>הם עשויים להתגלות באופן אוטומטי שוב לאחר הסרתם.</translation>
     </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7916,12 +7921,12 @@ to %1</source>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>הועתק</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>הודבק</translation>
     </message>
   </context>
   <context>
@@ -7934,8 +7939,8 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסיור</translation>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
@@ -8236,12 +8241,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסיור לחץ על Esc.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation>השתמש בחיצים במקלדת כדי להחליף מצלמות. כדי לצאת מהסיור לחץ על Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
     </message>
   </context>
   <context>
@@ -8262,16 +8267,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation>סיור פריסה</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation>סיור פריסה %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation>מחק את סיור פריסה %1?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
   </context>
   <context>
