@@ -149,11 +149,11 @@ struct ApiPeerDataEx: public ApiPeerData
     QnUuid systemId;
     QString cloudHost = nx::network::AppInfo::defaultCloudHost();
     qint64 identityTime = 0;
-    int keepAliveTimeout = 0;
+    int aliveUpdateInterval = 0;
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
 };
 
-#define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
+#define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(aliveUpdateInterval)(protoVersion)
 
 } // namespace ec2
 

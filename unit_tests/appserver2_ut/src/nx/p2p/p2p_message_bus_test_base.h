@@ -33,7 +33,7 @@ protected:
 
     void startServers(
         int count,
-        int keekDbAtServerIndex = -1,
+        int keepDbAtServerIndex = -1,
         quint16 baseTcpPort = 0);
     Appserver2Ptr createAppserver(bool keepDbFile = false, quint16 port = 0);
 

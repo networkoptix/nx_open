@@ -172,12 +172,12 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, quint16 baseTcpPort)
+void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, quint16 baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver(i == keekDbAtServerIndex, baseTcpPort));
+        m_servers.push_back(createAppserver(i == keepDbAtServerIndex, baseTcpPort));
 
     for (const auto& server: m_servers)
     {
