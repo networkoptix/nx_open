@@ -106,6 +106,8 @@ QnMobileClientModule::QnMobileClientModule(
     m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ true));
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
 
+    commonModule->moduleDiscoveryManager()->start();
+
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());
 
