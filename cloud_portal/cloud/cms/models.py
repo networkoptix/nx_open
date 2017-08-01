@@ -19,8 +19,8 @@ class Product(models.Model):
 class Context(models.Model):
 
     class Meta:
-        verbose_name = 'Content page'
-        verbose_name_plural = 'Content pages'
+        verbose_name = 'page'
+        verbose_name_plural = 'pages'
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
@@ -88,6 +88,8 @@ class Customization(models.Model):
 class ContentVersion(models.Model):
 
     class Meta:
+        verbose_name = 'revision'
+        verbose_name_plural = 'revisions'
         permissions = (
             ("publish_version", "Can publish content to production"),
         )
