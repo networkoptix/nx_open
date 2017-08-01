@@ -302,14 +302,14 @@ void AsyncClientWithHttpTunneling::onConnectionClosed(
 void AsyncClientWithHttpTunneling::scheduleReconnect()
 {
     if (!m_reconnectTimer.scheduleNextTry(
-            std::bind(&AsyncClientWithHttpTunneling::doReconnect, this)))
+            std::bind(&AsyncClientWithHttpTunneling::reconnect, this)))
     {
         NX_DEBUG(this, lm("Giving up reconnect to %1 attempts").arg(m_url));
         // TODO: #ak It makes sense to add "connection closed" event and raise it here.
     }
 }
 
-void AsyncClientWithHttpTunneling::doReconnect()
+void AsyncClientWithHttpTunneling::reconnect()
 {
     using namespace std::placeholders;
 

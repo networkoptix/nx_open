@@ -109,7 +109,7 @@ private:
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();
-    void doReconnect();
+    void reconnect();
     void onReconnectDone(SystemError::ErrorCode sysErrorCode);
 };
 
