@@ -13,11 +13,15 @@ static const nxpl::GUID IID_MediaPacket
 class AbstractMediaPacket: public AbstractDataPacket
 {
 public:
+    virtual const char* codec() const = 0;
+
     virtual const char* data() const = 0;
 
     virtual const int dataSize() const = 0;
 
     virtual int streamIndex() const = 0;
+
+    // ??? Context paramters
 };
 
 } // namespace metadata

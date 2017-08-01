@@ -12,7 +12,7 @@ namespace metadata {
 static const nxpl::GUID IID_CompressedAudio
     = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9, 0x9f, 0x80, 0x7d, 0x56, 0x91, 0x36, 0x82, 0x94}};
 
-class AbstractMetadataPlugin: public nxpl::PluginInterface
+class AbstractMetadataPlugin: public nxpl::Plugin
 {
     virtual AbstractMetadataManager* managerForResource(const ResourceInfo& resourceInfo, Error* error) = 0;
 
@@ -24,5 +24,7 @@ class AbstractMetadataPlugin: public nxpl::PluginInterface
 } // namespace nx
 
 extern "C" {
+
+nx::sdk::metadata::AbstractMetadataPlugin* createMetadataPlugin();
 
 } // extern "C"
