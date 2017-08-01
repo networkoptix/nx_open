@@ -10,8 +10,8 @@ STATIC_DIR = 'static/'
 
 def find_or_add_product(name):
     if Product.objects.filter(name=name).exists():
-        return Product.objects.get(name=item)
-    product = Product(name=item)
+        return Product.objects.get(name=name)
+    product = Product(name=name)
     product.save()
     return product
 
