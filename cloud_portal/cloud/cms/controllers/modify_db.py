@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from notifications.engines.email_engine import send
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 from PIL import Image
 import base64
@@ -31,13 +33,18 @@ def accept_latest_draft(customization, user):
     unaccepted_version.save()
 
 
-def notify_version_ready(customization, version_id, product_name):
-    super_users = Account.objects.filter(
-        customization=customization, is_superuser=1)
-    for user in super_users:
+def notify_version_ready(customization, version_id, product_name, exclude_user):
+    perm = Permission.objects.get(codename='publish_version')
+    users = Account.objects.\
+        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
+        filter(customization=customization, subscribe=True).\
+        exclude(pk=exclude_user.pk).\
+        distinct()
+
+    for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             settings.CUSTOMIZATION)
+             customization.name)
 
 
 def save_unrevisioned_records(customization, language, data_structures,
@@ -46,14 +53,9 @@ def save_unrevisioned_records(customization, language, data_structures,
     for data_structure in data_structures:
         data_structure_name = data_structure.name
 
-        latest_unapproved_record = data_structure.datarecord_set\
+        records = data_structure.datarecord_set\
             .filter(customization=customization,
-                    language=language,
-                    version=None)
-
-        latest_approved_record = data_structure.datarecord_set\
-            .filter(customization=customization, language=language)\
-            .exclude(version=None)
+                    language=language)
 
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
@@ -90,18 +92,13 @@ def save_unrevisioned_records(customization, language, data_structures,
                 continue
         else:
             new_record_value = request_data[data_structure_name]
-
-        if not latest_unapproved_record.exists() and \
-                not latest_approved_record.exists():
+        
+        
+        if records.exists():
+            if new_record_value == records.latest('created_date').value:
+                continue
+        else:
             if data_structure.default == new_record_value:
-                continue
-        if latest_unapproved_record.exists():
-            if new_record_value == latest_unapproved_record\
-                    .latest('created_date').value:
-                continue
-        if latest_approved_record.exists():
-            if new_record_value == latest_approved_record\
-                    .latest('created_date').value:
                 continue
 
         record = DataRecord(data_structure=data_structure,
@@ -131,7 +128,7 @@ def alter_records_version(contexts, customization, old_version, new_version):
 
 def generate_preview(context=None):
     fill_content(customization_name=settings.CUSTOMIZATION)
-    return '/' + context.url + "?preview" if context else "/?preview"
+    return context.url + "?preview" if context else "?preview"
 
 
 def publish_latest_version(customization, user):
@@ -159,7 +156,7 @@ def send_version_for_review(customization, language, data_structures,
 
     alter_records_version(Context.objects.filter(
         product=product), customization, None, version)
-    notify_version_ready(customization, version.id, product.name)
+    notify_version_ready(customization, version.id, product.name, user)
     return upload_errors
 
 

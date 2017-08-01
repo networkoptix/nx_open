@@ -237,7 +237,7 @@ void QnUserRolesDialog::applyChanges()
                 });
 
             const auto handleUserSaved =
-                [deleteRoleGuard](bool success)
+                [deleteRoleGuard](bool success, const QnUserResourcePtr& /*user*/)
                 {
                     if (!success)
                         deleteRoleGuard->disableDestructionHandler();

@@ -192,6 +192,7 @@ void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& it
             | QnLayoutFlag::NoResize
             | QnLayoutFlag::NoMove
             | QnLayoutFlag::NoTimeline
+            | QnLayoutFlag::FillViewport
         ));
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 

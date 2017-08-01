@@ -56,6 +56,8 @@ ConnectionBase::ConnectionBase(
     m_remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
+    m_httpClient->setSendTimeout(keepAliveTimeout);
+    m_httpClient->setResponseReadTimeout(keepAliveTimeout);
 }
 
 ConnectionBase::ConnectionBase(
@@ -124,7 +126,7 @@ QUrl ConnectionBase::remoteAddr() const
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
-    NX_VERBOSE(
+    NX_DEBUG(
         this,
         lit("Connection to peer %1 canceled from state %2. Reason: %3")
         .arg(m_remotePeer.id.toString())
@@ -138,7 +140,7 @@ void ConnectionBase::onHttpClientDone()
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
     {
-        cancelConnecting(State::Error, lm("Http request failed"));
+        cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
         return;
     }
 

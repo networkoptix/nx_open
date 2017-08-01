@@ -238,7 +238,9 @@
         </div>
 
         <div class="form-group"
-             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) && !forms.localForm.passwordInput.$dirty">
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) &&
++                    !forms.localForm.passwordInput.$dirty &&
++                    !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
                 パスワードには異なる種類の文字を含む、少なくとも 8 シンボルが必要です
             </div>

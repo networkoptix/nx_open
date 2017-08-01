@@ -32,185 +32,276 @@
 #include "kernel-headers/cedardev_api.h"
 
 #define DEVICE "/dev/cedar_dev"
-#define EXPORT __attribute__ ((visibility ("default")))
+#define EXPORT __attribute__((visibility("default")))
 
-static struct cedrus
+struct cedrus
 {
-	int fd;
-	void *regs;
-	int version;
-	int ioctl_offset;
-	struct cedrus_allocator *allocator;
-	pthread_mutex_t device_lock;
-} ve = { .fd = -1, .device_lock = PTHREAD_MUTEX_INITIALIZER };
+    int fd;
+    void *regs;
+    int version;
+    int ioctl_offset;
+    struct cedrus_allocator *allocator;
+    pthread_mutex_t device_lock;
+};
+
+// ATTENTION: Global static instance is required because phys2bus/bus2phys depend on ve.version,
+// and ve.allocator is used in some functions in this unit that receive only struct cedrus_mem*.
+static struct cedrus ve = { .fd = -1, .device_lock = PTHREAD_MUTEX_INITIALIZER };
 
 EXPORT struct cedrus *cedrus_open(void)
 {
-	if (ve.fd != -1)
-		return NULL;
+    if (ve.fd != -1)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_open(): Already opened (fd=%d)\n", ve.fd);
+        return NULL;
+    }
 
-	struct cedarv_env_infomation info;
+    struct cedarv_env_infomation info;
 
-	ve.fd = open(DEVICE, O_RDWR);
-	if (ve.fd == -1)
-		return NULL;
+    ve.fd = open(DEVICE, O_RDWR);
+    if (ve.fd == -1)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_open(): Unable to open %s\n", DEVICE);
+        return NULL;
+    }
 
-	if (ioctl(ve.fd, IOCTL_GET_ENV_INFO, (void *)(&info)) == -1)
-		goto close;
+    if (ioctl(ve.fd, IOCTL_GET_ENV_INFO, (void *)(&info)) == -1)
+    {
+        fprintf(stderr,
+            "[cedrus] ERROR: cedrus_open(): ioctl(%d, IOCTL_GET_ENV_INFO, ...) failed\n",
+            ve.fd);
+        goto close;
+    }
 
-	ve.regs = mmap(NULL, 0x800, PROT_READ | PROT_WRITE, MAP_SHARED, ve.fd, info.address_macc);
-	if (ve.regs == MAP_FAILED)
-		goto close;
+    ve.regs = mmap(NULL, 0x800, PROT_READ | PROT_WRITE, MAP_SHARED, ve.fd, info.address_macc);
+    if (ve.regs == MAP_FAILED)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_open(): mmap failed\n");
+        goto close;
+    }
 
 #ifdef USE_UMP
-	ve.allocator = cedrus_allocator_ump_new();
-	if (!ve.allocator)
+    ve.allocator = cedrus_allocator_ump_new();
+    if (!ve.allocator)
 #endif
-	{
-		ve.allocator = cedrus_allocator_ve_new(ve.fd, &info);
-		if (!ve.allocator)
-		{
-			ve.allocator = cedrus_allocator_ion_new();
-			if (!ve.allocator)
-				goto unmap;
-		}
-	}
+    {
+        ve.allocator = cedrus_allocator_ve_new(ve.fd, &info);
+        if (!ve.allocator)
+        {
+            fprintf(stderr,
+                "[cedrus] WARNING: cedrus_allocator_ve_new() failed, attempting cedrus_allocator_ion_new()\n");
+            ve.allocator = cedrus_allocator_ion_new();
+            if (!ve.allocator)
+            {
+                fprintf(stderr,
+                    "[cedrus] ERROR: cedrus_allocator_ion_new() failed\n");
+                goto unmap;
+            }
+        }
+    }
 
-	ioctl(ve.fd, IOCTL_ENGINE_REQ, 0);
+    ioctl(ve.fd, IOCTL_ENGINE_REQ, 0);
 
-	ve.version = readl(ve.regs + VE_VERSION) >> 16;
+    ve.version = readl(ve.regs + VE_VERSION) >> 16;
 
-	if (ve.version >= 0x1639)
-		ve.ioctl_offset = 1;
+    if (ve.version >= 0x1639)
+        ve.ioctl_offset = 1;
 
-	ioctl(ve.fd, IOCTL_ENABLE_VE + ve.ioctl_offset, 0);
-	ioctl(ve.fd, IOCTL_SET_VE_FREQ + ve.ioctl_offset, 320);
-	ioctl(ve.fd, IOCTL_RESET_VE + ve.ioctl_offset, 0);
+    ioctl(ve.fd, IOCTL_ENABLE_VE + ve.ioctl_offset, 0);
+    ioctl(ve.fd, IOCTL_SET_VE_FREQ + ve.ioctl_offset, 320);
+    ioctl(ve.fd, IOCTL_RESET_VE + ve.ioctl_offset, 0);
 
-	writel(0x00130007, ve.regs + VE_CTRL);
+    writel(0x00130007, ve.regs + VE_CTRL);
 
-	return &ve;
+    fprintf(stderr, "[cedrus] Initialized OK (fd=%d)\n", ve.fd);
+    return &ve;
 
 unmap:
-	munmap(ve.regs, 0x800);
+    munmap(ve.regs, 0x800);
 close:
-	close(ve.fd);
-	ve.fd = -1;
-	return NULL;
+    close(ve.fd);
+    ve.fd = -1;
+    return NULL;
 }
 
 EXPORT void cedrus_close(struct cedrus *dev)
 {
-	if (dev->fd == -1)
-		return;
+    if (dev != &ve)
+    {
+        fprintf(stderr,
+            "[cedrus] WARNING: cedrus_close(): Called not for the result of cedrus_open()\n");
+    }
 
-	ioctl(dev->fd, IOCTL_DISABLE_VE + dev->ioctl_offset, 0);
-	ioctl(dev->fd, IOCTL_ENGINE_REL, 0);
+    if (!dev)
+    {
+        fprintf(stderr,
+            "[cedrus] WARNING: cedrus_close(NULL) called\n");
+        return;
+    }
 
-	munmap(dev->regs, 0x800);
-	dev->regs = NULL;
+    if (dev->fd == -1)
+    {
+        fprintf(stderr,
+            "[cedrus] WARNING: cedrus_close(): Already closed\n");
+        return;
+    }
 
-	dev->allocator->free(dev->allocator);
+    ioctl(dev->fd, IOCTL_DISABLE_VE + dev->ioctl_offset, 0);
+    ioctl(dev->fd, IOCTL_ENGINE_REL, 0);
 
-	close(dev->fd);
-	dev->fd = -1;
+    munmap(dev->regs, 0x800);
+    dev->regs = NULL;
+
+    dev->allocator->free(dev->allocator);
+
+    close(dev->fd);
+    fprintf(stderr, "[cedrus] Deinitialized OK (fd=%d)\n", dev->fd);
+    dev->fd = -1;
 }
 
 EXPORT int cedrus_get_ve_version(struct cedrus *dev)
 {
-	if (!dev)
-		return 0x0;
+    if (!dev)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_get_ve_version(NULL) called; return 0\n");
+        return 0x0;
+    }
 
-	return dev->version;
+    return dev->version;
 }
 
 EXPORT int cedrus_ve_wait(struct cedrus *dev, int timeout)
 {
-	if (!dev)
-		return -1;
+    if (!dev)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_ve_wait(NULL) called; return -1\n");
+        return -1;
+    }
 
-	return ioctl(dev->fd, IOCTL_WAIT_VE_DE, timeout);
+    return ioctl(dev->fd, IOCTL_WAIT_VE_DE, timeout);
 }
 
 EXPORT void *cedrus_ve_get(struct cedrus *dev, enum cedrus_engine engine, uint32_t flags)
 {
-	if (!dev || pthread_mutex_lock(&dev->device_lock))
-		return NULL;
+    if (!dev)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_ve_get(NULL, ...) called; return NULL\n");
+        return NULL;
+    }
 
-	writel(0x00130000 | (engine & 0xf) | (flags & ~0xf), dev->regs + VE_CTRL);
+    if (pthread_mutex_lock(&dev->device_lock) != 0)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_ve_get(): pthread_mutex_lock() failed; return NULL\n");
+        return NULL;
+    }
 
-	return dev->regs;
+    writel(0x00130000 | (engine & 0xf) | (flags & ~0xf), dev->regs + VE_CTRL);
+
+    return dev->regs;
 }
 
 EXPORT void cedrus_ve_put(struct cedrus *dev)
 {
-	if (!dev)
-		return;
+    if (!dev)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_ve_put(NULL) called; do nothing\n");
+        return;
+    }
 
-	writel(0x00130007, dev->regs + VE_CTRL);
-	pthread_mutex_unlock(&dev->device_lock);
+    writel(0x00130007, dev->regs + VE_CTRL);
+    pthread_mutex_unlock(&dev->device_lock);
 }
 
 EXPORT struct cedrus_mem *cedrus_mem_alloc(struct cedrus *dev, size_t size)
 {
-	if (!dev || size == 0)
-		return NULL;
+    if (!dev)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_alloc(NULL, ...) called; return NULL\n");
+        return NULL;
+    }
 
-	return dev->allocator->mem_alloc(dev->allocator, (size + 4096 - 1) & ~(4096 - 1));
+    if (size == 0)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_alloc(..., /*size*/ 0) called; return NULL\n");
+        return NULL;
+    }
+
+    return dev->allocator->mem_alloc(dev->allocator, (size + 4096 - 1) & ~(4096 - 1));
 }
 
 EXPORT void cedrus_mem_free(struct cedrus_mem *mem)
 {
-	if (!mem)
-		return;
+    if (!mem)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_free(NULL) called; do nothing\n");
+        return;
+    }
 
-	ve.allocator->mem_free(ve.allocator, mem);
+    // ATTENTION: Using global struct cedrus ve.
+    ve.allocator->mem_free(ve.allocator, mem);
 }
 
 EXPORT void cedrus_mem_flush_cache(struct cedrus_mem *mem)
 {
-	if (!mem)
-		return;
+    if (!mem)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_flush_cache(NULL) called; do nothing\n");
+        return;
+    }
 
-	ve.allocator->mem_flush(ve.allocator, mem);
+    // ATTENTION: Using global struct cedrus ve.
+    ve.allocator->mem_flush(ve.allocator, mem);
 }
 
 EXPORT void *cedrus_mem_get_pointer(const struct cedrus_mem *mem)
 {
-	if (!mem)
-		return NULL;
+    if (!mem)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_get_pointer(NULL) called; return NULL\n");
+        return NULL;
+    }
 
-	return mem->virt;
+    return mem->virt;
 }
 
 EXPORT uint32_t cedrus_mem_get_phys_addr(const struct cedrus_mem *mem)
 {
-	if (!mem)
-		return 0x0;
+    if (!mem)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_get_phys_addr(NULL) called; return 0\n");
+        return 0x0;
+    }
 
-	return mem->phys;
+    return mem->phys;
 }
 
+// ATTENTION: Declared in cedrus_mem.h.
 uint32_t phys2bus(uint32_t phys)
 {
-	if (ve.version == 0x1639)
-		return phys - 0x20000000;
-	else
-		return phys - 0x40000000;
+    // ATTENTION: Using global struct cedrus ve.
+    if (ve.version == 0x1639)
+        return phys - 0x20000000;
+    else
+        return phys - 0x40000000;
 }
 
+// ATTENTION: Declared in cedrus_mem.h.
 uint32_t bus2phys(uint32_t bus)
 {
-	if (ve.version == 0x1639)
-		return bus + 0x20000000;
-	else
-		return bus + 0x40000000;
+    // ATTENTION: Using global struct cedrus ve.
+    if (ve.version == 0x1639)
+        return bus + 0x20000000;
+    else
+        return bus + 0x40000000;
 }
 
 EXPORT uint32_t cedrus_mem_get_bus_addr(const struct cedrus_mem *mem)
 {
-	if (!mem)
-		return 0x0;
+    if (!mem)
+    {
+        fprintf(stderr, "[cedrus] ERROR: cedrus_mem_get_bus_addr(NULL) called; return 0\n");
+        return 0x0;
+    }
 
-	return phys2bus(mem->phys);
+    return phys2bus(mem->phys);
 }

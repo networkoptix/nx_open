@@ -62,7 +62,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
 
     setProperty(style::Properties::kDontPolishFontProperty, true);
     setPopupMode(QToolButton::InstantPopup);
-    setMinimumWidth(kMinimumPanelWidth);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
     QFont font = qApp->font();
     font.setPixelSize(kFontPixelSize);
@@ -109,6 +109,22 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
 
 QnCloudStatusPanel::~QnCloudStatusPanel()
 {
+}
+
+QSize QnCloudStatusPanel::minimumSizeHint() const
+{
+    auto base = base_type::minimumSizeHint();
+    if (base.width() < kMinimumPanelWidth)
+        base.setWidth(kMinimumPanelWidth);
+    return base;
+}
+
+QSize QnCloudStatusPanel::sizeHint() const
+{
+    auto base = base_type::sizeHint();
+    if (base.width() < kMinimumPanelWidth)
+        base.setWidth(kMinimumPanelWidth);
+    return base;
 }
 
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):

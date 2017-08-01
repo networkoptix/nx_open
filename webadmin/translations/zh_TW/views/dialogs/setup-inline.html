@@ -238,7 +238,9 @@
         </div>
 
         <div class="form-group"
-             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) && !forms.localForm.passwordInput.$dirty">
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) &&
++                    !forms.localForm.passwordInput.$dirty &&
++                    !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
                 密碼必須包含不同類型的字元並且至少8個字元
             </div>

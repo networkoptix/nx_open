@@ -20,7 +20,7 @@ cloud_gateway:
 
 mail_from: 'pbxcloud@rassecurity.com'
 
-mail_prefix: '[PBX Cloud]'
+mail_prefix: ''
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
