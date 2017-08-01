@@ -2,14 +2,17 @@
 
 #include <nx/network/stun/stun_over_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace stun {
 
 AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
-    m_settings(settings)
+    m_settings(settings),
+    m_reconnectTimer(m_settings.reconnectPolicy)
 {
+    bindToAioThread(getAioThread());
 }
 
 void AsyncClientWithHttpTunneling::bindToAioThread(
@@ -17,6 +20,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
 {
     base_type::bindToAioThread(aioThread);
 
+    m_reconnectTimer.bindToAioThread(aioThread);
     if (m_stunClient)
         m_stunClient->bindToAioThread(aioThread);
     if (m_httpClient)
@@ -25,18 +29,12 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
 
 void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handler)
 {
-    if (url.scheme() == "http" || url.scheme() == "https")
-    {
-        openHttpTunnel(url, std::move(handler));
-    }
-    else if (url.scheme() == "stun" || url.scheme() == "stuns")
-    {
-        QnMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
-        m_stunClient = std::make_unique<AsyncClient>(m_settings);
-        m_stunClient->bindToAioThread(getAioThread());
-        m_stunClient->connect(url, std::move(handler));
-    }
+    m_url = url;
+    m_reconnectTimer.reset();
+
+    connectInternal(lock, std::move(handler));
 }
 
 bool AsyncClientWithHttpTunneling::setIndicationHandler(
@@ -65,9 +63,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
 {
     QnMutexLocker lock(&m_mutex);
 
-    invokeOrPostpone(
-        std::bind(&AbstractAsyncClient::addOnReconnectedHandler, std::placeholders::_1,
-            std::move(handler), client));
+    m_reconnectHandlers.emplace(client, std::move(handler));
 }
 
 void AsyncClientWithHttpTunneling::sendRequest(
@@ -117,10 +113,11 @@ SocketAddress AsyncClientWithHttpTunneling::remoteAddress() const
 
 void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode errorCode)
 {
-    QnMutexLocker lock(&m_mutex);
+    using namespace std::placeholders; 
 
+    QnMutexLocker lock(&m_mutex);
     invokeOrPostpone(
-        std::bind(&AbstractAsyncClient::closeConnection, std::placeholders::_1, errorCode));
+        std::bind(&AbstractAsyncClient::closeConnection, _1, errorCode));
 }
 
 void AsyncClientWithHttpTunneling::cancelHandlers(
@@ -158,25 +155,74 @@ void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
 {
     QnMutexLocker lock(&m_mutex);
 
-    invokeOrPostpone(
-        std::bind(&AbstractAsyncClient::setKeepAliveOptions, 
-            std::placeholders::_1, std::move(options)));
+    m_keepAliveOptions = std::move(options);
+    if (m_stunClient)
+        m_stunClient->setKeepAliveOptions(*m_keepAliveOptions);
 }
 
 void AsyncClientWithHttpTunneling::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    m_reconnectTimer.pleaseStopSync();
     m_stunClient.reset();
     m_httpClient.reset();
 }
 
+void AsyncClientWithHttpTunneling::connectInternal(
+    const QnMutexLockerBase& lock,
+    ConnectHandler handler)
+{
+    auto onConnected = 
+        [this, handler = std::move(handler)](SystemError::ErrorCode sysErrorCode)
+        {
+            if (sysErrorCode == SystemError::noError)
+                applyConnectionSettings();
+            handler(sysErrorCode);
+        };
+
+    if (m_url.scheme() == "http" || m_url.scheme() == "https")
+    {
+        openHttpTunnel(lock, m_url, std::move(onConnected));
+    }
+    else if (m_url.scheme() == "stun" || m_url.scheme() == "stuns")
+    {
+        createStunClient(lock, nullptr);
+        m_stunClient->connect(m_url, std::move(onConnected));
+    }
+    else
+    {
+        post([onConnected = std::move(onConnected)]() { onConnected(SystemError::invalidData); });
+    }
+}
+
+void AsyncClientWithHttpTunneling::applyConnectionSettings()
+{
+    if (m_keepAliveOptions)
+        m_stunClient->setKeepAliveOptions(*m_keepAliveOptions);
+}
+
+void AsyncClientWithHttpTunneling::createStunClient(
+    const QnMutexLockerBase&,
+    std::unique_ptr<AbstractStreamSocket> connection)
+{
+    using namespace std::placeholders;
+
+    auto settings = m_settings;
+    settings.reconnectPolicy.maxRetryCount = 0;
+    m_stunClient = std::make_unique<AsyncClient>(
+        std::move(connection),
+        std::move(settings));
+    m_stunClient->bindToAioThread(getAioThread());
+    m_stunClient->setOnConnectionClosedHandler(
+        std::bind(&AsyncClientWithHttpTunneling::onConnectionClosed, this, _1));
+}
+
 void AsyncClientWithHttpTunneling::openHttpTunnel(
+    const QnMutexLockerBase&,
     const QUrl& url,
     ConnectHandler handler)
 {
-    QnMutexLocker lock(&m_mutex);
-
     m_connectHandler = std::move(handler);
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
     m_httpClient->bindToAioThread(getAioThread());
@@ -206,7 +252,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
     {
         QnMutexLocker lock(&m_mutex);
 
-        m_stunClient = std::make_unique<AsyncClient>(httpClient->takeSocket());
+        createStunClient(lock, httpClient->takeSocket());
         makeCachedStunClientCalls();
     }
 
@@ -238,6 +284,53 @@ void AsyncClientWithHttpTunneling::invokeOrPostpone(
     }
 
     m_cachedStunClientCalls.push_back(std::move(func));
+}
+
+void AsyncClientWithHttpTunneling::onConnectionClosed(
+    SystemError::ErrorCode closeReason)
+{
+    NX_DEBUG(this, lm("Connection to %1 has been broken").arg(m_url));
+
+    scheduleReconnect();
+}
+
+void AsyncClientWithHttpTunneling::scheduleReconnect()
+{
+    if (!m_reconnectTimer.scheduleNextTry(
+            std::bind(&AsyncClientWithHttpTunneling::doReconnect, this)))
+    {
+        NX_DEBUG(this, lm("Giving up reconnect to %1 attempts").arg(m_url));
+        // TODO: #ak It makes sense to add "connection closed" event and raise it here.
+    }
+}
+
+void AsyncClientWithHttpTunneling::doReconnect()
+{
+    using namespace std::placeholders;
+
+    QnMutexLocker lock(&m_mutex);
+    connectInternal(
+        lock,
+        std::bind(&AsyncClientWithHttpTunneling::onReconnectDone, this, _1));
+}
+
+void AsyncClientWithHttpTunneling::onReconnectDone(SystemError::ErrorCode sysErrorCode)
+{
+    if (sysErrorCode != SystemError::noError)
+    {
+        NX_DEBUG(this, lm("Reconnect to %1 failed with result %2")
+            .arg(m_url).arg(SystemError::toString(sysErrorCode)));
+        return scheduleReconnect();
+    }
+
+    NX_DEBUG(this, lm("Reconnected to %1").arg(m_url));
+    for (const auto& handlerContext: m_reconnectHandlers)
+    {
+        nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
+        handlerContext.second();
+        if (objectDestructionWatcher.objectDestroyed())
+            return;
+    }
 }
 
 } // namespace stun
