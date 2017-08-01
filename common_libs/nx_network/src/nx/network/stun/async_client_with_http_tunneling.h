@@ -104,6 +104,7 @@ private:
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
     void dispatchIndication(nx::stun::Message indication);
+    void sendPendingRequests();
 
     void openHttpTunnel(
         const QnMutexLockerBase&,

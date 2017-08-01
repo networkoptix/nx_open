@@ -209,6 +209,7 @@ void AsyncClientWithHttpTunneling::connectInternal(
     {
         createStunClient(lock, nullptr);
         m_stunClient->connect(m_url, std::move(onConnected));
+        sendPendingRequests();
     }
     else
     {
@@ -242,6 +243,11 @@ void AsyncClientWithHttpTunneling::createStunClient(
         nx::stun::kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
         this);
+}
+
+void AsyncClientWithHttpTunneling::sendPendingRequests()
+{
+    using namespace std::placeholders;
 
     for (const auto& requestContext: m_activeRequests)
     {
@@ -310,6 +316,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
     {
         QnMutexLocker lock(&m_mutex);
         createStunClient(lock, httpClient->takeSocket());
+        sendPendingRequests();
     }
 
     nx::utils::swapAndCall(m_connectHandler, SystemError::noError);
