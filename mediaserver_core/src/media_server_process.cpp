@@ -2315,7 +2315,7 @@ void MediaServerProcess::serviceModeInit()
         logSettings, qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        settings->value("logFile", path->replace(lit(".log"), QString()));
+        settings->setValue("logFile", path->replace(lit(".log"), QString()));
     else
         settings->remove("logFile");
 
