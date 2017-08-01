@@ -45,7 +45,7 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('product', 'name', 'description', 'url',
+    list_display = ('name', 'description', 'url',
                     'translatable', 'context_actions')
 
     def context_actions(self, obj):
