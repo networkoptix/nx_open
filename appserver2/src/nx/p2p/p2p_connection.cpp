@@ -23,7 +23,7 @@ Connection::Connection(
         localPeer,
         std::move(connectionLockGuard),
         remotePeerUrl,
-        commonModule->globalSettings()->connectionKeepAliveTimeout(),
+        commonModule->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject)),
     QnCommonModuleAware(commonModule)
 {

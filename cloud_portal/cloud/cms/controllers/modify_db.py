@@ -44,7 +44,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
     for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             customization)
+             customization.name)
 
 
 def save_unrevisioned_records(customization, language, data_structures,
@@ -53,14 +53,9 @@ def save_unrevisioned_records(customization, language, data_structures,
     for data_structure in data_structures:
         data_structure_name = data_structure.name
 
-        latest_unapproved_record = data_structure.datarecord_set\
+        records = data_structure.datarecord_set\
             .filter(customization=customization,
-                    language=language,
-                    version=None)
-
-        latest_approved_record = data_structure.datarecord_set\
-            .filter(customization=customization, language=language)\
-            .exclude(version=None)
+                    language=language)
 
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
@@ -97,18 +92,13 @@ def save_unrevisioned_records(customization, language, data_structures,
                 continue
         else:
             new_record_value = request_data[data_structure_name]
-
-        if not latest_unapproved_record.exists() and \
-                not latest_approved_record.exists():
+        
+        
+        if records.exists():
+            if new_record_value == records.latest('created_date').value:
+                continue
+        else:
             if data_structure.default == new_record_value:
-                continue
-        if latest_unapproved_record.exists():
-            if new_record_value == latest_unapproved_record\
-                    .latest('created_date').value:
-                continue
-        if latest_approved_record.exists():
-            if new_record_value == latest_approved_record\
-                    .latest('created_date').value:
                 continue
 
         record = DataRecord(data_structure=data_structure,
