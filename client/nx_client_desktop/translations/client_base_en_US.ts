@@ -182,14 +182,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Tour...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Layout Tour...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Layout...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -565,10 +557,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove from Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop Sharing Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -741,18 +729,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make Layout Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -878,6 +854,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Bookmark Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Showreel...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Showreel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2347,6 +2347,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4025,10 +4029,6 @@ to %1</source>
         <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Hardware Id copied to clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnLicensesProposeWidget</name>
@@ -5076,11 +5076,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Tours</source>
+        <source>Showreels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Tour</source>
+        <source>Showreel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6419,11 +6419,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hh:mm ap</source>
-        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
         <translation type="unfinished"></translation>
@@ -6449,11 +6444,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <translation type="unfinished"></translation>
@@ -6476,6 +6466,16 @@ to %1</source>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6795,6 +6795,11 @@ to %1</source>
     </message>
     <message>
         <source>Apply changes before switching to another user?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user has not yet signed up for %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7504,14 +7509,6 @@ to %1</source>
         <source>There is another layout with the same name.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Overwrite existing layout tour?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout tour with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>User will still have access to %n removed resources:</source>
         <translation type="unfinished">
@@ -7588,13 +7585,6 @@ to %1</source>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Remove %n items from layout tour?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
         <translation type="unfinished"></translation>
@@ -7662,6 +7652,21 @@ to %1</source>
     <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing showreel?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is another showreel with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from showreel?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7742,7 +7747,7 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-        <source>Drag layout or camera here to add it to the tour</source>
+        <source>Drag layout or camera here to add it to the showreel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8030,11 +8035,11 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-        <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+        <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
+        <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8056,15 +8061,15 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-        <source>Layout Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layout Tour %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete layout tour %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

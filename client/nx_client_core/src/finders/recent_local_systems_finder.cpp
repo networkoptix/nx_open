@@ -52,11 +52,14 @@ void QnRecentLocalSystemsFinder::updateSystems()
 
         const auto connection = it.value();
 
-        for (const auto& url: connection.urls)
-        {
-            if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-                continue;
-        }
+        const bool onlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
+            [](const QUrl& url)
+            {
+                return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
+            });
+
+        if (onlyCloudUrls)
+            continue;
 
         const auto system = QnLocalSystemDescription::create(
             it.key().toString(), it.key(), connection.systemName);

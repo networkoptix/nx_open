@@ -28,7 +28,7 @@ bool isFileSupported(const QString& filePath)
         || FileTypeSupport::isFileSupported(filePath);
 }
 
-}
+} // namespace
 
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
@@ -117,9 +117,9 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
         if (!isFileSupported(filePath))
             continue;
 
-#ifdef Q_OS_MAC
-        mac_saveFileBookmark(url.path());
-#endif
+        #if defined(Q_OS_MAC)
+            mac_saveFileBookmark(url.path());
+        #endif
 
         auto resource = QnResourceDirectoryBrowser::resourceFromFile(filePath, resourcePool);
         if (resource)
