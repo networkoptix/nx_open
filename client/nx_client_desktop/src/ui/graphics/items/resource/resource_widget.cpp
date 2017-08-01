@@ -191,7 +191,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Videowall license changes helper */
-    auto videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
+    auto videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(commonModule(), this);
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         [this]
         {

@@ -19,7 +19,8 @@ class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAw
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    QnLicenseUsageWatcher(QObject* parent);
+    QnLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
+
 signals:
     void licenseUsageChanged();
 };
@@ -31,7 +32,7 @@ class QnLicenseUsageHelper: public Connective<QObject>, public QnCommonModuleAwa
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    QnLicenseUsageHelper(QObject *parent);
+    QnLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     bool isValid() const;
 
@@ -129,8 +130,10 @@ class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher
     Q_OBJECT
     using base_type = QnLicenseUsageWatcher;
 public:
-    QnCamLicenseUsageWatcher(QObject *parent = nullptr);
-    QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent = nullptr);
+    QnCamLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
+    QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr& camera,
+        QnCommonModule* commonModule,
+        QObject* parent = nullptr);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper
@@ -142,17 +145,19 @@ public:
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-    QnCamLicenseUsageHelper(QnCommonModule* commonModule);
+    QnCamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     QnCamLicenseUsageHelper(
         const QnVirtualCameraResourceList &proposedCameras,
         bool proposedEnable,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        QObject* parent = nullptr);
 
     QnCamLicenseUsageHelper(
         const QnVirtualCameraResourcePtr &proposedCamera,
         bool proposedEnable,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        QObject* parent = nullptr);
 
 public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
@@ -210,7 +215,7 @@ class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher
     Q_OBJECT
     using base_type = QnLicenseUsageWatcher;
 public:
-    QnVideoWallLicenseUsageWatcher(QObject* parent);
+    QnVideoWallLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
@@ -218,19 +223,18 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
     Q_OBJECT
     using base_type = QnLicenseUsageHelper;
 public:
-    QnVideoWallLicenseUsageHelper(QObject *parent);
-    QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule);
+    QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
 
     /** Calculate how many licenses are required for the given screens count. */
     static int licensesForScreens(int screens);
+
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
-private:
-    void init();
+
 private:
     int m_proposed = 0;
 };
