@@ -11,33 +11,50 @@
 #include <nx/network/stun/stun_over_http_server.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include "stun_async_client_acceptance_tests.h"
+
 namespace nx {
 namespace stun {
 namespace test {
 
+class StunOverHttpServer:
+    public AbstractStunServer
+{
+public:
+    StunOverHttpServer();
+
+    virtual bool bind(const SocketAddress& localEndpoint) override;
+    virtual bool listen() override;
+    virtual QUrl getServerUrl() const override;
+    virtual nx::stun::MessageDispatcher& dispatcher() override;
+    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) override;
+    virtual std::size_t connectionCount() const override;
+
+private:
+    TestHttpServer m_httpServer;
+    nx::stun::MessageDispatcher m_dispatcher;
+    nx::stun::StunOverHttpServer m_stunOverHttpServer;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class StunOverHttpServerFixture:
     public ::testing::Test
 {
-public:
-    StunOverHttpServerFixture();
-
 protected:
     virtual void SetUp() override;
 
+    nx::stun::MessageDispatcher& dispatcher();
     QUrl tunnelUrl() const;
     nx::stun::Message popReceivedMessage();
     nx::stun::Message prepareRequest();
-    nx::stun::MessageDispatcher& dispatcher();
 
     void givenTunnelingServer();
     void assertStunClientIsAbleToPerformRequest(AbstractAsyncClient* client);
 
 private:
-    TestHttpServer m_httpServer;
+    StunOverHttpServer m_server;
     nx::utils::SyncQueue<nx::stun::Message> m_messagesReceived;
-    nx::stun::MessageDispatcher m_dispatcher;
-    nx::stun::StunOverHttpServer m_stunOverHttpServer;
-    std::unique_ptr<AbstractStreamSocket> m_httpTunnelConnection;
 
     void processStunMessage(
         std::shared_ptr<nx::stun::AbstractServerConnection> serverConnection,

@@ -122,7 +122,7 @@ private:
 
     qint64 m_firstEncodedPts;
     qint64 m_lastTimestamp;
-    int m_frameNum;
+    int m_encodedDuration;
     
     // Buffers allocated for resampled audio data.
     uint8_t** m_sampleBuffers;
