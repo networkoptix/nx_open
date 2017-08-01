@@ -6,9 +6,9 @@ from models import *
 from cloud import settings
 from django.contrib import admin
 
-admin.site.site_header = 'Cloud Portal administration'
-admin.site.site_title = 'Cloud Portal administration'
-admin.site.index_title = 'Cloud Portal administration'
+admin.site.site_header = 'Cloud Administration'
+admin.site.site_title = 'Cloud Administration'
+admin.site.index_title = 'Cloud Administration'
 
 
 class CMSAdmin(admin.ModelAdmin):
