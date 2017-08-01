@@ -793,7 +793,8 @@ ApiPeerDataEx MessageBus::localPeerEx() const
     result.peerType = m_localPeerType;
     result.cloudHost = nx::network::AppInfo::defaultCloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
-    result.aliveUpdateInterval = commonModule()->globalSettings()->aliveUpdateInterval().count();
+    result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
+        (commonModule()->globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx_ec::EC2_PROTO_VERSION;
     result.dataFormat = Qn::UbjsonFormat;
     return result;
