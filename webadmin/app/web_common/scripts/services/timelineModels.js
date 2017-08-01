@@ -439,26 +439,20 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     if(start > end){
         console.error("Start is more than end, that is impossible");
     }
-
-    // requestInterval operates with server time always
-    var deferred = this.$q.defer();
-    //this.start = start;
-    //this.end = end;
     this.level = level;
+    if(this.currentRequest){
+        return;
+    }
+
     var levelData = RulerModel.levels[level];
     var detailization = levelData.interval.getMilliseconds();
 
     var self = this;
-    //1. Request records for interval
-    // And do we need to request it?
 
-    if(self.currentRequest){
-        return;
-    }
+    //1. Request records for interval
     self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
 
-    self.currentRequest.then(function (data) {
-
+    this.ready = self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
             var chunks = data.data.reply;
             //if(chunks.length == 0){} // No chunks for this camera
@@ -485,13 +479,9 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
             self.cacheRequestedInterval(timeManager.serverToDisplay(start), timeManager.serverToDisplay(end), level);
 
-            deferred.resolve(self.chunksTree);
-
-        }, function (error) {
-            deferred.reject(error);
+            return self.chunksTree;
         });
 
-    this.ready = deferred.promise;
     //3. return promise
     return this.ready;
 };
