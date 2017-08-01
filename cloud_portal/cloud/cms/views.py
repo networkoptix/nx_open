@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib import admin
 
 from cloud import settings
 
@@ -144,6 +145,8 @@ def context_edit_view(request, context=None, language=None):
                        'user': request.user,
                        'has_permission': mysite.has_permission(request),
                        'site_url': mysite.site_url,
+                       'site_header': admin.site.site_header,
+                       'site_title': admin.site.site_title,
                        'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
     else:
@@ -161,6 +164,8 @@ def context_edit_view(request, context=None, language=None):
                        'user': request.user,
                        'has_permission': mysite.has_permission(request),
                        'site_url': mysite.site_url,
+                       'site_header': admin.site.site_header,
+                       'site_title': admin.site.site_title,
                        'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
 
