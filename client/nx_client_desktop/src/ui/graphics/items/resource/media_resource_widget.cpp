@@ -1902,7 +1902,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
-    if (!m_camera)
+    if (!m_camera || !m_camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
     const bool canChangeSettings = accessController()->hasPermissions(m_camera,
