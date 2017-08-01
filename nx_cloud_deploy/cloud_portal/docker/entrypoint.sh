@@ -53,7 +53,7 @@ do
             /app/env/bin/python manage.py readstructure
             /app/env/bin/python manage.py initbranding
             ;;
-        config))
+        config)
             instantiate_configs
             ;;
         copystatic)
