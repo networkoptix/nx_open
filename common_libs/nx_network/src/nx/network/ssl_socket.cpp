@@ -1441,6 +1441,12 @@ SocketAddress SslSocket::getForeignAddress() const
     return d->wrappedSocket->getForeignAddress();
 }
 
+QString SslSocket::getForeignHostName() const
+{
+    Q_D(const SslSocket);
+    return d->wrappedSocket->getForeignHostName();
+}
+
 bool SslSocket::isConnected() const
 {
     Q_D(const SslSocket);
