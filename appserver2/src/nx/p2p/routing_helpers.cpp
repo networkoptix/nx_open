@@ -62,9 +62,6 @@ void BidirectionRoutingInfo::addLocalPeer()
 void BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& via)
 {
     alivePeers.remove(via);
-    alivePeers[m_localPeer].routeTo.remove(via);
-
-    allPeerDistances[via].remove(m_localPeer);
     for (auto itr = allPeerDistances.begin(); itr != allPeerDistances.end(); ++itr)
         itr->remove(via);
 }

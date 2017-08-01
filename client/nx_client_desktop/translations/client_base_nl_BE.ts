@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Bladwijzer vanaf het begin spelen</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Bladwijzer bewerken</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Bladwijzer verwijderen</translation>
     </message>
   </context>
   <context>
@@ -180,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>Nieuwe web pagina...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation type="unfinished">Layout Tour...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation type="unfinished">New Layout Tour...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -418,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Open Video Wall</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -438,7 +430,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Opslaan Video Wall</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -565,16 +557,12 @@ to view more bookmarks</source>
       <translation>Verwijderen uit de lay-out</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation type="unfinished">Remove from Tour</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>Lay-out delen beëindigen</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Bewerken...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -741,18 +729,6 @@ to view more bookmarks</source>
       <translation>Groot</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>Start tour</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Stop tour</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation type="unfinished">Make Layout Tour</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Instellingen</translation>
     </message>
@@ -878,7 +854,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Bookmark Log...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation type="unfinished">Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation type="unfinished">New Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation type="unfinished">Remove from Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
   </context>
   <context>
@@ -936,39 +936,39 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Onbekende fout.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Licentie bestaat niet.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Licentie is uitgeschakeld.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Licentie is niet actief.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Ongeldige licentie.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Proeflicentie.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Licentie zal worden gedeactiveerd, maar is nog niet gedeactiveerd.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Aantal deactiveringen overschreden voor deze licentie.</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>Hardware-id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -1030,15 +1030,15 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Pad &quot;%1&quot; is ongeldig. Probeer een ander pad.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; bestaat al. Probeer een andere naam.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Kan de huidige positie niet van de camera krijgen &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1119,7 +1119,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Kan de huidige positie voor camera niet instellen &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1511,35 +1511,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Omschrijving</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Klik om uit te breiden</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Apparaat bijgewerkt</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Camera bijgewerkt</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Apparaat toegevoegd</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Camera toegevoegd</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Apparaat verwijderd</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Camera verwijderd</translation>
     </message>
     <message>
       <source>Device name</source>
@@ -1551,81 +1551,81 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>Email instellingen zijn gewijzigd</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
+      <translation>Gevulde cirkel markering betekent dat het archief nog steeds beschikbaar is</translation>
     </message>
   </context>
   <context>
     <name>QnBackupCamerasDialog</name>
     <message>
       <source>Select Devices to Backup...</source>
-      <translation type="unfinished">Select Devices to Backup...</translation>
+      <translation>Selecteer apparaten voor een backup-kopie...</translation>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
-      <translation type="unfinished">Select Cameras to Backup...</translation>
+      <translation>Selecteer camera's voor een backup-kopie...</translation>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Als de back-up niet is ingesteld op de huidige server van de camera's, wordt hun archief niet gekopieerd.</translation>
     </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
     <message>
       <source>Until finished</source>
-      <translation type="unfinished">Until finished</translation>
+      <translation>Tot aan het einde</translation>
     </message>
   </context>
   <context>
     <name>QnBackupSettingsDialog</name>
     <message>
       <source>By Schedule</source>
-      <translation type="unfinished">By Schedule</translation>
+      <translation>Per schema</translation>
     </message>
     <message>
       <source>Realtime</source>
-      <translation type="unfinished">Realtime</translation>
+      <translation>Realtime</translation>
     </message>
     <message>
       <source>On Demand</source>
-      <translation type="unfinished">On Demand</translation>
+      <translation>Op aanvraag</translation>
     </message>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Hi-Res Streams</translation>
+      <translation>Hoge resolutie streams</translation>
     </message>
     <message>
       <source>All Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">All Streams</translation>
+      <translation>Alle Streams</translation>
     </message>
     <message>
       <source>Global Settings</source>
-      <translation type="unfinished">Global Settings</translation>
+      <translation>Globale instellingen</translation>
     </message>
     <message>
       <source>Lo-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Lo-Res Streams</translation>
+      <translation>Lage resolutie streams</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
       <comment>Relates to &apos;Global Settings&apos; subject</comment>
-      <translation type="unfinished">affect all servers in System</translation>
+      <translation>beïnvloed alle servers in het systeem</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>U heeft %n notificaties</numerusform>
+        <numerusform>U heeft %n notificaties</numerusform>
       </translation>
     </message>
   </context>
@@ -1633,42 +1633,42 @@ to view more bookmarks</source>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>Sluit archief niet af</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 maand</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 maanden</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 maanden</translation>
     </message>
     <message>
       <source>year</source>
-      <translation type="unfinished">year</translation>
+      <translation>jaar</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>De naam mag niet leeg zijn.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>De omschrijving mag niet leeg zijn</translation>
     </message>
   </context>
   <context>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation type="unfinished">Build Number</translation>
+      <translation>Buildnummer</translation>
     </message>
     <message>
       <source>Invalid build number</source>
-      <translation type="unfinished">Invalid build number</translation>
+      <translation>Ongeldig buildnummer</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1676,32 +1676,32 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>Het wachtwoord is onjuist.</translation>
     </message>
     <message>
       <source>Select Build</source>
-      <translation type="unfinished">Select Build</translation>
+      <translation>Selecteer Build</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 van %n apparaten</numerusform>
+        <numerusform>%1 van %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 van %n camera's</numerusform>
+        <numerusform>%1 van %n camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecteer ten minste één apparaat</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
@@ -1727,7 +1727,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Bladwijzers beheren</translation>
     </message>
   </context>
   <context>
@@ -1757,7 +1757,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecteer ten minste één apparaat</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
@@ -1792,7 +1792,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -1817,7 +1817,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecteer ten minste één apparaat</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
@@ -1892,7 +1892,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation type="unfinished">Restore all rules to default?</translation>
+      <translation>Alle regels terugzetten naar standaard?</translation>
     </message>
   </context>
   <context>
@@ -2098,11 +2098,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation type="unfinished">I/O Module Id</translation>
+      <translation>I/O Module ID</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>Camera ID</translation>
     </message>
   </context>
   <context>
@@ -2349,6 +2349,10 @@ to view more bookmarks</source>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>Maximum aantal bewegingsdetectievelden voor de huidige camera is %1, en %2 bewegingsdetectievelden zijn er momenteel geselecteerd.</translation>
     </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
@@ -2407,62 +2411,62 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
+      <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
+      <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
-      <translation type="unfinished">Not enough licenses to enable recording</translation>
+      <translation>Niet genoeg licenties om de opname in te schakelen</translation>
     </message>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
-      <translation type="unfinished">License limit exceeded, recording will not be enabled.</translation>
+      <translation>Licentielimiet overschreden, opname wordt niet ingeschakeld.</translation>
     </message>
     <message>
       <source>Turn on selector at the top of the window to enable recording.</source>
-      <translation type="unfinished">Turn on selector at the top of the window to enable recording.</translation>
+      <translation>Schakel de keuzeschakelaar boven in het scherm in om de opname in te schakelen.</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to.</translation>
+      <translation>Selecteer de gebieden op het schema om de gekozen parameters toe te passen.</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to.</translation>
+      <translation>Stel de opnameparameters in en selecteer de gebieden op het schema om ze toe te passen.</translation>
     </message>
     <message>
       <source>Motion detection disabled or not supported</source>
-      <translation type="unfinished">Motion detection disabled or not supported</translation>
+      <translation>Bewegingsdetectie is uitgeschakeld of niet ondersteund</translation>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Om ervoor te zorgen dat het wordt ondersteund en om het te activeren, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen.</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
-      <translation type="unfinished">Dual-Streaming not supported for this camera</translation>
+      <translation>Dual-streaming wordt niet ondersteund door deze camera</translation>
     </message>
     <message>
       <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation type="unfinished">Dual-Streaming and motion detection not supported for this camera</translation>
+      <translation>Dual-streaming en motion detectie worden niet ondersteund door deze camera</translation>
     </message>
     <message>
       <source>Motion detection disabled</source>
-      <translation type="unfinished">Motion detection disabled</translation>
+      <translation>Bewegingsdetectie uitgeschakeld</translation>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Als u deze wilt inschakelen of aanpassen, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen.</translation>
     </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Apparaatinstellingen</translation>
     </message>
     <message>
       <source>Devices Settings</source>
@@ -2474,7 +2478,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Camera-instellingen</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -2482,11 +2486,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>I/O module instellingen</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Toon op lay-out</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2518,77 +2522,77 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation type="unfinished">Apply changes before switching to another camera?</translation>
+      <translation>Wijzigingen toepassen voordat u naar een andere camera gaat?</translation>
     </message>
   </context>
   <context>
     <name>QnCameraSettingsWidget</name>
     <message>
       <source>Cannot edit properties for items of different types.</source>
-      <translation type="unfinished">Cannot edit properties for items of different types.</translation>
+      <translation>Kan eigenschappen voor items van verschillende typen niet bewerken.</translation>
     </message>
     <message>
       <source>No device selected.</source>
-      <translation type="unfinished">No device selected.</translation>
+      <translation>Geen apparaat geselecteerd.</translation>
     </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Nieuw wachtwoord</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Bevestig wachtwoord</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Wachtwoorden komen niet overeen.</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Huidig ​​wachtwoord</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation type="unfinished">To modify your password please enter the existing one.</translation>
+      <translation>Vul uw huidige wachtwoord in om uw wachtwoord te wijzigen.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation type="unfinished">Invalid current password.</translation>
+      <translation>Ongeldig huidig wachtwoord.</translation>
     </message>
   </context>
   <context>
     <name>QnClockLabel</name>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Servertijd</translation>
     </message>
     <message>
       <source>Local System Time</source>
-      <translation type="unfinished">Local System Time</translation>
+      <translation>Lokale Systeemtijd</translation>
     </message>
   </context>
   <context>
@@ -2597,64 +2601,60 @@ to view more bookmarks</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation type="unfinished">Connect to your Systems
-from anywhere with any
-devices</translation>
+      <translation>Verbinding maken met uw systemen overal met al uw apparaten</translation>
     </message>
     <message>
       <source>Known limitations</source>
-      <translation type="unfinished">Known limitations</translation>
+      <translation>Bekende beperkingen</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Disconnect System from %1</translation>
+      <translation>Ontkoppel het systeem van %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Open %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Create %1 Account</translation>
+      <translation>Maak een %1 account aan</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect System to %1...</translation>
+      <translation>Systeem verbinden met %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Create %1
-account</translation>
+      <translation>Maak %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect System
-to %1</translation>
+      <translation>Verbind systeem met %1</translation>
     </message>
     <message>
       <source>%1 is in Beta.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">%1 is in Beta.</translation>
+      <translation>%1 is in bèta.</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Meer informatie over %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation type="unfinished">Logging in...</translation>
+      <translation>Inloggen...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -2663,14 +2663,14 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Accountinstellingen</translation>
     </message>
   </context>
   <context>
@@ -2685,134 +2685,134 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation type="unfinished">Forgot password?</translation>
+      <translation>Wachtwoord vergeten?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1</translation>
+      <translation>Verbind met %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Enter %1 Account</translation>
+      <translation>Voer %1 account in</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCloudDialogPrivate</name>
     <message>
       <source>None of your servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your servers is connected to the Internet.</translation>
+      <translation>Geen van de servers is verbonden met internet.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">System connected to %1</translation>
+      <translation>Systeem verbonden met %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Failed to connect System to %1</translation>
+      <translation>Kan het systeem niet verbinden met %1</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation type="unfinished">Configuring Server</translation>
+      <translation>Server configureren</translation>
     </message>
     <message>
       <source>Updating Server</source>
-      <translation type="unfinished">Updating Server</translation>
+      <translation>Server updaten</translation>
     </message>
   </context>
   <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
-      <translation type="unfinished">You are trying to connect to incompatible Server.</translation>
+      <translation>U probeert verbinding te maken met incompatibele server.</translation>
     </message>
     <message>
       <source>Connection details that you have entered are incorrect, please try again.</source>
-      <translation type="unfinished">Connection details that you have entered are incorrect, please try again.</translation>
+      <translation>De verbindingsgegevens die u hebt ingevoerd, zijn niet correct, probeer het opnieuw.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your VMS administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your VMS administrator.</translation>
+      <translation>Als deze fout blijft terugkeren, neem dan contact op met uw VMS beheerder.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation type="unfinished">Compatibility mode for versions lower than %1 is not supported.</translation>
+      <translation>Compatibiliteitsmodus voor versies lager dan %1 wordt niet ondersteund.</translation>
     </message>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Sluit de toepassing en start opnieuw met behulp van de snelkoppeling in het startmenu.</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation type="unfinished">Server has a different version:</translation>
+      <translation>Server heeft een andere versie:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
-      <translation type="unfinished">You will be asked to restart the client in compatibility mode.</translation>
+      <translation>U zal gevraagd worden de client opnieuw te starten in compatibiliteitsmodus.</translation>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation type="unfinished">The username or password you have entered is incorrect. Please try again.</translation>
+      <translation>De gebruikersnaam of het wachtwoord dat u hebt ingevoerd is onjuist. Probeer het opnieuw.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
-      <translation type="unfinished">Unable to connect to the server</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation type="unfinished">LDAP Server connection timed out.</translation>
+      <translation>LDAP-serververbinding heeft een time-out.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation type="unfinished">Incorrect username or password</translation>
+      <translation>Onjuiste gebruikersnaam of wachtwoord</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
-      <translation type="unfinished">Server may be restarting now. Please try again later.</translation>
+      <translation>Server zal nu opnieuw starten. Probeer het later nogmaals.</translation>
     </message>
     <message>
       <source>Please check access credentials and try again.</source>
-      <translation type="unfinished">Please check access credentials and try again.</translation>
+      <translation>Controleer de inloggegevens en probeer het opnieuw.</translation>
     </message>
     <message>
       <source>Incompatible Server</source>
-      <translation type="unfinished">Incompatible Server</translation>
+      <translation>Incompatibele server</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>Client en Server hebben verschillende versies</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Client - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Server - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Download Client versie %1?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2820,35 +2820,35 @@ to %1</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>Kan versie %1 niet downloaden en starten</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Opnieuw proberen</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode will be required.</source>
-      <translation type="unfinished">Restart %1 in compatibility mode will be required.</translation>
+      <translation>Herstart %1 in de compatibiliteitsmodus zal nodig zijn.</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>Herstarten van %1 mislukt in de compatibiliteitsmodus</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Sluit %1 af en herstart opnieuw met de snelkoppeling in het startmenu.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>U moet een andere versie van %1 downloaden om verbinding te maken met deze Server.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>U moet %1 opnieuw starten in compatibiliteitsmodus om verbinding te maken met deze Server.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Herstart %1 in compatibiliteitsmodus?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
@@ -3093,23 +3093,23 @@ to %1</translation>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Disconnect System from %1?</translation>
+      <translation>Ontkoppel het systeem van %1?</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
-      <translation type="unfinished">You will be disconnected from this System and able to login again through local network with local account</translation>
+      <translation>U wordt losgekoppeld van dit systeem en kan opnieuw inloggen via het lokale netwerk met een lokaal account</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+      <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation type="unfinished">Filter Similar Rows</translation>
+      <translation>Filter Vergelijkbare Rijen</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -3125,44 +3125,44 @@ to %1</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Filter wissen</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exporteer de geselecteerde gebeurtenissen naar een bestand</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation type="unfinished">Any Action</translation>
+      <translation>Elke actie</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Geen gebeurtenissen</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation type="unfinished">Motion video</translation>
+      <translation>Motion video</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation type="unfinished">Date/Time</translation>
+      <translation>Datum/Tijd</translation>
     </message>
     <message>
       <source>Event</source>
@@ -3182,48 +3182,48 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Omschrijving</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Alle gebruikers</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n keer)</numerusform>
+        <numerusform>%1 (%n keer)</numerusform>
       </translation>
     </message>
     <message>
       <source>Open camera</source>
-      <translation type="unfinished">Open camera</translation>
+      <translation>Open camera</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+      <translation>
+        <numerusform>en %n gebruikers meer...</numerusform>
+        <numerusform>en %n gebruikers meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>en %n meer...</numerusform>
+        <numerusform>en %n meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Verwijderde onderwerpen</numerusform>
+        <numerusform>%n Verwijderde onderwerpen</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>Onderwerp verwijderd</translation>
     </message>
   </context>
   <context>
@@ -3237,30 +3237,30 @@ to %1</translation>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Selecteer één camera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 heeft geen PTZ presets</translation>
     </message>
   </context>
   <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
       <source>Copy archive length settings</source>
-      <translation type="unfinished">Copy archive length settings</translation>
+      <translation>Kopieer archief lengte-instellingen</translation>
     </message>
     <message>
       <source>Schedule motion type is not supported by some cameras.</source>
-      <translation type="unfinished">Schedule motion type is not supported by some cameras.</translation>
+      <translation>Schema motiondetectie type wordt niet ondersteund door sommige camera's.</translation>
     </message>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
+      <translation>Opname kan niet worden ingeschakeld voor sommige camera's.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
+      <translation>Schema instellingen zijn niet compatibel met sommige apparaten.</translation>
     </message>
   </context>
   <context>
@@ -3272,7 +3272,7 @@ to %1</translation>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Never</translation>
+      <translation>Nooit</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3294,79 +3294,79 @@ to %1</translation>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
       <source>Set Priority:</source>
-      <translation type="unfinished">Set Priority:</translation>
+      <translation>Prioriteit Instellen:</translation>
     </message>
     <message>
       <source>Select devices to setup failover priority</source>
-      <translation type="unfinished">Select devices to setup failover priority</translation>
+      <translation>Selecteer apparaten om de failover-prioriteit op te stellen</translation>
     </message>
     <message>
       <source>Select cameras to setup failover priority</source>
-      <translation type="unfinished">Select cameras to setup failover priority</translation>
+      <translation>Selecteer camera's om de failover prioriteit in te stellen</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Bestaand bestand overschrijven?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Fout tijdens het overschrijven van het bestand</translation>
     </message>
   </context>
   <context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
       <source>Loading preview, please wait...</source>
-      <translation type="unfinished">Loading preview, please wait...</translation>
+      <translation>Voorbeeld laden, even geduld...</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Automatische kalibratie mislukt</translation>
     </message>
     <message>
       <source>Image is not round.</source>
-      <translation type="unfinished">Image is not round.</translation>
+      <translation>Afbeelding is niet rond.</translation>
     </message>
     <message>
       <source>Image might be too dim.</source>
-      <translation type="unfinished">Image might be too dim.</translation>
+      <translation>Het beeld kan te donker zijn.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Selecteer map...</translation>
     </message>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>Map is reeds toegevoegd</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Open gebeurtenissenlogboek</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Open Bladwijzerlijst</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Event regels</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Gebeurtenissenlog</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Audit logboek</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
@@ -3374,64 +3374,64 @@ to %1</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bladwijzers</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Apparatenlijst</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Cameralijst</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Open Event regels Management</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Open Audit Trail Log</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
-      <translation type="unfinished">Monitor All Servers on a Single Layout</translation>
+      <translation>Monitor alle servers op een enkele layout</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Open apparaat lijst</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Open cameralijst</translation>
     </message>
   </context>
   <context>
     <name>QnGlHardwareChecker</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>De drivers van de videokaart zijn verouderd of niet geïnstalleerd</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>%1 werkt mogelijk niet goed.</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gamma %1</translation>
     </message>
   </context>
   <context>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Standaardwaarde</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3445,36 +3445,36 @@ to %1</translation>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Uitgeschakeld</translation>
     </message>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Input</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Uitgang</translation>
     </message>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Ongeldig</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Geaard circuit</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Ongeldige staat</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>Bij klikken</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -3483,28 +3483,28 @@ to %1</translation>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Open circuit</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Schakel status</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Impuls</translation>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
     <name>QnImageControlWidget</name>
     <message>
       <source>%1 degrees</source>
-      <translation type="unfinished">%1 degrees</translation>
+      <translation>%1 graden</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -3512,106 +3512,106 @@ to %1</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>meerdere waarden</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>Uitschakelen van I/O poort %1 niet gelukt</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>Inschakelen van I/O poort %1 niet gelukt</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutExportTool</name>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>Exporteren naar &quot;%1&quot;...</translation>
     </message>
     <message>
       <source>Could not export device %1.</source>
       <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation type="unfinished">Could not export device %1.</translation>
+      <translation>Apparaat %1 kan niet worden geëxporteerd.</translation>
     </message>
     <message>
       <source>Could not export camera %1.</source>
-      <translation type="unfinished">Could not export camera %1.</translation>
+      <translation>Camera %1 kon niet worden geëxporteerd.</translation>
     </message>
     <message>
       <source>Unknown error has occurred.</source>
-      <translation type="unfinished">Unknown error has occurred.</translation>
+      <translation>Er is een onbekende fout opgetreden.</translation>
     </message>
     <message>
       <source>Could not export I/O module %1.</source>
-      <translation type="unfinished">Could not export I/O module %1.</translation>
+      <translation>Kan de I/O-module %1 niet exporteren.</translation>
     </message>
     <message>
       <source>Could not create output file %1...</source>
-      <translation type="unfinished">Could not create output file %1...</translation>
+      <translation>Kan het uitvoerbestand %1 niet maken...</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Selecteer bestand...</translation>
     </message>
     <message>
       <source>Pictures %1</source>
-      <translation type="unfinished">Pictures %1</translation>
+      <translation>Afbeeldingen %1</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation type="unfinished">No picture</translation>
+      <translation>Geen Afbeelding</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation type="unfinished">Error while loading picture</translation>
+      <translation>Fout tijdens het laden van de afbeelding</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation type="unfinished">Error while uploading picture</translation>
+      <translation>Fout tijdens het uploaden van de foto</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation type="unfinished">Picture cannot be read</translation>
+      <translation>Afbeelding kan niet worden gelezen</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation type="unfinished">Picture cannot be loaded</translation>
+      <translation>Afbeelding kan niet worden geladen</translation>
     </message>
     <message>
       <source>cells</source>
-      <translation type="unfinished">cells</translation>
+      <translation>cellen</translation>
     </message>
     <message>
       <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation type="unfinished">Picture is too big. Maximum size is %1 MB</translation>
+      <translation>Afbeelding is te groot. Maximale grootte is %1 MB</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <source>Test failed</source>
-      <translation type="unfinished">Test failed</translation>
+      <translation>Test mislukt</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+      <translation>
+        <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
+        <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
       </translation>
     </message>
   </context>
@@ -3619,15 +3619,15 @@ to %1</translation>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>De verstrekte instellingen zijn niet geldig.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Kon een test niet uitvoeren.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Uitgesteld</translation>
     </message>
   </context>
   <context>
@@ -3642,7 +3642,7 @@ to %1</translation>
     </message>
     <message>
       <source>DN</source>
-      <translation type="unfinished">DN</translation>
+      <translation>DN</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3653,77 +3653,77 @@ to %1</translation>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>De verstrekte instellingen zijn niet geldig.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Kon een test niet uitvoeren.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation type="unfinished">Could not load users.</translation>
+      <translation>Kan gebruikers niet laden.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation type="unfinished">Error while loading users.</translation>
+      <translation>Fout bij het laden van gebruikers.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation type="unfinished">No new users found.</translation>
+      <translation>Geen nieuwe gebruikers gevonden.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Uitgesteld</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation type="unfinished">Import Selected</translation>
+      <translation>Selectie importeren</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
-      <translation type="unfinished">Screens Allowed:</translation>
+      <translation>Schermen toegestaan:</translation>
     </message>
     <message>
       <source>Control Sessions Allowed:</source>
-      <translation type="unfinished">Control Sessions Allowed:</translation>
+      <translation>Toegestane controlesessies:</translation>
     </message>
     <message>
       <source>Archive Streams Allowed:</source>
-      <translation type="unfinished">Archive Streams Allowed:</translation>
+      <translation>Toegestane archiefstreams:</translation>
     </message>
     <message>
       <source>Generic:</source>
-      <translation type="unfinished">Generic:</translation>
+      <translation>Algemeen:</translation>
     </message>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Licentie type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licentiesleutel</translation>
     </message>
     <message>
       <source>Features:</source>
-      <translation type="unfinished">Features:</translation>
+      <translation>Functies:</translation>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation type="unfinished">Locked to Hardware Id</translation>
+      <translation>Gelieerd aan Hardware ID</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licentiesleutel</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3735,11 +3735,11 @@ to %1</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Nooit</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Verlopen</translation>
     </message>
     <message>
       <source>OK</source>
@@ -3747,121 +3747,121 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Fout</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Server niet gevonden</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Verloopt</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>Licentie is actief</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>De licentie is verlopen</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Verloopt binnenkort</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>Licentie verloopt vandaag</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>Licentie verloopt morgen</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>De licentie verloopt over %n dagen</numerusform>
+        <numerusform>De licentie verloopt over %n dagen</numerusform>
       </translation>
     </message>
     <message>
       <source>Qty</source>
-      <translation type="unfinished">Qty</translation>
+      <translation>Aantal</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>You do not have a valid license installed.</source>
-      <translation type="unfinished">You do not have a valid license installed.</translation>
+      <translation>U heeft geen geldige licentie geïnstalleerd.</translation>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation type="unfinished">Please activate your commercial or trial license.</translation>
+      <translation>Activeer alstublieft uw (proef)licentie.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
-      <translation type="unfinished">Please activate your commercial license.</translation>
+      <translation>Activeer alstublieft uw licentie.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exporteer</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation type="unfinished">Export licenses to a file</translation>
+      <translation>Licenties naar een bestand exporteren</translation>
     </message>
     <message>
       <source>Copy To Clipboard</source>
-      <translation type="unfinished">Copy To Clipboard</translation>
+      <translation>Kopiëren naar klembord</translation>
     </message>
     <message>
       <source>Incompatible license</source>
-      <translation type="unfinished">Incompatible license</translation>
+      <translation>Incompatibele licentie</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
+      <translation>Licentie die u probeert te activeren is niet compatibel met uw software.</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation type="unfinished">You already activated this license</translation>
+      <translation>U heeft deze licentie al geactiveerd</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation type="unfinished">License activated</translation>
+      <translation>Licentie geactiveerd</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation type="unfinished">Failed to remove license from Server</translation>
+      <translation>Licentie niet verwijderen van de server</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation type="unfinished">Invalid activation key file</translation>
+      <translation>Ongeldig activatiebestand</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation type="unfinished">Select a valid activation key file to continue.</translation>
+      <translation>Selecteer een geldig activatiebestand om door te gaan.</translation>
     </message>
     <message>
       <source>This device accepts single channel license only</source>
-      <translation type="unfinished">This device accepts single channel license only</translation>
+      <translation>Dit apparaat accepteert alleen enkelvoudige licenties</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation type="unfinished">Database error occurred.</translation>
+      <translation>Er is een databasefout opgetreden.</translation>
     </message>
     <message>
       <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation type="unfinished">Invalid data received. Please contact Customer Support to report the issue.</translation>
+      <translation>Ongeldige gegevens ontvangen. Neem contact op met customer support om het probleem te rapporteren.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation type="unfinished">Failed to activate license</translation>
+      <translation>Het activeren van de licentie is mislukt</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Netwerkfout</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -4029,10 +4029,6 @@ to %1</translation>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
     </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation type="unfinished">Hardware Id copied to clipboard</translation>
-    </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
@@ -4128,39 +4124,39 @@ to %1</translation>
     </message>
     <message>
       <source>Version %1</source>
-      <translation type="unfinished">Version %1</translation>
+      <translation>Versie %1</translation>
     </message>
     <message>
       <source>Saved Sessions</source>
-      <translation type="unfinished">Saved Sessions</translation>
+      <translation>Opgeslagen sessies</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation type="unfinished">Auto-Discovered Servers</translation>
+      <translation>Automatisch ontdekte servers</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
-      <translation type="unfinished">* Last used connection *</translation>
+      <translation>* Laatst gebruikte verbinding *</translation>
     </message>
     <message>
       <source>%1 at %2</source>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 op %2</translation>
     </message>
     <message>
       <source>Overwrite existing connection?</source>
-      <translation type="unfinished">Overwrite existing connection?</translation>
+      <translation>Bestaande verbinding overschrijven?</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Verwijder verbinding?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
-      <translation type="unfinished">There is another connection with the same name.</translation>
+      <translation>Er is een andere verbinding met dezelfde naam.</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>geen</translation>
     </message>
   </context>
   <context>
@@ -4175,91 +4171,91 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation type="unfinished">Forgot password?</translation>
+      <translation>Wachtwoord vergeten?</translation>
     </message>
     <message>
       <source>Learn more about</source>
-      <translation type="unfinished">Learn more about</translation>
+      <translation>Leer meer over</translation>
     </message>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Welcome to %1!</translation>
+      <translation>Welkom bij %1!</translation>
     </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Pictures %1</source>
-      <translation type="unfinished">Pictures %1</translation>
+      <translation>Afbeeldingen %1</translation>
     </message>
     <message>
       <source>Preparing Image...</source>
-      <translation type="unfinished">Preparing Image...</translation>
+      <translation>Afbeelding voorbereiden...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation type="unfinished">Please wait while image is being prepared...</translation>
+      <translation>Een moment geduld a. u. b., afbeelding wordt voorbereid...</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Servertijd</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation type="unfinished">Client Time</translation>
+      <translation>Client tijd</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation type="unfinished">Stretch</translation>
+      <translation>Rekken</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation type="unfinished">Fit</translation>
+      <translation>Passend</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation type="unfinished">Crop</translation>
+      <translation>Uitsnijden</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation>Deze optie heeft geen invloed op het opnameplan. Het opnameplan is altijd gebaseerd op de servertijd.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Bestand selecteren...</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Geen afbeelding</translation>
     </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Schermafbeelding</translation>
     </message>
     <message>
       <source>Smart Search</source>
-      <translation type="unfinished">Smart Search</translation>
+      <translation>Slim zoeken</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -4271,7 +4267,7 @@ to %1</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -4279,79 +4275,79 @@ to %1</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1 (Tour &quot;%2&quot; is actief)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Zoomvenster</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O module</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+      <translation>De trigger %1 (%2) kon niet worden geactiveerd</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>houd ingedrukt</translation>
     </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation type="unfinished">http(s)://host:port</translation>
+      <translation>http (s): // host: port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
-      <translation type="unfinished">%1 (current)</translation>
+      <translation>%1 (huidig)</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation type="unfinished">Use a specific hostname or IP address rather than %1.</translation>
+      <translation>Gebruik een specifieke hostnaam of IP-adres in plaats van %1.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
-      <translation type="unfinished">Merge with %1</translation>
+      <translation>Samenvoegen met %1</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Testen...</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation type="unfinished">Merging Systems...</translation>
+      <translation>Systemen samenvoegen...</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation type="unfinished">The login cannot be empty.</translation>
+      <translation>De login kan niet leeg zijn.</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nieuwe Server</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation type="unfinished">Failed to merge Systems</translation>
+      <translation>Samenvoegen van systemen mislukt</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>URL is ongeldig.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation type="unfinished">You are about to merge the current System %1 with System</translation>
+      <translation>U staat op het punt om het huidige Systeem %1 samen te voegen met Systeem</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation type="unfinished">This is the current System URL.</translation>
+      <translation>Dit is de huidige Systeem-URL.</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
@@ -5080,12 +5076,12 @@ to %1</translation>
       <translation type="unfinished">Local Files</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation type="unfinished">Layout Tours</translation>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
     </message>
   </context>
   <context>
@@ -6424,11 +6420,6 @@ to %1</translation>
       <translation type="unfinished">hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">hh:mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation type="unfinished">h ap</translation>
@@ -6454,11 +6445,6 @@ to %1</translation>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
@@ -6482,6 +6468,16 @@ to %1</translation>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation type="unfinished">yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation type="unfinished">h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6801,6 +6797,11 @@ to %1</translation>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation type="unfinished">Apply changes before switching to another user?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
   </context>
   <context>
@@ -7509,14 +7510,6 @@ to %1</translation>
       <source>There is another layout with the same name.</source>
       <translation type="unfinished">There is another layout with the same name.</translation>
     </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation type="unfinished">Overwrite existing layout tour?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation type="unfinished">There is another layout tour with the same name.</translation>
-    </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation type="unfinished">
@@ -7593,13 +7586,6 @@ to %1</translation>
       <source>Remove</source>
       <translation type="unfinished">Remove</translation>
     </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout tour?</numerusform>
-        <numerusform>Remove %n items from layout tour?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
       <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
@@ -7667,6 +7653,21 @@ to %1</translation>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7747,8 +7748,8 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
@@ -8035,12 +8036,12 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the tour press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
     </message>
   </context>
   <context>
@@ -8061,16 +8062,16 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation type="unfinished">Layout Tour %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
   </context>
   <context>

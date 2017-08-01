@@ -12,6 +12,9 @@ class AccountAdmin(CMSAdmin):
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
 
+    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login',)
+    search_fields = ('email', 'first_name', 'last_name', 'customization', 'language',)
+
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
         if obj.is_superuser and not obj.email.endswith(settings.SUPERUSER_DOMAIN):
@@ -29,5 +32,10 @@ class AccountAdmin(CMSAdmin):
             qs = qs.filter(customization=settings.CUSTOMIZATION)
         return qs
 
+    def has_add_permission(self, request):  # No adding users in admin
+        return False
+
+    def has_delete_permission(self, request, obj=None):  # No deleting users at all
+        return False
 
 admin.site.register(Account, AccountAdmin)

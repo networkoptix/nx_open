@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from notifications.engines.email_engine import send
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 from PIL import Image
 import base64
@@ -31,13 +33,18 @@ def accept_latest_draft(customization, user):
     unaccepted_version.save()
 
 
-def notify_version_ready(customization, version_id, product_name):
-    super_users = Account.objects.filter(
-        customization=customization, is_superuser=1)
-    for user in super_users:
+def notify_version_ready(customization, version_id, product_name, exclude_user):
+    perm = Permission.objects.get(codename='publish_version')
+    users = Account.objects.\
+        filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
+        filter(customization=customization, subscribe=True).\
+        exclude(pk=exclude_user.pk).\
+        distinct()
+
+    for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             settings.CUSTOMIZATION)
+             customization)
 
 
 def save_unrevisioned_records(customization, language, data_structures,
@@ -131,7 +138,7 @@ def alter_records_version(contexts, customization, old_version, new_version):
 
 def generate_preview(context=None):
     fill_content(customization_name=settings.CUSTOMIZATION)
-    return '/' + context.url + "?preview" if context else "/?preview"
+    return context.url + "?preview" if context else "?preview"
 
 
 def publish_latest_version(customization, user):
@@ -159,7 +166,7 @@ def send_version_for_review(customization, language, data_structures,
 
     alter_records_version(Context.objects.filter(
         product=product), customization, None, version)
-    notify_version_ready(customization, version.id, product.name)
+    notify_version_ready(customization, version.id, product.name, user)
     return upload_errors
 
 

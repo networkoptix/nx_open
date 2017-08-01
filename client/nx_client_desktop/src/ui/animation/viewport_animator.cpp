@@ -50,17 +50,38 @@ void ViewportAnimator::moveTo(const QRectF &rect, bool animate)
     m_adjustedTargetRectValid = true;
 }
 
-const QMargins &ViewportAnimator::viewportMargins() const {
-    return m_margins;
+QMargins ViewportAnimator::viewportMargins(Qn::MarginTypes marginTypes) const
+{
+    QMargins result;
+    if (marginTypes.testFlag(Qn::PanelMargins))
+        result += m_panelMargins;
+    if (marginTypes.testFlag(Qn::LayoutMargins))
+        result += m_layoutMargins;
+    return result;
 }
 
-void ViewportAnimator::setViewportMargins(const QMargins &margins) {
-    if(margins == m_margins)
+void ViewportAnimator::setViewportMargins(const QMargins& margins, Qn::MarginType marginType)
+{
+    QMargins* field = nullptr;
+    switch (marginType)
+    {
+        case Qn::PanelMargins:
+            field = &m_panelMargins;
+            break;
+        case Qn::LayoutMargins:
+            field = &m_layoutMargins;
+            break;
+        default:
+            NX_EXPECT(false);
+            return;
+    }
+
+    if (margins == *field)
         return;
 
-    m_margins = margins;
+    *field = margins;
 
-    if(m_adjustedTargetRectValid)
+    if (m_adjustedTargetRectValid)
         setTargetRect(adjustedToReal(m_adjustedTargetRect));
 }
 
@@ -108,7 +129,7 @@ QRectF ViewportAnimator::realToAdjusted(const QGraphicsView *view, const QRectF 
     if(view == NULL)
         return realRect; /* Graphics view was destroyed, cannot adjust. */
 
-    MarginsF relativeMargins = QnGeometry::cwiseDiv(m_margins, view->viewport()->size());
+    MarginsF relativeMargins = QnGeometry::cwiseDiv(viewportMargins(), view->viewport()->size());
 
     /* Calculate size to match real aspect ratio. */
     QSizeF fixedRealSize = QnGeometry::expanded(QnGeometry::aspectRatio(view->viewport()->size()), realRect.size(), Qt::KeepAspectRatioByExpanding);
@@ -137,7 +158,9 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
     if(view == NULL)
         return adjustedRect; /* Graphics view was destroyed, cannot adjust. */
 
-    MarginsF relativeMargins = QnGeometry::cwiseDiv(m_margins, view->viewport()->size());
+    const auto margins = viewportMargins();
+
+    MarginsF relativeMargins = QnGeometry::cwiseDiv(margins, view->viewport()->size());
 
     /* Calculate margins that can be used for expanding adjusted to real rect.
      * Note that these margins are still positive, so SceneUtility::dilated should be used with them. */
@@ -148,7 +171,7 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
     {
         QSize adjustedViewportSize = view->viewport()->size();
         if(m_marginFlags & Qn::MarginsAffectSize)
-            adjustedViewportSize = QnGeometry::eroded(adjustedViewportSize, m_margins);
+            adjustedViewportSize = QnGeometry::eroded(adjustedViewportSize, margins);
 
         fixedAdjustedSize = QnGeometry::expanded(QnGeometry::aspectRatio(adjustedViewportSize), adjustedRect.size(), Qt::KeepAspectRatioByExpanding);
     }
