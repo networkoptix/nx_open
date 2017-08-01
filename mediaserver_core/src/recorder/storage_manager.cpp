@@ -624,8 +624,10 @@ bool QnStorageManager::getSqlDbPath(
     QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
 
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(
-        commonModule()->moduleGUID()));
+    dbRefFilePath =
+        closeDirPath(storageUrl) +
+        dbRefFileName.arg(commonModule()->moduleGUID().toSimpleString());
+
     QByteArray dbRefGuidStr;
 
     //checking for file db_ref.guid existence
@@ -660,7 +662,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule()->moduleGUID());
+    QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
