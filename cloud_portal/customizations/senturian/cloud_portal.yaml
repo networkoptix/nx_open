@@ -20,7 +20,7 @@ cloud_gateway:
 
 mail_from: 'admin@senturiansolutions.com'
 
-mail_prefix: '[Sentry Cloud]'
+mail_prefix: ''
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
