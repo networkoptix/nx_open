@@ -7,30 +7,85 @@ namespace stun {
 namespace test {
 
 static const char* const kStunOverHttpPath = "/StunOverHttp";
-static constexpr int kStunMethodToUse = nx::stun::MethodType::userMethod + 1;
 
-StunOverHttpServerFixture::StunOverHttpServerFixture():
+StunOverHttpServer::StunOverHttpServer():
     m_stunOverHttpServer(&m_dispatcher)
-{
-}
-
-void StunOverHttpServerFixture::SetUp()
 {
     using namespace std::placeholders;
 
-    ASSERT_TRUE(m_httpServer.bindAndListen());
-
-    m_dispatcher.registerRequestProcessor(
-        kStunMethodToUse,
-        std::bind(&StunOverHttpServerFixture::processStunMessage, this, _1, _2));
+    m_stunOverHttpServer.setupHttpTunneling(
+        &m_httpServer.httpMessageDispatcher(),
+        kStunOverHttpPath);
 }
 
-QUrl StunOverHttpServerFixture::tunnelUrl() const
+bool StunOverHttpServer::bind(const SocketAddress& localEndpoint)
+{
+    return m_httpServer.bindAndListen(localEndpoint);
+}
+
+bool StunOverHttpServer::listen()
+{
+    return true;
+}
+
+QUrl StunOverHttpServer::getServerUrl() const
 {
     return nx::network::url::Builder()
         .setScheme("http")
         .setEndpoint(m_httpServer.serverAddress())
         .setPath(kStunOverHttpPath).toUrl();
+}
+
+nx::stun::MessageDispatcher& StunOverHttpServer::dispatcher()
+{
+    return m_dispatcher;
+}
+
+void StunOverHttpServer::sendIndicationThroughEveryConnection(
+    nx::stun::Message message)
+{
+    m_stunOverHttpServer.stunConnectionPool().forEachConnection(
+        [message](nx::stun::ServerConnection* connection)
+        {
+            connection->post(
+                [message, connection]() mutable
+                {
+                    connection->sendMessage(
+                        std::move(message),
+                        [](SystemError::ErrorCode) {});
+                });
+        });
+}
+
+std::size_t StunOverHttpServer::connectionCount() const
+{
+    return m_stunOverHttpServer.stunConnectionPool().connectionCount();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr int kStunMethodToUse = nx::stun::MethodType::userMethod + 1;
+
+void StunOverHttpServerFixture::SetUp()
+{
+    using namespace std::placeholders;
+
+    m_server.dispatcher().registerRequestProcessor(
+        kStunMethodToUse,
+        std::bind(&StunOverHttpServerFixture::processStunMessage, this, _1, _2));
+
+    ASSERT_TRUE(m_server.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(m_server.listen());
+}
+
+nx::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
+{
+    return m_server.dispatcher();
+}
+
+QUrl StunOverHttpServerFixture::tunnelUrl() const
+{
+    return m_server.getServerUrl();
 }
 
 nx::stun::Message StunOverHttpServerFixture::popReceivedMessage()
@@ -46,16 +101,8 @@ nx::stun::Message StunOverHttpServerFixture::prepareRequest()
             kStunMethodToUse));
 }
 
-nx::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
-{
-    return m_dispatcher;
-}
-
 void StunOverHttpServerFixture::givenTunnelingServer()
 {
-    m_stunOverHttpServer.setupHttpTunneling(
-        &m_httpServer.httpMessageDispatcher(),
-        kStunOverHttpPath);
 }
 
 void StunOverHttpServerFixture::assertStunClientIsAbleToPerformRequest(

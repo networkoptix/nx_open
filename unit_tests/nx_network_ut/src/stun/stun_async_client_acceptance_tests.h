@@ -1,14 +1,37 @@
 #pragma once
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/stun/abstract_async_client.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace stun {
 namespace test {
 
-template<typename ClientType>
+class AbstractStunServer
+{
+public:
+    virtual ~AbstractStunServer() = default;
+
+    virtual bool bind(const SocketAddress&) = 0;
+    virtual bool listen() = 0;
+    virtual QUrl getServerUrl() const = 0;
+    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) = 0;
+    virtual nx::stun::MessageDispatcher& dispatcher() = 0;
+    virtual std::size_t connectionCount() const = 0;
+};
+
+/**
+ * @param AsyncClientTestTypes It is a struct with following nested types:
+ * - ClientType Type that inherits nx::stun::AbstractAsyncClient.
+ * - ServerType Class that implements AbstractStunServer interface.
+ */
+template<typename AsyncClientTestTypes>
 class StunAsyncClientAcceptanceTest:
     public ::testing::Test
 {
@@ -19,16 +42,74 @@ public:
     }
 
 protected:
+    void subscribeToEveryIndication()
+    {
+        m_indictionMethodToSubscribeTo = nx::stun::kEveryIndicationMethod;
+    }
+
     void givenClientWithIndicationHandler()
     {
         ASSERT_TRUE(addIndicationHandler());
     }
 
-    void whenRemovedHandler()
+    void givenConnectedClient()
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(m_client.setIndicationHandler(
+            m_indictionMethodToSubscribeTo,
+            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
+            this));
+
+        nx::utils::promise<SystemError::ErrorCode> connected;
+        m_client.connect(
+            m_server->getServerUrl(),
+            [&connected](SystemError::ErrorCode resultCode) { connected.set_value(resultCode); });
+        ASSERT_EQ(SystemError::noError, connected.get_future().get());
+    }
+
+    void givenReconnectedClient()
+    {
+        givenConnectedClient();
+        whenRestartServer();
+        thenClientReconnects();
+
+        while (m_server->connectionCount() == 0)
+            std::this_thread::yield();
+    }
+
+    void whenRemoveHandler()
     {
         nx::utils::promise<void> done;
         m_client.cancelHandlers(this, [&done]() { done.set_value(); });
         done.get_future().wait();
+    }
+
+    void whenRestartServer()
+    {
+        m_server.reset();
+
+        startServer();
+    }
+
+    void whenIssueRequest()
+    {
+        using namespace std::placeholders;
+
+        stun::Message request(stun::Header(
+            stun::MessageClass::request,
+            m_testMethodNumber));
+        m_client.sendRequest(
+            std::move(request),
+            std::bind(&StunAsyncClientAcceptanceTest::storeRequestResult, this, _1, _2));
+    }
+
+    void whenServerSendsIndication()
+    {
+        stun::Message indication(stun::Header(
+            stun::MessageClass::indication,
+            m_testMethodNumber));
+        m_server->sendIndicationThroughEveryConnection(std::move(indication));
     }
 
     void thenSameHandlerCannotBeAdded()
@@ -41,19 +122,126 @@ protected:
         ASSERT_TRUE(addIndicationHandler());
     }
 
+    void thenClientReconnects()
+    {
+        m_reconnectEvents.pop();
+    }
+
+    void thenSuccessResponseIsReceived()
+    {
+        m_prevRequestResult = m_requestResult.pop();
+
+        ASSERT_EQ(SystemError::noError, m_prevRequestResult.sysErrorCode);
+        ASSERT_EQ(
+            stun::MessageClass::successResponse,
+            m_prevRequestResult.response.header.messageClass);
+    }
+
+    void thenClientIsAbleToPerformRequests()
+    {
+        whenIssueRequest();
+        thenSuccessResponseIsReceived();
+    }
+
+    void thenClientReceivesIndication()
+    {
+        m_indicationsReceived.pop();
+    }
+
 private:
-    ClientType m_client;
+    struct RequestResult
+    {
+        SystemError::ErrorCode sysErrorCode = SystemError::noError;
+        stun::Message response;
+
+        RequestResult() = default;
+        RequestResult(
+            SystemError::ErrorCode sysErrorCode,
+            stun::Message response)
+            :
+            sysErrorCode(sysErrorCode),
+            response(std::move(response))
+        {
+        }
+    };
+
+    typename AsyncClientTestTypes::ClientType m_client;
+    std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
+    SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
+    nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
+    nx::utils::SyncQueue<RequestResult> m_requestResult;
+    nx::utils::SyncQueue<nx::stun::Message> m_indicationsReceived;
+    RequestResult m_prevRequestResult;
+    const int m_testMethodNumber = stun::MethodType::userMethod + 1;
+    int m_indictionMethodToSubscribeTo = stun::MethodType::userMethod + 1;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        startServer();
+
+        m_client.addOnReconnectedHandler(
+            std::bind(&StunAsyncClientAcceptanceTest::onReconnected, this));
+    }
+
+    void startServer()
+    {
+        using namespace std::placeholders;
+
+        m_server = std::make_unique<typename AsyncClientTestTypes::ServerType>();
+
+        m_server->dispatcher().registerRequestProcessor(
+            m_testMethodNumber,
+            std::bind(&StunAsyncClientAcceptanceTest::sendResponse, this, _1, _2));
+
+        ASSERT_TRUE(m_server->bind(m_serverEndpoint));
+        m_serverEndpoint = nx::network::url::getEndpoint(m_server->getServerUrl());
+        ASSERT_TRUE(m_server->listen());
+    }
+
+    void sendResponse(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        nx::stun::Message request)
+    {
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
+    }
+
+    void storeRequestResult(
+        SystemError::ErrorCode sysErrorCode,
+        stun::Message response)
+    {
+        m_requestResult.push(RequestResult(sysErrorCode, std::move(response)));
+    }
 
     bool addIndicationHandler()
     {
         return m_client.setIndicationHandler(
-            nx::stun::MethodType::userIndication + 1,
+            m_testMethodNumber + 1,
             [](nx::stun::Message) {},
             this);
+    }
+
+    void onReconnected()
+    {
+        m_reconnectEvents.push(0);
+    }
+
+    void saveIndication(nx::stun::Message indication)
+    {
+        m_indicationsReceived.push(std::move(indication));
     }
 };
 
 TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest);
+
+//-------------------------------------------------------------------------------------------------
+// Test cases.
 
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, same_handler_cannot_be_added_twice)
 {
@@ -64,12 +252,48 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, same_handler_cannot_be_added_twice)
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, add_remove_indication_handler)
 {
     this->givenClientWithIndicationHandler();
-    this->whenRemovedHandler();
+    this->whenRemoveHandler();
     this->thenSameHandlerCanBeAddedAgain();
 }
 
-REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest, 
-    same_handler_cannot_be_added_twice, add_remove_indication_handler);
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_works)
+{
+    this->givenConnectedClient();
+    this->whenRestartServer();
+    this->thenClientReconnects();
+    this->thenClientIsAbleToPerformRequests();
+}
+
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication)
+{
+    this->givenConnectedClient();
+    this->whenServerSendsIndication();
+    this->thenClientReceivesIndication();
+}
+
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, subscription_to_every_indication)
+{
+    this->subscribeToEveryIndication();
+
+    this->givenConnectedClient();
+    this->whenServerSendsIndication();
+    this->thenClientReceivesIndication();
+}
+
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication_after_reconnect)
+{
+    this->givenReconnectedClient();
+    this->whenServerSendsIndication();
+    this->thenClientReceivesIndication();
+}
+
+REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
+    same_handler_cannot_be_added_twice,
+    add_remove_indication_handler,
+    reconnect_works,
+    client_receives_indication,
+    subscription_to_every_indication,
+    client_receives_indication_after_reconnect);
 
 } // namespace test
 } // namespace stun
