@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>הדבק מהלוח</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>העתק ללוח</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>בחר קובץ רשיון...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>מחזור סיור</translation>
+      <source>seconds</source>
+      <translation>שניות</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>שניות</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

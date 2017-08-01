@@ -368,6 +368,7 @@ void QnPtzManageDialog::enableDewarping()
 void QnPtzManageDialog::clear()
 {
     // ensure that no old data will stay in dialog
+    m_widget.clear();
     setController(QnPtzControllerPtr());
     m_model->setPresets(QnPtzPresetList());
     m_model->setTours(QnPtzTourList());

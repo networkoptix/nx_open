@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Beillesztés vágólapról</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Válaszzon licenc fájlt...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Túra ciklus</translation>
+      <source>seconds</source>
+      <translation>másodperc</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>másodperc</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

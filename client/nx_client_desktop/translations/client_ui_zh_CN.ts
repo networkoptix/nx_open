@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>剪贴板复制</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>复制到剪贴板</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>选择授权文件...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>轮巡周期</translation>
+      <source>seconds</source>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>s</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

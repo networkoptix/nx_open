@@ -28,9 +28,13 @@ public:
     using CameraChangesFunction = std::function<void(const QnVirtualCameraResourcePtr&)>;
     using ServerChangesFunction = std::function<void(const QnMediaServerResourcePtr&)>;
     using UserChangesFunction = std::function<void(const QnUserResourcePtr&)>;
+    using UserCallbackFunction = std::function<void(bool, const QnUserResourcePtr&)>;
     using VideoWallChangesFunction = std::function<void(const QnVideoWallResourcePtr&)>;
+    using VideoWallCallbackFunction = std::function<void(bool, const QnVideoWallResourcePtr&)>;
     using LayoutChangesFunction = std::function<void(const QnLayoutResourcePtr&)>;
+    using LayoutCallbackFunction = std::function<void(bool, const QnLayoutResourcePtr&)>;
     using WebPageChangesFunction = std::function<void(const QnWebPageResourcePtr&)>;
+    using WebPageCallbackFunction = std::function<void(bool, const QnWebPageResourcePtr&)>;
 
     using GenericChangesFunction = std::function<void()>;
     using GenericCallbackFunction = std::function<void(bool)>;
@@ -74,7 +78,7 @@ public:
     /** Apply changes to the given user. */
     void saveUser(const QnUserResourcePtr &user,
         UserChangesFunction applyChanges,
-        GenericCallbackFunction callback = GenericCallbackFunction());
+        UserCallbackFunction callback = UserCallbackFunction());
 
     /** Apply changes to the given users. */
     void saveUsers(const QnUserResourceList& users);
@@ -88,18 +92,18 @@ public:
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr& videoWall,
-        VideoWallChangesFunction applyChanges,
-        GenericCallbackFunction callback = GenericCallbackFunction());
+        VideoWallChangesFunction applyChanges = VideoWallChangesFunction(),
+        VideoWallCallbackFunction callback = VideoWallCallbackFunction());
 
     /** Apply changes to the given layout. */
     void saveLayout(const QnLayoutResourcePtr& layout,
         LayoutChangesFunction applyChanges,
-        GenericCallbackFunction callback = GenericCallbackFunction());
+        LayoutCallbackFunction callback = LayoutCallbackFunction());
 
     /** Apply changes to the given web page. */
     void saveWebPage(const QnWebPageResourcePtr& webPage,
-        WebPageChangesFunction applyChanges,
-        GenericCallbackFunction callback = GenericCallbackFunction());
+        WebPageChangesFunction applyChanges = WebPageChangesFunction(),
+        WebPageCallbackFunction callback = WebPageCallbackFunction());
 
 signals:
     /** This signal is emitted every time when changes cannot be saved. */

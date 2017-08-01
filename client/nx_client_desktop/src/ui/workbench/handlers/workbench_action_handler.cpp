@@ -1782,13 +1782,21 @@ void ActionHandler::at_renameAction_triggered()
     {
         qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) { camera->setName(name); });
     }
-    else if (QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>())
+    else if (auto videowall = resource.dynamicCast<QnVideoWallResource>())
     {
-        qnResourcesChangesManager->saveVideoWall(videowall, [name](const QnVideoWallResourcePtr &videowall) { videowall->setName(name); });
+        qnResourcesChangesManager->saveVideoWall(videowall,
+            [name](const QnVideoWallResourcePtr& videowall)
+            {
+                videowall->setName(name);
+            });
     }
-    else if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+    else if (auto webPage = resource.dynamicCast<QnWebPageResource>())
     {
-        qnResourcesChangesManager->saveWebPage(webPage, [name](const QnWebPageResourcePtr &webPage) {  webPage->setName(name); });
+        qnResourcesChangesManager->saveWebPage(webPage,
+            [name](const QnWebPageResourcePtr& webPage)
+            {
+                webPage->setName(name);
+            });
     }
     else if (auto archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {
