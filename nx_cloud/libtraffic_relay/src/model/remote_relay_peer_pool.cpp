@@ -349,7 +349,7 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
     NX_ASSERT(!domainParts.empty());
 
     bool bindResult = true;
-    if (relayHost.is_initialized())
+    if ((bool) relayHost)
     {
         cassandra::Uuid localHostId;
         {
@@ -359,7 +359,7 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
         bindResult &= query->bind("relay_id", localHostId);
     }
 
-    if (relayHost.is_initialized())
+    if ((bool) relayHost)
         bindResult &= query->bind("relay_host", relayHost.get());
     bindResult &= query->bind("domain_suffix_1", domainParts[0]);
     bindResult &= query->bind("domain_suffix_2", domainParts.size() > 1 ? domainParts[1] : "");

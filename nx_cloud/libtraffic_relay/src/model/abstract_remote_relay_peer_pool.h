@@ -11,7 +11,7 @@ namespace model {
 class AbstractRemoteRelayPeerPool
 {
 public:
-    virtual ~AbstractRemoteRelayPeerPool() {}
+    virtual ~AbstractRemoteRelayPeerPool() = default;
 
     virtual cf::future<std::string> findRelayByDomain(const std::string& domainName) const = 0;
     virtual cf::future<bool> addPeer(
