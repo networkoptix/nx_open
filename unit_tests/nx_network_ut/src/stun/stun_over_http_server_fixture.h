@@ -15,29 +15,42 @@ namespace nx {
 namespace stun {
 namespace test {
 
+class StunOverHttpServer
+{
+public:
+    StunOverHttpServer();
+
+    bool bind(const SocketAddress& localEndpoint);
+    bool listen();
+    QUrl getServerUrl() const;
+
+    nx::stun::MessageDispatcher& dispatcher();
+
+private:
+    TestHttpServer m_httpServer;
+    nx::stun::MessageDispatcher m_dispatcher;
+    nx::stun::StunOverHttpServer m_stunOverHttpServer;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class StunOverHttpServerFixture:
     public ::testing::Test
 {
-public:
-    StunOverHttpServerFixture();
-
 protected:
     virtual void SetUp() override;
 
+    nx::stun::MessageDispatcher& dispatcher();
     QUrl tunnelUrl() const;
     nx::stun::Message popReceivedMessage();
     nx::stun::Message prepareRequest();
-    nx::stun::MessageDispatcher& dispatcher();
 
     void givenTunnelingServer();
     void assertStunClientIsAbleToPerformRequest(AbstractAsyncClient* client);
 
 private:
-    TestHttpServer m_httpServer;
+    StunOverHttpServer m_server;
     nx::utils::SyncQueue<nx::stun::Message> m_messagesReceived;
-    nx::stun::MessageDispatcher m_dispatcher;
-    nx::stun::StunOverHttpServer m_stunOverHttpServer;
-    std::unique_ptr<AbstractStreamSocket> m_httpTunnelConnection;
 
     void processStunMessage(
         std::shared_ptr<nx::stun::AbstractServerConnection> serverConnection,

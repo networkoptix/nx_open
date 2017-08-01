@@ -7,6 +7,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/sync_queue.h>
@@ -96,7 +97,8 @@ protected:
 
     void givenConnectedClient()
     {
-        m_stunClient->connect(m_serverEndpoint, false);
+        m_stunClient->connect(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(m_serverEndpoint));
     }
 
     void givenTcpConnectionToTheServer()
@@ -227,8 +229,8 @@ private:
 
         nx::utils::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->connect(
-            SocketAddress(HostAddress("localhost"), m_serverEndpoint.port),
-            false,
+            nx::network::url::Builder().setScheme("stun").setEndpoint(
+                SocketAddress(HostAddress("localhost"), m_serverEndpoint.port)),
             [&connectedPromise](SystemError::ErrorCode sysErrorCode)
             {
                 connectedPromise.set_value(sysErrorCode);
@@ -345,7 +347,50 @@ TEST_F(StunClientUser, correct_cancellation)
 
 //-------------------------------------------------------------------------------------------------
 
-INSTANTIATE_TYPED_TEST_CASE_P(StunAsyncClient, StunAsyncClientAcceptanceTest, AsyncClient);
+namespace {
+
+class TestServer:
+    public stun::SocketServer
+{
+    using base_type = stun::SocketServer;
+
+public:
+    TestServer():
+        base_type(&m_dispatcher, false)
+    {
+    }
+
+    ~TestServer()
+    {
+        pleaseStopSync();
+    }
+
+    QUrl getServerUrl() const
+    {
+        return nx::network::url::Builder().setScheme("stun").setEndpoint(address());
+    }
+
+    nx::stun::MessageDispatcher& dispatcher()
+    {
+        return m_dispatcher;
+    }
+
+private:
+    nx::stun::MessageDispatcher m_dispatcher;
+};
+
+struct AsyncClientTestTypes
+{
+    using ClientType = stun::AsyncClient;
+    using ServerType = TestServer;
+};
+
+} // namespace
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    StunAsyncClient,
+    StunAsyncClientAcceptanceTest,
+    AsyncClientTestTypes);
 
 } // namespace test
 } // namespace stun
