@@ -121,7 +121,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(commonModule()->moduleGUID()));
+    store(new QnStorageDbPool(commonModule()));
 
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(

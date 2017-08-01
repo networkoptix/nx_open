@@ -129,10 +129,20 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 
 //-------------------------------------------------------------------------------------------------
 
+namespace {
+
+struct AsyncClientWithHttpTunnelingTestTypes
+{
+    using ClientType = stun::AsyncClientWithHttpTunneling;
+    using ServerType = StunOverHttpServer;
+};
+
+} // namespace
+
 INSTANTIATE_TYPED_TEST_CASE_P(
     StunAsyncClientWithHttpTunneling,
     StunAsyncClientAcceptanceTest,
-    stun::AsyncClientWithHttpTunneling);
+    AsyncClientWithHttpTunnelingTestTypes);
 
 } // namespace test
 } // namespace stun
