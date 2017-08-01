@@ -152,7 +152,6 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
         {
             QnMutexLocker lock(&m_mutex);
 
-            const auto indicationHandlersSizeBak = m_indicationHandlers.size();
             for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
             {
                 if (it->second.client == client)
@@ -347,7 +346,8 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
 void AsyncClientWithHttpTunneling::onConnectionClosed(
     SystemError::ErrorCode closeReason)
 {
-    NX_DEBUG(this, lm("Connection to %1 has been broken").arg(m_url));
+    NX_DEBUG(this, lm("Connection to %1 has been broken. %2")
+        .arg(m_url).arg(SystemError::toString(closeReason)));
 
     scheduleReconnect();
 }

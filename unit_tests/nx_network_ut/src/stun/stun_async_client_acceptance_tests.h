@@ -322,7 +322,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, request_scheduled_after_connection_f
 {
     this->givenConnectedClient();
 
-    doInClientAioThread(
+    this->doInClientAioThread(
         [this]()
         {
             this->whenForciblyCloseClientConnection();
@@ -337,7 +337,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, scheduled_request_is_completed_after
 {
     this->givenConnectedClient();
 
-    doInClientAioThread(
+    this->doInClientAioThread(
         [this]()
         {
             this->whenIssueRequest();
