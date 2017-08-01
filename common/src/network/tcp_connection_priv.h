@@ -41,6 +41,10 @@ static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
+// TODO: Probably it's not the best way to inform this handler has infinite body, it's probobly
+// better to use a struct.
+static const int CODE_FLAG_INFINITE_BODY = 0x10000;
+
 class QnTCPConnectionProcessorPrivate
 {
     friend class QnTCPConnectionProcessor;
@@ -57,7 +61,6 @@ public:
         authenticatedOnce(false),
         owner(nullptr),
         isSocketTaken(false),
-        requestEmptyContentLength(false),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -90,7 +93,6 @@ public:
     bool authenticatedOnce;
     QnTcpListener* owner;
     bool isSocketTaken;
-    bool requestEmptyContentLength;
 
 private:
     QByteArray interleavedMessageData;

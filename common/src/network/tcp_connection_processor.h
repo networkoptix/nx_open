@@ -73,7 +73,6 @@ public:
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
-    void requestEmptyContentLength();
 
 protected:
     QString extractPath() const;

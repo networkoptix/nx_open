@@ -103,11 +103,7 @@ int QnModuleInformationRestHandler::executeGet(
         result.setReply(owner->commonModule()->moduleInformation());
     }
 
-    // TODO: Probably owner is supposed to be passed as mutable.
-    if (updateStreamMode(params))
-        const_cast<QnRestConnectionProcessor*>(owner)->requestEmptyContentLength();
-
-    return CODE_OK;
+    return CODE_OK | (updateStreamMode(params) ? CODE_FLAG_INFINITE_BODY : 0);
 }
 
 void QnModuleInformationRestHandler::afterExecute(
@@ -147,7 +143,7 @@ void QnModuleInformationRestHandler::afterExecute(
                 NX_VERBOSE(this, lm("Connection %1 asks for update stream, %2 total")
                     .args(socket, m_socketsToKeepOpen.size()));
 
-                sendModuleImformation(socket);
+                sendKeepAliveByTimer(socket);
             }
             else
             {
@@ -165,9 +161,7 @@ void QnModuleInformationRestHandler::afterExecute(
                             .args(socket->getForeignAddress(), size, SystemError::toString(code)));
                     });
             }
-
         });
-
 }
 
 void QnModuleInformationRestHandler::changeModuleInformation()
@@ -221,11 +215,11 @@ void QnModuleInformationRestHandler::sendModuleImformation(
 void QnModuleInformationRestHandler::sendKeepAliveByTimer(
     const QSharedPointer<AbstractStreamSocket>& socket)
 {
-    socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe,
+    socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2,
         [this, socket]()
         {
-            static const nx::Buffer kKeepAlive("{}");
-            socket->sendAsync(kKeepAlive,
+            static const auto kEmptyObject = QJson::serialize(QJsonObject());
+            socket->sendAsync(kEmptyObject,
                 [this, socket](SystemError::ErrorCode code, size_t)
                 {
                     if (code == SystemError::noError)
