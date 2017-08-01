@@ -13,23 +13,19 @@ namespace nx {
 namespace stun {
 namespace test {
 
-//struct AsyncClientTestTypes
-//{
-//    using ClientType = ...;
-//    using ServerType = ...;
-//};
-
-//class StunServer
-//{
-//public:
-//    void pleaseStopSync();
-//
-//    bool bind(SocketAddress);
-//    bool listen();
-//
-//    QUrl getServerUrl() const;
-//};
-
+/**
+ * @param AsyncClientTestTypes It is a struct with following nested types:
+ * - ClientType Type that inherits nx::stun::AbstractAsyncClient.
+ * - ServerType Stun server with a following interface:
+ * 
+ *   class StunServer
+ *   {
+ *   public:
+ *       bool bind(const SocketAddress&);
+ *       bool listen();
+ *       QUrl getServerUrl() const;
+ *   };
+ */
 template<typename AsyncClientTestTypes>
 class StunAsyncClientAcceptanceTest:
     public ::testing::Test
