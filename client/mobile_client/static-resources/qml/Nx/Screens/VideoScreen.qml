@@ -499,14 +499,6 @@ PageBase
         property string newResourceId
         property string thumbnail
 
-        NumberAnimation
-        {
-            target: d
-            property: "cameraUiOpacity"
-            to: 0.0
-            duration: 200
-        }
-
         ScriptAction
         {
             script:
@@ -515,6 +507,14 @@ PageBase
                 initialScreenshot = cameraSwitchAnimation.thumbnail
                 video.clear()
             }
+        }
+
+        NumberAnimation
+        {
+            target: d
+            property: "cameraUiOpacity"
+            to: 0.0
+            duration: 200
         }
 
         NumberAnimation
