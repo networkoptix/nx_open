@@ -23,16 +23,20 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(
-    SocketAddress endpoint,
-    bool useSsl,
-    ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handler)
 {
-    QnMutexLocker lock(&m_mutex);
+    if (url.scheme() == "http" || url.scheme() == "https")
+    {
+        openHttpTunnel(url, std::move(handler));
+    }
+    else if (url.scheme() == "stun" || url.scheme() == "stuns")
+    {
+        QnMutexLocker lock(&m_mutex);
 
-    m_stunClient = std::make_unique<AsyncClient>(m_settings);
-    m_stunClient->bindToAioThread(getAioThread());
-    m_stunClient->connect(std::move(endpoint), useSsl, std::move(handler));
+        m_stunClient = std::make_unique<AsyncClient>(m_settings);
+        m_stunClient->bindToAioThread(getAioThread());
+        m_stunClient->connect(url, std::move(handler));
+    }
 }
 
 bool AsyncClientWithHttpTunneling::setIndicationHandler(
@@ -157,21 +161,6 @@ void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
     invokeOrPostpone(
         std::bind(&AbstractAsyncClient::setKeepAliveOptions, 
             std::placeholders::_1, std::move(options)));
-}
-
-void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handler)
-{
-    if (url.scheme() == "http" || url.scheme() == "https")
-    {
-       openHttpTunnel(url, std::move(handler));
-    }
-    else
-    {
-        connect(
-            network::url::getEndpoint(url),
-            url.scheme() == "stuns" || url.scheme() == "https",
-            std::move(handler));
-    }
 }
 
 void AsyncClientWithHttpTunneling::stopWhileInAioThread()

@@ -40,13 +40,12 @@ public:
     /**
      * Asynchronously opens connection to the server.
      *
-     * @param endpoint Address to use.
+     * @param url stun::/hostname:port/
      * @param handler Is called when 1st connection attempt has passed regadless of it's success.
      * NOTE: shall be called only once (to provide address) reconnect will
      *      happen automatically.
      */
-    virtual void connect(
-        SocketAddress endpoint, bool useSsl = false, ConnectHandler handler = nullptr) = 0;
+    virtual void connect(const QUrl& url, ConnectHandler handler = nullptr) = 0;
 
     /**
      * Subscribes for certain indications.

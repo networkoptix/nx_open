@@ -27,10 +27,10 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
-    virtual void connect(
-        SocketAddress endpoint,
-        bool useSsl = false,
-        ConnectHandler handler = nullptr) override;
+    /**
+     * @param url http and stun scheme is supported.
+     */
+    virtual void connect(const QUrl& url, ConnectHandler handler) override;
 
     virtual bool setIndicationHandler(
         int method,
@@ -62,11 +62,6 @@ public:
         utils::MoveOnlyFunc<void()> handler) override;
 
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
-
-    /**
-     * @param url http and stun scheme is supported.
-     */
-    void connect(const QUrl& url, ConnectHandler handler);
 
 private:
     struct HandlerContext

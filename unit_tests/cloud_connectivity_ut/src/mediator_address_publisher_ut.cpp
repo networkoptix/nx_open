@@ -24,9 +24,7 @@ public:
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
 
-    virtual void connect(
-        SocketAddress /*endpoint*/, bool /*useSsl*/ = false,
-        ConnectHandler handler = nullptr) override
+    virtual void connect(const QUrl& /*url*/, ConnectHandler handler = nullptr) override
     {
         if (handler)
             post([handler = std::move(handler)]() { handler(SystemError::noError); });

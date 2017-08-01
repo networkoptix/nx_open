@@ -1,5 +1,7 @@
 #include "async_client.h"
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
@@ -39,15 +41,16 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 }
 
 void AsyncClient::connect(
-    SocketAddress endpoint,
-    bool useSsl,
-    ConnectHandler handler)
+    const QUrl& url,
+    ConnectHandler completionHandler)
 {
+    const auto endpoint = nx::network::url::getEndpoint(url);
+
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = useSsl;
+    m_useSsl = url.scheme() == "stuns";
     NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(handler);
+    m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);
 }
 
