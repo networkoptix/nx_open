@@ -241,8 +241,6 @@ void initLog(const QString& logLevel)
     logSettings.level.parse(logLevel);
     if (*ini().logLevel)
         logSettings.level.parse(QString::fromUtf8(ini().logLevel));
-    if (logSettings.level == nx::utils::log::Level::undefined)
-        logSettings.level = nx::utils::log::Level::verbose;
 
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
