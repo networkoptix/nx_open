@@ -54,6 +54,7 @@ PageBase
 
         property var videoNavigation: navigationLoader.item
 
+        property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
             (showOfflineStatus
@@ -455,6 +456,7 @@ PageBase
 
                 VideoNavigation
                 {
+                    animatePlaybackControls: d.animatePlaybackControls
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
                     ptzAvailable: ptzPanel.controller.available
@@ -499,22 +501,24 @@ PageBase
         property string newResourceId
         property string thumbnail
 
-        ScriptAction
-        {
-            script:
-            {
-                videoScreen.resourceId = cameraSwitchAnimation.newResourceId
-                initialScreenshot = cameraSwitchAnimation.thumbnail
-                video.clear()
-            }
-        }
-
         NumberAnimation
         {
             target: d
             property: "cameraUiOpacity"
             to: 0.0
             duration: 200
+        }
+
+        ScriptAction
+        {
+            script:
+            {
+                d.animatePlaybackControls = false
+                videoScreen.resourceId = cameraSwitchAnimation.newResourceId
+                initialScreenshot = cameraSwitchAnimation.thumbnail
+                video.clear()
+                d.animatePlaybackControls = true
+            }
         }
 
         NumberAnimation
