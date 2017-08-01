@@ -38,6 +38,24 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    class InformationReader
+    {
+    public:
+        InformationReader(network::aio::AbstractAioThread* thread);
+        void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
+        void start(const SocketAddress& endpoint);
+        HostAddress ip() const { return m_socket->getForeignAddress().address; }
+
+    private:
+        void readUntilError();
+
+        nx_http::AsyncHttpClientPtr m_httpClient;
+        SocketAddress m_endpoint;
+        nx::Buffer m_buffer;
+        std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::function<void(boost::optional<QnModuleInformation>, QString)> m_handler;
+    };
+
     class Module
     {
     public:
@@ -56,8 +74,7 @@ private:
         boost::optional<Endpoints::iterator> saveEndpoint(SocketAddress endpoint);
         void connectToGroup(Endpoints::iterator endpointsGroup);
         void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
-        boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
-        bool saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
+        bool saveConnection(SocketAddress endpoint, std::unique_ptr<InformationReader> reader,
             const QnModuleInformation& information);
 
     private:
@@ -66,8 +83,8 @@ private:
         Endpoints m_endpoints;
         std::set<SocketAddress> m_forbiddenEndpoints;
         network::RetryTimer m_timer;
-        std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
-        std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
+        std::unique_ptr<InformationReader> m_connectedReader;
         std::unique_ptr<network::aio::Timer> m_disconnectTimer;
     };
 

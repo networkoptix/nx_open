@@ -176,6 +176,12 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     expectConnect(id, endpoint3); //< The last one is unblocked now.
 }
 
+TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
+{
+    connector.newEndpoints({SocketAddress("127.0.0.1:7001")}, QnUuid());
+    std::this_thread::sleep_for(std::chrono::hours(1));
+}
+
 } // namespace test
 } // namespace discovery
 } // namespace vms
