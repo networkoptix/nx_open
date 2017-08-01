@@ -78,6 +78,7 @@ private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     ConnectHandler m_connectHandler;
     std::list<nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)>> m_cachedStunClientCalls;
+    /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
     QUrl m_url;
@@ -95,6 +96,7 @@ private:
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
+    void dispatchIndication(nx::stun::Message indication);
 
     void openHttpTunnel(
         const QnMutexLockerBase&,

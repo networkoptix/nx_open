@@ -11,20 +11,24 @@
 #include <nx/network/stun/stun_over_http_server.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include "stun_async_client_acceptance_tests.h"
+
 namespace nx {
 namespace stun {
 namespace test {
 
-class StunOverHttpServer
+class StunOverHttpServer:
+    public AbstractStunServer
 {
 public:
     StunOverHttpServer();
 
-    bool bind(const SocketAddress& localEndpoint);
-    bool listen();
-    QUrl getServerUrl() const;
-
-    nx::stun::MessageDispatcher& dispatcher();
+    virtual bool bind(const SocketAddress& localEndpoint) override;
+    virtual bool listen() override;
+    virtual QUrl getServerUrl() const override;
+    virtual nx::stun::MessageDispatcher& dispatcher() override;
+    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) override;
+    virtual std::size_t connectionCount() const override;
 
 private:
     TestHttpServer m_httpServer;

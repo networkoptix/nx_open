@@ -440,6 +440,9 @@ void AsyncClient::processMessage(Message message)
         case MessageClass::indication:
         {
             auto it = m_indicationHandlers.find( message.header.method );
+            if (it == m_indicationHandlers.end())
+                it = m_indicationHandlers.find(kEveryIndicationMethod); //< Default indication handler.
+
             if( it != m_indicationHandlers.end() )
             {
                 auto handler = it->second;

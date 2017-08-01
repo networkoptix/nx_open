@@ -44,17 +44,9 @@ bool AsyncClientWithHttpTunneling::setIndicationHandler(
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (m_stunClient)
-        return m_stunClient->setIndicationHandler(method, std::move(handler), client);
-
-    if (!m_indicationHandlers.emplace(
-            method,
-            HandlerContext{std::move(handler), client}).second)
-    {
-        return false;
-    }
-
-    return true;
+    return m_indicationHandlers.emplace(
+        method,
+        HandlerContext{std::move(handler), client}).second;
 }
 
 void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
@@ -126,9 +118,6 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (m_stunClient)
-        return m_stunClient->cancelHandlers(client, std::move(handler));
-
     const auto indicationHandlersSizeBak = m_indicationHandlers.size();
     for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
     {
@@ -137,18 +126,15 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
         else
             ++it;
     }
-    
-    if (m_indicationHandlers.size() == indicationHandlersSizeBak)
-    {
-        return invokeOrPostpone(
-            [client, handler = std::move(handler)](
-                AbstractAsyncClient* clientPtr) mutable
-            {
-                clientPtr->cancelHandlers(client, std::move(handler));
-            });
-    }
 
-    post([handler = std::move(handler)]() { handler(); });
+    post(
+        [this, client, handler = std::move(handler)]() mutable
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (!m_stunClient)
+                return handler();
+            m_stunClient->cancelHandlers(client, std::move(handler));
+        });
 }
 
 void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
@@ -216,6 +202,34 @@ void AsyncClientWithHttpTunneling::createStunClient(
     m_stunClient->bindToAioThread(getAioThread());
     m_stunClient->setOnConnectionClosedHandler(
         std::bind(&AsyncClientWithHttpTunneling::onConnectionClosed, this, _1));
+    m_stunClient->setIndicationHandler(
+        nx::stun::kEveryIndicationMethod,
+        std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
+        this);
+}
+
+void AsyncClientWithHttpTunneling::dispatchIndication(
+    nx::stun::Message indication)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_VERBOSE(this, lm("Received indication %1 from %2")
+        .arg(indication.header.method).arg(m_url));
+
+    auto it = m_indicationHandlers.find(indication.header.method);
+    if (it == m_indicationHandlers.end())
+        it = m_indicationHandlers.find(nx::stun::kEveryIndicationMethod);
+
+    if (it == m_indicationHandlers.end())
+    {
+        NX_DEBUG(this, lm("Ignoring unexpected indication %1").arg(indication.header.method));
+        return;
+    }
+
+    auto handler = it->second.handler;
+    lock.unlock();
+
+    handler(std::move(indication));
 }
 
 void AsyncClientWithHttpTunneling::openHttpTunnel(
@@ -263,15 +277,6 @@ void AsyncClientWithHttpTunneling::makeCachedStunClientCalls()
 {
     for (auto& cachedCall: m_cachedStunClientCalls)
         cachedCall(m_stunClient.get());
-
-    for (auto& elem: m_indicationHandlers)
-    {
-        m_stunClient->setIndicationHandler(
-            elem.first,
-            std::move(elem.second.handler),
-            elem.second.client);
-    }
-    m_indicationHandlers.clear();
 }
 
 void AsyncClientWithHttpTunneling::invokeOrPostpone(

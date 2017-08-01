@@ -41,6 +41,27 @@ nx::stun::MessageDispatcher& StunOverHttpServer::dispatcher()
     return m_dispatcher;
 }
 
+void StunOverHttpServer::sendIndicationThroughEveryConnection(
+    nx::stun::Message message)
+{
+    m_stunOverHttpServer.stunConnectionPool().forEachConnection(
+        [message](nx::stun::ServerConnection* connection)
+        {
+            connection->post(
+                [message, connection]() mutable
+                {
+                    connection->sendMessage(
+                        std::move(message),
+                        [](SystemError::ErrorCode) {});
+                });
+        });
+}
+
+std::size_t StunOverHttpServer::connectionCount() const
+{
+    return m_stunOverHttpServer.stunConnectionPool().connectionCount();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 static constexpr int kStunMethodToUse = nx::stun::MethodType::userMethod + 1;

@@ -375,6 +375,21 @@ public:
         return m_dispatcher;
     }
 
+    void sendIndicationThroughEveryConnection(nx::stun::Message message)
+    {
+        forEachConnection(
+            [message](nx::stun::ServerConnection* connection)
+            {
+                connection->post(
+                    [message, connection]() mutable
+                    {
+                        connection->sendMessage(
+                            std::move(message),
+                            [](SystemError::ErrorCode) {});
+                    });
+            });
+    }
+
 private:
     nx::stun::MessageDispatcher m_dispatcher;
 };
