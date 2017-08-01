@@ -44,7 +44,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
     for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             customization)
+             customization.name)
 
 
 def save_unrevisioned_records(customization, language, data_structures,
