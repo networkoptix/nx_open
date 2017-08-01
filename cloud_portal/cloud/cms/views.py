@@ -166,7 +166,7 @@ def context_edit_view(request, context=None, language=None):
 @api_view(["POST"])
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
-        preview_link = request.get_host() + generate_preview()
+        preview_link = "//" + request.get_host() + generate_preview()
         return redirect(preview_link)
     elif "Publish" in request.data:
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
