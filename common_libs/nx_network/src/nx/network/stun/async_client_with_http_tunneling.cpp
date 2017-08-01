@@ -34,7 +34,12 @@ void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handl
     m_url = url;
     m_reconnectTimer.reset();
 
-    connectInternal(lock, std::move(handler));
+    post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            QnMutexLocker lock(&m_mutex);
+            connectInternal(lock, std::move(handler));
+        });
 }
 
 bool AsyncClientWithHttpTunneling::setIndicationHandler(
@@ -53,22 +58,38 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     ReconnectHandler handler,
     void* client)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_reconnectHandlers.emplace(client, std::move(handler));
+    post(
+        [this, client, handler = std::move(handler)]() mutable
+        {
+            m_reconnectHandlers.emplace(client, std::move(handler));
+        });
 }
 
 void AsyncClientWithHttpTunneling::sendRequest(
     Message request,
     RequestHandler handler,
-    void* client)
+    void* clientId)
 {
-    QnMutexLocker lock(&m_mutex);
+    using namespace std::placeholders;
 
-    invokeOrPostpone(
-        [request = std::move(request), handler = std::move(handler), client](
-            AbstractAsyncClient* clientPtr) mutable
+    dispatch(
+        [this, request = std::move(request), handler = std::move(handler), clientId]() mutable
         {
-            clientPtr->sendRequest(std::move(request), std::move(handler), client);
+            const auto requestId = ++m_requestIdSequence;
+            RequestContext requestContext;
+            requestContext.request = std::move(request);
+            requestContext.handler = std::move(handler);
+            requestContext.clientId = clientId;
+
+            if (m_stunClient)
+            {
+                m_stunClient->sendRequest(
+                    requestContext.request,
+                    std::bind(&AsyncClientWithHttpTunneling::onRequestCompleted, this,
+                        _1, _2, requestId));
+            }
+
+            m_activeRequests.emplace(requestId, std::move(requestContext));
         });
 }
 
@@ -102,13 +123,24 @@ SocketAddress AsyncClientWithHttpTunneling::remoteAddress() const
     return m_stunClient->remoteAddress();
 }
 
-void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode errorCode)
+void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason)
 {
-    using namespace std::placeholders; 
+    dispatch(
+        [this, reason]()
+        {
+            if (m_stunClient)
+            {
+                m_stunClient->closeConnection(reason);
+                m_stunClient.reset();
+            }
+            if (m_httpClient)
+                m_httpClient.reset();
 
-    QnMutexLocker lock(&m_mutex);
-    invokeOrPostpone(
-        std::bind(&AbstractAsyncClient::closeConnection, _1, errorCode));
+            decltype(m_activeRequests) activeRequests;
+            activeRequests.swap(m_activeRequests);
+            for (auto& requestContext: activeRequests)
+                requestContext.second.handler(reason, nx::stun::Message());
+        });
 }
 
 void AsyncClientWithHttpTunneling::cancelHandlers(
@@ -159,6 +191,8 @@ void AsyncClientWithHttpTunneling::connectInternal(
     const QnMutexLockerBase& lock,
     ConnectHandler handler)
 {
+    NX_ASSERT(isInSelfAioThread());
+
     auto onConnected = 
         [this, handler = std::move(handler)](SystemError::ErrorCode sysErrorCode)
         {
@@ -194,6 +228,8 @@ void AsyncClientWithHttpTunneling::createStunClient(
 {
     using namespace std::placeholders;
 
+    NX_ASSERT(isInSelfAioThread());
+
     auto settings = m_settings;
     settings.reconnectPolicy.maxRetryCount = 0;
     m_stunClient = std::make_unique<AsyncClient>(
@@ -206,6 +242,14 @@ void AsyncClientWithHttpTunneling::createStunClient(
         nx::stun::kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
         this);
+
+    for (const auto& requestContext: m_activeRequests)
+    {
+        m_stunClient->sendRequest(
+            requestContext.second.request,
+            std::bind(&AsyncClientWithHttpTunneling::onRequestCompleted, this,
+                _1, _2, requestContext.first));
+    }
 }
 
 void AsyncClientWithHttpTunneling::dispatchIndication(
@@ -265,30 +309,32 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 
     {
         QnMutexLocker lock(&m_mutex);
-
         createStunClient(lock, httpClient->takeSocket());
-        makeCachedStunClientCalls();
     }
 
     nx::utils::swapAndCall(m_connectHandler, SystemError::noError);
 }
 
-void AsyncClientWithHttpTunneling::makeCachedStunClientCalls()
+void AsyncClientWithHttpTunneling::onRequestCompleted(
+    SystemError::ErrorCode sysErrorCode,
+    nx::stun::Message response,
+    int requestId)
 {
-    for (auto& cachedCall: m_cachedStunClientCalls)
-        cachedCall(m_stunClient.get());
-}
+    NX_ASSERT(isInSelfAioThread());
 
-void AsyncClientWithHttpTunneling::invokeOrPostpone(
-    nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)> func)
-{
-    if (m_stunClient)
+    auto requestIter = m_activeRequests.find(requestId);
+    if (requestIter == m_activeRequests.end())
     {
-        func(m_stunClient.get());
+        NX_ASSERT(false);
+        NX_DEBUG(this, lm("Received response from %1 with unexpected request id %2")
+            .arg(m_url).arg(requestId));
         return;
     }
 
-    m_cachedStunClientCalls.push_back(std::move(func));
+    auto requestContext = std::move(requestIter->second);
+    m_activeRequests.erase(requestIter);
+
+    requestContext.handler(sysErrorCode, std::move(response));
 }
 
 void AsyncClientWithHttpTunneling::onConnectionClosed(
@@ -331,6 +377,7 @@ void AsyncClientWithHttpTunneling::onReconnectDone(SystemError::ErrorCode sysErr
     NX_DEBUG(this, lm("Reconnected to %1").arg(m_url));
     for (const auto& handlerContext: m_reconnectHandlers)
     {
+        // TODO: #ak Add support for m_reconnectHandlers being modified within handler.
         nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
         handlerContext.second();
         if (objectDestructionWatcher.objectDestroyed())

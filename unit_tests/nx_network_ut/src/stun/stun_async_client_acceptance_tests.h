@@ -4,9 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/stun/abstract_async_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -47,6 +48,19 @@ protected:
         m_indictionMethodToSubscribeTo = nx::stun::kEveryIndicationMethod;
     }
 
+    template<typename Func>
+    void doInClientAioThread(Func func)
+    {
+        nx::utils::promise<void> done;
+        m_client.post(
+            [&func, &done]()
+            {
+                func();
+                done.set_value();
+            });
+        done.get_future().wait();
+    }
+
     void givenClientWithIndicationHandler()
     {
         ASSERT_TRUE(addIndicationHandler());
@@ -73,9 +87,6 @@ protected:
         givenConnectedClient();
         whenRestartServer();
         thenClientReconnects();
-
-        while (m_server->connectionCount() == 0)
-            std::this_thread::yield();
     }
 
     void whenRemoveHandler()
@@ -104,6 +115,11 @@ protected:
             std::bind(&StunAsyncClientAcceptanceTest::storeRequestResult, this, _1, _2));
     }
 
+    void whenForciblyCloseClientConnection()
+    {
+        m_client.closeConnection(SystemError::connectionReset);
+    }
+
     void whenServerSendsIndication()
     {
         stun::Message indication(stun::Header(
@@ -125,6 +141,10 @@ protected:
     void thenClientReconnects()
     {
         m_reconnectEvents.pop();
+
+        // Waiting for connection on the server.
+        while (m_server->connectionCount() == 0)
+            std::this_thread::yield();
     }
 
     void thenSuccessResponseIsReceived()
@@ -135,6 +155,17 @@ protected:
         ASSERT_EQ(
             stun::MessageClass::successResponse,
             m_prevRequestResult.response.header.messageClass);
+    }
+
+    void thenResponseIsReceived()
+    {
+        m_prevRequestResult = m_requestResult.pop();
+    }
+
+    void thenRequestFailureIsReported()
+    {
+        m_prevRequestResult = m_requestResult.pop();
+        ASSERT_NE(SystemError::noError, m_prevRequestResult.sysErrorCode);
     }
 
     void thenClientIsAbleToPerformRequests()
@@ -287,13 +318,45 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication_after_rec
     this->thenClientReceivesIndication();
 }
 
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, request_scheduled_after_connection_forcibly_closed)
+{
+    this->givenConnectedClient();
+
+    doInClientAioThread(
+        [this]()
+        {
+            this->whenForciblyCloseClientConnection();
+            this->whenIssueRequest();
+        });
+
+    this->thenClientReconnects();
+    this->thenResponseIsReceived();
+}
+
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, scheduled_request_is_completed_after_reconnect)
+{
+    this->givenConnectedClient();
+
+    doInClientAioThread(
+        [this]()
+        {
+            this->whenIssueRequest();
+            this->whenForciblyCloseClientConnection();
+        });
+
+    this->thenClientReconnects();
+    this->thenRequestFailureIsReported();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
     reconnect_works,
     client_receives_indication,
     subscription_to_every_indication,
-    client_receives_indication_after_reconnect);
+    client_receives_indication_after_reconnect,
+    request_scheduled_after_connection_forcibly_closed,
+    scheduled_request_is_completed_after_reconnect);
 
 } // namespace test
 } // namespace stun
