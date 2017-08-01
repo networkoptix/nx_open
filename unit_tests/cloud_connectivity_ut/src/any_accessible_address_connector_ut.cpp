@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/multiple_address_connector.h>
+#include <nx/network/cloud/any_accessible_address_connector.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
