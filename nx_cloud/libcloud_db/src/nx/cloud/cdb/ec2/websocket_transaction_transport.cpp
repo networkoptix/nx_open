@@ -33,6 +33,9 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
 {
     bindToAioThread(aioThread);
 
+    auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
+    webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
+
     connect(this, &ConnectionBase::gotMessage, this, &WebSocketTransactionTransport::onGotMessage);
     connect(this, &ConnectionBase::allDataSent,
         [this]()
