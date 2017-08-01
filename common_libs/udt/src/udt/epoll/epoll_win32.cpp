@@ -191,18 +191,16 @@ void EpollWin32::prepareOutEvents(
             *receivedInterruptEvent = true;
             continue;
         }
-        (*socketsAvailableForReading)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
 
-        // TODO: #ak Rollback after fixing issue VMS-6814.
-        if ((m_socketDescriptorToEventMask[m_readfds->fd_array[i]] & UDT_EPOLL_IN) == 0)
-        {
-            int* x = nullptr;
-            *x = 1234567;
-        }
+        if (isPollingSocketForEvent(m_readfds->fd_array[i], UDT_EPOLL_IN))
+            (*socketsAvailableForReading)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
     }
 
     for (size_t i = 0; i < m_writefds->fd_count; ++i)
-        (*socketsAvailableForWriting)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
+    {
+        if (isPollingSocketForEvent(m_writefds->fd_array[i], UDT_EPOLL_OUT))
+            (*socketsAvailableForWriting)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
+    }
 
     for (size_t i = 0; i < m_exceptfds->fd_count; ++i)
     {

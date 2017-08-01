@@ -19,6 +19,8 @@ namespace nx {
 namespace p2p {
 namespace test {
 
+static const int kServerCount = 4;
+
 class MessageBusOnlinePeers: public P2pMessageBusTestBase
 {
 public:
@@ -37,7 +39,29 @@ protected:
 
     bool isAllServersOnlineCond()
     {
-        return m_alivePeers.size() == 3;
+        if (m_alivePeers.size() != kServerCount -1)
+            return false;
+
+        for (int i = 0; i < m_servers.size(); ++i)
+        {
+            const auto& server = m_servers[i];
+            const auto pool = server->moduleInstance()->commonModule()->resourcePool();
+            int serverCount = pool->getAllServers(Qn::AnyStatus).size();
+            if (serverCount != kServerCount)
+                return false;
+        }
+
+        return true;
+    }
+
+    qint32 serverDistance(int from, int to)
+    {
+        const auto& serverFrom = m_servers[from];
+        const auto connection = serverFrom->moduleInstance()->ecConnection();
+        auto bus = connection->messageBus()->dynamicCast<MessageBus*>();
+        const auto toId = m_servers[to]->moduleInstance()->commonModule()->moduleGUID();
+        int distance = bus->distanceToPeer(toId);
+        return distance;
     }
 
     bool isPeerLost(int index)
@@ -64,7 +88,7 @@ protected:
     void startAllServers(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
     {
         const_cast<bool&>(ec2::ini().isP2pMode) = true;
-        startServers(4);
+        startServers(kServerCount);
         for (const auto& server : m_servers)
         {
             createData(server, 0, 0);
@@ -116,10 +140,14 @@ protected:
     void sequenceConnectMain()
     {
         startAllServers(sequenceConnect);
-        ASSERT_TRUE(m_servers.size() >= 2);
+        ASSERT_TRUE(m_servers.size() == kServerCount);
         m_servers[1]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 2));
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 3));
+		
+		// It should have some offline distance because server[0] has got some data.
+        for (int i = 0; i < kServerCount; ++i)
+            ASSERT_LT(serverDistance(0, i), kMaxDistance);
     }
 
 private:

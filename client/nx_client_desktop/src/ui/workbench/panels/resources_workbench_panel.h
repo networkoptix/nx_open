@@ -61,6 +61,7 @@ private:
 private:
     void at_resizerWidget_geometryChanged();
     void at_showingProcessor_hoverEntered();
+    void at_selectNewItemAction_triggered();
 
 private:
     bool m_ignoreClickEvent;

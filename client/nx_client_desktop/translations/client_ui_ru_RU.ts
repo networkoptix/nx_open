@@ -1469,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Вставить из буфера обмена</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Выбрать файл лицензии...</translation>
     </message>
@@ -1646,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Цикличность тура</translation>
+      <source>seconds</source>
+      <translation>сек</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>сек</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>
