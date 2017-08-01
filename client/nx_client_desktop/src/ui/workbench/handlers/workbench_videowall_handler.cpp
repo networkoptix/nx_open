@@ -335,7 +335,7 @@ auto offlineItemOnThisPc = []
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new QnVideoWallLicenseUsageHelper(this))
+    m_licensesHelper(new QnVideoWallLicenseUsageHelper(commonModule(), this))
 #ifdef _DEBUG
     /* Limit by reasonable size. */
     , m_uuidPool(new QnUuidPool(uuidPoolBase, 256))

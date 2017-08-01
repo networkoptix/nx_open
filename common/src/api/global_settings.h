@@ -199,7 +199,9 @@ public:
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
+
     bool isTimeSynchronizationEnabled() const;
+    void setTimeSynchronizationEnabled(bool value);
 
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);

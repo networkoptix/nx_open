@@ -3,9 +3,12 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -31,7 +34,6 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     m_extraInfoLabel(createGraphicsLabel())
 {
     setAcceptedMouseButtons(Qt::NoButton);
-    setAutoFillBackground(true);
 
     static const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #gdm #vkutin #customization
     setPaletteColor(this, QPalette::Window, overlayBackgroundColor);
@@ -55,6 +57,14 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
 
 QnResourceTitleItem::~QnResourceTitleItem()
 {
+}
+
+void QnResourceTitleItem::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
+{
+    const PainterTransformScaleStripper scaleStripper(painter);
+    painter->fillRect(scaleStripper.mapRect(rect()), palette().color(QPalette::Window));
 }
 
 void QnResourceTitleItem::setSimpleMode(bool isSimpleMode, bool animate)

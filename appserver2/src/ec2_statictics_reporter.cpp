@@ -226,7 +226,7 @@ namespace ec2
 
                 NX_LOGX(lm("Last reported version is '%1' while running '%2', plan early report for %3")
                     .arg(reportedVersion).arg(currentVersion)
-                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
+                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logDEBUG1);
 
                 return *m_plannedReportTime;
             }

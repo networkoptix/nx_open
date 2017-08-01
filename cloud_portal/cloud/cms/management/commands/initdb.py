@@ -8,6 +8,14 @@ from django.core.management.base import BaseCommand
 STATIC_DIR = 'static/'
 
 
+def find_or_add_product(name):
+    if Product.objects.filter(name=name).exists():
+        return Product.objects.get(name=name)
+    product = Product(name=name)
+    product.save()
+    return product
+
+
 def find_or_add_customization(item, default_language):
     if Customization.objects.filter(name=item).exists():
         return Customization.objects.get(name=item)
@@ -31,12 +39,7 @@ def find_or_add_language_to_customization(language, customization):
 
 # run read structure
 def init_cms_db():
-    if Product.objects.exists():
-        return
-
-    # create product
-    product = Product(name='cloud_portal')
-    product.save()
+    find_or_add_product('cloud_portal')
 
     # read customizations
     for custom in os.listdir(STATIC_DIR):

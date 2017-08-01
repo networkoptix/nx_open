@@ -19,7 +19,12 @@ function(detect_package_versions)
         set(_qt_version "5.6.1-1")
     endif()
 
+    if(LINUX AND box STREQUAL "none")
+        set(_qt_version "5.6.2-2")
+    endif()
+
     if(MACOSX)
+        set(_qt_version "5.6.2-2")
         set(_quazip_version "0.7.2")
         set(_festival_version "2.1")
     endif()

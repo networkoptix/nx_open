@@ -197,7 +197,7 @@ protected:
                 &ec2::DummyHandler::onRequestDone);
     }
 
-    void testMain(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc, int keekDbAtServerIndex = -1)
+    void testMain(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc, int keepDbAtServerIndex = -1)
     {
         nx::utils::ArgumentParser args(QCoreApplication::instance()->arguments());
 
@@ -207,7 +207,7 @@ protected:
         const_cast<bool&>(ec2::ini().isP2pMode) = true;
         const int instanceCount = getIntParam(args, kServerCountParamName, kDefaultInstanceCount);
         const int serverPort = getIntParam(args, kServerPortParamName);
-        startServers(instanceCount, keekDbAtServerIndex, serverPort);
+        startServers(instanceCount, keepDbAtServerIndex, serverPort);
 
         QElapsedTimer t;
         t.restart();
@@ -240,7 +240,7 @@ protected:
 
         int expectedCamerasCount = instanceCount;
         expectedCamerasCount *= cameraCount;
-        if (keekDbAtServerIndex >= 0)
+        if (keepDbAtServerIndex >= 0)
             expectedCamerasCount *= 2;
         // wait for data sync
         int syncDoneCounter = 0;
@@ -292,7 +292,7 @@ TEST_F(P2pMessageBusTest, FullConnect)
 TEST_F(P2pMessageBusTest, RestartServer)
 {
     testMain(fullConnect);
-    testMain(fullConnect, /*keekDbAtServerIndex*/ 0);
+    testMain(fullConnect, /*keepDbAtServerIndex*/ 0);
 }
 
 } // namespace test
