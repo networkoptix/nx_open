@@ -64,7 +64,7 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
 
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_lastTimestamp(AV_NOPTS_VALUE),
-    m_frameNum(0),
+    m_encodedDuration(0),
 
     m_sampleBuffers(nullptr),
     m_resampleDstBuffers(nullptr),
@@ -165,7 +165,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
         return false;
     }
 
-    m_frameNum = 0;
+    m_encodedDuration = 0;
     m_isOpened = true;
 
     return true;
@@ -202,7 +202,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
         if (tooBigJitter)
         {
-            m_frameNum = 0;
+            m_encodedDuration = 0;
             m_firstEncodedPts = media->timestamp;
         }
 
@@ -337,9 +337,6 @@ void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
     if (outCtx->frame_size == 0)
         outCtx->frame_size = inCtx->frame_size;
 
-    if (outCtx->channel_layout == 0 && media->context)
-        outCtx->channel_layout = media->context->getChannelLayout();
-
     if (outCtx->channel_layout == 0)
         outCtx->channel_layout = av_get_default_channel_layout(outCtx->channels);
 }
@@ -364,6 +361,8 @@ int QnFfmpegAudioTranscoder::initResampleCtx(
         "out_channel_layout",
         outCtx->channel_layout,
         0);
+    av_opt_set_int(m_resampleCtx, "in_channel_count", inCtx->channels, 0);
+    av_opt_set_int(m_resampleCtx, "out_channel_count", outCtx->channels, 0);
 
     av_opt_set_int(m_resampleCtx, "in_sample_rate", inCtx->sample_rate, 0);
     av_opt_set_int(m_resampleCtx, "out_sample_rate", outCtx->sample_rate, 0);
@@ -515,8 +514,8 @@ QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(cons
     resultAudioData->compressionType = m_codecId;
 
     AVRational r = {1, 1000000};
-    qint64 audioPts = m_frameNum++ * m_encoderCtx->frame_size;
-    resultAudioData->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
+    m_encodedDuration += packet.duration;
+    resultAudioData->timestamp  = av_rescale_q(m_encodedDuration, m_encoderCtx->time_base, r) + m_firstEncodedPts;
 
     resultAudioData->m_data.write((const char*)packet.data, packet.size);
     return  QnCompressedAudioDataPtr(resultAudioData);
