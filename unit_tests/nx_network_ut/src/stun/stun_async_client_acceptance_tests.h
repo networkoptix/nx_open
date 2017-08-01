@@ -80,6 +80,8 @@ protected:
             m_server->getServerUrl(),
             [&connected](SystemError::ErrorCode resultCode) { connected.set_value(resultCode); });
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
+
+        waitForServerToHaveAtLeastOneConnection();
     }
 
     void givenReconnectedClient()
@@ -142,9 +144,7 @@ protected:
     {
         m_reconnectEvents.pop();
 
-        // Waiting for connection on the server.
-        while (m_server->connectionCount() == 0)
-            std::this_thread::yield();
+        waitForServerToHaveAtLeastOneConnection();
     }
 
     void thenSuccessResponseIsReceived()
@@ -266,6 +266,13 @@ private:
     void saveIndication(nx::stun::Message indication)
     {
         m_indicationsReceived.push(std::move(indication));
+    }
+
+    void waitForServerToHaveAtLeastOneConnection()
+    {
+        // Waiting for connection on the server.
+        while (m_server->connectionCount() == 0)
+            std::this_thread::yield();
     }
 };
 
