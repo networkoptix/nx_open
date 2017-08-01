@@ -8,7 +8,7 @@
 
 
 QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
-    m_commonModule(commonModule)
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -26,7 +26,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                     .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
         }
-        QString simplifiedGUID = m_commonModule->moduleGUID().toSimpleString();
+        QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
         QString dbPath = storage->getUrl();
         QString fileName =
             closeDirPath(dbPath) +

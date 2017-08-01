@@ -5,11 +5,13 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <common/common_module_aware.h>
 
 class QnCommonModule;
 
 class QnStorageDbPool:
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnStorageDbPool>
 {
     Q_OBJECT
@@ -24,7 +26,6 @@ public:
 private:
     mutable QnMutex m_sdbMutex;
     mutable QnMutex m_mutexStorageIndex;
-    QnCommonModule* m_commonModule = nullptr;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     QMap<QString, QSet<int> > m_storageIndexes;
