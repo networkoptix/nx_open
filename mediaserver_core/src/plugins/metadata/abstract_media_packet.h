@@ -19,8 +19,6 @@ public:
 
     virtual const int dataSize() const = 0;
 
-    virtual int streamIndex() const = 0;
-
     // ??? Context paramters
 };
 

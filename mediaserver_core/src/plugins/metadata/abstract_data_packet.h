@@ -11,7 +11,7 @@ static const nxpl::GUID IID_DataPacket
 
 class AbstractDataPacket: public nxpl::PluginInterface
 {
-
+public:
 };
 
 } // namespace metadata

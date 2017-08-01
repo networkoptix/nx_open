@@ -14,7 +14,7 @@ class AbstractMediaFrame: public AbstractDataPacket
 public:
     virtual const char** data() const = 0;
     virtual int planeCount() const = 0;
-    virtual int planeSize(int planeNumber) const = 0;
+    virtual int* planeSize() const = 0;
 };
 
 } // namespace metadata
