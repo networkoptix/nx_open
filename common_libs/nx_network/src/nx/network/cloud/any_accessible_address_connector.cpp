@@ -1,4 +1,4 @@
-#include "multiple_address_connector.h"
+#include "any_accessible_address_connector.h"
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/move_only_func.h>
@@ -7,7 +7,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-MultipleAddressConnector::MultipleAddressConnector(
+AnyAccessibleAddressConnector::AnyAccessibleAddressConnector(
     int ipVersion,
     std::deque<AddressEntry> entries)
     :
@@ -18,7 +18,7 @@ MultipleAddressConnector::MultipleAddressConnector(
     bindToAioThread(getAioThread());
 }
 
-void MultipleAddressConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
+void AnyAccessibleAddressConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     
@@ -31,7 +31,7 @@ void MultipleAddressConnector::bindToAioThread(aio::AbstractAioThread* aioThread
         connector->bindToAioThread(aioThread);
 }
 
-void MultipleAddressConnector::connectAsync(
+void AnyAccessibleAddressConnector::connectAsync(
     std::chrono::milliseconds timeout,
     StreamSocketAttributes socketAttributes,
     ConnectHandler handler)
@@ -64,11 +64,11 @@ void MultipleAddressConnector::connectAsync(
             }
 
             if (m_timeout > std::chrono::milliseconds::zero())
-                m_timer.start(m_timeout, std::bind(&MultipleAddressConnector::onTimeout, this));
+                m_timer.start(m_timeout, std::bind(&AnyAccessibleAddressConnector::onTimeout, this));
         });
 }
 
-void MultipleAddressConnector::stopWhileInAioThread()
+void AnyAccessibleAddressConnector::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
     
@@ -77,12 +77,12 @@ void MultipleAddressConnector::stopWhileInAioThread()
     m_cloudConnectors.clear();
 }
 
-std::unique_ptr<AbstractStreamSocket> MultipleAddressConnector::createTcpSocket(int ipVersion)
+std::unique_ptr<AbstractStreamSocket> AnyAccessibleAddressConnector::createTcpSocket(int ipVersion)
 {
     return std::make_unique<TCPSocket>(ipVersion);
 }
 
-void MultipleAddressConnector::connectToEntryAsync(const AddressEntry& dnsEntry)
+void AnyAccessibleAddressConnector::connectToEntryAsync(const AddressEntry& dnsEntry)
 {
     using namespace std::placeholders;
 
@@ -117,7 +117,7 @@ void MultipleAddressConnector::connectToEntryAsync(const AddressEntry& dnsEntry)
     }
 }
 
-bool MultipleAddressConnector::establishDirectConnection(const SocketAddress& endpoint)
+bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddress& endpoint)
 {
     using namespace std::placeholders;
 
@@ -133,12 +133,12 @@ bool MultipleAddressConnector::establishDirectConnection(const SocketAddress& en
 
     tpcSocketPtr->connectAsync(
         endpoint,
-        std::bind(&MultipleAddressConnector::onDirectConnectDone, this,
+        std::bind(&AnyAccessibleAddressConnector::onDirectConnectDone, this,
             _1, --m_directConnections.end()));
     return true;
 }
 
-void MultipleAddressConnector::onDirectConnectDone(
+void AnyAccessibleAddressConnector::onDirectConnectDone(
     SystemError::ErrorCode sysErrorCode,
     std::list<std::unique_ptr<AbstractStreamSocket>>::iterator directConnectionIter)
 {
@@ -152,7 +152,7 @@ void MultipleAddressConnector::onDirectConnectDone(
     onConnectDone(sysErrorCode, boost::none, std::move(tcpSocket));
 }
 
-void MultipleAddressConnector::onConnectDone(
+void AnyAccessibleAddressConnector::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
@@ -182,7 +182,7 @@ void MultipleAddressConnector::onConnectDone(
         std::move(connection));
 }
 
-void MultipleAddressConnector::establishCloudConnection(const AddressEntry& dnsEntry)
+void AnyAccessibleAddressConnector::establishCloudConnection(const AddressEntry& dnsEntry)
 {
     using namespace std::placeholders;
 
@@ -197,11 +197,11 @@ void MultipleAddressConnector::establishCloudConnection(const AddressEntry& dnsE
     m_cloudConnectors.push_back(std::move(cloudConnector));
 
     cloudConnectorPtr->connectAsync(
-        std::bind(&MultipleAddressConnector::onCloudConnectDone, this,
+        std::bind(&AnyAccessibleAddressConnector::onCloudConnectDone, this,
             _1, _2, _3, --m_cloudConnectors.end()));
 }
 
-void MultipleAddressConnector::onCloudConnectDone(
+void AnyAccessibleAddressConnector::onCloudConnectDone(
     SystemError::ErrorCode sysErrorCode,
     TunnelAttributes cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection,
@@ -217,7 +217,7 @@ void MultipleAddressConnector::onCloudConnectDone(
         std::move(connection));
 }
 
-void MultipleAddressConnector::cleanUpAndReportResult(
+void AnyAccessibleAddressConnector::cleanUpAndReportResult(
     SystemError::ErrorCode sysErrorCode,
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
@@ -248,7 +248,7 @@ void MultipleAddressConnector::cleanUpAndReportResult(
         std::move(connection));
 }
 
-void MultipleAddressConnector::onTimeout()
+void AnyAccessibleAddressConnector::onTimeout()
 {
     cleanUpAndReportResult(SystemError::timedOut, boost::none, nullptr);
 }

@@ -12,6 +12,16 @@ StunOverHttpServer::StunOverHttpServer(
 {
 }
 
+StunOverHttpServer::StunConnectionPool& StunOverHttpServer::stunConnectionPool()
+{
+    return m_stunConnectionPool;
+}
+
+const StunOverHttpServer::StunConnectionPool& StunOverHttpServer::stunConnectionPool() const
+{
+    return m_stunConnectionPool;
+}
+
 void StunOverHttpServer::createStunConnection(
     std::unique_ptr<AbstractStreamSocket> connection)
 {
