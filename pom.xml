@@ -776,7 +776,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -823,7 +823,7 @@
             </modules>
             <properties>
                 <modification>ubuntu</modification>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
         </profile>
 
