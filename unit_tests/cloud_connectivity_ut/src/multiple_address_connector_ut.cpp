@@ -54,9 +54,9 @@ public:
 
 template<typename SocketType>
 class ConnectorStub:
-    public cloud::MultipleAddressConnector
+    public cloud::AnyAccessibleAddressConnector
 {
-    using base_type = cloud::MultipleAddressConnector;
+    using base_type = cloud::AnyAccessibleAddressConnector;
 
 public:
     ConnectorStub(
@@ -81,11 +81,11 @@ using UnresponsiveHostConnector = ConnectorStub<UnresponsiveRemoteHostTcpSocketS
 
 //-------------------------------------------------------------------------------------------------
 
-class MultipleAddressConnector:
+class AnyAccessibleAddressConnector:
     public ::testing::Test
 {
 public:
-    MultipleAddressConnector()
+    AnyAccessibleAddressConnector()
     {
         m_socketAttributes.recvTimeout = 
             nx::utils::random::number<unsigned int>(1, 100000);
@@ -94,7 +94,7 @@ public:
         m_socketAttributes.aioThread = SocketGlobals::aioService().getRandomAioThread();
     }
 
-    ~MultipleAddressConnector()
+    ~AnyAccessibleAddressConnector()
     {
         if (m_connector)
             m_connector->pleaseStopSync();
@@ -179,7 +179,7 @@ private:
     };
 
     std::vector<std::unique_ptr<network::test::RandomDataTcpServer>> m_tcpServers;
-    std::unique_ptr<cloud::MultipleAddressConnector> m_connector;
+    std::unique_ptr<cloud::AnyAccessibleAddressConnector> m_connector;
     nx::utils::SyncQueue<Result> m_connectResultQueue;
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds::zero();
     Result m_lastResult;
@@ -199,7 +199,7 @@ private:
         return serverEndpoint;
     }
 
-    template<typename ConnectorType = cloud::MultipleAddressConnector>
+    template<typename ConnectorType = cloud::AnyAccessibleAddressConnector>
     void initiateConnection(std::deque<AddressEntry> entries)
     {
         using namespace std::placeholders;
@@ -210,7 +210,7 @@ private:
         m_connector->connectAsync(
             m_timeout,
             m_socketAttributes,
-            std::bind(&MultipleAddressConnector::onConnectCompletion, this, _1, _2, _3));
+            std::bind(&AnyAccessibleAddressConnector::onConnectCompletion, this, _1, _2, _3));
     }
 
     std::deque<AddressEntry> prepareEntries()
@@ -232,19 +232,19 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(MultipleAddressConnector, connection_is_established_via_regular_entry)
+TEST_F(AnyAccessibleAddressConnector, connection_is_established_via_regular_entry)
 {
     whenConnect();
     thenConnectionIsEstablished();
 }
 
-TEST_F(MultipleAddressConnector, empty_entry_list_produces_error)
+TEST_F(AnyAccessibleAddressConnector, empty_entry_list_produces_error)
 {
     whenConnectSpecifyingEmptyAddressList();
     thenConnectFailedWithResult(SystemError::invalidData);
 }
 
-TEST_F(MultipleAddressConnector, timeout_is_reported)
+TEST_F(AnyAccessibleAddressConnector, timeout_is_reported)
 {
     setConnectTimeout(std::chrono::milliseconds(1));
 
@@ -252,15 +252,15 @@ TEST_F(MultipleAddressConnector, timeout_is_reported)
     thenConnectFailedWithResult(SystemError::timedOut);
 }
 
-TEST_F(MultipleAddressConnector, error_is_reported_if_every_entry_is_not_accessible)
+TEST_F(AnyAccessibleAddressConnector, error_is_reported_if_every_entry_is_not_accessible)
 {
     whenConnectToFailingHost();
     thenConnectFailed();
 }
 
-// TEST_F(MultipleAddressConnector, connection_is_established_via_cloud_entry)
+// TEST_F(AnyAccessibleAddressConnector, connection_is_established_via_cloud_entry)
 
-TEST_F(MultipleAddressConnector, socket_attributes_are_applied_for_direct_connection)
+TEST_F(AnyAccessibleAddressConnector, socket_attributes_are_applied_for_direct_connection)
 {
     whenConnect();
 
@@ -268,7 +268,7 @@ TEST_F(MultipleAddressConnector, socket_attributes_are_applied_for_direct_connec
     andSocketAttributesHaveBeenAppliedToTheConnection();
 }
 
-// TEST_F(MultipleAddressConnector, socket_attributes_are_applied_for_cloud_connection)
+// TEST_F(AnyAccessibleAddressConnector, socket_attributes_are_applied_for_cloud_connection)
 
 } // namespace test
 } // namespace cloud

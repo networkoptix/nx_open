@@ -116,7 +116,7 @@ private:
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
-    std::unique_ptr<MultipleAddressConnector> m_multipleAddressConnector;
+    std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
 
     QnMutex m_mutex;
     bool m_terminated;
