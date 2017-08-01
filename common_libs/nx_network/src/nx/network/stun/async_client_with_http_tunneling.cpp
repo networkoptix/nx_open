@@ -54,7 +54,6 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     void* client)
 {
     QnMutexLocker lock(&m_mutex);
-
     m_reconnectHandlers.emplace(client, std::move(handler));
 }
 
@@ -116,21 +115,22 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
     void* client,
     utils::MoveOnlyFunc<void()> handler)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    const auto indicationHandlersSizeBak = m_indicationHandlers.size();
-    for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
-    {
-        if (it->second.client == client)
-            it = m_indicationHandlers.erase(it);
-        else
-            ++it;
-    }
-
     post(
         [this, client, handler = std::move(handler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
+
+            const auto indicationHandlersSizeBak = m_indicationHandlers.size();
+            for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
+            {
+                if (it->second.client == client)
+                    it = m_indicationHandlers.erase(it);
+                else
+                    ++it;
+            }
+
+            m_reconnectHandlers.erase(client);
+
             if (!m_stunClient)
                 return handler();
             m_stunClient->cancelHandlers(client, std::move(handler));
