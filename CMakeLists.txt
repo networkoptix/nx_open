@@ -159,6 +159,10 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTestCamera)
+    add_subdirectory(testcamera)
+endif()
+
 if(withTrayTool)
     add_subdirectory(traytool)
 endif()
