@@ -1,7 +1,10 @@
 #!/usr/local/bin/dumb-init /bin/bash
 set -ex
 
+echo "Running with args: $@"
+echo "Environment:"
 env
+echo "---------------------------"
 
 function instantiate_config()
 {
