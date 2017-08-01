@@ -1,8 +1,6 @@
 #pragma once
 
-#include <list>
 #include <memory>
-#include <set>
 
 #include <boost/optional.hpp>
 
@@ -73,11 +71,17 @@ private:
         void* client;
     };
 
+    struct RequestContext
+    {
+        Message request;
+        RequestHandler handler;
+        void* clientId = nullptr;
+    };
+
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     ConnectHandler m_connectHandler;
-    std::list<nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)>> m_cachedStunClientCalls;
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
@@ -86,6 +90,9 @@ private:
     nx::network::RetryTimer m_reconnectTimer;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    int m_requestIdSequence = 0;
+    /** map<request id, request context>. */
+    std::map<int, RequestContext> m_activeRequests;
 
     virtual void stopWhileInAioThread() override;
 
@@ -97,15 +104,18 @@ private:
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
     void dispatchIndication(nx::stun::Message indication);
+    void sendPendingRequests();
 
     void openHttpTunnel(
         const QnMutexLockerBase&,
         const QUrl& url,
         ConnectHandler handler);
     void onHttpConnectionUpgradeDone();
-    void makeCachedStunClientCalls();
 
-    void invokeOrPostpone(nx::utils::MoveOnlyFunc<void(AbstractAsyncClient*)> func);
+    void onRequestCompleted(
+        SystemError::ErrorCode sysErrorCode,
+        nx::stun::Message response,
+        int requestId);
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();
