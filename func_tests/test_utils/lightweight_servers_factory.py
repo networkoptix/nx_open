@@ -158,6 +158,7 @@ class LightweightServersHost(object):
         self._host.put_file(self._test_binary_path, lws_dir)
         self._write_lws_ctl(server_dir, lws_dir, server_count)
         server_ctl.set_state(is_started=True)
+        self._allocated = True  # failure in following code must not prevent from artifacts collection
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
@@ -168,7 +169,6 @@ class LightweightServersHost(object):
             if not self._first_server:
                 self._first_server = server
             yield server
-        self._allocated = True
 
     def release(self):
         if self._allocated:
