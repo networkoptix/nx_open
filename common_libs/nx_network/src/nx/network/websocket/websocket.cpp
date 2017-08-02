@@ -15,6 +15,7 @@ WebSocket::WebSocket(
     ReceiveMode receiveMode,
     Role role)
     :
+    m_pingTimeout(kPingTimeout),
     m_socket(std::move(streamSocket)),
     m_parser(role, this),
     m_serializer(role == Role::client),
