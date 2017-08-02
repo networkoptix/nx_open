@@ -17,6 +17,7 @@ public:
     QTransform::TransformationType type() const;
     QRectF mapRect(const QRectF& rect) const;
 
+    const QTransform& transform() const;
 private:
     QPainter* m_painter;
     QTransform m_originalTransform;

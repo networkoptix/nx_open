@@ -52,7 +52,7 @@ def save_unrevisioned_records(customization, language, data_structures,
     upload_errors = []
     for data_structure in data_structures:
         data_structure_name = data_structure.name
-
+        
         records = data_structure.datarecord_set\
             .filter(customization=customization,
                     language=language)

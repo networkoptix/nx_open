@@ -239,8 +239,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicenses();
     };
 
-    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
-    auto videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(this);
+    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(commonModule(), this);
+    auto videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(commonModule(), this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
     connect(videowallUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
@@ -313,7 +313,7 @@ void QnLicenseManagerWidget::updateLicenses()
         QStringList messages;
 
         QnCamLicenseUsageHelper camUsageHelper(commonModule());
-        QnVideoWallLicenseUsageHelper vwUsageHelper(this);
+        QnVideoWallLicenseUsageHelper vwUsageHelper(commonModule());
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
         for (auto helper: helpers)

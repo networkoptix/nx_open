@@ -15,6 +15,7 @@
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
+        <rdep.packages>any/certificates-${customization}</rdep.packages>
     </properties>
 
     <build>
