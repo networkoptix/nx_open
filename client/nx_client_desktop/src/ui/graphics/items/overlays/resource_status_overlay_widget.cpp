@@ -6,6 +6,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QPushButton>
 
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/style/nx_style.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -17,8 +18,9 @@
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <utils/math/color_transformations.h>
 
-namespace {
+using namespace nx::client::desktop::ui;
 
+namespace {
 
 void disableFocus(QGraphicsItem* item)
 {
@@ -179,8 +181,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
 
     m_button(new QPushButton())
 {
-    setAutoFillBackground(true);
-
     makeTransparentForMouse(this);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
@@ -190,6 +190,14 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     setupPreloader();
     setupCentralControls();
     setupExtrasControls();
+}
+
+void QnStatusOverlayWidget::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
+{
+    const PainterTransformScaleStripper scaleStripper(painter);
+    painter->fillRect(scaleStripper.mapRect(rect()), palette().color(QPalette::Window));
 }
 
 void QnStatusOverlayWidget::setVisibleControls(Controls controls)

@@ -45,7 +45,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
-    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(commonModule(), this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
 }

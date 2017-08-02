@@ -344,15 +344,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     updateGridEnabledState();
     updateMotionButtons();
 
-    auto updateLicensesIfNeeded = [this]
+    auto updateLicensesIfNeeded =
+        [this]
         {
             if (!isVisible())
                 return;
             updateLicensesLabelText();
         };
 
-    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
-    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
+    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(commonModule(), this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
+        updateLicensesIfNeeded);
 
     retranslateUi();
 }
