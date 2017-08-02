@@ -23,6 +23,19 @@ Page
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
 
+    ResourceHelper
+    {
+        id: resourceHelper
+        resourceId: clientId
+    }
+
+    Binding
+    {
+        target: liteClientControlScreen
+        property: "title"
+        value: "%1 (%2)".arg(applicationInfo.liteDeviceName()).arg(resourceHelper.resourceName)
+    }
+
     titleControls:
     [
         Switch
