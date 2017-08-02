@@ -5,7 +5,9 @@
 # create report: added vs outdated
 import os
 import re
+import base64
 from ...controllers import filldata
+from cloud import settings
 import json
 import codecs
 from ...models import Product, Context, DataStructure
@@ -109,6 +111,12 @@ def read_structure_json():
             if type and type == "Image":
                 data_structure.translatable = "{{language}}" in name
 
+                #this is used to convert source images into b64 strings
+                file_path = os.path.join('static', settings.CUSTOMIZATION, 'source', name)
+                file_path = file_path.replace("{{language}}", settings.DEFAULT_LANGUAGE)
+                with open(file_path, 'r') as file:
+                    value = encoded_string = base64.b64encode(file.read())
+                        
             data_structure.meta_settings = meta if meta else {}
             data_structure.default = value
             data_structure.save()
