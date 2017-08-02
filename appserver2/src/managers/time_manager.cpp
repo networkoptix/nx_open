@@ -1321,6 +1321,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
         });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    QN_UNUSED(lock);
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this]
         {
