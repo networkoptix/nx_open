@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -135,7 +136,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
 # Create your views here.
 @api_view(["GET", "POST"])
-@permission_classes((IsAdminUser, ))
+@permission_required('cms.edit_content')
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
         context, form, language = handle_get_view(request, context, language)
@@ -171,12 +172,12 @@ def context_edit_view(request, context=None, language=None):
 
 
 @api_view(["POST"])
-@permission_classes((IsAdminUser, ))
+@permission_required('cms.change_contentversion')
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
         preview_link = "//" + request.get_host() + generate_preview()
         return redirect(preview_link)
-    elif "Publish" in request.data:
+    elif "Publish" in request.data:# and request.user.has_perm('cms.publish_version'):
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publish_latest_version(customization, request.user)
         version = ContentVersion.objects.latest('created_date')
@@ -187,7 +188,7 @@ def review_version_request(request, context=None, language=None):
 
 
 @api_view(["GET"])
-@permission_classes((IsAdminUser, ))
+@permission_required('cms.change_contentversion')
 def review_version_view(request, version_id=None):
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
