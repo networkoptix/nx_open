@@ -46,6 +46,7 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     {
         AbstractAsyncChannel::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
+        m_pingTimer->cancelSync();
         m_pingTimer->bindToAioThread(aioThread);
         m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
         p.set_value();
