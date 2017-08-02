@@ -91,7 +91,7 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
+    set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
     if(beta)
         configure_file("maven/filter-resources/mobile_client-beta.entitlements"
