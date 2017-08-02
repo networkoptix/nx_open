@@ -443,6 +443,7 @@ nx::network::server::ParserState MessageParser::parse( const nx::Buffer& user_bu
                 return nx::network::server::ParserState::readingMessage;
             case FAILED:
                 *bytes_transferred = buffer.position();
+                reset();
                 return nx::network::server::ParserState::failed;         
             case FINISH:
                 *bytes_transferred = buffer.position();
