@@ -440,6 +440,11 @@ const nx::network::WebSocket* ConnectionBase::webSocket() const
     return m_webSocket.get();
 }
 
+nx::network::WebSocket* ConnectionBase::webSocket()
+{
+    return m_webSocket.get();
+}
+
 void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     m_timer.bindToAioThread(aioThread);

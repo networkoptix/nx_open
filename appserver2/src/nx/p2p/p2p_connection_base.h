@@ -96,6 +96,7 @@ signals:
 protected:
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    nx::network::WebSocket* webSocket();
 private:
     void cancelConnecting(State state, const QString& reason);
 
