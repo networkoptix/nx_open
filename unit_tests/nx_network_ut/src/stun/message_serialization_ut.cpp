@@ -3,15 +3,16 @@
 #include <nx/network/cloud/data/bind_data.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/network/stun/message_parser.h>
-
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace stun {
+namespace test {
 
 static const Buffer DEFAULT_TID( "012345670123456789ABCDEF" );
 
 /** Parses @param message by @param partSize chunks in @param @parser */
-void partialParse( MessageParser& parser, const Buffer& message, size_t partSize )
+static void partialParse( MessageParser& parser, const Buffer& message, size_t partSize )
 {
     size_t parsedNow;
     size_t parsedTotal = 0;
@@ -307,7 +308,81 @@ TEST( StunMessageSerialization, Authentification )
     ASSERT_EQ(parsed.attributes.size(), 3U);
 }
 
-// TODO: add some more test when we support some
+//-------------------------------------------------------------------------------------------------
 
+class StunMessageParser:
+    public ::testing::Test
+{
+protected:
+    void whenParseMultipleJunkPackets()
+    {
+        for (int i = 0; i < 10; ++i)
+            whenParseJunkPacket();
+    }
+
+    void whenParseJunkPacket()
+    {
+        m_bufferToParse = nx::utils::random::generate(
+            nx::utils::random::number<int>(1, 1024));
+
+        whenPacketIsInvoked();
+        thenParseDidNotSucceed();
+    }
+
+    void whenPacketIsInvoked()
+    {
+        m_parsedMessage = Message();
+        m_parser.setMessage(&m_parsedMessage);
+        std::size_t bytesRead = 0;
+        m_prevParseResult = m_parser.parse(m_bufferToParse, &bytesRead);
+    }
+
+    void thenParserIsAbleToParseCorrectPacket()
+    {
+        prepareCorrectStunPacket();
+        whenPacketIsInvoked();
+        thenParseSucceeded();
+    }
+
+    void thenParseSucceeded()
+    {
+        ASSERT_EQ(nx_api::ParserState::done, m_prevParseResult);
+    }
+
+    void thenParseDidNotSucceed()
+    {
+        ASSERT_NE(nx_api::ParserState::done, m_prevParseResult);
+    }
+
+private:
+    Message m_messageToParse;
+    Message m_parsedMessage;
+    MessageParser m_parser;
+    nx::Buffer m_bufferToParse;
+    nx_api::ParserState m_prevParseResult = nx_api::ParserState::init;
+
+    void prepareCorrectStunPacket()
+    {
+        m_messageToParse = Message(Header(MessageClass::request, MethodType::bindingMethod));
+        m_messageToParse.header.transactionId = Buffer::fromHex(DEFAULT_TID);
+     
+        MessageSerializer serializer;
+        serializer.setMessage(&m_messageToParse);
+        m_bufferToParse.clear();
+        m_bufferToParse.reserve(16*1024);
+        size_t serializedSize = 0;
+        ASSERT_EQ(
+            serializer.serialize(&m_bufferToParse, &serializedSize),
+            nx_api::SerializerState::done);
+    }
+};
+
+TEST_F(StunMessageParser, is_able_to_parse_after_junk_message)
+{
+    whenParseMultipleJunkPackets();
+    thenParserIsAbleToParseCorrectPacket();
+}
+
+} // namespace test
 } // namespase stun
 } // namespase nx
