@@ -23,7 +23,7 @@ namespace cloud {
 /**
  * Connects to any accessible address from the address list provided.
  */
-class NX_NETWORK_API MultipleAddressConnector:
+class NX_NETWORK_API AnyAccessibleAddressConnector:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
@@ -34,7 +34,7 @@ public:
         boost::optional<TunnelAttributes> /*cloudTunnelAttributes*/,
         std::unique_ptr<AbstractStreamSocket>)>;
 
-    MultipleAddressConnector(
+    AnyAccessibleAddressConnector(
         int ipVersion,
         std::deque<AddressEntry> entries);
 

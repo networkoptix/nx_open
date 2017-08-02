@@ -951,7 +951,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(moduleGuid);
+    QString simplifiedGUID = moduleGuid.toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
