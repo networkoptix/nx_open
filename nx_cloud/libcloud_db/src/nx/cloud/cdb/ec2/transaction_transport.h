@@ -11,6 +11,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
+#include "abstract_transaction_transport.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_log_reader.h"
@@ -22,18 +23,21 @@ namespace ec2 {
 
 class TransactionLog;
 
-class TransactionTransport:
-    public ::ec2::QnTransactionTransportBase
+struct ConnectionRequestAttributes
 {
-    typedef ::ec2::QnTransactionTransportBase ParentType;
+    nx::String connectionId;
+    ::ec2::ApiPeerData remotePeer;
+    nx::String contentEncoding;
+    int remotePeerProtocolVersion = 0;
+};
+
+class TransactionTransport:
+    public QObject,
+    public AbstractTransactionTransport
+{
+    using base_type = AbstractTransactionTransport;
 
 public:
-    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectionClosedEventHandler;
-    typedef nx::utils::MoveOnlyFunc<void(
-        Qn::SerializationFormat,
-        const QByteArray&,
-        TransactionTransportHeader)> GotTransactionEventHandler;
-
     /**
      * Initializer for incoming connection.
      */
@@ -41,21 +45,30 @@ public:
         nx::network::aio::AbstractAioThread* aioThread,
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         TransactionLog* const transactionLog,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
         const nx::String& systemId,
-        const nx::String& connectionId,
         const ::ec2::ApiPeerData& localPeer,
-        const ::ec2::ApiPeerData& remotePeer,
         const SocketAddress& remotePeerEndpoint,
-        const nx_http::Request& request,
-        const QByteArray& contentEncoding);
+        const nx_http::Request& request);
     virtual ~TransactionTransport();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    /** Set handler to be executed when tcp connection is closed. */
-    void setOnConnectionClosed(ConnectionClosedEventHandler handler);
-    void setOnGotTransaction(GotTransactionEventHandler handler);
+    virtual SocketAddress remoteSocketAddr() const override;
+    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
+    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual QnUuid connectionGuid() const override;
+    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
+    virtual void sendTransaction(
+        TransactionTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+
+    void receivedTransaction(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData);
+
+    void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
 
     void startOutgoingChannel();
 
@@ -74,19 +87,8 @@ public:
         ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
         TransactionProcessedHandler handler);
 
-    void sendTransaction(
-        TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer);
-
-    const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const;
-
-protected:
-    virtual void fillAuthInfo(
-        const nx_http::AsyncHttpClientPtr& httpClient,
-        bool authByKey) override;
-    virtual void onSomeDataReceivedFromRemotePeer() override;
-
 private:
+    ::ec2::QnTransactionTransportBase m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
@@ -130,6 +132,7 @@ private:
 
     void enableOutputChannel();
 
+    void restartInactivityTimer();
     void onInactivityTimeout();
 
     template<class T>

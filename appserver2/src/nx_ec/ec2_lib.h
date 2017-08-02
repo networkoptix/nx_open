@@ -22,6 +22,7 @@ extern "C"
     ec2::AbstractECConnectionFactory* getConnectionFactory(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        bool isP2pMode);
 }
 

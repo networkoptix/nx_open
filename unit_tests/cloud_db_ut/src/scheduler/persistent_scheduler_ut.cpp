@@ -144,6 +144,7 @@ protected:
             new nx::cdb::PersistentScheduler(&executor, &dbHelper));
 
         user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), functorId));
+        user->registerAsAnEventReceiver();
         scheduler->start();
     }
 
