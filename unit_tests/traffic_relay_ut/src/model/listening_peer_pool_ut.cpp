@@ -111,7 +111,7 @@ protected:
 
     void whenCloseAllConnections()
     {
-        for (int i = 0; i < m_peerConnections.size(); ++i)
+        for (std::size_t i = 0; i < m_peerConnections.size(); ++i)
             m_peerConnections[i]->setConnectionToClosedState();
     }
 

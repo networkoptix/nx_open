@@ -1,5 +1,7 @@
 #include "async_client.h"
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
@@ -21,10 +23,12 @@ AsyncClient::AsyncClient(
     :
     AsyncClient(timeouts)
 {
-    m_endpoint = tcpConnection->getForeignAddress();
-
-    bindToAioThread(tcpConnection->getAioThread());
-    initializeMessagePipeline(std::move(tcpConnection));
+    if (tcpConnection)
+    {
+        m_endpoint = tcpConnection->getForeignAddress();
+        bindToAioThread(tcpConnection->getAioThread());
+        initializeMessagePipeline(std::move(tcpConnection));
+    }
 }
 
 void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -39,15 +43,16 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 }
 
 void AsyncClient::connect(
-    SocketAddress endpoint,
-    bool useSsl,
-    ConnectHandler handler)
+    const QUrl& url,
+    ConnectHandler completionHandler)
 {
+    const auto endpoint = nx::network::url::getEndpoint(url);
+
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = useSsl;
+    m_useSsl = url.scheme() == "stuns";
     NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(handler);
+    m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);
 }
 
@@ -435,6 +440,9 @@ void AsyncClient::processMessage(Message message)
         case MessageClass::indication:
         {
             auto it = m_indicationHandlers.find( message.header.method );
+            if (it == m_indicationHandlers.end())
+                it = m_indicationHandlers.find(kEveryIndicationMethod); //< Default indication handler.
+
             if( it != m_indicationHandlers.end() )
             {
                 auto handler = it->second;

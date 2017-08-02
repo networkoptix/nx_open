@@ -8,6 +8,8 @@
 namespace nx {
 namespace stun {
 
+constexpr int kEveryIndicationMethod = 0;
+
 class NX_NETWORK_API AbstractAsyncClient:
     public network::aio::BasicPollable
 {
@@ -40,18 +42,18 @@ public:
     /**
      * Asynchronously opens connection to the server.
      *
-     * @param endpoint Address to use.
+     * @param url stun::/hostname:port/
      * @param handler Is called when 1st connection attempt has passed regadless of it's success.
      * NOTE: shall be called only once (to provide address) reconnect will
      *      happen automatically.
      */
-    virtual void connect(
-        SocketAddress endpoint, bool useSsl = false, ConnectHandler handler = nullptr) = 0;
+    virtual void connect(const QUrl& url, ConnectHandler handler = nullptr) = 0;
 
     /**
      * Subscribes for certain indications.
      *
-     * @param method Is monitoring indication type.
+     * @param method Indication method of interest. 
+     *    Use kEveryIndicationMethod constant to install handler that will received all unhandled indications.
      * @param handler Will be called for each indication message.
      * @param client Can be used to cancel subscription.
      * @return true on success, false if this methed is already monitored.
