@@ -199,6 +199,9 @@ function(get_dependencies)
         nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
         nx_rdep_add_package(opengl-es-mali)
     endif()
+
+    nx_rdep_add_package("any/certificates-${customization}" PATH_VARIABLE certificates_path)
+    set(certificates_path ${certificates_path} PARENT_SCOPE)
 endfunction()
 
 detect_package_versions()
