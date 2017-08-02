@@ -13,7 +13,6 @@
 {% endblock %}
 
 {% block content%}
-<h1>{{ context.name }} for {{ context.product.name }}</h1>
 <fieldset>
     <div>{{ context.description }}</div>
     {% if context.url %}
@@ -41,7 +40,7 @@
                 {{ field }}
                 
                 {% if field.help_text %}
-                <p class="help">{{ field.help_text }}</p>
+                <p class="help">{{ field.help_text|safe }}</p>
                 {% endif %}
             </div>
         </div>
