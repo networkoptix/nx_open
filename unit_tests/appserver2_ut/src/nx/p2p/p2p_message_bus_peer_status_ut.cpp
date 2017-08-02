@@ -12,7 +12,6 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 
 namespace nx {
@@ -87,7 +86,6 @@ protected:
 
     void startAllServers(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
     {
-        const_cast<bool&>(ec2::ini().isP2pMode) = true;
         startServers(kServerCount);
         for (const auto& server : m_servers)
         {

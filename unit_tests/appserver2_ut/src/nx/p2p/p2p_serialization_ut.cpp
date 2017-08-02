@@ -2,6 +2,7 @@
 
 #include <utils/media/bitStream.h>
 #include <nx/p2p/p2p_serialization.h>
+#include <nx_ec/data/api_tran_state_data.h>
 
 namespace nx {
 namespace p2p {
@@ -106,6 +107,25 @@ TEST(P2pSerialization, SubscribeRequest)
     bool success = false;
     auto deserializedPeers = deserializeSubscribeRequest(expectedData, &success);
     QByteArray actualData = serializeSubscribeRequest(deserializedPeers, 0);
+    ASSERT_TRUE(success);
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
+}
+
+TEST(P2pSerialization, SubscribeAllRequest)
+{
+    using namespace nx::p2p;
+
+    ec2::QnTranState tranState;
+    for (int i = 0; i < 100; ++i)
+    {
+        tranState.values.insert(
+            ec2::ApiPersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
+    }
+
+    QByteArray expectedData = serializeSubscribeAllRequest(tranState, 0);
+    bool success = false;
+    auto deserializedState = deserializeSubscribeAllRequest(expectedData, &success);
+    QByteArray actualData = serializeSubscribeAllRequest(deserializedState, 0);
     ASSERT_TRUE(success);
     ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }

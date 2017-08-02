@@ -26,12 +26,18 @@ enum class MessageType
     resolvePeerNumberRequest,
     resolvePeerNumberResponse,
     alivePeers,
-    subscribeForDataUpdates,
+    subscribeForDataUpdates, //< Subscribe for specified ID numbers
     pushTransactionData, //< transaction data
     pushTransactionList, //< for UbJson format only. transaction list
     pushImpersistentBroadcastTransaction, //< transportHeader + transaction data
     pushImpersistentUnicastTransaction, //< transportHeader + transaction data
 
+    /**
+     * Subscribe for all data updates. This request contains current peer state.
+     * Foreign peer MUST send all its data above described state. Unlike 'subscribeForDataUpdates'
+     * this request sends all other data which are not mentioned in request.
+     */
+    subscribeAll,
     counter
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MessageType)

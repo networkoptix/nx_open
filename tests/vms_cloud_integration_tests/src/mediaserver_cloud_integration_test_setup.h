@@ -4,8 +4,18 @@
 #include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_client.h"
+#include <gtest/gtest.h>
 
-class MediaServerCloudIntegrationTest
+struct TestParams
+{
+    TestParams() {}
+    TestParams(bool p2pMode) : p2pMode(p2pMode) {}
+
+    bool p2pMode = false;
+};
+
+class MediaServerCloudIntegrationTest:
+    public ::testing::TestWithParam<TestParams>
 {
 public:
     MediaServerCloudIntegrationTest();

@@ -3,13 +3,16 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/public_ip_discovery.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
+#include <nx/casssandra/async_cassandra_connection.h>
 
 #include "traffic_relay.h"
 #include "../model/client_session_pool.h"
 #include "../model/listening_peer_pool.h"
+#include "../model/remote_relay_peer_pool.h"
 #include "../settings.h"
 
 namespace nx {
@@ -21,13 +24,83 @@ ConnectSessionManager::ConnectSessionManager(
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
-    controller::AbstractTrafficRelay* trafficRelay)
+    controller::AbstractTrafficRelay* trafficRelay,
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool)
     :
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
-    m_trafficRelay(trafficRelay)
+    m_trafficRelay(trafficRelay),
+    m_remoteRelayPool(std::move(remoteRelayPool))
 {
+    discoverPublicIp();
+
+    nx::utils::SubscriptionId subscriptionId;
+    m_listeningPeerPool->peerConnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->addPeer(peer, m_publicIpString)
+                .then(
+                    [this, peer](cf::future<bool> addPeerFuture)
+                    {
+                        if (addPeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+
+    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->removePeer(peer)
+                .then(
+                    [this, peer](cf::future<bool> removePeerFuture)
+                    {
+                        if (removePeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+}
+
+void ConnectSessionManager::discoverPublicIp()
+{
+    network::PublicIPDiscovery ipDiscovery;
+    ipDiscovery.update();
+    ipDiscovery.waitForFinished();
+    auto publicAddress = ipDiscovery.publicIP();
+
+    if (publicAddress.isNull())
+    {
+        NX_ERROR(this, "Failed to discover public relay host address.");
+        return;
+    }
+
+    m_publicIpString = publicAddress.toString().toStdString();
 }
 
 ConnectSessionManager::~ConnectSessionManager()
@@ -44,6 +117,9 @@ ConnectSessionManager::~ConnectSessionManager()
 
     for (auto& relaySession: relaySessions)
         relaySession.listeningPeerConnection->pleaseStopSync();
+
+    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
+        m_listeningPeerPool->peerConnectedSubscription().removeSubscription(subscriptionId);
 }
 
 void ConnectSessionManager::beginListening(
@@ -80,13 +156,10 @@ void ConnectSessionManager::beginListening(
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectSessionManager::saveServerConnection, this, 
+        std::bind(&ConnectSessionManager::saveServerConnection, this,
             request.peerName, _1);
 
-    completionHandler(
-        api::ResultCode::ok,
-        std::move(response),
-        std::move(connectionEvents));
+    completionHandler(api::ResultCode::ok, std::move(response), std::move(connectionEvents));
 }
 
 void ConnectSessionManager::createClientSession(
@@ -97,24 +170,40 @@ void ConnectSessionManager::createClientSession(
         .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG2);
 
     api::CreateClientSessionResponse response;
-    response.sessionTimeout = 
+    response.sessionTimeout =
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
-    const auto peerName = 
-        m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
-    if (peerName.empty())
+    const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
+    if (!peerName.empty())
     {
-        NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-            .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG1);
-        return completionHandler(
-            api::ResultCode::notFound,
-            std::move(response));
+        response.sessionId = m_clientSessionPool->addSession(request.desiredSessionId, peerName);
+        completionHandler(api::ResultCode::ok, std::move(response));
+
+        return;
     }
 
-    response.sessionId = m_clientSessionPool->addSession(
-        request.desiredSessionId, peerName);
-    completionHandler(api::ResultCode::ok, std::move(response));
+    m_remoteRelayPool->findRelayByDomain(request.targetPeerName)
+        .then(
+            [completionHandler = std::move(completionHandler), response = std::move(response),
+            request, this](
+                cf::future<std::string> findRelayFuture) mutable
+            {
+                response.redirectHost = findRelayFuture.get();
+                if (response.redirectHost.empty())
+                {
+                    NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
+                        .arg(request.desiredSessionId)
+                        .arg(request.targetPeerName));
+                    completionHandler(api::ResultCode::notFound, std::move(response));
+
+                    return cf::unit();
+                }
+                completionHandler(api::ResultCode::needRedirect, std::move(response));
+
+                return cf::unit();
+
+            });
 }
 
 void ConnectSessionManager::connectToPeer(
@@ -175,7 +264,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
             cl_logDEBUG1);
         return completionHandler(resultCode, nx_http::ConnectionEvents());
     }
-    
+
     NX_LOGX(lm("Session %1. Got listening peer %2 connection")
         .arg(connectSessionId).arg(listeningPeerName), cl_logDEBUG2);
 
@@ -183,7 +272,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        [this, connectSessionId, listeningPeerName, 
+        [this, connectSessionId, listeningPeerName,
             listeningPeerConnection = std::move(listeningPeerConnection)](
                 nx_http::HttpServerConnection* httpConnection) mutable
         {
@@ -238,7 +327,7 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
 {
     RelaySession relaySession;
 
-    // TODO: #ak Make lock shorter. Handle cancellation problem: 
+    // TODO: #ak Make lock shorter. Handle cancellation problem:
     // element from m_relaySessions is removed and destructor does not wait for this session completion.
     QnMutexLocker lock(&m_mutex);
 
@@ -289,11 +378,14 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
 {
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
+
     return std::make_unique<ConnectSessionManager>(
-        settings, clientSessionPool, listeningPeerPool, trafficRelay);
+        settings, clientSessionPool, listeningPeerPool, trafficRelay,
+        std::make_unique<model::RemoteRelayPeerPool>(
+            settings.cassandraHost().toLatin1().constData()));
 }
 
-ConnectSessionManagerFactory::FactoryFunc 
+ConnectSessionManagerFactory::FactoryFunc
     ConnectSessionManagerFactory::setFactoryFunc(
         ConnectSessionManagerFactory::FactoryFunc func)
 {
