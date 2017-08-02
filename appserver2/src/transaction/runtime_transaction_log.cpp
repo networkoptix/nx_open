@@ -15,6 +15,8 @@ QnRuntimeTransactionLog::QnRuntimeTransactionLog(
     const auto& manager = commonModule->runtimeInfoManager();
     connect(manager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
     connect(manager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+
+    at_runtimeInfoChanged(commonModule->runtimeInfoManager()->localInfo());
 }
 
 QnRuntimeTransactionLog::~QnRuntimeTransactionLog()
