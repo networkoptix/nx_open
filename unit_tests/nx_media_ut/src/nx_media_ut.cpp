@@ -52,7 +52,8 @@ public:
 
     virtual ~MockVideoDecoder() {}
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
+    static bool isCompatible(
+        const AVCodecID codec, const QSize& resolution, bool /*useHardwareDecoder*/)
     {
         if (!s_maxResolution.isEmpty()
             && (resolution.width() > s_maxResolution.width()

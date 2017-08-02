@@ -219,6 +219,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         while (m_videoDecoders.size() <= videoChannel)
         {
             auto videoDecoder = new SeamlessVideoDecoder();
+            videoDecoder->setUseHardwareDecoder(m_useHardwareDecoder);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
         }
@@ -463,6 +464,11 @@ qint64 PlayerDataConsumer::getExternalTime() const
 void PlayerDataConsumer::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
+}
+
+void PlayerDataConsumer::setUseHardwareDecoder(bool value)
+{
+    m_useHardwareDecoder = value;
 }
 
 } // namespace media

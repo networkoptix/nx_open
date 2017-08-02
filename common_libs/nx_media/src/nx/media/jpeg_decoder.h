@@ -20,7 +20,8 @@ class JpegDecoder: public AbstractVideoDecoder
 public:
     JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution);
+    static bool isCompatible(
+        const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder);
 
     static QSize maxResolution(const AVCodecID codec);
 

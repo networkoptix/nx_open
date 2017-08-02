@@ -159,6 +159,8 @@ public:
     // See property comment.
     int videoQuality;
 
+    bool useHardwareDecoder;
+
     // Video geometry inside the application window.
     QRect videoGeometry;
 
@@ -229,6 +231,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     underflowCounter(0),
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
+    useHardwareDecoder(true),
     isAudioEnabled(true)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
@@ -623,7 +626,8 @@ void PlayerPrivate::applyVideoQuality()
         videoQuality,
         liveMode,
         positionMs,
-        camera);
+        camera,
+        useHardwareDecoder);
 
     if (quality == media_player_quality_chooser::kQualityHigh)
     {
@@ -675,6 +679,7 @@ bool PlayerPrivate::initDataProvider()
     applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
+    dataConsumer->setUseHardwareDecoder(useHardwareDecoder);
 
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
@@ -1028,6 +1033,26 @@ Player::VideoQuality Player::actualVideoQuality() const
         default:
             return HighVideoQuality;
     }
+}
+
+bool Player::useHardwareDecoder() const
+{
+    Q_D(const Player);
+    return d->useHardwareDecoder;
+}
+
+void Player::setUseHardwareDecoder(bool useHardwareDecoder)
+{
+    Q_D(Player);
+
+    if (d->useHardwareDecoder == useHardwareDecoder)
+    {
+        d->log(lit("setUseHardwareDecoder(%1): no change, ignoring").arg(useHardwareDecoder));
+        return;
+    }
+    d->log(lit("setUseHardwareDecoder(%1)").arg(useHardwareDecoder));
+    d->useHardwareDecoder = useHardwareDecoder;
+    emit useHardwareDecoderChanged();
 }
 
 QSize Player::currentResolution() const

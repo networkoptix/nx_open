@@ -74,8 +74,17 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 {
 }
 
-bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
+bool ProxyVideoDecoder::isCompatible(
+    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
 {
+    const auto loggedCall =
+        [&](bool returnValue)
+        {
+            return lm("isCompatible(%1, %2 x %3, useHardwareDecoder: %4) -> %5")
+                .strs(avcodec_get_name(codec), resolution.width(), resolution.height(),
+                    useHardwareDecoder, returnValue);
+        };
+
     static bool calledOnce = false;
     if (!calledOnce)
     {
@@ -86,43 +95,45 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
 
     if (conf.disable)
     {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.disable is set";
+        PRINT << loggedCall(false) << ": conf.disable is set";
         return false;
+    }
+
+    if (!useHardwareDecoder)
+    {
+        if (!conf.largeOnly)
+        {
+            PRINT << "isCompatible() ignores useHardwareDecoder because conf.largeOnly is set";
+        }
+        else
+        {
+            OUTPUT << loggedCall(false) << ": useHardwareDecoder is false";
+            return false;
+        }
     }
 
     // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
     if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: only even width and height is supported";
+        OUTPUT << loggedCall(false) << ": only even width and height is supported";
         return false;
     }
 
-    QSize maxRes = maxResolution(codec);
+    const QSize& maxRes = maxResolution(codec);
     if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: resolution is higher than " 
+        OUTPUT << loggedCall(false) << ": resolution is higher than "
             << maxRes.width() << " x " << maxRes.height();
         return false;
     }
 
     if (codec != AV_CODEC_ID_H264)
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: codec != AV_CODEC_ID_H264";
+        OUTPUT << loggedCall(false) << ": Only codec AV_CODEC_ID_H264 is supported";
         return false;
     }
 
-    if (conf.largeOnly && resolution.width() <= 640)
-    {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.largeOnly is set";
-        return false;
-    }
-
-    OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution << ") -> true";
+    OUTPUT << loggedCall(true);
     return true;
 }
 

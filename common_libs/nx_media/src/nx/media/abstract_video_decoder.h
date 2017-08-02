@@ -31,26 +31,25 @@ public:
     virtual ~AbstractVideoDecoder() = default;
 
     /**
-     * This function should be overridden despite static keyword. Otherwise it is a compile error.
+     * Used from a template; should be overridden despite being static.
      * @return True if the decoder is compatible with the provided parameters.
      */
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
+    static bool isCompatible(
+        const AVCodecID /*codec*/, const QSize& /*resolution*/, bool /*useHardwareDecoder*/)
     {
-        QN_UNUSED(codec, resolution);
         return false;
     }
 
     /**
-     * This function should be overridden despite static keyword. Otherwise it is a compile error.
+     * Used from a template; should be overridden despite being static.
      * ATTENTION: The definition of maximum for resolution is left somewhat fuzzy: complete
      * implementation would probably require to define the maximum as a set of resolutions with
      * either maximum width or maximum height (similar to how Android does it).
      * @return Max supported resolution for the specified codec, or Invalid if there is no limit or
      * the codec is not supported.
      */
-    static QSize maxResolution(const AVCodecID codec)
+    static QSize maxResolution(const AVCodecID /*codec*/)
     {
-        QN_UNUSED(codec);
         return QSize();
     }
 

@@ -29,7 +29,10 @@ public:
 
     virtual ~SeamlessVideoDecoder();
 
-    /** Should be called before other methods; needed by some decoders, e.g. hw-based. */
+    /** Should be called before first decode(). */
+    void setUseHardwareDecoder(bool value);
+
+    /** Should be called before first decode(); needed by some decoders, e.g. hw-based. */
     void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
 
     /**

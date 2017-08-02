@@ -88,6 +88,8 @@ class Player: public QObject
      */
     Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality NOTIFY videoQualityChanged)
 
+    Q_PROPERTY(bool useHardwareDecoder READ useHardwareDecoder WRITE setUseHardwareDecoder NOTIFY useHardwareDecoderChanged)
+
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
      */
@@ -176,10 +178,14 @@ public:
 
     int videoQuality() const;
     void setVideoQuality(int videoQuality);
+
     /**
      * @return Video quality of the video stream being played back. May differ from videoQuality().
      */
     Q_INVOKABLE VideoQuality actualVideoQuality() const;
+
+    bool useHardwareDecoder() const;
+    void setUseHardwareDecoder(bool useHardwareDecoder);
 
     QSize currentResolution() const;
 
@@ -213,6 +219,7 @@ signals:
     void liveModeChanged();
     void aspectRatioChanged();
     void videoQualityChanged();
+    void useHardwareDecoderChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();

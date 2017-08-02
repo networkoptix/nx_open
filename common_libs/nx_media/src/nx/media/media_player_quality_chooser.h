@@ -39,7 +39,8 @@ public:
         int videoQuality,
         bool liveMode,
         qint64 positionMs,
-        const QnVirtualCameraResourcePtr& camera);
+        const QnVirtualCameraResourcePtr& camera,
+        bool useHardwareDecoder);
 
 private:
     media_player_quality_chooser() = delete;
@@ -49,6 +50,7 @@ private:
         bool liveMode,
         qint64 positionMs,
         const QnVirtualCameraResourcePtr& camera,
+        bool useHardwareDecoder,
         AVCodecID highCodec,
         const QSize& highResolution,
         const QnConstResourceVideoLayoutPtr& videoLayout);

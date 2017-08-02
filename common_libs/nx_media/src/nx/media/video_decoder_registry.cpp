@@ -20,14 +20,15 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 }
 
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution)
+    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
 {
     QMutexLocker lock(&mutex);
 
     static std::map<AbstractVideoDecoder*, Metadata*> decodersInUse;
     for (auto& plugin: m_plugins)
     {
-        if (plugin.useCount < plugin.maxUseCount && plugin.isCompatible(codec, resolution))
+        if (plugin.useCount < plugin.maxUseCount
+            && plugin.isCompatible(codec, resolution, useHardwareDecoder))
         {
             auto videoDecoder = VideoDecoderPtr(
                 plugin.createVideoDecoder(plugin.allocator, resolution),
@@ -50,13 +51,17 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     return VideoDecoderPtr(nullptr, nullptr); //< no compatible decoder found
 }
 
-bool VideoDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution)
+bool VideoDecoderRegistry::hasCompatibleDecoder(
+    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
 {
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
+        if (plugin.isCompatible(codec, resolution, useHardwareDecoder)
+            && plugin.useCount < plugin.maxUseCount)
+        {
             return true;
+        }
     }
     return false;
 }
