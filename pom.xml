@@ -203,7 +203,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloudGroup>test</cloudGroup>
-        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
+        <certificates_dir>${packages.dir}/any/certificates-${customization}</certificates_dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -776,7 +776,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -823,7 +823,7 @@
             </modules>
             <properties>
                 <modification>ubuntu</modification>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
         </profile>
 
