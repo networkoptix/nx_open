@@ -12,7 +12,6 @@ static const nxpl::GUID IID_CompressedAudio
 class AbstractCompressedAudioData: public AbstractCompressedMediaPacket
 {
 public:
-    virtual int duration() const  = 0;
 };
 
 } // namespace metadata

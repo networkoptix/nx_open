@@ -25,12 +25,14 @@ class AbstractMetadataManager: nxpl::PluginInterface
 {
 public:
     virtual ~AbstractMetadataHandler() {}
-    virtual void setHandler(AbstractMetadataHandler* handler) = 0;
 
-    virtual Error startFetchingMetadata() = 0;
+    /**
+     * AbstractMetadataManager will call @param handler when it gets new metadata.
+     **/
+    virtual Error startFetchingMetadata(AbstractMetadataHandler* handler) = 0;
     virtual Error stopFetchingMetadata() = 0;
 
-    virtual Error capabiltiesManifest(char* buffer, int* bufferSize);
+    virtual Error capabiltiesManifest(char* buffer, int* inOutBufferSize);
 };
 
 } // namespace metadata
