@@ -272,7 +272,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto tunnelAcceptorFactoryFuncBak =
         TunnelAcceptorFactory::instance().setCustomFunc(
             [&addressManager](
-                const SocketAddress& mediatorUdpEndpoint,
+                const SocketAddress& /*mediatorUdpEndpoint*/,
                 hpm::api::ConnectionRequestedEvent)
             {
                 std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
@@ -287,7 +287,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         });
 
     PredefinedMediatorConnector mediatorConnector(
-        *nx::network::SocketGlobals::mediatorConnector().udpEndpoint(),
+        stunAsyncClient->remoteAddress(),
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::mediatorConnector()));
@@ -378,7 +378,7 @@ protected:
                 });
 
         m_mediatorConnector = std::make_unique<PredefinedMediatorConnector>(
-            *SocketGlobals::mediatorConnector().udpEndpoint(),
+            m_stunClient->remoteAddress(),
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
                 &SocketGlobals::mediatorConnector()));
@@ -504,17 +504,23 @@ protected:
         m_stunClient->emulateIndication(message);
     }
 
-    void readOnClient(AbstractStreamSocket* socket, const SocketAddress& peer)
+    void readOnClient(AbstractStreamSocket* socketPtr, const SocketAddress& peer)
     {
         auto buffer = std::make_shared<Buffer>();
         buffer->reserve(network::test::kTestMessage.size() + 1);
-        socket->readSomeAsync(
+        socketPtr->readSomeAsync(
             buffer.get(),
             [=](SystemError::ErrorCode code, size_t size)
             {
+                std::unique_ptr<AbstractStreamSocket> socket;
                 {
                     QnMutexLocker lock(&m_mutex);
-                    m_connectSockets.erase(socket);
+                    auto socketIt = m_connectSockets.find(socketPtr);
+                    if (socketIt != m_connectSockets.end())
+                    {
+                        socket = std::move(socketIt->second);
+                        m_connectSockets.erase(socketIt);
+                    }
                 }
 
                 if (code != SystemError::noError ||

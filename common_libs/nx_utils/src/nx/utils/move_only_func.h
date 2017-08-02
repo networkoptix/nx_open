@@ -46,7 +46,7 @@ class MoveOnlyFunc:
         {
         }
 
-        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs) noexcept
+        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs)
         {
             if (&rhs == this)
                 return *this;

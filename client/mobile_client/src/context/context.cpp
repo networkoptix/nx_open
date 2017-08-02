@@ -245,7 +245,7 @@ QUrl QnContext::getWebSocketUrl() const
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
-    //TODO: #GDM do we need store temporary credentials here?
+    // TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
     cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));

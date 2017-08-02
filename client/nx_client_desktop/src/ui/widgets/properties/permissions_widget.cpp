@@ -26,7 +26,7 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     NX_ASSERT(m_permissionsModel);
     ui->setupUi(this);
 
-    //TODO: #GDM think where to store flags set to avoid duplication
+    // TODO: #GDM think where to store flags set to avoid duplication
 
     /* Manager permissions. */
     addCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"),

@@ -1,28 +1,25 @@
 #include "password_strength_indicator.h"
 
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QLineEdit>
 
-#include <ui/common/widget_anchor.h>
 #include <ui/style/nx_style.h>
-
 #include <utils/common/connective.h>
-#include <utils/common/event_processors.h>
+
+#include <nx/client/desktop/ui/common/line_edit_controls.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace
 {
-    /* Margins outside of indicator rectangle: */
-    const QMargins kDefaultIndicatorMargins(6, 6, 6, 6);
-
     /* Rounding radius of indicator rectangle: */
-    const qreal kDefaultRoundingRadius = 2.5;
+    static constexpr qreal kDefaultRoundingRadius = 2.5;
 
-    /* Text horizontal margins inside indicator rectangle: */
-    const int kDefaultTextMargins = 8;
+    /* Text margins inside indicator rectangle: */
+    static const QMargins kDefaultTextMargins(4, 3, 4, 2);
 
     /* Minimum width of indicator rectangle: */
-    const int kDefaultMinimumWidth = 40;
+    static constexpr int kMinimumWidth = 40;
 }
 
 /*
@@ -34,42 +31,8 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
     QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
         lineEdit(lineEdit),
         currentInformation(lineEdit->text()),
-        roundingRadius(kDefaultRoundingRadius),
-        textMargins(kDefaultTextMargins),
-        anchor(new QnWidgetAnchor(q)),
-        lineEditContentsMargins(lineEdit->contentsMargins()),
-        eventSignalizer(nullptr),
         q_ptr(q)
     {
-        eventSignalizer = installEventHandler(lineEdit,
-            { QEvent::ContentsRectChange, QEvent::LayoutDirectionChange }, q,
-            [this](QObject* object, QEvent* event)
-            {
-                Q_UNUSED(object);
-                switch (event->type())
-                {
-                    case QEvent::ContentsRectChange:
-                    {
-                        lineEditContentsMargins = this->lineEdit->contentsMargins();
-                        break;
-                    }
-
-                    case QEvent::LayoutDirectionChange:
-                    {
-                        anchor->setEdges(anchorEdges());
-                        updateIndicator();
-                        break;
-                    }
-
-                    default:
-                        break;
-                }
-            });
-
-        NX_ASSERT(eventSignalizer);
-
-        anchor->setEdges(anchorEdges());
-
         connect(lineEdit, &QLineEdit::textChanged, q,
             [this](const QString& text)
             {
@@ -88,44 +51,27 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
             return;
 
         Q_Q(QnPasswordStrengthIndicator);
-        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine, currentInformation.text());
-        q->resize(qMax(textSize.width() + textMargins, q->minimumWidth()), q->height());
+        auto size = q->fontMetrics().size(Qt::TextSingleLine, currentInformation.text());
+        size.setWidth(qMax(kMinimumWidth, size.width() + textMargins.left() + textMargins.right()));
+        size.setHeight(size.height() + textMargins.top() + textMargins.bottom());
 
-        int extraContentMargin = q->width() + q->indicatorMargins().right() * 2;
-        QMargins newMargins = lineEditContentsMargins;
-
-        if (lineEdit->layoutDirection() == Qt::RightToLeft)
-            newMargins.setLeft(qMax(newMargins.left(), extraContentMargin));
-        else
-            newMargins.setRight(qMax(newMargins.right(), extraContentMargin));
-
-        QSignalBlocker blockEventSignals(eventSignalizer);
-        lineEdit->setContentsMargins(newMargins);
+        if (minimumSizeHint != size)
+        {
+            minimumSizeHint = size;
+            q->updateGeometry();
+        }
 
         q->setToolTip(currentInformation.hint());
-
         q->update();
-    }
-
-    Qt::Edges anchorEdges() const
-    {
-        NX_ASSERT(lineEdit);
-        Qt::LayoutDirection dir = lineEdit->layoutDirection();
-        const int vertical = Qt::TopEdge | Qt::BottomEdge;
-        const int horizontal = (dir == Qt::RightToLeft) ? Qt::LeftEdge : Qt::RightEdge;
-        return Qt::Edges(horizontal | vertical);
     }
 
     QPointer<QLineEdit> lineEdit;
     QnPasswordInformation currentInformation;
 
     QnPasswordStrengthColors colors;
-    qreal roundingRadius;
-    int textMargins;
-
-    QnWidgetAnchor* anchor;
-    QMargins lineEditContentsMargins;
-    QnAbstractEventSignalizer* eventSignalizer;
+    qreal roundingRadius = kDefaultRoundingRadius;
+    QMargins textMargins = kDefaultTextMargins;
+    QSize minimumSizeHint;
 
     QnPasswordStrengthIndicator* q_ptr;
     Q_DECLARE_PUBLIC(QnPasswordStrengthIndicator)
@@ -135,8 +81,8 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 * QnPasswordStrengthIndicator
 */
 
-QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(QLineEdit* lineEdit) :
-    base_type(lineEdit),
+QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(QLineEdit* lineEdit):
+    base_type(),
     d_ptr(new QnPasswordStrengthIndicatorPrivate(this, lineEdit))
 {
     QFont textFont = font();
@@ -144,11 +90,12 @@ QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(QLineEdit* lineEdit) :
     textFont.setBold(true);
     textFont.setCapitalization(QFont::AllUppercase);
     setFont(textFont);
-
     setCursor(Qt::ArrowCursor);
 
-    setMinimumWidth(kDefaultMinimumWidth);
-    setIndicatorMargins(kDefaultIndicatorMargins);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    d_ptr->updateIndicator();
+
+    LineEditControls::get(lineEdit)->addControl(this);
 }
 
 QnPasswordStrengthIndicator::~QnPasswordStrengthIndicator()
@@ -177,19 +124,6 @@ void QnPasswordStrengthIndicator::setColors(const QnPasswordStrengthColors& colo
     update();
 }
 
-const QMargins& QnPasswordStrengthIndicator::indicatorMargins() const
-{
-    Q_D(const QnPasswordStrengthIndicator);
-    return d->anchor->margins();
-}
-
-void QnPasswordStrengthIndicator::setIndicatorMargins(const QMargins& margins)
-{
-    Q_D(QnPasswordStrengthIndicator);
-    d->anchor->setMargins(margins);
-    d->updateIndicator();
-}
-
 qreal QnPasswordStrengthIndicator::roundingRadius() const
 {
     Q_D(const QnPasswordStrengthIndicator);
@@ -206,19 +140,19 @@ void QnPasswordStrengthIndicator::setRoundingRadius(qreal radius)
     update();
 }
 
-int QnPasswordStrengthIndicator::textMargins() const
+QMargins QnPasswordStrengthIndicator::textMargins() const
 {
     Q_D(const QnPasswordStrengthIndicator);
     return d->textMargins;
 }
 
-void QnPasswordStrengthIndicator::setTextMargins(int margins)
+void QnPasswordStrengthIndicator::setTextMargins(const QMargins& value)
 {
     Q_D(QnPasswordStrengthIndicator);
-    if (d->textMargins == margins)
+    if (d->textMargins == value)
         return;
 
-    d->textMargins = margins;
+    d->textMargins = value;
     d->updateIndicator();
 }
 
@@ -247,9 +181,19 @@ void QnPasswordStrengthIndicator::paintEvent(QPaintEvent* event)
     painter.setPen(Qt::NoPen);
     painter.setBrush(background);
 
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.drawRoundedRect(rect().adjusted(0.5, 0.5, -0.5, -0.5), d->roundingRadius, d->roundingRadius);
+    const auto rect = this->rect();
 
-    painter.setPen(palette().color(QPalette::Shadow));
-    painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignCenter, d->currentInformation.text());
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.drawRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5),
+        d->roundingRadius, d->roundingRadius);
+
+    painter.setPen(d->colors.text);
+    painter.drawText(rect.marginsRemoved(d->textMargins), Qt::TextSingleLine | Qt::AlignCenter,
+        d->currentInformation.text());
+}
+
+QSize QnPasswordStrengthIndicator::minimumSizeHint() const
+{
+    Q_D(const QnPasswordStrengthIndicator);
+    return d->minimumSizeHint;
 }

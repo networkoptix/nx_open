@@ -25,8 +25,8 @@ private:
     LineBreaks m_lineBreaks;
 };
 
-
-QString htmlBold(const QString &source);
+QString makeHtml(const QString& source);
+QString htmlBold(const QString& source);
 QString htmlFormattedParagraph(const QString &text
     , int pixelSize
     , bool isBold = false
@@ -40,3 +40,6 @@ QString escapeHtml(const QString& input);
 QString unescapeHtml(const QString& escaped);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
+
+bool mightBeHtml(const QString& text);
+bool mightBeHtml(const QStringList& lines);

@@ -366,35 +366,46 @@ CameraRecordsProvider.prototype.cacheRequestedInterval = function (start, end, l
                 continue;
             }
 
-            if(this.requestedCache[i][j].start > end){ // no intersection - just add
+            if(this.requestedCache[i][j].start > end){ // no intersection - just add to the beginning
                 this.requestedCache[i].splice(j,0,{start:start,end:end});
                 break;
             }
 
+            // Intersection - unite two intervals together
             this.requestedCache[i][j].start = Math.min(start, this.requestedCache[i][j].start);
             this.requestedCache[i][j].end = Math.max(end, this.requestedCache[i][j].end);
             break;
+        }
+        if(j == this.requestedCache[i].length){
+            // We need to add our requested interval to the end of an array
+            this.requestedCache[i].push({start:start,end:end});
         }
     }
 };
 CameraRecordsProvider.prototype.getBlindSpotsInCache = function(start,end,level){
     if(typeof(this.requestedCache[level])=='undefined'){
-        return [{start:start,end:end}]; // One large blind spot
+        return [{start:start, end:end, blindSpotsInCache:true}]; // One large blind spot
     }
     var result = [];
 
     var levelCache = this.requestedCache[level];
     for(var i = 0;i < levelCache.length;i++) {
-
-        if(start < levelCache[i].start){
-            result.push ({start:start,end:levelCache[i].start,blindSpotsInCache:true});
+        if(levelCache[i].end < start){
+            continue; // Ignore this cached interval - not relevant
         }
 
-        start = Math.max(start,levelCache[i].end);//Move start
+        if(levelCache[i].start > start){ // Calculate blank spot
+            result.push ({start:start, end: Math.min(levelCache[i].start, end), blindSpotsInCache:true});
+        }
 
-        if(end < levelCache[i].end){
+        start = levelCache[i].end; // start of the next blind spot
+
+        if(start >= end){ // Time to stop, we got the whole interval covered
             break;
         }
+    }
+    if(start < end){ // We did not cover the whole interval - so we add one more blind spot
+        result.push({start:start, end:end, blindSpotsInCache:true});
     }
     return result;
 };
@@ -405,14 +416,14 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start, e
     }
     var levelCache = this.requestedCache[level];
 
-    for(var i=0;i < levelCache.length;i++) {
-        if(start < levelCache[i].start){
+    for(var i=0; i < levelCache.length; i++) {
+        if(start < levelCache[i].start){ // there is a blind spot in cache
             return false;
         }
 
-        start = Math.max(start,levelCache[i].end);//Move start
+        start = Math.max(start, levelCache[i].end); // Move start
 
-        if(end < levelCache[i].end){
+        if(end <= start){ // No need to move forward - there is no blind spot in cache
             return true;
         }
     }
@@ -439,26 +450,20 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     if(start > end){
         console.error("Start is more than end, that is impossible");
     }
-
-    // requestInterval operates with server time always
-    var deferred = this.$q.defer();
-    //this.start = start;
-    //this.end = end;
     this.level = level;
+    if(this.currentRequest){
+        return;
+    }
+
     var levelData = RulerModel.levels[level];
     var detailization = levelData.interval.getMilliseconds();
 
     var self = this;
-    //1. Request records for interval
-    // And do we need to request it?
 
-    if(self.currentRequest){
-        return;
-    }
+    //1. Request records for interval
     self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
 
-    self.currentRequest.then(function (data) {
-
+    this.ready = self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
             var chunks = data.data.reply;
             //if(chunks.length == 0){} // No chunks for this camera
@@ -485,13 +490,9 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
             self.cacheRequestedInterval(timeManager.serverToDisplay(start), timeManager.serverToDisplay(end), level);
 
-            deferred.resolve(self.chunksTree);
-
-        }, function (error) {
-            deferred.reject(error);
+            return self.chunksTree;
         });
 
-    this.ready = deferred.promise;
     //3. return promise
     return this.ready;
 };
@@ -703,12 +704,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     // iterate blind spots:
-    var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
+    var blindSpots = this.getBlindSpotsInCache(start, end, parent.level + 1);
+
     for (i = 0; i < blindSpots.length; i++) {
-        var spot = blindSpots[i];
-        if (spot.start >= start || spot.end <= end) {
-            result.push(spot);
-        }
+        result.push(blindSpots[i]);
     }
 };
 
@@ -979,8 +978,14 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.start = start; //Start is always right
     this.updateTotalInterval();
 };
-ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
+
+    var end = timeManager.nowToDisplay();
+    if(this.playedPosition > this.end && this.liveMode){
+        end = this.playedPosition;
+    }
+
     this.end = end;
 
     this.updateTotalInterval();
@@ -1076,25 +1081,22 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
 };
 
 ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
-    this.playedPosition = playing;
+    if(playing !== null){
+        this.playedPosition = playing;
+    }
     this.liveMode = liveMode;
 
     if(this.anchorDate == playing){
         return;
     }
 
-    var end = timeManager.nowToDisplay();
-    if(playing > this.end && liveMode){
-        this.setEnd(playing);
-    }else if(end > this.end){
-        this.setEnd(end);
-    }
+    this.setEnd();
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(playing, liveMode);
+        this.checkWatchPlaying(this.playedPosition, liveMode);
     }
     if(this.watchPlayingPosition){
-        this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
+        this.setAnchorDateAndPoint(this.playedPosition, liveMode ? 1:this.anchorPoint);
     }
 };
 

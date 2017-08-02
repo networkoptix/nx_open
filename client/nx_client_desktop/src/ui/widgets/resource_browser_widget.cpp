@@ -636,7 +636,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     if (scope != action::TreeScope)
         return action::Parameters();
 
-    //TODO: #GDM #3.1 refactor to a simple switch by node type
+    // TODO: #GDM #3.1 refactor to a simple switch by node type
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();
@@ -1039,4 +1039,69 @@ void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
     int typeIndex = ui->typeComboBox->findData((int)query.flags);
     NX_EXPECT(typeIndex >= 0);
     ui->typeComboBox->setCurrentIndex(typeIndex);
+}
+
+void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(!id.isNull());
+    if (id.isNull())
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::UuidRole,
+        qVariantFromValue(id),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectResource(const QnResourcePtr& resource)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(resource);
+    if (!resource)
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::ResourceRole,
+        qVariantFromValue(resource),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectIndices(const QModelIndexList& indices)
+{
+    if (indices.empty())
+        return;
+
+    for (const auto& index: indices)
+    {
+        auto parent = index.parent();
+        while (parent.isValid())
+        {
+            ui->resourceTreeWidget->expand(parent);
+            parent = parent.parent();
+        }
+    }
+
+    if (auto selection = ui->resourceTreeWidget->selectionModel())
+    {
+        selection->clear();
+        for (const auto& index: indices)
+            selection->select(index, QItemSelectionModel::Select);
+    }
 }

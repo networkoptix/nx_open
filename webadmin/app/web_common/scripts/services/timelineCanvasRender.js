@@ -424,7 +424,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckEvents(context, mouseX, mouseY){
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height; // Top border
 
-        if(context ) {
+        if(context) {
             context.fillStyle = blurColor(timelineConfig.chunksBgColor, 1);
             context.fillRect(0, top, self.canvas.width, timelineConfig.chunkHeight * self.canvas.height);
 
@@ -447,8 +447,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 // 1. Splice events
                 var events = self.recordsProvider.getIntervalRecords(start, end, levelIndex);
 
-
-
                 // 2. Draw em!
                 for (var i = 0; i < events.length; i++) {
                     drawEvent(context, events[i], levelIndex);
@@ -457,7 +455,10 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
         return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
-    function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
+
+    var chunkLoadingTexture = false;
+    var chunkLoadingTextureImg = false;
+    function drawEvent(context, chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
         var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
 
@@ -487,11 +488,47 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             top = Math.floor(top);
             height = Math.ceil(height);
         }
+        else if(levelIndex != chunk.level || !chunk.level){
+            //Show loading color under loading texture
+            context.fillStyle = blurColor(timelineConfig.loadingChunkColor, blur);
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+            
+            //Load the loading texture
+            if(chunkLoadingTexture){
+                context.fillStyle = chunkLoadingTexture;
+            }
+            else{
+                if(!chunkLoadingTextureImg) {
+                    var img = new Image();
+                    img.onload = function () {
+                        chunkLoadingTexture = context.createPattern(img, 'repeat');
+                        context.fillStyle = chunkLoadingTexture;
+                    };
+                    img.src = Config.viewsDirCommon + '../images/chunkloading.png';
+                    chunkLoadingTextureImg = img;
+                }
+                context.fillStyle = blurColor(timelineConfig.loadingChunkColor,1);
+            }
 
-        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
-            top,
-                (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-            height);
+            //Give the texture the appearance of moving
+            var start = self.scaleManager.lastMinute();
+            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start);
+            
+            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize);
+
+            context.save();
+            context.translate(offset_x, 0);
+
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+
+            context.restore();
+        }
+        else{
+            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+        }
     }
 
 
@@ -535,10 +572,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.save();
         context.translate(offset_x, 0);
 
-        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x,
-            top,
-                (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
-            height);
+        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
+                        (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
         context.restore();
     }

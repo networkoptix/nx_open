@@ -118,7 +118,7 @@ angular.module('nxCommon')
                 function initTimeline(){
                     var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(timeManager.nowToDisplay());
+                    scope.scaleManager.setEnd();
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }
@@ -279,7 +279,8 @@ angular.module('nxCommon')
                 function canvasDrag(event){
                     updateMouseCoordinate(event);
                     dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
-                              timelineActions.timelineDrag (mouseXOverTimeline);
+                              timelineActions.timelineDrag (mouseXOverTimeline) || dragged;
+                              // dragged is true if it was actually dragged at least once during interaction
                 }
 
                 var preventClick = false;
@@ -324,11 +325,8 @@ angular.module('nxCommon')
                     }
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        var scrollLeft = true;
                         //checking if mouse is to the left or right of the scrollbar
-                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline){
-                            scrollLeft = false;
-                        }
+                        var scrollLeft = mouseXOverTimeline <= scope.scaleManager.scrollSlider().start;
                         scrollbarClickOrHold(scrollLeft);
                     }
                 }
@@ -411,10 +409,13 @@ angular.module('nxCommon')
                 //$canvas.bind('touchcancel', canvasDragEnd);
                 // Actual browser events handling
 
-
-
-
-
+                /*
+                    We use updateTimelineWidth here because the width of the timeline
+                    changes from when the page loads. When the page loads the volume button
+                    is initially there. Then ng-class is applied hiding the button and
+                    adjusting the width of the timeline. After this the timeline is longer
+                    than the previous width causing the time marker to be offset.
+                */
                 scope.$watch('positionProvider',function(){
                     timelineActions.setPositionProvider(scope.positionProvider);
                     $timeout(updateTimelineWidth);
@@ -445,7 +446,12 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                //We need a delay for the timeline to fully load then we can calculate the width of the timeline
+                /*
+                    This timeout gets us the initial width. If volume is not disabled then
+                    the width is correct. Otherwise we update the width in the positionProvider
+                    watcher function. This is done when the postion provider changes because
+                    the timeline's width should not change after that.
+                */
                 $timeout(updateTimelineWidth); // Adjust width.
                 initTimeline(); // Setup boundaries and scale
 

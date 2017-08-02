@@ -46,6 +46,11 @@ int AbstractCommunicatingSocket::send(const QByteArray& data)
     return send(data.constData(), data.size());
 }
 
+QString AbstractCommunicatingSocket::getForeignHostName() const
+{
+    return getForeignAddress().address.toString();
+}
+
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
     nx::utils::MoveOnlyFunc<void()> handler)

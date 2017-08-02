@@ -2,20 +2,49 @@ find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
 set(product.title "${mobile_client.name}")
 set(product.display.title "${mobile_client.display.name}")
+set(project.version.code "${buildNumber}")
+set(project.version.name "${mobileClientVersion}")
 
+nx_configure_file(
+    maven/filter-resources/version.h
+    ${CMAKE_CURRENT_BINARY_DIR})
 nx_configure_file(
     maven/filter-resources/mobile_client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
+set(resources)
+
+if(IOS)
+    if(NOT mobile_client_ios_launch_screen)
+        set(mobile_client_ios_launch_screen "${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib")
+    endif()
+
+    set(ios_sources
+        src/nx/mobile_client/settings/settings_migration_ios.mm
+        src/ui/window_utils_ios.mm
+        src/utils/app_delegate.mm
+    )
+
+    set(icons_dir "${customization_dir}/icons/ios/ios/images")
+    file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+
+    list(APPEND resources ${mobile_client_ios_launch_screen})
+    list(APPEND resources "${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf")
+else()
+    set(ios_sources)
+endif()
+
 set(target_args
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
+        ${ios_sources}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mobile_client/resources"
     OTHER_SOURCES
         ${QML_FILES}
+        ${resources}
     PUBLIC_LIBS
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
@@ -37,9 +66,6 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    set(project.version.name "${mobileClientVersion}")
-    set(project.version.code "${buildNumber}")
-
     file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     file(COPY "${customization_dir}/icons/android/android"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -65,8 +91,6 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    configure_file("maven/filter-resources/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-
     set(provisioning_profiles_dir "${static_customization_dir}/mobile_client/ios/provisioning_profiles")
 
     if(beta)
@@ -91,9 +115,29 @@ if(IOS)
 
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
+        RESOURCE "${resources}"
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
         XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
     )
+
+    setup_ios_application(mobile_client
+        ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio
+        QML_ROOT "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+    )
+
+    target_link_libraries(mobile_client PRIVATE
+        "-framework VideoToolbox"
+        "-framework AudioToolbox"
+        "-framework CoreAudio"
+        "-framework CoreVideo"
+        "-framework CoreMedia"
+        "-framework AVFoundation"
+        Qt5WebView
+    )
+
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client
+        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
 endif()

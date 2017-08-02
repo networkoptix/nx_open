@@ -729,13 +729,13 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
 
     qreal magicConst = maxExpandedSize;
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        magicConst = 0.8;   //TODO: #Elric magic const
+        magicConst = 0.8;   // TODO: #Elric magic const
     else
         if (
             canShowLayoutBackground() &&
             (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
             )
-            magicConst = 0.33;  //TODO: #Elric magic const
+            magicConst = 0.33;  // TODO: #Elric magic const
     QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
 
     QPointF viewportCenter = viewportGeometry.center();
@@ -1172,8 +1172,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
-
-    updateWidgetsFrameOpacity();
     return true;
 }
 
@@ -1303,17 +1301,17 @@ bool QnWorkbenchDisplay::removeZoomLinksInternal(QnWorkbenchItem *item)
     return true;
 }
 
-QMargins QnWorkbenchDisplay::viewportMargins() const
+QMargins QnWorkbenchDisplay::viewportMargins(Qn::MarginTypes marginTypes) const
 {
-    return m_viewportAnimator->viewportMargins();
+    return m_viewportAnimator->viewportMargins(marginTypes);
 }
 
-void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins)
+void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins, Qn::MarginType marginType)
 {
-    if (viewportMargins() == margins)
+    if (viewportMargins(marginType) == margins)
         return;
 
-    m_viewportAnimator->setViewportMargins(margins);
+    m_viewportAnimator->setViewportMargins(margins, marginType);
 
     synchronizeSceneBoundsExtension();
 }
@@ -1370,15 +1368,6 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
     m_viewportAnimator->setMarginFlags(flags);
 
     synchronizeSceneBoundsExtension();
-}
-
-void QnWorkbenchDisplay::updateWidgetsFrameOpacity()
-{
-    // Opacity for all widgets frames
-    const auto normalOpacity = qFuzzyIsNull(workbench()->mapper()->spacing()) ? 0.0 : 1.0;
-
-    for (auto widget: m_widgets)
-        widget->setFrameOpacity(widget->isSelected() ? 1.0 : normalOpacity);
 }
 
 // -------------------------------------------------------------------------- //
@@ -1498,7 +1487,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    QRectF minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRectF>();
+    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
     if (!minimalBoundingRect.isEmpty())
         sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
@@ -1521,12 +1510,13 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const
         : QRectF();
 }
 
-QRectF QnWorkbenchDisplay::boundedViewportGeometry() const
+QRectF QnWorkbenchDisplay::boundedViewportGeometry(Qn::MarginTypes marginTypes) const
 {
     if (m_view == NULL)
         return QRectF();
 
-    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    const auto boundedRect = QnGeometry::eroded(m_view->viewport()->rect(),
+        viewportMargins(marginTypes));
     return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
 
@@ -2267,8 +2257,6 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
     {
         workbench()->setItem(Qn::SingleSelectedRole, NULL);
     }
-
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_view_destroyed()
@@ -2299,7 +2287,6 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     synchronizeAllGeometries(false);
     synchronizeSceneBounds();
     fitInView(false);
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

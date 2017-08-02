@@ -37,7 +37,9 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
             const auto resource = qnClientCoreModule->commonModule()
                 ->resourcePool()->getResourceById(d->uniqueResourceId);
             const auto controller = qnClientCoreModule->ptzControllerPool()->controller(resource);
-            const auto presets = core::ptz::helpers::getSortedPresets(controller);
+            QnPtzPresetList presets;
+            // In case of error empty list will be returned.
+            core::ptz::helpers::getSortedPresets(controller, presets);
 
             if (presets == d->presets)
                 return;

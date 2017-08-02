@@ -18,7 +18,8 @@ def read_branding(customization_name):
 
 
 class Command(BaseCommand):
-    help = 'Creates initial records for CMS in the database (customizations, languages, products)'
+    help = 'Creates initial records for CMS in the database\
+     (customizations, languages, products)'
 
     def handle(self, *args, **options):
         for custom in Customization.objects.all():
@@ -30,9 +31,11 @@ class Command(BaseCommand):
                 continue
 
             for (key, value) in branding_messages:
-                data_structure = DataStructure.objects.get(name=key, context_id=branding_context.id)
-                data_record = DataRecord.objects.filter(data_structure_id=data_structure.id,
-                                                        customization_id=custom.id)
+                data_structure = DataStructure.objects.get(
+                    name=key, context_id=branding_context.id)
+                data_record = DataRecord.objects\
+                    .filter(data_structure_id=data_structure.id,
+                            customization_id=custom.id)
                 if data_record.exists():  # data record exists - ignore
                     continue
                 data_record = DataRecord(data_structure_id=data_structure.id,
@@ -40,4 +43,5 @@ class Command(BaseCommand):
                                          language=custom.default_language,
                                          value=value)
                 data_record.save()  # write to database
-        self.stdout.write(self.style.SUCCESS('Successfully initiated database records for CMS'))
+        self.stdout.write(self.style.SUCCESS(
+            'Successfully initiated database records for CMS'))

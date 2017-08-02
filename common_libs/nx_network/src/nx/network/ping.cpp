@@ -44,5 +44,5 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLatin1().data());
     return WEXITSTATUS(rez) == 0;
 #endif 
-    //TODO: #ivan MacOS ping?
+    // TODO: #ivan MacOS ping?
 }

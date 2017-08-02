@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/screen_recording/video_recorder_settings.h> //TODO: #GDM move out enums
+#include <ui/screen_recording/video_recorder_settings.h> // TODO: #GDM move out enums
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui {

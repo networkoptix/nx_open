@@ -8,6 +8,14 @@ from django.core.management.base import BaseCommand
 STATIC_DIR = 'static/'
 
 
+def find_or_add_product(name):
+    if Product.objects.filter(name=name).exists():
+        return Product.objects.get(name=name)
+    product = Product(name=name)
+    product.save()
+    return product
+
+
 def find_or_add_customization(item, default_language):
     if Customization.objects.filter(name=item).exists():
         return Customization.objects.get(name=item)
@@ -31,12 +39,7 @@ def find_or_add_language_to_customization(language, customization):
 
 # run read structure
 def init_cms_db():
-    if Product.objects.exists():
-        return
-
-    # create product
-    product = Product(name='cloud_portal')
-    product.save()
+    find_or_add_product('cloud_portal')
 
     # read customizations
     for custom in os.listdir(STATIC_DIR):
@@ -44,19 +47,24 @@ def init_cms_db():
             continue
         if os.path.isdir(os.path.join(STATIC_DIR, custom)):
             # read languages and languages in customizations
-            language_json_filename = os.path.join(STATIC_DIR, custom, 'source/static/languages.json')
+            language_json_filename = os.path.join(
+                STATIC_DIR, custom, 'source/static/languages.json')
             with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
                 data = json.load(file_descriptor)
 
                 for lang in data:
-                    language = find_or_add_language(lang["name"], lang["language"])
+                    language = find_or_add_language(
+                        lang["name"], lang["language"])
                     customization = find_or_add_customization(custom, language)
-                    find_or_add_language_to_customization(language, customization)
+                    find_or_add_language_to_customization(
+                        language, customization)
 
 
 class Command(BaseCommand):
-    help = 'Creates initial records for CMS in the database (customizations, languages, products)'
+    help = 'Creates initial records for CMS in the\
+     database (customizations, languages, products)'
 
     def handle(self, *args, **options):
         init_cms_db()
-        self.stdout.write(self.style.SUCCESS('Successfully initiated database records for CMS'))
+        self.stdout.write(self.style.SUCCESS(
+            'Successfully initiated database records for CMS'))

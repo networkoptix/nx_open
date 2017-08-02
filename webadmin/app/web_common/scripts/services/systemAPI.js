@@ -80,9 +80,7 @@ angular.module('nxCommon')
                 method: method,
                 url: requestUrl,
                 data: postData,
-                config: {
-                    timeout: canceler.promise
-                }
+                timeout: canceler.promise
             });
 
             var promise = request.catch(function(error){

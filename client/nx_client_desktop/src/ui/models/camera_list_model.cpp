@@ -171,7 +171,7 @@ void QnCameraListModel::addCamera(const QnResourcePtr &resource) {
         return;
 
     connect(camera, &QnResource::parentIdChanged, this, &QnCameraListModel::at_resource_parentIdChanged);
-    connect(camera, &QnResource::resourceChanged, this, &QnCameraListModel::at_resource_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
+    connect(camera, &QnResource::resourceChanged, this, &QnCameraListModel::at_resource_resourceChanged); // TODO: #GDM #Common get rid of resourceChanged
 
     int row = m_cameras.size();
     beginInsertRows(QModelIndex(), row, row);

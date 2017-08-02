@@ -1,6 +1,6 @@
 #include "server_backup_schedule.h"
 
-//TODO: #GDM dependency will be removed together with this class itself
+// TODO: #GDM dependency will be removed together with this class itself
 #include <nx_ec/data/api_media_server_data.h>
 
 #include <nx/fusion/model_functions.h>

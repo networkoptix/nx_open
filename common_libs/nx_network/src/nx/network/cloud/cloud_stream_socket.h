@@ -12,6 +12,7 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
+#include "any_accessible_address_connector.h"
 #include "tunnel/tunnel_attributes.h"
 
 namespace nx {
@@ -86,7 +87,7 @@ public:
     virtual bool isInSelfAioThread() const override;
     virtual QString idForToStringFromPtr() const override;
 
-    virtual QString getForeignHostFullCloudName() const;
+    virtual QString getForeignHostName() const override;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
@@ -96,16 +97,12 @@ private:
         std::deque<AddressEntry> dnsEntries, int port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
-    void connectToEntryAsync(
-        const AddressEntry& dnsEntry, int port,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-
     SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
-    void onDirectConnectDone(SystemError::ErrorCode errorCode);
-    void onCloudConnectDone(
+
+    void onConnectDone(
         SystemError::ErrorCode errorCode,
-        TunnelAttributes cloudTunnelAttributes,
-        std::unique_ptr<AbstractStreamSocket> cloudConnection);
+        boost::optional<TunnelAttributes> cloudTunnelAttributes,
+        std::unique_ptr<AbstractStreamSocket> connection);
 
     void cancelIoWhileInAioThread(aio::EventType eventType);
     void stopWhileInAioThread();
@@ -120,6 +117,7 @@ private:
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
+    std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
 
     QnMutex m_mutex;
     bool m_terminated;

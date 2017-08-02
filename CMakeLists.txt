@@ -23,12 +23,16 @@ include(build_utils/cmake/find_python.cmake)
 include(build_utils/cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice)
+if(targetDevice AND NOT targetDevice STREQUAL "ios")
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
     include(cmake/sync_toolchain.cmake)
 endif()
 
 project(vms VERSION 3.1.0)
+
+if(targetDevice STREQUAL "ios")
+    include(cmake/ios.cmake)
+endif()
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
@@ -99,6 +103,8 @@ endif()
 
 if(ANDROID)
     include(android-apk)
+elseif(IOS)
+    include(ios_app)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")

@@ -32,9 +32,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/mac_utils.h>
 
-#include <nx/client/desktop/utils/mime_data.h>
-
 #include "destruction_guard_item.h"
+
+#include <nx/client/desktop/utils/mime_data.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -77,7 +77,12 @@ DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, 
     m_filterItem->setEventFilter(this);
 }
 
-QGraphicsObject *DropInstrument::surface() const {
+DropInstrument::~DropInstrument()
+{
+}
+
+QGraphicsObject *DropInstrument::surface() const
+{
     return m_surface.data();
 }
 
@@ -126,7 +131,7 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
 {
-    m_ids.clear();
+    m_mimeData.reset();
 
     const auto mimeData = event->mimeData();
     if (mimeData->hasFormat(Qn::NoSceneDrop))
@@ -135,22 +140,9 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
         return false;
     }
 
-#ifdef Q_OS_MAC
-    if (mimeData->hasUrls())
-    {
-        for (const auto& url: mimeData->urls())
-        {
-            if (url.isLocalFile() && QFile::exists(url.toLocalFile()))
-                mac_saveFileBookmark(url.path());
-        }
-    }
-#endif
+    m_mimeData.reset(new MimeData{mimeData, resourcePool()});
 
-    // Scene drop is working only for resources that are already in the pool.
-    MimeData data(mimeData);
-    m_ids = data.getIds();
-
-    if (m_ids.empty())
+    if (!isDragValid())
     {
         event->ignore();
         return false;
@@ -162,7 +154,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
 {
-    if (m_ids.empty())
+    if (!isDragValid())
     {
         event->ignore();
         return false;
@@ -174,25 +166,29 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent 
 
 bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *)
 {
-    if (m_ids.empty())
-        return false;
-
+    m_mimeData.reset();
     return true;
 }
 
 bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEvent* event)
 {
+    // Reset stored mimedata.
+    std::unique_ptr<nx::client::desktop::MimeData> localMimeData = std::move(m_mimeData);
+
     auto context = m_context.data();
     if (!context)
         return true;
 
-    const QMimeData *mimeData = event->mimeData();
+    const auto mimeData = event->mimeData();
     if (mimeData->hasFormat(Qn::NoSceneDrop))
+    {
+        NX_ASSERT(false, "Mimedata format could not be changed during drag");
         return false;
+    }
 
     event->acceptProposedAction();
 
-    const auto layoutTours = layoutTourManager()->tours(m_ids);
+    const auto layoutTours = layoutTourManager()->tours(localMimeData->entities());
     if (!layoutTours.empty())
     {
         for (const auto& tour : layoutTours)
@@ -203,24 +199,28 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
     }
 
     // Try to drop videowall items first.
-    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_ids);
+    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(localMimeData->entities());
     if (delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
     {
         // Ignore resources.
         return true;
     }
 
-    const auto resources = resourcePool()->getResources(m_ids);
+    if (localMimeData->resources().empty())
+        return false;
+
+    resourcePool()->addNewResources(localMimeData->resources());
+
     if (!m_intoNewLayout)
     {
         delayedTriggerIfPossible(
             action::DropResourcesAction,
-            action::Parameters(resources).withArgument(Qn::ItemPositionRole,
+            action::Parameters(localMimeData->resources()).withArgument(Qn::ItemPositionRole,
                 context->workbench()->mapper()->mapToGridF(event->scenePos())));
     }
     else
     {
-        delayedTriggerIfPossible(action::OpenInNewTabAction, resources);
+        delayedTriggerIfPossible(action::OpenInNewTabAction, localMimeData->resources());
     }
 
     return true;
@@ -254,4 +254,9 @@ bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::P
 
     executeDelayed(triggerIfPossible);
     return true;
+}
+
+bool DropInstrument::isDragValid() const
+{
+    return !m_mimeData->isEmpty();
 }

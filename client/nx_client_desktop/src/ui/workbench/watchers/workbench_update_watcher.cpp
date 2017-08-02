@@ -16,6 +16,7 @@
 #include <client/client_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -55,7 +56,8 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent)
         return;
 
     m_checker = new QnUpdateChecker(updateFeedUrl, this);
-    connect(m_checker, &QnUpdateChecker::updateAvailable, this, &QnWorkbenchUpdateWatcher::at_checker_updateAvailable);
+    connect(m_checker, &QnUpdateChecker::updateAvailable, this,
+        &QnWorkbenchUpdateWatcher::at_checker_updateAvailable);
 
     m_timer->setInterval(kUpdatePeriodMSec);
     connect(m_timer, &QTimer::timeout, m_checker, &QnUpdateChecker::checkForUpdates);
@@ -147,14 +149,19 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     const auto text = tr("%1 version available").arg(info.currentRelease.toString());
     const auto releaseNotesLink = makeHref(tr("Release Notes"), info.releaseNotesUrl);
-    const auto extras = (majorVersionChange
-        ? releaseNotesLink
-        : tr("Major issues have been fixed. Update is strongly recommended.")
-            + L'\n' + releaseNotesLink);
 
+    QStringList extras;
+    if (majorVersionChange)
+        extras.push_back(tr("Major issues have been fixed. Update is strongly recommended."));
+    if (!info.description.isEmpty())
+        extras.push_back(info.description);
+    extras.push_back(releaseNotesLink);
 
-    QnMessageBox messageBox(QnMessageBoxIcon::Question,
-        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+    QnMessageBox messageBox(QnMessageBoxIcon::Information,
+        text,
+        makeHtml(extras.join(lit("<br>"))),
+        QDialogButtonBox::Cancel,
+        QDialogButtonBox::NoButton,
         mainWindow());
 
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);

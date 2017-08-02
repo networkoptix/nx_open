@@ -1302,23 +1302,40 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
 void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
     QnMutexLockerBase* const lock)
 {
-    if (m_connection)
-    {
-        ApiMiscData localTimeData(
-            LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-            QByteArray::number(m_localTimePriorityKey.toUInt64()));
+    if (!m_connection)
+        return;
+#if 0
+    ApiMiscData localTimeData(
+        LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+        QByteArray::number(m_localTimePriorityKey.toUInt64()));
 
-        auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+    auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
 
-        QnMutexUnlocker unlocker(lock);
+    QnMutexUnlocker unlocker(lock);
 
-        manager->saveMiscParam(localTimeData, this,
-            [](int /*reqID*/, ec2::ErrorCode errCode)
-            {
-                if (errCode != ec2::ErrorCode::ok)
-                    qWarning() << "Failed to save time data to the database";
-            });
-    }
+    manager->saveMiscParam(localTimeData, this,
+        [](int /*reqID*/, ec2::ErrorCode errCode)
+        {
+            if (errCode != ec2::ErrorCode::ok)
+                qWarning() << "Failed to save time data to the database";
+        });
+#else
+    // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    Ec2ThreadPool::instance()->start(make_custom_runnable(
+        [this]
+        {
+            auto db = m_connection->messageBus()->getDb();
+            QnTransaction<ApiMiscData> localTimeTran(
+                ApiCommand::NotDefined,
+                db->commonModule()->moduleGUID(),
+                ec2::ApiMiscData(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+                    QByteArray::number(m_localTimePriorityKey.toUInt64())));
+
+            localTimeTran.transactionType = TransactionType::Local;
+            db->transactionLog()->fillPersistentInfo(localTimeTran);
+            db->executeTransaction(localTimeTran, QByteArray());
+        }));
+#endif
 }
 
 void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
@@ -1356,6 +1373,7 @@ bool TimeSynchronizationManager::saveSyncTimeSync(
     if (!m_connection)
         return false;
 
+#if 0
     ApiMiscData deltaData(
         TIME_DELTA_PARAM_NAME,
         QByteArray::number(syncTimeToLocalDelta));
@@ -1368,6 +1386,33 @@ bool TimeSynchronizationManager::saveSyncTimeSync(
     return
         manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
         manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
+#else
+    // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    auto db = m_connection->messageBus()->getDb();
+    QnTransaction<ApiMiscData> deltaTran(
+        ApiCommand::NotDefined,
+        db->commonModule()->moduleGUID(),
+        ApiMiscData(TIME_DELTA_PARAM_NAME, QByteArray::number(syncTimeToLocalDelta)));
+
+    QnTransaction<ApiMiscData> priorityTran(
+        ApiCommand::NotDefined,
+        db->commonModule()->moduleGUID(),
+        ApiMiscData(USED_TIME_PRIORITY_KEY_PARAM_NAME,
+            QByteArray::number(syncTimeKey.toUInt64())));
+
+    deltaTran.transactionType = TransactionType::Local;
+    priorityTran.transactionType = TransactionType::Local;
+
+    db->transactionLog()->fillPersistentInfo(deltaTran);
+    db->transactionLog()->fillPersistentInfo(priorityTran);
+
+    bool result =
+        db->executeTransaction(deltaTran, QByteArray()) == ErrorCode::ok &&
+        db->executeTransaction(priorityTran, QByteArray()) == ErrorCode::ok;
+    if (!result)
+        NX_WARNING(this, lm("Can't save syncTime to the local DB."));
+    return result;
+#endif
 }
 
 void TimeSynchronizationManager::saveSyncTimeAsync(
@@ -1388,7 +1433,7 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
 {
     if (!m_connection)
         return;
-
+#if 0
     ApiMiscData deltaData(
         TIME_DELTA_PARAM_NAME,
         QByteArray::number(syncTimeToLocalDelta));
@@ -1410,6 +1455,14 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
         if (errCode != ec2::ErrorCode::ok)
             NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
     });
+#else
+    // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    Ec2ThreadPool::instance()->start(make_custom_runnable(
+        [this, syncTimeToLocalDelta, syncTimeKey]()
+        {
+            saveSyncTimeSync(syncTimeToLocalDelta, syncTimeKey);
+        }));
+#endif
 }
 
 } // namespace ec2

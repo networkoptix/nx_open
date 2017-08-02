@@ -17,6 +17,19 @@
 #include <plugins/resource/avi/filetypesupport.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <ui/workaround/mac_utils.h>
+
+namespace {
+
+bool isFileSupported(const QString& filePath)
+{
+    return QnAviDvdResource::isAcceptedUrl(filePath)
+        || QnAviBlurayResource::isAcceptedUrl(filePath)
+        || FileTypeSupport::isFileSupported(filePath);
+}
+
+} // namespace
+
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
     QStringList acceptedFiles;
@@ -50,11 +63,16 @@ QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
     return acceptedFiles;
 }
 
-QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls)
+QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl>& urls)
 {
     QStringList files;
-    foreach (const QUrl &url, urls)
+    for (const QUrl& url: urls)
+    {
+        if (!url.isLocalFile())
+            continue;
+
         files.append(url.toLocalFile());
+    }
     return QnFileProcessor::findAcceptedFiles(files);
 }
 
@@ -78,6 +96,36 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
             result << resource;
     }
     pool->addResources(result);
+
+    return result;
+}
+
+QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>& urls,
+    QnResourcePool* resourcePool)
+{
+    QnResourceList result;
+
+    for (const auto& url: urls)
+    {
+        if (!url.isLocalFile())
+            continue;
+
+        const QString filePath = url.toLocalFile();
+        if (!QFile::exists(filePath))
+            continue;
+
+        if (!isFileSupported(filePath))
+            continue;
+
+        #if defined(Q_OS_MAC)
+            mac_saveFileBookmark(url.path());
+        #endif
+
+        auto resource = QnResourceDirectoryBrowser::resourceFromFile(filePath, resourcePool);
+        if (resource)
+            result << resource;
+
+    }
 
     return result;
 }

@@ -24,8 +24,8 @@ struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarping
     /** Fov in radians. */
     qreal fov;
 
-    /** Aspect ratio correction?  //TODO: #Elric
-     * multiplier for 90 degrees of.. //TODO: #vasilenko
+    /** Aspect ratio correction?  // TODO: #Elric
+     * multiplier for 90 degrees of.. // TODO: #vasilenko
      */
     int panoFactor;
 

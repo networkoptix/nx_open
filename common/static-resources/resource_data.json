@@ -1558,6 +1558,14 @@
 			"forcedSecondaryStreamResolution": "352x288",
 			"fpsBase": 25
         },
+        {
+            "keys": [
+                "*|IMM12018*",
+                "*|IMM12027*",
+                "*|IMM12036*"
+            ],
+            "onvifManufacturerReplacement": "PelcoOptera"
+        },
 		{
 			"keys": [
 				"Pelco|IMM12018",
@@ -1881,7 +1889,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 20],
-                        "logicalMultiplier": 32,
+                        "logicalMultiplier": 30,
                         "space": "35MmEquiv"
                     }
                 }

@@ -34,6 +34,8 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/string.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -78,6 +80,8 @@ private:
 
 static const int kMargin = 8; //< Pixels.
 static const int kSpacing = 8; //< Pixels.
+
+static constexpr int kMaxTitleLength = 30; //< symbols
 
 } // namespace
 
@@ -159,7 +163,8 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateTitle = [this, title]
         {
-            title->setText(resource()->getName());
+            // TODO: #GDM elide on the widget level
+            title->setText(nx::utils::elideString(resource()->getName(), kMaxTitleLength));
         };
     updateTitle();
     connect(resource(), &QnResource::nameChanged, this, updateTitle);

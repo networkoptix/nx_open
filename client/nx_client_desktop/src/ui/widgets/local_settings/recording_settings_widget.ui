@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>373</height>
+    <width>582</width>
+    <height>422</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -95,7 +95,7 @@
        <widget class="QComboBox" name="screenComboBox"/>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="screenLabel">
         <property name="text">
          <string>Screen</string>
         </property>

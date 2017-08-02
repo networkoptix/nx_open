@@ -139,7 +139,7 @@ void QnCameraAdvancedParamsWidget::loadValues() {
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -157,7 +157,7 @@ void QnCameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamVa
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -176,7 +176,7 @@ void QnCameraAdvancedParamsWidget::saveValues() {
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -184,7 +184,7 @@ void QnCameraAdvancedParamsWidget::saveValues() {
     QnCameraAdvancedParamValueList modifiedValues = m_currentValues.difference(m_loadedValues);
     if (modifiedValues.isEmpty()) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -217,7 +217,7 @@ bool QnCameraAdvancedParamsWidget::isCameraAvailable() const {
     if (!m_camera)
         return false;
 
-    //TODO: #GDM check special capability flag
+    // TODO: #GDM check special capability flag
     return m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording;
 }
 
@@ -299,7 +299,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
 
     /* Show error if something was not correct. */
     if (status != 0) {
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 

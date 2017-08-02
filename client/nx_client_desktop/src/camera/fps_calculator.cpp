@@ -1,6 +1,6 @@
 #include "fps_calculator.h"
 
-//TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
 #include <core/resource/resource.h>

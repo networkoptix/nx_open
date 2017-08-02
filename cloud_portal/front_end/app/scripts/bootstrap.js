@@ -13,12 +13,12 @@ $.ajax({
     success: function (response) {
         L = response;// Fill global L variable
         Config.viewsDir = 'static/lang_' + L.language + '/views/'; //'static/lang_' + lang + '/views/';
-
         // detect preview mode
         var preview = window.location.href.indexOf('preview')>=0;
         if(preview){
             console.log("preview mode");
             Config.viewsDir = 'preview/' + Config.viewsDir;
+            Config.previewPath = 'preview';
         }
         angular.bootstrap(document, ['cloudApp']);
     },

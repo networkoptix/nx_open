@@ -32,6 +32,8 @@ public:
     virtual void applyChanges() override;
     virtual void retranslateUi() override;
 
+    virtual bool canApplyChanges() const override;
+
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
 

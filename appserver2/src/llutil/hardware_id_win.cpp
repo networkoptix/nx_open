@@ -209,7 +209,7 @@ static void findMacAddresses(IWbemServices* pSvc, QnPathToMacAndDeviceClassMap& 
                 }
 
                 if (device.xclass.isEmpty())
-                    continue;
+                    device.xclass = "XXX";
             }
         } else
         {

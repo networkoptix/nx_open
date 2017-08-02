@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos los servidores están desconectados. Los registros no están disponibles.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Registro de Marcador</translation>
     </message>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Pegar desde el portapapeles</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Copiar al Portapapeles</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Seleccione el archivo de licencia...</translation>
     </message>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Ciclo de giras</translation>
+      <source>seconds</source>
+      <translation>segundos</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>segundos</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

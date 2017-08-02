@@ -143,6 +143,12 @@ enum IDType
     SelectionChangeAction,
 
     /**
+     * Select newly created item (webpage, layout tour, user, videowall) in the resource tree. Open
+     * on the scene if possible.
+     */
+    SelectNewItemAction,
+
+    /**
      * Enters "what's this" mode.
      */
     WhatsThisAction,

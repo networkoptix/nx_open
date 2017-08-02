@@ -1,5 +1,10 @@
 #!/usr/local/bin/dumb-init /bin/bash
-set -e
+set -ex
+
+echo "Running with args: $@"
+echo "Environment:"
+env
+echo "---------------------------"
 
 function instantiate_config()
 {
@@ -25,39 +30,53 @@ database = $DB_NAME
 EOF
 }
 
-ORIG_CUSTOMIZATION=$CUSTOMIZATION
+function instantiate_configs()
+{
+    ORIG_CUSTOMIZATION=$CUSTOMIZATION
 
-for customization in $ALL_CUSTOMIZATIONS
+    for customization in $ALL_CUSTOMIZATIONS
+    do
+        instantiate_config $customization
+    done
+
+    CUSTOMIZATION=$ORIG_CUSTOMIZATION
+}
+
+for command in $@
 do
-    instantiate_config $customization
+    case "$command" in
+        migratedb)
+            write_my_cnf
+            echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
+
+            yes "yes" | /app/env/bin/python manage.py migrate
+            yes "yes" | /app/env/bin/python manage.py createcachetable
+
+            /app/env/bin/python manage.py initdb
+            /app/env/bin/python manage.py readstructure
+            /app/env/bin/python manage.py initbranding
+            ;;
+        config)
+            instantiate_configs
+            ;;
+        copystatic)
+            cp -R /app/app/static /static_volume
+            ;;
+        web)
+            write_my_cnf
+
+            /app/env/bin/python manage.py filldata
+
+            find /app/app/static | xargs touch
+            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            ;;
+        celery)
+            write_my_cnf
+            rm -f /tmp/*.pid
+            exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            ;;
+        *)
+            echo Usage: cloud_portal '[web|celery|config|copystatic|migratedb]'
+            ;;
+    esac
 done
-
-CUSTOMIZATION=$ORIG_CUSTOMIZATION
-
-case "$1" in
-    copystatic)
-        cp -R /app/app/static /static_volume
-        ;;
-    web)
-        write_my_cnf
-        echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
-
-        yes "yes" | /app/env/bin/python manage.py migrate
-        yes "yes" | /app/env/bin/python manage.py createcachetable
-        /app/env/bin/python manage.py initdb
-        /app/env/bin/python manage.py readstructure
-        /app/env/bin/python manage.py initbranding
-        /app/env/bin/python manage.py filldata
-
-        find /app/app/static | xargs touch
-        exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
-        ;;
-    celery)
-        write_my_cnf
-        rm -f /tmp/*.pid
-        exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
-        ;;
-    *)
-        echo Usage: cloud_portal '[web|celery|copystatic]'
-        ;;
-esac

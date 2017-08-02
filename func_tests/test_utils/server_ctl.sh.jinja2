@@ -1,113 +1,13 @@
-#!/bin/bash
+{% extends "server_ctl_base.sh.jinja2" %}
 
-ROOT_DIR="{{ SERVER_DIR }}"
-PID_PATH="$ROOT_DIR/server.pid"
-STDOUT_PATH="$ROOT_DIR/server.stdout"
-STDERR_PATH="$ROOT_DIR/server.stderr"
-BIN_PATH="$ROOT_DIR/bin/mediaserver-bin"
-CONF_PATH="$ROOT_DIR/etc/mediaserver.conf"
-RUNTIME_CONF_PATH="$ROOT_DIR/etc/mediaserver_runtime.conf"
-
+{% block variables %}
+{{ super() }}
+BIN_DIR="$SERVER_DIR/bin/"
+STOP_TIMEOUT_SEC=10
+CORE_DUMP_TIMEOUT_SEC=30
+BIN_PATH="$BIN_DIR/mediaserver-bin"
+CONF_PATH="$SERVER_DIR/etc/mediaserver.conf"
+RUNTIME_CONF_PATH="$SERVER_DIR/etc/mediaserver_runtime.conf"
 ARGS="-e --conf-file=$CONF_PATH --runtime-conf-file=$RUNTIME_CONF_PATH"
-
-
-function start() {
-	export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ROOT_DIR/lib"
-    "$BIN_PATH" $ARGS > $STDOUT_PATH 2> $STDERR_PATH &
-    PID=$!
-    echo $PID > "$PID_PATH"
-}
-
-function wait_until_process_is_dead() {
-	PID=$1
-	TIME_SEC=$2
-	for i in $(seq $TIME_SEC); do
-		if ! kill -0 $PID 2> /dev/null; then
-			return 0
-		fi
-		sleep 1
-	done
-	return 1
-}
-
-function stop() {
-	if [ ! -f "$PID_PATH" ]; then
-		echo "PID file $PID_PATH does not exist, assumming server is not running"
-	    return 0
-	fi
-	PID=$(cat "$PID_PATH")
-	if kill -0 $PID 2> /dev/null; then
-		echo "Sending SIGTERM to server PID $PID..."
-		kill -SIGTERM $PID
-		if wait_until_process_is_dead $PID 10; then
-			echo "Server is dead now"
-		else
-			echo "Server still alive after 10 seconds, sending SIGKILL..."
-			kill -SIGKILL $PID
-			if wait_until_process_is_dead $PID 10; then
-				echo "Server is dead now"
-			else
-				echo "Unable to kill server, bailing out."
-				return 1;
-			fi
-		fi
-	else
-		echo "Server with PID $PID is already dead."
-	fi
-	echo "Removing PID file: $PID_PATH"
-	rm $PID_PATH
-	return 0
-}
-
-function make_core_dump() {
-	if [ ! -f "$PID_PATH" ]; then
-		echo "PID file $PID_PATH does not exist, looks like server is not running"
-	    return 0
-	fi
-	PID=$(cat "$PID_PATH")
-	if kill -0 $PID 2> /dev/null; then
-		echo "Sending SIGTRAP to server PID $PID..."
-		kill -SIGTRAP $PID
-		if wait_until_process_is_dead $PID 30; then
-			echo "Server is dead now."
-		else
-			echo "Server still alive, bailing out."
-			return 1;
-		fi
-	else
-		echo "Server with PID $PID is already dead."
-	fi
-	echo "Removing PID file: $PID_PATH"
-	rm $PID_PATH
-	return 0
-}
-
-function is_active() {
-	if [ -f "$PID_PATH" ]; then
-		PID=$(cat "$PID_PATH")
-		if kill -0 $PID 2> /dev/null; then
-			echo "active"
-			return
-		fi
-	fi
-	echo "inactive"
-}
-
-
-case "$1" in
-  start)
-    start
-    ;;
-  stop)
-    stop
-    ;;
-  make_core_dump)
-    make_core_dump
-    ;;
-  is_active)
-    is_active
-    ;;
-  *)
-    echo "Usage: $0 start|stop|make_core_dump|is_active"
-	exit 1
-esac
+ADD_LD_LIBRARY_PATH="$SERVER_DIR/lib"
+{% endblock variables %}

@@ -41,7 +41,7 @@ public:
      * \param data                      Item data to create an item from.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QnLayoutItemData& data, QObject* parent = nullptr);
+    QnWorkbenchItem(const QnResourcePtr& resource, const QnLayoutItemData& data, QObject* parent = nullptr);
 
     /**
      * Virtual destructor.

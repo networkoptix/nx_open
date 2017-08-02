@@ -364,7 +364,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
                 arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
             return nullptr;
         }
-        transcodeMethod = codecID == resourceVideoStreamCodecID ?   //TODO: #ak and resolusion did not change
+        transcodeMethod = codecID == resourceVideoStreamCodecID ?   // TODO: #ak and resolusion did not change
             QnTranscoder::TM_DirectStreamCopy :
             QnTranscoder::TM_FfmpegTranscode;
         if( transcodeParams.pictureSizePixels().isValid() )
@@ -374,7 +374,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         else
         {
             NX_ASSERT( false );
-            videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+            videoResolution = QSize( 1280, 720 );  // TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
         }
     }
     if( transcoder->setVideoCodec( codecID, transcodeMethod, Qn::QualityNormal, videoResolution ) != 0 )

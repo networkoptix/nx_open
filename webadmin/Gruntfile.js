@@ -521,14 +521,15 @@ module.exports = function (grunt) {
                 command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;python ../../devtools/util/merge_dev.py -t default;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
-
-            pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;'
+            pull:{
+                branch:'',
+                command: 'hg pull -u; python ../../devtools/util/merge_dev.py -r <%= shell.pull.branch %>'
             },
-            merge_release: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+            push:{
+                branch:'',
+                command: 'python ../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
             },
             version: {
                 command: 'hg parent > static/version.txt'
@@ -846,14 +847,6 @@ module.exports = function (grunt) {
         'publish'
     ]);
 
-    grunt.registerTask('merge', [
-        'shell:merge'
-    ]);
-
-    grunt.registerTask('pull', [
-        'shell:pull'
-    ]);
-
     grunt.registerTask('merge_release', [
         'shell:merge_release'
     ]);
@@ -878,4 +871,25 @@ module.exports = function (grunt) {
         'build',
         'scp:demo_fast'
     ]);
+
+    grunt.registerTask('pull', function(branch){
+        grunt.config.set('shell.pull.branch', branch);
+        grunt.task.run([
+            'shell:pull'
+        ]);
+    });
+
+    grunt.registerTask('push', function(branch){
+        grunt.config.set('shell.push.branch', branch);
+        grunt.task.run([
+            'shell:push'
+        ]);
+    });
+
+    grunt.registerTask('merge', function(branch){
+        grunt.task.run([
+            'pull:' + branch,
+            'push:' + branch
+        ]);
+    });
 };

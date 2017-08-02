@@ -40,7 +40,7 @@ enum MetricPrefix
 /**
 * \param size                          File size to format. Can be negative.
 * \param precision                     Maximal number of decimal digits after comma.
-* \param prefixThreshold               //TODO: #rvasilenko what is prefixThreshold? Why 1 is default, and usually passed 10?
+* \param prefixThreshold               // TODO: #rvasilenko what is prefixThreshold? Why 1 is default, and usually passed 10?
 * \param minPrefix
 * \param maxPrefix
 * \param useBinaryPrefixes
