@@ -90,17 +90,21 @@ ConnectSessionManager::ConnectSessionManager(
 void ConnectSessionManager::discoverPublicIp()
 {
     network::PublicIPDiscovery ipDiscovery;
-    ipDiscovery.update();
-    ipDiscovery.waitForFinished();
-    auto publicAddress = ipDiscovery.publicIP();
 
-    if (publicAddress.isNull())
+    while (true)
     {
-        NX_ERROR(this, "Failed to discover public relay host address.");
-        return;
-    }
+        ipDiscovery.update();
+        ipDiscovery.waitForFinished();
+        QHostAddress publicAddress = ipDiscovery.publicIP();
 
-    m_publicIpString = publicAddress.toString().toStdString();
+        if (!publicAddress.isNull())
+        {
+            m_publicIpString = publicAddress.toString().toStdString();
+            return;
+        }
+
+        NX_WARNING(this, "Failed to discover public relay host address. Keep trying...");
+    }
 }
 
 ConnectSessionManager::~ConnectSessionManager()
