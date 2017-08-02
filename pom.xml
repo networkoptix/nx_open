@@ -203,7 +203,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloudGroup>test</cloudGroup>
-        <certificates_dir>${packages.dir}/certificates-${customization}</certificates_dir>
+        <certificates_dir>${packages.dir}/any/certificates-${customization}</certificates_dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
