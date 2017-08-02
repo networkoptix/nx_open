@@ -131,3 +131,10 @@ class DataRecord(models.Model):
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
+
+
+    def save(self, *args, **kwargs):
+        if not self.data_structure.translatable:
+            self.language = None
+
+        super(DataRecord, self).save(*args, **kwargs)

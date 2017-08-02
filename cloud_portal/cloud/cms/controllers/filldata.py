@@ -97,10 +97,7 @@ def process_context_structure(customization, context, content,
             if preview:
                 image_storage = os.path.join(image_storage, 'preview')
 
-            file_name = record.name
-            match = re.search(r'{{language}}/', file_name)
-            if match:
-                file_name = file_name.replace("{{language}}", language.code)
+            file_name = record.name.replace("{{language}}", language.code)
 
             convert_b64_image_to_png(content_value, file_name, image_storage)
     return content

@@ -52,11 +52,10 @@ def save_unrevisioned_records(customization, language, data_structures,
     upload_errors = []
     for data_structure in data_structures:
         data_structure_name = data_structure.name
-
-        ds_language = language
+        
         records = data_structure.datarecord_set\
             .filter(customization=customization,
-                    language=ds_language)
+                    language=language)
 
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
@@ -85,8 +84,6 @@ def save_unrevisioned_records(customization, language, data_structures,
                     if size_errors:
                         upload_errors.extend(size_errors)
                         continue
-                if not data_structure.translatable:
-                    ds_language = None
             # If file was not uploaded remove it if user chooses to delete it
             elif "Remove_" + data_structure_name in request_data:
                 new_record_value = ""
@@ -105,7 +102,7 @@ def save_unrevisioned_records(customization, language, data_structures,
                 continue
 
         record = DataRecord(data_structure=data_structure,
-                            language=ds_language,
+                            language=language,
                             customization=customization,
                             value=new_record_value,
                             created_by=user)
