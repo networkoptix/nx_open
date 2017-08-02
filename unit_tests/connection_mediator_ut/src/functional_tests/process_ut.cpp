@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include <nx/utils/random.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -16,6 +17,11 @@ class FtMediatorProcess:
     public MediatorFunctionalTest
 {
 public:
+    FtMediatorProcess()
+    {
+        startMediator();
+    }
+
     ~FtMediatorProcess()
     {
         if (m_udpClient)
@@ -23,6 +29,8 @@ public:
             m_udpClient->pleaseStopSync();
             m_udpClient.reset();
         }
+
+        stopMediator();
     }
 
     void startMediator()
@@ -39,21 +47,65 @@ public:
         m_udpClient = std::make_unique<api::MediatorClientUdpConnection>(stunEndpoint());
     }
     
-    void startIssuingMediatorRequests()
-    {
-        issueConnectRequest();
-    }
-
     void stopMediator()
     {
         stop();
     }
 
+protected:
+    void startIssuingMediatorRequests()
+    {
+        m_sendRequestsNonStop = true;
+        issueConnectRequest();
+    }
+
+    void whenSeveralJunkPacketsHaveBeenSentToMediatorUdpPort()
+    {
+        constexpr int kRequestToSendCount = 17;
+        constexpr int kMaxPacketSize = 2*1024;
+
+        nx::network::UDPSocket udpSocket(AF_INET);
+        ASSERT_TRUE(udpSocket.connect(stunEndpoint()));
+        for (int i = 0; i < kRequestToSendCount; ++i)
+        {
+            nx::Buffer packet = nx::utils::random::generate(kMaxPacketSize);
+            ASSERT_EQ(packet.size(), udpSocket.send(packet.constData(), packet.size()))
+                << SystemError::getLastOSErrorText().toStdString();
+        }
+    }
+
+    void whenSendConnectRequest()
+    {
+        issueConnectRequest();
+    }
+
+    void thenMediatorStillAbleToProcessCorrectRequests()
+    {
+        whenSendConnectRequest();
+        thenResponseIsReceived();
+    }
+
+    void thenResponseIsReceived()
+    {
+        m_prevResponse = m_receivedResponses.pop();
+        ASSERT_NE(api::ResultCode::networkError, m_prevResponse.resultCode);
+    }
+
 private:
+    struct Result
+    {
+        stun::TransportHeader transportHeader;
+        api::ResultCode resultCode = api::ResultCode::networkError;
+        api::ConnectResponse response;
+    };
+
     AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_server;
     std::unique_ptr<api::MediatorClientTcpConnection> m_client;
     std::unique_ptr<api::MediatorClientUdpConnection> m_udpClient;
+    Result m_prevResponse;
+    nx::utils::SyncQueue<Result> m_receivedResponses;
+    bool m_sendRequestsNonStop = false;
 
     void issueConnectRequest()
     {
@@ -70,21 +122,33 @@ private:
     }
 
     void onConnectResponse(
-        stun::TransportHeader /*transportHeader*/,
-        api::ResultCode /*resultCode*/,
-        api::ConnectResponse /*response*/)
+        stun::TransportHeader transportHeader,
+        api::ResultCode resultCode,
+        api::ConnectResponse response)
     {
-        issueConnectRequest();
+        Result requestResult;
+        requestResult.transportHeader = std::move(transportHeader);
+        requestResult.resultCode = resultCode;
+        requestResult.response = std::move(response);
+        m_receivedResponses.push(std::move(requestResult));
+
+        if (m_sendRequestsNonStop)
+            issueConnectRequest();
     }
 };
 
 TEST_F(FtMediatorProcess, correct_manager_destruction_order)
 {
-    startMediator();
     startIssuingMediatorRequests();
     std::this_thread::sleep_for(
         std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
     stopMediator();
+}
+
+TEST_F(FtMediatorProcess, properly_handles_requests_after_receiving_junk_on_input)
+{
+    whenSeveralJunkPacketsHaveBeenSentToMediatorUdpPort();
+    thenMediatorStillAbleToProcessCorrectRequests();
 }
 
 } // namespace test
