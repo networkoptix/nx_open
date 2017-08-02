@@ -1,5 +1,7 @@
 #pragma once
 
+#include <plugins/plugin_api.h>
+
 namespace nx {
 namespace sdk {
 namespace metadata {
@@ -33,6 +35,23 @@ struct Ratio
 {
     int numerator;
     int denominator;
+};
+
+enum class AttributeType
+{
+    undefined,
+    number,
+    boolean,
+    string
+
+    // Other more specific types as DateTime, Coordinates, Temperature ???
+};
+
+struct Attribute
+{
+    AttributeType type = AttributeType::undefined;
+    char* name = nullptr;
+    char* value = nullptr;
 };
 
 enum class Error

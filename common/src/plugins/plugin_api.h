@@ -19,6 +19,12 @@
 */
 namespace nxpl
 {
+    //!Define to mark locale dependent output paramters and return values.
+    #define NX_LOCALE_DEPENDENT
+
+    //!Define to mark ascii only output parameters and return values.
+    #define NX_ASCII
+
     //!GUID of plugin interface
     struct NX_GUID
     {
@@ -127,6 +133,18 @@ namespace nxpl
             This reference can be used to access some data and functionality of the container
         */
         virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
+    };
+
+    class Plugin3
+    :
+        public Plugin2
+    {
+    public:
+        //!Sets locale information to be used by the plugin.
+        /*!
+            \param locale is BCP47 language tag
+        */
+        virtual void setLocale(char* locale) = 0;
     };
 
     //!Type of plugin entry-point function
