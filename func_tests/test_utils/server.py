@@ -197,7 +197,7 @@ class Server(object):
             self.wait_for_server_become_online()
             self._state = self._st_started
             if is_started:
-                self.load_system_settings()
+                self.load_system_settings(log_settings=True)
 
     def ensure_service_status(self, is_started):
         if self._state != self._bool2final_state(is_started):
@@ -225,9 +225,12 @@ class Server(object):
     def get_log_file(self):
         return self._installation.get_log_file()
 
-    def load_system_settings(self):
+    def load_system_settings(self, log_settings=False):
         log.debug('%s: Loading settings...', self)
         self.settings = self.get_system_settings()
+        if log_settings:
+            for name, value in self.settings.items():
+                log.debug('%s settings: %s = %r', self.title, name, value)
         self.local_system_id = self.settings['localSystemId']
         self.cloud_system_id = self.settings['cloudSystemID']
         iflist = self.rest_api.api.iflist.GET()
@@ -270,7 +273,7 @@ class Server(object):
         while time.time() - t < timeout:
             new_uptime = self._safe_api_call(self.get_uptime)
             if new_uptime and new_uptime < uptime:
-                self.load_system_settings()
+                self.load_system_settings(log_settings=True)
                 return
             log.debug('Server did not restart yet, waiting...')
             time.sleep(0.5)
@@ -297,11 +300,11 @@ class Server(object):
 
     def set_system_settings(self, **kw):
         self.rest_api.api.systemSettings.GET(**kw)
-        self.load_system_settings()
+        self.load_system_settings(log_settings=True)
 
     def setup_local_system(self, **kw):
         self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
-        self.load_system_settings()
+        self.load_system_settings(log_settings=True)
 
     def setup_cloud_system(self, cloud_host, **kw):
         assert isinstance(cloud_host, CloudHost), repr(cloud_host)
@@ -315,7 +318,7 @@ class Server(object):
             **kw)
         settings = setup_response['settings']
         self.set_user_password(cloud_host.user, cloud_host.password)
-        self.load_system_settings()
+        self.load_system_settings(log_settings=True)
         assert self.settings['systemName'] == self.name
         return settings
 
