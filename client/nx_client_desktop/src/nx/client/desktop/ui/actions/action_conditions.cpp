@@ -1074,7 +1074,7 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-        return any_of(resources, QnResourceAccessFilter::isDroppable);
+        return any_of(resources, QnResourceAccessFilter::isOpenableInEntity);
 
     bool isExportedLayout = layout->isFile();
 

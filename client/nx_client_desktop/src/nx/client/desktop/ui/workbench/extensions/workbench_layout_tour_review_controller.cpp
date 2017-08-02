@@ -496,7 +496,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
         return;
 
     QScopedValueRollback<bool> guard(m_updating, true);
-    for (const auto& resource: resources.filtered(QnResourceAccessFilter::isDroppable))
+    for (const auto& resource: resources.filtered(QnResourceAccessFilter::isOpenableInEntity))
         addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 
