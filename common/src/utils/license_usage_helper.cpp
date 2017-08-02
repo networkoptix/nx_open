@@ -11,6 +11,8 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
+#include <api/runtime_info_manager.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -88,21 +90,22 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QnCommonModule* commonModule, QObje
     base_type(parent),
     QnCommonModuleAware(commonModule)
 {
-    const auto& resPool = commonModule->resourcePool();
-    /* Call update if server was added or removed or changed its status. */
-    auto updateIfNeeded =
-        [this](const QnResourcePtr &resource)
+    connect(licensePool(), &QnLicensePool::licensesChanged, this,
+        &QnLicenseUsageWatcher::licenseUsageChanged);
+
+    // Call update if server was added or removed or changed its status.
+    auto updateIfServerStatusChanged =
+        [this](const QnPeerRuntimeInfo& data)
         {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+            if (data.data.peer.peerType == Qn::PT_Server)
                 emit licenseUsageChanged();
         };
 
-    connect(resPool, &QnResourcePool::resourceAdded, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::statusChanged, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, updateIfNeeded);
-
-    connect(licensePool(), &QnLicensePool::licensesChanged, this,
-        &QnLicenseUsageWatcher::licenseUsageChanged);
+    // Ignoring runtimeInfoChanged as hardwareIds must not change in runtime.
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+        updateIfServerStatusChanged);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+        updateIfServerStatusChanged);
 }
 
 
@@ -381,9 +384,15 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent):
-    base_type(commonModule, parent)
+    base_type(commonModule, parent),
+    m_watcher(new QnCamLicenseUsageWatcher(commonModule, this))
 {
-    initWatcher();
+    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this,
+        [this]()
+        {
+            invalidate();
+            emit licenseUsageChanged();
+        });
 }
 
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
@@ -392,9 +401,8 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
     QnCommonModule* commonModule,
     QObject* parent)
     :
-    base_type(commonModule, parent)
+    QnCamLicenseUsageHelper(commonModule, parent)
 {
-    initWatcher();
     propose(proposedCameras, proposedEnable);
 }
 
@@ -404,9 +412,8 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
     QnCommonModule* commonModule,
     QObject* parent)
 :
-    base_type(commonModule, parent)
+    QnCamLicenseUsageHelper(commonModule, parent)
 {
-    initWatcher(proposedCamera);
     propose(proposedCamera, proposedEnable);
 }
 
@@ -477,17 +484,6 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
         if (requiresLicense)
             proposedToUse[lt]++;
     }
-}
-
-void QnCamLicenseUsageHelper::initWatcher(const QnVirtualCameraResourcePtr& camera)
-{
-    m_watcher = new QnCamLicenseUsageWatcher(camera, commonModule(), this);
-    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this,
-        [this]()
-        {
-            invalidate();
-            emit licenseUsageChanged();
-        });
 }
 
 //////////////////////////////////////////////////////////////////////////
