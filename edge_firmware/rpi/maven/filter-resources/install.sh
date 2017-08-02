@@ -112,7 +112,7 @@ getPidWhichUsesPort() # port
 }
 
 # Output nothing if the specified pid does not belong to a mediaserver; otherwise, output the pid.
-checkServerPid() # pid
+checkMediaserverPid() # pid
 {
     local PID="$1"
 
@@ -121,26 +121,29 @@ checkServerPid() # pid
     fi
 }
 
-restartServer()
+restartMediaserver()
 {
-    local SERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
+    local MEDIASERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
         |grep '^port=[0-9]\+$' |sed 's/port=//')
 
-    # If the server cannot start because another process uses its port, kill it and restart.
+    # If the mediaserver cannot start because another process uses its port, kill it and restart.
     while true; do
         "$STARTUP_SCRIPT" start || true #< If not started, the loop will try again.
         sleep 3
 
-        local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$SERVER_PORT")
-        local SERVER_PID=$(checkServerPid "$PID_WHICH_USES_PORT")
-        if [ ! -z "$SERVER_PID" ]; then
-            echo "Upgraded mediaserver is up and running with pid $SERVER_PID at port $SERVER_PORT"
+        local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$MEDIASERVER_PORT")
+        local MEDIASERVER_PID=$(checkMediaserverPid "$PID_WHICH_USES_PORT")
+        if [ ! -z "$MEDIASERVER_PID" ]; then
+            echo "Upgraded mediaserver is up and running with pid $MEDIASERVER_PID at port $MEDIASERVER_PORT"
             break
         fi
 
-        echo "Another process (pid $PID_WHICH_USES_PORT) uses port $SERVER_PORT:" \
+        echo "Another process (pid $PID_WHICH_USES_PORT) uses port $MEDIASERVER_PORT:" \
             "killing it and restarting $CUSTOMIZATION-mediaserver"
-        "$STARTUP_SCRIPT" stop || true #< Just in case - the server should not be running by now.
+
+        # Just in case - the mediaserver should not be running by now.
+        "$STARTUP_SCRIPT" stop || true
+
         kill -9 "$PID_WHICH_USES_PORT" || true
     done
 }
@@ -163,7 +166,7 @@ main()
         exit 0
     fi
 
-    restartServer
+    restartMediaserver
 }
 
 onExit() # Called on exit via trap.
