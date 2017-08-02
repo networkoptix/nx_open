@@ -12,7 +12,7 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
-#include "multiple_address_connector.h"
+#include "any_accessible_address_connector.h"
 #include "tunnel/tunnel_attributes.h"
 
 namespace nx {
@@ -116,7 +116,7 @@ private:
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
-    std::unique_ptr<MultipleAddressConnector> m_multipleAddressConnector;
+    std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
 
     QnMutex m_mutex;
     bool m_terminated;

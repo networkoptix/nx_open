@@ -72,7 +72,7 @@ QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
     localPeer.peerType = Qn::PT_Server;
     localPeer.cloudHost = nx::network::AppInfo::defaultCloudHost();
     localPeer.identityTime = commonModule()->systemIdentityTime();
-    localPeer.aliveUpdateInterval = std::chrono::duration_cast<std::chrono::milliseconds>(
+    localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
     localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
@@ -271,7 +271,7 @@ void ConnectionProcessor::run()
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
-    auto keepAliveTimeout = commonModule->globalSettings()->aliveUpdateInterval();
+    auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
     webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
 
