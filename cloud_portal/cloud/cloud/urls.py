@@ -20,6 +20,9 @@ from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 
 
+admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
+
+
 def redirect_login(request):
     target_url = '/login'
     if 'QUERY_STRING' in request.META:

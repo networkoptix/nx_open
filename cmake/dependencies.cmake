@@ -20,7 +20,12 @@ function(detect_package_versions)
         set(_qt_version "5.6.1-1")
     endif()
 
+    if(LINUX AND box STREQUAL "none")
+        set(_qt_version "5.6.2-2")
+    endif()
+
     if(MACOSX)
+        set(_qt_version "5.6.2-2")
         set(_quazip_version "0.7.2")
         set(_festival_version "2.1")
     endif()
@@ -200,6 +205,9 @@ function(get_dependencies)
         nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
         nx_rdep_add_package(opengl-es-mali)
     endif()
+
+    nx_rdep_add_package("any/certificates-${customization}" PATH_VARIABLE certificates_path)
+    set(certificates_path ${certificates_path} PARENT_SCOPE)
 endfunction()
 
 detect_package_versions()

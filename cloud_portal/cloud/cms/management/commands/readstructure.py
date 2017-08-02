@@ -106,6 +106,9 @@ def read_structure_json():
             if type:
                 data_structure.type = DataStructure.get_type(type)
 
+            if type and type == "Image":
+                data_structure.translatable = "{{language}}" in name
+
             data_structure.meta_settings = meta if meta else {}
             data_structure.default = value
             data_structure.save()

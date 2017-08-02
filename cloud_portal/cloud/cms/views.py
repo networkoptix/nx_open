@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib import admin
 
 from cloud import settings
 
@@ -137,14 +138,16 @@ def handle_post_context_edit_view(request, context_id, language_id):
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
         context, form, language = handle_get_view(request, context, language)
-
-        return render(request, 'context_editor.html', {'context': context,
-                                                       'form': form,
-                                                       'language': language,
-                                                       'user': request.user,
-                                                       'has_permission': mysite.has_permission(request),
-                                                       'site_url': mysite.site_url,
-                                                       'title': 'Content Editor'})
+        return render(request, 'context_editor.html',
+                      {'context': context,
+                       'form': form,
+                       'language': language,
+                       'user': request.user,
+                       'has_permission': mysite.has_permission(request),
+                       'site_url': mysite.site_url,
+                       'site_header': admin.site.site_header,
+                       'site_title': admin.site.site_title,
+                       'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
     else:
         context, form, language, preview_link = handle_post_context_edit_view(
@@ -153,14 +156,17 @@ def context_edit_view(request, context=None, language=None):
         if 'SendReview' in request.data:
             return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
-        return render(request, 'context_editor.html', {'context': context,
-                                                       'form': form,
-                                                       'language': language,
-                                                       'preview_link': preview_link,
-                                                       'user': request.user,
-                                                       'has_permission': mysite.has_permission(request),
-                                                       'site_url': mysite.site_url,
-                                                       'title': 'Content Editor'})
+        return render(request, 'context_editor.html',
+                      {'context': context,
+                       'form': form,
+                       'language': language,
+                       'preview_link': preview_link,
+                       'user': request.user,
+                       'has_permission': mysite.has_permission(request),
+                       'site_url': mysite.site_url,
+                       'site_header': admin.site.site_header,
+                       'site_title': admin.site.site_title,
+                       'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
 
 @api_view(["POST"])
