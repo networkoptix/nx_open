@@ -102,6 +102,7 @@ PageBase
             {
                 width: videoScreen.width
                 state: videoScreenController.dummyState
+                centered: true
             }
         }
 

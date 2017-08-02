@@ -100,10 +100,10 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
     if (!securityCameraResource)
         return;
 
-    auto archiveCanBeSynchronized = securityCameraResource->isInitialized() 
+    auto archiveCanBeSynchronized = securityCameraResource->isInitialized()
         && securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)
         && securityCameraResource->isLicenseUsed()
-        && !securityCameraResource->isScheduleDisabled(); 
+        && !securityCameraResource->isScheduleDisabled();
 
     if (!archiveCanBeSynchronized)
     {
@@ -132,7 +132,10 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 
 void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
-    NX_LOGX(lm("Resource parent ID has changed").arg(resource->getParentId()), cl_logDEBUG1);
+    NX_LOGX(lm("Resource %1 parent ID has changed to %2")
+        .arg(resource->getName())
+        .arg(resource->getParentId()),
+        cl_logDEBUG1);
     cancelTaskForResource(resource->getId());
 }
 
@@ -149,7 +152,7 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
     SynchronizationTaskContext context;
     context.task = task;
     context.result = nx::utils::concurrent::run([task]() { task->execute(); });
-    m_syncTasks[id] = context;    
+    m_syncTasks[id] = context;
 }
 
 void RemoteArchiveSynchronizer::removeTaskFromAwaited(const QnUuid& id)
@@ -265,9 +268,9 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
 
     auto totalEntriesToSynchronize = filtered.size();
     int currentNumberOfSynchronizedEntries = 0;
-    double lastBroadcastedSyncProgress = 0; 
+    double lastBroadcastedSyncProgress = 0;
     const int kNumberOfSynchronizedEntriesToNotify = 5;
-    double broadcastSyncProgressStep = 
+    double broadcastSyncProgressStep =
         kNumberOfSynchronizedEntriesToNotify / (double)totalEntriesToSynchronize;
 
     if (broadcastSyncProgressStep > 0.7)
@@ -291,7 +294,7 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
 
         ++currentNumberOfSynchronizedEntries;
 
-        double currentSyncProgress = 
+        double currentSyncProgress =
             (double) currentNumberOfSynchronizedEntries / totalEntriesToSynchronize;
 
         if (currentSyncProgress - lastBroadcastedSyncProgress > broadcastSyncProgressStep)
