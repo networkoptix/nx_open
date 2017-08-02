@@ -112,7 +112,7 @@ def read_structure_json():
                 data_structure.translatable = "{{language}}" in name
 
                 #this is used to convert source images into b64 strings
-                file_path = os.path.join('static', settings.CUSTOMIZATION, 'source', name)
+                file_path = os.path.join('static', 'default', 'source', name)
                 file_path = file_path.replace("{{language}}", settings.DEFAULT_LANGUAGE)
                 with open(file_path, 'r') as file:
                     value = encoded_string = base64.b64encode(file.read())
