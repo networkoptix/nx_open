@@ -106,6 +106,7 @@ private:
     bool m_terminated = false;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPool;
     std::set<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
+    std::string m_publicIpString;
 
     void saveServerConnection(
         const std::string& peerName,
@@ -129,6 +130,7 @@ private:
         std::size_t bytesSent,
         std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
+    void discoverPublicIp();
 };
 
 class ConnectSessionManagerFactory
