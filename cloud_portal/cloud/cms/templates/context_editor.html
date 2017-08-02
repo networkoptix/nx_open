@@ -41,7 +41,7 @@
                 {{ field }}
                 
                 {% if field.help_text %}
-                <p class="help">{{ field.help_text }}</p>
+                <p class="help">{{ field.help_text|safe }}</p>
                 {% endif %}
             </div>
         </div>

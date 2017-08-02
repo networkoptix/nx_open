@@ -111,7 +111,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    language = models.ForeignKey(Language, null=True)
+    language = models.ForeignKey(Language, null=True, blank=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
