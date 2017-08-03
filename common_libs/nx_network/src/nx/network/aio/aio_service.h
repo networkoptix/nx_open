@@ -63,6 +63,8 @@ public:
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
+        boost::optional<std::chrono::milliseconds> timeoutMillis
+            = boost::optional<std::chrono::milliseconds>(),
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
@@ -91,12 +93,6 @@ public:
         std::chrono::milliseconds timeoutMillis,
         AIOEventHandler* const eventHandler );
     
-    void registerTimerNonSafe(
-        QnMutexLockerBase* const locker,
-        Pollable* const sock,
-        std::chrono::milliseconds timeoutMillis,
-        AIOEventHandler* const eventHandler);
-
     /**
      * @returns true, if socket is still listened for state changes.
      */
@@ -120,41 +116,11 @@ public:
      *   otherwise - queued like aio::AIOService::post does.
      */
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
-    // TODO #ak: Remove this method. It violates encapsulation.
-    QnMutex* mutex() const;
     aio::AIOThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;
     bool isInAnyAioThread() const;
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
-
-    /**
-     * Same as AIOService::startMonitoring, but does not lock mutex. 
-     *   Calling entity MUST lock AIOService::mutex() before calling this method.
-     * @param socketAddedToPollHandler Called after socket has been added 
-     *   to pollset but before pollset.poll has been called.
-     */
-    void startMonitoringNonSafe(
-        QnMutexLockerBase* const lock,
-        Pollable* const sock,
-        aio::EventType eventToWatch,
-        AIOEventHandler* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis
-            = boost::optional<std::chrono::milliseconds>(),
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler
-            = nx::utils::MoveOnlyFunc<void()>());
-
-    /**
-     * Same as AIOService::stopMonitoring, but does not lock mutex. 
-     * Calling entity MUST lock AIOService::mutex() before calling this method.
-     */
-    void stopMonitoringNonSafe(
-        QnMutexLockerBase* const lock,
-        Pollable* const sock,
-        aio::EventType eventType,
-        bool waitForRunningHandlerCompletion = true,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler
-            = nx::utils::MoveOnlyFunc<void()>());
 
     void cancelPostedCalls(
         Pollable* const sock,
@@ -177,6 +143,22 @@ private:
     mutable QnMutex m_mutex;
 
     void initializeAioThreadPool(SocketAIOContext* aioCtx, unsigned int threadCount);
+
+    /**
+     * Same as AIOService::startMonitoring, but does not lock mutex. 
+     *   Calling entity MUST lock AIOService::mutex() before calling this method.
+     * @param socketAddedToPollHandler Called after socket has been added 
+     *   to pollset but before pollset.poll has been called.
+     */
+    void startMonitoringNonSafe(
+        QnMutexLockerBase* const lock,
+        Pollable* const sock,
+        aio::EventType eventToWatch,
+        AIOEventHandler* const eventHandler,
+        boost::optional<std::chrono::milliseconds> timeoutMillis = boost::none,
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler
+            = nx::utils::MoveOnlyFunc<void()>());
+
     aio::AIOThread* getSocketAioThread(
         QnMutexLockerBase* const lock,
         Pollable* sock);

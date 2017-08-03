@@ -50,7 +50,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>() );
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
     /**
      * Change timeout of existing polling sock for eventToWatch to timeoutMS. 
      *   eventHandler is changed also.
@@ -61,7 +61,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
-        std::function<void()> socketAddedToPollHandler = std::function<void()>() );
+        std::function<void()> socketAddedToPollHandler = std::function<void()>());
     /**
      * Stop monitoring sock for event eventType.
      * Guarantees that no AIOEventHandler::eventTriggered will be called after return of this method.
@@ -80,16 +80,16 @@ public:
     /**
      * Queues functor to be executed from within this aio thread as soon as possible.
      */
-    void post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor );
+    void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
     /**
      * If called in this aio thread, then calls functor immediately, 
      *   otherwise queues functor in same way as aio::AIOThread::post does.
      */
-    void dispatch( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor );
+    void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
     /**
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
-    void cancelPostedCalls( Pollable* const sock, bool waitForRunningHandlerCompletion );
+    void cancelPostedCalls(Pollable* const sock, bool waitForRunningHandlerCompletion);
     /**
      * Returns number of sockets handled by this object.
      */
