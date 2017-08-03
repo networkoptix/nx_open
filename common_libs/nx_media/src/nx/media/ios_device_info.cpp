@@ -12,7 +12,7 @@ IosDeviceInformation iosDeviceInformation()
     struct utsname systemInfo;
     uname(&systemInfo);
 
-	const auto& infoString = QString::fromLatin1(systemInfo.machine);
+    const auto& infoString = QString::fromLatin1(systemInfo.machine);
 
     QRegExp infoRegExp(lit("(\\w+)(\\d+),(\\d+)"));
 
