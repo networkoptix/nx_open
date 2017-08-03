@@ -1,17 +1,11 @@
 #pragma once
 
-#include <plugins/metadata/abstract_metadata_packet.h>
+#include <plugins/metadata/abstract_iterable_metadata_packet.h>
 #include <plugins/metadata/utils.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
-
-static const char* kObjectTypeAttribute = "objectType";
-static const char* kObjectClassAttribute = "objectClass";
-
-static const char* kPersonObjectType = "person";
-static const char* kVehicleObjectType = "vehicle";
 
 /**
  * @brief The Rect struct represents bounding box of detected object.
@@ -46,7 +40,7 @@ struct Rect
 /**
  * @brief The DetectedObject struct represents the single detected on the scene object.
  */
-struct DetectedObject
+struct DetectedObject: public AbstractMetadataItem
 {
     /**
      * @brief id of detected object. If the object (e.g. particular person)
@@ -101,7 +95,7 @@ static const nxpl::GUID IID_DetectionMetadataPacket
  * @brief The AbstractDetectionMetadataPacket class is an interface for metadata packet
  * that contains the data about detected on the scene objects.
  */
-class AbstractDetectionMetadataPacket: public AbstractMetadataPacket
+class AbstractDetectionMetadataPacket: public AbstractIterableMetadataPacket
 {
 public:
 

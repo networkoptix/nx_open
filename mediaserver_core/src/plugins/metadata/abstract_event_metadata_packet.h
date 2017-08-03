@@ -1,6 +1,7 @@
 #pragma once
 
-#include <plugins/metadata/abstract_metadata_packet.h>
+#include <plugins/metadata/abstract_iterable_metadata_packet.h>
+#include <plugins/metadata/abstract_metadata_item.h>
 
 namespace nx {
 namespace sdk {
@@ -41,7 +42,7 @@ struct DetectedEvent: public AbstractMetadataItem
  * @brief The AbstractEventMetadataPacket class is an interface for metadata packet
  * containing information about some event.
  */
-class AbstractEventMetadataPacket: public AbstractMetadataPacket
+class AbstractEventMetadataPacket: public AbstractIterableMetadataPacket
 {
     /**
     * @return next detected object or null if no more objects left.
