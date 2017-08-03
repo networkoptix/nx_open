@@ -161,6 +161,8 @@ public:
         bool waitForRunningHandlerCompletion = true );
 
 private:
+    using MonitoringContext = std::pair<AIOThread*, std::chrono::milliseconds>;
+
     struct SocketAIOContext
     {
         typedef AIOThread AIOThreadType;
@@ -168,7 +170,7 @@ private:
         std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
         std::map<
             std::pair<Pollable*, aio::EventType>,
-            std::pair<AIOThreadType*, std::chrono::milliseconds> > sockets;
+            MonitoringContext> sockets;
     };
 
     SocketAIOContext m_systemSocketAIO;
@@ -178,6 +180,14 @@ private:
     aio::AIOThread* getSocketAioThread(
         QnMutexLockerBase* const lock,
         Pollable* sock);
+    bool getSocketTimeout(
+        Pollable* const sock,
+        aio::EventType eventToWatch,
+        std::chrono::milliseconds* timeout);
+    boost::optional<MonitoringContext> getSocketMonitoringContext(
+        Pollable* const sock,
+        aio::EventType eventToWatch);
+
     void cancelPostedCallsNonSafe(
         QnMutexLockerBase* const lock,
         Pollable* const sock,

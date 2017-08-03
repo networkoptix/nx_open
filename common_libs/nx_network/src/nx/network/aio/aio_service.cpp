@@ -186,88 +186,39 @@ void AIOService::startMonitoringNonSafe(
 {
     if (!timeoutMillis)
     {
-        unsigned int sockTimeoutMS = 0;
-        if (eventToWatch == aio::etRead)
+        timeoutMillis = std::chrono::milliseconds::zero();
+        if (!getSocketTimeout(sock, eventToWatch, &(*timeoutMillis)))
         {
-            if (!sock->getRecvTimeout(&sockTimeoutMS))
-            {
-                //reporting error via event thread
-                postNonSafe(
-                    lock,
-                    sock,
-                    std::bind(
-                        &AIOEventHandler::eventTriggered,
-                        eventHandler,
-                        sock,
-                        aio::etError));
-                return;
-            }
-        }
-        else if (eventToWatch == aio::etWrite)
-        {
-            if (!sock->getSendTimeout(&sockTimeoutMS))
-            {
-                //reporting error via event thread
-                postNonSafe(
-                    lock,
-                    sock,
-                    std::bind(
-                        &AIOEventHandler::eventTriggered,
-                        eventHandler,
-                        sock,
-                        aio::etError));
-                return;
-            }
-        }
-        else
-        {
-            NX_ASSERT(false);
-        }
-        timeoutMillis = std::chrono::milliseconds(sockTimeoutMS);
-    }
-
-    //checking, if that socket is already polled
-    const std::pair<Pollable*, aio::EventType>& sockCtx = std::make_pair(sock, eventToWatch);
-    //checking if sock is already polled (even for another event)
-    auto closestSockIter = m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, (aio::EventType)0));
-    auto sameSockAndEventIter = closestSockIter;
-    for (; sameSockAndEventIter != m_systemSocketAIO.sockets.end(); ++sameSockAndEventIter)
-    {
-        if (sameSockAndEventIter->first.first != sock)
-        {
-            sameSockAndEventIter = m_systemSocketAIO.sockets.end();
-            break;
-        }
-        else if (sameSockAndEventIter->first.second == eventToWatch)
-        {
-            break;
-        }
-    }
-    if (sameSockAndEventIter != m_systemSocketAIO.sockets.end() &&
-        sameSockAndEventIter->second.second == timeoutMillis.get())
-    {
-        return;    //socket already monitored for eventToWatch
-    }
-
-    if ((closestSockIter != m_systemSocketAIO.sockets.end()) && (closestSockIter->first.first == sockCtx.first))  //same socket is already polled
-    {
-        if (sameSockAndEventIter != m_systemSocketAIO.sockets.end())
-        {
-            //socket is already polled for this event but with another timeout. Just changing timeout
-            sameSockAndEventIter->second.first->changeSocketTimeout(
-                sock, eventToWatch, eventHandler, timeoutMillis.get());
-            sameSockAndEventIter->second.second = timeoutMillis.get();
+            postNonSafe(
+                lock,
+                sock,
+                std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
             return;
         }
     }
 
+    boost::optional<MonitoringContext> monitoringContext = 
+        getSocketMonitoringContext(sock, eventToWatch);
+    if (monitoringContext)
+    {
+        if (monitoringContext->second != timeoutMillis)
+        {
+            // Socket is already polled for this event but with another timeout. Just changing timeout.
+            monitoringContext->first->changeSocketTimeout(
+                sock, eventToWatch, eventHandler, timeoutMillis.get());
+            monitoringContext->second = timeoutMillis.get();
+        }
+        return;
+    }
+
     const auto threadToUse = getSocketAioThread(lock, sock);
     if (!m_systemSocketAIO.sockets.emplace(
-            sockCtx,
+            std::make_pair(sock, eventToWatch),
             std::make_pair(threadToUse, timeoutMillis.get())).second)
     {
         NX_ASSERT(false);
     }
+
     lock->unlock();
     threadToUse->startMonitoring(
         sock,
@@ -336,6 +287,59 @@ aio::AIOThread* AIOService::getSocketAioThread(
 
     NX_ASSERT(thread);
     return thread;
+}
+
+bool AIOService::getSocketTimeout(
+    Pollable* const sock,
+    aio::EventType eventToWatch,
+    std::chrono::milliseconds* timeout)
+{
+    unsigned int sockTimeoutMS = 0;
+    if (eventToWatch == aio::etRead)
+    {
+        if (!sock->getRecvTimeout(&sockTimeoutMS))
+            return false;
+    }
+    else if (eventToWatch == aio::etWrite)
+    {
+        if (!sock->getSendTimeout(&sockTimeoutMS))
+            return false;
+    }
+    else
+    {
+        NX_ASSERT(false);
+        return false;
+    }
+    *timeout = std::chrono::milliseconds(sockTimeoutMS);
+    return true;
+}
+
+boost::optional<AIOService::MonitoringContext> AIOService::getSocketMonitoringContext(
+    Pollable* const sock,
+    aio::EventType eventToWatch)
+{
+    // Checking, if that socket is already polled
+    const std::pair<Pollable*, aio::EventType>& sockCtx = std::make_pair(sock, eventToWatch);
+    // Checking if sock is already polled (even for another event)
+    auto closestSockIter = m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, (aio::EventType)0));
+    auto sameSockAndEventIter = closestSockIter;
+    for (; sameSockAndEventIter != m_systemSocketAIO.sockets.end(); ++sameSockAndEventIter)
+    {
+        if (sameSockAndEventIter->first.first != sock)
+        {
+            sameSockAndEventIter = m_systemSocketAIO.sockets.end();
+            break;
+        }
+        else if (sameSockAndEventIter->first.second == eventToWatch)
+        {
+            break;
+        }
+    }
+
+    if (sameSockAndEventIter != m_systemSocketAIO.sockets.end())
+        return sameSockAndEventIter->second;
+
+    return boost::none;
 }
 
 void AIOService::cancelPostedCallsNonSafe(
