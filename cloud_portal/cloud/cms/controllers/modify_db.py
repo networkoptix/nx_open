@@ -202,43 +202,43 @@ def check_image_dimensions(data_structure_name,
 
     if 'height' in meta_dimensions and \
                     meta_dimensions['height'] != image_dimensions['height']:
-        error_msg = "Image height must be equal to {}.\
-         Uploaded image's height is {}."\
+        error_msg = "Image height must be equal to {}." \
+                    "Uploaded image's height is {}."\
             .format(meta_dimensions['height'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
     if 'width' in meta_dimensions and \
                     meta_dimensions['width'] != image_dimensions['width']:
-        error_msg = "Image width must be equal to {}.\
-         Uploaded image's width is {}."\
+        error_msg = "Image width must be equal to {}." \
+                    "Uploaded image's width is {}."\
             .format(meta_dimensions['width'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
     if 'height_le' in meta_dimensions and \
                     meta_dimensions['height_le'] < image_dimensions['height']:
-        error_msg = "Image height must be equal to or less than {}.\
-         Uploaded image's height is {}."\
+        error_msg = "Image height must be equal to or less than {}." \
+                    "Uploaded image's height is {}."\
             .format(meta_dimensions['height_le'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
     if 'width_le' in meta_dimensions and \
                     meta_dimensions['width_le'] < image_dimensions['width']:
-        error_msg = "Image width must be equal to or less than {}.\
-         Uploaded image's width is {}."\
+        error_msg = "Image width must be equal to or less than {}." \
+                    "Uploaded image's width is {}."\
             .format(meta_dimensions['width_le'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
     if 'height_ge' in meta_dimensions and \
                     meta_dimensions['height_ge'] > image_dimensions['height']:
-            error_msg = "Image height must be equal to or more than {}.\
-         Uploaded image's height is {}." \
-                .format(meta_dimensions['height_ge'], image_dimensions['height'])
+        error_msg = "Image height must be equal to or more than {}." \
+                    "Uploaded image's height is {}."\
+            .format(meta_dimensions['height_ge'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
     if 'width_ge' in meta_dimensions and \
                     meta_dimensions['width_ge'] > image_dimensions['width']:
-        error_msg = "Image width must be equal to or more than {}.\
-         Uploaded image's width is {}." \
+        error_msg = "Image width must be equal to or more than {}." \
+                    "Uploaded image's width is {}." \
             .format(meta_dimensions['width_ge'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
