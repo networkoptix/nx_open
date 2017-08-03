@@ -17,7 +17,7 @@ Item
     property bool privateAutoFocusPressed: false
     readonly property vector2d zeroVector: Qt.vector2d(0, 0)
 
-    function handleAutoFocusClicked()
+    function showCommonPreloader()
     {
         privateAutoFocusPressed = true; //< Shows autofocus preloader
         privateAutoFocusPressed = false;
@@ -62,7 +62,6 @@ Item
 
     function updatePreloaderState()
     {
-
         var someoneActive = zoomInPressed || zoomOutPressed  || focusPressed
             || privateAutoFocusPressed || moveDirection != zeroVector
 

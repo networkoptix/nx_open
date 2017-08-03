@@ -7,7 +7,7 @@ BasePreloader
 {
     id: control
 
-    property color color: "white"
+    property color color: Qt.rgba(1, 1, 1, 0.8)
     property real thickness: 6
     property real sectionFOV: Math.PI / 2
     property real sectionRotationDegrees: 90
@@ -25,6 +25,7 @@ BasePreloader
         height: control.thickness * 2
 
         radius: control.thickness
+        color: control.color
         visible: true
     }
 
@@ -53,7 +54,7 @@ BasePreloader
                     context.reset()
                     context.scale(Screen.devicePixelRatio, Screen.devicePixelRatio)
 
-                    context.fillStyle = Qt.rgba(1, 1, 1, 1)
+                    context.fillStyle = control.color
                     drawSection(Math.PI * 3 / 2)
                     drawSection(Math.PI / 2)
                 }

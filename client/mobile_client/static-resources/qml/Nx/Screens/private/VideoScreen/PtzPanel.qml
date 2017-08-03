@@ -45,7 +45,17 @@ Item
         Connections
         {
             target: focusControl
-            onAutoFocusClicked: preloadersPanel.handleAutoFocusClicked()
+            onAutoFocusClicked: preloadersPanel.showCommonPreloader()
+        }
+        Connections
+        {
+            target: presetsItem
+            onGoToPreset: preloadersPanel.showCommonPreloader()
+        }
+        Connections
+        {
+            target: presetsButton
+            onPresetChoosen: preloadersPanel.showCommonPreloader()
         }
     }
 

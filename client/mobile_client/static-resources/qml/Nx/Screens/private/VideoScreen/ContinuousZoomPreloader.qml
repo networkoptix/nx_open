@@ -5,7 +5,7 @@ BasePreloader
 {
     id: control
 
-    property color color: Qt.rgba(1, 1, 1, 1)
+    property color color: Qt.rgba(1, 1, 1, 0.8)
     property real thickness: 4
     property int period: 1500
     property int figuresCount: 4
