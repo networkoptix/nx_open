@@ -50,21 +50,28 @@ static const QSize kCellSize{1, 1};
 
 static const QMargins kReviewMargins(16, 16, 16, 16);
 
+// Placeholders are allowed only for grids less or equal than 4*4.
+static const int kMaxGridSizeWithPlaceholders = 4;
+
+// Grid size less than 2*2 is not allowed;
+static const int kMinGridSize = 2;
+
 QRect createItemGrid(int itemCount)
 {
-    static const QSize kMinMatrixSize(2, 2);
-    QSize size(kMinMatrixSize);
-
     int root = std::ceil(std::sqrt(itemCount));
+    int h = std::max(root, kMinGridSize);
+    int w = std::max((int)std::ceil(1.0 * itemCount / h), kMinGridSize);
 
-    if (itemCount > 3)
-        size.setHeight(std::max(3, root));
-    if (itemCount > 5)
-        size.setWidth(std::max(3, root));
-    if (itemCount > 8)
-        size.setHeight(std::max(4, root));
-
-    return QRect({0, 0}, size);
+    // Check if we need to add a placeholder, and there is no space for it.
+    if (w * h == itemCount &&
+        itemCount < kMaxGridSizeWithPlaceholders * kMaxGridSizeWithPlaceholders)
+    {
+        if (w == h)
+            ++h;
+        else
+            ++w;
+    }
+    return QRect(0, 0, w, h);
 }
 
 struct GridWalker
@@ -104,6 +111,8 @@ namespace client {
 namespace desktop {
 namespace ui {
 namespace workbench {
+
+static bool onlyOnePlaceholder = false;
 
 LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     base_type(parent),
@@ -153,6 +162,9 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
         this, &LayoutTourReviewController::handleItemDataChanged);
+
+    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
+        [this]{ onlyOnePlaceholder = !onlyOnePlaceholder; updatePlaceholders(); });
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -343,8 +355,8 @@ void LayoutTourReviewController::updatePlaceholders()
 
     QRect boundingRect = createItemGrid(itemCount);
 
-    static const int kMaxSize = 4;
-    if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
+    if (boundingRect.width() > kMaxGridSizeWithPlaceholders
+        || boundingRect.height() > kMaxGridSizeWithPlaceholders)
     {
         m_dropPlaceholders.clear();
         return;
@@ -358,6 +370,7 @@ void LayoutTourReviewController::updatePlaceholders()
             m_dropPlaceholders.remove(p);
     }
 
+    int placeholdersCount = 0;
     for (int x = boundingRect.left(); x <= boundingRect.right(); ++x)
     {
         for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
@@ -365,15 +378,26 @@ void LayoutTourReviewController::updatePlaceholders()
             const QPoint cell(x, y);
             const bool isFree = layout->isFreeSlot(cell, kCellSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
+            const bool mustBePlaceholder = isFree &&
+                (onlyOnePlaceholder ? placeholdersCount == 0 : true);
 
             // If cell is empty and there is a placeholder (or vise versa), skip this step.
-            if (isFree == placeholderExists)
+            if (mustBePlaceholder == placeholderExists)
+            {
+                if (placeholderExists)
+                    ++placeholdersCount;
                 continue;
+            }
 
             if (placeholderExists)
+            {
                 m_dropPlaceholders.remove(cell);
+            }
             else
+            {
                 m_dropPlaceholders.insert(cell, createPlaceholder(cell));
+                ++placeholdersCount;
+            }
         }
     }
 
