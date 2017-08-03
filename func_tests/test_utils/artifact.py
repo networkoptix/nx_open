@@ -41,7 +41,7 @@ class ArtifactFactory(object):
         artifact = Artifact(path_root,
                             ext or self._artifact.ext,
                             name or self._artifact.name,
-                            full_name of self._artifact.full_name,
+                            full_name or self._artifact.full_name,
                             is_error if is_error is not None else self._artifact.is_error,
                             type_name or self._artifact.type_name,
                             content_type or self._artifact.content_type)
