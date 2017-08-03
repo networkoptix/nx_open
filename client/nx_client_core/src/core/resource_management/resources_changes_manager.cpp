@@ -36,7 +36,8 @@ namespace {
 template<class... Args>
 auto safeProcedure(std::function<void(Args...)> proc)
 {
-    return [proc](Args... args)
+    return
+        [proc](Args... args)
         {
             if (proc)
                 proc(args...);
@@ -50,71 +51,86 @@ QPointer<QThread> threadGuard()
 
 using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode errorCode)>;
 
-template<typename ResourceType>
-using ResourceCallbackFunction = std::function<void(bool, const QnSharedResourcePointer<ResourceType>&)>;
-
-template<typename ResourceType, typename BackupType>
+/**
+ * Create handler that will be called in the callee thread and only if we have not changed the
+ * actual connection session.
+ */
 ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
-    QnSharedResourcePointer<ResourceType> resource,
-    ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
+    ReplyProcessorFunction handler)
 {
     QPointer<QnResourcesChangesManager> guard(manager);
     const auto sessionGuid = manager->commonModule()->runningInstanceGUID();
-    auto thread = threadGuard();
+    QPointer<QThread> thread(QThread::currentThread());
+    return
+        [thread, guard, sessionGuid, handler](int reqID, ec2::ErrorCode errorCode)
+        {
+            if (!thread)
+                return;
 
+            executeInThread(thread,
+                [guard, sessionGuid, reqID, errorCode, handler]
+                {
+                    if (!guard)
+                        return;
+
+                    // Check if we have already changed session.
+                    if (guard->commonModule()->runningInstanceGUID() != sessionGuid)
+                        return;
+
+                    handler(reqID, errorCode);
+                }); //< executeInThread
+        };
+}
+
+
+template<typename ResourceType>
+using ResourceCallbackFunction = std::function<void(bool, const QnSharedResourcePointer<ResourceType>&)>;
+
+/**
+* Create handler that will be called in the callee thread and only if we have not changed the
+* actual connection session.
+*/
+template<typename ResourceType, typename BackupType>
+ReplyProcessorFunction makeSaveResourceReplyProcessor(QnResourcesChangesManager* manager,
+    QnSharedResourcePointer<ResourceType> resource,
+    ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
+{
     BackupType backup;
     ec2::fromResourceToApi(resource, backup);
 
-    return
-        [guard, sessionGuid, thread, resource, backup, callback]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [manager, resource, backup, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            if (!guard)
-                return;
-
-            // Check if we have already changed session.
-            if (guard->commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
             const bool success = errorCode == ec2::ErrorCode::ok;
 
             if (success)
             {
-                guard->resourcePool()->addNewResources({{resource}});
+                manager->resourcePool()->addNewResources({{resource}});
             }
             else
             {
-                if (auto existing = guard->resourcePool()->getResourceById<ResourceType>(
+                if (auto existing = manager->resourcePool()->getResourceById<ResourceType>(
                     resource->getId()))
-                {
-                    ec2::fromApiToResource(backup, existing);
-                }
+                    {
+                        ec2::fromApiToResource(backup, existing);
+                    }
             }
 
-            if (thread && callback)
+            if (callback)
             {
-                executeInThread(thread,
-                    [guard, sessionGuid, callback, success, resource]()
-                    {
-                        if (!guard)
-                            return;
+                /* Resource could be added by transaction message bus, so shared pointer
+                * will differ (if we have created a new resource). */
+                auto updatedResource = manager->resourcePool()->getResourceById<ResourceType>(
+                    resource->getId());
 
-                        // Check if we have already changed session.
-                        if (guard->commonModule()->runningInstanceGUID() != sessionGuid)
-                            return;
-
-                        // Resource could be added by transaction message bus, so shared pointer
-                        // will differ (if we have created a new resource).
-                        auto updatedResource = guard->resourcePool()->
-                            getResourceById<ResourceType>(resource->getId());
-
-                        callback(success, updatedResource);
-                    });
+                callback(success, updatedResource);
             }
 
             if (!success)
-                emit guard->saveChangesFailed({{resource}});
+                emit manager->saveChangesFailed({{resource}});
         };
+
+    return makeReplyProcessor(manager, handler);
 }
 
 } // namespace
@@ -149,10 +165,23 @@ void QnResourcesChangesManager::deleteResources(
         return;
     }
 
-    const auto sessionGuid = commonModule()->runningInstanceGUID();
+    auto handler =
+        [this, safeCallback, resources](int /*reqID*/, ec2::ErrorCode errorCode)
+        {
+            const bool success = errorCode == ec2::ErrorCode::ok;
+
+            // We don't want to wait until transaction is received.
+            if (success)
+                resourcePool()->removeResources(resources);
+
+            safeCallback(success);
+
+            if (!success)
+                emit resourceDeletingFailed(resources);
+        };
 
     QVector<QnUuid> idToDelete;
-    for (const QnResourcePtr& resource: resources)
+    for (const QnResourcePtr& resource : resources)
     {
         // if we are deleting an edge camera, also delete its server
         // check for camera to avoid unnecessary parent lookup
@@ -164,27 +193,8 @@ void QnResourcesChangesManager::deleteResources(
             idToDelete << parentToDelete;
         idToDelete << resource->getId();
     }
-
     connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
-        [this, safeCallback, resources, sessionGuid, thread = threadGuard()]
-            (int /*reqID*/, ec2::ErrorCode errorCode)
-        {
-            /* Check if we have already changed session: */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
-            const bool success = errorCode == ec2::ErrorCode::ok;
-
-            // We don't want to wait until transaction is received.
-            if (success)
-                resourcePool()->removeResources(resources);
-
-            if (thread)
-                executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
-
-            if (!success)
-                emit resourceDeletingFailed(resources);
-        });
+        makeReplyProcessor(this, handler));
 }
 
 
@@ -220,6 +230,10 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     if (cameras.isEmpty())
         return;
 
+    auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+
     auto idList = idListFromResList(cameras);
 
     QPointer<QnCameraUserAttributePool> pool(cameraUserAttributesPool());
@@ -231,49 +245,40 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
         backup << *(*userAttributesLock);
     }
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
-
-    if (applyChanges)
-        applyChanges();
-    auto changes = pool->getAttributesList(idList);
-
-    auto connection = commonModule()->ec2Connection();
-    if (!connection)
-        return;
-
-    ec2::ApiCameraAttributesDataList apiAttributes;
-    fromResourceListToApi(changes, apiAttributes);
-
-    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
-        [this, cameras, pool, backup, sessionGuid, thread = threadGuard(), callback]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [this, cameras, pool, backup, callback] (int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            /* Check if all OK */
             const bool success = errorCode == ec2::ErrorCode::ok;
-
-            /* Check if we have already changed session or attributes pool was recreated. */
-            if (!pool || commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
-            if (callback && thread)
-                executeInThread(thread, [callback, success]() { callback(success); });
+            if (callback)
+                callback(success);
 
             if (success)
                 return;
 
-            /* Restore attributes from backup. */
-            for( const QnCameraUserAttributes& cameraAttrs: backup ) {
+            // Restore attributes from backup.
+            for (const auto& cameraAttrs: backup)
+            {
                 QSet<QByteArray> modifiedFields;
                 {
-                    QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraId );
-                    (*userAttributesLock)->assign( cameraAttrs, &modifiedFields );
+                    QnCameraUserAttributePool::ScopedLock userAttributesLock(pool, cameraAttrs.cameraId);
+                    (*userAttributesLock)->assign(cameraAttrs, &modifiedFields);
                 }
-                if( const auto& res = resourcePool()->getResourceById(cameraAttrs.cameraId) )   //it is OK if resource is missing
-                    res->emitModificationSignals( modifiedFields );
+
+                // It is OK if resource is missing.
+                if (const auto& res = resourcePool()->getResourceById(cameraAttrs.cameraId))
+                    res->emitModificationSignals(modifiedFields);
             }
 
             emit saveChangesFailed(cameras);
-        });
+        };
+
+    if (applyChanges)
+        applyChanges();
+    auto changes = pool->getAttributesList(idList);
+    ec2::ApiCameraAttributesDataList apiAttributes;
+    fromResourceListToApi(changes, apiAttributes);
+    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
+        makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
     propertyDictionary()->saveParamsAsync(idList);
@@ -282,46 +287,44 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
  void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
      CameraChangesFunction applyChanges)
  {
+     NX_EXPECT(applyChanges); //< ::saveCamerasCore is to be removed someday.
      if (!applyChanges)
          return;
 
      if (cameras.isEmpty())
          return;
 
-     auto sessionGuid = commonModule()->runningInstanceGUID();
-
-     ec2::ApiCameraDataList backup;
-     ec2::fromResourceListToApi(cameras, backup);
-     for (const QnVirtualCameraResourcePtr &camera: cameras)
-         applyChanges(camera);
-
      auto connection = commonModule()->ec2Connection();
      if (!connection)
          return;
 
-     ec2::ApiCameraDataList apiCameras;
-     ec2::fromResourceListToApi(cameras, apiCameras);
+     ec2::ApiCameraDataList backup;
+     ec2::fromResourceListToApi(cameras, backup);
 
-     connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
-         [this, cameras, sessionGuid, backup]
-         (int /*reqID*/, ec2::ErrorCode errorCode)
-         {
+     auto handler =
+        [this, cameras, backup](int /*reqID*/, ec2::ErrorCode errorCode)
+        {
              /* Check if all OK */
              if (errorCode == ec2::ErrorCode::ok)
                  return;
 
-             /* Check if we have already changed session or attributes pool was recreated. */
-             if (commonModule()->runningInstanceGUID() != sessionGuid)
-                 return;
-
-             for (const ec2::ApiCameraData &data: backup) {
-                 QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(data.id);
+             for (const ec2::ApiCameraData& data : backup)
+             {
+                 auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(data.id);
                  if (camera)
                      ec2::fromApiToResource(data, camera);
              }
 
              emit saveChangesFailed(cameras);
-         });
+        };
+
+     for (const auto& camera : cameras)
+         applyChanges(camera);
+
+     ec2::ApiCameraDataList apiCameras;
+     ec2::fromResourceListToApi(cameras, apiCameras);
+     connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
+         makeReplyProcessor(this, handler));
 }
 
 
@@ -359,51 +362,43 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     if (servers.isEmpty())
         return;
 
+    auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+
     auto idList = idListFromResList(servers);
 
     QPointer<QnMediaServerUserAttributesPool> pool(mediaServerUserAttributesPool());
 
     QList<QnMediaServerUserAttributes> backup;
-    for(const QnMediaServerUserAttributesPtr& serverAttrs: pool->getAttributesList(idList)) {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs->serverId );
+    for(const auto& serverAttrs: pool->getAttributesList(idList))
+    {
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(pool, serverAttrs->serverId);
         backup << *(*userAttributesLock);
     }
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
-
-    applyChanges();
-    auto changes = pool->getAttributesList(idList);
-
-    auto connection = commonModule()->ec2Connection();
-    if (!connection)
-        return;
-
-    ec2::ApiMediaServerUserAttributesDataList attributes;
-    fromResourceListToApi(changes, attributes);
-
-    connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
-        [this, servers, pool, backup, sessionGuid]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [this, servers, pool, backup] (int /*reqID*/, ec2::ErrorCode errorCode)
         {
             /* Check if all OK */
             if (errorCode == ec2::ErrorCode::ok)
                 return;
 
-            /* Check if we have already changed session or attributes pool was recreated. */
-            if (!pool || commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
             /* Restore attributes from backup. */
             bool somethingWasChanged = false;
-            for( const QnMediaServerUserAttributes& serverAttrs: backup ) {
+            for (const auto& serverAttrs: backup)
+            {
                 QSet<QByteArray> modifiedFields;
                 {
-                    QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverId);
-                    (*userAttributesLock)->assign( serverAttrs, &modifiedFields );
+                    QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(pool, serverAttrs.serverId);
+                    (*userAttributesLock)->assign(serverAttrs, &modifiedFields);
                 }
-                if (!modifiedFields.isEmpty()) {
-                    if( const QnResourcePtr& res = resourcePool()->getResourceById(serverAttrs.serverId) )   //it is OK if resource is missing
-                        res->emitModificationSignals( modifiedFields );
+
+                if (!modifiedFields.isEmpty())
+                {
+                    // It is OK if resource is missing.
+                    if (const auto& res = resourcePool()->getResourceById(serverAttrs.serverId))
+                        res->emitModificationSignals(modifiedFields);
                     somethingWasChanged = true;
                 }
             }
@@ -413,7 +408,15 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
                 return;
 
             emit saveChangesFailed(servers);
-        });
+        };
+
+
+    applyChanges();
+    auto changes = pool->getAttributesList(idList);
+    ec2::ApiMediaServerUserAttributesDataList attributes;
+    fromResourceListToApi(changes, attributes);
+    connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
+        makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
     propertyDictionary()->saveParamsAsync(idList);
@@ -446,8 +449,8 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         return;
     }
 
-    auto replyProcessor = makeReplyProcessor<QnUserResource, ec2::ApiUserData>(this, user,
-        callback);
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnUserResource, ec2::ApiUserData>(this,
+        user, callback);
 
     applyChanges(user);
     NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
@@ -467,8 +470,6 @@ void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
     if (!connection)
         return;
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
-
     ec2::ApiUserDataList apiUsers;
     for (const auto& user: users)
     {
@@ -476,17 +477,16 @@ void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
         fromResourceToApi(user, apiUsers.back());
     }
 
-    connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, this,
-        [this, users, sessionGuid](int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [this, users](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            /* Check if we have already changed session: */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
             const bool success = errorCode == ec2::ErrorCode::ok;
             if (success)
                 resourcePool()->addNewResources(users);
-        });
+        };
+
+    connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, this,
+        makeReplyProcessor(this, handler));
 }
 
 void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
@@ -496,31 +496,26 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     if (!connection)
         return;
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
     auto backup = sharedResourcesManager()->sharedResources(subject);
     if (backup == accessibleResources)
         return;
 
     sharedResourcesManager()->setSharedResources(subject, accessibleResources);
 
+    auto handler =
+        [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
+        {
+            const bool success = errorCode == ec2::ErrorCode::ok;
+            if (!success)
+                sharedResourcesManager()->setSharedResources(subject, backup);
+        };
+
     ec2::ApiAccessRightsData accessRights;
     accessRights.userId = subject.effectiveId();
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this, subject, sessionGuid, backup]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
-        {
-            /* Check if all OK */
-            if (errorCode == ec2::ErrorCode::ok)
-                return;
-
-            /* Check if we have already changed session. */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
-            sharedResourcesManager()->setSharedResources(subject, backup);
-        });
+        makeReplyProcessor(this, handler));
 }
 
 void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserRoleData& role)
@@ -529,28 +524,24 @@ void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserRoleData& role)
     if (!connection)
         return;
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
-
     auto backup = userRolesManager()->userRole(role.id);
     userRolesManager()->addOrUpdateUserRole(role);
 
-    connection->getUserManager(Qn::kSystemAccess)->saveUserRole(role, this,
-        [this, backup, role, sessionGuid]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [this, backup, role](int /*reqID*/, ec2::ErrorCode errorCode)
         {
             /* Check if all OK */
             if (errorCode == ec2::ErrorCode::ok)
-                return;
-
-            /* Check if we have already changed session. */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
                 return;
 
             if (backup.id.isNull())
                 userRolesManager()->removeUserRole(role.id);  /*< New group was not added */
             else
                 userRolesManager()->addOrUpdateUserRole(backup);
-        });
+        };
+
+    connection->getUserManager(Qn::kSystemAccess)->saveUserRole(role, this,
+        makeReplyProcessor(this, handler));
 }
 
 void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
@@ -559,26 +550,21 @@ void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
     if (!connection)
         return;
 
-    auto sessionGuid = commonModule()->runningInstanceGUID();
-
     auto backup = userRolesManager()->userRole(id);
     userRolesManager()->removeUserRole(id);
 
-    connection->getUserManager(Qn::kSystemAccess)->removeUserRole(id, this,
-        [this, backup, sessionGuid]
-        (int /*reqID*/, ec2::ErrorCode errorCode)
+    auto handler =
+        [this, backup](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-
             /* Check if all OK */
             if (errorCode == ec2::ErrorCode::ok)
                 return;
 
-            /* Check if we have already changed session. */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
-                return;
-
             userRolesManager()->addOrUpdateUserRole(backup);
-        });
+        };
+
+    connection->getUserManager(Qn::kSystemAccess)->removeUserRole(id, this,
+        makeReplyProcessor(this, handler));
 }
 
 void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
@@ -593,7 +579,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnVideoWallResource, ec2::ApiVideowallData>(this,
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnVideoWallResource, ec2::ApiVideowallData>(this,
         videoWall, callback);
 
     if (applyChanges)
@@ -620,7 +606,7 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnLayoutResource, ec2::ApiLayoutData>(this,
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnLayoutResource, ec2::ApiLayoutData>(this,
         layout, callback);
 
     applyChanges(layout);
@@ -642,7 +628,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     if (!connection)
         return;
 
-    auto replyProcessor = makeReplyProcessor<QnWebPageResource, ec2::ApiWebPageData>(this,
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnWebPageResource, ec2::ApiWebPageData>(this,
         webPage, callback);
 
     if (applyChanges)
