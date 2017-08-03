@@ -513,10 +513,10 @@ QnLiveStreamProviderPtr QnVideoCamera::getSecondaryReader()
     return getLiveReader(QnServer::LowQualityCatalog);
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog, bool autoInitIfNeed)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized)
 {
     QnMutexLocker lock( &m_getReaderMutex );
-    return getLiveReaderNonSafe( catalog, autoInitIfNeed);
+    return getLiveReaderNonSafe( catalog, ensureInitialized);
 }
 
 int QnVideoCamera::copyLastGop(
@@ -749,7 +749,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     return false;
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool autoInitIfNeed)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool ensureInitialized)
 {
     if( m_resource->hasFlags(Qn::foreigner) )
         return QnLiveStreamProviderPtr();
@@ -762,7 +762,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
             createReader(catalog);
         }
     }
-    else if (autoInitIfNeed)
+    else if (ensureInitialized)
     {
         m_resource->initAsync( true );
     }

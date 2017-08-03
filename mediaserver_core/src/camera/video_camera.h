@@ -28,7 +28,7 @@ public:
     QnVideoCamera(const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
 
-    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog, bool autoInitIfNeed = true);
+    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized = true);
     virtual QnLiveStreamProviderPtr getPrimaryReader() override;
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
@@ -106,7 +106,7 @@ private:
     const qint64 m_loStreamHlsInactivityPeriodMS;
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
-    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool autoInitIfNeed);
+    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool ensureInitialized);
     void startLiveCacheIfNeeded();
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
