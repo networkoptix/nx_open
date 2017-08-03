@@ -52,10 +52,12 @@ def save_unrevisioned_records(customization, language, data_structures,
     upload_errors = []
     for data_structure in data_structures:
         data_structure_name = data_structure.name
-        
+        ds_language = language
+        if not data_structure.translatable:
+            ds_language = None
         records = data_structure.datarecord_set\
             .filter(customization=customization,
-                    language=language)
+                    language=ds_language)
 
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
@@ -90,7 +92,6 @@ def save_unrevisioned_records(customization, language, data_structures,
         else:
             new_record_value = request_data[data_structure_name]
         
-        
         if records.exists():
             if new_record_value == records.latest('created_date').value:
                 continue
@@ -99,7 +100,7 @@ def save_unrevisioned_records(customization, language, data_structures,
                 continue
 
         record = DataRecord(data_structure=data_structure,
-                            language=language,
+                            language=ds_language,
                             customization=customization,
                             value=new_record_value,
                             created_by=user)
@@ -121,6 +122,13 @@ def alter_records_version(contexts, customization, old_version, new_version):
                 latest_record = record.latest('created_date')
                 latest_record.version = new_version
                 latest_record.save()
+
+
+def remove_unused_records(customization):
+    nullify_records = DataRecord.objects.filter(customization_id=customization.id, version_id=None)
+    if nullify_records.exists():
+        for record in nullify_records:
+            record.delete()
 
 
 def generate_preview(context=None):
@@ -153,6 +161,9 @@ def send_version_for_review(customization, language, data_structures,
 
     alter_records_version(Context.objects.filter(
         product=product), customization, None, version)
+    
+    remove_unused_records(customization)
+    
     notify_version_ready(customization, version.id, product.name, user)
     return upload_errors
 
