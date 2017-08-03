@@ -152,12 +152,13 @@ def context_edit_view(request, context=None, language=None):
                        'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
     else:
+        if not request.user.has_perm('cms.edit_content'):
+            raise PermissionDenied
+
         context, form, language, preview_link = handle_post_context_edit_view(
             request, context, language)
 
         if 'SendReview' in request.data:
-            if not request.user.has_perm('cms.add_contentversion'):
-                raise PermissionDenied
             return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
         return render(request, 'context_editor.html',
