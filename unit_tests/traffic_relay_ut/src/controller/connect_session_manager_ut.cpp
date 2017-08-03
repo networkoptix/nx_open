@@ -268,6 +268,13 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
+        return customConnectSessionManager(
+            std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
+    }
+
+    controller::ConnectSessionManager& customConnectSessionManager(
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPeerPool)
+    {
         if (!m_connectSessionManager)
         {
             m_settingsLoader.load();
@@ -278,7 +285,7 @@ protected:
                     &clientSessionPool(),
                     &listeningPeerPool(),
                     &m_trafficRelayStub,
-                    std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"),
+                    std::move(remoteRelayPeerPool),
                     "127.0.0.1");
         }
 
@@ -475,6 +482,14 @@ protected:
         }
     }
 
+    void givenSessionManagerWithFilledRemoteRelayPeerPool()
+    {
+    }
+
+    void whenIssuedConnectToTheServerOnAnotherRelay()
+    {
+    }
+
     void whenIssuedCreateSessionWithoutId()
     {
         issueCreateSession(std::string());
@@ -505,6 +520,10 @@ protected:
     void whenListeningPeerDisconnects()
     {
         lastListeningPeerConnection()->setConnectionToClosedState();
+    }
+
+    void thenRequestShouldBeRedirected()
+    {
     }
 
     void thenClientSessionsAreClosed()
@@ -579,6 +598,14 @@ TEST_F(
     givenMultipleClientSessions();
     whenListeningPeerDisconnects();
     thenClientSessionsAreClosed();
+}
+
+TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_to_the_server_on_another_relay)
+{
+    givenSessionManagerWithFilledRemoteRelayPeerPool();
+    whenIssuedConnectToTheServerOnAnotherRelay();
+
+    thenRequestShouldBeRedirected();
 }
 
 //-------------------------------------------------------------------------------------------------
