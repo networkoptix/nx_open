@@ -3,7 +3,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
-#include <nx/network/public_ip_discovery.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -25,7 +24,8 @@ ConnectSessionManager::ConnectSessionManager(
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
     controller::AbstractTrafficRelay* trafficRelay,
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool)
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool,
+    std::string publicHostString)
     :
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
@@ -33,13 +33,11 @@ ConnectSessionManager::ConnectSessionManager(
     m_trafficRelay(trafficRelay),
     m_remoteRelayPool(std::move(remoteRelayPool))
 {
-    discoverPublicIp();
-
     nx::utils::SubscriptionId subscriptionId;
     m_listeningPeerPool->peerConnectedSubscription().subscribe(
-        [this](std::string peer)
+        [this, publicHostString = std::move(publicHostString)](std::string peer)
         {
-            m_remoteRelayPool->addPeer(peer, m_publicIpString)
+            m_remoteRelayPool->addPeer(peer, publicHostString)
                 .then(
                     [this, peer](cf::future<bool> addPeerFuture)
                     {
@@ -85,26 +83,6 @@ ConnectSessionManager::ConnectSessionManager(
         &subscriptionId);
 
     m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-}
-
-void ConnectSessionManager::discoverPublicIp()
-{
-    network::PublicIPDiscovery ipDiscovery;
-
-    while (true)
-    {
-        ipDiscovery.update();
-        ipDiscovery.waitForFinished();
-        QHostAddress publicAddress = ipDiscovery.publicIP();
-
-        if (!publicAddress.isNull())
-        {
-            m_publicIpString = publicAddress.toString().toStdString();
-            return;
-        }
-
-        NX_WARNING(this, "Failed to discover public relay host address. Keep trying...");
-    }
 }
 
 ConnectSessionManager::~ConnectSessionManager()
@@ -378,15 +356,22 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
-    controller::AbstractTrafficRelay* trafficRelay)
+    controller::AbstractTrafficRelay* trafficRelay,
+    std::string publicHostString)
 {
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
 
+    auto cassandraHostCStr = settings.cassandraHost().toLatin1().constData();
+    auto remoteRelayPool = std::make_unique<model::RemoteRelayPeerPool>(cassandraHostCStr);
+
     return std::make_unique<ConnectSessionManager>(
-        settings, clientSessionPool, listeningPeerPool, trafficRelay,
-        std::make_unique<model::RemoteRelayPeerPool>(
-            settings.cassandraHost().toLatin1().constData()));
+        settings,
+        clientSessionPool,
+        listeningPeerPool,
+        trafficRelay,
+        std::move(remoteRelayPool),
+        std::move(publicHostString));
 }
 
 ConnectSessionManagerFactory::FactoryFunc

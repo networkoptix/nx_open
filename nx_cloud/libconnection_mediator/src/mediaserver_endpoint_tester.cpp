@@ -14,7 +14,7 @@ struct PingCollector
 {
     QnMutex mutex;
     size_t expected;
-    std::list< SocketAddress > endpoints;
+    std::list<SocketAddress> endpoints;
     ConnectionWeakRef connection;
 
     PingCollector(

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "connect_session_manager.h"
 #include "traffic_relay.h"
 
@@ -22,6 +23,8 @@ public:
 private:
     controller::TrafficRelay m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
+
+    std::string discoverPublicIp();
 };
 
 } // namespace relay
