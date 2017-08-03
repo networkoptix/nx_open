@@ -292,8 +292,6 @@ boost::optional<AIOService::MonitoringContext> AIOService::getSocketMonitoringCo
     aio::EventType eventToWatch)
 {
     // Checking, if that socket is already polled
-    const std::pair<Pollable*, aio::EventType>& sockCtx = std::make_pair(sock, eventToWatch);
-    // Checking if sock is already polled (even for another event)
     auto closestSockIter = m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, (aio::EventType)0));
     auto sameSockAndEventIter = closestSockIter;
     for (; sameSockAndEventIter != m_systemSocketAIO.sockets.end(); ++sameSockAndEventIter)
