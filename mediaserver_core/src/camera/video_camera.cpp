@@ -513,10 +513,10 @@ QnLiveStreamProviderPtr QnVideoCamera::getSecondaryReader()
     return getLiveReader(QnServer::LowQualityCatalog);
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog, bool autoInitIfNeed)
 {
     QnMutexLocker lock( &m_getReaderMutex );
-    return getLiveReaderNonSafe( catalog );
+    return getLiveReaderNonSafe( catalog, autoInitIfNeed);
 }
 
 int QnVideoCamera::copyLastGop(
@@ -731,7 +731,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     if( streamQuality == MEDIA_Quality_High )
     {
         if( !m_primaryReader )
-            getLiveReaderNonSafe( QnServer::HiQualityCatalog );
+            getLiveReaderNonSafe( QnServer::HiQualityCatalog, true);
         if( !m_primaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_primaryReader, targetDurationUSec );
@@ -740,7 +740,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     if( streamQuality == MEDIA_Quality_Low )
     {
         if( !m_secondaryReader )
-            getLiveReaderNonSafe( QnServer::LowQualityCatalog );
+            getLiveReaderNonSafe( QnServer::LowQualityCatalog, true);
         if( !m_secondaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_secondaryReader, targetDurationUSec );
@@ -749,7 +749,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     return false;
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool autoInitIfNeed)
 {
     if( m_resource->hasFlags(Qn::foreigner) )
         return QnLiveStreamProviderPtr();
@@ -762,7 +762,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
             createReader(catalog);
         }
     }
-    else
+    else if (autoInitIfNeed)
     {
         m_resource->initAsync( true );
     }
