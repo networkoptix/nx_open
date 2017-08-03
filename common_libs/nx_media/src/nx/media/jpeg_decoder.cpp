@@ -24,7 +24,7 @@ JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize&
 }
 
 bool JpegDecoder::isCompatible(
-    const AVCodecID codec, const QSize& /*resolution*/, bool /*useHardwareDecoder*/)
+    const AVCodecID codec, const QSize& /*resolution*/, bool /*allowOverlay*/)
 {
     return codec == AV_CODEC_ID_MJPEG;
 }

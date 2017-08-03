@@ -159,7 +159,7 @@ public:
     // See property comment.
     int videoQuality;
 
-    bool useHardwareDecoder;
+    bool allowOverlay;
 
     // Video geometry inside the application window.
     QRect videoGeometry;
@@ -231,7 +231,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     underflowCounter(0),
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
-    useHardwareDecoder(true),
+    allowOverlay(true),
     isAudioEnabled(true)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
@@ -627,7 +627,7 @@ void PlayerPrivate::applyVideoQuality()
         liveMode,
         positionMs,
         camera,
-        useHardwareDecoder);
+        allowOverlay);
 
     if (quality == media_player_quality_chooser::kQualityHigh)
     {
@@ -679,7 +679,7 @@ bool PlayerPrivate::initDataProvider()
     applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
-    dataConsumer->setUseHardwareDecoder(useHardwareDecoder);
+    dataConsumer->setAllowOverlay(allowOverlay);
 
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
@@ -1035,24 +1035,24 @@ Player::VideoQuality Player::actualVideoQuality() const
     }
 }
 
-bool Player::useHardwareDecoder() const
+bool Player::allowOverlay() const
 {
     Q_D(const Player);
-    return d->useHardwareDecoder;
+    return d->allowOverlay;
 }
 
-void Player::setUseHardwareDecoder(bool useHardwareDecoder)
+void Player::setAllowOverlay(bool allowOverlay)
 {
     Q_D(Player);
 
-    if (d->useHardwareDecoder == useHardwareDecoder)
+    if (d->allowOverlay == allowOverlay)
     {
-        d->log(lit("setUseHardwareDecoder(%1): no change, ignoring").arg(useHardwareDecoder));
+        d->log(lit("setAllowOverlay(%1): no change, ignoring").arg(allowOverlay));
         return;
     }
-    d->log(lit("setUseHardwareDecoder(%1)").arg(useHardwareDecoder));
-    d->useHardwareDecoder = useHardwareDecoder;
-    emit useHardwareDecoderChanged();
+    d->log(lit("setAllowOverlay(%1)").arg(allowOverlay));
+    d->allowOverlay = allowOverlay;
+    emit allowOverlayChanged();
 }
 
 QSize Player::currentResolution() const

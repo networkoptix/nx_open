@@ -25,7 +25,7 @@ public:
     virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(
-        const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder);
+        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
 
     static QSize maxResolution(const AVCodecID codec);
 

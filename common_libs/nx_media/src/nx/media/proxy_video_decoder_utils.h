@@ -27,7 +27,7 @@ public:
     using nx::utils::FlagConfig::FlagConfig;
 
     NX_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");
-    NX_FLAG(1, largeOnly, "Disable ProxyVideoDecoder (isCompatible() -> false) if MediaPlayer::useHardwareDecoder is set.");
+    NX_FLAG(1, largeOnly, "Disable ProxyVideoDecoder (isCompatible() -> false) if MediaPlayer::allowOverlay is set.");
 
     // Debug output.
     NX_FLAG(0, enableOutput, "");

@@ -88,7 +88,7 @@ class Player: public QObject
      */
     Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality NOTIFY videoQualityChanged)
 
-    Q_PROPERTY(bool useHardwareDecoder READ useHardwareDecoder WRITE setUseHardwareDecoder NOTIFY useHardwareDecoderChanged)
+    Q_PROPERTY(bool allowOverlay READ allowOverlay WRITE setAllowOverlay NOTIFY allowOverlayChanged)
 
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
@@ -184,8 +184,8 @@ public:
      */
     Q_INVOKABLE VideoQuality actualVideoQuality() const;
 
-    bool useHardwareDecoder() const;
-    void setUseHardwareDecoder(bool useHardwareDecoder);
+    bool allowOverlay() const;
+    void setAllowOverlay(bool allowOverlay);
 
     QSize currentResolution() const;
 
@@ -219,7 +219,7 @@ signals:
     void liveModeChanged();
     void aspectRatioChanged();
     void videoQualityChanged();
-    void useHardwareDecoderChanged();
+    void allowOverlayChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();

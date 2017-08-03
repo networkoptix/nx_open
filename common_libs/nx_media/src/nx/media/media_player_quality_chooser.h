@@ -40,7 +40,7 @@ public:
         bool liveMode,
         qint64 positionMs,
         const QnVirtualCameraResourcePtr& camera,
-        bool useHardwareDecoder);
+        bool allowOverlay);
 
 private:
     media_player_quality_chooser() = delete;
@@ -50,7 +50,7 @@ private:
         bool liveMode,
         qint64 positionMs,
         const QnVirtualCameraResourcePtr& camera,
-        bool useHardwareDecoder,
+        bool allowOverlay,
         AVCodecID highCodec,
         const QSize& highResolution,
         const QnConstResourceVideoLayoutPtr& videoLayout);

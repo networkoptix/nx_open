@@ -246,7 +246,7 @@ Control
                         playLive()
                 }
                 videoQuality: MediaPlayer.LowVideoQuality
-                useHardwareDecoder: false
+                allowOverlay: false
             }
 
             Connections

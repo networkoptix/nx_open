@@ -474,9 +474,9 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
 }
 
 bool AndroidVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
-    if (!useHardwareDecoder) //< Considering AndroidVideoDecoder a hardware one.
+    if (!allowOverlay) //< Considering AndroidVideoDecoder a hardware one.
         return false;
 
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);

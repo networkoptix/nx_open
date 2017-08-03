@@ -75,14 +75,14 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 }
 
 bool ProxyVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
     const auto loggedCall =
         [&](bool returnValue)
         {
-            return lm("isCompatible(%1, %2 x %3, useHardwareDecoder: %4) -> %5")
+            return lm("isCompatible(%1, %2 x %3, allowOverlay: %4) -> %5")
                 .strs(avcodec_get_name(codec), resolution.width(), resolution.height(),
-                    useHardwareDecoder, returnValue);
+                    allowOverlay, returnValue);
         };
 
     static bool calledOnce = false;
@@ -99,15 +99,15 @@ bool ProxyVideoDecoder::isCompatible(
         return false;
     }
 
-    if (!useHardwareDecoder)
+    if (!allowOverlay)
     {
         if (!conf.largeOnly)
         {
-            PRINT << "isCompatible() ignores useHardwareDecoder because conf.largeOnly is set";
+            PRINT << "isCompatible() ignores allowOverlay because conf.largeOnly is set";
         }
         else
         {
-            OUTPUT << loggedCall(false) << ": useHardwareDecoder is false";
+            OUTPUT << loggedCall(false) << ": allowOverlay is false";
             return false;
         }
     }

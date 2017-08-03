@@ -20,7 +20,7 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 }
 
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
     QMutexLocker lock(&mutex);
 
@@ -28,7 +28,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     for (auto& plugin: m_plugins)
     {
         if (plugin.useCount < plugin.maxUseCount
-            && plugin.isCompatible(codec, resolution, useHardwareDecoder))
+            && plugin.isCompatible(codec, resolution, allowOverlay))
         {
             auto videoDecoder = VideoDecoderPtr(
                 plugin.createVideoDecoder(plugin.allocator, resolution),
@@ -52,12 +52,12 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
 }
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution, useHardwareDecoder)
+        if (plugin.isCompatible(codec, resolution, allowOverlay)
             && plugin.useCount < plugin.maxUseCount)
         {
             return true;

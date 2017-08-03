@@ -145,7 +145,7 @@ static QSize applyTranscodingIfPossible(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
-    bool useHardwareDecoder,
+    bool allowOverlay,
     const QSize& desiredResolution)
 {
     if (!isTranscodingSupported(liveMode, positionMs, camera))
@@ -158,7 +158,7 @@ static QSize applyTranscodingIfPossible(
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        transcodingCodec, resolution, useHardwareDecoder))
+        transcodingCodec, resolution, allowOverlay))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
             .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
@@ -182,7 +182,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
-    bool useHardwareDecoder,
+    bool allowOverlay,
     AVCodecID highCodec,
     const QSize& highResolution,
     const QnConstResourceVideoLayoutPtr& videoLayout)
@@ -202,12 +202,12 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
                 cl_logDEBUG1);
 
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, useHardwareDecoder, resolution);
+                transcodingCodec, liveMode, positionMs, camera, allowOverlay, resolution);
             if (quality.isValid())
                 return quality;
         }
         else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-            highCodec, highResolution, useHardwareDecoder))
+            highCodec, highResolution, allowOverlay))
         {
             NX_LOG(lit("[media_player] High stream requested => Set high stream"),
                 cl_logDEBUG1);
@@ -218,7 +218,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
             NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
                 cl_logDEBUG1);
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, useHardwareDecoder, highResolution);
+                transcodingCodec, liveMode, positionMs, camera, allowOverlay, highResolution);
             if (quality.isValid())
                 return quality;
         }
@@ -238,7 +238,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
-    bool useHardwareDecoder)
+    bool allowOverlay)
 {
     if (videoQuality == Player::LowIframesOnlyVideoQuality)
     {
@@ -268,7 +268,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     if (highStreamRequested)
     {
         return chooseHighStreamIfPossible(transcodingCodec, liveMode, positionMs, camera,
-            useHardwareDecoder, highCodec, highResolution, videoLayout);
+            allowOverlay, highCodec, highResolution, videoLayout);
     }
     else if (lowStreamRequested)
     {
@@ -279,7 +279,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
         const QSize& resolution = transcodingResolution(
             lowResolution, highResolution, videoQuality, transcodingCodec);
         const QSize& quality = applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, useHardwareDecoder, resolution);
+            transcodingCodec, liveMode, positionMs, camera, allowOverlay, resolution);
         if (quality.isValid())
             return quality;
     }

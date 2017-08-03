@@ -71,7 +71,7 @@ public:
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
 
-    bool useHardwareDecoder;
+    bool allowOverlay;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 };
 
@@ -129,10 +129,10 @@ SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
 }
 
-void SeamlessVideoDecoder::setUseHardwareDecoder(bool value)
+void SeamlessVideoDecoder::setAllowOverlay(bool value)
 {
     Q_D(SeamlessVideoDecoder);
-    d->useHardwareDecoder = value;
+    d->allowOverlay = value;
 }
 
 
@@ -188,7 +188,7 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, frameInfo.size, d->useHardwareDecoder);
+            frame->compressionType, frameInfo.size, d->allowOverlay);
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;

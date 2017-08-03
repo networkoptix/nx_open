@@ -82,7 +82,7 @@ public:
     /** Turn on / off audio. Allowed to be called from another thread. */
     void setAudioEnabled(bool value);
 
-    void setUseHardwareDecoder(bool value);
+    void setAllowOverlay(bool value);
 
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
@@ -182,7 +182,7 @@ private:
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
     std::atomic<bool> m_audioEnabled;
-    std::atomic<bool> m_useHardwareDecoder;
+    std::atomic<bool> m_allowOverlay;
 };
 
 } // namespace media

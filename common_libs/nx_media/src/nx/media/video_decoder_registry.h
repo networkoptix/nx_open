@@ -29,13 +29,13 @@ public:
      * pointer if no compatible decoder is found.
      */
     VideoDecoderPtr createCompatibleDecoder(
-        const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder);
+        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
 
     /**
      * @return Whether a compatible video decoder is found.
      */
     bool hasCompatibleDecoder(
-        const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder);
+        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
@@ -78,7 +78,7 @@ private:
         std::function<AbstractVideoDecoder*(
             const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
         std::function<bool(
-            const AVCodecID codec, const QSize& resolution, bool useHardwareDecoder)> isCompatible;
+            const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
         ResourceAllocatorPtr allocator;
         int useCount;
