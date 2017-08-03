@@ -14,7 +14,7 @@ static const char* kPersonObjectType = "person";
 static const char* kVehicleObjectType = "vehicle";
 
 /**
- * @brief The Rect struct reprsents bounding box of detected object.
+ * @brief The Rect struct represents bounding box of detected object.
  */
 struct Rect
 {
@@ -44,7 +44,7 @@ struct Rect
 };
 
 /**
- * @brief The DetectedObject struct resprsents the single detected on the scene object.
+ * @brief The DetectedObject struct represents the single detected on the scene object.
  */
 struct DetectedObject
 {
@@ -53,6 +53,21 @@ struct DetectedObject
      * is detected on multiple frames this parameter SHOULD be the same every time.
      */
     nxpl::NX_GUID id;
+
+    /**
+     * @brief Human readable object type (vehicle | person | generic | etc)
+     */
+    NX_ASCII char* objectType = nullptr;
+
+    /**
+     * @brief (vehicle type | truck | car | e.t.c)
+     */
+    NX_ASCII char* objectSubType = nullptr;
+
+    /**
+     * @brief Level of confidence in range (0..1]
+     */
+    double confidence = 1.0;
 
     /**
      * @brief attributes array of object attributes (e.g. age, color).
@@ -65,7 +80,7 @@ struct DetectedObject
     int attributeCount = 0;
 
     /**
-     * @brief auxilaryData some side data in user defined format.
+     * @brief auxilaryData user side data in json format. Null terminated UTF-8 string.
      */
     char* auxilaryData = nullptr;
 
@@ -74,7 +89,6 @@ struct DetectedObject
      */
     Rect boundingBox;
 };
-
 
 /**
  * Each class that implements AbstractDetectionMetadataPacket interface
@@ -92,16 +106,10 @@ class AbstractDetectionMetadataPacket: public AbstractMetadataPacket
 public:
 
     /**
-     * @brief detectionInfo retrieves information about detected objects.
-     * @param detectedObjectsBuffer pointer to the output buffer.
-     * @param inOutMaxDetectedObjects size of output buffer. If this size is not enough then
-     * this method MUST set this parameter to the desired size and return needMoreBufferSpace.
-     * @return noError in case of success,
-     * needMoreBufferSpace if size of buffer too small, some other value otherwise.
+     * @return next detected object or null if no more objects left.
+     * This functions should not modify objects and behave like a constant iterator.
      */
-    virtual Error detectionInfo(
-        DetectedObject* detectedObjectsBuffer,
-        int* inOutMaxDetectedObjects) = 0;
+    virtual const DetectedObject* nextObject() = 0;
 };
 
 } // namespace metadata

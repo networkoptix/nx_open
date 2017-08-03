@@ -20,6 +20,12 @@ static const nxpl::NX_GUID IID_MetadataPacket =
 class AbstractMetadataPacket: public AbstractDataPacket
 {
 public:
+    virtual int64_t timestampUsec() = 0;
+
+    /**
+     * @return duration of packet or zero if not used.
+     */
+    virtual int64_t durationUsec() = 0;
 };
 
 } // namespace metadata
