@@ -48,20 +48,11 @@ struct DetectedObject: public AbstractMetadataItem
      */
     nxpl::NX_GUID id;
 
-    /**
-     * @brief Human readable object type (vehicle | person | generic | etc)
-     */
-    NX_ASCII char* objectType = nullptr;
 
     /**
      * @brief (vehicle type | truck | car | e.t.c)
      */
     NX_ASCII char* objectSubType = nullptr;
-
-    /**
-     * @brief Level of confidence in range (0..1]
-     */
-    double confidence = 1.0;
 
     /**
      * @brief attributes array of object attributes (e.g. age, color).
@@ -103,7 +94,7 @@ public:
      * @return next detected object or null if no more objects left.
      * This functions should not modify objects and behave like a constant iterator.
      */
-    virtual const DetectedObject* nextObject() = 0;
+    virtual const DetectedObject* nextItem() = 0;
 };
 
 } // namespace metadata

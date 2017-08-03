@@ -18,11 +18,6 @@ static const nxpl::GUID IID_EventMetadataPacket
 struct DetectedEvent: public AbstractMetadataItem
 {
     /**
-    * @brief Human readable object type (line crossing | human detected | etc)
-    */
-    NX_ASCII char* kindName;
-
-    /**
      * @return Null terminated UTF8 string containing the caption of the event.
      */
     NX_LOCALE_DEPENDENT char* caption;
@@ -48,7 +43,7 @@ class AbstractEventMetadataPacket: public AbstractIterableMetadataPacket
     * @return next detected object or null if no more objects left.
     * This functions should not modify objects and behave like a constant iterator.
     */
-    virtual const DetectedEvent* nextObject() = 0;
+    virtual const DetectedEvent* nextItem() = 0;
 };
 
 } // namespace metadata

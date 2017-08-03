@@ -21,7 +21,10 @@ public:
      * @param error used for reporting errors to the outer code.
      * @param metadata incoming from the plugin
      */
-    virtual void handleMetadata(Error* error, const AbstractMetadataPacket** outMetadata) = 0;
+    virtual void handleMetadata(
+        Error* error,
+        const char* uuid, //< ???
+        const AbstractMetadataPacket** outMetadata) = 0;
 };
 
 /**
@@ -64,7 +67,7 @@ public:
      * needMoreBufferSpace in case buffer size is not enough.
      * some other value otherwise.
      */
-    virtual Error capabiltiesManifest(char* buffer, int* inOutBufferSize);
+    virtual const char* capabiltiesManifest() = 0;
 };
 
 } // namespace metadata

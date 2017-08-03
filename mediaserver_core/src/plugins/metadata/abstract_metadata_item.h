@@ -21,6 +21,15 @@ static const nxpl::GUID IID_MetadataItem
 class AbstractMetadataItem: public nxpl::PluginInterface
 {
 public:
+    /**
+    * @brief Human readable object type (line crossing | human detected | etc)
+    */
+    NX_ASCII char* kindName;
+
+    /**
+    * @brief Level of confidence in range (0..1]
+    */
+    double confidence = 1.0;
 };
 
 } // namespace metadata
