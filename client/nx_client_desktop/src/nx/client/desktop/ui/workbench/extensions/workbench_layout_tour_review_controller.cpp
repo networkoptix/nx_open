@@ -51,26 +51,19 @@ static const QSize kCellSize{1, 1};
 static const QMargins kReviewMargins(16, 16, 16, 16);
 
 // Placeholders are allowed only for grids less or equal than 4*4.
-static const int kMaxGridSizeWithPlaceholders = 4;
+static const int kMaxItemCountWithPlaceholders = 15;
 
 // Grid size less than 2*2 is not allowed;
 static const int kMinGridSize = 2;
 
 QRect createItemGrid(int itemCount)
 {
-    int root = std::ceil(std::sqrt(itemCount));
-    int h = std::max(root, kMinGridSize);
-    int w = std::max((int)std::ceil(1.0 * itemCount / h), kMinGridSize);
+    const bool addPlaceholder = itemCount <= kMaxItemCountWithPlaceholders;
+    if (addPlaceholder)
+        ++itemCount;
 
-    // Check if we need to add a placeholder, and there is no space for it.
-    if (w * h == itemCount &&
-        itemCount < kMaxGridSizeWithPlaceholders * kMaxGridSizeWithPlaceholders)
-    {
-        if (w == h)
-            ++h;
-        else
-            ++w;
-    }
+    int h = std::max((int)std::ceil(std::sqrt(itemCount)), kMinGridSize);
+    int w = std::max((int)std::ceil(1.0 * itemCount / h), kMinGridSize);
     return QRect(0, 0, w, h);
 }
 
@@ -352,15 +345,13 @@ void LayoutTourReviewController::updatePlaceholders()
     }
 
     const int itemCount = layout->items().size();
-
-    QRect boundingRect = createItemGrid(itemCount);
-
-    if (boundingRect.width() > kMaxGridSizeWithPlaceholders
-        || boundingRect.height() > kMaxGridSizeWithPlaceholders)
+    if (itemCount > kMaxItemCountWithPlaceholders)
     {
         m_dropPlaceholders.clear();
         return;
     }
+
+    QRect boundingRect = createItemGrid(itemCount);
 
     // Copy list to avoid crash while iterating.
     const auto existingPlaceholders = m_dropPlaceholders.keys();
