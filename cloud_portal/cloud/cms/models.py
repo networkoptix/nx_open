@@ -51,7 +51,7 @@ class DataStructure(models.Model):
     description = models.TextField()
 
     type = models.IntegerField(choices=DATA_TYPES, default=0)
-    default = models.CharField(max_length=1024, default='')
+    default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
 

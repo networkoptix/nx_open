@@ -31,10 +31,6 @@
                 {% if field|is_ImageField and field.value%}
                 <div>
                     <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
-                    <div>
-                        <label><input id="Remove_{{field.label}}"
-                               type="checkbox" name="Remove_{{field.label}}"> Remove Image</label>
-                    </div>
                 </div>
                 {% endif %}
                 {{ field }}

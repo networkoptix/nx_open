@@ -84,9 +84,6 @@ def save_unrevisioned_records(customization, language, data_structures,
                     if size_errors:
                         upload_errors.extend(size_errors)
                         continue
-            # If file was not uploaded remove it if user chooses to delete it
-            elif "Remove_" + data_structure_name in request_data:
-                new_record_value = ""
             # If neither case do nothing for this record
             else:
                 continue
