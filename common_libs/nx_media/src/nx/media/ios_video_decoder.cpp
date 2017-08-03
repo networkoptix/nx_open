@@ -294,24 +294,26 @@ bool IOSVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolutio
 
 QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    QN_UNUSED(codec);
+    static const QSize hdReadyResolution(1280, 720);
+    static const QSize fullHdResolution(1920, 1080);
+    static const QSize uhd4kResolution(3840, 2160);
 
     if (codec != AV_CODEC_ID_H264)
-        return QSize(1280, 720);
+        return hdReadyResolution;
 
     const auto& deviceInfo = iosDeviceInformation();
     if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
     {
         if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
-            return QSize(3840, 2160);
+            return uhd4kResolution;
     }
     else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
     {
         if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
-            return QSize(3840, 2160);
+            return uhd4kResolution;
     }
 
-    return QSize(1920, 1080);
+    return fullHdResolution;
 }
 
 int IOSVideoDecoder::decode(
