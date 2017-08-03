@@ -108,23 +108,20 @@ def save_unrevisioned_records(customization, language, data_structures,
 
     return upload_errors
 
-def update_latest_record_version(records, new_version, force_update):
+
+def update_latest_record_version(records, new_version):
     record = records.latest('created_date')
-    #if we have an old version we chould always update
-    if not record.version or force_update:
+    if not record.version:
         record.version = new_version
         record.save()
 
-def alter_records_version(contexts, customization,
-                          old_version, new_version):
+
+def update_records_to_version(contexts, customization, version):
     languages = Language.objects.all()
     for context in contexts:
         for data_structure in context.datastructure_set.all():
             all_records = data_structure.datarecord_set.filter(
                 customization=customization)
-
-            if old_version:
-                all_records = all_records.filter(version=old_version)
 
             if data_structure.translatable:
                 for language in languages:
@@ -132,10 +129,17 @@ def alter_records_version(contexts, customization,
                     # Now only the latest records that can be published will have its
                     # version altered
                     if records_for_language.exists():
-                        update_latest_record_version(records_for_language, new_version, old_version)
+                        update_latest_record_version(records_for_language, version)
 
             elif all_records.exists():
-                update_latest_record_version(all_records, new_version, old_version)
+                update_latest_record_version(all_records, version)
+
+
+def strip_version_from_records(version):
+    records_to_strip = DataRecord.objects.filter(version=version)
+    for record in records_to_strip:
+        record.version = None
+        record.save()
 
 
 def remove_unused_records(customization):
@@ -162,8 +166,7 @@ def send_version_for_review(customization, language, data_structures,
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
-        alter_records_version(Context.objects.filter(
-            product=product), customization, old_version, None)
+        strip_version_from_records(old_version)
         old_version.delete()
 
     upload_errors = save_unrevisioned_records(
@@ -174,8 +177,8 @@ def send_version_for_review(customization, language, data_structures,
                              name="N/A", created_by=user)
     version.save()
 
-    alter_records_version(Context.objects.filter(
-        product=product), customization, None, version)
+    update_records_to_version(Context.objects.filter(
+        product=product), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
     return upload_errors
