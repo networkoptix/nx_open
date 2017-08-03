@@ -475,9 +475,22 @@ angular.module('webadminApp')
                 });
             },
 
-            debugFunctionUrl:function(url,getParams){
+            debugFunctionUrl:function(url, getParams){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
-                return proxy + url + delimeter + $.param(getParams);
+                var params = '';
+                if (!window.location.origin) {
+                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+                }
+                if(getParams){
+                    params = delimeter + $.param(getParams);
+                }
+
+                url = proxy + url + params;
+                if(url.indexOf('/')!==0){
+                    url = '/' + url;
+                }
+                url = url.replace('//','/');
+                return window.location.origin + url;
             },
             debugFunction:function(method,url,getParams,postParams){
                 switch(method){

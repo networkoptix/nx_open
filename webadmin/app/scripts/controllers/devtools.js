@@ -34,13 +34,10 @@ angular.module('webadminApp')
 
         if(!$scope.session.method){
             $scope.session.method = {
-                name:'/api/pingSystem',
+                name:'/api/moduleInformation',
                 data:'',
-                params: JSON.stringify({
-                    password: 'admin',
-                    url: 'http://demo.networkoptix.com:7001/'
-                }, null,  '\t '),
-                method:'POST'
+                params: '',
+                method:'GET'
             };
         }
 
@@ -49,17 +46,12 @@ angular.module('webadminApp')
         };
 
         $scope.getDebugUrl = function(){
-
-            var params = $scope.session.method.params;
-            if(params && params !== '') {
-                try {
-                    params = JSON.parse(params);
-                } catch (a) {
-                    return  'GET-params is not a valid json object:  ' + a;
-                }
+            var params = $scope.session.method.params.trim();
+            if(params && params.indexOf('?')!==0 && $scope.session.method.name.indexOf('?')<0){
+                params = '?' + params;
             }
 
-            return mediaserver.debugFunctionUrl($scope.session.method.name, params);
+            return mediaserver.debugFunctionUrl($scope.session.method.name + params);
         };
 
         $scope.testMethod = function(){
