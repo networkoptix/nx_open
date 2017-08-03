@@ -82,6 +82,18 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
         })
+        .when('/devtools/api', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'DevtoolsCtrl'
+        })
+        .when('/devtools/events', {
+            templateUrl: Config.viewsDir + 'devtools/events.html',
+            controller: 'DevtoolsCtrl'
+        })
+        .when('/devtools/sameras', {
+            templateUrl: Config.viewsDir + 'devtools/cameras.html',
+            controller: 'DevtoolsCtrl'
+        })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',

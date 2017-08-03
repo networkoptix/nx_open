@@ -1,12 +1,12 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
+    .controller('DevtoolsCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
 
         mediaserver.getUser().then(function(user){
-            if(!user.isOwner){
+            /*if(!user.isOwner){
                 $location.path('/info'); //no admin rights - redirect
-            }
+            }*/
         });
 
         $scope.Config = Config;
