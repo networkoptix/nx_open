@@ -40,7 +40,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": ["some", "pixel", "formats"]
+                "enum": ["YUV_420", "YUV_442", "YUV_444", "NV_12", "RGB", "RGBA", "ABGR", "BGR"]
             },
             "minItems": 1,
             "uniqueItems": true
@@ -50,7 +50,7 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "typeId": {
+                    "kindName": {
                         "type": "string"
                     },
                     "localization":{
@@ -61,17 +61,17 @@
                                 "locale": {
                                     "type": "string"
                                 },
-                                "typeName": {
+                                "kindName": {
                                     "type": "string"
                                 }
                             },
-                            "required": ["locale", "typeName"]
+                            "required": ["locale", "kindName"]
                         },
                         "minItems": 1,
                         "uniqueItems": true
                     }
                 },
-                "required": ["typeId", "localization"]
+                "required": ["kindName", "localization"]
             },
             "minItems": 1,
             "uniqueItems": true

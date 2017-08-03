@@ -13,12 +13,13 @@ namespace metadata {
 static const nxpl::GUID IID_EventMetadataPacket
     = {{0x20, 0xfc, 0xa8, 0x08, 0x17, 0x6b, 0x48, 0xa6, 0x92, 0xfd, 0xba, 0xb5, 0x9d, 0x37, 0xd7, 0xc0}};
 
-struct AnalyticsEvent: public AbstractMetadataItem
+
+struct DetectedEvent: public AbstractMetadataItem
 {
     /**
     * @brief Human readable object type (line crossing | human detected | etc)
     */
-    NX_ASCII char* eventType;
+    NX_ASCII char* kindName;
 
     /**
      * @return Null terminated UTF8 string containing the caption of the event.
@@ -46,7 +47,7 @@ class AbstractEventMetadataPacket: public AbstractMetadataPacket
     * @return next detected object or null if no more objects left.
     * This functions should not modify objects and behave like a constant iterator.
     */
-    virtual const AnalyticsEvent* nextObject() = 0;
+    virtual const DetectedEvent* nextObject() = 0;
 };
 
 } // namespace metadata
