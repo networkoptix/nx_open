@@ -78,7 +78,7 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = licensePool()->getLicenses();
-    m_licensedToStr = tr("Trial License");
+    m_licensedToStr = tr("Time License");
     for (const QnLicensePtr& license: list)
     {
         if (license->type() != Qn::LC_Trial && m_licenseValidator->isValid(license))
