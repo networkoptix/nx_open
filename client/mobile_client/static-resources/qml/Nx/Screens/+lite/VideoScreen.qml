@@ -7,6 +7,7 @@ import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
 import "../private/VideoScreen"
+import "private/VideoScreen"
 
 PageBase
 {
@@ -33,7 +34,10 @@ PageBase
 
         mediaPlayer.onSourceChanged:
         {
-            if (mediaPlayer.source)
+            video.clear()
+            transformationsNotSupportedWarningLoader.showIfNeeded()
+
+            if (mediaPlayer.source && !transformationsNotSupportedWarningLoader.active)
                 mediaPlayer.playLive()
             else
                 mediaPlayer.stop()
@@ -89,6 +93,20 @@ PageBase
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
         visible: status == Image.Ready
+    }
+
+    WheelSwitchArea
+    {
+        anchors.fill: parent
+        onPreviousRequested: previousCameraRequested()
+        onNextRequested: nextCameraRequested()
+        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        onDoubleClicked: Workflow.popCurrentScreen()
     }
 
     Loader
@@ -147,6 +165,30 @@ PageBase
         active: resourceId == ""
     }
 
+    Loader
+    {
+        id: transformationsNotSupportedWarningLoader
+        anchors.fill: parent
+        visible: active
+        active: false
+
+        sourceComponent: TransformationsNotSupportedWarning
+        {
+            onCloseClicked:
+            {
+                transformationsNotSupportedWarningLoader.active = false
+                videoScreenController.start()
+            }
+        }
+
+        function showIfNeeded()
+        {
+            active = resourceId !== "" && !d.cameraWarningVisible
+                && (videoScreenController.resourceHelper.customRotation !== 0
+                    || videoScreenController.resourceHelper.customAspectRatio !== 0.0)
+        }
+    }
+
     Keys.onPressed:
     {
         if (event.modifiers == Qt.ControlModifier)
@@ -169,22 +211,6 @@ PageBase
         }
     }
 
-    WheelSwitchArea
-    {
-        anchors.fill: parent
-        onPreviousRequested: previousCameraRequested()
-        onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
-    }
-
-    MouseArea
-    {
-        anchors.fill: parent
-        onDoubleClicked: Workflow.popCurrentScreen()
-    }
-
-    onResourceIdChanged: video.clear()
-
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
@@ -196,7 +222,7 @@ PageBase
 
     onActivePageChanged:
     {
-        if (activePage)
+        if (activePage && !transformationsNotSupportedWarningLoader.active)
             videoScreenController.start()
     }
 }
