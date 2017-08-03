@@ -262,7 +262,24 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
     if (!m_user)
         return false;
 
-    return resourceAccessProvider()->hasAccess(m_user, layout);
+    if (!resourceAccessProvider()->hasAccess(m_user, layout))
+        return false;
+
+    if (!layout->isServiceLayout())
+        return true;
+
+    const auto layoutParentId = layout->getParentId();
+    if (layoutParentId.isNull())
+        return true;
+
+    const auto servers = resourcePool()->getResources<QnMediaServerResource>();
+    const auto isNx1Layout = std::any_of(servers.begin(), servers.end(),
+        [layoutParentId](const QnMediaServerResourcePtr& server)
+        {
+            return layoutParentId == server->getId();
+        });
+
+    return !isNx1Layout;
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
