@@ -1,6 +1,6 @@
 import QtQuick 2.6
 
-import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils // todo: move
+import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils
 
 Item
 {
