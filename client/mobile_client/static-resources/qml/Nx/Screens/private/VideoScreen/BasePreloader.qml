@@ -1,10 +1,27 @@
 import QtQuick 2.6
+import QtGraphicalEffects 1.0;
 
 Item
 {
     id: control
 
     property alias timeout: timer.interval
+
+    default property alias data: preloaderHolder.data
+    Item
+    {
+        id: preloaderHolder
+
+        anchors.fill: parent
+    }
+
+    DropShadow
+    {
+        id: shadow
+
+        anchors.fill: parent
+        source: preloaderHolder
+    }
 
     state: "invisible"
 

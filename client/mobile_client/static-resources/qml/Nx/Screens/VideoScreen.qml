@@ -330,7 +330,7 @@ PageBase
         {
             id: ptzPanel
 
-            preloadersParent: videoScreen
+            preloadersParent: video.item.videoControl
 
             width: parent.width
             anchors.bottom: parent.bottom
