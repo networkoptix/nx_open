@@ -12,6 +12,8 @@ class QnResourceHelper: public Connective<QObject>, public QnConnectionContextAw
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
 
+    Q_ENUMS(Qn::ResourceStatus)
+
     using base_type = Connective<QObject>;
 
 public:
