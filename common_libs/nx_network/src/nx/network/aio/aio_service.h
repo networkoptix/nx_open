@@ -120,23 +120,32 @@ public:
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;
     bool isInAnyAioThread() const;
+
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
+    aio::AIOThread* bindSocketToAioThread(Pollable* const sock);
 
     void cancelPostedCalls(
         Pollable* const sock,
         bool waitForRunningHandlerCompletion = true );
 
 private:
-    using MonitoringContext = std::pair<AIOThread*, std::chrono::milliseconds>;
+    struct MonitoringContext
+    {
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::zero();
+
+        MonitoringContext() = default;
+        MonitoringContext(std::chrono::milliseconds timeout):
+            timeout(timeout)
+        {
+        }
+    };
 
     struct SocketAIOContext
     {
-        typedef AIOThread AIOThreadType;
+        using AIOThreadType = AIOThread;
 
         std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
-        std::map<
-            std::pair<Pollable*, aio::EventType>,
-            MonitoringContext> sockets;
+        std::map<std::pair<Pollable*, aio::EventType>, MonitoringContext> sockets;
     };
 
     SocketAIOContext m_systemSocketAIO;
@@ -144,43 +153,15 @@ private:
 
     void initializeAioThreadPool(SocketAIOContext* aioCtx, unsigned int threadCount);
 
-    /**
-     * Same as AIOService::startMonitoring, but does not lock mutex. 
-     *   Calling entity MUST lock AIOService::mutex() before calling this method.
-     * @param socketAddedToPollHandler Called after socket has been added 
-     *   to pollset but before pollset.poll has been called.
-     */
-    void startMonitoringNonSafe(
-        QnMutexLockerBase* const lock,
-        Pollable* const sock,
-        aio::EventType eventToWatch,
-        AIOEventHandler* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis = boost::none,
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler
-            = nx::utils::MoveOnlyFunc<void()>());
-
-    aio::AIOThread* getSocketAioThread(
-        QnMutexLockerBase* const lock,
-        Pollable* sock);
     bool getSocketTimeout(
         Pollable* const sock,
         aio::EventType eventToWatch,
         std::chrono::milliseconds* timeout);
     boost::optional<MonitoringContext> getSocketMonitoringContext(
+        const QnMutexLockerBase& /*lock*/,
         Pollable* const sock,
         aio::EventType eventToWatch);
-
-    void cancelPostedCallsNonSafe(
-        QnMutexLockerBase* const lock,
-        Pollable* const sock,
-        bool waitForRunningHandlerCompletion = true );
-    aio::AIOThread* bindSocketToAioThread(
-        QnMutexLockerBase* const /*lock*/,
-        Pollable* const sock );
-    void postNonSafe(
-        QnMutexLockerBase* const lock,
-        Pollable* sock,
-        nx::utils::MoveOnlyFunc<void()> handler);
+    AIOThread* AIOService::findLeastUsedAioThread() const;
 };
 
 } // namespace aio

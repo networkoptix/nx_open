@@ -88,7 +88,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
 
             case TaskType::tChangingTimeout:
             {
-                void* userData = task.socket->impl()->eventTypeToUserData[task.eventType];
+                void* userData = task.socket->impl()->monitoredEvents[task.eventType].userData;
                 AioEventHandlingDataHolder* handlingData =
                     reinterpret_cast<AioEventHandlingDataHolder*>(userData);
                 //NOTE we are in aio thread currently
@@ -197,7 +197,7 @@ void AioTaskQueue::addSockToPollset(
                 .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
         }
     }
-    socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
+    socket->impl()->monitoredEvents[eventType].userData = handlingData.get();
 
     if (failedToAddToPollset)
     {
@@ -225,7 +225,7 @@ void AioTaskQueue::removeSocketFromPollSet(Pollable* sock, aio::EventType eventT
 {
     //NX_LOG( QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
 
-    void*& userData = sock->impl()->eventTypeToUserData[eventType];
+    void*& userData = sock->impl()->monitoredEvents[eventType].userData;
     if (userData)
         delete static_cast<AioEventHandlingDataHolder*>(userData);
     userData = nullptr;
@@ -262,7 +262,7 @@ bool AioTaskQueue::removeReverseTask(
             if (eventHandler != it->eventHandler)
                 continue;   //event handler changed, cannot ignore task
                             //cancelling remove task
-            void* userData = sock->impl()->eventTypeToUserData[eventType];
+            void* userData = sock->impl()->monitoredEvents[eventType].userData;
             NX_ASSERT(userData);
             static_cast<AioEventHandlingDataHolder*>(userData)->data->timeout = newTimeoutMS;
             static_cast<AioEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
@@ -311,7 +311,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         const aio::EventType handlerToInvokeType =
             (sockEventType == aio::etRead || sockEventType == aio::etWrite)
             ? sockEventType
-            : (socket->impl()->eventTypeToUserData[aio::etRead] //in case of error calling any handler
+            : (socket->impl()->monitoredEvents[aio::etRead].userData //in case of error calling any handler
                 ? aio::etRead
                 : aio::etWrite);
 
@@ -327,7 +327,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         //no need to lock mutex, since data is removed in this thread only
         std::shared_ptr<AioEventHandlingData> handlingData =
             static_cast<AioEventHandlingDataHolder*>(
-                socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
+                socket->impl()->monitoredEvents[handlerToInvokeType].userData)->data;
 
         QnMutexLocker lk(&socketEventProcessingMutex);
         ++handlingData->beingProcessed;

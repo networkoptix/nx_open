@@ -101,7 +101,7 @@ void AIOThread::stopMonitoring(
     if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))
         return;    //< Ignoring task.
 
-    void*& userData = sock->impl()->eventTypeToUserData[eventType];
+    void*& userData = sock->impl()->monitoredEvents[eventType].userData;
     if (userData == nullptr)
         return; //< Socket is not polled.
 
@@ -247,7 +247,10 @@ void AIOThread::cancelPostedCalls(Pollable* const sock, bool waitForRunningHandl
 
 size_t AIOThread::socketsHandled() const
 {
-    return m_taskQueue->pollSet->size() + m_taskQueue->newReadMonitorTaskCount + m_taskQueue->newWriteMonitorTaskCount;
+    QnMutexLocker lk(&m_taskQueue->mutex);
+    return m_taskQueue->pollSet->size() 
+        + m_taskQueue->newReadMonitorTaskCount
+        + m_taskQueue->newWriteMonitorTaskCount;
 }
 
 void AIOThread::run()

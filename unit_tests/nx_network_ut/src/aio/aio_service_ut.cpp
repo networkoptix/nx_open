@@ -42,6 +42,9 @@ public:
 
     ~AIOService()
     {
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead, this);
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etTimedOut, this);
+
         m_service.pleaseStopSync();
     }
 

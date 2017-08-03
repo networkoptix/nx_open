@@ -9,9 +9,12 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "pollable.h"
+
+//#define USE_SOCKET_EVENT_DICTIONARY
 
 namespace nx {
 namespace network {
@@ -32,7 +35,9 @@ AIOService::~AIOService()
 
 void AIOService::pleaseStopSync()
 {
+#ifdef USE_SOCKET_EVENT_DICTIONARY
     m_systemSocketAIO.sockets.clear();
+#endif
     m_systemSocketAIO.aioThreadPool.clear();
 }
 
@@ -48,14 +53,75 @@ void AIOService::startMonitoring(
     boost::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
-    QnMutexLocker lk(&m_mutex);
-    startMonitoringNonSafe(
-        &lk,
+    if (!timeoutMillis)
+    {
+        timeoutMillis = std::chrono::milliseconds::zero();
+        if (!getSocketTimeout(sock, eventToWatch, &(*timeoutMillis)))
+        {
+            post(
+                sock,
+                std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
+            return;
+        }
+    }
+
+    auto aioThread = getSocketAioThread(sock);
+
+#ifdef USE_SOCKET_EVENT_DICTIONARY
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        boost::optional<MonitoringContext> monitoringContext =
+            getSocketMonitoringContext(lock, sock, eventToWatch);
+        if (monitoringContext)
+        {
+            if (monitoringContext->timeout != timeoutMillis)
+            {
+                // Socket is already polled for this event but with another timeout. Just changing timeout.
+                aioThread->changeSocketTimeout(
+                    sock, eventToWatch, eventHandler, timeoutMillis.get());
+                monitoringContext->timeout = timeoutMillis.get();
+            }
+            return;
+        }
+
+        if (!m_systemSocketAIO.sockets.emplace(
+                std::make_pair(sock, eventToWatch),
+                MonitoringContext(timeoutMillis.get())).second)
+        {
+            NX_ASSERT(false);
+        }
+    }
+
+    aioThread->startMonitoring(
         sock,
         eventToWatch,
         eventHandler,
-        timeoutMillis,
+        timeoutMillis.get(),
         std::move(socketAddedToPollHandler));
+#else
+    if (sock->impl()->monitoredEvents[eventToWatch].isUsed)
+    {
+        if (sock->impl()->monitoredEvents[eventToWatch].timeout == timeoutMillis)
+            return;
+        sock->impl()->monitoredEvents[eventToWatch].timeout = timeoutMillis;
+        aioThread->changeSocketTimeout(
+            sock,
+            eventToWatch,
+            eventHandler,
+            timeoutMillis.get());
+    }
+    else
+    {
+        sock->impl()->monitoredEvents[eventToWatch].isUsed = true;
+        aioThread->startMonitoring(
+            sock,
+            eventToWatch,
+            eventHandler,
+            timeoutMillis.get(),
+            std::move(socketAddedToPollHandler));
+    }
+#endif
 }
 
 void AIOService::stopMonitoring(
@@ -64,22 +130,29 @@ void AIOService::stopMonitoring(
     bool waitForRunningHandlerCompletion,
     nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
 {
-    QnMutexLocker lock(&m_mutex);
+#ifdef USE_SOCKET_EVENT_DICTIONARY
+    {
+        QnMutexLocker lock(&m_mutex);
 
-    const std::pair<Pollable*, aio::EventType>& sockCtx = std::make_pair(sock, eventType);
-    auto it = m_systemSocketAIO.sockets.find(sockCtx);
-    if (it == m_systemSocketAIO.sockets.end())
+        const std::pair<Pollable*, aio::EventType>& sockCtx = std::make_pair(sock, eventType);
+        auto it = m_systemSocketAIO.sockets.find(sockCtx);
+        if (it == m_systemSocketAIO.sockets.end())
+            return;
+        m_systemSocketAIO.sockets.erase(it);
+    }
+#else
+    if (sock->impl()->monitoredEvents[eventType].isUsed)
+        sock->impl()->monitoredEvents[eventType].isUsed = false;
+    else
         return;
+#endif
 
-    auto aioThread = it->second.first;
-    m_systemSocketAIO.sockets.erase(it);
-    lock.unlock();
+    auto aioThread = getSocketAioThread(sock);
     aioThread->stopMonitoring(
         sock,
         eventType,
         waitForRunningHandlerCompletion,
         std::move(pollingStoppedHandler));
-    lock.relock();
 }
 
 void AIOService::registerTimer(
@@ -87,9 +160,7 @@ void AIOService::registerTimer(
     std::chrono::milliseconds timeoutMillis,
     AIOEventHandler* const eventHandler)
 {
-    QnMutexLocker lock(&m_mutex);
-    startMonitoringNonSafe(
-        &lock,
+    startMonitoring(
         sock,
         aio::etTimedOut,
         eventHandler,
@@ -98,24 +169,31 @@ void AIOService::registerTimer(
 
 bool AIOService::isSocketBeingWatched(Pollable* sock) const
 {
-    QnMutexLocker lk(&m_mutex);
+#ifdef USE_SOCKET_EVENT_DICTIONARY
+    QnMutexLocker lock(&m_mutex);
     const auto& it = m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, aio::etNone));
     return it != m_systemSocketAIO.sockets.end() && it->first.first == sock;
+#else
+    for (const auto& monitoringContext: sock->impl()->monitoredEvents)
+    {
+        if (monitoringContext.isUsed)
+            return true;
+    }
+
+    return false;
+#endif
 }
 
 void AIOService::post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler)
 {
-    QnMutexLocker lk(&m_mutex);
-    postNonSafe(&lk, sock, std::move(handler));
+    auto* aioThread = getSocketAioThread(sock);
+    aioThread->post(sock, std::move(handler));
 }
 
 void AIOService::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    QnMutexLocker lk(&m_mutex);
-    //if sock is not still bound to aio thread, binding it
     auto& threadToUse = nx::utils::random::choice(m_systemSocketAIO.aioThreadPool);
     NX_ASSERT(threadToUse);
-    lk.unlock();
     threadToUse->post(nullptr, std::move(handler));
 }
 
@@ -129,20 +207,22 @@ void AIOService::dispatch(
 
 aio::AIOThread* AIOService::getSocketAioThread(Pollable* sock)
 {
-    QnMutexLocker lk(&m_mutex);
-    return getSocketAioThread(&lk, sock);
+    auto thread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+
+    if (!thread) //< Socket has not been bound to aio thread yet.
+        thread = bindSocketToAioThread(sock);
+
+    NX_ASSERT(thread);
+    return thread;
 }
 
 AbstractAioThread* AIOService::getRandomAioThread() const
 {
-    QnMutexLocker lk(&m_mutex);
     return nx::utils::random::choice(m_systemSocketAIO.aioThreadPool).get();
 }
 
 AbstractAioThread* AIOService::getCurrentAioThread() const
 {
-    QnMutexLocker lk(&m_mutex);
-
     const auto thisThread = QThread::currentThread();
     const auto it = std::find_if(
         m_systemSocketAIO.aioThreadPool.begin(),
@@ -168,98 +248,44 @@ void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThr
 
     NX_ASSERT(!isSocketBeingWatched(sock));
 
-    //socket can be bound to another aio thread, if it is not used at the moment
+    // Socket can be bound to another aio thread, if it is not used at the moment.
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
+}
+
+aio::AIOThread* AIOService::bindSocketToAioThread(Pollable* const sock)
+{
+    aio::AIOThread* threadToUse = findLeastUsedAioThread();
+
+    // Assigning thread to socket once and for all.
+    aio::AIOThread* expectedSocketThread = nullptr;
+    if (!sock->impl()->aioThread.compare_exchange_strong(expectedSocketThread, threadToUse))
+        threadToUse = expectedSocketThread;     //< Socket is already bound to some thread.
+
+    return threadToUse;
 }
 
 void AIOService::cancelPostedCalls(
     Pollable* const sock,
     bool waitForRunningHandlerCompletion)
 {
-    QnMutexLocker lk(&m_mutex);
-    cancelPostedCallsNonSafe(&lk, sock, waitForRunningHandlerCompletion);
+    AIOThread* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+    if (!aioThread)
+        return;
+    aioThread->cancelPostedCalls(sock, waitForRunningHandlerCompletion);
 }
 
 void AIOService::initializeAioThreadPool(
     SocketAIOContext* aioCtx,
     unsigned int threadCount)
 {
-    typedef typename SocketAIOContext::AIOThreadType AIOThreadType;
-
     for (unsigned int i = 0; i < threadCount; ++i)
     {
-        std::unique_ptr<AIOThreadType> thread(new AIOThreadType());
+        auto thread = std::make_unique<AIOThread>();
         thread->start();
         if (!thread->isRunning())
             continue;
         aioCtx->aioThreadPool.push_back(std::move(thread));
     }
-}
-
-void AIOService::startMonitoringNonSafe(
-    QnMutexLockerBase* const lock,
-    Pollable* const sock,
-    aio::EventType eventToWatch,
-    AIOEventHandler* const eventHandler,
-    boost::optional<std::chrono::milliseconds> timeoutMillis,
-    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
-{
-    if (!timeoutMillis)
-    {
-        timeoutMillis = std::chrono::milliseconds::zero();
-        if (!getSocketTimeout(sock, eventToWatch, &(*timeoutMillis)))
-        {
-            postNonSafe(
-                lock,
-                sock,
-                std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
-            return;
-        }
-    }
-
-    boost::optional<MonitoringContext> monitoringContext =
-        getSocketMonitoringContext(sock, eventToWatch);
-    if (monitoringContext)
-    {
-        if (monitoringContext->second != timeoutMillis)
-        {
-            // Socket is already polled for this event but with another timeout. Just changing timeout.
-            monitoringContext->first->changeSocketTimeout(
-                sock, eventToWatch, eventHandler, timeoutMillis.get());
-            monitoringContext->second = timeoutMillis.get();
-        }
-        return;
-    }
-
-    const auto threadToUse = getSocketAioThread(lock, sock);
-    if (!m_systemSocketAIO.sockets.emplace(
-        std::make_pair(sock, eventToWatch),
-        std::make_pair(threadToUse, timeoutMillis.get())).second)
-    {
-        NX_ASSERT(false);
-    }
-
-    lock->unlock();
-    threadToUse->startMonitoring(
-        sock,
-        eventToWatch,
-        eventHandler,
-        timeoutMillis.get(),
-        std::move(socketAddedToPollHandler));
-    lock->relock();
-}
-
-aio::AIOThread* AIOService::getSocketAioThread(
-    QnMutexLockerBase* const lock,
-    Pollable* sock)
-{
-    auto thread = sock->impl()->aioThread.load(std::memory_order_relaxed);
-
-    if (!thread) // socket has not been bound to aio thread yet
-        thread = bindSocketToAioThread(lock, sock);
-
-    NX_ASSERT(thread);
-    return thread;
 }
 
 bool AIOService::getSocketTimeout(
@@ -287,13 +313,15 @@ bool AIOService::getSocketTimeout(
     return true;
 }
 
+#ifdef USE_SOCKET_EVENT_DICTIONARY
 boost::optional<AIOService::MonitoringContext> AIOService::getSocketMonitoringContext(
+    const QnMutexLockerBase& /*lock*/,
     Pollable* const sock,
     aio::EventType eventToWatch)
 {
-    // Checking, if that socket is already polled
-    auto closestSockIter = m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, (aio::EventType)0));
-    auto sameSockAndEventIter = closestSockIter;
+    // Checking, if that socket is already monitored.
+    auto sameSockAndEventIter = 
+        m_systemSocketAIO.sockets.lower_bound(std::make_pair(sock, (aio::EventType)0));
     for (; sameSockAndEventIter != m_systemSocketAIO.sockets.end(); ++sameSockAndEventIter)
     {
         if (sameSockAndEventIter->first.first != sock)
@@ -312,27 +340,13 @@ boost::optional<AIOService::MonitoringContext> AIOService::getSocketMonitoringCo
 
     return boost::none;
 }
+#endif
 
-void AIOService::cancelPostedCallsNonSafe(
-    QnMutexLockerBase* const lock,
-    Pollable* const sock,
-    bool waitForRunningHandlerCompletion)
-{
-    typename SocketAIOContext::AIOThreadType* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
-    if (!aioThread)
-        return;
-    lock->unlock();
-    aioThread->cancelPostedCalls(sock, waitForRunningHandlerCompletion);
-    lock->relock();
-}
-
-aio::AIOThread* AIOService::bindSocketToAioThread(
-    QnMutexLockerBase* const /*lock*/,
-    Pollable* const sock)
+AIOThread* AIOService::findLeastUsedAioThread() const
 {
     aio::AIOThread* threadToUse = nullptr;
 
-    //searching for a least-used thread, which is ready to accept
+    // Searching for a least-used thread, which is ready to accept.
     for (auto
         threadIter = m_systemSocketAIO.aioThreadPool.cbegin();
         threadIter != m_systemSocketAIO.aioThreadPool.cend();
@@ -343,26 +357,7 @@ aio::AIOThread* AIOService::bindSocketToAioThread(
         threadToUse = threadIter->get();
     }
 
-    //assigning thread to socket once and for all
-    aio::AIOThread* expectedSocketThread = nullptr;
-    if (!sock->impl()->aioThread.compare_exchange_strong(expectedSocketThread, threadToUse))
-    {
-        //if created new thread than just leaving it for future use
-        threadToUse = expectedSocketThread;     //socket is already bound to some thread
-    }
-
     return threadToUse;
-}
-
-void AIOService::postNonSafe(
-    QnMutexLockerBase* const lock,
-    Pollable* sock,
-    nx::utils::MoveOnlyFunc<void()> handler)
-{
-    auto* aioThread = getSocketAioThread(lock, sock);
-    lock->unlock();
-    aioThread->post(sock, std::move(handler));
-    lock->relock();
 }
 
 } // namespace aio
