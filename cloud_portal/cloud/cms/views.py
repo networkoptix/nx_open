@@ -156,6 +156,8 @@ def context_edit_view(request, context=None, language=None):
             request, context, language)
 
         if 'SendReview' in request.data:
+            if not request.user.has_perm('cms.add_contentversion'):
+                raise PermissionDenied
             return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
         return render(request, 'context_editor.html',
@@ -177,7 +179,9 @@ def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
         preview_link = "//" + request.get_host() + generate_preview()
         return redirect(preview_link)
-    elif "Publish" in request.data:# and request.user.has_perm('cms.publish_version'):
+    elif "Publish" in request.data:
+        if not request.user.has_perm('cms.publish_version'):
+            raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publish_latest_version(customization, request.user)
         version = ContentVersion.objects.latest('created_date')
