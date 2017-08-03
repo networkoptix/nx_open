@@ -26,16 +26,14 @@ public:
     virtual int planeCount() const = 0;
 
     /**
-     * @return array of pointers to decoded data.
-     * Size of this array is equal to the value return by planeCount call.
+     * @return pointers to decoded data.
      */
-    virtual const char** data() const = 0;
+    virtual const char* bits(int plane) const = 0;
 
     /**
-     * @return array of data plane sizes (in bytes).
-     * Size of this array is equal to the value returned by planeCount call.
+     * @return bytes per line for plane.
      */
-    virtual const int* planeSize() const = 0;
+    virtual const int* bytesPerLine(int plane) const = 0;
 };
 
 } // namespace metadata

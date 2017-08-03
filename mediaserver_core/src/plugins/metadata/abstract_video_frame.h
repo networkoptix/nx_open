@@ -21,6 +21,25 @@ class AbstractVideoFrame: public AbstractMediaFrame
 {
 public:
 
+    enum class PixelFormat
+    {
+        yuv420,
+        yuv422,
+        yuv444,
+        rgba,
+        rgb,
+        bgr,
+        bgra,
+    };
+
+    enum class Handle
+    {
+        NoHandle,
+        GLTexture,
+        EGLImageHandle,
+        UserHandle = 1000
+    };
+
     /**
      * @return width of decoded frame in pixels.
      */
@@ -36,11 +55,26 @@ public:
      */
     virtual Ratio sampleAspectRatio() const = 0;
 
+    virtual PixelFormat pixelFormat() const = 0;
+
     /**
-     * @return null terminated string describing pixel format.
-     * Possible values are ... TODO: #dmishin insert possible formats.
+     * @brief handle type
      */
-    virtual char* pixelFormat() const = 0;
+    virtual Handle handleType() const = 0;
+
+    /**
+     * @brief Return handle number or 0 if handle is not used.
+     */
+    virtual int handle() const = 0;
+
+    /**
+     * @brief maps the contents of a video frame to system (CPU addressable) memory.
+     * @return true if map success. If handle is not zero function 'bits' should be called only after map call.
+     * otherwise function 'bits' returns zero.
+     * If function handle
+     */
+    virtual bool map();
+    virtual void unmap();
 };
 
 } // namespace metadata
