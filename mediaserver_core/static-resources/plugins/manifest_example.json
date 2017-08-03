@@ -1,0 +1,22 @@
+{
+    "acceptedDataTypes": ["compressedVideo", "decompressedVideo"],
+    "supportedCodecs": ["video/avc"],
+    "supportedHandleTypes": ["eglImage"],
+    "supportedPixelFormats": ["YUV_444"],
+    "outputEventTypes": [
+        {
+            "kindName": "Line crossing",
+            "localization": [
+                {"locale": "ru-RU", "kindName": "Пересечение линии"},
+                {"locale": "uk-UA", "kindName": "Перетин лiнiї"}
+            ]
+        },
+        {
+            "kindName": "Object in the area",
+            "localization": [
+                {"locale": "ru-RU", "kindName": "Объект внутри области"},
+                {"locale": "ru-RU", "kindName": "Об'єкт всередині області"}
+            ]
+        }
+    ]
+}

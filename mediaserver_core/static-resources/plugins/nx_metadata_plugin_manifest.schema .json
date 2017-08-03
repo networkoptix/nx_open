@@ -31,7 +31,7 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "enum": ["glTexture", "xvShmImage", "coreImage", "qPixmap", "eglImage"]
+                "enum": ["none, glTexture", "xvShmImage", "coreImage", "qPixmap", "eglImage"]
             },
             "minItems": 1,
             "uniqueItems": true
