@@ -319,6 +319,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
 QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename,
     QnResourcePool* resourcePool)
 {
+    if (resourcePool)
+    {
+        if (const auto& existing = resourcePool->getResourceByUrl(filename))
+            return existing;
+    }
+
     QFile file(filename);
     if (!file.exists())
         return QnResourcePtr();

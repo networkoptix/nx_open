@@ -1257,6 +1257,8 @@ APPLY(2009, broadcastPeerSyncTime, ApiPeerSyncTimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+/* Transaction 4001 (getClientInfoList) removed, code is forbidden. */ \
+/* Transaction 4002 (saveClientInfo) removed, code is forbidden. */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \
