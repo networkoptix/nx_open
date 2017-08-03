@@ -346,12 +346,12 @@ protected:
 
     void thenParseSucceeded()
     {
-        ASSERT_EQ(nx_api::ParserState::done, m_prevParseResult);
+        ASSERT_EQ(nx::network::server::ParserState::done, m_prevParseResult);
     }
 
     void thenParseDidNotSucceed()
     {
-        ASSERT_NE(nx_api::ParserState::done, m_prevParseResult);
+        ASSERT_NE(nx::network::server::ParserState::done, m_prevParseResult);
     }
 
 private:
@@ -359,7 +359,7 @@ private:
     Message m_parsedMessage;
     MessageParser m_parser;
     nx::Buffer m_bufferToParse;
-    nx_api::ParserState m_prevParseResult = nx_api::ParserState::init;
+    nx::network::server::ParserState m_prevParseResult = nx::network::server::ParserState::init;
 
     void prepareCorrectStunPacket()
     {
@@ -373,7 +373,7 @@ private:
         size_t serializedSize = 0;
         ASSERT_EQ(
             serializer.serialize(&m_bufferToParse, &serializedSize),
-            nx_api::SerializerState::done);
+            nx::network::server::SerializerState::done);
     }
 };
 
