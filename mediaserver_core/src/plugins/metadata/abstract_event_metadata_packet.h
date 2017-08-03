@@ -22,7 +22,7 @@ class AbstractEventMetadataPacket: public AbstractMetadataPacket
     /**
      * @return Null terminated ASCII string determinig the type of the event.
      */
-    virtual NX_ASCII const char* type() const = 0;
+    virtual NX_ASCII const char* typeId() const = 0;
 
     /**
      * @return Null terminated UTF8 string containig the caption of the event.
