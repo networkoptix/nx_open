@@ -302,12 +302,12 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     const auto& deviceInfo = iosDeviceInformation();
     if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
     {
-        if (deviceInfo.majorVersion >= 7) //< 6 and newer.
+        if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
             return QSize(3840, 2160);
     }
     else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
     {
-        if (deviceInfo.majorVersion >= 5) //< Air 2 / Mini 4 or newer.
+        if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
             return QSize(3840, 2160);
     }
 
