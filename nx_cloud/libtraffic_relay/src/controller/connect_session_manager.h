@@ -70,7 +70,8 @@ public:
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
         controller::AbstractTrafficRelay* trafficRelay,
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool);
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool,
+        std::string publicHostString);
     ~ConnectSessionManager();
 
     virtual void beginListening(
@@ -106,7 +107,6 @@ private:
     bool m_terminated = false;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPool;
     std::set<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
-    std::string m_publicIpString;
 
     void saveServerConnection(
         const std::string& peerName,
@@ -130,7 +130,6 @@ private:
         std::size_t bytesSent,
         std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
-    void discoverPublicIp();
 };
 
 class ConnectSessionManagerFactory
@@ -147,7 +146,8 @@ public:
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
-        controller::AbstractTrafficRelay* trafficRelay);
+        controller::AbstractTrafficRelay* trafficRelay,
+        std::string publicHostString);
     /**
      * @return Previous factory func.
      */
