@@ -10,6 +10,7 @@ function JsHlsAPI(){
     dumpfMP4 = false;
 
     this.initHlsEvents = function(hls){
+        hls.config.manifestLoadingTimeOut = 30*1000; // 30 seconds to wait for manifest
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
