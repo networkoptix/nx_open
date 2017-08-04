@@ -9,7 +9,7 @@
 import pytest
 import time
 import logging
-from test_utils.utils import SimpleNamespace, datetime_utc_now
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str, str_to_bool
 import server_api_data_generators as generator
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 
@@ -156,7 +156,9 @@ def discovery(request):
 @pytest.mark.testcam
 def test_failover_and_auto_discovery(server_factory, camera_factory, counter, discovery):
     one = server_factory('one')
-    two = server_factory('two', setup_settings=dict(autoDiscoveryEnabled=discovery))
+    two = server_factory('two', setup_settings=dict(
+        systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
+    assert str_to_bool(two.settings['autoDiscoveryEnabled']) == discovery
     two.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=two.ecs_guid,
         maxCameras=2,

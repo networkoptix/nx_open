@@ -17,9 +17,9 @@ log = logging.getLogger(__name__)
 @pytest.fixture
 def test_system_settings():
     return dict(systemSettings=dict(
-        cameraSettingsOptimization='false',
-        autoDiscoveryEnabled='false',
-        statisticsAllowed='false'))
+        cameraSettingsOptimization=bool_to_str(False),
+        autoDiscoveryEnabled=bool_to_str(False),
+        statisticsAllowed=bool_to_str(False)))
 
 
 def check_system_settings(server, **kw):

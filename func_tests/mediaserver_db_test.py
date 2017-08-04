@@ -18,7 +18,7 @@ import pytest
 import os
 import time
 import json
-from test_utils.utils import SimpleNamespace, datetime_utc_now
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 import server_api_data_generators as generator
 
@@ -62,7 +62,7 @@ def server(name, server_factory, bin_dir, db_version):
     else:
         server = server_factory(name, start=False)
     server.start_service()
-    system_settings = dict(autoDiscoveryEnabled=False)
+    system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)
     server.set_system_settings(statisticsAllowed=False)
     if db_version == '2.4':

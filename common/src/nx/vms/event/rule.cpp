@@ -206,16 +206,15 @@ Rule::Rule(
     m_system = isSystem;
     m_actionType = bActionType;
     m_eventType = bEventType;
-
-    if (subjectIds.empty())
-        return;
-
-    if (requiresUserResource(m_actionType))
-        m_actionResources = subjectIds.toVector();
-    else
-        m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
-
     m_actionParams.allUsers = allUsers;
+
+    if (!subjectIds.empty())
+    {
+        if (requiresUserResource(m_actionType))
+            m_actionResources = subjectIds.toVector();
+        else
+            m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
+    }
 }
 
 Rule* Rule::clone()

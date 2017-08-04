@@ -203,15 +203,16 @@ void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
         setData(format, data->data(format));
 
     auto ids = deserializeFromInternal(this->data(kInternalMimeType));
-    m_resources.clear();
+    QSet<QnResourcePtr> resources;
     if (resourcePool)
-        m_resources.append(resourcePool->getResources(ids));
+        resources.unite(resourcePool->getResources(ids).toSet());
 
     if (data->hasUrls())
     {
-        m_resources.append(QnFileProcessor::findOrCreateResourcesForFiles(data->urls(),
-            resourcePool));
+        resources.unite(QnFileProcessor::findOrCreateResourcesForFiles(data->urls(),
+            resourcePool).toSet());
     }
+    m_resources = resources.toList();
 
     for (const auto resource: m_resources)
         ids.removeAll(resource->getId());

@@ -59,7 +59,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
 def servers(metrics_saver, server_factory, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
-    setup_settings = dict(autoDiscoveryEnabled=False)
+    setup_settings = dict(systemSettings=dict(autoDiscoveryEnabled=utils.bool_to_str(False)))
     start_time = utils.datetime_utc_now()
     server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
@@ -263,3 +263,4 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         metrics_saver.save('merge_duration', merge_duration)
     finally:
         servers[0].load_system_settings(log_settings=True)  # log final settings
+    assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

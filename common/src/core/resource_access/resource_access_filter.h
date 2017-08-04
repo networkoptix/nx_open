@@ -32,8 +32,18 @@ public:
         return isShareable(LayoutsFilter, resource);
     }
 
-    // Resource can be opened in a common layout OR is a layout itself.
+    /**
+     * Check if resource can be opened in a common layout...
+     * ... OR is a layout itself
+     * ... OR is a videowall.
+     */
     static bool isDroppable(const QnResourcePtr& resource);
+
+    /**
+    * Check if resource can be opened in a common layout...
+    * ... OR is a layout itself.
+    */
+    static bool isOpenableInEntity(const QnResourcePtr& resource);
 
     // Resource can be opened in a common layout.
     static bool isOpenableInLayout(const QnResourcePtr& resource);
