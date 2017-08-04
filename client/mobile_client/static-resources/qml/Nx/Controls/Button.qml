@@ -9,6 +9,7 @@ Button
     id: control
 
     property color color: ColorTheme.base9
+    property color hoveredColor: Qt.lighter(color)
     property color textColor: ColorTheme.windowText
     property color highlightColor: "#30ffffff"
     property bool flat: false
@@ -16,8 +17,10 @@ Button
     property real radius: 2
     property real labelPadding: 24
 
-    property real mouseX: mouseTracker.mouseX
-    property real mouseY: mouseTracker.mouseY
+    property alias mouseX: mouseTracker.mouseX
+    property alias mouseY: mouseTracker.mouseY
+
+    property alias hovered: mouseTracker.containsMouse
 
     implicitWidth: Math.max(background ? background.implicitWidth : 0,
                             label ? label.implicitWidth: 0) + leftPadding + rightPadding
@@ -66,8 +69,22 @@ Button
         x: parent.leftPadding
         y: parent.topPadding
 
-        color: flat ? "transparent"
-                    : control.enabled && control.highlighted ? Qt.lighter(control.color) : control.color
+        color:
+        {
+            if (control.flat)
+                return "transparent"
+
+            if (!control.enabled)
+                return control.color
+
+            if (control.highlighted)
+                return Qt.lighter(control.color)
+
+            if (control.hovered)
+                return control.hoveredColor
+
+            return control.color
+        }
         opacity: control.enabled ? 1.0 : 0.3
 
         MaterialEffect
@@ -84,6 +101,8 @@ Button
     ItemMouseTracker
     {
         id: mouseTracker
+
         item: control
+        hoverEventsEnabled: true
     }
 }
