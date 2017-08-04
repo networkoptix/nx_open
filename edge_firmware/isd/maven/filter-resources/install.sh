@@ -1,20 +1,27 @@
 #!/bin/sh
 
-CUSTOMIZATION=${deb.customization.company.name}
-export DISTRIB=${artifact.name.server}
+CUSTOMIZATION="${deb.customization.company.name}"
+DISTRIB="${artifact.name.server}"
 
 INSTALL_DIR="/usr/local/apps/$CUSTOMIZATION"
+STARTUP_SCRIPT="/etc/init.d/S99$CUSTOMIZATION-mediaserver"
+TAR_FILE="./$DISTRIB.tar.gz"
 
-update()
+upgradeVms()
 {
-    /etc/init.d/S99$CUSTOMIZATION-mediaserver stop
+    "$STARTUP_SCRIPT" stop
     rm -rf "$INSTALL_DIR/mediaserver/lib"
-    tar xfv $DISTRIB.tar.gz -C /
-    /etc/init.d/S99$CUSTOMIZATION-mediaserver start
+    tar xfv "$TAR_FILE" -C /
+    "$STARTUP_SCRIPT" start
 }
 
-if [ "$1" != "" ]; then
-    update >>"$1" 2>&1
-else
-    update 2>&1
-fi
+main()
+{
+    if [ "$1" != "" ]; then
+        upgradeVms >>"$1" 2>&1
+    else
+        upgradeVms 2>&1
+    fi
+}
+
+main "$@"
