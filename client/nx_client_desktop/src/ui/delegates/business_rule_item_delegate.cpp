@@ -94,7 +94,7 @@ void QnSelectResourcesDialogButton::at_clicked()
 {
     if (m_target == QnResourceSelectionDialog::Filter::users)
     {
-        // Dialog will be destroyed wothether with delegate editor.
+        // Dialog will be destroyed by delegate editor.
         auto dialog = new SubjectSelectionDialog(this);
         auto ids = m_resources;
 
