@@ -183,7 +183,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
         /* Check if we are creating new user */
-        if (user->flags().testFlag(Qn::local))
+        if (!user->resourcePool())
         {
             return hasGlobalPermission(Qn::GlobalAdminPermission)
                 ? Qn::FullUserPermissions

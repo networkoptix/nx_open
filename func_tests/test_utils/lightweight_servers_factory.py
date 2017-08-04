@@ -147,13 +147,13 @@ class LightweightServersHost(object):
     def allocate(self, server_count):
         assert not self._allocated, 'Lightweight servers were already allocated by this test'
         pih = self._physical_installation_host
-        pih.ensure_mediaserver_is_unpacked()
         server_dir = pih.unpacked_mediaserver_dir
         lws_dir = self._installation.dir
-        self._host.mk_dir(lws_dir)
         server_ctl = PhysicalHostServerCtl(self._host, lws_dir)
         if server_ctl.get_state():
             server_ctl.set_state(is_started=False)
+        pih.ensure_mediaserver_is_unpacked()
+        self._host.mk_dir(lws_dir)
         self._cleanup_log_files()
         self._host.put_file(self._test_binary_path, lws_dir)
         self._write_lws_ctl(server_dir, lws_dir, server_count)

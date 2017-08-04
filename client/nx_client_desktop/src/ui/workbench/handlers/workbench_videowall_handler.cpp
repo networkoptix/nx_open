@@ -1465,9 +1465,11 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
         return;
 
     // Deleting one-by-one to avoid invalid layouts which cannot be deleted for whatever reason
-    NX_ASSERT(menu()->canTrigger(action::RemoveFromServerAction, layoutsToDelete));
     for (auto layout: layoutsToDelete)
-        menu()->trigger(action::RemoveFromServerAction, layout);
+    {
+        if (!menu()->triggerIfPossible(action::RemoveFromServerAction, layout))
+            resourcePool()->removeResource(layout);
+    }
 }
 
 /*------------------------------------ HANDLERS ------------------------------------------*/

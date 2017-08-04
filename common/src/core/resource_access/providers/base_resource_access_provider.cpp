@@ -102,7 +102,7 @@ bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubjec
         return false;
 
     return subject.user()
-        ? subject.user()->isEnabled()
+        ? subject.user()->isEnabled() && subject.user()->resourcePool()
         : true; //< Roles are always enabled (at least for now)
 }
 
