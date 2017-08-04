@@ -177,83 +177,83 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
     client->setSendTimeoutMs(kSystemConnectTimeout.count());
     client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
 
-    QPointer<QThread> thread(QThread::currentThread());
     QPointer<QObject> guard(this);
 
     const auto handleReply =
-        [this, thread, guard, cloudSystemId](nx_http::AsyncHttpClientPtr reply) mutable
+        [this, guard, cloudSystemId](nx_http::AsyncHttpClientPtr reply) mutable
         {
             const bool failed = reply->failed();
             const QByteArray data = failed ? QByteArray() : reply->fetchMessageBodyBuffer();
 
-            if (thread && guard)
-            {
-                executeInThread(thread,
-                    [this, guard, cloudSystemId, failed, data, reply]
+            NX_ASSERT(guard, "If we are already in the handler, destructor must wait on stopSync.");
+
+            executeInThread(guard->thread(),
+                [this, guard, cloudSystemId, failed, data, reply]
+                {
+                    if (!guard)
+                        return;
+
+                    const QnMutexLocker lock(&m_mutex);
+                    m_runningRequests.removeOne(reply);
+
+                    const auto it = m_systems.find(cloudSystemId);
+                    if (it == m_systems.end())
+                        return;
+
+                    const auto systemDescription = it.value();
+                    const auto clearServers =
+                        [systemDescription]()
                     {
-                        if (!guard)
-                            return;
+                        const auto currentServers = systemDescription->servers();
+                        NX_ASSERT(currentServers.size() <= 1,
+                            "There should be one or zero servers");
+                        for (const auto& current : currentServers)
+                            systemDescription->removeServer(current.id);
+                    };
 
-                        const QnMutexLocker lock(&m_mutex);
-                        m_runningRequests.removeOne(reply);
+                    auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
+                    if (failed)
+                        return;
 
-                        const auto it = m_systems.find(cloudSystemId);
-                        if (it == m_systems.end())
-                            return;
+                    QnJsonRestResult jsonReply;
+                    if (!QJson::deserialize(data, &jsonReply))
+                        return;
 
-                        const auto systemDescription = it.value();
-                        const auto clearServers =
-                            [systemDescription]()
-                            {
-                                const auto currentServers = systemDescription->servers();
-                                NX_ASSERT(currentServers.size() <= 1,
-                                    "There should be one or zero servers");
-                                for (const auto& current : currentServers)
-                                    systemDescription->removeServer(current.id);
-                            };
+                    QnModuleInformation moduleInformation;
+                    if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
+                        return;
 
-                        auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
-                        if (failed)
-                            return;
+                    // To prevent hanging on of fake online cloud servers
+                    // It is almost not hack.
+                    tryRemoveAlienServer(moduleInformation);
+                    if (cloudSystemId != moduleInformation.cloudSystemId)
+                        return;
 
-                        QnJsonRestResult jsonReply;
-                        if (!QJson::deserialize(data, &jsonReply))
-                            return;
+                    clearServersTask->disableDestructionHandler();
 
-                        QnModuleInformation moduleInformation;
-                        if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
-                            return;
+                    const auto serverId = moduleInformation.id;
+                    if (systemDescription->containsServer(serverId))
+                    {
+                        systemDescription->updateServer(moduleInformation);
+                    }
+                    else
+                    {
+                        clearServers();
+                        systemDescription->addServer(moduleInformation, 0);
+                    }
 
-                        // To prevent hanging on of fake online cloud servers
-                        // It is almost not hack.
-                        tryRemoveAlienServer(moduleInformation);
-                        if (cloudSystemId != moduleInformation.cloudSystemId)
-                            return;
-
-                        clearServersTask->disableDestructionHandler();
-
-                        const auto serverId = moduleInformation.id;
-                        if (systemDescription->containsServer(serverId))
-                        {
-                            systemDescription->updateServer(moduleInformation);
-                        }
-                        else
-                        {
-                            clearServers();
-                            systemDescription->addServer(moduleInformation, 0);
-                        }
-
-                        QUrl url;
-                        url.setHost(moduleInformation.cloudId());
-                        url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
-                        systemDescription->setServerHost(serverId, url);
-                    }); //< executeInThread
-            } //< if (thread && guard)
+                    QUrl url;
+                    url.setHost(moduleInformation.cloudId());
+                    url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+                    systemDescription->setServerHost(serverId, url);
+                }); //< executeInThread
             reply->pleaseStopSync();
 
         };
 
     client->doGet(lit("http://%1:0/api/moduleInformation").arg(cloudSystemId), handleReply);
+
+    // This method is always called under mutex.
     m_runningRequests.push_back(client);
 }
 
