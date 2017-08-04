@@ -82,13 +82,43 @@ AbstractSocket::SOCKET_HANDLE Socket<SocketInterfaceToImplement>::handle() const
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::getRecvTimeout(unsigned int* millis) const
 {
-    return Pollable::getRecvTimeout(millis);
+#ifdef _WIN32
+    int valLen = sizeof(*millis);
+    if (getsockopt(this->handle(), SOL_SOCKET, SO_RCVTIMEO, (char*)millis, &valLen) != 0)
+        return false;
+#else
+    timeval tv;
+    memset(&tv, 0, sizeof(tv));
+    int valLen = sizeof(tv);
+    if (::getsockopt(this->handle(), SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, &valLen) < 0)
+        return false;
+    *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
+#endif
+
+    m_readTimeoutMS = *millis;
+
+    return true;
 }
 
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::getSendTimeout(unsigned int* millis) const
 {
-    return Pollable::getSendTimeout(millis);
+#ifdef _WIN32
+    int valLen = sizeof(*millis);
+    if (getsockopt(this->handle(), SOL_SOCKET, SO_SNDTIMEO, (char*)millis, &valLen) != 0)
+        return false;
+#else
+    timeval tv;
+    memset(&tv, 0, sizeof(tv));
+    int valLen = sizeof(tv);
+    if (::getsockopt(this->handle(), SOL_SOCKET, SO_SNDTIMEO, (void*)&tv, &valLen) < 0)
+        return false;
+    *millis = tv.tv_sec * 1000 + tv.tv_usec/1000;
+#endif
+
+    m_writeTimeoutMS = *millis;
+
+    return true;
 }
 
 template<typename SocketInterfaceToImplement>
@@ -592,7 +622,12 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
             &wsaFlags, &overlapped, nullptr);
         if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
         {
-            auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
+            unsigned int timeout = INFINITE;
+            if (!getRecvTimeout(&timeout))
+                return -1;
+            if (timeout == 0)
+                timeout = INFINITE;
+
             WaitForSingleObject(m_eventObject, timeout);
             if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
             {
@@ -1455,6 +1490,16 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     // Make all platforms behave like Linux, so all new sockets are in blocking mode
     // regardless of their origin.
     if (!acceptedSocket->setNonBlockingMode(false))
+    {
+        delete acceptedSocket;
+        return nullptr;
+    }
+
+    // TODO: #ak Get rid of following calls. 
+    // Have to call these methods to fill internal cached values.
+    unsigned int socketTimeout = 0;
+    if (!acceptedSocket->getRecvTimeout(&socketTimeout) ||
+        !acceptedSocket->getSendTimeout(&socketTimeout))
     {
         delete acceptedSocket;
         return nullptr;

@@ -362,7 +362,9 @@ bool UdtSocket<InterfaceToImplement>::getRecvTimeout(unsigned int* millis) const
     int ret = UDT::getsockopt(
         m_impl->udtHandle, 0, UDT_RCVTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
-    if (ret != 0)
+    if (ret == 0)
+        m_readTimeoutMS = *millis;
+    else
         SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
@@ -391,7 +393,9 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
     int ret = UDT::getsockopt(
         m_impl->udtHandle, 0, UDT_SNDTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
-    if (ret != 0)
+    if (ret == 0)
+        m_writeTimeoutMS = *millis;
+    else
         SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
