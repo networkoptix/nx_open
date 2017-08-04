@@ -50,7 +50,18 @@ bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
     if (!resource)
         return false;
 
-    return resource->hasFlags(Qn::layout) || isOpenableInLayout(resource);
+    return resource->hasFlags(Qn::videowall)
+        || isOpenableInEntity(resource);
+}
+
+bool QnResourceAccessFilter::isOpenableInEntity(const QnResourcePtr& resource)
+{
+    NX_EXPECT(resource);
+    if (!resource)
+        return false;
+
+    return resource->hasFlags(Qn::layout)
+        || isOpenableInLayout(resource);
 }
 
 bool QnResourceAccessFilter::isOpenableInLayout(const QnResourcePtr& resource)

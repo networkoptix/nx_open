@@ -68,7 +68,7 @@ class PhysicalInstallationCtl(object):
     # will unpack [new] distributive and reinstall servers
     def reset_all_installations(self):
         for host in self.installation_hosts:
-            host.reset_installations()
+            host.set_reset_installation_flag()
 
     def allocate_server(self, config):
         while self._available_hosts:
@@ -111,6 +111,7 @@ class PhysicalInstallationHost(object):
         self._allocated_server_list = []
         self._timezone = host.get_timezone()
         self._ensure_servers_are_stopped()  # expected initial state, we may reset_installations after this, so pids will be lost
+        self._must_reset_installation = False
 
     @property
     def name(self):
@@ -133,7 +134,10 @@ class PhysicalInstallationHost(object):
         return os.path.join(self._unpacked_mediaserver_root_dir, MEDIASERVER_DIR.format(
             customization_company_name=self._customization_company_name))
 
-    def reset_installations(self):
+    def set_reset_installation_flag(self):
+        self._must_reset_installation = True
+
+    def _reset_installations(self):
         log.info('%s: removing directory: %s', self._name, self._root_dir)
         self._host.rm_tree(self._root_dir, ignore_errors=True)
         self._dist_unpacked = False  # although unpacked dist is still in place, it will be reunpacked again with new deb
@@ -141,6 +145,9 @@ class PhysicalInstallationHost(object):
         self._available_installations = []
 
     def allocate_server(self, config):
+        if self._must_reset_installation:
+            self._reset_installations()
+            self._must_reset_installation = False
         if self._available_installations:
             installation = self._available_installations.pop(0)
             if config.leave_initial_cloud_host:
@@ -164,6 +171,9 @@ class PhysicalInstallationHost(object):
         self._available_installations = self._installations[:]
 
     def ensure_mediaserver_is_unpacked(self):
+        if self._must_reset_installation:
+            self._reset_installations()
+            self._must_reset_installation = False
         if self._dist_unpacked: return
         remote_dist_path = os.path.join(self._remote_dist_root, os.path.basename(self._mediaserver_dist_path))
         self._host.mk_dir(self._remote_dist_root)
