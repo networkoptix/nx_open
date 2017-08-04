@@ -62,7 +62,8 @@ public:
         const ec2::ApiPeerDataEx& remotePeer,
         ec2::ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserAccessData& userAccessData,
+        std::function<void()> onConnectionClosedCallback);
 
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
