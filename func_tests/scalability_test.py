@@ -49,7 +49,11 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     log.info('Creating lightweight servers:')
     start_time = utils.datetime_utc_now()
     # at least one full/real server is required for testing
-    lws_list = lightweight_servers_factory(config.SERVER_COUNT - 1)
+    lws_list = lightweight_servers_factory(
+        config.SERVER_COUNT - 1,
+        CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
+        USERS_PER_SERVER=config.USERS_PER_SERVER,
+        )
     log.info('Created %d lightweight servers', len(lws_list))
     metrics_saver.save('lws_server_init_duration', utils.datetime_utc_now() - start_time)
     assert lws_list, 'No lightweight servers were created'
