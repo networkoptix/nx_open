@@ -458,7 +458,7 @@ void QnServerUpdatesWidget::discardChanges()
             this);
 
         const auto cancelUpdateButton = dialog.addButton(
-            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 

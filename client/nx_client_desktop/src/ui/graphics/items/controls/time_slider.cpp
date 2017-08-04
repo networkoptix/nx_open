@@ -1188,7 +1188,7 @@ QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* loader, qreal aspectRatio)
 {
-    if (m_thumbnailsLoader.data() == loader)
+    if (m_thumbnailsLoader.data() == loader && qFuzzyEquals(m_thumbnailsAspectRatio, aspectRatio))
         return;
 
     clearThumbnails();
