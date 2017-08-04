@@ -6,6 +6,12 @@ angular.module('webadminApp')
         $scope.Config = Config;
         $scope.session = $sessionStorage;
 
+
+        if($scope.Config.developersFeedbackForm){
+            $scope.developersFeedbackForm =
+                $scope.Config.developersFeedbackForm.replace("{{PRODUCT}}",encodeURIComponent(Config.productName));
+        }
+
         /* API Test Tool */
         if(!$scope.session.method){
             $scope.session.method = {
