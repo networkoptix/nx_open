@@ -22,6 +22,8 @@ class TestTcpServer:
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) override
     {
+        ASSERT_TRUE(connection->setRecvTimeout(0));
+
         nx::Buffer buf;
         buf.resize(100);
         connection->recv(buf.data(), buf.size());
