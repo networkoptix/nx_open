@@ -182,6 +182,9 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     connect(m_model, &QnTimeServerSelectionModel::hasInternetAccessChanged,
         this, &QnTimeServerSelectionWidget::updateAlert);
 
+    connect(qnGlobalSettings, &QnGlobalSettings::timeSynchronizationSettingsChanged, this,
+        &QnTimeServerSelectionWidget::loadDataToUi);
+
     onSyncWithInternetCheckboxToggled(ui->syncWithInternetCheckBox->isChecked());
 }
 
