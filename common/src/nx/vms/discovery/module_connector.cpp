@@ -110,6 +110,11 @@ ModuleConnector::InformationReader::InformationReader(network::aio::AbstractAioT
     m_httpClient->bindToAioThread(thread);
 }
 
+ModuleConnector::InformationReader::~InformationReader()
+{
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
+}
 
 void ModuleConnector::InformationReader::setHandler(
     std::function<void(boost::optional<QnModuleInformation>, QString)> handler)
@@ -119,9 +124,11 @@ void ModuleConnector::InformationReader::setHandler(
 
 void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
 {
-    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+    const auto handler =
         [this](nx_http::AsyncHttpClientPtr client) mutable
         {
+            NX_ASSERT(m_httpClient, client);
+            const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
             m_httpClient.reset();
             if (!client->hasRequestSuccesed())
                 return nx::utils::swapAndCall(m_handler, boost::none, lit("HTTP request has failed"));
@@ -133,8 +140,10 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
                 return nx::utils::swapAndCall(m_handler, boost::none, SystemError::getLastOSErrorText());
 
             readUntilError();
-        });
+        };
 
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, handler);
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, handler);
     m_httpClient->doGet(kUrl.arg(endpoint.toString()));
 }
 
@@ -182,16 +191,22 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
         }
 
+        nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
         const auto localHandler = m_handler;
         localHandler(std::move(moduleInformation), QString());
+        if (destructionWatcher.objectDestroyed())
+            return;
     }
 
     m_buffer.reserve(1500);
     m_socket->readSomeAsync(&m_buffer,
-        [this](SystemError::ErrorCode code, size_t)
+        [this](SystemError::ErrorCode code, size_t size)
         {
             if (code != SystemError::noError)
                 return nx::utils::swapAndCall(m_handler, boost::none, SystemError::toString(code));
+
+            if (size == 0)
+                return nx::utils::swapAndCall(m_handler, boost::none, lit("Disconnected"));
 
             readUntilError();
         });

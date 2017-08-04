@@ -42,6 +42,8 @@ private:
     {
     public:
         InformationReader(network::aio::AbstractAioThread* thread);
+        ~InformationReader();
+
         void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
         void start(const SocketAddress& endpoint);
         HostAddress ip() const { return m_socket->getForeignAddress().address; }
@@ -54,6 +56,7 @@ private:
         nx::Buffer m_buffer;
         std::unique_ptr<AbstractStreamSocket> m_socket;
         std::function<void(boost::optional<QnModuleInformation>, QString)> m_handler;
+        nx::utils::ObjectDestructionFlag m_destructionFlag;
     };
 
     class Module

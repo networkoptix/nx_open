@@ -22,7 +22,7 @@ public:
         connector.setConnectHandler(
             [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
             {
-                connectedQueue.push(std::move(information), std::move(endpoint));
+                connectedQueue.push(information.id, std::move(endpoint));
             });
 
         connector.setDisconnectHandler(disconnectedQueue.pusher());
@@ -37,7 +37,7 @@ public:
     void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
     {
         const auto server = connectedQueue.pop();
-        EXPECT_EQ(id, server.first.id);
+        EXPECT_EQ(id.toString(), server.first.toString());
         EXPECT_EQ(endpoint.toString(), server.second.toString()) << id.toStdString();
     }
 
@@ -59,11 +59,12 @@ public:
 
         const auto endpoint = server->serverAddress();
         mediaservers[endpoint] = std::move(server);
+        NX_INFO(this, lm("Module %1 started with endpoint %2").args(module.id, endpoint));
         return endpoint;
     }
 
     ModuleConnector connector;
-    utils::TestSyncMultiQueue<QnModuleInformation, SocketAddress> connectedQueue;
+    utils::TestSyncMultiQueue<QnUuid, SocketAddress> connectedQueue;
     utils::TestSyncQueue<QnUuid> disconnectedQueue;
     std::map<SocketAddress, std::unique_ptr<TestHttpServer>> mediaservers;
 };
