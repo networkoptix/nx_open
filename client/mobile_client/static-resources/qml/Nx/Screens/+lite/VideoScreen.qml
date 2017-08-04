@@ -15,7 +15,7 @@ PageBase
     objectName: "videoScreen"
 
     property alias resourceId: videoScreenController.resourceId
-    property alias initialScreenshot: screenshot.source
+    property string initialScreenshot
     property LiteClientLayoutHelper layoutHelper: null
     property QnCameraListModel camerasModel: null
 
@@ -57,6 +57,13 @@ PageBase
         }
     }
 
+    QnThumbnailCacheAccessor
+    {
+        id: thumbnailCacheAccessor
+        resourceId: videoScreen.resourceId
+        onResourceIdChanged: refreshThumbnail()
+    }
+
     Object
     {
         id: d
@@ -93,6 +100,7 @@ PageBase
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
         visible: status == Image.Ready
+        source: thumbnailCacheAccessor.thumbnailUrl
     }
 
     WheelSwitchArea
