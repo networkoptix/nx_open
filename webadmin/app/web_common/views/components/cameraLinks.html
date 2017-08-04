@@ -33,7 +33,7 @@
             <label title="for transcoding">Resolution: <input type="text" class="input-sm" ng-model="resolution"></label>
         </li>
         <li>
-            <label>Playing position: {{liveMode?'live': position}}</label>
+            <label>Playing position: {{liveMode?'live': position.toFixed(0)}}</label>
         </li>
     </ul>
 </div>
