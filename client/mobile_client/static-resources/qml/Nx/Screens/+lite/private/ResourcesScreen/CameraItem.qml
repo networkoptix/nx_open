@@ -30,6 +30,39 @@ Control
         id: resourceHelper
     }
 
+    QnThumbnailCacheAccessor
+    {
+        id: thumbnailCacheAccessor
+        resourceId: cameraItem.resourceId
+        onResourceIdChanged: refreshTimer.restart()
+    }
+
+    Timer
+    {
+        id: refreshTimer
+
+        readonly property int initialLoadDelay: 400
+        readonly property int reloadDelay: 60 * 1000
+
+        interval: initialLoadDelay
+        repeat: true
+        running: active
+            && resourceId !== ""
+            && connectionManager.connectionState === QnConnectionManager.Ready
+
+        onTriggered:
+        {
+            interval = reloadDelay
+            thumbnailCacheAccessor.refreshThumbnail()
+        }
+
+        onRunningChanged:
+        {
+            if (!running)
+                interval = initialLoadDelay
+        }
+    }
+
     QtObject
     {
         id: d
@@ -47,7 +80,7 @@ Control
 
     contentItem: Rectangle
     {
-        id: thumbnailContainer
+        id: mainContainer
 
         width: parent.availableWidth
         height: parent.availableHeight
@@ -197,8 +230,8 @@ Control
 
         Item
         {
-            width: thumbnailContainer.width
-            height: thumbnailContainer.height
+            width: mainContainer.width
+            height: mainContainer.height
 
             VideoPositioner
             {
@@ -235,6 +268,14 @@ Control
                         onResourceIdChanged: videoOutput.clear()
                     }
                 }
+            }
+
+            Image
+            {
+                source: thumbnailCacheAccessor.thumbnailUrl
+                anchors.fill: parent
+                fillMode: Qt.KeepAspectRatio
+                visible: source && mediaPlayer.mediaStatus !== MediaPlayer.Loaded
             }
 
             MediaPlayer

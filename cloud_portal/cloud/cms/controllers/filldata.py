@@ -56,15 +56,9 @@ def process_context_structure(customization, context, content,
         content_record = None
         content_value = None
         # try to get translated content
-        if language:
+        if language and record.translatable:
             content_record = DataRecord.objects\
                 .filter(language_id=language.id,
-                        data_structure_id=record.id,
-                        customization_id=customization.id)
-        # if not - get default language
-        if not content_record or not content_record.exists():
-            content_record = DataRecord.objects\
-                .filter(language_id=customization.default_language_id,
                         data_structure_id=record.id,
                         customization_id=customization.id)
 
@@ -72,6 +66,13 @@ def process_context_structure(customization, context, content,
         if not content_record or not content_record.exists():
             content_record = DataRecord.objects\
                 .filter(language_id=None,
+                        data_structure_id=record.id,
+                        customization_id=customization.id)
+
+        # if not - get default language
+        if not content_record or not content_record.exists():
+            content_record = DataRecord.objects\
+                .filter(language_id=customization.default_language_id,
                         data_structure_id=record.id,
                         customization_id=customization.id)
 
