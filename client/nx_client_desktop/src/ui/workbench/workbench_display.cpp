@@ -723,19 +723,22 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 
 QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const
 {
-    QRectF occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
-    QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
+    const auto occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
+    const auto viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
+
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    {
         magicConst = 0.8;   // TODO: #Elric magic const
-    else
-        if (
-            canShowLayoutBackground() &&
-            (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-            )
-            magicConst = 0.33;  // TODO: #Elric magic const
+    }
+    else if (canShowLayoutBackground()
+        && (workbench()->currentLayout()->resource()
+            && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()))
+    {
+        magicConst = 0.33;  // TODO: #Elric magic const
+    }
     QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
 
     QPointF viewportCenter = viewportGeometry.center();
@@ -746,10 +749,20 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
 
     /* Calculate expansion values. Expand towards the screen center. */
     qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-    calculateExpansionValues(occupiedGeometry.left(), occupiedGeometry.right(), viewportCenter.x(), newWidgetSize.width(), &xp1, &xp2);
-    calculateExpansionValues(occupiedGeometry.top(), occupiedGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+    calculateExpansionValues(occupiedGeometry.left(),
+        occupiedGeometry.right(),
+        viewportCenter.x(),
+        newWidgetSize.width(),
+        &xp1,
+        &xp2);
+    calculateExpansionValues(occupiedGeometry.top(),
+        occupiedGeometry.bottom(),
+        viewportCenter.y(),
+        newWidgetSize.height(),
+        &yp1,
+        &yp2);
 
-    return rotated(occupiedGeometry.adjusted(xp1, yp1, xp2, yp2), -rotation);
+    return widgetGeometry.adjusted(xp1, yp1, xp2, yp2);;
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
