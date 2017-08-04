@@ -90,10 +90,6 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'devtools/events.html',
             controller: 'DevtoolsCtrl'
         })
-        .when('/devtools/sameras', {
-            templateUrl: Config.viewsDir + 'devtools/cameras.html',
-            controller: 'DevtoolsCtrl'
-        })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',

@@ -10,7 +10,8 @@ angular.module('nxCommon')
                 "system": "=",
                 "currentResolution": "=",
                 "positionProvider": "=",
-                "toggleCameraPanel": "="
+                "toggleCameraPanel": "=",
+                "cameraLinksEnabled": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {

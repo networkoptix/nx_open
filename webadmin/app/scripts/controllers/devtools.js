@@ -3,37 +3,8 @@
 angular.module('webadminApp')
     .controller('DevtoolsCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
 
-        mediaserver.getUser().then(function(user){
-            /*if(!user.isOwner){
-                $location.path('/info'); //no admin rights - redirect
-            }*/
-        });
-
         $scope.Config = Config;
         $scope.session = $sessionStorage;
-        $scope.resources = [];
-
-        systemAPI.getMediaServers().then(function(result){
-            $scope.resources =  $scope.resources.concat(result.data);
-        });
-        systemAPI.getCameras().then(function(result){
-            $scope.resources =  $scope.resources.concat(result.data);
-        });
-        $scope.filterResources = function(filter){
-            console.log(filter,!filter || filter === '' || filter === ' ');
-            var filtered = _.filter($scope.resources,function(resource){
-                return !filter || filter === '' || resource.name.toLowerCase().indexOf(filter.trim().toLowerCase())>=0;
-            });
-            console.log($scope.resources,filtered);
-            return filtered;
-
-        };
-        $scope.getId = function(resource){
-            return resource.id;
-        };
-
-
-
 
         /* API Test Tool */
         if(!$scope.session.method){

@@ -27,6 +27,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
+        $scope.cameraLinksEnabled = $location.search().cameraLinks;
+
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
             $scope.toggleCameraPanel = false;
             systemAPI.setCameraPath($scope.storage.cameraId);
