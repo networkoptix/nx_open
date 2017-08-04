@@ -35,9 +35,8 @@ PageBase
         mediaPlayer.onSourceChanged:
         {
             video.clear()
-            transformationsNotSupportedWarningLoader.showIfNeeded()
 
-            if (mediaPlayer.source && !transformationsNotSupportedWarningLoader.active)
+            if (mediaPlayer.source && !transformationsWarningLoader.active)
                 mediaPlayer.playLive()
             else
                 mediaPlayer.stop()
@@ -175,7 +174,7 @@ PageBase
 
     Loader
     {
-        id: transformationsNotSupportedWarningLoader
+        id: transformationsWarningLoader
         anchors.fill: parent
         visible: active
         active: false
@@ -184,16 +183,9 @@ PageBase
         {
             onCloseClicked:
             {
-                transformationsNotSupportedWarningLoader.active = false
+                transformationsWarningLoader.active = false
                 videoScreenController.start()
             }
-        }
-
-        function showIfNeeded()
-        {
-            active = resourceId !== "" && !d.cameraWarningVisible
-                && (videoScreenController.resourceHelper.customRotation !== 0
-                    || videoScreenController.resourceHelper.customAspectRatio !== 0.0)
         }
     }
 
@@ -222,15 +214,33 @@ PageBase
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
+        showTransformationsWarningIfNeeded()
     }
     onPreviousCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+        showTransformationsWarningIfNeeded()
     }
 
     onActivePageChanged:
     {
-        if (activePage && !transformationsNotSupportedWarningLoader.active)
+        if (activePage && !transformationsWarningLoader.active)
             videoScreenController.start()
+    }
+
+    onResourceIdChanged: hideTransformationsWarning()
+
+    function hideTransformationsWarning()
+    {
+        transformationsWarningLoader.active = false
+    }
+
+    function showTransformationsWarningIfNeeded()
+    {
+        transformationsWarningLoader.active =
+            resourceId !== ""
+                && !d.cameraWarningVisible
+                && (videoScreenController.resourceHelper.customRotation !== 0
+                    || videoScreenController.resourceHelper.customAspectRatio !== 0.0)
     }
 }
