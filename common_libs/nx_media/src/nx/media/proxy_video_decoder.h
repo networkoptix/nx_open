@@ -26,7 +26,8 @@ public:
 
     virtual ~ProxyVideoDecoder();
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution);
+    static bool isCompatible(
+        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
 
     static QSize maxResolution(const AVCodecID codec);
 

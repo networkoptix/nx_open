@@ -82,8 +82,11 @@ public:
     /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
     virtual void pleaseStop() override;
 
-    /** Turn on / off audio. It allowed to call from other thread. */
+    /** Turn on / off audio. Allowed to be called from another thread. */
     void setAudioEnabled(bool value);
+
+    void setAllowOverlay(bool value);
+
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -93,6 +96,7 @@ signals:
 
     /** Jump to new position. */
     void jumpOccurred(int sequence);
+
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);
@@ -105,6 +109,7 @@ protected:
 
     virtual void endOfRun() override;
     virtual void clearUnprocessedData() override;
+
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);
@@ -114,6 +119,7 @@ private:
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
     bool checkSequence(int sequence);
+
 private:
     /**
      * In case of multi-sensor video camera this class is used to calculate
@@ -179,6 +185,7 @@ private:
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
     std::atomic<bool> m_audioEnabled;
+    std::atomic<bool> m_allowOverlay;
 };
 
 } // namespace media

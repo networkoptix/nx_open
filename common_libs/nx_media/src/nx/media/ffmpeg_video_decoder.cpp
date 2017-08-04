@@ -224,23 +224,21 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
 QSize FfmpegVideoDecoder::s_maxResolution;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
-    const ResourceAllocatorPtr& allocator,
-    const QSize& resolution)
+    const ResourceAllocatorPtr& /*allocator*/,
+    const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
-    QN_UNUSED(allocator, resolution);
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder()
 {
 }
 
-bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
+bool FfmpegVideoDecoder::isCompatible(
+    const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
 {
-    Q_UNUSED(codec);
-
     const QSize maxRes = maxResolution(codec);
     if (maxRes.isEmpty())
         return true;
@@ -266,10 +264,8 @@ bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolu
     }
 }
 
-QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 {
-    QN_UNUSED(codec);
-
     return s_maxResolution;
 }
 
