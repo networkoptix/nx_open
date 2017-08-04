@@ -259,27 +259,9 @@ void QnLayoutsModelUnsorted::resetModel()
 
 bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout) const
 {
-    if (!m_user)
-        return false;
-
-    if (!resourceAccessProvider()->hasAccess(m_user, layout))
-        return false;
-
-    if (!layout->isServiceLayout())
-        return true;
-
-    const auto layoutParentId = layout->getParentId();
-    if (layoutParentId.isNull())
-        return true;
-
-    const auto servers = resourcePool()->getResources<QnMediaServerResource>();
-    const auto isNx1Layout = std::any_of(servers.begin(), servers.end(),
-        [layoutParentId](const QnMediaServerResourcePtr& server)
-        {
-            return layoutParentId == server->getId();
-        });
-
-    return !isNx1Layout;
+    return m_user
+        && !layout->isServiceLayout()
+        && resourceAccessProvider()->hasAccess(m_user, layout);
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
