@@ -177,6 +177,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     expectConnect(id, endpoint3); //< The last one is unblocked now.
 }
 
+// This unit test is just for easy debug agains real mediaserver.
 TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
     connector.newEndpoints({SocketAddress("127.0.0.1:7001")}, QnUuid());
