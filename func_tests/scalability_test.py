@@ -36,7 +36,7 @@ def config(test_config):
         CAMERAS_PER_SERVER=1,
         STORAGES_PER_SERVER=1,
         USERS_PER_SERVER=1,
-        RESOURCES_PER_CAMERA=2,
+        PROPERTIES_PER_CAMERA=5,
         MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
         REST_API_TIMEOUT=datetime.timedelta(minutes=1),
         )
@@ -53,6 +53,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
         config.SERVER_COUNT - 1,
         CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
         USERS_PER_SERVER=config.USERS_PER_SERVER,
+        PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
         )
     log.info('Created %d lightweight servers', len(lws_list))
     metrics_saver.save('lws_server_init_duration', utils.datetime_utc_now() - start_time)
@@ -122,7 +123,7 @@ def create_test_data_on_server((config, server, index)):
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * config.CAMERAS_PER_SERVER),
         saveCameraUserAttributes=resource_test.ResourceGenerator(generator.generate_camera_user_attributes_data),
-        setResourceParams=resource_test.SeedResourceList(generator.generate_resource_params_data_list, config.RESOURCES_PER_CAMERA),
+        setResourceParams=resource_test.SeedResourceList(generator.generate_resource_params_data_list, config.PROPERTIES_PER_CAMERA),
         saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
         saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
         saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
