@@ -9,7 +9,6 @@
 #endif
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/singleton.h>
 
 #include "aio_event_handler.h"
 #include "aio_thread.h"
@@ -17,8 +16,6 @@
 namespace nx {
 namespace network {
 namespace aio {
-
-//TODO #ak think about removing sockets dictionary and mutex (only in release, probably). some data from dictionary can be moved to socket
 
 /**
  * Monitors multiple sockets for asynchronous events and triggers handler (AIOEventHandler) on event.
@@ -45,6 +42,9 @@ public:
      */
     AIOService(unsigned int threadCount = 0);
     virtual ~AIOService();
+
+    AIOService(const AIOService&) = delete;
+    AIOService& operator=(const AIOService&) = delete;
 
     void pleaseStopSync();
 
@@ -126,42 +126,18 @@ public:
 
     void cancelPostedCalls(
         Pollable* const sock,
-        bool waitForRunningHandlerCompletion = true );
+        bool waitForRunningHandlerCompletion = true);
 
 private:
-    struct MonitoringContext
-    {
-        std::chrono::milliseconds timeout = std::chrono::milliseconds::zero();
+    std::vector<std::unique_ptr<AIOThread>> m_aioThreadPool;
 
-        MonitoringContext() = default;
-        MonitoringContext(std::chrono::milliseconds timeout):
-            timeout(timeout)
-        {
-        }
-    };
-
-    struct SocketAIOContext
-    {
-        using AIOThreadType = AIOThread;
-
-        std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
-        std::map<std::pair<Pollable*, aio::EventType>, MonitoringContext> sockets;
-    };
-
-    SocketAIOContext m_systemSocketAIO;
-    mutable QnMutex m_mutex;
-
-    void initializeAioThreadPool(SocketAIOContext* aioCtx, unsigned int threadCount);
+    void initializeAioThreadPool(unsigned int threadCount);
 
     bool getSocketTimeout(
         Pollable* const sock,
         aio::EventType eventToWatch,
         std::chrono::milliseconds* timeout);
-    boost::optional<MonitoringContext> getSocketMonitoringContext(
-        const QnMutexLockerBase& /*lock*/,
-        Pollable* const sock,
-        aio::EventType eventToWatch);
-    AIOThread* AIOService::findLeastUsedAioThread() const;
+    AIOThread* findLeastUsedAioThread() const;
 };
 
 } // namespace aio
