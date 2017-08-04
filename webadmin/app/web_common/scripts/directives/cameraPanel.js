@@ -33,7 +33,7 @@ angular.module('nxCommon')
 
                 scope.selectCamera = function (activeCamera) {
                     scope.toggleCameraPanel = false;
-                    if(scope.activeCamera && (scope.activeCamera.id === activeCamera.id || scope.activeCamera.physicalId === activeCamera)){
+                    if(scope.activeCamera && (scope.activeCamera.id === activeCamera)){
                         return;
                     }
                     scope.activeCamera = activeCamera;

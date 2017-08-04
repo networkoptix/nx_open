@@ -3,7 +3,7 @@
     <ul>
         <li>Playing: {{transport}} - {{currentResolution}} with {{player}}</li>
         <li>Name: {{activeCamera.name}}</li>
-        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>CameraID: {{activeCamera.id.replace('{','').replace('}','')}}</li>
         <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
         <li ng-repeat="stream in activeCamera.mediaStreams">
             {{streamName(stream)}}:
