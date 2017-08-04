@@ -203,13 +203,13 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     const auto systemDescription = it.value();
                     const auto clearServers =
                         [systemDescription]()
-                    {
-                        const auto currentServers = systemDescription->servers();
-                        NX_ASSERT(currentServers.size() <= 1,
-                            "There should be one or zero servers");
-                        for (const auto& current : currentServers)
-                            systemDescription->removeServer(current.id);
-                    };
+                        {
+                            const auto currentServers = systemDescription->servers();
+                            NX_ASSERT(currentServers.size() <= 1,
+                                "There should be one or zero servers");
+                            for (const auto& current : currentServers)
+                                systemDescription->removeServer(current.id);
+                        };
 
                     auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
                     if (failed)
