@@ -244,7 +244,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
     if (resourceAccessManager()->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
     {
-        const auto servers = resourcePool()->getResources<QnMediaServerResource>();
+        const auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
         for (const auto& server : servers)
         {
             if (!isServerSuitable(server))
