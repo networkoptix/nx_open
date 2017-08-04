@@ -58,6 +58,7 @@ QWidget* createMainView(QObject* context, QQuickView* quickView)
     auto holder = new QStackedWidget();
     holder->addWidget(new QWidget());
     holder->addWidget(QWidget::createWindowContainer(quickView));
+    setHelpTopic(holder, Qn::Login_Help);
 
     const auto loadQmlData = [quickView, context, holder]()
         {
@@ -597,24 +598,60 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
     // TODO: #3.1 Implement something generic to handle help events inside QQuickView items.
-    if (obj == m_quickView && event->type() == QEvent::MouseButtonPress)
+    if (obj == m_quickView)
     {
-        const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if (QWhatsThis::inWhatsThisMode())
+        // Copy some logic from QWhatsThisPrivate.
+        switch (event->type())
         {
-            if (mouseEvent->button() == Qt::LeftButton)
+            case QEvent::MouseButtonPress:
             {
-                QHelpEvent helpEvent(
-                    QEvent::WhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
-                qApp->sendEvent(m_widget, &helpEvent);
-            }
-            else
-            {
-                QWhatsThis::leaveWhatsThisMode();
+                const auto mouseEvent = static_cast<QMouseEvent*>(event);
+                if (QWhatsThis::inWhatsThisMode())
+                {
+                    if (mouseEvent->button() == Qt::LeftButton)
+                    {
+                        QHelpEvent helpEvent(
+                            QEvent::WhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
+                        qApp->sendEvent(m_widget, &helpEvent);
+                    }
+                    else
+                    {
+                        QWhatsThis::leaveWhatsThisMode();
+                    }
+
+                    event->accept();
+                    return true;
+                }
+                break;
             }
 
-            event->accept();
-            return true;
+            case QEvent::MouseMove:
+            {
+                const auto mouseEvent = static_cast<QMouseEvent*>(event);
+                if (QWhatsThis::inWhatsThisMode())
+                {
+                    QHelpEvent helpEvent(
+                        QEvent::QueryWhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
+                    const bool sentEvent = qApp->sendEvent(m_widget, &helpEvent);
+
+                    QApplication::changeOverrideCursor((!sentEvent || !helpEvent.isAccepted())
+                        ? Qt::ForbiddenCursor
+                        : Qt::WhatsThisCursor);
+
+                    event->accept();
+                    return true;
+                }
+                break;
+            }
+
+            case QEvent::QueryWhatsThis:
+            {
+                event->setAccepted(true);
+                return true;
+            }
+
+            default:
+                break;
         }
     }
 

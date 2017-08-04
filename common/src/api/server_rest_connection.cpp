@@ -25,22 +25,24 @@
 #include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
-namespace {
-    static const size_t ResponseReadTimeoutMs = 15 * 1000;
-    static const size_t TcpConnectTimeoutMs   = 5 * 1000;
+#include <nx/utils/log/log.h>
 
-    void trace(const QString& serverId, int handle, const QString& message)
-    {
-        NX_LOG(lit("rest::ServerConnection %1 <%2>: %3")
-            .arg(serverId)
-            .arg(handle)
-            .arg(message),
-            cl_logDEBUG1);
-    }
+namespace {
+
+static const size_t ResponseReadTimeoutMs = 15 * 1000;
+static const size_t TcpConnectTimeoutMs = 5 * 1000;
+
+void trace(const QString& serverId, int handle, const QString& message)
+{
+    NX_VERBOSE("rest::ServerConnection") lm("%1 <%2>: %3")
+        .arg(serverId)
+        .arg(handle)
+        .arg(message);
 }
+
+} // namepspace
 
 // --------------------------- public methods -------------------------------------------
 
