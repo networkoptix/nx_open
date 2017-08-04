@@ -173,12 +173,7 @@ void ConnectSessionManager::createClientSession(
             request, this](
                 cf::future<std::string> findRelayFuture) mutable
             {
-                std::stringstream ss;
-                ss << "http://" << findRelayFuture.get() << "/relay/server/"
-                    << request.targetPeerName << "/client_sessions/";
-
-                response.redirectHost = ss.str();
-                if (response.redirectHost.empty())
+                if (findRelayFuture.get().empty())
                 {
                     NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
                         .arg(request.desiredSessionId)
@@ -187,6 +182,12 @@ void ConnectSessionManager::createClientSession(
 
                     return cf::unit();
                 }
+
+                std::stringstream ss;
+                ss << "http://" << findRelayFuture.get() << "/relay/server/"
+                    << request.targetPeerName << "/client_sessions/";
+
+                response.redirectHost = ss.str();
                 completionHandler(api::ResultCode::needRedirect, std::move(response));
 
                 return cf::unit();
