@@ -180,7 +180,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
     QPointer<QObject> guard(this);
 
     const auto handleReply =
-        [this, guard, cloudSystemId](nx_http::AsyncHttpClientPtr reply) mutable
+        [this, guard, cloudSystemId](nx_http::AsyncHttpClientPtr reply)
         {
             const bool failed = reply->failed();
             const QByteArray data = failed ? QByteArray() : reply->fetchMessageBodyBuffer();
