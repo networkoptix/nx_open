@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Window 2.0
+import Nx 1.0
 
 import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils
 
@@ -7,7 +8,8 @@ BasePreloader
 {
     id: control
 
-    property color color: Qt.rgba(1, 1, 1, 0.8)
+    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
+
     property real thickness: 6
     property real sectionFOV: Math.PI / 2
     property real sectionRotationDegrees: 90
@@ -15,26 +17,27 @@ BasePreloader
     implicitHeight: 96
     implicitWidth: 96
 
-    Rectangle
+    contentItem: Item
     {
-        id: dot
+        Rectangle
+        {
+            id: dot
 
-        anchors.centerIn: parent
+            anchors.centerIn: parent
 
-        width: control.thickness * 2
-        height: control.thickness * 2
+            width: control.thickness * 2
+            height: control.thickness * 2
 
-        radius: control.thickness
-        color: control.color
-        visible: true
-    }
+            radius: control.thickness
+            color: control.color
+            visible: true
+        }
 
-    Repeater
-    {
-        model: 2
+        Repeater
+        {
+            model: 2
 
-        delegate:
-            Canvas
+            delegate: Canvas
             {
                 id: section
 
@@ -84,11 +87,8 @@ BasePreloader
                 {
                     id: animation
 
-                    readonly property int initialSign: index %2 ? 1 : -1
+                    readonly property int initialSign: index % 2 ? 1 : -1
 
-                    // Can't use Animation.Infinite since from/to fields of number
-                    // animation stick on initial values
-                    loops: 1
                     running: true
 
                     PauseAnimation
@@ -108,6 +108,8 @@ BasePreloader
                         to: -animation.initialSign * control.sectionRotationDegrees / 2
                     }
 
+                    // Can't use Animation.Infinite since from/to fields of number
+                    // animation stick on initial values.
                     onStopped:
                     {
                         numberAnimation.from = -numberAnimation.from
@@ -116,5 +118,6 @@ BasePreloader
                     }
                 }
             }
+        }
     }
 }

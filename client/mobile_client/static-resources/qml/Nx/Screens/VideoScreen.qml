@@ -332,7 +332,7 @@ PageBase
         {
             id: ptzPanel
 
-            preloadersParent: video.item.videoControl
+            preloadersParent: video.item.videoControl ? video.item.videoControl : null
 
             width: parent.width
             anchors.bottom: parent.bottom

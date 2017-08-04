@@ -13,13 +13,12 @@ Item
     property bool focusPressed: false
     property vector2d moveDirection
 
-    property Item privateCurrentPreloader
     property bool privateAutoFocusPressed: false
     readonly property vector2d zeroVector: Qt.vector2d(0, 0)
 
     function showCommonPreloader()
     {
-        privateAutoFocusPressed = true; //< Shows autofocus preloader
+        privateAutoFocusPressed = true; //< Shows autofocus preloader.
         privateAutoFocusPressed = false;
     }
 
@@ -31,33 +30,50 @@ Item
     {
         updatePreloaderState()
         if (moveDirection != zeroVector)
-            movePreloader.rotation = -VectorUtils.getDegrees(moveDirection)
+            loader.item.rotation = -VectorUtils.getDegrees(moveDirection)
     }
 
-    FocusPreloader
+    Component
     {
         id: focusPreloader
-        anchors.centerIn: parent;
+        FocusPreloader {}
     }
 
-    ContinuousMovePreloader
+    Component
     {
         id: movePreloader
-        anchors.centerIn: parent;
+        ContinuousMovePreloader {}
     }
 
-    ContinuousZoomPreloader
+    Component
     {
         id: zoomInPreloader
-        anchors.centerIn: parent;
+        ContinuousZoomPreloader {}
     }
 
-    ContinuousZoomPreloader
+    Component
     {
         id: zoomOutPreloader
 
-        zoomInIndicator: false
-        anchors.centerIn: parent;
+        ContinuousZoomPreloader
+        {
+            zoomInIndicator: false
+        }
+    }
+
+    Loader
+    {
+        id: loader
+
+        anchors.centerIn: parent
+        onItemChanged:
+        {
+            if (!item)
+                return
+
+            item.anchors.centerIn = loader
+            item.show()
+        }
     }
 
     function updatePreloaderState()
@@ -67,8 +83,8 @@ Item
 
         if (!someoneActive)
         {
-            if (privateCurrentPreloader)
-                privateCurrentPreloader.hide()
+            if (loader.item)
+                loader.item.hide()
 
             return
         }
@@ -85,12 +101,12 @@ Item
 
     function setCurrentPreloader(preloader)
     {
-        if (privateCurrentPreloader)
-            privateCurrentPreloader.hide(true)
+        if (loader.item)
+            loader.item.hide(true)
 
-        privateCurrentPreloader = preloader;
+        loader.sourceComponent = preloader
 
-        if (privateCurrentPreloader)
-            privateCurrentPreloader.show()
+        if (loader.item)
+            loader.item.show()
     }
 }

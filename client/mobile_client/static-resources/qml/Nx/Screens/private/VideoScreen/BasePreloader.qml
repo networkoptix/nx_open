@@ -1,26 +1,24 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0;
+import Qt.labs.templates 1.0
 
-Item
+Control
 {
     id: control
 
     property alias timeout: timer.interval
 
-    default property alias data: preloaderHolder.data
-    Item
+    visible: opacity > 0
+    onContentItemChanged:
     {
-        id: preloaderHolder
-
-        anchors.fill: parent
+        contentItem.visible = false
     }
-
-    DropShadow
+    background: DropShadow
     {
         id: shadow
 
         anchors.fill: parent
-        source: preloaderHolder
+        source: contentItem
         color: Qt.rgba(0, 0, 0, 0.2)
     }
 

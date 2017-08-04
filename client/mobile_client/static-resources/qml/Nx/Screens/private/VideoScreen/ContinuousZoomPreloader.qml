@@ -1,11 +1,12 @@
 import QtQuick 2.6
 import QtQuick.Window 2.0
+import Nx 1.0
 
 BasePreloader
 {
     id: control
 
-    property color color: Qt.rgba(1, 1, 1, 0.8)
+    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
     property real thickness: 4
     property int period: 1500
     property int figuresCount: 4
@@ -14,84 +15,87 @@ BasePreloader
     implicitWidth: 96
     implicitHeight: 96
 
-    Repeater
+    contentItem: Item
     {
-        id: repeater
-
-        model: figuresCount
-
-        Rectangle
+        Repeater
         {
-            id: figure
+            id: repeater
 
-            width: radius * 2
-            height: radius * 2
-            anchors.centerIn: parent
-            color: "transparent"
-            radius: parent.width / 2
-            opacity: 0
-            border.color: control.color
-            border.width: control.thickness
+            model: figuresCount
 
-            SequentialAnimation
+            Rectangle
             {
-                running: true
+                id: figure
 
-                PauseAnimation
+                width: radius * 2
+                height: radius * 2
+                anchors.centerIn: parent
+                color: "transparent"
+                radius: 48
+                opacity: 0
+                border.color: control.color
+                border.width: control.thickness
+
+                SequentialAnimation
                 {
-                    duration: index * control.period / control.figuresCount
-                }
+                    running: true
 
-                ParallelAnimation
-                {
-                    loops: Animation.Infinite
-
-                    SequentialAnimation
+                    PauseAnimation
                     {
-                        NumberAnimation
-                        {
-                            id: fadeInAnimation
-
-                            target: figure
-                            property: "opacity"
-                            duration: positionAnimation.duration / (control.zoomInIndicator ? 2 : 4)
-                            easing.type: Easing.InQuad
-
-                            from: 0
-                            to: 1
-                        }
-
-                        PauseAnimation
-                        {
-                            duration: positionAnimation.duration
-                                - fadeInAnimation.duration - fadeOutAnimation.duration
-                        }
-
-                        NumberAnimation
-                        {
-                            id: fadeOutAnimation
-
-                            target: figure
-                            property: "opacity"
-                            duration: positionAnimation.duration / (control.zoomInIndicator ? 4 : 2)
-                            easing.type: Easing.OutQuad
-
-                            from: 1
-                            to: 0
-                        }
+                        duration: index * control.period / control.figuresCount
                     }
 
-                    NumberAnimation
+                    ParallelAnimation
                     {
-                        id: positionAnimation
+                        loops: Animation.Infinite
 
-                        target: figure
-                        property: "radius"
-                        duration: control.period
-                        easing.type: Easing.Linear
+                        SequentialAnimation
+                        {
+                            NumberAnimation
+                            {
+                                id: fadeInAnimation
 
-                        from: control.zoomInIndicator ? control.width / 2 - control.thickness : 0
-                        to: control.zoomInIndicator ? 0 : control.width / 2 - control.thickness
+                                target: figure
+                                property: "opacity"
+                                duration: opacityAnimation.duration / (control.zoomInIndicator ? 2 : 4)
+                                easing.type: Easing.InQuad
+
+                                from: 0
+                                to: 1
+                            }
+
+                            PauseAnimation
+                            {
+                                duration: opacityAnimation.duration
+                                    - fadeInAnimation.duration - fadeOutAnimation.duration
+                            }
+
+                            NumberAnimation
+                            {
+                                id: fadeOutAnimation
+
+                                target: figure
+                                property: "opacity"
+                                duration: opacityAnimation.duration / (control.zoomInIndicator ? 4 : 2)
+                                easing.type: Easing.OutQuad
+
+                                from: 1
+                                to: 0
+                            }
+                        }
+
+                        NumberAnimation
+                        {
+                            id: opacityAnimation
+
+                            target: figure
+                            property: "radius"
+                            duration: control.period
+                            easing.type: Easing.Linear
+
+                            from: control.zoomInIndicator ? control.width / 2 - control.thickness : 0
+                            to: control.zoomInIndicator ? 0 : control.width / 2 - control.thickness
+                        }
                     }
                 }
             }
