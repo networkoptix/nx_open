@@ -181,7 +181,7 @@ void QnResourcesChangesManager::deleteResources(
         };
 
     QVector<QnUuid> idToDelete;
-    for (const QnResourcePtr& resource : resources)
+    for (const QnResourcePtr& resource: resources)
     {
         // if we are deleting an edge camera, also delete its server
         // check for camera to avoid unnecessary parent lookup
@@ -308,7 +308,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
              if (errorCode == ec2::ErrorCode::ok)
                  return;
 
-             for (const ec2::ApiCameraData& data : backup)
+             for (const ec2::ApiCameraData& data: backup)
              {
                  auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(data.id);
                  if (camera)
@@ -318,7 +318,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
              emit saveChangesFailed(cameras);
         };
 
-     for (const auto& camera : cameras)
+     for (const auto& camera: cameras)
          applyChanges(camera);
 
      ec2::ApiCameraDataList apiCameras;
@@ -512,7 +512,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
 
     ec2::ApiAccessRightsData accessRights;
     accessRights.userId = subject.effectiveId();
-    for (const auto &id : accessibleResources)
+    for (const auto& id: accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         makeReplyProcessor(this, handler));
