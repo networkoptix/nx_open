@@ -38,6 +38,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topics.h>
 
@@ -842,6 +843,20 @@ void QnTimeSlider::enumerateSteps(QVector<QnTimeStep>& steps)
 {
     for (int i = 0; i < steps.size(); i++)
         steps[i].index = i;
+}
+
+void QnTimeSlider::setupShowAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipShow);
+}
+
+void QnTimeSlider::setupHideAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipHide);
 }
 
 void QnTimeSlider::invalidateWindow()
