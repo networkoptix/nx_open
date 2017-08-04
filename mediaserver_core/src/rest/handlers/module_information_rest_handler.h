@@ -13,22 +13,19 @@ class QnModuleInformationRestHandler: public QnJsonRestHandler
 public:
     virtual ~QnModuleInformationRestHandler() override;
 
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor* owner) override;
-
-    virtual void afterExecute(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QnRestConnectionProcessor* owner);
+    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
+    virtual void afterExecute(const RestRequest& request, const QByteArray& response) override;
 
 private slots:
     void changeModuleInformation();
 
 private:
+    virtual int executeGet(
+        const QString& /*path*/,
+        const QnRequestParams& /*params*/,
+        QnJsonRestResult& /*result*/,
+        const QnRestConnectionProcessor* /*owner*/);
+
     void updateModuleImformation();
     void sendModuleImformation(const QSharedPointer<AbstractStreamSocket>& socket);
     void sendKeepAliveByTimer(const QSharedPointer<AbstractStreamSocket>& socket);

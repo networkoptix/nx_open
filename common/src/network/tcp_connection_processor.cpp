@@ -234,13 +234,11 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+QByteArray QnTCPConnectionProcessor::createResponse(
+    int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
+    const QByteArray& multipartBoundary, bool isUndefinedContentLength, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
-    const bool isInfiniteBody = httpStatusCode & CODE_FLAG_INFINITE_BODY;
-    if (isInfiniteBody)
-        httpStatusCode -= CODE_FLAG_INFINITE_BODY;
-
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
@@ -274,7 +272,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!isInfiniteBody &&!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
+    if (!isUndefinedContentLength &&!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->response.messageBody.length()) ) );
 
     QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
@@ -289,10 +287,14 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
     return response;
 }
 
-void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+void QnTCPConnectionProcessor::sendResponse(
+    int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
+    const QByteArray& multipartBoundary, bool isUndefinedContentLength, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
-    auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary, displayDebug);
+    auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary,
+        isUndefinedContentLength, displayDebug);
+
     QnMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
 }
