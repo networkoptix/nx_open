@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "connect_session_manager.h"
 
 #include <nx/fusion/model_functions.h>
@@ -171,7 +173,11 @@ void ConnectSessionManager::createClientSession(
             request, this](
                 cf::future<std::string> findRelayFuture) mutable
             {
-                response.redirectHost = findRelayFuture.get();
+                std::stringstream ss;
+                ss << "http://" << findRelayFuture.get() << "/relay/server/"
+                    << request.targetPeerName << "/client_sessions/";
+
+                response.redirectHost = ss.str();
                 if (response.redirectHost.empty())
                 {
                     NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
