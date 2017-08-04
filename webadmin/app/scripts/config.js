@@ -160,9 +160,9 @@ var Config = {
             'BackupCancelled'
         ],
         states: [
-            '',
-            'Inactive',
-            'Active'
+            {label: 'Instant', value: null},
+            {label: 'Inactive', value: 'Inactive'},
+            {label: 'Active', value: 'Active'}
         ]
     },
 

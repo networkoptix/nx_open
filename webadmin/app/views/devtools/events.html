@@ -1,135 +1,89 @@
 <div class="container">
 
-    <h1>Generate events </h1>
+    <h1>Generic Events Tool</h1>
+    
+    <form class="form-horizontal" novalidate>
 
-    <div class="row">
-        <div class="col-sm-6">
-
-            <form class="form-horizontal" novalidate ng-class="session.event.event_type">
-                <div class="form-group AnyEvent">
-                    <label class="col-sm-3 control-label">Event </label>
-                    <div class="col-sm-5">
-                        <select ng-model="session.event.event_type" ng-options="event.event as event.label for event in Config.debugEvents.events"
-                                class="form-control"></select>
-                    </div>
-                    <div class="col-sm-4">
-                        <p class="form-control-static">
-                            {{session.event.event_type}}
-                        </p>
-                    </div>
-                </div>
-                <div class="form-group AnyEvent">
-                    <label class="col-sm-3 control-label">Timestamp</label>
-                    <div class="col-sm-5">
-                        <input type="text" ng-model="session.event.timestamp"
-                               class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-group CameraMotionEvent CameraInputEvent CameraDisconnectEvent StorageFailureEvent
-        NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent ServerStartEvent
-        LicenseIssueEvent BackupFinishedEvent">
-                    <label class="col-sm-3 control-label">Resource</label>
-                    <div class="col-sm-5">
-                        <input type="text" ng-model="session.eventResource"
-                               typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
-                               typeahead-focus-on-select="false"
-                               typeahead-min-length="0"
-                               typeahead-show-hint="true"
-                               typeahead-focus-first="false"
-                               typeahead-focus
-                               class="form-control">
-                    </div>
-                    <div class="col-sm-4">
-                        <p class="form-control-static">
-                            {{session.eventResource.id}}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label ">Source</label>
-                    <div class="col-sm-5">
-                        <input type="text" ng-model="session.event.source"
-                               class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
-                    <label class="col-sm-3 control-label">State</label>
-                    <div class="col-sm-5">
-                        <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
-                                class="form-control"></select>
-                    </div>
-                </div>
-
-                <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
-                    <label class="col-sm-3 control-label">Reason</label>
-                    <div class="col-sm-5">
-                        <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
-                                class="form-control"></select>
-                    </div>
-                </div>
-
-                <div class="form-group CameraInputEvent">
-                    <label class="col-sm-3 control-label">Input Port</label>
-                    <div class="col-sm-5">
-                        <input type="number" ng-model="session.event.inputPortId"
-                               class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-group UserDefinedEvent CameraIpConflictEvent">
-                    <label class="col-sm-3 control-label">Caption </label>
-                    <div class="col-sm-5">
-                        <input type="text" ng-model="session.event.caption"
-                               class="form-control">
-                    </div>
-                    <div class="col-sm-4">
-                        <p class="form-control-static">
-                            for camera ip conflict - conflicting IP
-                        </p>
-                    </div>
-                </div>
-
-                <div class="form-group StorageFailureEvent
-                NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
-                LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Description</label>
-                    <div class="col-sm-5">
-                        <textarea ng-model="session.event.description"
-                                  class="form-control"></textarea>
-                    </div>
-                </div>
-
-                <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Metadata - JSON</label>
-                    <div class="col-sm-5">
-                        <textarea ng-model="session.event.metadata"
-                                  class="form-control">{
-                            cameraRefs:['cameraUUID']
-                            }</textarea>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-5">
-                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Generate event</button>
-                    </div>
-                </div>
-
-
-            </form>
+        <div class="form-group">
+            <label class="col-sm-2 control-label ">Source</label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="session.event.source"
+                       class="form-control">
+            </div>
         </div>
-        <div class="col-sm-6">
-            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> random events</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> random events</button>
 
-            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> repeat last event</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> repeat last event</button>
 
-            <p>Events Log:</p>
-            <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Caption </label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="session.event.caption"
+                       class="form-control">
+            </div>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-10">
+                <textarea ng-model="session.event.description"
+                          class="form-control"></textarea>
+            </div>
+        </div>
+
+         <div class="form-group AnyEvent">
+            <label class="col-sm-2 control-label">Timestamp</label>
+            <div class="col-sm-10">
+                <input type="text" ng-model="session.event.timestamp"
+                       class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">State</label>
+            <div class="col-sm-10">
+                <select ng-model="session.event.state" ng-options="state.value as state.label for state in Config.debugEvents.states"
+                        class="form-control"></select>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Metadata - JSON</label>
+            <div class="col-sm-10">
+                <textarea ng-model="session.event.metadata" class="form-control"
+                          placeholder='{"cameraRefs":["cameraUUID"]}' rows="4"></textarea>
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Requesting URL</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{generateEventLink()}}</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Generate event</button>
+                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{generateEventLink()}}" target="_blank">Open in a new tab</a>
+            </div>
+        </div>
+
+
+
+
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Status</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{result.status}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Result</label>
+            <div class="col-sm-10">
+                <pre>{{result.result}}</pre>
+            </div>
+        </div>
+    </form>
 </div>

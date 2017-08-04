@@ -32,6 +32,10 @@ angular.module('webadminApp')
             return resource.id;
         };
 
+
+
+
+        /* API Test Tool */
         if(!$scope.session.method){
             $scope.session.method = {
                 name:'/api/moduleInformation',
@@ -87,132 +91,45 @@ angular.module('webadminApp')
             });
         };
 
-        $scope.session.event = {};
+
+        /*  Generic Events Tool */
+        $scope.session.event = null;
+        if(!$scope.session.event){
+            $scope.session.event = {
+                state: null
+            };
+        }
+        $scope.generateEventLink = function(){
+            var event = _.clone($scope.session.event);
+            if(event.state == null){
+                delete event.state;
+            }
+            return mediaserver.debugFunctionUrl('/api/createEvent', event);
+        }
         $scope.generateEvent = function(){
-            $scope.session.event.eventResourceId = $scope.session.eventResource.id;
-            if(!$scope.session.event.state){
-                delete $scope.session.event.state;
+
+            var event = _.clone($scope.session.event);
+            if(event.state == null){
+                delete event.state;
             }
-            if($scope.session.event.metadata){
+
+            if(event.metadata){
                 try {
-                    $scope.session.event.metadata = JSON.stringify(JSON.parse($scope.session.event.metadata));
+                    $scope.session.event.metadata = JSON.stringify(JSON.parse(event.metadata));
                 }catch(a){
-                    console.error("couldn't decode json, ignoring" , $scope.session.event.metadata);
+                    dialogs.alert('metadata is not a valid json object ');
+                    return;
                 }
             }
-            return mediaserver.createEvent($scope.session.event).then(function(success){
-                var result = "ok";
-                var source =  $scope.session.event.event_type == 'UserDefinedEvent'? $scope.session.event.source : $scope.session.eventResource.name;
-                if(success.data.error !=="0"){
-                    result = success.data.errorString +" (" + success.data.error +") state:" + $scope.session.event.state;
-                }
-                $scope.eventsLog = $scope.eventsLog || [];
-                $scope.eventsLog.push({
-                    event: $scope.session.event.event_type,
-                    source: source,
-                    result: result
-                });
+            return mediaserver.createEvent(event).then(function(success){
+                $scope.result.status = success.status + ':  ' + success.statusText;
+                $scope.result.result = JSON.stringify(success.data, null,  '\t ');
             },function(error){
-                $scope.eventsLog = $scope.eventsLog || [];
-                $scope.eventsLog.push({
-                    event: $scope.session.event.event_type,
-                    source: source,
-                    result: error
-                });
+                $scope.result.status = error.status + ':  ' + error.statusText;
+                $scope.result.result = 'Error: ' + JSON.stringify(error.data, null,  '\t ');
             });
         };
 
-        function rand(limit){
-            return Math.floor(Math.random()*limit);
-        }
-        function randomElement(array){
-            return array[rand(array.length)];
-        }
 
-        var nextCounter = 0;
-        function nextElement(array){
-            return array[nextCounter++ % array.length];
-        }
-
-        function randomEvent(){
-            $scope.session.event.event_type = nextElement(Config.debugEvents.events).event;
-            $scope.session.eventResource = randomElement($scope.resources);
-            $scope.session.event.eventResourceId = $scope.session.eventResource.id;
-            $scope.session.event.state = randomElement(Config.debugEvents.states);
-            $scope.session.event.reasonCode = randomElement(Config.debugEvents.reasons);
-            $scope.session.event.inputPortId = rand(8);
-            $scope.session.event.source = "Source " + rand(1000);
-            $scope.session.event.caption = "Caption " + rand(1000);
-            $scope.session.event.description = "Description " + rand(1000);
-        }
-        var doRandomEvent = false;
-        function eventGenerator(){
-            $timeout(function(){
-                if(doRandomEvent && !$scope.generatingEvents ||
-                    !doRandomEvent && !$scope.repeatingEvents){
-                    return;
-                }
-                if(doRandomEvent) {
-                    randomEvent();
-                }
-                $scope.generateEvent().then(eventGenerator,eventGenerator);
-            },1000);
-        }
-
-        $scope.generatingEvents = false;
-        $scope.startGeneratingEvents = function(){
-            $scope.generatingEvents = true;
-            doRandomEvent = true;
-            eventGenerator(true);
-        };
-        $scope.stopGeneratingEvents = function(){
-            $scope.generatingEvents = false;
-            doRandomEvent = false;
-        };
-
-        $scope.repeatingEvents = false;
-        $scope.startRepeatingEvent = function(){
-            $scope.repeatingEvents = true;
-            eventGenerator(false);
-        };
-        $scope.stopRepeatingEvent = function(){
-            $scope.repeatingEvents = false;
-        };
-
-
-
-        $scope.linkSettings = {
-            system: 'demo.networkoptix.com:7001',
-            getnonce: '/api/moduleInformation',
-            physicalId: '00-16-6C-7E-0B-E7',
-            cameraIds:[
-                '00-1C-A6-01-67-DA',
-                'ACTI_E96--A-XX-13K-00850',
-                '00-1A-07-0E-EE-6C',
-                '00-1C-A6-01-CA-A6',
-                'urn_uuid_0b89056d-9de8-e5aa-a50b-ac03207875e4'
-
-             ],
-            nonce: '',
-            realm:'networkoptix',
-            method: 'PLAY',
-            login:'demo',
-            password:'nxwitness',
-            auth:'',
-            rtspLink:''
-        };
-        $scope.formatLink = function(camID){
-
-
-            $scope.linkSettings.auth = mediaserver.digest($scope.linkSettings.login,
-                $scope.linkSettings.password,
-                $scope.linkSettings.realm,
-                $scope.linkSettings.nonce,
-                $scope.linkSettings.method);
-
-            $scope.linkSettings.rtspLink = "rtsp://" + $scope.linkSettings.system + '/' + camID +
-                '?auth=' + $scope.linkSettings.auth;
-            return $scope.linkSettings.rtspLink;
-        };
 
     });

@@ -482,6 +482,7 @@ angular.module('webadminApp')
                     window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
                 }
                 if(getParams){
+                    getParams
                     params = delimeter + $.param(getParams);
                 }
 
@@ -526,6 +527,7 @@ angular.module('webadminApp')
                     return serverInfo.flags.hasInternet;
                 });
             },
+
             createEvent:function(params){
                 return wrapGet(proxy + '/web/api/createEvent',params);
             },
