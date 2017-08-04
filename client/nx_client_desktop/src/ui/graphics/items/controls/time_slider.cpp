@@ -704,14 +704,19 @@ bool QnTimeSlider::isWindowBeingDragged() const
 
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
 {
-    const auto bookmarksAtLocationFunc = [this](qint64 location) -> QnCameraBookmarkList
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
-            location = valueFromPosition(QPointF(location, 0));
+    const auto bookmarksAtLocationFunc =
+        [this](qint64 location) -> QnCameraBookmarkList
+        {
+            if (m_options.testFlag(StillBookmarksViewer))
+                location = valueFromPosition(QPointF(location, 0));
 
-        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel)
-            : QnCameraBookmarkList());
-    };
+            static const auto searchOptions = QnBookmarkMergeHelper::OnlyTopmost
+                | QnBookmarkMergeHelper::ExpandArea;
+
+            return m_bookmarksHelper
+                ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel, searchOptions)
+                : QnCameraBookmarkList();
+        };
 
     const auto getPosFunc = [this](qint64 location) -> QnBookmarksViewer::PosAndBoundsPair
     {
@@ -2811,16 +2816,12 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
-    qint64 hoverValue = valueFromPosition(m_hoverMousePos, false);
-    int hoveredBookmarkItem = -1;
+    qint64 hoverValueMs = valueFromPosition(m_hoverMousePos, false);
 
-    /* Find the topmost (the latest) hovered bookmark: */
-    for (int i = 0; i < bookmarks.size(); ++i)
-    {
-        const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
-        if (hoverValue >= bookmarkItem.startTimeMs() && hoverValue <= bookmarkItem.endTimeMs())
-            hoveredBookmarkItem = i;
-    }
+    int hoveredBookmarkItem = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
+        hoverValueMs,
+        m_msecsPerPixel,
+        QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
 
     /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)
