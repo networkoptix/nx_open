@@ -482,14 +482,6 @@ protected:
         }
     }
 
-    void givenSessionManagerWithFilledRemoteRelayPeerPool()
-    {
-    }
-
-    void whenIssuedConnectToTheServerOnAnotherRelay()
-    {
-    }
-
     void whenIssuedCreateSessionWithoutId()
     {
         issueCreateSession(std::string());
@@ -520,10 +512,6 @@ protected:
     void whenListeningPeerDisconnects()
     {
         lastListeningPeerConnection()->setConnectionToClosedState();
-    }
-
-    void thenRequestShouldBeRedirected()
-    {
     }
 
     void thenClientSessionsAreClosed()
@@ -598,14 +586,6 @@ TEST_F(
     givenMultipleClientSessions();
     whenListeningPeerDisconnects();
     thenClientSessionsAreClosed();
-}
-
-TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_to_the_server_on_another_relay)
-{
-    givenSessionManagerWithFilledRemoteRelayPeerPool();
-    whenIssuedConnectToTheServerOnAnotherRelay();
-
-    thenRequestShouldBeRedirected();
 }
 
 //-------------------------------------------------------------------------------------------------
