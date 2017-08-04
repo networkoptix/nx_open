@@ -184,10 +184,14 @@ def review_version_request(request, context=None, language=None):
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-        publish_latest_version(customization, request.user)
+        publishing_errors = publish_latest_version(customization, request.user)
         version = ContentVersion.objects.latest('created_date')
-        messages.success(request._request, "Version " +
-                         str(version.id) + " has been published")
+        if publishing_errors:
+            messages.error(request._requet, "Version " +
+                             str(version.id) + publishing_errors)
+        else:
+            messages.success(request._request, "Version " +
+                             str(version.id) + " has been published")
         return redirect(reverse('review_version', args=[version.id]))
     return Response("Invalid")
 

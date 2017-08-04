@@ -27,10 +27,14 @@ def get_context_and_language(request_data, context_id, language_id):
 
 def accept_latest_draft(customization, user):
     unaccepted_version = ContentVersion.objects.filter(
-        accepted_date=None, customization=customization).latest('created_date')
+        accepted_date=None, customization=customization)
+    if not unaccepted_version.exists():
+        return " is currently publishing or has already been published"
+    unaccepted_version = unaccepted_version.latest('created_date')
     unaccepted_version.accepted_by = user
     unaccepted_version.accepted_date = datetime.now()
     unaccepted_version.save()
+    return None
 
 
 def notify_version_ready(customization, version_id, product_name, exclude_user):
@@ -156,9 +160,10 @@ def generate_preview(context=None):
 
 
 def publish_latest_version(customization, user):
-    accept_latest_draft(customization, user)
-    fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
-
+    publish_errors = accept_latest_draft(customization, user)
+    if not publish_errors:
+        fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
+    return publish_errors
 
 def send_version_for_review(customization, language, data_structures,
                             product, request_data, request_files, user):
