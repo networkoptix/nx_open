@@ -82,8 +82,8 @@ static const int SOCKET_TIMEOUT = 1000 * 1000;
 //following value is for VERY slow networks and VERY large transactions (e.g., some large image)
     //Connection keep-alive timeout is not influenced by this value
 static const std::chrono::minutes kSocketSendTimeout(23);
-const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
-const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
+const char* const QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
+const char* const QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
@@ -361,7 +361,7 @@ int QnTransactionTransportBase::keepAliveProbeCount() const
     return m_keepAliveProbeCount;
 }
 
-void QnTransactionTransportBase::addData(QByteArray data)
+void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_base64EncodeOutgoingTransactions )
@@ -645,7 +645,7 @@ void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCo
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
 
-    onSomeDataReceivedFromRemotePeer();
+    emit onSomeDataReceivedFromRemotePeer();
 
     QnMutexLocker lock( &m_mutex );
 
@@ -761,7 +761,7 @@ void QnTransactionTransportBase::receivedTransaction(
     const nx_http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
-    onSomeDataReceivedFromRemotePeer();
+    emit onSomeDataReceivedFromRemotePeer();
 
     QnMutexLocker lock(&m_mutex);
 
@@ -1017,7 +1017,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
 
     if( m_base64EncodeOutgoingTransactions )
-        dataCtx.sourceData = dataCtx.sourceData.toBase64(); //TODO #ak should use streaming base64 encoder in addData method
+        dataCtx.sourceData = dataCtx.sourceData.toBase64(); //TODO #ak should use streaming base64 encoder in addDataToTheSendQueue method
 
     if( dataCtx.encodedSourceData.isEmpty() )
     {

@@ -41,62 +41,73 @@ QString toString(ConnectionBase::State value)
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     const QUrl& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
     m_httpClient(new nx_http::AsyncClient()),
     m_localPeer(localPeer),
     m_direction(Direction::outgoing),
     m_keepAliveTimeout(keepAliveTimeout),
-    m_opaqueObject(std::move(opaqueObject))
+    m_opaqueObject(std::move(opaqueObject)),
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
-    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
-        std::move(connectionLockGuard));
-
     m_remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
+    m_httpClient->setSendTimeout(keepAliveTimeout);
+    m_httpClient->setResponseReadTimeout(keepAliveTimeout);
 }
 
 ConnectionBase::ConnectionBase(
     const ApiPeerDataEx& remotePeer,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
-    const Qn::UserAccessData& userAccessData,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
     m_webSocket(std::move(webSocket)),
     m_state(State::Connected),
     m_direction(Direction::incoming),
-    m_userAccessData(userAccessData),
-    m_opaqueObject(std::move(opaqueObject))
+    m_opaqueObject(std::move(opaqueObject)),
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
-    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
-        std::move(connectionLockGuard));
-
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_timer.bindToAioThread(m_webSocket->getAioThread());
 }
 
+void ConnectionBase::stopWhileInAioThread()
+{
+    // All objects in the same AIO thread
+    m_timer.pleaseStopSync();
+    m_webSocket.reset();
+    m_httpClient.reset();
+}
+
 ConnectionBase::~ConnectionBase()
 {
-    std::promise<void> waitToStop;
-    m_timer.pleaseStop(
-        [&]()
-        {
-            if (m_webSocket)
-                m_webSocket->pleaseStopSync();
-            if (m_httpClient)
-                m_httpClient->pleaseStopSync();
-            waitToStop.set_value();
-        }
-    );
-    waitToStop.get_future().wait();
+    if (m_timer.isInSelfAioThread())
+    {
+        stopWhileInAioThread();
+    }
+    else
+    {
+        std::promise<void> waitToStop;
+        m_timer.pleaseStop(
+            [&]()
+            {
+                if (m_webSocket)
+                    m_webSocket->pleaseStopSync();
+                if (m_httpClient)
+                    m_httpClient->pleaseStopSync();
+                waitToStop.set_value();
+            }
+        );
+        waitToStop.get_future().wait();
+    }
 }
 
 QUrl ConnectionBase::remoteAddr() const
@@ -115,7 +126,7 @@ QUrl ConnectionBase::remoteAddr() const
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
-    NX_VERBOSE(
+    NX_DEBUG(
         this,
         lit("Connection to peer %1 canceled from state %2. Reason: %3")
         .arg(m_remotePeer.id.toString())
@@ -129,7 +140,7 @@ void ConnectionBase::onHttpClientDone()
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
     {
-        cancelConnecting(State::Error, lm("Http request failed"));
+        cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
         return;
     }
 
@@ -162,7 +173,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     const auto& headers = m_httpClient->response()->headers;
-    if (headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
+    if (m_connectionLockGuard && headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
     {
         // Addition stage for server to server connect. It prevents to open two (incoming and outgoing) connections at once.
         if (m_connectionLockGuard->tryAcquireConnecting())
@@ -204,7 +215,7 @@ void ConnectionBase::onHttpClientDone()
     if (m_remotePeer.id == ::ec2::kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
 
-    if (!m_connectionLockGuard->tryAcquireConnected())
+    if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {
         cancelConnecting(State::Error, lm("tryAcquireConnected failed"));
         return;
@@ -297,6 +308,8 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
+    NX_ASSERT(!data.isEmpty());
+
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
@@ -420,6 +433,25 @@ nx_http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authData() const
 QObject* ConnectionBase::opaqueObject()
 {
     return m_opaqueObject.get();
+}
+
+const nx::network::WebSocket* ConnectionBase::webSocket() const
+{
+    return m_webSocket.get();
+}
+
+nx::network::WebSocket* ConnectionBase::webSocket()
+{
+    return m_webSocket.get();
+}
+
+void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    m_timer.bindToAioThread(aioThread);
+    if (m_httpClient)
+        m_httpClient->bindToAioThread(aioThread);
+    if (m_webSocket)
+        m_webSocket->bindToAioThread(aioThread);
 }
 
 } // namespace p2p

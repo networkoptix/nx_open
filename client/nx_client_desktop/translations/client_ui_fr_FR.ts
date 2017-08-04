@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Tous les serveurs sont hors ligne, Journal non disponibles.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Journal Signet</translation>
     </message>
@@ -732,17 +727,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>Contrôle PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Désactiver les préréglages natives, utiliser plutôt les préréglages du système</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Attention! Les préréglages de caméras natifs ne seront pas disponibles.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>ID d'entrée</translation>
     </message>
   </context>
   <context>
@@ -776,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>ID de sortie:</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1416,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Verrouillé sur ID Matériel:</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Coller du Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Sélectionner un fichier licence...</translation>
     </message>
@@ -1530,7 +1515,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>ID Matériel</translation>
     </message>
   </context>
   <context>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Cycle de tour</translation>
+      <source>seconds</source>
+      <translation>secondes</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>secondes</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

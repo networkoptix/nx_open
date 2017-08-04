@@ -12,7 +12,6 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <api/common_message_processor.h>
 
@@ -51,7 +50,6 @@ protected:
 
     void startAllServers(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
     {
-        const_cast<bool&>(ec2::ini().isP2pMode) = true;
         startServers(4);
         for (const auto& server: m_servers)
         {

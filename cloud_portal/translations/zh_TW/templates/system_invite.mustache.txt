@@ -9,5 +9,5 @@
 與您共用系統 {{message.system_name}}.
 {{/message.sharer_name}}
 
-註冊並查看系統: {{config.portal_url}}/註冊/{{message.code}}
+註冊並查看系統: {{config.portal_url}}/register/{{message.code}}
 

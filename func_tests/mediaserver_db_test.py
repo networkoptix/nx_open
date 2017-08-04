@@ -18,8 +18,8 @@ import pytest
 import os
 import time
 import json
-from test_utils.utils import SimpleNamespace
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 import server_api_data_generators as generator
 
 
@@ -62,7 +62,7 @@ def server(name, server_factory, bin_dir, db_version):
     else:
         server = server_factory(name, start=False)
     server.start_service()
-    system_settings = dict(autoDiscoveryEnabled=False)
+    system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)
     server.set_system_settings(statisticsAllowed=False)
     if db_version == '2.4':
@@ -103,28 +103,28 @@ def store_json_data(filepath, json_data):
 
 
 def wait_until_servers_have_same_full_info(one, two):
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         full_info_one = one.rest_api.ec2.getFullInfo.GET()
         full_info_two = two.rest_api.ec2.getFullInfo.GET()
         if full_info_one == full_info_two:
             return full_info_one
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             assert full_info_one == full_info_two
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
 def wait_for_camera_disappearance_after_backup(server, camera_guid):
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         cameras = [c for c in server.rest_api.ec2.getCameras.GET()
                    if c['id'] == camera_guid]
         if not cameras:
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
-            pytest.fail('Camera %s did not disappear in %s seconds after backup' % (
-                camera_guid, MEDIASERVER_MERGE_TIMEOUT_SEC))
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
+            pytest.fail('Camera %s did not disappear in %s after backup' % (
+                camera_guid, MEDIASERVER_MERGE_TIMEOUT))
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
 def test_backup_restore(one, two, camera):

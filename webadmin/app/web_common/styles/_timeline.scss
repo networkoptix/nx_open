@@ -220,6 +220,10 @@ ng-include{
   box-shadow: 0px 0px 2px #888;
 }
 
+.no-volume > .live-button{
+  border-right: none !important;
+}
+
 .live-button{
   width: 64px;
   height: 100%;
@@ -256,10 +260,6 @@ ng-include{
     background-color: $light5 !important;
     border-left: 1px solid $light8 !important;
     border-right: 1px solid $light7 !important; 
-  }
-
-  &.active > .live-circle{
-    background-color: chartreuse !important;
   }
 }
 

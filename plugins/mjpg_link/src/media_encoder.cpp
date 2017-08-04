@@ -69,7 +69,7 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 #if 0
     if( !m_resolutionKnown.isValid() )
     {
-        //TODO: #ak reading one picture to get its resolution
+        // TODO: #ak reading one picture to get its resolution
         std::unique_ptr<StreamReader> streamReader( new StreamReader(
             &m_refManager,
             m_cameraManager->info(),

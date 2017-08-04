@@ -215,7 +215,7 @@ void QnNxStylePrivate::drawSwitch(
         signColorOn = mainGreen.lighter(2);
     }
 
-    //TODO: Implement animation
+    // TODO: Implement animation
 
     qreal animationProgress = undefined ? 0.5 : (checked ? 1.0 : 0.0);
 

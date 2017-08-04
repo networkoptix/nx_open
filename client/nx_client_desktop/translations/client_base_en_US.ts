@@ -36,6 +36,18 @@ to view more bookmarks</source>
         <comment>It is highly recommended to split message in two lines</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Play bookmark from the beginning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -167,14 +179,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>New Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layout Tour...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Layout Tour...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -553,10 +557,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove from Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop Sharing Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -729,18 +729,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make Layout Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -866,6 +854,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Bookmark Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Showreel...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Showreel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1015,6 +1027,21 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>LocalFiles</name>
+    <message>
+        <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PasswordInformation</name>
     <message>
         <source>Good</source>
@@ -1077,6 +1104,37 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>Ptz</name>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to get current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to set current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset used by some tours. Delete it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -1123,10 +1181,6 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnAboutDialog</name>
-    <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
     <message>
         <source>%1 uses the following external libraries:</source>
         <translation type="unfinished"></translation>
@@ -1670,6 +1724,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+        <source>Manage Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -2065,10 +2126,6 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation></translation>
     </message>
@@ -2290,6 +2347,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3634,10 +3695,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Generic:</source>
         <translation></translation>
     </message>
@@ -3877,10 +3934,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If the problem presists please contact Customer Support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License deactivated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3941,6 +3994,10 @@ to %1</source>
         <source>This license is already activated and linked to Hardware Id %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If the problem persists please contact Customer Support.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
@@ -3970,10 +4027,6 @@ to %1</source>
     </message>
     <message>
         <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hardware Id copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4539,6 +4592,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+        <source>Manage Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -4883,6 +4943,45 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+        <source>Role %1 has no %2 permission</source>
+        <comment>%1 is the name of selected role, %2 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected roles have no %1 permission</source>
+        <comment>%1 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 selected roles have no %2 permission</source>
+        <comment>%1 is number of selected roles, %2 is permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User %1 has no %2 permission</source>
+        <comment>%1 is the name of selected user, %2 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected users have no %1 permission</source>
+        <comment>%1 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 selected users have no %2 permission</source>
+        <comment>%1 is number of selected users, %2 is permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
@@ -4977,11 +5076,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Tours</source>
+        <source>Showreels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Layout Tour</source>
+        <source>Showreel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5734,38 +5833,8 @@ to %1</source>
 <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-        <source>Role %1 has no User Input permission</source>
-        <comment>%1 is the name of selected role</comment>
+        <source>User Input</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected roles have no User Input permission</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected roles have no User Input permission</source>
-        <comment>%1 is number of selected roles</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>User %1 has no User Input permission</source>
-        <comment>%1 is the name of selected user</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected users have no User Input permission</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected users have no User Input permission</source>
-        <comment>%1 is number of selected users</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -6237,6 +6306,30 @@ to %1</source>
         <source>Error while sending email</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Remote archive synchronization has been started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization is in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error occured during remote archive synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been started for the following device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been finished for the following device:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
@@ -6326,11 +6419,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hh:mm ap</source>
-        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
         <translation type="unfinished"></translation>
@@ -6356,11 +6444,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <translation type="unfinished"></translation>
@@ -6383,6 +6466,16 @@ to %1</source>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6702,6 +6795,11 @@ to %1</source>
     </message>
     <message>
         <source>Apply changes before switching to another user?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user has not yet signed up for %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7394,155 +7492,7 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-        <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform>%n user</numerusform>
-            <numerusform>%n users</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-        <source>NO DATA</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-        <source>Drag layout or camera here to add it to the tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-        <source>Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-        <source>Switch with Hotkeys</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Switch on Timer</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-        <source>%1 (active)</source>
-        <comment>Template for active PTZ preset</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (active)</source>
-        <comment>Template for active PTZ tour</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
-    <message>
-        <source>Please fill up information about yourself and reason for license deactivation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name is necessary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reason is necessary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reason for deactivation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>- Choose one -</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I accidentally assigned the license to a wrong machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Other Reason</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I am upgrading my machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
-    <message>
-        <source>Go to Live</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-        <source>Cannot get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot set the current position for camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to set current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset used by some tours. Delete it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::resources</name>
+    <name>Resources</name>
     <message>
         <source>There is another layout with the same name</source>
         <translation type="unfinished"></translation>
@@ -7704,15 +7654,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Overwrite existing layout tour?</source>
+        <source>Overwrite existing showreel?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>There is another layout tour with the same name.</source>
+        <source>There is another showreel with the same name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Remove %n items from layout tour?</source>
+        <source>Remove %n items from showreel?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -7720,7 +7670,17 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::ui::videowall</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>Videowall</name>
     <message>
         <source>There is another video wall with the same name</source>
         <translation type="unfinished"></translation>
@@ -7743,6 +7703,144 @@ to %1</source>
     </message>
     <message>
         <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+        <source>Copy</source>
+        <comment>to Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <comment>from Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste from Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <comment>to Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pasted</source>
+        <comment>from Clipboard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+        <source>NO DATA</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+        <source>Drag layout or camera here to add it to the showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+        <source>Switch with Hotkeys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch on Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+        <source>%1 (active)</source>
+        <comment>Template for active PTZ preset</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (active)</source>
+        <comment>Template for active PTZ tour</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+        <source>Please fill up information about yourself and reason for license deactivation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name is necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason is necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason for deactivation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>- Choose one -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I accidentally assigned the license to a wrong machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Reason</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I am upgrading my machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+        <source>Go to Live</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7937,7 +8035,11 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-        <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+        <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7959,15 +8061,15 @@ to %1</source>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-        <source>Layout Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Layout Tour %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete layout tour %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreel %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

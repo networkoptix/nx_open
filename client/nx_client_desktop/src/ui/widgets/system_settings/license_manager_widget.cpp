@@ -57,6 +57,10 @@
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static const auto kHtmlDelimiter = lit("<br>");
@@ -235,8 +239,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicenses();
     };
 
-    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
-    auto videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(this);
+    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(commonModule(), this);
+    auto videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(commonModule(), this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
     connect(videowallUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
@@ -309,7 +313,7 @@ void QnLicenseManagerWidget::updateLicenses()
         QStringList messages;
 
         QnCamLicenseUsageHelper camUsageHelper(commonModule());
-        QnVideoWallLicenseUsageHelper vwUsageHelper(this);
+        QnVideoWallLicenseUsageHelper vwUsageHelper(commonModule());
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
         for (auto helper: helpers)
@@ -460,7 +464,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).value<QUrl>();
         if (!redirectUrl.isEmpty())
         {
-            updateFromServer(licenseKey, infoMode, redirectUrl);    //TODO: #GDM add possible redirect loop check
+            updateFromServer(licenseKey, infoMode, redirectUrl);    // TODO: #GDM add possible redirect loop check
             return;
         }
         processReply(reply, licenseKey, url, infoMode);
@@ -683,6 +687,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     const auto icon = errorsCount < licenses.size()
         ? QnMessageBoxIcon::Information
         : QnMessageBoxIcon::Critical;
+
     const auto text = getDeactivationErrorCaption(licenses.size(), errorsCount);
     const auto extras = getDeactivationErrorMessage(licenses, filteredErrors);
 
@@ -691,12 +696,13 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     QnMessageBox dialog(icon, text, QString(),
         standardButton, QDialogButtonBox::NoButton);
 
-    const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
-    button->setFlat(true);
-    button->setIcon(qnSkin->icon(lit("buttons/copy.png")));
-    dialog.addButton(button, QDialogButtonBox::HelpRole);
-    connect(button, &QAbstractButton::clicked, this,
-        [text, extras]() { qApp->clipboard()->setText(lit("%1\n%2").arg(text, toPlainText(extras))); });
+    auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
+    dialog.addButton(copyButton, QDialogButtonBox::HelpRole);
+    connect(copyButton, &QAbstractButton::clicked, this,
+        [text, extras]()
+        {
+            qApp->clipboard()->setText(lit("%1\n%2").arg(text, toPlainText(extras)));
+        });
 
     dialog.setInformativeText(extras, false);
     dialog.setInformativeTextFormat(Qt::RichText);
@@ -762,7 +768,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
                 case Result::ServerError:
                     QnMessageBox::critical(this,
                         tr("License Server error"),
-                        tr("If the problem presists please contact Customer Support."));
+                        tr("If the problem persists please contact Customer Support."));
                     return;
 
                 default:

@@ -67,9 +67,10 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
+    auto logSettings = settings.vmsSynchronizationLogging();
+    logSettings.updateDirectoryIfEmpty(settings.dataDir());
     nx::utils::log::initialize(
-        settings.vmsSynchronizationLogging(), settings.dataDir(),
-        QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
+        logSettings, QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
         "sync_log", nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     const auto& httpAddrToListenList = settings.endpointsToListen();
@@ -306,6 +307,12 @@ void CloudDbService::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
+        nx_http::Method::get,
+        kEstablishEc2P2pTransactionConnectionPath,
+        &ec2::ConnectionManager::createWebsocketTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
         //api::kPushEc2TransactionPath,
         nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
@@ -417,6 +424,24 @@ void CloudDbService::registerHttpHandler(
         {
             return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
         });
+}
+
+template<typename ManagerType>
+void CloudDbService::registerHttpHandler(
+    nx_http::Method::ValueType method,
+    const char* handlerPath,
+    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+    ManagerType* manager)
+{
+    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
+        handlerPath,
+        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+        {
+            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+        },
+        method);
 }
 
 } // namespace cdb

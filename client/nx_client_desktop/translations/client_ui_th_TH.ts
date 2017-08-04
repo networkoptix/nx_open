@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>การบันทึก บุ๊คมาร์ค</translation>
     </message>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>วางจากคลิปบอร์ด</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>คัดลอกจากคลิปบอร์ด</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>เลือกไฟล์ใบอนุญาติ...</translation>
     </message>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <source>seconds</source>
+      <translation>วินาที</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>วินาที</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

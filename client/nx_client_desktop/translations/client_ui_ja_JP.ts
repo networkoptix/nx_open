@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>ブックマークログ</translation>
     </message>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>クリップボードから貼付け</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>ライセンスファイル選択...</translation>
     </message>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>ツアーサイクル</translation>
+      <source>seconds</source>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>秒</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

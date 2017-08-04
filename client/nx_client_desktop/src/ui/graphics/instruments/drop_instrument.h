@@ -13,11 +13,22 @@ class QnWorkbenchContext;
 class DropSurfaceItem;
 class DestructionGuardItem;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class MimeData;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class DropInstrument: public Instrument, public SceneEventFilter, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
     DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent = NULL);
+    virtual ~DropInstrument() override;
 
     /**
      * \returns                         Graphics item that serves as a surface for
@@ -47,8 +58,10 @@ private:
     bool delayedTriggerIfPossible(nx::client::desktop::ui::action::IDType id,
         const nx::client::desktop::ui::action::Parameters& parameters);
 
+    bool isDragValid() const;
+
 private:
-    QList<QnUuid> m_ids;
+    std::unique_ptr<nx::client::desktop::MimeData> m_mimeData;
 
     QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;

@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>所有攝影機皆已離線. 無法記錄.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>書籤記錄</translation>
     </message>
@@ -442,7 +437,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>於</translation>
     </message>
   </context>
   <context>
@@ -589,7 +584,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
@@ -722,7 +717,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>系統管理中的 &quot;允許系統優化攝影機設定&quot; 已被停用.</translation>
     </message>
     <message>
       <location/>
@@ -732,17 +727,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ 控制</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>停用攝影機內建預設點, 改用系統預設點</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>警告! 攝影機內建預設點將無法使用.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>輸入ID</translation>
     </message>
   </context>
   <context>
@@ -776,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>輸出 Id:</translation>
     </message>
   </context>
   <context>
@@ -889,7 +884,7 @@
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation>位移高解析 + 全時低解析</translation>
+      <translation>位移主串流 + 全時次串流</translation>
     </message>
   </context>
   <context>
@@ -910,7 +905,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正確的電子郵件或密碼</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1416,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>已鎖定至硬體 Id:</translation>
     </message>
   </context>
   <context>
@@ -1470,17 +1465,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation>手動啟動</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Paste from Clipboard</source>
-      <translation>從剪貼簿貼上</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>複製到剪貼簿</translation>
+      <translation>離線啟動授權</translation>
     </message>
     <message>
       <location/>
@@ -1530,7 +1515,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>硬體 Id</translation>
     </message>
   </context>
   <context>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>巡曳週期</translation>
+      <source>seconds</source>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>秒</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1711,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>播放至客戶端</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1729,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>強制確認</translation>
     </message>
   </context>
   <context>
@@ -1919,7 +1904,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正確的電子郵件或密碼</translation>
     </message>
   </context>
   <context>
@@ -2057,7 +2042,7 @@
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>不建議在週末更新系統.</translation>
+      <translation>為預防任何可能的問題, 建議於上班時間進行更新.</translation>
     </message>
   </context>
   <context>
@@ -2256,7 +2241,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>建議更換更強的電腦以因應 &quot;最高&quot; 畫質與解析度.</translation>
     </message>
     <message>
       <location/>
@@ -2322,7 +2307,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>發話至客戶端</translation>
     </message>
   </context>
   <context>
@@ -2565,7 +2550,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>文字標籤</translation>
     </message>
   </context>
   <context>
@@ -2662,7 +2647,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>適用於</translation>
     </message>
     <message>
       <location/>
@@ -2672,7 +2657,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>圖示</translation>
     </message>
   </context>
   <context>
@@ -2787,22 +2772,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>角色</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>顯示所有使用者</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>選擇使用者</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>找不到符合您的搜尋.</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2823,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>與網路校時</translation>
     </message>
   </context>
   <context>
@@ -2878,8 +2863,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>目前還沒有自定義角色.
+按一下 &quot;新角色&quot; 按鈕來新建一個.</translation>
     </message>
     <message>
       <location/>

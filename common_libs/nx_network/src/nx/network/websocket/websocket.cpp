@@ -15,6 +15,7 @@ WebSocket::WebSocket(
     ReceiveMode receiveMode,
     Role role)
     :
+    m_pingTimeout(kPingTimeout),
     m_socket(std::move(streamSocket)),
     m_parser(role, this),
     m_serializer(role == Role::client),
@@ -45,6 +46,7 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     {
         AbstractAsyncChannel::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
+        m_pingTimer->cancelSync();
         m_pingTimer->bindToAioThread(aioThread);
         m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
         p.set_value();
@@ -245,43 +247,39 @@ void WebSocket::handlePingTimer()
 
 void WebSocket::resetPingTimeoutBySocketTimeoutSync()
 {
-    nx::utils::promise<void> p;
-    auto f = p.get_future();
-    resetPingTimeoutBySocketTimeout([p = std::move(p)]() mutable { p.set_value(); });
-    f.wait();
-}
+    unsigned socketRecvTimeoutMs = 0;
+    if (!m_socket->getRecvTimeout(&socketRecvTimeoutMs))
+        NX_LOG("[WebSocket] Failed to get socket timeouts.", cl_logWARNING);
 
-void WebSocket::resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> afterHandler)
-{
-    dispatch([this, afterHandler = std::move(afterHandler)]()
-    {
-        unsigned socketRecvTimeoutMs;
-        if (!m_socket->getRecvTimeout(&socketRecvTimeoutMs))
-            NX_LOG("[WebSocket] Failed to get socket timeouts.", cl_logWARNING);
+    m_pingTimeout = socketRecvTimeoutMs == 0
+        ? kPingTimeout
+        : std::chrono::milliseconds(socketRecvTimeoutMs / m_pingTimeoutMultiplier);
 
-        m_pingTimeout = socketRecvTimeoutMs == 0
-            ? kPingTimeout
-            : std::chrono::milliseconds(socketRecvTimeoutMs / m_pingTimeoutMultiplier);
+    NX_LOG(lit("[WebSocket, Ping] Socket read timeout: %1. Ping timeout: %2")
+        .arg(socketRecvTimeoutMs)
+        .arg(m_pingTimeout.count()), cl_logDEBUG1);
 
-        NX_LOG(lit("[WebSocket, Ping] Socket read timeout: %1. Ping timeout: %2")
-            .arg(socketRecvTimeoutMs)
-            .arg(m_pingTimeout.count()), cl_logDEBUG1);
-
-        setPingTimeout();
-        afterHandler();
-    });
+    setPingTimeout();
 }
 
 void WebSocket::setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier)
 {
     NX_ASSERT(multiplier > 0);
+    if (multiplier == 0)
+    {
+        NX_VERBOSE(this, lm("multiplier == 0, setting to default").arg(multiplier));
+        multiplier = kDefaultPingTimeoutMultiplier;
+    }
+
+    NX_VERBOSE(this, lm("timeout: %1 ms, multiplier: %2").arg(timeout.count()).arg(multiplier));
+
     dispatch(
         [this, timeout, multiplier]()
-    {
-        m_pingTimeoutMultiplier = multiplier;
-        m_socket->setRecvTimeout(timeout);
-        resetPingTimeoutBySocketTimeout([]() {});
-    });
+        {
+            m_pingTimeoutMultiplier = multiplier;
+            m_socket->setRecvTimeout(timeout);
+            resetPingTimeoutBySocketTimeoutSync();
+        });
 }
 
 void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)

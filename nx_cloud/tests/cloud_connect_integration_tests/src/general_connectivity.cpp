@@ -27,7 +27,7 @@ protected:
         ASSERT_NE(nullptr, cloudStreamSocket);
         ASSERT_EQ(
             cloudSystemCredentials().hostName(),
-            cloudStreamSocket->getForeignHostFullCloudName());
+            cloudStreamSocket->getForeignHostName());
     }
 
 private:

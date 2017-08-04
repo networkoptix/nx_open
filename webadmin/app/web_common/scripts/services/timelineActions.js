@@ -79,7 +79,8 @@ TimelineActions.prototype.updatePosition = function(){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
                 self.nextPlayedPosition = false;
             }
-
+            // Update live position anyways
+            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
             return; // ignore changes until played position wasn't changed
         }
 
@@ -88,6 +89,8 @@ TimelineActions.prototype.updatePosition = function(){
         var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
 
         if(intervalMs == 0){
+            // Update live position anyways
+            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
@@ -365,7 +368,8 @@ TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.catchScrollSlider = this.scaleManager.scrollSlider();
 };
 TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
-    if(!this.catchScrollSlider.scrollingWidth){ // Do not scroll on full zoom out
+    if(!this.catchScrollSlider || !this.catchScrollSlider.scrollingWidth){
+        // Do not scroll if there is no caught position and on full zoom out
         return;
     }
     if(this.catchScrollBar) {
@@ -402,4 +406,5 @@ TimelineActions.prototype.timelineDragEnd = function(){
         this.catchTimeline = false;
     }
 };
+
 

@@ -93,7 +93,7 @@ ActionType Rule::actionType() const
 void Rule::setActionType(ActionType actionType)
 {
     m_actionType = actionType;
-    //TODO: #GDM #Business fill action params with default values? filter action resources?
+    // TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
 QVector<QnUuid> Rule::actionResources() const
@@ -206,16 +206,15 @@ Rule::Rule(
     m_system = isSystem;
     m_actionType = bActionType;
     m_eventType = bEventType;
-
-    if (subjectIds.empty())
-        return;
-
-    if (requiresUserResource(m_actionType))
-        m_actionResources = subjectIds.toVector();
-    else
-        m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
-
     m_actionParams.allUsers = allUsers;
+
+    if (!subjectIds.empty())
+    {
+        if (requiresUserResource(m_actionType))
+            m_actionResources = subjectIds.toVector();
+        else
+            m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
+    }
 }
 
 Rule* Rule::clone()

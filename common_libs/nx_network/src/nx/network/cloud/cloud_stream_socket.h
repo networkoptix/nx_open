@@ -12,18 +12,20 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
+#include "any_accessible_address_connector.h"
 #include "tunnel/tunnel_attributes.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-//!Socket that is able to use hole punching (tcp or udp) and mediator to establish connection
-/*!
-    Method to use to connect to remote peer is selected depending on route to the peer
-    If connection to peer requires using udp hole punching than this socket uses UDT.
-    \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
-*/
+/**
+ * Socket that is able to use hole punching (tcp or udp) and mediator to establish connection.
+ * Method to use to connect to remote peer is selected depending on route to the peer
+ * If connection to peer requires using udp hole punching than this socket uses UDT.
+ * NOTE: Actual socket is instanciated only when address is known 
+ *   (AbstractCommunicatingSocket::connect or AbstractCommunicatingSocket::connectAsync)
+ */
 class NX_NETWORK_API CloudStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
@@ -36,7 +38,6 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    //!Implementation of AbstractSocket::*
     virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;
@@ -44,10 +45,8 @@ public:
     virtual bool shutdown() override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
-    //!Implementation of AbstractStreamSocket::*
     virtual bool reopen() override;
 
-    //!Implementation of AbstractCommunicatingSocket::*
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis) override;
@@ -62,11 +61,9 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
-    //!Implementation of AbstractSocket::*
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
-    //!Implementation of AbstractCommunicatingSocket::*
     virtual void connectAsync(
         const SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
@@ -86,7 +83,7 @@ public:
     virtual bool isInSelfAioThread() const override;
     virtual QString idForToStringFromPtr() const override;
 
-    virtual QString getForeignHostFullCloudName() const;
+    virtual QString getForeignHostName() const override;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
@@ -96,16 +93,12 @@ private:
         std::deque<AddressEntry> dnsEntries, int port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
-    void connectToEntryAsync(
-        const AddressEntry& dnsEntry, int port,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-
     SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
-    void onDirectConnectDone(SystemError::ErrorCode errorCode);
-    void onCloudConnectDone(
+
+    void onConnectDone(
         SystemError::ErrorCode errorCode,
-        TunnelAttributes cloudTunnelAttributes,
-        std::unique_ptr<AbstractStreamSocket> cloudConnection);
+        boost::optional<TunnelAttributes> cloudTunnelAttributes,
+        std::unique_ptr<AbstractStreamSocket> connection);
 
     void cancelIoWhileInAioThread(aio::EventType eventType);
     void stopWhileInAioThread();
@@ -120,6 +113,7 @@ private:
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
+    std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
 
     QnMutex m_mutex;
     bool m_terminated;

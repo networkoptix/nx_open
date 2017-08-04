@@ -1,4 +1,5 @@
 import os.path
+import logging
 import datetime
 import argparse
 import yaml
@@ -7,6 +8,8 @@ from .utils import SimpleNamespace
 from .server_physical_host import PhysicalInstallationHostConfig
 from datetime import timedelta
 from .host import SshHostConfig
+
+log = logging.getLogger(__name__)
 
 
 def expand_path(path):
@@ -145,6 +148,7 @@ class SingleTestConfig(object):
                 config[name] = self._cast_value(value, type(default_value))
             else:
                 config[name] = default_value
+            log.info('Test config: %s = %r', name, config[name])
         return SimpleNamespace(**config)
 
     def _cast_value(self, value, t):
@@ -152,6 +156,12 @@ class SingleTestConfig(object):
             return value
         if t is int:
             return int(value)
+        if t is bool:
+            if value in ['true', 'yes', 'on']:
+                return True
+            if value in ['false', 'no', 'off']:
+                return False
+            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value
         if t is datetime.timedelta:
             return str_to_timedelta(value)
         return value

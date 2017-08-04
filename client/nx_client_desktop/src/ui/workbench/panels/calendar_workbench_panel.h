@@ -55,7 +55,7 @@ public:
 
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
 
-    //TODO: #gdm Probably make this AbstractWorkbenchPanel interface function
+    // TODO: #gdm Probably make this AbstractWorkbenchPanel interface function
     QList<QGraphicsItem*> activeItems() const;
 
 protected:

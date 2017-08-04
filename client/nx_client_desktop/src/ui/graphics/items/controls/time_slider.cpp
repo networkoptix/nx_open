@@ -753,7 +753,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
 {
     static const QString hmFormat = tr("hh:mm",
         "Format for displaying hours and minutes on timeline.");
-    static const QString hmApFormat = tr("hh:mm ap",
+    static const QString hmApFormat = tr("h:mm ap",
         "Format for displaying hours and minutes on timeline, with am/pm indicator.");
     static const QString hApFormat = tr("h ap",
         "Format for displaying hours on timeline, with am/pm indicator.");
@@ -765,7 +765,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         "Format for displaying years on timeline");
     static const QString dateMinsFormat = tr("dd MMMM yyyy hh:mm",
         "Format for displaying minute caption in timeline's header, without am/pm indicator.");
-    static const QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap",
+    static const QString dateMinsApFormat = tr("dd MMMM yyyy h:mm ap",
         "Format for displaying minute caption in timeline's header, with am/pm indicator.");
     static const QString dateHoursFormat = tr("dd MMMM yyyy hh:mm",
         "Format for displaying hour caption in timeline's header, without am/pm indicator.");
@@ -1188,7 +1188,7 @@ QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* loader, qreal aspectRatio)
 {
-    if (m_thumbnailsLoader.data() == loader)
+    if (m_thumbnailsLoader.data() == loader && qFuzzyEquals(m_thumbnailsAspectRatio, aspectRatio))
         return;
 
     clearThumbnails();
@@ -1711,7 +1711,7 @@ void QnTimeSlider::updateToolTipText()
     if (!m_options.testFlag(UpdateToolTip))
         return;
 
-    qint64 pos = sliderPosition();
+    const auto pos = sliderPosition();
 
     QString line1;
     QString line2;
@@ -1723,8 +1723,12 @@ void QnTimeSlider::updateToolTipText()
     else
     {
         static const QString tooltipFormatDate = lit("dd MMMM yyyy");
-        static const QString tooltipFormatTime = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeLong = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeLongAP = lit("h:mm:ss ap");
         static const QString tooltipFormatTimeShort = lit("mm:ss");
+
+        const bool ampm = m_locale.timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+        const auto tooltipFormatTime = ampm ? tooltipFormatTimeLongAP : tooltipFormatTimeLong;
 
         if (m_options.testFlag(UseUTC))
         {
@@ -1734,9 +1738,9 @@ void QnTimeSlider::updateToolTipText()
         }
         else
         {
-            const QString& format = maximum() >= 60ll * 60ll * 1000ll ? /* Longer than 1 hour? */
-                tooltipFormatTime :
-                tooltipFormatTimeShort;
+            const auto& format = maximum() >= 60ll * 60ll * 1000ll /* Longer than 1 hour? */
+                ? tooltipFormatTimeLong
+                : tooltipFormatTimeShort;
 
             line1 = m_locale.toString(msecsToTime(pos), format);
         }
@@ -2619,7 +2623,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         if (!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
             break;
 
-    highlightIndex = qMin(highlightIndex, stepCount - 1); //TODO: #Elric remove this line.
+    highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: #Elric remove this line.
     const QnTimeStep& highlightStep = m_steps[highlightIndex];
 
     qreal topMargin = qFloor((rect.height() - kDateTextFontHeight) * 0.5);
@@ -2771,7 +2775,7 @@ void QnTimeSlider::drawThumbnail(QPainter* painter, const ThumbnailData& data, c
     painter->setOpacity(opacity);
 }
 
-//TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
+// TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
 void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
 {
     if (!m_bookmarksVisible)

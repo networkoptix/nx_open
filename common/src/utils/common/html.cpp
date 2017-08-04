@@ -1,5 +1,7 @@
 #include "html.h"
 
+#include <QtGui/QTextDocument>
+
 #include <QtXml/QDomDocument>
 
 #include <nx/utils/string.h>
@@ -116,9 +118,14 @@ QnHtmlTag::~QnHtmlTag()
         m_result.append(L'\n');
 }
 
-QString htmlBold(const QString &source)
+QString makeHtml(const QString& source)
 {
-    return lit("<b>%1</b>").arg(source);
+    return lit("<html>") + source + lit("</html>");
+}
+
+QString htmlBold(const QString& source)
+{
+    return lit("<b>") + source + lit("</b>");
 }
 
 QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /*= false */, bool isItalic /*= false*/)
@@ -200,4 +207,17 @@ QString elideHtml(const QString &html, int maxLength, const QString &tail)
     return dom.toString();
 }
 
+bool mightBeHtml(const QString& text)
+{
+    if (!text.contains(L'\n'))
+        return Qt::mightBeRichText(text);
+
+    return mightBeHtml(text.split(L'\n'));
+}
+
+bool mightBeHtml(const QStringList& lines)
+{
+    return std::any_of(lines.cbegin(), lines.cend(),
+        [](const QString& line) { return mightBeHtml(line); });
+}
 

@@ -120,7 +120,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -378,7 +379,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         }
     }
 
-    //TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
+    // TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
     qnSettings->setVSyncEnabled(!startupParams.vsyncDisabled);
     qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
@@ -397,7 +398,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
-    //TODO: #GDM fix it
+    // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
 #ifndef __arm__
     QnPerformanceTest::detectLightMode();
@@ -443,19 +444,17 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             logFileNameSuffix = L'_' + QString::number(idx) + L'_';
     }
 
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
     nx::utils::log::Settings logSettings;
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
+    logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
     nx::utils::log::initialize(
         logSettings,
-        dataLocation,
         qApp->applicationName(),
         qApp->applicationFilePath(),
         lit("log_file") + logFileNameSuffix);
@@ -466,7 +465,6 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logSettings.level.parse(ec2TranLogLevel);
         nx::utils::log::initialize(
             logSettings,
-            dataLocation,
             qApp->applicationName(),
             qApp->applicationFilePath(),
             lit("ec2_tran") + logFileNameSuffix,

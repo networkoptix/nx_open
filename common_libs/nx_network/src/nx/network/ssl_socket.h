@@ -59,6 +59,7 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 
     virtual SocketAddress getForeignAddress() const override;
+    virtual QString getForeignHostName() const override;
     virtual bool isConnected() const override;
 
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;

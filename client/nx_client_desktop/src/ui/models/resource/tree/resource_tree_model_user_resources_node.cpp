@@ -128,7 +128,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureRecorderN
     auto pos = m_recorders.find(id);
     if (pos == m_recorders.end())
     {
-        //TODO: #GDM move to factory
+        // TODO: #GDM move to factory
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(model(), camera));
         node->initialize();
         node->setParent(parent);

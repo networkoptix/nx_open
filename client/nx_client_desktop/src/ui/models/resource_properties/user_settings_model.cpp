@@ -55,7 +55,7 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
             if (m_user == context()->user())
                 return OwnProfile;
 
-            if (m_user->flags().testFlag(Qn::local))
+            if (!m_user->resourcePool())
                 return NewUser;
 
             if (!accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))

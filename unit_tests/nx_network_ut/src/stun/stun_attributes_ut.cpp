@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/stun/stun_attributes.h>
+#include <nx/network/stun/message_parser.h>
 
 namespace nx {
 namespace stun {

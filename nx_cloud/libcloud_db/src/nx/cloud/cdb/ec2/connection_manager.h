@@ -27,6 +27,7 @@
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
+#include "transaction_transport.h"
 #include "../access_control/auth_types.h"
 
 namespace nx_http {
@@ -55,7 +56,7 @@ class TransactionTransportHeader;
 class ConnectionManager
 {
 public:
-    using SystemStatusChangedSubscription = 
+    using SystemStatusChangedSubscription =
         nx::utils::Subscription<std::string /*systemId*/, api::SystemHealth>;
 
     ConnectionManager(
@@ -70,6 +71,12 @@ public:
      * Mediaserver calls this method to open 2-way transaction exchange channel.
      */
     void createTransactionConnection(
+        nx_http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::RequestProcessedHandler completionHandler);
+    void createWebsocketTransactionConnection(
         nx_http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
@@ -121,17 +128,9 @@ private:
 
     struct ConnectionContext
     {
-        std::unique_ptr<TransactionTransport> connection;
+        std::unique_ptr<AbstractTransactionTransport> connection;
         nx::String connectionId;
         FullPeerName fullPeerName;
-    };
-
-    struct ConnectionRequestAttributes
-    {
-        nx::String connectionId;
-        ::ec2::ApiPeerData remotePeer;
-        nx::String contentEncoding;
-        int remotePeerProtocolVersion = 0;
     };
 
     typedef boost::multi_index::multi_index_container<
@@ -166,39 +165,39 @@ private:
     SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 
     bool addNewConnection(ConnectionContext connectionContext);
-    
+
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
         const ConnectionContext& context) const;
-    
+
     unsigned int getConnectionCountBySystemId(
         const QnMutexLockerBase& lk,
         const nx::String& systemId) const;
-    
+
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
             const QnMutexLockerBase& /*lock*/,
             ConnectionKeyType connectionKey);
-    
+
     template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
     void removeConnectionByIter(
         const QnMutexLockerBase& /*lock*/,
         ConnectionIndex& connectionIndex,
         Iterator connectionIterator,
         CompletionHandler completionHandler);
-    
+
     void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
 
     void removeConnection(const nx::String& connectionId);
-    
+
     void onGotTransaction(
         const nx::String& connectionId,
         Qn::SerializationFormat tranFormat,
         QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
-    
+
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
-    
+
     bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
         ConnectionRequestAttributes* connectionRequestAttributes);
@@ -213,6 +212,12 @@ private:
     nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx_http::Response* const response);
+
+    void onHttpConnectionUpgraded(
+        nx_http::HttpServerConnection* connection,
+        ::ec2::ApiPeerDataEx remotePeerInfo,
+        nx::utils::stree::ResourceContainer authInfo,
+        const nx::String systemId);
 };
 
 } // namespace ec2

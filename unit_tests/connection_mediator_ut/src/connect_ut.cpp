@@ -88,7 +88,7 @@ TEST_F( ConnectTest, BindConnect )
     stun::AsyncClient msClient;
     auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
-    msClient.connect( address() );
+    msClient.connect(nx::network::url::Builder().setScheme("stun").setEndpoint(address()));
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::extension::methods::bind ) );

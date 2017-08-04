@@ -33,6 +33,7 @@
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
 #include <database/migrations/add_default_webpages_migration.h>
+#include <database/migrations/cleanup_removed_transactions.h>
 
 #include <network/system_helpers.h>
 
@@ -468,7 +469,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
         QSqlQuery queryAdminUser(m_sdb);
         queryAdminUser.setForwardOnly(true);
-        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); //TODO: #GDM check owner permission instead
+        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); // TODO: #GDM check owner permission instead
         execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
         if (queryAdminUser.next())
         {
@@ -1343,7 +1344,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName.endsWith(lit("/07_videowall.sql")))
     {
-        //TODO: #GDM move to migration?
+        // TODO: #GDM move to migration?
         auto guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
         return updateTableGuids("vms_resourcetype", "guid", guids);
     }
@@ -1371,7 +1372,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/32_default_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getSystemRules())
         {
             ApiBusinessRuleData ruleData;
@@ -1402,7 +1403,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/43_add_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getRulesUpd43())
         {
             ApiBusinessRuleData ruleData;
@@ -1415,7 +1416,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/48_add_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getRulesUpd48())
         {
             ApiBusinessRuleData ruleData;
@@ -1466,19 +1467,19 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::db::migrateRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
 
     if (updateName.endsWith(lit("/52_fix_onvif_mt.sql")))
-        return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+        return removeWrongSupportedMotionTypeForONVIF(); // TODO: #rvasilenko consistency break
 
     if (updateName.endsWith(lit("/65_transaction_log_add_fields.sql")))
         return resyncIfNeeded(ResyncLog);
 
     if (updateName.endsWith(lit("/68_add_transaction_type.sql")))
-        return migration::addTransactionType::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+        return migration::addTransactionType::migrate(&m_sdb); // TODO: #rvasilenko namespaces consistency break
 
     if (updateName.endsWith(lit("/68_cleanup_db.sql")))
         return resyncIfNeeded({ClearLog, ResyncLog});
 
     if (updateName.endsWith(lit("/70_make_transaction_timestamp_128bit.sql")))
-        return migration::timestamp128bit::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+        return migration::timestamp128bit::migrate(&m_sdb); // TODO: #rvasilenko namespaces consistency break
 
     if (updateName.endsWith(lit("/73_encrypt_kvpairs.sql")))
         return encryptKvPairs();
@@ -1530,6 +1531,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
         return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
+        return ec2::db::cleanupClientInfoList(m_sdb);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -4305,6 +4309,8 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
 {
     if (!m_dbJustCreated)
         m_resyncFlags |= flags;
+    if (flags.testFlag(ResyncWebPages))
+        m_resyncFlags |= ResyncWebPages; //< Resync web pages always. Media servers could have different list even it started with empty DB.
     return true;
 }
 

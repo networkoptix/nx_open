@@ -12,6 +12,6 @@
     "emailSubject":"有人分享影像 {{message.system_name}} 給您"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"版本 {{message.id}} 已準備好審查"
   }
 }

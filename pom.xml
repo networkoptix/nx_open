@@ -36,6 +36,7 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_cassandra.guid>{585CA31B-4D3E-40D6-B759-DD1616D7BC8A}</nx_cassandra.guid>
         <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
         <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
@@ -203,7 +204,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloudGroup>test</cloudGroup>
-        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
+        <certificates_dir>${packages.dir}/any/certificates-${customization}</certificates_dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -669,6 +670,7 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>nx_cloud/traffic_relay</module>
                 <module>client/minilauncher</module>
@@ -776,7 +778,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -784,6 +786,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>client/mobile_client</module>
             </modules>
@@ -810,6 +813,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libtraffic_relay</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
@@ -823,7 +827,7 @@
             </modules>
             <properties>
                 <modification>ubuntu</modification>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
         </profile>
 
@@ -898,7 +902,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <festival.version>2.1x-SNAPSHOT</festival.version>
+                <festival.version>2.1x</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -950,7 +954,6 @@
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
-                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -970,6 +973,7 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
+                <festival.version>2.1x</festival.version>
                 <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>

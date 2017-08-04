@@ -347,8 +347,5 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../x64/build/client.qrc"/>
- </resources>
  <connections/>
 </ui>

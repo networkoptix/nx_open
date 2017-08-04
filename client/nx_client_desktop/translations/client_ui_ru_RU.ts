@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Все серверы отключены. Журналы недоступны.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Журнал закладок</translation>
     </message>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Вставить из буфера обмена</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Выбрать файл лицензии...</translation>
     </message>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Цикличность тура</translation>
+      <source>seconds</source>
+      <translation>сек</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>сек</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

@@ -185,6 +185,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->longUpdateWarning->setVisible(false);
 
     ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->releaseDescriptionLabel->setText(QString());
+    ui->releaseDescriptionLabel->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -456,7 +458,7 @@ void QnServerUpdatesWidget::discardChanges()
             this);
 
         const auto cancelUpdateButton = dialog.addButton(
-            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
@@ -482,13 +484,13 @@ bool QnServerUpdatesWidget::hasChanges() const
 
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from saving their changes
+    // TODO: #GDM now this prevents other tabs from saving their changes
     return !isUpdating();
 }
 
 bool QnServerUpdatesWidget::canDiscardChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from discarding their changes
+    // TODO: #GDM now this prevents other tabs from discarding their changes
     return canCancelUpdate();
 }
 
@@ -620,6 +622,9 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     m_releaseNotesUrl = result.releaseNotesUrl;
     ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
+
+    ui->releaseDescriptionLabel->setText(result.description);
+    ui->releaseDescriptionLabel->setVisible(!result.description.isEmpty());
 
     ui->targetVersionLabel->setText(versionText);
 

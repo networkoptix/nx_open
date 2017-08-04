@@ -942,6 +942,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -1727,7 +1729,7 @@ void MediaServerProcess::at_timer()
     if (isStopping())
         return;
 
-    //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
+    // TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     qnServerModule->runTimeSettings()->setValue(
         "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
 
@@ -2301,25 +2303,29 @@ void MediaServerProcess::updateGuidIfNeeded()
 void MediaServerProcess::serviceModeInit()
 {
     const auto settings = qnServerModule->roSettings();
-    const auto dataLocation = getDataDirectory();
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
     nx::utils::log::Settings logSettings;
+    logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
-    logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
-    logSettings.level.parse(
-        cmdLineArguments().logLevel, settings->value("logLevel").toString());
+    logSettings.updateDirectoryIfEmpty(getDataDirectory());
+    logSettings.level.parse(cmdLineArguments().logLevel,
+        settings->value("logLevel").toString());
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), binaryPath);
+        logSettings, qApp->applicationName(), binaryPath);
 
-    logSettings.level.reset();
+    if (auto path = nx::utils::log::mainLogger()->filePath())
+        settings->setValue("logFile", path->replace(lit(".log"), QString()));
+    else
+        settings->remove("logFile");
+
     logSettings.level.parse(
         cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
     logSettings.level.reset();
@@ -2327,7 +2333,7 @@ void MediaServerProcess::serviceModeInit()
         cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     logSettings.level.reset();
@@ -2335,7 +2341,7 @@ void MediaServerProcess::serviceModeInit()
         cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -2557,7 +2563,8 @@ void MediaServerProcess::run()
         getConnectionFactory(
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            commonModule()));
+            commonModule(),
+            settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
@@ -3000,10 +3007,10 @@ void MediaServerProcess::run()
     qnServerModule->roSettings()->sync();
 
 #ifndef EDGE_SERVER
-    //TODO: #GDM make this the common way with other settings
+    // TODO: #GDM make this the common way with other settings
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
-    qnGlobalSettings->synchronizeNowSync(); //TODO: #GDM double sync
+    qnGlobalSettings->synchronizeNowSync(); // TODO: #GDM double sync
 #endif
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));

@@ -272,14 +272,11 @@ bool QnRecordingManager::startOrStopRecording(
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
-    if (!cameraRes->isInitialized() && needRecordCamera) {
-        cameraRes->initAsync(true);
-    }
 
     bool someRecordingIsPresent = false;
 
-    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
-    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog, needRecordCamera);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog, needRecordCamera);
 
     if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
@@ -656,7 +653,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
-        //TODO: #gdm move (de)serializing of encoded reason params to common place
+        // TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }
 }

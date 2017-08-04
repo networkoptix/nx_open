@@ -3,7 +3,7 @@
   "contexts":[
     {
       "name":"branding",
-      "description":"common branding constants",
+      "description":"Common branding information",
       "translatable": false,
       "values":[
         ["{{PRODUCT_NAME}}","VMS Demo Cloud","Name for cloud"],
@@ -17,7 +17,10 @@
         ["{{IOS_APP_LINK}}","disabled","Link for iOS application in Apple AppStore"],
         ["{{ANDROID_APP_LINK}}","disabled","Link for Android application in Google Play"],
         ["{{COMPANY_NAME}}", "Network Optix", "The name of the company itself"],
-        ["static/images/logo.png", "N/A", "Logo for branding", "Image"]
+        ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
+        ["templates/email_logo.png", "",
+          "Logo for email. Height must be not more than 40px, width - not more than 100px",
+          "Image", {"height_le": 40, "width_le": 100}]
       ]
     },
     {
@@ -26,13 +29,23 @@
       "url": "/content/about",
       "translatable": true,
       "values":[
-        ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
-        ["%BLOCK1_TITLE%","Connect from Anywhere"],
-        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password","","Long Text"],
-        ["%BLOCK2_TITLE%","Simple User Management"],
-        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles","","Long Text"],
-        ["%BLOCK3_TITLE%","Multiple System Management"],
-        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management","","Long Text"]
+        ["static/images/promo/cloud.png", "",
+          "Image for the front page. Image must have transparent background, recommended height is 100px (minimal height is 100px, maximum is 200px).",
+          "Image", {"height_ge": 100, "height_le": 200}],
+        ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}",
+          "One line (50-100 symbols)"],
+        ["%BLOCK1_TITLE%","Connect from Anywhere",
+          "1-3 words"],
+        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password",
+          "8-10 words","Long Text"],
+        ["%BLOCK2_TITLE%","Simple User Management",
+          "1-3 words"],
+        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles",
+          "8-10 words","Long Text"],
+        ["%BLOCK3_TITLE%","Multiple System Management",
+          "1-3 words"],
+        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management",
+          "8-10 words","Long Text"]
       ]
     },
     {

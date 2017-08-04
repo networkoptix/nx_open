@@ -25,50 +25,60 @@ public:
     QnResourcesChangesManager(QObject* parent = nullptr);
     ~QnResourcesChangesManager();
 
-    typedef std::function<void (const QnVirtualCameraResourcePtr &)>    CameraChangesFunction;
-    typedef std::function<void (const QnMediaServerResourcePtr &)>      ServerChangesFunction;
-    typedef std::function<void (const QnUserResourcePtr &)>             UserChangesFunction;
-    typedef std::function<void (const QnVideoWallResourcePtr &)>        VideoWallChangesFunction;
-    typedef std::function<void (const QnLayoutResourcePtr &)>           LayoutChangesFunction;
-    typedef std::function<void (const QnWebPageResourcePtr &)>          WebPageChangesFunction;
+    using CameraChangesFunction = std::function<void(const QnVirtualCameraResourcePtr&)>;
+    using ServerChangesFunction = std::function<void(const QnMediaServerResourcePtr&)>;
+    using UserChangesFunction = std::function<void(const QnUserResourcePtr&)>;
+    using UserCallbackFunction = std::function<void(bool, const QnUserResourcePtr&)>;
+    using VideoWallChangesFunction = std::function<void(const QnVideoWallResourcePtr&)>;
+    using VideoWallCallbackFunction = std::function<void(bool, const QnVideoWallResourcePtr&)>;
+    using LayoutChangesFunction = std::function<void(const QnLayoutResourcePtr&)>;
+    using LayoutCallbackFunction = std::function<void(bool, const QnLayoutResourcePtr&)>;
+    using WebPageChangesFunction = std::function<void(const QnWebPageResourcePtr&)>;
+    using WebPageCallbackFunction = std::function<void(bool, const QnWebPageResourcePtr&)>;
 
-
-    typedef std::function<void ()> BatchChangesFunction;
-    typedef std::function<void ()> RollbackFunction;
-
-    using ActionResultCallback = std::function<void (bool success)>;
+    using GenericChangesFunction = std::function<void()>;
+    using GenericCallbackFunction = std::function<void(bool)>;
 
     /** Generic function to delete resources. */
     void deleteResources(
         const QnResourceList& resources,
-        const ActionResultCallback& callback = ActionResultCallback());
+        const GenericCallbackFunction& callback = GenericCallbackFunction());
 
     /** Apply changes to the given camera. */
-    void saveCamera(const QnVirtualCameraResourcePtr &camera, CameraChangesFunction applyChanges);
+    void saveCamera(const QnVirtualCameraResourcePtr& camera,
+        CameraChangesFunction applyChanges);
 
     /** Apply changes to the given list of cameras. */
-    void saveCameras(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges);
+    void saveCameras(const QnVirtualCameraResourceList& cameras,
+        CameraChangesFunction applyChanges);
 
     /** Apply changes to the given list of cameras. */
-    void saveCamerasBatch(const QnVirtualCameraResourceList &cameras, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
+    void saveCamerasBatch(const QnVirtualCameraResourceList& cameras,
+        GenericChangesFunction applyChanges,
+        GenericCallbackFunction callback = GenericCallbackFunction());
 
     /** Apply changes to the given camera as a core resource, e.g. change parent id.
      *  Strongly not recommended to use from client code.
      */
-    void saveCamerasCore(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges);
+    void saveCamerasCore(const QnVirtualCameraResourceList& cameras,
+        CameraChangesFunction applyChanges);
 
     /** Apply changes to the given server. */
-    void saveServer(const QnMediaServerResourcePtr &server, ServerChangesFunction applyChanges);
+    void saveServer(const QnMediaServerResourcePtr& server,
+        ServerChangesFunction applyChanges);
 
     /** Apply changes to the given list of servers. */
-    void saveServers(const QnMediaServerResourceList &servers, ServerChangesFunction applyChanges);
+    void saveServers(const QnMediaServerResourceList& servers,
+        ServerChangesFunction applyChanges);
 
     /** Apply changes to the given list of servers. */
-    void saveServersBatch(const QnMediaServerResourceList &servers, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
+    void saveServersBatch(const QnMediaServerResourceList& servers,
+        GenericChangesFunction applyChanges);
 
     /** Apply changes to the given user. */
-    void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges,
-        const ActionResultCallback& callback = ActionResultCallback());
+    void saveUser(const QnUserResourcePtr &user,
+        UserChangesFunction applyChanges,
+        UserCallbackFunction callback = UserCallbackFunction());
 
     /** Apply changes to the given users. */
     void saveUsers(const QnUserResourceList& users);
@@ -81,13 +91,19 @@ public:
     void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */
-    void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);
+    void saveVideoWall(const QnVideoWallResourcePtr& videoWall,
+        VideoWallChangesFunction applyChanges = VideoWallChangesFunction(),
+        VideoWallCallbackFunction callback = VideoWallCallbackFunction());
 
     /** Apply changes to the given layout. */
-    void saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges);
+    void saveLayout(const QnLayoutResourcePtr& layout,
+        LayoutChangesFunction applyChanges,
+        LayoutCallbackFunction callback = LayoutCallbackFunction());
 
     /** Apply changes to the given web page. */
-    void saveWebPage(const QnWebPageResourcePtr &webPage, WebPageChangesFunction applyChanges);
+    void saveWebPage(const QnWebPageResourcePtr& webPage,
+        WebPageChangesFunction applyChanges = WebPageChangesFunction(),
+        WebPageCallbackFunction callback = WebPageCallbackFunction());
 
 signals:
     /** This signal is emitted every time when changes cannot be saved. */

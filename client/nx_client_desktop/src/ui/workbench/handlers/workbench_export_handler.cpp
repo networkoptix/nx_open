@@ -253,8 +253,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 }
 
 
-//TODO: #GDM Monstrous function, refactor required
-//TODO: #ynikitenkov refactor to use QnResourcePtr
+// TODO: #GDM Monstrous function, refactor required
+// TODO: #ynikitenkov refactor to use QnResourcePtr
 void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     const QnMediaResourcePtr &mediaResource,
     const QnAbstractStreamDataProvider *dataProvider,

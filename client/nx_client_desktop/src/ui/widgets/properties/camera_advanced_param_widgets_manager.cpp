@@ -175,42 +175,29 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 
             auto handler = [dependency, paramId = param.id, this]() -> bool
                 {
-                    bool allConditionsSatisfied = true;
-                    for (const auto& condition: dependency.conditions)
-                    {
-                        if (!m_paramWidgetsById.contains(condition.paramId))
+                    bool allConditionsSatisfied = std::all_of(
+                        dependency.conditions.cbegin(), dependency.conditions.cend(),
+                        [this](const QnCameraAdvancedParameterCondition& condition)
                         {
-                            allConditionsSatisfied = false;
-                            break;
-                        }
+                            auto widget = m_paramWidgetsById.value(condition.paramId);
+                            return widget && condition.checkValue(widget->value());
+                        });
 
-                        auto value = m_paramWidgetsById[condition.paramId]->value();
-
-                        if (!condition.checkValue(value))
-                        {
-                            allConditionsSatisfied = false;
-                            break;
-                        }
-                    }
-
-                    //TODO: #dmishin move this somewhere.
+                    // TODO: #dmishin move this somewhere.
                     if (dependency.type == DependencyType::Show)
                     {
-                        if (allConditionsSatisfied)
-                        {
-                            m_paramLabelsById[paramId]->show();
-                            m_paramWidgetsById[paramId]->show();
-                        }
-                        else
-                        {
-                            m_paramLabelsById[paramId]->hide();
-                            m_paramWidgetsById[paramId]->hide();
-                        }
+                        if (auto label = m_paramLabelsById.value(paramId))
+                            label->setHidden(!allConditionsSatisfied);
+                        if (auto widget = m_paramWidgetsById.value(paramId))
+                            widget->setHidden(!allConditionsSatisfied);
                     }
                     else if (dependency.type == DependencyType::Range)
                     {
-                        if (allConditionsSatisfied)
-                            m_paramWidgetsById[paramId]->setRange(dependency.range);
+                        if (auto widget = m_paramWidgetsById.value(paramId))
+                        {
+                            if (allConditionsSatisfied)
+                                m_paramWidgetsById[paramId]->setRange(dependency.range);
+                        }
                     }
 
                     return allConditionsSatisfied;
@@ -219,7 +206,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             handlerChains[dependency.type].push_back(handler);
         }
 
-        auto runHandlerChains = [handlerChains](const QString& /*id*/, const QString& /*value*/)
+        auto runHandlerChains = [handlerChains]()
             {
                 for (const auto& chainPair: handlerChains)
                 {
@@ -235,12 +222,13 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 
         for (const auto& watch: watches)
         {
-            connect(
-                m_paramWidgetsById[watch],
-                &QnAbstractCameraAdvancedParamWidget::valueChanged,
-                runHandlerChains);
+            if (auto widget = m_paramWidgetsById.value(watch))
+            {
+                connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged,
+                    runHandlerChains);
 
-            runHandlerChains(QString(), QString());
+                runHandlerChains();
+            }
         }
     }
 

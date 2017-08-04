@@ -393,11 +393,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation type="unfinished">Bookmark Log</translation>
     </message>
@@ -1474,16 +1469,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation type="unfinished">Paste from Clipboard</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation type="unfinished">Select License File...</translation>
     </message>
@@ -1651,13 +1636,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <source>seconds</source>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>

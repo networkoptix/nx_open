@@ -83,8 +83,8 @@ public:
         QnTransactionTransportBase* m_objectToLock;
     };
 
-    static const char* TUNNEL_MULTIPART_BOUNDARY;
-    static const char* TUNNEL_CONTENT_TYPE;
+    static const char* const TUNNEL_MULTIPART_BOUNDARY;
+    static const char* const TUNNEL_CONTENT_TYPE;
 
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
     typedef std::function<void(QnTransactionTransportBase*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
@@ -208,6 +208,8 @@ public:
 
     void setKeepAliveEnabled(bool value);
 
+    void addDataToTheSendQueue(QByteArray data);
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -216,13 +218,10 @@ signals:
     void stateChanged(State state);
     void remotePeerUnauthorized(const QnUuid& id);
     void peerIdDiscovered(const QUrl& url, const QnUuid& id);
+    void onSomeDataReceivedFromRemotePeer();
 
 protected:
-    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
-    virtual void onSomeDataReceivedFromRemotePeer() {};
-
-    /** Post serialized data to the send queue */
-    void addData(QByteArray data);
+    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& /*httpClient*/, bool /*authByKey*/) {};
 
 private:
     struct DataToSend

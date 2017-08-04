@@ -979,8 +979,10 @@ ActionVisibility OpenInFolderCondition::check(const QnResourceList& resources, Q
         return InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    bool isLocalResource = resource->hasFlags(Qn::local_media)
-        && !resource->hasFlags(Qn::exported);
+
+    // Skip cameras inside the exported layouts.
+    bool isLocalResource = resource->hasFlags(Qn::local_media) && resource->getParentId().isNull();
+
     bool isExportedLayout = resource->hasFlags(Qn::exported_layout);
 
     return isLocalResource || isExportedLayout ? EnabledAction : InvisibleAction;
@@ -1072,7 +1074,7 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-        return any_of(resources, QnResourceAccessFilter::isDroppable);
+        return any_of(resources, QnResourceAccessFilter::isOpenableInEntity);
 
     bool isExportedLayout = layout->isFile();
 
