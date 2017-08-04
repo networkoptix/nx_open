@@ -241,7 +241,7 @@ private:
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
     * the user logs in. */
-    QList<MimeData> m_delayedDrops;
+    QList<QByteArray> m_delayedDrops;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
