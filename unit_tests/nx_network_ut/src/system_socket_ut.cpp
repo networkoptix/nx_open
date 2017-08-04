@@ -42,28 +42,32 @@ protected:
          ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
 
-    void thenTimeoutsAreInheritedFromTheServerSocket()
+    void thenTimeoutsAreReportedCorrectly()
     {
-        thenRecvTimeoutIsInherited();
-        thenSendTimeoutIsInherited();
+        thenRecvTimeoutIsReportedCorrectly();
+        thenSendTimeoutIsReportedCorrectly();
     }
 
-    void thenRecvTimeoutIsInherited()
+    void thenRecvTimeoutIsReportedCorrectly()
     {
-        unsigned int acceptedSocketRecvTimeout = 0;
-        ASSERT_TRUE(m_acceptedSocket->getRecvTimeout(&acceptedSocketRecvTimeout));
-        unsigned int serverSocketRecvTimeout = 0;
-        ASSERT_TRUE(m_tcpServerSocket.getRecvTimeout(&serverSocketRecvTimeout));
-        ASSERT_EQ(serverSocketRecvTimeout, acceptedSocketRecvTimeout);
+        unsigned int reportedTimeout = 0;
+        ASSERT_TRUE(m_acceptedSocket->getRecvTimeout(&reportedTimeout));
+
+        unsigned int actualTimeout = 0;
+        ASSERT_TRUE(readSocketTimeout(m_acceptedSocket->handle(), SO_RCVTIMEO, &actualTimeout));
+
+        ASSERT_EQ(actualTimeout, reportedTimeout);
     }
 
-    void thenSendTimeoutIsInherited()
+    void thenSendTimeoutIsReportedCorrectly()
     {
-        unsigned int acceptedSocketSendTimeout = 0;
-        ASSERT_TRUE(m_acceptedSocket->getSendTimeout(&acceptedSocketSendTimeout));
-        unsigned int serverSocketSendTimeout = 0;
-        ASSERT_TRUE(m_tcpServerSocket.getSendTimeout(&serverSocketSendTimeout));
-        ASSERT_EQ(serverSocketSendTimeout, acceptedSocketSendTimeout);
+        unsigned int reportedTimeout = 0;
+        ASSERT_TRUE(m_acceptedSocket->getSendTimeout(&reportedTimeout));
+
+        unsigned int actualTimeout = 0;
+        ASSERT_TRUE(readSocketTimeout(m_acceptedSocket->handle(), SO_SNDTIMEO, &actualTimeout));
+
+        ASSERT_EQ(actualTimeout, reportedTimeout);
     }
 
 private:
@@ -80,6 +84,24 @@ private:
 
         ASSERT_TRUE(m_tcpServerSocket.bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_tcpServerSocket.listen());
+    }
+
+    static bool readSocketTimeout(int fd, int socketOption, unsigned int* millis)
+    {
+        #ifdef _WIN32
+            int valLen = sizeof(*millis);
+            if (getsockopt(fd, SOL_SOCKET, socketOption, (char*)millis, &valLen) != 0)
+                return false;
+        #else
+            timeval tv;
+            memset(&tv, 0, sizeof(tv));
+            int valLen = sizeof(tv);
+            if (::getsockopt(fd, SOL_SOCKET, socketOption, (void*)&tv, &valLen) < 0)
+                return false;
+            *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
+        #endif
+        
+        return true;
     }
 };
 
@@ -193,10 +215,10 @@ TEST_F(TcpSocket, ConnectErrorReporting)
     ASSERT_FALSE(tcpSocket.isConnected());
 }
 
-TEST_F(TcpSocket, accepted_socket_inherits_timeouts_from_server_socket)
+TEST_F(TcpSocket, accepted_socket_timeouts_properly_reported)
 {
     whenAcceptedSocket();
-    thenTimeoutsAreInheritedFromTheServerSocket();
+    thenTimeoutsAreReportedCorrectly();
 }
 
 TEST(TcpServerSocketIpv6, BindsToLocalAddress)

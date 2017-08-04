@@ -66,8 +66,8 @@ public:
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;
     std::unique_ptr<CommonSocketImpl> m_impl;
-    mutable unsigned int m_readTimeoutMS;
-    mutable unsigned int m_writeTimeoutMS;
+    unsigned int m_readTimeoutMS;
+    unsigned int m_writeTimeoutMS;
 };
 
 }   //network
