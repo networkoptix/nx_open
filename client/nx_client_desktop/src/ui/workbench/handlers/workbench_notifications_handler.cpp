@@ -123,6 +123,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         [this]
         {
             qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
+            setSystemHealthEventVisible(QnSystemHealth::CloudPromo, false);
         });
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH),

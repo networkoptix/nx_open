@@ -174,7 +174,7 @@ QString QnLicense::displayName() const {
 
 QString QnLicense::displayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial");
+    case Qn::LC_Trial:          return tr("Time");
     case Qn::LC_Analog:         return tr("Analog");
     case Qn::LC_Professional:   return tr("Professional");
     case Qn::LC_Edge:           return tr("Edge");
@@ -197,7 +197,7 @@ QString QnLicense::longDisplayName() const {
 
 QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial Licenses");
+    case Qn::LC_Trial:          return tr("Time Licenses");
     case Qn::LC_Analog:         return tr("Analog Licenses");
     case Qn::LC_Professional:   return tr("Professional Licenses");
     case Qn::LC_Edge:           return tr("Edge Licenses");
