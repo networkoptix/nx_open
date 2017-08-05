@@ -95,7 +95,7 @@ private:
         #else
             timeval tv;
             memset(&tv, 0, sizeof(tv));
-            int valLen = sizeof(tv);
+            socklen_t valLen = sizeof(tv);
             if (::getsockopt(fd, SOL_SOCKET, socketOption, (void*)&tv, &valLen) < 0)
                 return false;
             *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
