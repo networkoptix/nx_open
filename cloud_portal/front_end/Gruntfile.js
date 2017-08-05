@@ -676,6 +676,9 @@ module.exports = function (grunt) {
             up_3_2:{
                 command: 'hg up vms_3.2_dev'
             },
+            up_3_1:{
+                command: 'hg up vms_3.1_web'
+            },
             version: {
                 command: 'hg parent > dist/version.txt'
             },
@@ -894,7 +897,8 @@ module.exports = function (grunt) {
             'push:vms_3.1',
             'shell:up_3_2',
             'pull:vms_3.1',
-            'push:default'
+            'push:default',
+            'shell:up_3_1'
         ]);
     });
 };
