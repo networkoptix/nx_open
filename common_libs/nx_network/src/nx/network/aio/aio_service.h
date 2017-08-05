@@ -92,7 +92,7 @@ public:
     /**
      * @returns true, if socket is still listened for state changes.
      */
-    bool isSocketBeingWatched(Pollable* sock);
+    bool isSocketBeingMonitored(Pollable* sock);
 
     /**
      * Call handler from within aio thread sock is bound to.

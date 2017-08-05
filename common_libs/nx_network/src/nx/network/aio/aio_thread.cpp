@@ -183,7 +183,7 @@ size_t AIOThread::socketsHandled() const
         + m_taskQueue->newWriteMonitorTaskCount;
 }
 
-bool AIOThread::isSocketBeingWatched(Pollable* sock) const
+bool AIOThread::isSocketBeingMonitored(Pollable* sock) const
 {
     for (const auto& monitoringContext: sock->impl()->monitoredEvents)
     {

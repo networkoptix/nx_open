@@ -85,7 +85,7 @@ public:
      * Returns number of sockets handled by this object.
      */
     size_t socketsHandled() const;
-    bool isSocketBeingWatched(Pollable* sock) const;
+    bool isSocketBeingMonitored(Pollable* sock) const;
 
 protected:
     virtual void run() override;

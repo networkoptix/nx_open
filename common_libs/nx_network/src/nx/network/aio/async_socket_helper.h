@@ -132,7 +132,7 @@ public:
                     .isRequestIdKnown(this)), kFailureMessage);
             NX_CRITICAL(
                 !SocketGlobals::aioService()
-                .isSocketBeingWatched(this->m_socket), kFailureMessage);
+                .isSocketBeingMonitored(this->m_socket), kFailureMessage);
         }
     }
 

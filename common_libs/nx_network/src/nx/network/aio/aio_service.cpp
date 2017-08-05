@@ -83,10 +83,10 @@ void AIOService::registerTimer(
         timeoutMillis);
 }
 
-bool AIOService::isSocketBeingWatched(Pollable* sock)
+bool AIOService::isSocketBeingMonitored(Pollable* sock)
 {
     auto* aioThread = getSocketAioThread(sock);
-    return aioThread->isSocketBeingWatched(sock);
+    return aioThread->isSocketBeingMonitored(sock);
 }
 
 void AIOService::post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler)
@@ -151,7 +151,7 @@ void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThr
     if (sock->impl()->aioThread.load() == desiredThread)
         return;
 
-    NX_ASSERT(!isSocketBeingWatched(sock));
+    NX_ASSERT(!isSocketBeingMonitored(sock));
 
     // Socket can be bound to another aio thread, if it is not used at the moment.
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
