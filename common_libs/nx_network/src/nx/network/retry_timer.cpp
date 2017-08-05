@@ -1,8 +1,3 @@
-/**********************************************************
-* Mar 15, 2016
-* akolesnikov
-***********************************************************/
-
 #include "retry_timer.h"
 
 #include <nx/utils/std/cpp14.h>
@@ -10,9 +5,8 @@
 namespace nx {
 namespace network {
 
-////////////////////////////////////////////////////////////
-//// class RetryPolicy
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class RetryPolicy
 
 constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
@@ -51,9 +45,8 @@ bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class RetryTimer
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class RetryTimer
 
 RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
