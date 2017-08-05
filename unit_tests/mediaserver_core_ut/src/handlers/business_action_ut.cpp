@@ -18,7 +18,8 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
-TEST(ExecActionAccessRightsTest, main)
+
+TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
 {
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
@@ -57,13 +58,14 @@ TEST(ExecActionAccessRightsTest, main)
             &jsonTranSerializer,
             &ubjsonTranSerializer);
         messageBus.init(ec2::MessageBusType::LegacyMode);
-        ec2::ServerQueryProcessorAccess(nullptr/*QnDbManager*/, &messageBus)
-            .getAccess(userAccess).processUpdateAsync(
-            actionTran,
-            [&resultPromise](ec2::ErrorCode ecode)
-            {
-                resultPromise.set_value(ecode);
-            });
+
+        ec2::ServerQueryProcessorAccess access(nullptr/*QnDbManager*/, &messageBus);
+        access.getAccess(userAccess).processUpdateAsync(
+                actionTran,
+                [&resultPromise](ec2::ErrorCode ecode)
+                {
+                    resultPromise.set_value(ecode);
+                });
 
         return resultFuture.get();
     };

@@ -272,14 +272,11 @@ bool QnRecordingManager::startOrStopRecording(
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
-    if (!cameraRes->isInitialized() && needRecordCamera) {
-        cameraRes->initAsync(true);
-    }
 
     bool someRecordingIsPresent = false;
 
-    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
-    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog, needRecordCamera);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog, needRecordCamera);
 
     if (needRecordCamera && res->getStatus() != Qn::Offline)
     {

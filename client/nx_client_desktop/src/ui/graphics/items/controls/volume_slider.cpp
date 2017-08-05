@@ -3,6 +3,7 @@
 #include <nx/audio/audiodevice.h>
 
 #include <ui/style/helper.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -13,14 +14,15 @@ static const qreal kMouseWheelFactor = 2.0;
 } // namespace
 
 
-QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
+QnVolumeSlider::QnVolumeSlider(QGraphicsItem* parent):
     base_type(parent),
     m_updating(false)
 {
     /* Supress AudioDevice reset from constructor. */
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    setProperty(style::Properties::kSliderFeatures, static_cast<int>(style::SliderFeature::FillingUp));
+    setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
 
     setWheelFactor(kMouseWheelFactor);
 
@@ -38,15 +40,17 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
         });
 }
 
-QnVolumeSlider::~QnVolumeSlider() {
-    return;
+QnVolumeSlider::~QnVolumeSlider()
+{
 }
 
-bool QnVolumeSlider::isMute() const {
+bool QnVolumeSlider::isMute() const
+{
     return nx::audio::AudioDevice::instance()->isMute();
 }
 
-void QnVolumeSlider::setMute(bool mute) {
+void QnVolumeSlider::setMute(bool mute)
+{
     nx::audio::AudioDevice::instance()->setMute(mute);
 
     setSliderPosition(qMax(
@@ -55,22 +59,25 @@ void QnVolumeSlider::setMute(bool mute) {
     ));
 }
 
-void QnVolumeSlider::stepBackward() {
+void QnVolumeSlider::stepBackward()
+{
     triggerAction(SliderPageStepSub);
 }
 
-void QnVolumeSlider::stepForward() {
+void QnVolumeSlider::stepForward()
+{
     triggerAction(SliderPageStepAdd);
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnVolumeSlider::sliderChange(SliderChange change) {
+void QnVolumeSlider::sliderChange(SliderChange change)
+{
     base_type::sliderChange(change);
 
-    if(change == SliderValueChange) {
+    if (change == SliderValueChange)
+    {
         qint64 value = this->value();
 
         if (!m_updating)
@@ -79,5 +86,19 @@ void QnVolumeSlider::sliderChange(SliderChange change) {
         setToolTip(
             nx::audio::AudioDevice::instance()->isMute() ? tr("Muted") : lit("%1%").arg(value));
     }
+}
+
+void QnVolumeSlider::setupShowAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::VolumeTooltipShow);
+}
+
+void QnVolumeSlider::setupHideAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::VolumeTooltipHide);
 }
 

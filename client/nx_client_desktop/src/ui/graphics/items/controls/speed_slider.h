@@ -52,6 +52,10 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
+    virtual bool calculateToolTipAutoVisibility() const override;
+    virtual void setupShowAnimator(VariantAnimator* animator) const override;
+    virtual void setupHideAnimator(VariantAnimator* animator) const override;
+
 protected slots:
     void restartSpeedAnimation();
 
