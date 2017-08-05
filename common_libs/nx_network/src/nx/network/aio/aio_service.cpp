@@ -18,12 +18,12 @@ namespace nx {
 namespace network {
 namespace aio {
 
-AIOService::AIOService(unsigned int threadCount)
+AIOService::AIOService(unsigned int aioThreadPollSize)
 {
-    if (!threadCount)
-        threadCount = QThread::idealThreadCount();
+    if (!aioThreadPollSize)
+        aioThreadPollSize = QThread::idealThreadCount();
 
-    initializeAioThreadPool(threadCount);
+    initializeAioThreadPool(aioThreadPollSize);
 }
 
 AIOService::~AIOService()
