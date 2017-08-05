@@ -71,7 +71,7 @@ TEST(aio, socketPolledNotification)
     std::this_thread::sleep_for(std::chrono::seconds(2));
     ASSERT_TRUE(socketAddedFlag);
     ASSERT_FALSE(handlerCalledFlag);
-    aioThread.stopMonitoring(&socket, aio::etRead, true);
+    aioThread.stopMonitoring(&socket, aio::etRead, true, nullptr);
 }
 
 class TestPollSet:

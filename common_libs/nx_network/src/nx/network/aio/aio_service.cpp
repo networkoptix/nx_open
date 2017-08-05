@@ -48,41 +48,13 @@ void AIOService::startMonitoring(
     boost::optional<std::chrono::milliseconds> timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
-    if (!timeoutMillis)
-    {
-        timeoutMillis = std::chrono::milliseconds::zero();
-        if (!getSocketTimeout(sock, eventToWatch, &(*timeoutMillis)))
-        {
-            post(
-                sock,
-                std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
-            return;
-        }
-    }
-
     auto aioThread = getSocketAioThread(sock);
-
-    if (sock->impl()->monitoredEvents[eventToWatch].isUsed)
-    {
-        if (sock->impl()->monitoredEvents[eventToWatch].timeout == timeoutMillis)
-            return;
-        sock->impl()->monitoredEvents[eventToWatch].timeout = timeoutMillis;
-        aioThread->changeSocketTimeout(
-            sock,
-            eventToWatch,
-            eventHandler,
-            timeoutMillis.get());
-    }
-    else
-    {
-        sock->impl()->monitoredEvents[eventToWatch].isUsed = true;
-        aioThread->startMonitoring(
-            sock,
-            eventToWatch,
-            eventHandler,
-            timeoutMillis.get(),
-            std::move(socketAddedToPollHandler));
-    }
+    aioThread->startMonitoring(
+        sock,
+        eventToWatch,
+        eventHandler,
+        timeoutMillis,
+        std::move(socketAddedToPollHandler));
 }
 
 void AIOService::stopMonitoring(
@@ -91,11 +63,6 @@ void AIOService::stopMonitoring(
     bool waitForRunningHandlerCompletion,
     nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
 {
-    if (sock->impl()->monitoredEvents[eventType].isUsed)
-        sock->impl()->monitoredEvents[eventType].isUsed = false;
-    else
-        return;
-
     auto aioThread = getSocketAioThread(sock);
     aioThread->stopMonitoring(
         sock,
@@ -116,15 +83,10 @@ void AIOService::registerTimer(
         timeoutMillis);
 }
 
-bool AIOService::isSocketBeingWatched(Pollable* sock) const
+bool AIOService::isSocketBeingWatched(Pollable* sock)
 {
-    for (const auto& monitoringContext: sock->impl()->monitoredEvents)
-    {
-        if (monitoringContext.isUsed)
-            return true;
-    }
-
-    return false;
+    auto* aioThread = getSocketAioThread(sock);
+    return aioThread->isSocketBeingWatched(sock);
 }
 
 void AIOService::post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler)
@@ -227,31 +189,6 @@ void AIOService::initializeAioThreadPool(unsigned int threadCount)
             continue;
         m_aioThreadPool.push_back(std::move(thread));
     }
-}
-
-bool AIOService::getSocketTimeout(
-    Pollable* const sock,
-    aio::EventType eventToWatch,
-    std::chrono::milliseconds* timeout)
-{
-    unsigned int sockTimeoutMS = 0;
-    if (eventToWatch == aio::etRead)
-    {
-        if (!sock->getRecvTimeout(&sockTimeoutMS))
-            return false;
-    }
-    else if (eventToWatch == aio::etWrite)
-    {
-        if (!sock->getSendTimeout(&sockTimeoutMS))
-            return false;
-    }
-    else
-    {
-        NX_ASSERT(false);
-        return false;
-    }
-    *timeout = std::chrono::milliseconds(sockTimeoutMS);
-    return true;
 }
 
 AIOThread* AIOService::findLeastUsedAioThread() const

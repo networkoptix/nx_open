@@ -96,7 +96,7 @@ public:
     /**
      * @returns true, if socket is still listened for state changes.
      */
-    bool isSocketBeingWatched(Pollable* sock) const;
+    bool isSocketBeingWatched(Pollable* sock);
 
     /**
      * Call handler from within aio thread sock is bound to.
