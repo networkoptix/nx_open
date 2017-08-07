@@ -63,7 +63,10 @@ void AIOService::stopMonitoring(
     bool waitForRunningHandlerCompletion,
     nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
 {
-    auto aioThread = getSocketAioThread(sock);
+    auto aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+    if (!aioThread)
+        return; //< Not bound to a thread. Socket is definitely not monitored.
+
     aioThread->stopMonitoring(
         sock,
         eventType,
@@ -85,7 +88,10 @@ void AIOService::registerTimer(
 
 bool AIOService::isSocketBeingMonitored(Pollable* sock)
 {
-    auto* aioThread = getSocketAioThread(sock);
+    auto aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+    if (!aioThread)
+        return false;
+
     return aioThread->isSocketBeingMonitored(sock);
 }
 
