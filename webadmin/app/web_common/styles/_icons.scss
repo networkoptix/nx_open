@@ -84,11 +84,21 @@
   }
 }
 
-.glyphicon-th-list{
-  @include kill-glyphicon;
-  top: 4px !important;
+.glyphicon-server-active,
+.glyphicon-server-offline
+{
+  @include icon;
+  top: 7px !important;
+  height: 22px;
+  width: 22px;
+}
+.glyphicon-server-active{
   background-position: -1px -170px;
 }
+.glyphicon-server-offline{
+  background-position: -50px -170px
+}
+
 
 .glyphicon-search{
   @include kill-glyphicon;
