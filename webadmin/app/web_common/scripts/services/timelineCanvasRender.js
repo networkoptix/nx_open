@@ -458,6 +458,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     var chunkLoadingTexture = false;
     var chunkLoadingTextureImg = false;
+    var chunkLoadingTextureSize = 0;
     function drawEvent(context, chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
         var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
@@ -504,8 +505,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     img.onload = function () {
                         chunkLoadingTexture = context.createPattern(img, 'repeat');
                         context.fillStyle = chunkLoadingTexture;
+                        chunkLoadingTextureSize = this.width;
                     };
-                    img.src = Config.viewsDirCommon + '../images/chunkloading.png';
+                    img.src = Config.viewsDirCommon + '../images/timeline-loading@2x.png';
                     chunkLoadingTextureImg = img;
                 }
                 context.fillStyle = blurColor(timelineConfig.loadingChunkColor,1);
@@ -515,7 +517,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             var start = self.scaleManager.lastMinute();
             var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start);
             
-            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize);
+            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize);
 
             context.save();
             context.translate(offset_x, 0);
@@ -534,6 +536,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     var lastMinuteTexture = false;
     var lastMinuteTextureImg = false;
+    var lastMinuteTextureSize = 0;
     function drawLastMinute(context){
         // 1. Get start coordinate for last minute
         var end = self.scaleManager.end;
@@ -553,6 +556,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 img.onload = function () {
                     lastMinuteTexture = context.createPattern(img, 'repeat');
                     context.fillStyle = lastMinuteTexture;
+                    lastMinuteTextureSize = this.width;
                 };
                 img.src = Config.viewsDirCommon + '../images/lastminute.png';
                 lastMinuteTextureImg = img;
@@ -567,7 +571,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
         var height = timelineConfig.chunkHeight * self.canvas.height;
 
-        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize;
+        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize;
 
         context.save();
         context.translate(offset_x, 0);
