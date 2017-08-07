@@ -37,18 +37,18 @@ angular.module('nxCommon')
 
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
-                        'preview': 'http://{{host}}/ec2/cameraThumbnail?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
-                        'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
-                        'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
-                        'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
-                        'webm':'http://{{host}}/media/{{physicalId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
-                        'mjpeg':'http://{{host}}/media/{{physicalId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
-                        'download':'http://{{host}}/hls/{{physicalId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
+                        'preview': 'http://{{host}}/ec2/cameraThumbnail?cameraId={{cameraId}}{{previewPosition}}{{auth}}',
+                        'hls':'http://{{host}}/hls/{{cameraId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
+                        'rtsp':'rtsp://{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}{{auth}}',
+                        'transrtsp':'rtsp://{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
+                        'webm':'http://{{host}}/media/{{cameraId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
+                        'mjpeg':'http://{{host}}/media/{{cameraId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
+                        'download':'http://{{host}}/hls/{{cameraId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
 
                     return linkTemplates[transport].
                         replace("{{host}}", window.location.host).
-                        replace("{{physicalId}}", camera.physicalId).
+                        replace("{{cameraId}}", camera.id.replace('{','').replace('}','')).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
                         replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
