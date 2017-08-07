@@ -36,7 +36,8 @@ void initialize(
             fileSettings.size = settings.maxFileSize;
             fileSettings.count = settings.maxBackupCount;
             fileSettings.name = settings.directory.isEmpty()
-                ? baseName : (settings.directory + lit("/") + baseName);
+                ? baseName
+                : (settings.directory + lit("/") + baseName);
 
             logger->setWriter(std::make_unique<File>(fileSettings));
         }
