@@ -56,7 +56,7 @@ function TimelineConfig(){
 
         zoomSpeed: 0.025, // Zoom speed for dblclick
         zoomAccuracyMs: 5000, // 5 seconds - accuracy for zoomout
-        slowZoomSpeed: 0.01, // Zoom speed for holding buttons
+        slowZoomSpeed: 0.02, // Zoom speed for holding buttons
         maxVerticalScrollForZoom: 250, // value for adjusting zoom
         maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
         animationDuration: 400, // 300, // 200-400 for smooth animation
