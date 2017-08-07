@@ -89,29 +89,26 @@ void AIOThread::stopMonitoring(
     QnMutexLocker lock(&m_taskQueue->mutex);
 
     if (sock->impl()->monitoredEvents[eventType].isUsed)
+    {
         sock->impl()->monitoredEvents[eventType].isUsed = false;
+        stopMonitoringInternal(
+            &lock,
+            sock,
+            eventType,
+            waitForRunningHandlerCompletion,
+            std::move(pollingStoppedHandler));
+    }
     else
-        return;
-
-    stopMonitoringInternal(
-        &lock,
-        sock,
-        eventType,
-        waitForRunningHandlerCompletion,
-        std::move(pollingStoppedHandler));
+    {
+        if (pollingStoppedHandler)
+            post(lock, nullptr, std::move(pollingStoppedHandler));
+    }
 }
 
 void AIOThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
-
-    m_taskQueue->addTask(
-        detail::PostAsyncCallTask(
-            sock,
-            std::move(functor)));
-    // If eventTriggered is lower on stack, socket will be added to pollset before the next poll call.
-    if (currentThreadSystemId() != systemThreadId())
-        m_taskQueue->pollSet->interrupt();
+    post(lock, sock, std::move(functor));
 }
 
 void AIOThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
@@ -421,6 +418,20 @@ void AIOThread::changeSocketTimeout(
         nullptr,
         std::move(socketAddedToPollHandler)));
     // If eventTriggered call is down the stack, socket will be added to pollset before next poll call.
+    if (currentThreadSystemId() != systemThreadId())
+        m_taskQueue->pollSet->interrupt();
+}
+
+void AIOThread::post(
+    const QnMutexLockerBase& /*lock*/,
+    Pollable* const sock,
+    nx::utils::MoveOnlyFunc<void()> functor)
+{
+    m_taskQueue->addTask(
+        detail::PostAsyncCallTask(
+            sock,
+            std::move(functor)));
+    // If eventTriggered is lower on stack, socket will be added to pollset before the next poll call.
     if (currentThreadSystemId() != systemThreadId())
         m_taskQueue->pollSet->interrupt();
 }

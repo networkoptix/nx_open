@@ -78,7 +78,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     --newReadMonitorTaskCount;
                 else if (task.eventType == aio::etWrite)
                     --newWriteMonitorTaskCount;
-                addSockToPollset(
+                addSocketToPollset(
                     task.socket,
                     task.eventType,
                     task.timeout,
@@ -130,7 +130,9 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     }
                 }
                 else if (handlingData->data->timeout > 0)  //&& timeout == 0
+                {
                     handlingData->data->updatedPeriodicTaskClock = -1;  //cancelling existing periodic task (there must be one)
+                }
                 handlingData->data->timeout = task.timeout;
                 break;
             }
@@ -179,38 +181,40 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
     }
 }
 
-void AioTaskQueue::addSockToPollset(
+void AioTaskQueue::addSocketToPollset(
     Pollable* socket,
     aio::EventType eventType,
     int timeout,
     AIOEventHandler* eventHandler)
 {
-    std::unique_ptr<AioEventHandlingDataHolder> handlingData(new AioEventHandlingDataHolder(eventHandler));
+    auto handlingData = std::make_unique<AioEventHandlingDataHolder>(eventHandler);
     bool failedToAddToPollset = false;
     if (eventType != aio::etTimedOut)
     {
         if (!pollSet->add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-            failedToAddToPollset = true;
             NX_LOG(lm("Failed to add %1 to pollset. %2")
                 .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
+
+            socket->impl()->monitoredEvents[eventType].isUsed = false;
+            socket->impl()->monitoredEvents[eventType].timeout = boost::none;
+
+            m_postedCalls.push_back(
+                PostAsyncCallTask(
+                    socket,
+                    [eventHandler, socket]()
+                    {
+                        eventHandler->eventTriggered(socket, aio::etError);
+                    }));
+            return;
         }
     }
-    socket->impl()->monitoredEvents[eventType].userData = handlingData.get();
 
-    if (failedToAddToPollset)
+    socket->impl()->monitoredEvents[eventType].userData = handlingData.get();
+    if (timeout > 0)
     {
-        m_postedCalls.push_back(
-            PostAsyncCallTask(
-                socket,
-                [eventHandler, socket](){
-                    eventHandler->eventTriggered(socket, aio::etError);
-                }));
-    }
-    else if (timeout > 0)
-    {
-        //adding periodic task associated with socket
+        // Adding periodic task associated with socket.
         handlingData->data->timeout = timeout;
         addPeriodicTask(
             getSystemTimerVal() + timeout,

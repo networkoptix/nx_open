@@ -65,7 +65,11 @@ void AIOService::stopMonitoring(
 {
     auto aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
     if (!aioThread)
+    {
+        if (pollingStoppedHandler)
+            post(std::move(pollingStoppedHandler));
         return; //< Not bound to a thread. Socket is definitely not monitored.
+    }
 
     aioThread->stopMonitoring(
         sock,

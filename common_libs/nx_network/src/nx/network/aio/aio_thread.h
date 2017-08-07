@@ -125,6 +125,11 @@ private:
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>());    
+
+    void post(
+        const QnMutexLockerBase& /*lock*/,
+        Pollable* const sock,
+        nx::utils::MoveOnlyFunc<void()> functor);
 };
 
 } // namespace aio
