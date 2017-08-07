@@ -24,7 +24,7 @@ public:
     /**
     * @brief Human readable object type (line crossing | human detected | etc)
     */
-    NX_ASCII char* kindName;
+    GUID eventTypeId;
 
     /**
     * @brief Level of confidence in range (0..1]

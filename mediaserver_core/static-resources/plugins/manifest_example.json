@@ -14,7 +14,7 @@
     "supportedPixelFormats": ["YUV_444"],
     "outputEventTypes": [
         {
-            "eventId": "{59306203-F37F-44D5-ACC4-1AE9CAA7CBCB}",
+            "eventTypeId": "{59306203-F37F-44D5-ACC4-1AE9CAA7CBCB}",
             "eventName": {
                 "value": "Line crossing",
                 "localization": {
@@ -24,7 +24,7 @@
             }
         },
         {
-            "eventId": "{AC08F9B9-FB06-4D81-886B-C81EA5009933}",
+            "eventTypeId": "{AC08F9B9-FB06-4D81-886B-C81EA5009933}",
             "eventName": {
                 "value": "Object in the area",
                 "localization": {
