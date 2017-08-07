@@ -30,7 +30,7 @@
                     </span>
                 </div>
                 <div class="hide-excess-text">
-                    <span class="glyphicon glyphicon-th-list"></span>
+                    <span class="glyphicon" ng-class="server.status == 'Online' ? 'glyphicon-server-active' : 'glyphicon-server-offline'"></span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>
             </a>
