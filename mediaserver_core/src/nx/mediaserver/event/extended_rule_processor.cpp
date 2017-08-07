@@ -189,6 +189,8 @@ struct EmailAttachmentData
                 templatePath = lit(":/email_templates/backup_finished.mustache");
                 imageName = lit("server.png");
                 break;
+            // TODO: #GDM #analytics Generate a separate template involving correct name from the driver
+            case vms::event::analyticsSdkEvent:
             case vms::event::userDefinedEvent:
                 templatePath = lit(":/email_templates/generic_event.mustache");
                 imageName = lit("server.png");
@@ -808,6 +810,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
+        // TODO: #GDM #analytics Generate a separate template involving correct name from the driver
+        case vms::event::analyticsSdkEvent:
         case vms::event::userDefinedEvent:
         {
             auto metadata = action->getRuntimeParams().metadata;

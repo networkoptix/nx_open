@@ -126,6 +126,9 @@ enum EventType
     /** Software triggers. */
     softwareTriggerEvent = 12,
 
+    /** Analytics SDK. */
+    analyticsSdkEvent = 13,
+
     /** System health message. */
     systemHealthEvent = 500,
 

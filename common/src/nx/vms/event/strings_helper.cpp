@@ -91,6 +91,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case serverStartEvent:     return tr("Server Started");
         case licenseIssueEvent:    return tr("License Issue");
         case backupFinishedEvent:  return tr("Archive backup finished");
+        case analyticsSdkEvent:    return tr("Analytics Event");
 
         case anyServerEvent:       return tr("Any Server Issue");
         case anyEvent:             return tr("Any Event");
@@ -193,6 +194,10 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
 
+        case analyticsSdkEvent:
+            // TODO: #GDM #analytics Get event type from the driver.
+            return tr("Analytics Event at %1").arg(resourceName);
+
         default:
             return tr("An unknown event has occurred");
     }
@@ -238,7 +243,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     if (!sourceText.isEmpty())
         result << tr("Source: %1").arg(sourceText);
 
-    if (eventType >= userDefinedEvent)
+    if (eventType >= userDefinedEvent || eventType == analyticsSdkEvent)
     {
         if (!params.caption.isEmpty())
             result << tr("Caption: %1").arg(params.caption);
@@ -318,6 +323,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
         case serverStartEvent:
             break;
 
+        case analyticsSdkEvent:
         case userDefinedEvent:
             if (!params.description.isEmpty())
                 result << params.description;
