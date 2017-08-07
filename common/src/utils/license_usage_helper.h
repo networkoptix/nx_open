@@ -173,9 +173,6 @@ protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    void initWatcher(const QnVirtualCameraResourcePtr& camera = QnVirtualCameraResourcePtr());
-
-private:
     QnCamLicenseUsageWatcher* m_watcher{nullptr};
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;

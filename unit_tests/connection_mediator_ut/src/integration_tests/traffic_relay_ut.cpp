@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/stun/async_client.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 
 #include <test_support/mediaserver_emulator.h>
@@ -138,7 +139,8 @@ private:
         m_systemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
 
         m_stunClient = std::make_shared<nx::stun::AsyncClient>();
-        m_stunClient->connect(stunEndpoint());
+        m_stunClient->connect(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
         m_serverConnection = 
             std::make_unique<api::MediatorServerTcpConnection>(m_stunClient, this);
 

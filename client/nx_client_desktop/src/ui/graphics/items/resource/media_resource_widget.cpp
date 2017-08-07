@@ -1311,8 +1311,6 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     const QRectF& channelRect,
     const QRectF& paintRect)
 {
-    const auto& transform = painter->transform();
-    const auto type = transform.type();
     const QRectF sourceSubRect = toSubRect(channelRect, paintRect);
 
     Qn::RenderStatus result = Qn::NothingRendered;

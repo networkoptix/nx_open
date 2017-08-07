@@ -29,14 +29,23 @@
       "url": "/content/about",
       "translatable": true,
       "values":[
-        ["static/images/promo/cloud.png", "", "Image for front page", "Image"],
-        ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
-        ["%BLOCK1_TITLE%","Connect from Anywhere"],
-        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password","","Long Text"],
-        ["%BLOCK2_TITLE%","Simple User Management"],
-        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles","","Long Text"],
-        ["%BLOCK3_TITLE%","Multiple System Management"],
-        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management","","Long Text"]
+        ["static/images/promo/cloud.png", "",
+          "Image for the front page. Image must have transparent background, recommended height is 200px (that is minimal height).",
+          "Image", {"height_ge": 200}],
+        ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}",
+          "One line (50-100 symbols)"],
+        ["%BLOCK1_TITLE%","Connect from Anywhere",
+          "1-3 words"],
+        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password",
+          "8-10 words","Long Text"],
+        ["%BLOCK2_TITLE%","Simple User Management",
+          "1-3 words"],
+        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles",
+          "8-10 words","Long Text"],
+        ["%BLOCK3_TITLE%","Multiple System Management",
+          "1-3 words"],
+        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management",
+          "8-10 words","Long Text"]
       ]
     },
     {

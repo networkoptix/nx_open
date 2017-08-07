@@ -4,9 +4,11 @@ import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Items.LiteClient 1.0
 import com.networkoptix.qml 1.0
 
 import "../private/VideoScreen"
+import "private/VideoScreen"
 
 PageBase
 {
@@ -14,7 +16,7 @@ PageBase
     objectName: "videoScreen"
 
     property alias resourceId: videoScreenController.resourceId
-    property alias initialScreenshot: screenshot.source
+    property string initialScreenshot
     property LiteClientLayoutHelper layoutHelper: null
     property QnCameraListModel camerasModel: null
 
@@ -33,7 +35,9 @@ PageBase
 
         mediaPlayer.onSourceChanged:
         {
-            if (mediaPlayer.source)
+            video.clear()
+
+            if (mediaPlayer.source && !transformationsWarningLoader.active)
                 mediaPlayer.playLive()
             else
                 mediaPlayer.stop()
@@ -51,6 +55,13 @@ PageBase
                 d.showOfflineStatus = false
             }
         }
+    }
+
+    QnThumbnailCacheAccessor
+    {
+        id: thumbnailCacheAccessor
+        resourceId: videoScreen.resourceId
+        onResourceIdChanged: refreshThumbnail()
     }
 
     Object
@@ -89,6 +100,21 @@ PageBase
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
         visible: status == Image.Ready
+        source: thumbnailCacheAccessor.thumbnailUrl
+    }
+
+    WheelSwitchArea
+    {
+        anchors.fill: parent
+        onPreviousRequested: previousCameraRequested()
+        onNextRequested: nextCameraRequested()
+        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        onDoubleClicked: Workflow.popCurrentScreen()
     }
 
     Loader
@@ -113,37 +139,25 @@ PageBase
         id: noCameraDummyLoader
         anchors.fill: parent
         visible: active
-        sourceComponent: Rectangle
+        sourceComponent: SelectCameraDummy {}
+        active: resourceId === ""
+    }
+
+    Loader
+    {
+        id: transformationsWarningLoader
+        anchors.fill: parent
+        visible: active
+        active: false
+
+        sourceComponent: TransformationsNotSupportedWarning
         {
-            color: ColorTheme.base3
-
-            Column
+            onCloseClicked:
             {
-                width: parent.width
-                anchors.centerIn: parent
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Select camera")
-                    color: ColorTheme.base13
-                    font.pixelSize: 24
-                    font.capitalization: Font.AllUppercase
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
-                    color: ColorTheme.base13
-                    font.pixelSize: 11
-                    wrapMode: Text.WordWrap
-                }
+                transformationsWarningLoader.active = false
+                videoScreenController.start()
             }
         }
-
-        active: resourceId == ""
     }
 
     Keys.onPressed:
@@ -168,34 +182,36 @@ PageBase
         }
     }
 
-    WheelSwitchArea
-    {
-        anchors.fill: parent
-        onPreviousRequested: previousCameraRequested()
-        onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
-    }
-
-    MouseArea
-    {
-        anchors.fill: parent
-        onDoubleClicked: Workflow.popCurrentScreen()
-    }
-
-    onResourceIdChanged: video.clear()
-
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
+        showTransformationsWarningIfNeeded()
     }
     onPreviousCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+        showTransformationsWarningIfNeeded()
     }
 
     onActivePageChanged:
     {
-        if (activePage)
+        if (activePage && !transformationsWarningLoader.active)
             videoScreenController.start()
+    }
+
+    onResourceIdChanged: hideTransformationsWarning()
+
+    function hideTransformationsWarning()
+    {
+        transformationsWarningLoader.active = false
+    }
+
+    function showTransformationsWarningIfNeeded()
+    {
+        transformationsWarningLoader.active =
+            resourceId !== ""
+                && !d.cameraWarningVisible
+                && (videoScreenController.resourceHelper.customRotation !== 0
+                    || videoScreenController.resourceHelper.customAspectRatio !== 0.0)
     }
 }

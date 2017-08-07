@@ -390,10 +390,6 @@
 <context>
     <name>QnLicense</name>
     <message>
-        <source>Trial</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Analog</source>
         <translation></translation>
     </message>
@@ -423,10 +419,6 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trial Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -475,6 +467,14 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Licenses</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -651,10 +651,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Trial License</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation type="unfinished"></translation>
     </message>
@@ -668,6 +664,10 @@
     </message>
     <message>
         <source>Hardware Id: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

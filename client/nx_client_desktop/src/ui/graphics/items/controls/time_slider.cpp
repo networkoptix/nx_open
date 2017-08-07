@@ -38,6 +38,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topics.h>
 
@@ -703,44 +704,51 @@ bool QnTimeSlider::isWindowBeingDragged() const
 
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
 {
-    const auto bookmarksAtLocationFunc = [this](qint64 location) -> QnCameraBookmarkList
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
-            location = valueFromPosition(QPointF(location, 0));
-
-        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel)
-            : QnCameraBookmarkList());
-    };
-
-    const auto getPosFunc = [this](qint64 location) -> QnBookmarksViewer::PosAndBoundsPair
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
+    const auto bookmarksAtLocationFunc =
+        [this](qint64 location)
         {
-            if (location >= rect().width())
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
-        else
+            if (!m_bookmarksHelper)
+                return QnCameraBookmarkList();
+
+            if (m_options.testFlag(StillBookmarksViewer))
+                location = valueFromPosition(QPointF(location, 0));
+
+            static const auto searchOptions = QnBookmarkMergeHelper::OnlyTopmost
+                | QnBookmarkMergeHelper::ExpandArea;
+
+            return m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel, searchOptions);
+        };
+
+    const auto getPosFunc =
+        [this](qint64 location)
         {
-            if (!windowContains(location))
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
+            if (m_options.testFlag(StillBookmarksViewer))
+            {
+                if (location >= rect().width())
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
+            else
+            {
+                if (!windowContains(location))
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
 
-        const auto viewer = bookmarksViewer();
+            const auto viewer = bookmarksViewer();
 
-        qreal pos = m_options.testFlag(StillBookmarksViewer) ?
-            static_cast<qreal>(location) :
-            positionFromValue(location).x();
+            qreal pos = m_options.testFlag(StillBookmarksViewer) ?
+                static_cast<qreal>(location) :
+                positionFromValue(location).x();
 
-        const auto target = QPointF(pos, lineBarRect().top());
+            const auto target = QPointF(pos, lineBarRect().top());
 
-        Q_D(const GraphicsSlider);
+            Q_D(const GraphicsSlider);
 
-        const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
-        const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
-        const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
-        const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
-        return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
-    };
+            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
+        };
 
     return new QnBookmarksViewer(bookmarksAtLocationFunc, getPosFunc, this);
 }
@@ -842,6 +850,20 @@ void QnTimeSlider::enumerateSteps(QVector<QnTimeStep>& steps)
 {
     for (int i = 0; i < steps.size(); i++)
         steps[i].index = i;
+}
+
+void QnTimeSlider::setupShowAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipShow);
+}
+
+void QnTimeSlider::setupHideAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipHide);
 }
 
 void QnTimeSlider::invalidateWindow()
@@ -1188,7 +1210,7 @@ QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* loader, qreal aspectRatio)
 {
-    if (m_thumbnailsLoader.data() == loader)
+    if (m_thumbnailsLoader.data() == loader && qFuzzyEquals(m_thumbnailsAspectRatio, aspectRatio))
         return;
 
     clearThumbnails();
@@ -2796,16 +2818,12 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
-    qint64 hoverValue = valueFromPosition(m_hoverMousePos, false);
-    int hoveredBookmarkItem = -1;
+    qint64 hoverValueMs = valueFromPosition(m_hoverMousePos, false);
 
-    /* Find the topmost (the latest) hovered bookmark: */
-    for (int i = 0; i < bookmarks.size(); ++i)
-    {
-        const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
-        if (hoverValue >= bookmarkItem.startTimeMs() && hoverValue <= bookmarkItem.endTimeMs())
-            hoveredBookmarkItem = i;
-    }
+    int hoveredBookmarkItem = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
+        hoverValueMs,
+        m_msecsPerPixel,
+        QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
 
     /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)

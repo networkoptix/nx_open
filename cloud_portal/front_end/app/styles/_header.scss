@@ -113,7 +113,7 @@ $header-collapsing-width-1: 1px;
                 padding-right:0;
 
                 border-bottom: $active-border-width solid $brand_core;
-                padding-bottom: $vertical-spacing - $active-border-width;
+                padding-bottom: $vertical-spacing - $active-border-width + 1px;
                 &:hover{
                     background-color: transparent !important;
                 }

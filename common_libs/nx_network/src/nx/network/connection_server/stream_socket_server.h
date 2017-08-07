@@ -93,6 +93,14 @@ public:
         m_connections.emplace(connection.get(), std::move(connection));
     }
 
+    template<typename Func>
+    void forEachConnection(Func func)
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (const auto& connection: m_connections)
+            func(connection.first);
+    }
+
 private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;

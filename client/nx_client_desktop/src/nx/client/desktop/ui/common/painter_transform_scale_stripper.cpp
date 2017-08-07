@@ -16,7 +16,9 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
     m_type(m_originalTransform.type())
 {
     /* 1. The simplest case: only translate & scale. */
-    if (m_type <= QTransform::TxScale)
+    if (m_type <= QTransform::TxScale
+        && m_originalTransform.m11() > 0
+        && m_originalTransform.m22() > 0)
     {
         m_transform = m_originalTransform;
         painter->setTransform(QTransform());
@@ -65,6 +67,11 @@ QRectF PainterTransformScaleStripper::mapRect(const QRectF& rect) const
         return m_transform.mapRect(rect).toAlignedRect();
 
     return m_transform.mapRect(rect);
+}
+
+const QTransform& PainterTransformScaleStripper::transform() const
+{
+    return m_transform;
 }
 
 } // namespace ui

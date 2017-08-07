@@ -556,10 +556,12 @@ void ActionHandler::submitDelayedDrops()
 
     for (const auto& data: m_delayedDrops)
     {
-        for (const auto& tour: layoutTourManager()->tours(data.entities()))
+        MimeData mimeData = MimeData::deserialized(data, resourcePool());
+
+        for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
             tours.push_back(tour);
 
-        resources.append(data.resources());
+        resources.append(mimeData.resources());
     }
 
     m_delayedDrops.clear();
@@ -1019,9 +1021,7 @@ void ActionHandler::at_delayedDropResourcesAction_triggered()
 {
     QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
         Qn::SerializedDataRole);
-    MimeData mimeData = MimeData::deserialized(data, resourcePool());
-
-    m_delayedDrops.push_back(mimeData);
+    m_delayedDrops.push_back(data);
 
     submitDelayedDrops();
 }

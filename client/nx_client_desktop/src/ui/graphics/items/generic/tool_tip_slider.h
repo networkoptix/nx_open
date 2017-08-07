@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QBasicTimer>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
@@ -16,50 +16,67 @@ class QnToolTipSliderAnimationListener;
 /**
  * Graphics slider that shows a balloon-shaped tooltip on top of its handle.
  */
-class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable {
-    Q_OBJECT;
+class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable
+{
+    Q_OBJECT
 
-    typedef Animated<GraphicsSlider> base_type;
+    using base_type = Animated<GraphicsSlider>;
 
 public:
-    explicit QnToolTipSlider(QGraphicsItem *parent = NULL);
-
+    explicit QnToolTipSlider(QGraphicsItem* parent = nullptr);
     virtual ~QnToolTipSlider();
 
-    QnToolTipWidget *toolTipItem() const;
-    void setToolTipItem(QnToolTipWidget *toolTipItem);
+    /**
+     * Item to display tooltip. Note: this class takes ownership of an item.
+     */
+    QnToolTipWidget* toolTipItem() const;
+    void setToolTipItem(QnToolTipWidget* toolTipItem);
 
+    /**
+     * Auto-hide behavior (enabled by default). Working the following way: once a certain event
+     * is triggered (by default: hover enter, hover leave), ::calculateToolTipAutoVisibility() is
+     * called. If value differs from the last calculated, tooltip is displayed or hidden. Before
+     * each animation setupShowAnimator() or setupHideAnimator() functions are called.
+     * Also tooltip is displayed for some time if slider value was changed recently (2500ms).
+     */
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);
 
     qreal tooltipMargin() const;
     void setTooltipMargin(qreal margin);
 
-    virtual bool eventFilter(QObject *target, QEvent *event) override;
+    virtual bool eventFilter(QObject* target, QEvent* event) override;
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
 
     void hideToolTip(bool animated = true);
     void showToolTip(bool animated = true);
 
     void setToolTipEnabled(bool enabled);
 
-    int toolTipHideDelayMs() const;
-    void setToolTipHideDelayMs(int delayMs);
-
-protected :
+protected:
     virtual void sliderChange(SliderChange change) override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    virtual void timerEvent(QTimerEvent *event) override;
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent* event) override;
+    virtual void timerEvent(QTimerEvent* event) override;
 
-    virtual QString toolTipAt(const QPointF &pos) const override;
-    virtual bool showOwnTooltip(const QPointF &pos) override;
+    virtual QString toolTipAt(const QPointF& pos) const override;
+    virtual bool showOwnTooltip(const QPointF& pos) override;
+
+    virtual void setupShowAnimator(VariantAnimator* animator) const = 0;
+    virtual void setupHideAnimator(VariantAnimator* animator) const = 0;
+
+    /**
+     * Function to handle auto-hide behavior.
+     */
+    virtual bool calculateToolTipAutoVisibility() const;
+    void updateToolTipAutoVisibility();
 
 private:
-    void updateToolTipVisibility();
     Q_SLOT void updateToolTipPosition();
     void updateToolTipOpacity();
     void updateToolTipText();
@@ -71,15 +88,16 @@ private:
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
     QPointer<QnToolTipWidget> m_tooltipWidget;
     VariantAnimator* m_tooltipWidgetVisibilityAnimator;
-    qreal m_tooltipWidgetVisibility;
-    QBasicTimer m_hideTimer;
-    bool m_autoHideToolTip;
-    bool m_sliderUnderMouse;
-    bool m_toolTipUnderMouse;
-    bool m_pendingPositionUpdate;
-    bool m_instantPositionUpdate;
+    qreal m_tooltipWidgetVisibility = 0.0;
+    bool m_autoHideToolTip = true;
+    bool m_toolTipAutoVisible = false; //< Last value of auto-hide calculation.
+    int m_toolTipAutoHideTimerId = 0;
+    QElapsedTimer m_lastSliderChangeTime;
+    bool m_sliderUnderMouse = false;
+    bool m_toolTipUnderMouse = false;
+    bool m_pendingPositionUpdate = false;
+    bool m_instantPositionUpdate = false;
     QPointF m_dragOffset;
-    qreal m_tooltipMargin;
-    bool m_toolTipEnabled;
-    int m_toolTipHideDelayMs;
+    qreal m_tooltipMargin = 0.0;
+    bool m_toolTipEnabled = true;
 };

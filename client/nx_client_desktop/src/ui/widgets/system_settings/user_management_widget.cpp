@@ -341,27 +341,32 @@ void QnUserManagementWidget::applyChanges()
             modifiedUsers << user;
         }
     }
-    qnResourcesChangesManager->saveUsers(modifiedUsers);
+
+    if (!modifiedUsers.empty())
+        qnResourcesChangesManager->saveUsers(modifiedUsers);
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (nx::client::desktop::ui::messages::Resources::deleteResources(this, usersToDelete))
+    if (!usersToDelete.empty())
     {
-        qnResourcesChangesManager->deleteResources(usersToDelete,
-            [this, guard = QPointer<QnUserManagementWidget>(this)](bool success)
-            {
-                if (guard)
+        if (messages::Resources::deleteResources(this, usersToDelete))
+        {
+            qnResourcesChangesManager->deleteResources(usersToDelete,
+                [this, guard = QPointer<QnUserManagementWidget>(this)](bool success)
                 {
-                    setEnabled(true);
-                    emit hasChangesChanged();
-                }
-            });
+                    if (guard)
+                    {
+                        setEnabled(true);
+                        emit hasChangesChanged();
+                    }
+                });
 
-        setEnabled(false);
-        emit hasChangesChanged();
-    }
-    else
-    {
-        m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
+            setEnabled(false);
+            emit hasChangesChanged();
+        }
+        else
+        {
+            m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
+        }
     }
 }
 

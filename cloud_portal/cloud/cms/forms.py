@@ -24,8 +24,14 @@ class CustomContextForm(forms.Form):
 
             ds_description = data_structure.description
 
+            ds_language = language
+            if not data_structure.translatable:
+                if context.translatable:
+                    ds_description += "<br>This record is the same for every language."
+                ds_language = None
+
             latest_record = data_structure.datarecord_set.filter(
-                customization=customization, language=language)
+                customization=customization, language=ds_language)
 
             record_value = latest_record.latest('created_date').value\
                 if latest_record.exists() else data_structure.default

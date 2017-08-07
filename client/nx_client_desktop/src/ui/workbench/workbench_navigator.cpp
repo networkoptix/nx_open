@@ -1124,7 +1124,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
             updateItemDataFromSlider(m_currentWidget);
         }
 
-        disconnect(m_currentWidget->resource(), nullptr, this, nullptr);
+        m_currentWidget->disconnect(this);
+        m_currentWidget->resource()->disconnect(this);
         connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     }
     else
@@ -1148,7 +1149,12 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     }
 
     if (m_currentWidget)
-        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
+    {
+        connect(m_currentWidget, &QnMediaResourceWidget::aspectRatioChanged, this,
+            &QnWorkbenchNavigator::updateThumbnailsLoader);
+        connect(m_currentWidget->resource(), &QnResource::nameChanged, this,
+            &QnWorkbenchNavigator::updateLines);
+    }
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;

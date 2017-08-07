@@ -19,8 +19,8 @@ class Product(models.Model):
 class Context(models.Model):
 
     class Meta:
-        verbose_name = 'Content page'
-        verbose_name_plural = 'Content pages'
+        verbose_name = 'page'
+        verbose_name_plural = 'pages'
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
@@ -51,7 +51,7 @@ class DataStructure(models.Model):
     description = models.TextField()
 
     type = models.IntegerField(choices=DATA_TYPES, default=0)
-    default = models.CharField(max_length=1024, default='')
+    default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
 
@@ -88,6 +88,8 @@ class Customization(models.Model):
 class ContentVersion(models.Model):
 
     class Meta:
+        verbose_name = 'revision'
+        verbose_name_plural = 'revisions'
         permissions = (
             ("publish_version", "Can publish content to production"),
         )
@@ -111,7 +113,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    language = models.ForeignKey(Language, null=True)
+    language = models.ForeignKey(Language, null=True, blank=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
@@ -129,3 +131,10 @@ class DataRecord(models.Model):
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
+
+
+    def save(self, *args, **kwargs):
+        if not self.data_structure.translatable:
+            self.language = None
+
+        super(DataRecord, self).save(*args, **kwargs)

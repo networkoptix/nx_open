@@ -12,6 +12,7 @@ Pane
     property alias buttonText: button.text
     property alias image: image.source
     property bool compact: height < 540
+    property bool centered: false
 
     signal buttonClicked()
 
@@ -28,7 +29,7 @@ Pane
         Column
         {
             width: parent.width
-            y: (parent.height - height) / 4
+            y: (parent.height - height) / (centered ? 2 : 4)
 
             Image
             {

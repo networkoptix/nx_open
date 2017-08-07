@@ -197,7 +197,7 @@ void QnFlatCameraDataLoader::trace(const QString& message)
         return;
 
     QString name = m_resource ? m_resource->getName() : lit("_invalid_camera_");
-    NX_LOG(lit("Chunks: (%1) %2").arg(name).arg(message), cl_logDEBUG1);
+    NX_VERBOSE(this, lm("Chunks: (%1) %2").arg(name).arg(message));
 }
 
 QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():

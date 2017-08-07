@@ -5,6 +5,7 @@ import Nx.Media 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Items.LiteClient 1.0
 import com.networkoptix.qml 1.0
 
 Control
@@ -30,6 +31,39 @@ Control
         id: resourceHelper
     }
 
+    QnThumbnailCacheAccessor
+    {
+        id: thumbnailCacheAccessor
+        resourceId: cameraItem.resourceId
+        onResourceIdChanged: refreshTimer.restart()
+    }
+
+    Timer
+    {
+        id: refreshTimer
+
+        readonly property int initialLoadDelay: 400
+        readonly property int reloadDelay: 60 * 1000
+
+        interval: initialLoadDelay
+        repeat: true
+        running: active
+            && resourceId !== ""
+            && connectionManager.connectionState === QnConnectionManager.Ready
+
+        onTriggered:
+        {
+            interval = reloadDelay
+            thumbnailCacheAccessor.refreshThumbnail()
+        }
+
+        onRunningChanged:
+        {
+            if (!running)
+                interval = initialLoadDelay
+        }
+    }
+
     QtObject
     {
         id: d
@@ -47,7 +81,7 @@ Control
 
     contentItem: Rectangle
     {
-        id: thumbnailContainer
+        id: mainContainer
 
         width: parent.availableWidth
         height: parent.availableHeight
@@ -123,37 +157,10 @@ Control
     {
         id: noCameraComponent
 
-        Rectangle
+        SelectCameraDummy
         {
             width: cameraItem.width
             height: cameraItem.height
-
-            color: ColorTheme.base3
-
-            Column
-            {
-                width: parent.width
-                anchors.centerIn: parent
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Select camera")
-                    color: ColorTheme.base13
-                    font.pixelSize: 24
-                    font.capitalization: Font.AllUppercase
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
-                    color: ColorTheme.base13
-                    font.pixelSize: 11
-                    wrapMode: Text.WordWrap
-                }
-            }
         }
     }
 
@@ -163,30 +170,33 @@ Control
 
         Column
         {
-            width: parent ? parent.width : 0
+            width: parent ? Math.min(800, parent.width, parent.height) : 0
             leftPadding: 8
             rightPadding: 8
 
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
+                source: d.unauthorized
+                    ? lp("/images/lite_client/camera_locked.png")
+                    : lp("/images/lite_client/camera_offline.png")
             }
 
             Text
             {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                height: 32
+                height: 160
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
+                text: d.unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                color: ColorTheme.windowText
+                font.pixelSize: 88
+                font.weight: Font.Light
+                font.capitalization: Font.AllUppercase
+                color: ColorTheme.red_main
             }
         }
     }
@@ -197,12 +207,14 @@ Control
 
         Item
         {
-            width: thumbnailContainer.width
-            height: thumbnailContainer.height
+            width: mainContainer.width
+            height: mainContainer.height
 
             VideoPositioner
             {
                 anchors.fill: parent
+                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
+                videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
                 item: videoOutput
@@ -233,6 +245,14 @@ Control
                         onResourceIdChanged: videoOutput.clear()
                     }
                 }
+            }
+
+            Image
+            {
+                source: thumbnailCacheAccessor.thumbnailUrl
+                anchors.fill: parent
+                fillMode: Qt.KeepAspectRatio
+                visible: source && mediaPlayer.mediaStatus !== MediaPlayer.Loaded
             }
 
             MediaPlayer

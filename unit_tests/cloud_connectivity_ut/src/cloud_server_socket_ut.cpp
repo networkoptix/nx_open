@@ -272,7 +272,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto tunnelAcceptorFactoryFuncBak =
         TunnelAcceptorFactory::instance().setCustomFunc(
             [&addressManager](
-                const SocketAddress& mediatorUdpEndpoint,
+                const SocketAddress& /*mediatorUdpEndpoint*/,
                 hpm::api::ConnectionRequestedEvent)
             {
                 std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
@@ -287,7 +287,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         });
 
     PredefinedMediatorConnector mediatorConnector(
-        *nx::network::SocketGlobals::mediatorConnector().udpEndpoint(),
+        stunAsyncClient->remoteAddress(),
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::mediatorConnector()));
@@ -378,7 +378,7 @@ protected:
                 });
 
         m_mediatorConnector = std::make_unique<PredefinedMediatorConnector>(
-            *SocketGlobals::mediatorConnector().udpEndpoint(),
+            m_stunClient->remoteAddress(),
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
                 &SocketGlobals::mediatorConnector()));
