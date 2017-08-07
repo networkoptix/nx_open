@@ -766,6 +766,19 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
+QnUuid QnSecurityCamResource::analyticsDriverId() const
+{
+    return QnUuid::fromStringSafe(getProperty(Qn::kAnalyticsDriversParamName));
+}
+
+void QnSecurityCamResource::setAnalyticsDriverId(const QnUuid& value)
+{
+    if (value.isNull())
+        setProperty(Qn::kAnalyticsDriversParamName, QVariant());
+    else
+        setProperty(Qn::kAnalyticsDriversParamName, value.toString());
+}
+
 void QnSecurityCamResource::setMinDays(int value)
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );

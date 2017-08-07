@@ -590,6 +590,13 @@ QList<nx::api::AnalyticsDriverManifest> QnMediaServerResource::analyticsDrivers(
     return m_analyticsDriversCache.get();
 }
 
+void QnMediaServerResource::setAnalyticsDrivers(
+    const QList<nx::api::AnalyticsDriverManifest>& drivers)
+{
+    QString value = QString::fromUtf8(QJson::serialized(drivers));
+    setProperty(Qn::kAnalyticsDriversParamName, value);
+}
+
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge);

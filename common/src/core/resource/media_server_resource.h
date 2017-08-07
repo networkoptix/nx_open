@@ -106,6 +106,7 @@ public:
     QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
     QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
+    void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
