@@ -36,10 +36,10 @@ static const size_t TcpConnectTimeoutMs = 5 * 1000;
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
-    NX_VERBOSE("rest::ServerConnection") lm("%1 <%2>: %3")
+    NX_VERBOSE("rest::ServerConnection", lm("%1 <%2>: %3")
         .arg(serverId)
         .arg(handle)
-        .arg(message);
+        .arg(message));
 }
 
 } // namepspace
