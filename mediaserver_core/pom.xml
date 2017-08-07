@@ -130,6 +130,8 @@
                                 <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>
                                 <argument>-output-xml</argument>
                                 <argument>${project.build.directory}/resources/static/api.xml</argument>
+                                <argument>-output-json</argument>
+                                <argument>${project.build.directory}/resources/static/api.json</argument>
                             </arguments>
                         </configuration>
                     </execution>
