@@ -280,12 +280,16 @@ bool AioTaskQueue::removeReverseTask(
             //removing futher tChangingTimeout tasks
             for (;
                 it != m_pollSetModificationQueue.end();
-                ++it)
+                )
             {
                 if (it->socket == sock && it->eventType == eventType)
                 {
                     NX_ASSERT(it->type == TaskType::tChangingTimeout);
                     it = m_pollSetModificationQueue.erase(it);
+                }
+                else
+                {
+                    ++it;
                 }
             }
 
