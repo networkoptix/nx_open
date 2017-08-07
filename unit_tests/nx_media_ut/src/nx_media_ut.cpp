@@ -447,7 +447,12 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     m_camera->setChannelCount(testCase.channelCount);
 
     const auto& result = media_player_quality_chooser::chooseVideoQuality(
-        MockVideoDecoder::s_transcodingCodec, testCase.videoQuality, true, -1, m_camera);
+        MockVideoDecoder::s_transcodingCodec,
+        testCase.videoQuality,
+        true,
+        -1,
+        m_camera,
+        true);
 
     if (result != testCase.expectedQuality)
     {
