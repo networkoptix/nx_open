@@ -187,7 +187,7 @@ def review_version_request(request, context=None, language=None):
         publishing_errors = publish_latest_version(customization, request.user)
         version = ContentVersion.objects.latest('created_date')
         if publishing_errors:
-            messages.error(request._requet, "Version " +
+            messages.error(request._request, "Version " +
                              str(version.id) + publishing_errors)
         else:
             messages.success(request._request, "Version " +
