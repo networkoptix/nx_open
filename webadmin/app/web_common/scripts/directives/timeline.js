@@ -325,11 +325,8 @@ angular.module('nxCommon')
                     }
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        var scrollLeft = true;
                         //checking if mouse is to the left or right of the scrollbar
-                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline){
-                            scrollLeft = false;
-                        }
+                        var scrollLeft = mouseXOverTimeline <= scope.scaleManager.scrollSlider().start;
                         scrollbarClickOrHold(scrollLeft);
                     }
                 }

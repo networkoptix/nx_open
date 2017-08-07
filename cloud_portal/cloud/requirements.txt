@@ -30,3 +30,4 @@ wsgiref==0.1.2
 pycurl==7.43.0
 pillow==4.2.1
 django-tinymce==2.6.0
+django-csv-exports==1.0.3

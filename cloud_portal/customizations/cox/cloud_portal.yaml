@@ -20,7 +20,7 @@ cloud_gateway:
 
 mail_from: 'Cox Cloud <CCI-tier5-support.chs@cox.com>'
 
-mail_prefix: '[Cox Cloud]'
+mail_prefix: ''
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

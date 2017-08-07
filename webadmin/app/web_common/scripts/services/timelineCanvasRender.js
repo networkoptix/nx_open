@@ -424,7 +424,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckEvents(context, mouseX, mouseY){
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height; // Top border
 
-        if(context ) {
+        if(context) {
             context.fillStyle = blurColor(timelineConfig.chunksBgColor, 1);
             context.fillRect(0, top, self.canvas.width, timelineConfig.chunkHeight * self.canvas.height);
 
@@ -447,8 +447,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 // 1. Splice events
                 var events = self.recordsProvider.getIntervalRecords(start, end, levelIndex);
 
-
-
                 // 2. Draw em!
                 for (var i = 0; i < events.length; i++) {
                     drawEvent(context, events[i], levelIndex);
@@ -460,7 +458,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     var chunkLoadingTexture = false;
     var chunkLoadingTextureImg = false;
-    function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
+    function drawEvent(context, chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
         var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
 

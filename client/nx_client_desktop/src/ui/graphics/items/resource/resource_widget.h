@@ -259,6 +259,7 @@ public:
 
     int visibleButtons() const;
 
+    SelectionState selectionState() const;
 
     using base_type::mapRectToScene;
 
@@ -276,8 +277,6 @@ signals:
     void selectionStateChanged(SelectionState state);
 
 protected:
-
-
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -285,17 +284,11 @@ protected:
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paintWindowFrame(QPainter* painter, const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
         const QRectF& channelRect, const QRectF& paintRect);
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
-
-    void paintSelection(QPainter *painter, const QRectF &rect);
-
-    /**
-     * Inner frame is painted when there is no layout cell spacing.
-     */
-    void paintInnerFrame(QPainter* painter);
 
     virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
@@ -352,13 +345,11 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
-    SelectionState selectionState() const;
+
 
 private:
-    QColor calculateFrameColor() const;
-    qreal calculateFrameWidth() const;
-
     void setupHud();
+    void setupSelectionOverlay();
     void createButtons();
 
     void setTitleTextInternal(const QString &titleText);

@@ -59,7 +59,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
 def servers(metrics_saver, server_factory, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
-    setup_settings = dict(autoDiscoveryEnabled=False)
+    setup_settings = dict(systemSettings=dict(autoDiscoveryEnabled=utils.bool_to_str(False)))
     start_time = utils.datetime_utc_now()
     server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
@@ -187,11 +187,12 @@ def log_diffs(x, y):
     else:
         log.warning('Strange, no diffs are found...')
 
-def save_json_artifact(artifact_factory, api_method, side_name, value):
+def save_json_artifact(artifact_factory, api_method, side_name, server, value):
     file_path = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name),
                                  ext='.json', type_name='json', content_type='application/json').produce_file_path()
     with open(file_path, 'w') as f:
         json.dump(value, f, indent=4, cls=transaction_log.TransactionJsonEncoder)
+    log.debug('results from %s from server %s %s is stored to %s', api_method, server.title, server, file_path)
 
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
@@ -221,8 +222,8 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
         if utils.datetime_utc_now() - start_time >= merge_timeout:
             log.info('Servers %s and %s still has unmatched results for method %r:', servers[0], first_unsynced_server, api_method)
             log_diffs(expected_result, unmatched_result)
-            save_json_artifact(artifact_factory, api_method, 'x', expected_result)
-            save_json_artifact(artifact_factory, api_method, 'y', unmatched_result)
+            save_json_artifact(artifact_factory, api_method, 'x', servers[0], expected_result)
+            save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
             pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
                 merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
         time.sleep(MERGE_DONE_CHECK_PERIOD.total_seconds())
@@ -256,7 +257,10 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
     else:
         servers[0].merge(servers[1:])
 
-    wait_for_data_merged(artifact_factory, lightweight_servers[:1] + servers, config.MERGE_TIMEOUT, start_time)
-
-    merge_duration = utils.datetime_utc_now() - start_time
-    metrics_saver.save('merge_duration', merge_duration)
+    try:
+        wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
+        merge_duration = utils.datetime_utc_now() - start_time
+        metrics_saver.save('merge_duration', merge_duration)
+    finally:
+        servers[0].load_system_settings(log_settings=True)  # log final settings
+    assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

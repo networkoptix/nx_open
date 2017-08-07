@@ -135,6 +135,7 @@ public:
     void registerUserCredentials(const nx::String& userName, const nx::String& password);
 
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
+    const nx_http::HttpStreamSocketServer& server() const { return *m_httpServer; }
     nx_http::server::rest::MessageDispatcher& httpMessageDispatcher()
         { return m_httpMessageDispatcher; }
 

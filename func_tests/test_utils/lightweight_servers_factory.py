@@ -147,17 +147,18 @@ class LightweightServersHost(object):
     def allocate(self, server_count):
         assert not self._allocated, 'Lightweight servers were already allocated by this test'
         pih = self._physical_installation_host
-        pih.ensure_mediaserver_is_unpacked()
         server_dir = pih.unpacked_mediaserver_dir
         lws_dir = self._installation.dir
-        self._host.mk_dir(lws_dir)
         server_ctl = PhysicalHostServerCtl(self._host, lws_dir)
         if server_ctl.get_state():
             server_ctl.set_state(is_started=False)
+        pih.ensure_mediaserver_is_unpacked()
+        self._host.mk_dir(lws_dir)
         self._cleanup_log_files()
         self._host.put_file(self._test_binary_path, lws_dir)
         self._write_lws_ctl(server_dir, lws_dir, server_count)
         server_ctl.set_state(is_started=True)
+        self._allocated = True  # failure in following code must not prevent from artifacts collection
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
@@ -168,7 +169,6 @@ class LightweightServersHost(object):
             if not self._first_server:
                 self._first_server = server
             yield server
-        self._allocated = True
 
     def release(self):
         if self._allocated:

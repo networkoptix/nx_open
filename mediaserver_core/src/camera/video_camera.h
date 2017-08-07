@@ -27,15 +27,15 @@ class QnVideoCamera: public QObject, public QnAbstractVideoCamera
 public:
     QnVideoCamera(const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
-    
-    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog);
+
+    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized = true);
     virtual QnLiveStreamProviderPtr getPrimaryReader() override;
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
     int copyLastGop(
-        bool primaryLiveStream, 
-        qint64 skipTime, 
-        QnDataPacketQueue& dstQueue, 
+        bool primaryLiveStream,
+        qint64 skipTime,
+        QnDataPacketQueue& dstQueue,
         int cseq,
         bool iFramesOnly);
 
@@ -102,11 +102,11 @@ private:
     std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
     //!index - is a \a MediaQuality element
     std::vector<nx_hls::HLSLivePlaylistManagerPtr> m_hlsLivePlaylistManager;
-    
+
     const qint64 m_loStreamHlsInactivityPeriodMS;
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
-    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
+    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool ensureInitialized);
     void startLiveCacheIfNeeded();
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,

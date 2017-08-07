@@ -2,37 +2,37 @@
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
+#include <ui/animation/variant_animator.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
+
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 
-#include <ui/animation/variant_animator.h>
+namespace {
 
-namespace
+inline qint64 speedToPosition(qreal speed, qreal minimalStep)
 {
-    inline qint64 speedToPosition(qreal speed, qreal minimalStep)
-    {
-        if (speed < -minimalStep)
-            return static_cast<qint64>((std::log(speed / -minimalStep) / M_LN2  + 1.0) * -1000.0);
+    if (speed < -minimalStep)
+        return static_cast<qint64>((std::log(speed / -minimalStep) / M_LN2 + 1.0) * -1000.0);
 
-        if (speed < 1.0)
-            return static_cast<qint64>((speed / minimalStep) * 1000.0);
+    if (speed < 1.0)
+        return static_cast<qint64>((speed / minimalStep) * 1000.0);
 
-        return static_cast<qint64>((std::log(speed /  minimalStep) / M_LN2 + 1.0) *  1000.0);
-    }
+    return static_cast<qint64>((std::log(speed / minimalStep) / M_LN2 + 1.0) *  1000.0);
+}
 
-    inline qreal positionToSpeed(qint64 position, qreal minimalStep)
-    {
-        if (position < -1000)
-            return std::exp(M_LN2 * (position / -1000.0 - 1.0)) * -minimalStep;
+inline qreal positionToSpeed(qint64 position, qreal minimalStep)
+{
+    if (position < -1000)
+        return std::exp(M_LN2 * (position / -1000.0 - 1.0)) * -minimalStep;
 
-        if (position < 1000)
-            return position / 1000.0 * minimalStep;
+    if (position < 1000)
+        return position / 1000.0 * minimalStep;
 
-        return std::exp(M_LN2 * (position /  1000.0 - 1.0)) *  minimalStep;
-    }
+    return std::exp(M_LN2 * (position / 1000.0 - 1.0)) *  minimalStep;
+}
 
-
-} // anonymous namespace
+} // namespace
 
 
 QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
@@ -56,7 +56,8 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
     registerAnimation(m_animator);
 
     /* Set up handlers. */
-    connect(this, SIGNAL(sliderReleased()), this, SLOT(restartSpeedAnimation()));
+    connect(this, &AbstractGraphicsSlider::sliderReleased, this,
+        &QnSpeedSlider::restartSpeedAnimation);
 
     /* Make sure that tooltip text is updated. */
     sliderChange(SliderValueChange);
@@ -109,7 +110,8 @@ void QnSpeedSlider::setMaximalSpeed(qreal maximalSpeed)
 void QnSpeedSlider::setSpeedRange(qreal minimalSpeed, qreal maximalSpeed)
 {
     maximalSpeed = qMax(minimalSpeed, maximalSpeed);
-    setRange(speedToPosition(minimalSpeed, m_minimalSpeedStep), speedToPosition(maximalSpeed, m_minimalSpeedStep));
+    setRange(speedToPosition(minimalSpeed, m_minimalSpeedStep),
+        speedToPosition(maximalSpeed, m_minimalSpeedStep));
 }
 
 qreal QnSpeedSlider::defaultSpeed() const
@@ -195,6 +197,7 @@ void QnSpeedSlider::sliderChange(SliderChange change)
         {
             m_roundedSpeed = roundedSpeed;
             setToolTip(!qFuzzyIsNull(roundedSpeed) ? tr("%1x").arg(roundedSpeed) : tr("Paused"));
+            updateToolTipAutoVisibility();
 
             emit roundedSpeedChanged(roundedSpeed);
         }
@@ -230,6 +233,29 @@ void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
 
     setTracking(true);
     triggerAction(SliderMove);
+}
+
+bool QnSpeedSlider::calculateToolTipAutoVisibility() const
+{
+    // Always show playback speed tooltip if speed is different from 0 or 1.
+    const bool alwaysShowTooltip = !qFuzzyIsNull(m_roundedSpeed)
+        && !qFuzzyEquals(m_roundedSpeed, 1.0);
+
+    return alwaysShowTooltip || base_type::calculateToolTipAutoVisibility();
+}
+
+void QnSpeedSlider::setupShowAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::SpeedTooltipShow);
+}
+
+void QnSpeedSlider::setupHideAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::SpeedTooltipHide);
 }
 
 void QnSpeedSlider::timerEvent(QTimerEvent *event)

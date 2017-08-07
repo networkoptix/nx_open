@@ -10,6 +10,8 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
 
+#include <utils/common/synctime.h>
+
 using namespace nx;
 
 namespace {
@@ -67,6 +69,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getId();
+    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
 
     vms::event::StringsHelper helper(commonModule);
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);

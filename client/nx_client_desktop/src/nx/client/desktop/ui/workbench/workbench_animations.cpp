@@ -43,6 +43,11 @@ Animations::Animations(QObject* parent):
     setup(Id::TimelineButtonsShow, QEasingCurve::InOutQuad, 200);
     setup(Id::TimelineButtonsHide, QEasingCurve::InOutQuad, 200);
 
+    setup(Id::SpeedTooltipShow, QEasingCurve::InOutQuad, 160);
+    setup(Id::SpeedTooltipHide, QEasingCurve::InOutQuad, 100);
+    setup(Id::VolumeTooltipShow, QEasingCurve::InOutQuad, 160);
+    setup(Id::VolumeTooltipHide, QEasingCurve::InOutQuad, 100);
+
     setup(Id::ResourcesPanelExpand, QEasingCurve::InOutQuad, 300);
     setup(Id::ResourcesPanelCollapse, QEasingCurve::OutQuad, 300);
     setup(Id::ResourcesPanelTooltipShow, QEasingCurve::InOutQuad, 200);

@@ -1,7 +1,7 @@
 @echo off
 SET PASSWORD=${sign.password}
 SET CERTIFICATE=${sign.intermediate.cer}
-SET SIGNCER=${static.customization.dir}/wixsetup/${sign.cer}
+SET SIGNCER=${certificates_dir}/wixsetup/${sign.cer}
 SET TIMESTAMP=
 IF NOT ["${beta}"] == ["true"] (
     SET TIMESTAMP=/tr http://tsa.startssl.com/rfc3161

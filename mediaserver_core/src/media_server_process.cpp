@@ -942,6 +942,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -2334,7 +2336,7 @@ void MediaServerProcess::serviceModeInit()
     nx::utils::log::initialize(logSettings, qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        settings->value("logFile", path->replace(lit(".log"), QString()));
+        settings->setValue("logFile", path->replace(lit(".log"), QString()));
     else
         settings->remove("logFile");
 

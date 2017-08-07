@@ -204,7 +204,7 @@ ng-include{
 }
 
 .player-controls{
-  padding-top: 25px !important;
+  padding-top: 27px !important;
 }
 
 .zoom-level{
@@ -218,6 +218,10 @@ ng-include{
   display: inline-block;
   border-radius: 100px;
   box-shadow: 0px 0px 2px #888;
+}
+
+.no-volume > .live-button{
+  border-right: none !important;
 }
 
 .live-button{
@@ -256,10 +260,6 @@ ng-include{
     background-color: $light5 !important;
     border-left: 1px solid $light8 !important;
     border-right: 1px solid $light7 !important; 
-  }
-
-  &.active > .live-circle{
-    background-color: chartreuse !important;
   }
 }
 

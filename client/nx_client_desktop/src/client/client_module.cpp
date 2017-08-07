@@ -121,7 +121,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 

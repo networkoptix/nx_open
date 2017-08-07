@@ -392,7 +392,7 @@ void CloudStreamSocket::connectToEntriesAsync(
 
     m_connectHandler = std::move(handler);
 
-    m_multipleAddressConnector = std::make_unique<MultipleAddressConnector>(
+    m_multipleAddressConnector = std::make_unique<AnyAccessibleAddressConnector>(
         m_ipVersion,
         std::move(dnsEntries));
     m_multipleAddressConnector->bindToAioThread(getAioThread());

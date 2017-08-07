@@ -42,8 +42,7 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        SocketAddress endpoint,
-        bool useSsl = false,
+        const QUrl& url,
         ConnectHandler completionHandler = nullptr) override;
 
     virtual bool setIndicationHandler(
