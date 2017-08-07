@@ -141,7 +141,9 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    add_subdirectory(wixsetup)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_subdirectory(wixsetup)
+    endif()
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER

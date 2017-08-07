@@ -19,4 +19,4 @@ add_library(customactions SHARED ${cpp_files} "CustomActions.rc")
 add_precompiled_header(customactions "${CMAKE_CURRENT_SOURCE_DIR}/stdafx.h")
 target_link_libraries(customactions userenv.lib;Rpcrt4.lib;Ws2_32.lib;IPHLPAPI.lib;comsuppw.lib;msi.lib;dutil.lib;wcautil.lib;Version.lib)
 
-install(TARGETS customactions RUNTIME DESTINATION ${config})
+install(TARGETS customactions RUNTIME DESTINATION "${CMAKE_BUILD_TYPE}")

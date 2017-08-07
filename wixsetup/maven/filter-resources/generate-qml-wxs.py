@@ -2,7 +2,7 @@ import os, sys, subprocess
 from subprocess import Popen, PIPE
 
 # Windows only
-target_bin_path = os.path.normcase('${target_bin_path}')
+bin_source_dir = os.path.normcase('${bin_source_dir}')
 qtdir = os.path.normcase('${qt.dir}')
 qmldir = os.path.join(qtdir, 'qml')
 qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
@@ -13,7 +13,7 @@ os.environ["PATH"] = "%s;%s\\bin" % (os.environ['PATH'], qtdir)
 commands = ['heat dir %s -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientQml.wxs -cg ClientQmlComponent -dr ClientQml -var var.ClientQmlDir' % qmldir]
 
 if __name__ == '__main__':
-    cmd = '${qt.dir}\\bin\\windeployqt.exe %s\\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % (target_bin_path, qmldir)
+    cmd = '${qt.dir}\\bin\\windeployqt.exe %s\\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % (bin_source_dir, qmldir)
     p = subprocess.Popen(cmd, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print out
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         os.unlink('nxtoolqml/QtWebProcess.exe')
 
     if '${nxtool}' == 'true':
-        p = subprocess.Popen('${qt.dir}\\bin\\windeployqt.exe %s\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % (target_bin_path, qmldir_nxtool), shell=True, stdout=PIPE)
+        p = subprocess.Popen('${qt.dir}\\bin\\windeployqt.exe %s\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % (bin_source_dir, qmldir_nxtool), shell=True, stdout=PIPE)
         out, err = p.communicate()
         print out
         p.wait()

@@ -119,7 +119,11 @@ def get_candle_command(project, suffix, args, components):
 def get_light_command(folder, msi, suffix):
     command = ['light']
     command.append('-sice:ICE07')
+    command.append('-sice:ICE38')
+    command.append('-sice:ICE43')
+    command.append('-sice:ICE57')
     command.append('-sice:ICE60')
+    command.append('-sice:ICE64')
     command.append('-sice:ICE69')
     command.append('-sice:ICE91')
     command.append('-cultures:${installer.cultures}')
