@@ -1,21 +1,51 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('ApiToolCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
+    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams', '$location', 'dialogs', '$timeout', 'systemAPI',
+    function ($scope, mediaserver, $sessionStorage, $routeParams, $location, dialogs, $timeout, systemAPI) {
 
+        var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
         $scope.session = $sessionStorage;
-        $scope.allowProprietary = true;
+
+        if($location.search().proprietary){
+            Config.allowProprietary = $location.search().proprietary;
+        }
+        $scope.allowProprietary = Config.allowProprietary;
 
         mediaserver.getApiMethods().then(function(data){
             $scope.apiGroups = data.data.groups;
+            if(activeApiMethod){
+                activeApiMethod = '/' + activeApiMethod;
+                for(var groupIdx in $scope.apiGroups){
+                    var group = $scope.apiGroups[groupIdx];
+                    if(activeApiMethod.indexOf(group.urlPrefix)==0){
+                        for(var funcIdx in group.functions){
+                            var func = group.functions[funcIdx];
+                            if(func.proprietary == 'true' && !$scope.allowProprietary){
+                                break;
+                            }
+                            if(group.urlPrefix + '/' + func.name === activeApiMethod){
+                                $scope.setActiveFunction(group,func);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         });
 
-        $scope.setActiveFunction = function(group, method){
+        $scope.setActiveFunction = function(group, method, $event){
             $scope.activeGroup = group;
             $scope.activeFunction = method;
             $scope.session.method.method = method.method;
             $scope.session.method.name = group.urlPrefix + '/' + method.name;
+            if($event){
+                $event.preventDefault();
+                $event.stopPropagation();
+                $location.path('/developers/api' + group.urlPrefix + '/' + method.name, false);
+            }
+            return false;
         }
         $scope.clearActiveFunction = function(){
             $scope.activeGroup = null;
@@ -121,4 +151,4 @@ angular.module('webadminApp')
             $window.unbind('resize', updateHeights);
             $('html').removeClass('webclient-page');
         });
-    });
+    }]);
