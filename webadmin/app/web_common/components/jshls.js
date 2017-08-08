@@ -233,13 +233,13 @@ function JsHlsAPI(){
             switch(data.details) {
                 case Hls.ErrorDetails.MANIFEST_LOAD_ERROR:
                     try {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
                         if(data.response.code === 0) {
                             console.log("this might be a CORS issue, consider installing <a href=\"https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi\">Allow-Control-Allow-Origin</a> Chrome Extension");
                         }
                     }
                     catch(err) {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>Reason:Load " + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>Reason:Load " + data.response.text);
                     }
                     break;
                 case Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT:
