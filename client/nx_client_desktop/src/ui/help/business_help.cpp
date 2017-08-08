@@ -34,7 +34,7 @@ int eventHelpId(vms::event::EventType type)
         case vms::event::backupFinishedEvent:
             return Qn::EventsActions_BackupFinished_Help;
         case vms::event::analyticsSdkEvent:
-            return -1; //< TODO: #GDM #analytics Create an issue on #bbirychkov to add help.
+            return Qn::EventsActions_VideoAnalytics_Help;
         default:
             return type >= vms::event::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help
