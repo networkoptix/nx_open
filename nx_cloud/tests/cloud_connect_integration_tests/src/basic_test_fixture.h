@@ -69,6 +69,7 @@ protected:
     virtual void SetUp() override;
 
     void startServer();
+    void stopServer();
     QUrl relayUrl(int relayNum = 0) const;
     void restartMediator();
 

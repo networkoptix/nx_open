@@ -119,6 +119,11 @@ void BasicTestFixture::startServer()
     startHttpServer();
 }
 
+void BasicTestFixture::stopServer()
+{
+    m_httpServer.reset();
+}
+
 QUrl BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());

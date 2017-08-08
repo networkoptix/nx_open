@@ -34,10 +34,7 @@ public:
         const std::string& domainName,
         const std::string& relayHost) override;
 
-    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
-    {
-        return cf::make_ready_future(false);
-    }
+    virtual cf::future<bool> removePeer(const std::string& domainName) override;
 
 private:
     std::string m_redirectToRelay;
@@ -131,9 +128,27 @@ public:
         m_addedPeers.push_back(std::make_pair(domainName, relayHost));
     }
 
+    void removePeer(const std::string& domainName)
+    {
+        m_removedPeer = domainName;
+    }
+
+    void whenServerGoesOffline()
+    {
+        stopServer();
+    }
+
+    void thenItsRecordShouldBeRemovedFromRemoteRelayPool()
+    {
+        nx::String removedPeer = nx::String::fromStdString(m_removedPeer);
+        nx::String firstRelayServerId = this->serverSocketCloudAddress();
+
+        ASSERT_TRUE(removedPeer.contains(firstRelayServerId));
+    }
+
 private:
     std::vector<std::pair<std::string, std::string>> m_addedPeers;
-
+    std::string m_removedPeer;
 };
 
 cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
@@ -144,11 +159,23 @@ cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
     return cf::make_ready_future(true);
 }
 
+cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
+{
+    m_relayTest->removePeer(domainName);
+    return cf::make_ready_future(true);
+}
 
 TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)
 {
     assertServerIsAccessibleFromAnotherRelay();
     assertFirstRelayHasBeenAddedToThePool();
+}
+
+TEST_F(RelayToRelayRedirect, RecordRemovedOnServerDisconnect)
+{
+    whenServerGoesOffline();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    thenItsRecordShouldBeRemovedFromRemoteRelayPool();
 }
 
 } // namespace test
