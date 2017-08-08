@@ -16,25 +16,25 @@ struct Rect
      * @brief x coordinate of top left corner by x axis.
      * MUST be in the range [0..1].
      */
-    double x = 0;
+    float x = 0;
 
     /**
      * @brief y coordinate of top left corner by y axis.
      * MUST be in the range [0..1].
      */
-    double y = 0;
+    float y = 0;
 
     /**
      * @brief width of rectangle.
      * MUST be in the range [0..1] and the rule x + width <= 1 MUST be satisfied.
      */
-    double width = 0;
+    float width = 0;
 
     /**
      * @brief height of rectangle.
      * MUST be in the range [0..1] and the rule y + height <= 1 MUST be satisfied.
      */
-    double height = 0;
+    float height = 0;
 };
 
 /**

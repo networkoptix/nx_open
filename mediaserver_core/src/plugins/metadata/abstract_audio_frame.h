@@ -22,6 +22,7 @@ class AbstractAudioFrame: public AbstractMediaFrame
 public:
     /**
      * @return duration of the audio frame in microseconds.
+     * Should return negative value in case of error.
      */
     virtual int durationUsec() const = 0;
 };

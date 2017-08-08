@@ -144,7 +144,7 @@ namespace nxpl
         /*!
             \param locale is BCP47 language tag
         */
-        virtual void setLocale(char* locale) = 0;
+        virtual void setLocale(const char* locale) = 0;
     };
 
     //!Type of plugin entry-point function

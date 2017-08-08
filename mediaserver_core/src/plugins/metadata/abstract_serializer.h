@@ -12,14 +12,14 @@ namespace metadata {
  * Each class that implements AbstractSerializator interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::GUID IID_Serializator
+static const nxpl::GUID IID_Serializer
     = {{0xf1, 0xc8, 0xfc, 0x64, 0x03, 0x19, 0x47, 0x6f, 0xa9, 0xfd, 0xee, 0x24, 0x32, 0x27, 0xe9, 0xc7}};
 
 /**
  * @brief The AbstractSerializator class is an interface for classes
  * providing data packet serialization / deserialization functionality.
  */
-class AbstractSerializator: nxpl::PluginInterface
+class AbstractSerializer: nxpl::PluginInterface
 {
     /**
      * @brief serialize serializes data packet.

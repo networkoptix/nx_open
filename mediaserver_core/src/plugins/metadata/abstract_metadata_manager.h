@@ -22,8 +22,7 @@ public:
      * @param metadata incoming from the plugin
      */
     virtual void handleMetadata(
-        Error* error,
-        const char* uuid, //< ???
+        Error error,
         const AbstractMetadataPacket** outMetadata) = 0;
 };
 

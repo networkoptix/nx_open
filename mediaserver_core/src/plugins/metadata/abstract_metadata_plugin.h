@@ -2,7 +2,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/metadata/abstract_metadata_manager.h>
-#include <plugins/metadata/abstract_serializator.h>
+#include <plugins/metadata/abstract_serializer.h>
 #include <plugins/metadata/utils.h>
 
 namespace nx {
@@ -43,13 +43,13 @@ class AbstractMetadataPlugin: public nxpl::Plugin3
 
     /**
      * @brief serializatorForType creates (or returns already existing)
-     * serializator/deserializator for the given type.
+     * serializer/deserializer for the given type.
      * @param typeGuid GUID of type.
      * @param error status of operation.
      * noError in case of success and some other value in case of failure.
      * @return pointer to object that implements AbstractSerializator interface.
      */
-    virtual AbstractSerializator* serializatorForType(
+    virtual AbstractSerializer* serializerForType(
         const nxpl::GUID& typeGuid,
         Error* outError) = 0;
 };
