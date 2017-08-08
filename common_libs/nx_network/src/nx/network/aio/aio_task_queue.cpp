@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "pollset_factory.h"
 
@@ -188,7 +189,6 @@ void AioTaskQueue::addSocketToPollset(
     AIOEventHandler* eventHandler)
 {
     auto handlingData = std::make_unique<AioEventHandlingDataHolder>(eventHandler);
-    bool failedToAddToPollset = false;
     if (eventType != aio::etTimedOut)
     {
         if (!pollSet->add(socket, eventType, handlingData.get()))
