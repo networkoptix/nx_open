@@ -30,14 +30,16 @@ public:
      * @return Optimal video decoder (in case of any) compatible with such frame. Return null
      * pointer if no compatible decoder is found.
      */
-    VideoDecoderPtr createCompatibleDecoder(const AVCodecID codec, const QSize& resolution);
+    VideoDecoderPtr createCompatibleDecoder(
+        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
 
     /**
-     * @return True if compatible video decoder found.
+     * @return Whether a compatible video decoder is found.
      */
     bool hasCompatibleDecoder(
         const AVCodecID codec,
         const QSize& resolution,
+        bool allowOverlay,
         const std::vector<AbstractVideoDecoder*>& currentDecoders);
 
     /**
@@ -74,8 +76,9 @@ private:
     {
         std::function<AbstractVideoDecoder*(
             const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
-        std::function<bool (const AVCodecID codec, const QSize& resolution)> isCompatible;
-        std::function<QSize (const AVCodecID codec)> maxResolution;
+        std::function<bool(
+            const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
+        std::function<QSize(const AVCodecID codec)> maxResolution;
         ResourceAllocatorPtr allocator;
         int useCount = 0;
         int maxUseCount = std::numeric_limits<int>::max();

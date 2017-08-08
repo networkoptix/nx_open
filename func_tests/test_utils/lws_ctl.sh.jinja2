@@ -5,6 +5,9 @@ MEDIASERVER_DIST_DIR={{ MEDIASERVER_DIST_DIR }}
 SERVER_COUNT={{ SERVER_COUNT }}
 PORT_BASE={{ PORT_BASE }}
 LOG_PATH_BASE={{ LOG_PATH_BASE }}
+CAMERAS_PER_SERVER={{ CAMERAS_PER_SERVER|default(5, true) }}
+PROPERTIES_PER_CAMERA={{ PROPERTIES_PER_CAMERA|default(5, true) }}
+USERS_PER_SERVER={{ USERS_PER_SERVER|default(4, true) }}
 {{ super() }}
 BIN_DIR="$SERVER_DIR"
 STOP_TIMEOUT_SEC=30
@@ -16,9 +19,9 @@ ARGS_LIST=(
 	--gtest_filter=P2pMessageBusTest.FullConnect
 	--standaloneMode
 	--serverCount=$SERVER_COUNT
-	--cameraCount=5
-	--propertyCount=3
-	--userCount=4
+	--cameraCount=$CAMERAS_PER_SERVER
+	--propertyCount=$PROPERTIES_PER_CAMERA
+	--userCount=$USERS_PER_SERVER
 	--tcpPort=$PORT_BASE
     )
 ARGS="${ARGS_LIST[@]}"

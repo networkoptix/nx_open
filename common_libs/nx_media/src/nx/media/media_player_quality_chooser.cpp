@@ -156,6 +156,7 @@ static Result applyTranscodingIfPossible(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
+    bool allowOverlay,
     const QSize& desiredResolution,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
@@ -169,7 +170,7 @@ static Result applyTranscodingIfPossible(
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        transcodingCodec, resolution, currentDecoders))
+        transcodingCodec, resolution, allowOverlay, currentDecoders))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported.")
             .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
@@ -186,6 +187,7 @@ static Result chooseHighStreamIfPossible(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
+    bool allowOverlay,
     AVCodecID highCodec,
     const QSize& highResolution,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
@@ -210,10 +212,16 @@ static Result chooseHighStreamIfPossible(
             cl_logDEBUG1);
 
         return applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, resolution, currentDecoders);
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            resolution,
+            currentDecoders);
     }
     else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        highCodec, highResolution, currentDecoders))
+        highCodec, highResolution, allowOverlay, currentDecoders))
     {
         return Result(Player::HighVideoQuality, highResolution);
     }
@@ -223,7 +231,13 @@ static Result chooseHighStreamIfPossible(
             cl_logDEBUG1);
 
         return applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, highResolution, currentDecoders);
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            highResolution,
+            currentDecoders);
     }
 
     return Result();
@@ -234,6 +248,7 @@ static Result chooseFallbackQuality(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
+    bool allowOverlay,
     AVCodecID lowCodec,
     const QSize& lowResolution,
     AVCodecID highCodec,
@@ -247,7 +262,7 @@ static Result chooseFallbackQuality(
         lowResolution, highResolution, kFallbackLowQualityLines, transcodingCodec);
 
     const auto& result = applyTranscodingIfPossible(
-        transcodingCodec, liveMode, positionMs, camera, resolution, currentDecoders);
+        transcodingCodec, liveMode, positionMs, camera, allowOverlay, resolution, currentDecoders);
 
     if (result.isValid())
         return result;
@@ -255,8 +270,13 @@ static Result chooseFallbackQuality(
     if (highCodec != AV_CODEC_ID_NONE && highResolution.isValid())
     {
         return chooseHighStreamIfPossible(
-            transcodingCodec, liveMode, positionMs, camera,
-            highCodec, highResolution,
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            highCodec,
+            highResolution,
             currentDecoders);
     }
 
@@ -284,6 +304,7 @@ Result chooseVideoQuality(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
+    bool allowOverlay,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
     // Obtain Low and High stream codec and resolution.
@@ -331,8 +352,13 @@ Result chooseVideoQuality(
     else if (highStreamRequested)
     {
         result = chooseHighStreamIfPossible(
-            transcodingCodec, liveMode, positionMs, camera,
-            highCodec, highResolution,
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            highCodec,
+            highResolution,
             currentDecoders);
 
         if (!result.isValid())
@@ -348,13 +374,24 @@ Result chooseVideoQuality(
             lowResolution, highResolution, videoQuality, transcodingCodec);
 
         result = applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, resolution, currentDecoders);
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            resolution,
+            currentDecoders);
 
         if (!result.isValid() && videoQuality >= kHighQualityFallbackThreshold)
         {
             result = chooseHighStreamIfPossible(
-                transcodingCodec, liveMode, positionMs, camera,
-                highCodec, highResolution,
+                transcodingCodec,
+                liveMode,
+                positionMs,
+                camera,
+                allowOverlay,
+                highCodec,
+                highResolution,
                 currentDecoders);
         }
 
@@ -365,8 +402,15 @@ Result chooseVideoQuality(
     if (result.quality == Player::LowVideoQuality)
     {
         result = chooseFallbackQuality(
-            transcodingCodec, liveMode, positionMs, camera,
-            lowCodec, lowResolution, highCodec, highResolution,
+            transcodingCodec,
+            liveMode,
+            positionMs,
+            camera,
+            allowOverlay,
+            lowCodec,
+            lowResolution,
+            highCodec,
+            highResolution,
             currentDecoders);
     }
 

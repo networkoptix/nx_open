@@ -53,6 +53,7 @@ protected:
 
     void startServer();
     QUrl relayUrl() const;
+    void restartMediator();
 
     void assertConnectionCanBeEstablished();
 
@@ -63,6 +64,9 @@ protected:
     nx::cloud::relay::test::Launcher& trafficRelay();
     nx::String serverSocketCloudAddress() const;
     const hpm::api::SystemCredentials& cloudSystemCredentials() const;
+
+    void waitUntilServerIsRegisteredOnMediator();
+    void waitUntilServerIsRegisteredOnTrafficRelay();
 
     void setRemotePeerName(const nx::String& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);

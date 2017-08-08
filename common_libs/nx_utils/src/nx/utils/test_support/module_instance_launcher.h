@@ -27,8 +27,7 @@ public:
     ~ModuleLauncher()
     {
         stop();
-        for (auto ptr: m_args)
-            free(ptr);
+        clearArgs();
     }
 
     void start()
@@ -41,6 +40,8 @@ public:
         m_moduleProcessThread = nx::utils::thread(
             [this, &moduleInstantiatedCreatedPromise]()->int
             {
+                beforeModuleCreation();
+
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
                     static_cast<int>(m_args.size()), m_args.data());
                 m_moduleInstance->setOnStartedEventHandler(
@@ -51,8 +52,11 @@ public:
                 moduleInstantiatedCreatedPromise.set_value();
                 auto result = m_moduleInstance->exec();
 
-                std::lock_guard<std::mutex> lock(m_mutex);
-                m_moduleInstance.reset();
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    m_moduleInstance.reset();
+                }
+                afterModuleDestruction();
                 return result;
             });
         moduleInstantiatedCreatedFuture.wait();
@@ -111,6 +115,18 @@ public:
         addArg(value);
     }
 
+    void clearArgs()
+    {
+        for (auto ptr: m_args)
+            free(ptr);
+        m_args.clear();
+    }
+
+    std::vector<char*>& args()
+    {
+        return m_args;
+    }
+
     const std::unique_ptr<ModuleProcessType>& moduleInstance()
     {
         return m_moduleInstance;
@@ -120,6 +136,10 @@ public:
     {
         return m_moduleInstance.get();
     }
+
+protected:
+    virtual void beforeModuleCreation() {}
+    virtual void afterModuleDestruction() {}
 
 private:
     std::vector<char*> m_args;
