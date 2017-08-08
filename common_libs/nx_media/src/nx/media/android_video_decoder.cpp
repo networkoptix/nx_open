@@ -472,13 +472,19 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
     }
 }
 
-bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
+bool AndroidVideoDecoder::isCompatible(
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
+    if (!allowOverlay) //< Considering AndroidVideoDecoder a hardware one.
+        return false;
+
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 
-    QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
-    const QSize maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
-
+    QSize maxSize;
+    {
+        QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
+        maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
+    }
     if (maxSize.isEmpty())
         return false;
 

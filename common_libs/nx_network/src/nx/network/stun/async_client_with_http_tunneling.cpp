@@ -302,19 +302,35 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 
     if (httpClient->failed())
     {
+        NX_DEBUG(this, lm("Connection to %1 failed with error %2").arg(m_url)
+            .arg(SystemError::toString(httpClient->lastSysErrorCode())));
         nx::utils::swapAndCall(m_connectHandler, httpClient->lastSysErrorCode());
         return;
     }
 
     if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::switchingProtocols)
     {
+        NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
+            .arg(m_url)
+            .arg(nx_http::StatusCode::toString(httpClient->response()->statusLine.statusCode)));
         nx::utils::swapAndCall(m_connectHandler, SystemError::connectionRefused);
+        return;
+    }
+
+    auto connection = httpClient->takeSocket();
+    if (!connection->setRecvTimeout(std::chrono::milliseconds::zero()) ||
+        !connection->setSendTimeout(std::chrono::milliseconds::zero()))
+    {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        NX_DEBUG(this, lm("Error changing socket timeout. %1")
+            .arg(SystemError::toString(sysErrorCode)));
+        nx::utils::swapAndCall(m_connectHandler, sysErrorCode);
         return;
     }
 
     {
         QnMutexLocker lock(&m_mutex);
-        createStunClient(lock, httpClient->takeSocket());
+        createStunClient(lock, std::move(connection));
         sendPendingRequests();
     }
 
