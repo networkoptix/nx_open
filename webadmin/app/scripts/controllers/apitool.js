@@ -15,24 +15,48 @@ angular.module('webadminApp')
 
         mediaserver.getApiMethods().then(function(data){
             $scope.apiGroups = data.data.groups;
+
             if(activeApiMethod){
                 activeApiMethod = '/' + activeApiMethod;
-                for(var groupIdx in $scope.apiGroups){
-                    var group = $scope.apiGroups[groupIdx];
-                    if(activeApiMethod.indexOf(group.urlPrefix)==0){
-                        for(var funcIdx in group.functions){
-                            var func = group.functions[funcIdx];
-                            if(func.proprietary == 'true' && !$scope.allowProprietary){
-                                break;
-                            }
-                            if(group.urlPrefix + '/' + func.name === activeApiMethod){
-                                $scope.setActiveFunction(group,func);
-                                return;
+            }
+            var regex = /(<([^>]+)>)/ig; // Regex to clean tags from description
+            _.each($scope.apiGroups,function(group){
+                _.each(group.functions,function(func){
+                    func.url = group.urlPrefix + '/' + func.name;
+                    _.each(func.params,function(param){
+                        // Detecting type for param
+                        param.type = 'text';
+
+                        if(param.name == 'cameraId'){
+                            param.type = 'camera';
+                        }
+
+                        if(param.name == 'time' || param.name == 'timestamp'){
+                            param.type = 'timestamp';
+                        }
+
+                        if(param.values && param.values.length>0){
+                            param.type = 'enum';
+                            _.each(param.values,function(value){
+                                value.label = value.name;
+                                if(value.description.xml){
+                                    value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                }
+                            });
+                            if(param.optional == 'true'){
+                                param.values.unshift({label:'', name:null});
                             }
                         }
+                    });
+
+                    if(func.url == activeApiMethod){ // Check if we should select this method (checking url parameter)
+                        if(func.proprietary == 'true' && !$scope.allowProprietary){
+                            return; // proprietary methods are forbidden
+                        }
+                        $scope.setActiveFunction(group, func);
                     }
-                }
-            }
+                });
+            });
         });
 
         $scope.setActiveFunction = function(group, method, $event){
