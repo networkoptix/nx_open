@@ -71,46 +71,45 @@ angular.module('webadminApp')
 
         };
 
-        $scope.getDebugUrl = function(){
-            var params = $scope.session.method.params.trim();
-            if(params && params.indexOf('?')!==0 && $scope.session.method.name.indexOf('?')<0){
-                params = '?' + params;
+        function cleanParams(params){
+            var newParams = {};
+            for(var key in params){
+                if(params[key] === null || params[key].toString().trim() === ''){
+                    continue;
+                }
+                newParams[key] = params[key].toString().trim();
             }
-
-            return mediaserver.debugFunctionUrl($scope.session.method.name + params);
+            return newParams;
+        };
+        $scope.getDebugUrl = function(){
+            if($scope.session.method.method == 'GET'){
+                return mediaserver.debugFunctionUrl($scope.session.method.name, cleanParams($scope.session.method.params));
+            }
+            return mediaserver.debugFunctionUrl($scope.session.method.name);
         };
 
         $scope.testMethod = function(){
-            var data = $scope.session.method.data;
-            if(data && data !== '') {
-                try {
-                    data = JSON.parse(data);
-                } catch (a) {
-                    console.error(a);
-                    dialogs.alert( 'POST-params is not a valid json object ');
-                    return;
-                }
+            var getParams = null;
+            var postParams = null;
+
+            if($scope.session.method.method == 'GET'){
+                getParams = cleanParams($scope.session.method.params);
+            }else{
+                postParams = cleanParams($scope.session.method.params);
             }
 
-            var params = $scope.session.method.params;
-            if(params && params !== '') {
-                try {
-                    params = JSON.parse(params);
-                } catch (a) {
-                    console.error(a);
-                    dialogs.alert( 'GET-params is not a valid json object ');
-                    return;
-                }
-            }
-
-
-            mediaserver.debugFunction($scope.session.method.method, $scope.session.method.name, params, data).then(function(success){
-                $scope.result.status = success.status +  ':  ' + success.statusText;
-                $scope.result.result = JSON.stringify(success.data, null,  '  ');
-            },function(error){
-                $scope.result.status = error.status +  ':  ' + error.statusText;
-                $scope.result.result =   'Error: ' + JSON.stringify(error.data, null,  '  ');
-            });
+            mediaserver.debugFunction($scope.session.method.method,
+                                      $scope.session.method.name,
+                                      getParams, postParams).
+                        then(function(success){
+                            $scope.result.status = success.status +  ':  ' + success.statusText;
+                            $scope.result.error = false;
+                            $scope.result.result = JSON.stringify(success.data, null,  '  ');
+                        },function(error){
+                            $scope.result.status = error.status +  ':  ' + error.statusText;
+                            $scope.result.error = true;
+                            $scope.result.result =  JSON.stringify(error.data, null,  '  ');
+                        });
         };
 
 
