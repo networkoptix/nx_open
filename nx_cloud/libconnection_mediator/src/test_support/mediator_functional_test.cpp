@@ -63,12 +63,12 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     QDir(m_tmpDir).removeRecursively();
     QDir().mkpath(m_tmpDir);
 
-    const auto stunAddress = findFreeTcpAndUdpLocalAddress();
-    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(stunAddress), cl_logINFO);
+    m_stunAddress = findFreeTcpAndUdpLocalAddress();
+    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(m_stunAddress), cl_logINFO);
 
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-stun/addrToListenList", stunAddress.toStdString().c_str());
+    addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
     addArg("-http/addrToListenList", SocketAddress::anyPrivateAddress.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
@@ -247,6 +247,37 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
     return std::make_tuple(
         nx_http::StatusCode::ok,
         QJson::deserialized<data::ListeningPeers>(responseBody));
+}
+
+void MediatorFunctionalTest::beforeModuleCreation()
+{
+    for (auto it = args().begin(); it != args().end(); )
+    {
+        if (strcmp((*it), "-stun/addrToListenList") == 0 ||
+            strcmp((*it), "-http/addrToListenList") == 0)
+        {
+            free(*it);
+            it = args().erase(it);
+            free(*it);
+            it = args().erase(it); //< Value.
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    SocketAddress httpEndpoint = SocketAddress::anyPrivateAddress;
+    if (m_httpPort != 0)
+        httpEndpoint.port = m_httpPort;
+
+    addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", httpEndpoint.toStdString().c_str());
+}
+
+void MediatorFunctionalTest::afterModuleDestruction()
+{
+    //clearArgs();
 }
 
 } // namespace hpm

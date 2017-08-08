@@ -47,6 +47,8 @@ public:
     bool recvDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us
     PeerNumberInfo shortPeerInfo;
+
+    std::function<void()> onConnectionClosedCallback;
 };
 
 } // namespace p2p

@@ -57,7 +57,8 @@ public:
 
     virtual ~MockVideoDecoder() {}
 
-    static bool isCompatible(const AVCodecID codec, const QSize& resolution)
+    static bool isCompatible(
+        const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
     {
         if (!s_maxResolution.isEmpty()
             && (resolution.width() > s_maxResolution.width()
@@ -454,7 +455,12 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     m_camera->setChannelCount(testCase.channelCount);
 
     const auto& result = media_player_quality_chooser::chooseVideoQuality(
-        MockVideoDecoder::s_transcodingCodec, testCase.videoQuality, true, -1, m_camera);
+        MockVideoDecoder::s_transcodingCodec,
+        testCase.videoQuality,
+        true,
+        -1,
+        m_camera,
+        true);
 
     if (result != testCase.expectedQuality)
     {

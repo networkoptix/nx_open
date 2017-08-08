@@ -20,6 +20,7 @@ from requests.auth import HTTPDigestAuth
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'
 REST_API_TIMEOUT = datetime.timedelta(seconds=10)
+MAX_CONTENT_LEN_TO_LOG = 1000
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,9 @@ class ServerRestApiProxy(object):
         except requests.exceptions.RequestException as x:
             log.debug('\t--> %s: %s', x.__class__.__name__, x)
             raise
-        log.debug('\t--> [%d] %s', response.status_code, response.content)
+        log.debug('\t--> [%d] %s', response.status_code,
+                      response.content if len(response.content) <= MAX_CONTENT_LEN_TO_LOG
+                      else response.content[:MAX_CONTENT_LEN_TO_LOG] + '...')
         if raise_exception:
             if 400 <= response.status_code < 600:
                 raise HttpError(self._server_name, url, response.status_code, response.reason)

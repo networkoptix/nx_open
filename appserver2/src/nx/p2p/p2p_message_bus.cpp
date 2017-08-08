@@ -214,7 +214,8 @@ void MessageBus::gotConnectionFromRemotePeer(
     const ec2::ApiPeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserAccessData& userAccessData,
+    std::function<void()> onConnectionClosedCallback)
 {
     P2pConnectionPtr connection(new Connection(
         commonModule(),
@@ -240,6 +241,7 @@ void MessageBus::gotConnectionFromRemotePeer(
         m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
         sendInitialDataToClient(connection);
     }
+    context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;
 }
 
 void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
@@ -841,7 +843,8 @@ void MessageBus::at_stateChanged(
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
 
-
+            if (auto callback = context(connection)->onConnectionClosedCallback)
+                callback();
             auto outgoingConnection = m_outgoingConnections.value(remoteId);
             if (outgoingConnection == connection)
             {
