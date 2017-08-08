@@ -19,11 +19,11 @@ void initialize(
     const QString& baseName,
     std::shared_ptr<Logger> logger)
 {
+    if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
+        return;
+
     if (!logger)
         logger = mainLogger();
-
-    if (settings.level.primary == Level::undefined)
-        return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
