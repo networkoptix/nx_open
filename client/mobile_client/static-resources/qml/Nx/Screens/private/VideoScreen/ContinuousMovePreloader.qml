@@ -6,7 +6,7 @@ BasePreloader
 {
     id: control
 
-    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
+    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.9)
     property real sideSize: control.height / 2.5
     property real thickness: 6
     property int figuresCount: 5

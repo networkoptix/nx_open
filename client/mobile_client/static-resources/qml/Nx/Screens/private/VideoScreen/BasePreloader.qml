@@ -9,6 +9,7 @@ Control
     property alias timeout: timer.interval
 
     visible: opacity > 0
+
     onContentItemChanged:
     {
         contentItem.visible = false
@@ -79,7 +80,7 @@ Control
         if (immediately)
             control.state = "invisible"
         else
-            timer.start()
+            timer.restart()
     }
 
     function show()
@@ -93,6 +94,9 @@ Control
         id: timer
 
         interval: 1500
-        onTriggered: control.state = "invisible"
+        onTriggered:
+        {
+            control.state = "invisible"
+        }
     }
 }

@@ -68,11 +68,8 @@ Item
         anchors.centerIn: parent
         onItemChanged:
         {
-            if (!item)
-                return
-
-            item.anchors.centerIn = loader
-            item.show()
+            if (item)
+                item.show()
         }
     }
 
@@ -83,9 +80,7 @@ Item
 
         if (!someoneActive)
         {
-            if (loader.item)
-                loader.item.hide()
-
+            setCurrentPreloader(undefined)
             return
         }
 
@@ -101,12 +96,22 @@ Item
 
     function setCurrentPreloader(preloader)
     {
+        var emptyPreloader = !preloader
+        var immediately = !emptyPreloader
+
         if (loader.item)
-            loader.item.hide(true)
+            loader.item.hide(immediately)
+
+        if (emptyPreloader)
+            return
 
         loader.sourceComponent = preloader
-
-        if (loader.item)
-            loader.item.show()
+        loader.item.show()
+        loader.item.visibleChanged.connect(
+            function()
+            {
+                if (loader.item && !loader.item.visible)
+                    loader.sourceComponent = undefined
+            })
     }
 }

@@ -6,7 +6,7 @@ BasePreloader
 {
     id: control
 
-    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
+    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.9)
     property real thickness: 4
     property int period: 1500
     property int figuresCount: 4
@@ -57,7 +57,7 @@ BasePreloader
 
                                 target: figure
                                 property: "opacity"
-                                duration: opacityAnimation.duration / (control.zoomInIndicator ? 2 : 4)
+                                duration: radiusAnimator.duration / (control.zoomInIndicator ? 2 : 4)
                                 easing.type: Easing.InQuad
 
                                 from: 0
@@ -66,7 +66,7 @@ BasePreloader
 
                             PauseAnimation
                             {
-                                duration: opacityAnimation.duration
+                                duration: radiusAnimator.duration
                                     - fadeInAnimation.duration - fadeOutAnimation.duration
                             }
 
@@ -76,7 +76,7 @@ BasePreloader
 
                                 target: figure
                                 property: "opacity"
-                                duration: opacityAnimation.duration / (control.zoomInIndicator ? 4 : 2)
+                                duration: radiusAnimator.duration / (control.zoomInIndicator ? 4 : 2)
                                 easing.type: Easing.OutQuad
 
                                 from: 1
@@ -86,7 +86,7 @@ BasePreloader
 
                         NumberAnimation
                         {
-                            id: opacityAnimation
+                            id: radiusAnimator
 
                             target: figure
                             property: "radius"

@@ -8,10 +8,10 @@ BasePreloader
 {
     id: control
 
-    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
+    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.9)
 
     property real thickness: 6
-    property real sectionFOV: Math.PI / 2
+    property real sectionFov: Math.PI / 2
     property real sectionRotationDegrees: 90
 
     implicitHeight: 96
@@ -64,7 +64,7 @@ BasePreloader
 
                 function drawSection(targetAngle)
                 {
-                    var angleDiff = control.sectionFOV / 2
+                    var angleDiff = control.sectionFov / 2
                     var centerAspect = 1 / (2 * Screen.devicePixelRatio)
                     var center = Qt.vector2d(
                         section.width * centerAspect,
