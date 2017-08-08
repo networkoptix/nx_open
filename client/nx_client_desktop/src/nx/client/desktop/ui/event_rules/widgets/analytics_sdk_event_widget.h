@@ -9,7 +9,9 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-class AnalyticsSdkEventWidget : public QnAbstractBusinessParamsWidget
+class AnalyticsSdkEventModel;
+
+class AnalyticsSdkEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
@@ -22,11 +24,18 @@ public:
 
 protected slots:
     virtual void at_model_dataChanged(Fields fields) override;
+
 private slots:
     void paramsChanged();
 
 private:
+    void updateSdkEventTypesModel();
+    void updateSelectedEventType();
+
+private:
     QScopedPointer<Ui::AnalyticsSdkEventWidget> ui;
+    AnalyticsSdkEventModel* m_sdkEventModel;
+
 };
 
 } // namespace ui
