@@ -18,6 +18,8 @@
  * playingSpeed - later
  *
  */
+var flashPlayer = "";
+
 angular.module('nxCommon')
     .directive('videowindow', ['$interval','$timeout','animateScope', '$sce', '$log', function ($interval,$timeout,animateScope, $sce, $log) {
         return {
@@ -408,19 +410,24 @@ angular.module('nxCommon')
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
                     // TODO: Nick, remove html from js code
-                    var flashPlayer = "";
-                    $.ajax({
-                        url: Config.viewsDirCommon + 'components/flashPlayer.html',
-                        success: function(result){
-                            flashPlayer = result;
-                            flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
-                            flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
-                            scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
-                        },
-                        error: function(){
-                            $log.error("There was a problem with loading the flash player!!!");
-                        }
-                    });
+                    
+                    if(!flashPlayer){
+                        $.ajax({
+                            url: Config.viewsDirCommon + 'components/flashPlayer.html',
+                            success: function(result){
+                                flashPlayer = result;
+                                flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
+                                flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
+                                scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                            },
+                            error: function(){
+                                $log.error("There was a problem with loading the flash player!!!");
+                            }
+                        });
+                    }
+                    else{
+                        scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                    }
                 };
 
                 scope.getRotation = function(){
