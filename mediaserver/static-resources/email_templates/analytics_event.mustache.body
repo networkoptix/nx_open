@@ -1,0 +1,55 @@
+<h1>{{event}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
+<h1>{{event}} <b>{{analyticsSdkEventType}}</b></h1>
+
+{{#count}}
+
+<table class="description">
+    <thead>
+        <tr>
+	    <th>#</th>
+            <th>Source</th>
+            <th>User</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#aggregated}}
+        <tr>
+            <td>{{index}}</td>
+            <td><b>{{source}}</b> ({{sourceIp}})</td>
+            <td>{{user}}</td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
+        </tr>
+    {{/aggregated}}
+    </tbody>
+</table>
+
+<div class="date">
+    Trigger has been activated {{count}} times, first:<br/>
+    <b>{{timestampDate}} {{timestampTime}}</b>
+</div>
+
+{{/count}}
+
+{{^count}}
+
+<table class="description">
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>User</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#aggregated}}
+        <tr>
+            <td><b>{{source}}</b> ({{sourceIp}})</td>
+            <td>{{user}}</td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
+        </tr>
+    {{/aggregated}}
+    </tbody>
+</table>
+
+{{/count}}

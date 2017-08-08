@@ -117,6 +117,7 @@ static const QString tpReasonContext(lit("reasonContext"));
 static const QString tpAggregated(lit("aggregated"));
 static const QString tpInputPort(lit("inputPort"));
 static const QString tpTriggerName(lit("triggerName"));
+static const QString tpAnalyticsSdkEventType(lit("analyticsSdkEventType"));
 static const QString tpHasCameras(lit("hasCameras"));
 static const QString tpCameras(lit("cameras"));
 static const QString tpUser(lit("user"));
@@ -189,8 +190,10 @@ struct EmailAttachmentData
                 templatePath = lit(":/email_templates/backup_finished.mustache");
                 imageName = lit("server.png");
                 break;
-            // TODO: #GDM #analytics Generate a separate template involving correct name from the driver
             case vms::event::analyticsSdkEvent:
+                templatePath = lit(":/email_templates/analytics_event.mustache");
+                imageName = lit("camera.png");
+                break;
             case vms::event::userDefinedEvent:
                 templatePath = lit(":/email_templates/generic_event.mustache");
                 imageName = lit("server.png");
@@ -810,8 +813,44 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
-        // TODO: #GDM #analytics Generate a separate template involving correct name from the driver
         case vms::event::analyticsSdkEvent:
+        {
+            contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
+
+            const auto aggregationCount = action->getAggregationCount();
+
+            if (aggregationCount > 1)
+                contextMap[tpCount] = QString::number(aggregationCount);
+
+            contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+            contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
+            contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
+
+            auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                params.eventResourceId);
+
+            cameraHistoryPool()->updateCameraHistorySync(camera);
+            if (camera->hasVideo(nullptr))
+            {
+                QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
+                    params.eventTimestampUsec, SCREENSHOT_SIZE);
+                if (!screenshotData.isNull())
+                {
+                    contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId,
+                        params.eventTimestampUsec, false);
+                    contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId,
+                        params.eventTimestampUsec, true);
+
+                    QBuffer screenshotStream(&screenshotData);
+                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot,
+                        screenshotStream, lit("image/jpeg"))));
+                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                }
+            }
+
+            break;
+        }
+
         case vms::event::userDefinedEvent:
         {
             auto metadata = action->getRuntimeParams().metadata;
