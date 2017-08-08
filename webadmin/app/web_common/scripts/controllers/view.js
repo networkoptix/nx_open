@@ -217,7 +217,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(API) {
                 setTimeout(function(){
                     $scope.switchPlaying($scope.positionProvider.playing);
-                    $scope.playerAPI.volume($scope.volumeLevel);
+                    if($scope.playerAPI){
+                        $scope.playerAPI.volume($scope.volumeLevel);
+                    }
                 },100);
             }
         };

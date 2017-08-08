@@ -19,7 +19,7 @@ angular.module('nxCommon')
 
         //getters
         camerasProvider.prototype.getCamera = function(id){
-            if(!this.cameras) {
+            if(!this.cameras || ! id) {
                 return null;
             }
             id = id.replace('{','').replace('}','');
