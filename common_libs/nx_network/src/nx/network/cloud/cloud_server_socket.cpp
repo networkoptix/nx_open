@@ -155,6 +155,8 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    base_type::bindToAioThread(aioThread);
+
     NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
@@ -226,7 +228,7 @@ void CloudServerSocket::cancelIOSync()
     }
 }
 
-bool CloudServerSocket::isInSelfAioThread()
+bool CloudServerSocket::isInSelfAioThread() const
 {
     return m_mediatorRegistrationRetryTimer.isInSelfAioThread();
 }
