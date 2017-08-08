@@ -82,6 +82,10 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'devtools/developers.html',
             controller: 'DevtoolsCtrl'
         })
+        .when('/developers/api/:apiMethod*', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'ApiToolCtrl'
+        })
         .when('/developers/api', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
             controller: 'ApiToolCtrl'

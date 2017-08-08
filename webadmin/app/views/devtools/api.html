@@ -6,13 +6,14 @@
                     <div class="view-wrapper">
                         <div class="cameras-panel">
                             <h3>Test API calls</h3>
-                            <a ng-click="clearActiveFunction()" href="">View all functions</a>
+                            <a ng-click="clearActiveFunction()" href="#/developers/api">View all functions</a>
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
                                     <li ng-repeat="function in group.functions" ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
-                                        <b><a ng-click="setActiveFunction(group,function)" href="">{{function.name}}</a></b>
+                                        <b><a ng-click="setActiveFunction(group,function,$event)"
+                                              ng-href="#/developers/api{{group.urlPrefix}}/{{function.name}}">{{function.name}}</a></b>
                                     </li>
                                 </ul>
                             </div>
@@ -32,7 +33,8 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions" ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
-                                            <b><a ng-click="setActiveFunction(group,function)" href="">{{function.name}}</a></b>
+                                            <b><a ng-click="setActiveFunction(group,function,$event)"
+                                                  ng-href="#/developers/api{{group.urlPrefix}}/{{function.name}}">{{function.name}}</a></b>
                                             <span ng-bind-html="function.description.xml" class="api-description-strip"></span>
                                         </li>
                                     </ul>
