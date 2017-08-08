@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include "basic_test_fixture.h"
 #include "model/abstract_remote_relay_peer_pool.h"
 #include <controller/connect_session_manager.h>
@@ -12,34 +13,35 @@ namespace test {
 
 using namespace nx::cloud::relay;
 
+class RelayToRelayRedirect;
+
 class MemoryRemoteRelayPeerPool: public model::AbstractRemoteRelayPeerPool
 {
 public:
-    MemoryRemoteRelayPeerPool(const std::string& redirectToRelay):
-        m_redirectToRelay(redirectToRelay)
+    MemoryRemoteRelayPeerPool(const std::string& redirectToRelay, RelayToRelayRedirect* relayTest):
+        m_redirectToRelay(redirectToRelay),
+        m_relayTest(relayTest)
     {}
 
-    virtual cf::future<std::string> findRelayByDomain(const std::string& domainName) const override
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& /*domainName*/) const override
     {
         auto redirectToRelayCopy = m_redirectToRelay;
-        qWarning() << "findRelayByDomain: returning" << QString::fromStdString(redirectToRelayCopy);
         return cf::make_ready_future<std::string>(std::move(redirectToRelayCopy));
     }
 
     virtual cf::future<bool> addPeer(
         const std::string& domainName,
-        const std::string& relayHost) override
-    {
-        return cf::make_ready_future(true);
-    }
+        const std::string& relayHost) override;
 
-    virtual cf::future<bool> removePeer(const std::string& domainName) override
+    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
     {
         return cf::make_ready_future(false);
     }
 
 private:
     std::string m_redirectToRelay;
+    RelayToRelayRedirect* m_relayTest;
 };
 
 class RelayToRelayRedirect: public BasicTestFixture
@@ -60,7 +62,7 @@ public:
     void setUpConnectSessionManagerFactoryFunc()
     {
         controller::ConnectSessionManagerFactory::setFactoryFunc(
-            [](
+            [this](
                 const conf::Settings& settings,
                 model::ClientSessionPool* clientSessionPool,
                 model::ListeningPeerPool* listeningPeerPool,
@@ -73,7 +75,7 @@ public:
                 clientSessionPool,
                 listeningPeerPool,
                 trafficRelay,
-                std::make_unique<MemoryRemoteRelayPeerPool>("127.0.0.1:20000"),
+                std::make_unique<MemoryRemoteRelayPeerPool>("127.0.0.1:20000", this),
                 std::move("127.0.0.1:" + std::to_string(relayPort++)));
         });
     }
@@ -108,11 +110,45 @@ public:
             qWarning() << "waiting...";
         }
     }
+
+    void assertFirstRelayHasBeenAddedToThePool()
+    {
+        auto it = std::find_if(
+            m_addedPeers.cbegin(),
+            m_addedPeers.cend(),
+            [this](const std::pair<std::string, std::string>& p)
+        {
+            return
+                nx::String::fromStdString(p.first).contains(this->serverSocketCloudAddress())
+                && p.second == "127.0.0.1:20000";
+        });
+
+        ASSERT_NE(it, m_addedPeers.cend());
+    }
+
+    void addPeerRelay(const std::string& domainName, const std::string& relayHost)
+    {
+        m_addedPeers.push_back(std::make_pair(domainName, relayHost));
+    }
+
+private:
+    std::vector<std::pair<std::string, std::string>> m_addedPeers;
+
 };
+
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    const std::string& relayHost)
+{
+    m_relayTest->addPeerRelay(domainName, relayHost);
+    return cf::make_ready_future(true);
+}
+
 
 TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)
 {
     assertServerIsAccessibleFromAnotherRelay();
+    assertFirstRelayHasBeenAddedToThePool();
 }
 
 } // namespace test
