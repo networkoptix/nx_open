@@ -2185,7 +2185,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
                 return false;
 
             const auto result = restartClient();
-            if (result == api::ResultType::ok)
+            if (result == applauncher::api::ResultType::Value::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2193,7 +2193,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
             {
                 QThread::msleep(100);
                 qApp->processEvents();
-                if (restartClient() == api::ResultType::ok)
+                if (restartClient() == applauncher::api::ResultType::ok)
                     return true;
             }
             return false;
