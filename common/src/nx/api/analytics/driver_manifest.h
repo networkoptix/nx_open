@@ -12,10 +12,10 @@ namespace api {
 
 struct AnalyticsEventType
 {
-    QnUuid eventId;
+    QnUuid eventTypeId;
     TranslatableString eventName;
 };
-#define AnalyticsEventType_Fields (eventId)(eventName)
+#define AnalyticsEventType_Fields (eventTypeId)(eventName)
 
 struct AnalyticsDriverManifest
 {
