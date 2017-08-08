@@ -83,4 +83,42 @@ angular.module('webadminApp')
             });
         };
 
+
+        /* Making window have correct size and positioning */
+        var $window = $(window);
+        var $header = $('header');
+        var updateHeights = function() {
+            var $camerasPanel = $('.cameras-panel');
+            var $apiPanel = $('.api-view');
+            var windowHeight = $window.height();
+            var headerHeight = $header.outerHeight();
+
+            var topAlertHeight = 0;
+
+            var topAlert = $('.alerts-row>td');
+            //after the user is notified this should not be calculated again
+            if(topAlert.length && !$scope.session.mobileAppNotified){
+                topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
+            }
+
+            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
+
+            $camerasPanel.css('height',viewportHeight );
+            var listWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;
+            $apiPanel.css('width',listWidth + 'px');
+        };
+
+        $timeout(updateHeights);
+
+        $header.click(function() {
+            //350ms delay is to give the navbar enough time to collapse
+            $timeout(updateHeights,350);
+        });
+
+        $window.resize(updateHeights);
+        $('html').addClass('webclient-page');
+        $scope.$on('$destroy', function( event ) {
+            $window.unbind('resize', updateHeights);
+            $('html').removeClass('webclient-page');
+        });
     });

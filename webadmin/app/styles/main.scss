@@ -627,3 +627,7 @@ h3 {
 .api-description-strip *{
     display:none; /* Do not show info about post method */
 }
+.api-view{
+    overflow-x:auto;
+    padding:5px;
+}
