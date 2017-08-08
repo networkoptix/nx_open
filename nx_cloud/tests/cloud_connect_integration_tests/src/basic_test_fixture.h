@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -41,18 +42,34 @@ enum class MediatorApiProtocol
     http
 };
 
+using Relay = nx::cloud::relay::test::Launcher;
+using RelayPtr = std::unique_ptr<Relay>;
+
+struct RelayContext
+{
+    RelayPtr relay;
+    int port;
+
+    RelayContext(RelayPtr relay, int port):
+        relay(std::move(relay)),
+        port(port)
+    {}
+};
+
+using RelayContextList = std::vector<RelayContext>;
+
 class BasicTestFixture:
     public ::testing::Test
 {
 public:
-    BasicTestFixture();
+    BasicTestFixture(int relayCount = 1);
     ~BasicTestFixture();
 
 protected:
     virtual void SetUp() override;
 
     void startServer();
-    QUrl relayUrl() const;
+    QUrl relayUrl(int relayNum = 0) const;
     void restartMediator();
 
     void assertConnectionCanBeEstablished();
@@ -84,7 +101,6 @@ private:
     const nx_http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
-    nx::cloud::relay::test::Launcher m_trafficRelay;
     std::unique_ptr<TestHttpServer> m_httpServer;
     TestHttpServer m_cloudModulesXmlProvider;
     QUrl m_staticUrl;
@@ -95,14 +111,19 @@ private:
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
-    QUrl m_relayUrl;
     std::unique_ptr<AbstractStreamSocket> m_clientSocket;
+
+    RelayContextList m_relays;
+    int m_relayCount;
+
 
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();
     void startHttpServer();
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter);
+    void startRelays();
+    void startRelay(int port);
 };
 
 } // namespace test
