@@ -290,11 +290,11 @@ angular.module('nxCommon')
                                     scope.jsHls = false;
                                 });
 
-                                console.error(error);
                                 if(scope.vgApi){
                                     scope.vgApi.kill();
                                 }
                                 scope.vgPlayerReady({$API: null});
+                                console.error(error);
                             }, function (position, duration) {
                                 if (position != 0) {
                                     scope.loading = false; // Video is playing - disable loading
@@ -334,11 +334,11 @@ angular.module('nxCommon')
                                 scope.jsHls = false;
                             });
 
-                            console.error(error);
                             if(scope.vgApi){
                                 scope.vgApi.kill();
                             }
                             scope.vgPlayerReady({$API: null});
+                            console.error(error);
                         });
                         videoPlayers.push(jsHlsAPI);
                     });

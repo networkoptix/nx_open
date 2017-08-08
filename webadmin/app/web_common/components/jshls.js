@@ -304,7 +304,6 @@ function JsHlsAPI(){
                         hls.destroy();
                         break;
                 }
-                console.log(console.log());
             }
             if(!stats) stats = {};
             // track all errors independently
@@ -434,7 +433,7 @@ function JsHlsAPI(){
     };
 
     var recoverDecodingErrorDate,recoverSwapAudioCodecDate;
-    this.handleMediaError= function(){
+    this.handleMediaError = function(){
         if(autoRecoverError) {
             var now = performance.now();
             if(!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 3000) {
