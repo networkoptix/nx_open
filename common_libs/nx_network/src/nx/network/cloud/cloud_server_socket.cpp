@@ -542,6 +542,8 @@ void CloudServerSocket::onMediatorConnectionRestored()
 
     if (m_state == State::listening)
     {
+        m_aggregateAcceptor.cancelIOSync();
+
         m_state = State::registeringOnMediator;
         m_mediatorRegistrationRetryTimer.reset();
 
