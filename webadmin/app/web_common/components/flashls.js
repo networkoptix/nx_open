@@ -3,7 +3,7 @@ function FlashlsAPI (flashObject) {
         window[p] = function(eventName, args) {
             flo.embedHandler();
             if(flo.flashlsEvents[eventName]) {
-              flo.flashlsEvents[eventName].apply(flo, args);
+                flo.flashlsEvents[eventName].apply(flo, args);
             }
         };
     }
@@ -15,7 +15,7 @@ function FlashlsAPI (flashObject) {
         }
     };
 
-    this.init = function(id,readyHandler,errorHandler, positionHandler) {
+    this.init = function(id, readyHandler,errorHandler, positionHandler) {
         this.id = id;
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;

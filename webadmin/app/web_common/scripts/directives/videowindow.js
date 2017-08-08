@@ -278,7 +278,6 @@ angular.module('nxCommon')
                                 if (scope.vgSrc) {
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
-
                                 scope.vgPlayerReady({$API: api});
                             }, function (error) {
                                 $timeout(function () {
@@ -409,25 +408,12 @@ angular.module('nxCommon')
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
                     // TODO: Nick, remove html from js code
-                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
-                    tmp += 'width="100%" height="100%">';
-                    tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
-                    tmp += '\n\t<param name="quality" value="high" />';
-                    tmp += '\n\t<param name="swliveconnect" value="true" />';
-                    tmp += '\n\t<param name="allowScriptAccess" value="always" />';
-                    tmp += '\n\t<param name="bgcolor" value="#1C2327" />';
-                    tmp += '\n\t<param name="allowFullScreen" value="true" />';
-                    tmp += '\n\t<param name="wmode" value="transparent" />';
-                    tmp += '\n\t<param name="FlashVars" value="callback=' + playerId + '" />';
-                    tmp += '\n\t<embed src="'+scope.flashSource+'?inline=1" width="100%" height="100%"';
-                    tmp += ' name="flashvideoembed_'+playerId+'" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
-                    tmp += 'allowScriptAccess="always" type="application/x-shockwave-flash" swliveconnect="true" wmode="transparent"';
-                    tmp += 'FlashVars="callback='+playerId+'">\n\t</embed>\n</object>';
+                    var tmp = L.common.flashPlayer.join('\n');
+                    tmp = tmp.replace(/{{playerId}}/g, playerId);
+                    tmp = tmp.replace(/{{flashSource}}/g, scope.flashSource);
                     
                     playerId = !scope.playerId ? '' : '#'+playerId;
                     scope.flashPlayer = $sce.trustAsHtml(tmp);
-                    // TODO: Nick, that is strange. Why do you do it like this?
-                    // TODO: Also, try ng-bind-html instead of setting innerHTML
                 };
 
                 scope.getRotation = function(){
