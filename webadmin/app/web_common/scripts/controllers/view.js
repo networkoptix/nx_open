@@ -243,6 +243,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             }else{
                 playing = Math.round(playing);
             }
+
+            if(!$scope.activeCamera){
+                return;
+            }
             var cameraId = $scope.activeCamera.id;
             var serverUrl = '';
 

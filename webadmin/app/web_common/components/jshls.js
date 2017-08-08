@@ -10,6 +10,7 @@ function JsHlsAPI(){
     dumpfMP4 = false;
 
     this.initHlsEvents = function(hls){
+        var jshlsApi = this;
         hls.config.manifestLoadingTimeOut = 30*1000; // 30 seconds to wait for manifest
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
@@ -294,7 +295,7 @@ function JsHlsAPI(){
                 console.log('fatal error :' + data.details);
                 switch(data.type) {
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        this.handleMediaError();
+                        jshlsApi.handleMediaError();
                         break;
                     case Hls.ErrorTypes.NETWORK_ERROR:
                         console.log(",network error ...");
@@ -304,6 +305,7 @@ function JsHlsAPI(){
                         hls.destroy();
                         break;
                 }
+                jshlsApi.errorHandler("Fatal Error");
             }
             if(!stats) stats = {};
             // track all errors independently
@@ -365,6 +367,7 @@ function JsHlsAPI(){
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
+        this.errorHandler = errorHandler;
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
