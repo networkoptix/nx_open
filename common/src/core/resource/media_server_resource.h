@@ -137,7 +137,6 @@ protected:
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
-    void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
     void at_cloudSettingsChanged();
 
