@@ -34,7 +34,7 @@ void IncomingTunnelPool::acceptAsync(AcceptCompletionHandler handler)
         if (!m_acceptedSockets.empty())
         {
             lock.unlock();
-            return dispatch([this]() { callAcceptHandler(SystemError::noError); });
+            return post([this]() { callAcceptHandler(SystemError::noError); });
         }
     }
 
