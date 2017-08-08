@@ -174,7 +174,7 @@ TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)
 TEST_F(RelayToRelayRedirect, RecordRemovedOnServerDisconnect)
 {
     whenServerGoesOffline();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     thenItsRecordShouldBeRemovedFromRemoteRelayPool();
 }
 
