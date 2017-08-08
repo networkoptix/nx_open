@@ -15,10 +15,15 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+
+#include <nx/api/analytics/driver_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -33,6 +38,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/random.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
@@ -139,6 +145,72 @@ public:
                 runTilesTest();
                 close();
             });
+
+        addButton(lit("Generate analytics manifests"),
+            [this]()
+            {
+                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+                if (servers.empty())
+                    return;
+
+                int serverIndex = 0;
+
+                for (int i = 0; i < 5; ++i)
+                {
+                    nx::api::AnalyticsDriverManifest manifest;
+                    manifest.driverId = QnUuid::createUuid();
+                    manifest.driverName.value = lit("Driver %1").arg(i);
+                    manifest.driverName.localization[lit("ru_RU")] = lit("Äנאיגונ %1").arg(i);
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        nx::api::AnalyticsEventType eventType;
+                        eventType.eventTypeId = QnUuid::createUuid();
+                        eventType.eventName.value = lit("Event %1").arg(j);
+                        eventType.eventName.localization[lit("ru_RU")] = lit("Ñמבûעטו %1").arg(j);
+                        manifest.outputEventTypes.push_back(eventType);
+                    }
+
+                    auto server = servers[serverIndex];
+                    auto manifests = server->analyticsDrivers();
+                    manifests.push_back(manifest);
+                    server->setAnalyticsDrivers(manifests);
+                    server->saveParamsAsync();
+
+                    serverIndex = (serverIndex + 1) % servers.size();
+                }
+
+                for (auto server: servers)
+                {
+                    QList<QnUuid> driverIds;
+                    driverIds.push_back(QnUuid()); //< Some cameras will not have driver.
+                    for (const auto& driver: server->analyticsDrivers())
+                        driverIds.push_back(driver.driverId);
+
+                    for (auto camera: resourcePool()->getAllCameras(server, true))
+                    {
+                        const QnUuid randomTypeId = nx::utils::random::choice(driverIds);
+                        camera->setAnalyticsDriverId(randomTypeId);
+                        camera->saveParamsAsync();
+                    }
+                }
+            });
+
+        addButton(lit("Clear analytics manifests"),
+            [this]()
+            {
+                for (auto camera: resourcePool()->getAllCameras({}))
+                {
+                    camera->setAnalyticsDriverId(QnUuid());
+                    camera->saveParamsAsync();
+                }
+
+                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
+                {
+                    server->setAnalyticsDrivers({});
+                    server->saveParamsAsync();
+                }
+            });
+
 
     }
 
