@@ -5,6 +5,4 @@
 
 void PrintTo(const Qn::GlobalPermissions& val, ::std::ostream* os);
 void PrintTo(const Qn::Permissions& val, ::std::ostream* os);
-void PrintTo(const QByteArray& val, ::std::ostream* os);
-void PrintTo(const QString& val, ::std::ostream* os);
 
