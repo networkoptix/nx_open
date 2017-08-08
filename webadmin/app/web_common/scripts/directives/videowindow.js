@@ -289,7 +289,12 @@ angular.module('nxCommon')
                                     scope.native = false;
                                     scope.jsHls = false;
                                 });
+
                                 console.error(error);
+                                if(scope.vgApi){
+                                    scope.vgApi.kill();
+                                }
+                                scope.vgPlayerReady({$API: null});
                             }, function (position, duration) {
                                 if (position != 0) {
                                     scope.loading = false; // Video is playing - disable loading
@@ -322,9 +327,18 @@ angular.module('nxCommon')
                                 });
                             }
                             scope.vgPlayerReady({$API:api});
-                        },  function (api) {
-                            scope.videoFlags.errorLoading = true;
-                            scope.jsHls = false;
+                        },  function (error) {
+                            $timeout(function(){
+                                scope.loading = false;
+                                scope.videoFlags.errorLoading = true;
+                                scope.jsHls = false;
+                            });
+
+                            console.error(error);
+                            if(scope.vgApi){
+                                scope.vgApi.kill();
+                            }
+                            scope.vgPlayerReady({$API: null});
                         });
                         videoPlayers.push(jsHlsAPI);
                     });
