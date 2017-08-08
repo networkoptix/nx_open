@@ -622,3 +622,8 @@ h3 {
     background-color: transparent;
   }
 }
+
+
+.api-description-strip *{
+    display:none; /* Do not show info about post method */
+}
