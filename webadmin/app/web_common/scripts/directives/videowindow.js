@@ -285,7 +285,7 @@ angular.module('nxCommon')
                                     scope.loading = false; // Some error happended - stop loading
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
-                                    scoep.jsHls = false;
+                                    scope.jsHls = false;
                                 });
                                 console.error(error);
                             }, function (position, duration) {
@@ -408,12 +408,19 @@ angular.module('nxCommon')
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
                     // TODO: Nick, remove html from js code
-                    var tmp = L.common.flashPlayer.join('\n');
-                    tmp = tmp.replace(/{{playerId}}/g, playerId);
-                    tmp = tmp.replace(/{{flashSource}}/g, scope.flashSource);
-                    
-                    playerId = !scope.playerId ? '' : '#'+playerId;
-                    scope.flashPlayer = $sce.trustAsHtml(tmp);
+                    var flashPlayer = "";
+                    $.ajax({
+                        url: Config.viewsDirCommon + 'components/flashPlayer.html',
+                        success: function(result){
+                            flashPlayer = result;
+                            flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
+                            flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
+                            scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                        },
+                        error: function(){
+                            $log.error("There was a problem with loading the flash player!!!");
+                        }
+                    });
                 };
 
                 scope.getRotation = function(){
