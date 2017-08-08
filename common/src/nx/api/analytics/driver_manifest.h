@@ -10,6 +10,9 @@
 namespace nx {
 namespace api {
 
+/**
+ * Description of the analytics event.
+ */
 struct AnalyticsEventType
 {
     QnUuid eventTypeId;
@@ -17,6 +20,9 @@ struct AnalyticsEventType
 };
 #define AnalyticsEventType_Fields (eventTypeId)(eventName)
 
+/**
+* Description of the analytics driver, which can generate different events.
+*/
 struct AnalyticsDriverManifest
 {
    QnUuid driverId;

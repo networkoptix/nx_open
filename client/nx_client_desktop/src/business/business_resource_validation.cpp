@@ -20,6 +20,9 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
+
 #include <utils/email/email.h>
 
 namespace {
@@ -702,4 +705,47 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
     }
 
     return alert.isEmpty() ? alert : kForceHtml.arg(alert);
+}
+
+bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto supportedEvents = camera->analyticsSupportedEvents();
+
+    QSet<QnUuid> supportedDrivers;
+    for (auto supportedEventSet: supportedEvents)
+    {
+        if (supportedEventSet.driverId.isNull())
+            continue;
+
+        if (supportedEventSet.eventTypes.empty())
+            continue;
+
+        supportedDrivers.insert(supportedEventSet.driverId);
+    }
+    if (supportedDrivers.empty())
+        return false;
+
+    const auto server = camera->getParentServer();
+    NX_EXPECT(server);
+    if (!server)
+        return false;
+
+    const auto drivers = server->analyticsDrivers();
+    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
+        [supportedDrivers](const nx::api::AnalyticsDriverManifest& manifest)
+        {
+            return supportedDrivers.contains(manifest.driverId);
+        });
+
+    return driver != drivers.cend();
+}
+
+QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.empty())
+        return QnBusinessResourceValidationStrings::selectCamera();
+
+    // TODO: #GDM #analytics
+    return QString();
 }

@@ -88,9 +88,10 @@ void AnalyticsSdkEventWidget::paramsChanged()
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
-    // TODO: #GDM #analytics add a new field when event rules will be refactored
-    eventParams.inputPortId = ui->sdkEventTypeComboBox->currentData(
-        AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>().toString();
+    eventParams.setAnalyticsEventId(ui->sdkEventTypeComboBox->currentData(
+        AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>());
+    eventParams.setAnalyticsDriverId(ui->sdkEventTypeComboBox->currentData(
+        AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>());
     model()->setEventParams(eventParams);
 }
 
@@ -105,11 +106,27 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    // TODO: #GDM #analytics add a new field when event rules will be refactored
-    QnUuid eventTypeId = QnUuid::fromStringSafe(model()->eventParams().inputPortId);
-    int index = ui->sdkEventTypeComboBox->findData(qVariantFromValue(eventTypeId),
-        AnalyticsSdkEventModel::EventTypeIdRole, Qt::MatchExactly);
-    ui->sdkEventTypeComboBox->setCurrentIndex(std::max(index, 0));
+    QnUuid driverId = model()->eventParams().analyticsDriverId();
+    QnUuid eventTypeId = model()->eventParams().analyticsEventId();
+
+    bool index = 0;
+    for (int i = 0; i < ui->sdkEventTypeComboBox->count(); ++i)
+    {
+        auto itemDriverId = ui->sdkEventTypeComboBox->itemData(i,
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+        if (itemDriverId != driverId)
+            continue;
+
+        auto itemEventTypeId = ui->sdkEventTypeComboBox->itemData(i,
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
+        if (itemDriverId != eventTypeId)
+            continue;
+
+        index = i;
+        break;
+    }
+
+    ui->sdkEventTypeComboBox->setCurrentIndex(index);
 }
 
 } // namespace ui

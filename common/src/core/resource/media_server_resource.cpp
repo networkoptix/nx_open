@@ -35,6 +35,8 @@
 #include <common/common_module.h>
 #include <api/global_settings.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+
 namespace {
     const QString kUrlScheme = lit("rtsp");
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -68,7 +70,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     m_statusTimer.restart();
 
     connect(this, &QnResource::resourceChanged,
-        this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+        this, &QnMediaServerResource::resetCachedValues, Qt::DirectConnection);
 
     connect(this, &QnResource::propertyChanged,
         this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
@@ -84,9 +86,9 @@ QnMediaServerResource::~QnMediaServerResource()
 void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key)
 {
     if (key == QnMediaResource::panicRecordingKey())
-        m_panicModeCache.update();
+        m_panicModeCache.reset();
     else if (key == Qn::kAnalyticsDriversParamName)
-        m_analyticsDriversCache.update();
+        m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::at_cloudSettingsChanged()
@@ -95,6 +97,12 @@ void QnMediaServerResource::at_cloudSettingsChanged()
         return;
 
     emit auxUrlsChanged(toSharedPointer(this));
+}
+
+void QnMediaServerResource::resetCachedValues()
+{
+    m_panicModeCache.reset();
+    m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -115,12 +123,6 @@ void QnMediaServerResource::beforeDestroy()
 {
     QnMutexLocker lock(&m_mutex);
     m_firstCamera.clear();
-}
-
-void QnMediaServerResource::atResourceChanged()
-{
-    m_panicModeCache.update();
-    m_analyticsDriversCache.update();
 }
 
 QString QnMediaServerResource::getUniqueId() const

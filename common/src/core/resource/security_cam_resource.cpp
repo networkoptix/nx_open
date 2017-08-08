@@ -25,6 +25,8 @@
 #include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
+#include <nx/api/analytics/supported_events.h>
+
 #include <nx/utils/log/log.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
@@ -81,7 +83,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         &m_mutex ),
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
-        &m_mutex )
+        &m_mutex),
+    m_cachedAnalyticsSupportedEvents(
+        [this]()
+        {
+            return QJson::deserialized<QList<nx::api::AnalyticsSupportedEvents>>(
+                getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
+        },
+        &m_mutex)
 {
     addFlags(Qn::live_cam);
 
@@ -89,13 +98,9 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         this, &QnResource::initializedChanged,
         this, &QnSecurityCamResource::at_initializedChanged,
         Qt::DirectConnection);
-    connect(
-        this, &QnResource::resourceChanged,
-        this, &QnSecurityCamResource::resetCachedValues,
+    connect(this, &QnResource::resourceChanged, this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
-    connect(
-        this, &QnResource::propertyChanged,
-        this, &QnSecurityCamResource::resetCachedValues,
+    connect(this, &QnResource::propertyChanged, this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -766,17 +771,19 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
-QnUuid QnSecurityCamResource::analyticsDriverId() const
+QList<nx::api::AnalyticsSupportedEvents> QnSecurityCamResource::analyticsSupportedEvents() const
 {
-    return QnUuid::fromStringSafe(getProperty(Qn::kAnalyticsDriversParamName));
+    return m_cachedAnalyticsSupportedEvents.get();
 }
 
-void QnSecurityCamResource::setAnalyticsDriverId(const QnUuid& value)
+void QnSecurityCamResource::setAnalyticsSupportedEvents(
+    const QList<nx::api::AnalyticsSupportedEvents>& eventsList)
 {
+    QString value = QString::fromUtf8(QJson::serialized(eventsList));
     if (value.isNull())
         setProperty(Qn::kAnalyticsDriversParamName, QVariant());
     else
-        setProperty(Qn::kAnalyticsDriversParamName, value.toString());
+        setProperty(Qn::kAnalyticsDriversParamName, value);
 }
 
 void QnSecurityCamResource::setMinDays(int value)
@@ -1095,6 +1102,7 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
 
 void QnSecurityCamResource::resetCachedValues()
 {
+    // TODO: #rvasilenko reset only required values on property changed (as in server resource).
     //resetting cached values
     m_cachedHasDualStreaming2.reset();
     m_cachedSupportedMotionType.reset();
@@ -1102,6 +1110,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
     m_cachedIsIOModule.reset();
+    m_cachedAnalyticsSupportedEvents.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const

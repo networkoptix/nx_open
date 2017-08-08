@@ -10,11 +10,10 @@
 #include <core/resource/resource.h>
 #include <nx/network/socket_common.h>
 
-#include <nx/api/analytics/driver_manifest.h>
-
 #include "api/server_rest_connection_fwd.h"
 
 namespace nx_http { class AsyncHttpClientPtr; }
+namespace nx { namespace api { struct AnalyticsDriverManifest; } }
 
 class SocketAddress;
 
@@ -141,6 +140,8 @@ private slots:
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
     void at_cloudSettingsChanged();
+
+    void resetCachedValues();
 
 signals:
     void portChanged(const QnResourcePtr &resource);

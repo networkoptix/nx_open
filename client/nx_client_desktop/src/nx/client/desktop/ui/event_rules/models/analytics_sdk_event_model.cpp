@@ -5,6 +5,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -46,6 +49,9 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
         case EventTypeIdRole:
             return qVariantFromValue(item.eventTypeId);
 
+        case DriverIdRole:
+            return qVariantFromValue(item.driverId);
+
         default:
             break;
     }
@@ -55,46 +61,57 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
 
 void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
 {
-    /*
-    * Notes:
-    * 1) Event type id is not unique between different drivers.
-    * 2) Different servers can have different versions of the same driver with different event
-    * types list. This situation is not handled right now. // TODO: #GDM #analytics should we???
-    */
-
     beginResetModel();
     m_items.clear();
     m_usedDrivers.clear();
 
+    // Events are defined by pair of driver id and event type id.
+    using ItemKey = QPair<QnUuid, QnUuid>;
+    QSet<ItemKey> addedEvents;
+
     for (const auto& camera: cameras)
     {
-        const auto driverId = camera->analyticsDriverId();
-        if (driverId.isNull() || m_usedDrivers.contains(driverId))
-            continue;
-
-        const auto server = camera->getParentServer();
-        NX_EXPECT(server);
-        if (!server)
-            continue;
-
-        const auto drivers = server->analyticsDrivers();
-        const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-            [driverId](const nx::api::AnalyticsDriverManifest& manifest)
-            {
-                return manifest.driverId == driverId;
-            });
-        NX_EXPECT(driver != drivers.cend());
-        if (driver == drivers.cend())
-            continue;
-
-        m_usedDrivers[driverId] = driver->driverName.text(qnRuntime->locale());
-        for (const auto eventType: driver->outputEventTypes)
+        const auto supportedEvents = camera->analyticsSupportedEvents();
+        for (const auto& supportedEvent: supportedEvents)
         {
-            Item item;
-            item.driverId = driverId;
-            item.eventTypeId = eventType.eventTypeId;
-            item.eventName = eventType.eventName.text(qnRuntime->locale());
-            m_items.push_back(item);
+            const auto driverId = supportedEvent.driverId;
+            if (driverId.isNull())
+                continue;
+
+            const auto server = camera->getParentServer();
+            NX_EXPECT(server);
+            if (!server)
+                continue;
+
+            const auto drivers = server->analyticsDrivers();
+            const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
+                [driverId](const nx::api::AnalyticsDriverManifest& manifest)
+                {
+                    return manifest.driverId == driverId;
+                });
+            NX_EXPECT(driver != drivers.cend());
+            if (driver == drivers.cend())
+                continue;
+
+            m_usedDrivers[driverId] = driver->driverName.text(qnRuntime->locale());
+
+            for (const auto eventType: driver->outputEventTypes)
+            {
+                if (!supportedEvent.eventTypes.contains(eventType.eventTypeId))
+                    continue;
+
+                // Ignore duplicating events.
+                ItemKey key(driverId, eventType.eventTypeId);
+                if (addedEvents.contains(key))
+                    continue;
+                addedEvents.insert(key);
+
+                Item item;
+                item.driverId = driverId;
+                item.eventTypeId = eventType.eventTypeId;
+                item.eventName = eventType.eventName.text(qnRuntime->locale());
+                m_items.push_back(item);
+            }
         }
     }
 

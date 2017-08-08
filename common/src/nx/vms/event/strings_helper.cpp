@@ -16,6 +16,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/events.h>
@@ -25,14 +27,12 @@
 namespace {
 
 nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
-    const QnUuid& eventTypeId)
+    const QnUuid& driverId, const QnUuid& eventTypeId)
 {
     NX_EXPECT(camera);
     if (!camera)
         return {};
 
-    auto driverId = camera->analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
     if (driverId.isNull())
         return {};
 
@@ -713,14 +713,16 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == analyticsSdkEvent);
 
-    // TODO: #GDM #analytics add a new field when event rules will be refactored
-    QnUuid eventTypeId = QnUuid::fromStringSafe(params.inputPortId);
+    QnUuid driverId = params.analyticsDriverId();
+    NX_EXPECT(!driverId.isNull());
+
+    QnUuid eventTypeId = params.analyticsEventId();
     NX_EXPECT(!eventTypeId.isNull());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventType = analyticsEventType(camera, eventTypeId);
+    const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
     const auto text = eventType.eventName.text(locale);
 
     return !text.isEmpty()

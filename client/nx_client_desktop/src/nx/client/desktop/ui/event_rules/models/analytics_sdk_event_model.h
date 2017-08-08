@@ -19,6 +19,7 @@ public:
     enum DataRole
     {
         EventTypeIdRole = Qt::UserRole + 1,
+        DriverIdRole,
     };
 
     AnalyticsSdkEventModel(QObject* parent = nullptr);

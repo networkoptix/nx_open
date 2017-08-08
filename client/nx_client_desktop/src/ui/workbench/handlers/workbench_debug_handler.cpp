@@ -29,12 +29,16 @@
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
+
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
 #include <finders/systems_finder.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -181,15 +185,30 @@ public:
 
                 for (auto server: servers)
                 {
-                    QList<QnUuid> driverIds;
-                    driverIds.push_back(QnUuid()); //< Some cameras will not have driver.
-                    for (const auto& driver: server->analyticsDrivers())
-                        driverIds.push_back(driver.driverId);
+                    auto drivers = server->analyticsDrivers();
+                    drivers.push_back(nx::api::AnalyticsDriverManifest()); //< Some cameras will not have driver.
 
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
-                        const QnUuid randomTypeId = nx::utils::random::choice(driverIds);
-                        camera->setAnalyticsDriverId(randomTypeId);
+                        const auto randomDriver = nx::utils::random::choice(drivers);
+                        if (randomDriver.driverId.isNull()) //< dummy driver
+                        {
+                            camera->setAnalyticsSupportedEvents({});
+                        }
+                        else
+                        {
+                            nx::api::AnalyticsSupportedEvents supported;
+                            supported.driverId = randomDriver.driverId;
+                            std::transform(randomDriver.outputEventTypes.cbegin(),
+                                randomDriver.outputEventTypes.cend(),
+                                std::back_inserter(supported.eventTypes),
+                                [](const nx::api::AnalyticsEventType& eventType)
+                                {
+                                    return eventType.eventTypeId;
+                                });
+                            camera->setAnalyticsSupportedEvents({supported});
+                        }
+
                         camera->saveParamsAsync();
                     }
                 }
@@ -200,7 +219,7 @@ public:
             {
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
-                    camera->setAnalyticsDriverId(QnUuid());
+                    camera->setAnalyticsSupportedEvents({});
                     camera->saveParamsAsync();
                 }
 
