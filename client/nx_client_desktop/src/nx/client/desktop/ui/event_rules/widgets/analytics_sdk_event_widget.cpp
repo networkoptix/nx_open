@@ -76,7 +76,7 @@ void AnalyticsSdkEventWidget::at_model_dataChanged(Fields fields)
             ui->descriptionEdit->setText(description);
     }
 
-    if (fields.testFlag(Field::eventParams) || fields.testFlag(Field::eventParams))
+    if (fields.testFlag(Field::eventResources) || fields.testFlag(Field::eventParams))
         updateSelectedEventType();
 }
 
@@ -88,6 +88,9 @@ void AnalyticsSdkEventWidget::paramsChanged()
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
+    // TODO: #GDM #analytics add a new field
+    eventParams.inputPortId = ui->sdkEventTypeComboBox->currentData(
+        AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>().toString();
     model()->setEventParams(eventParams);
 }
 
@@ -97,6 +100,7 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
         model()->eventResources());
     m_sdkEventModel->loadFromCameras(cameras);
     ui->sdkEventTypeComboBox->setEnabled(m_sdkEventModel->isValid());
+    ui->sdkEventTypeComboBox->model()->sort(0);
 }
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
