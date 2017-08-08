@@ -82,6 +82,7 @@ function FlashlsAPI (flashObject) {
 }
 
 FlashlsAPI.prototype.kill = function(){
+    delete window[this.id];
     this.flashObject = null;
 };
 
