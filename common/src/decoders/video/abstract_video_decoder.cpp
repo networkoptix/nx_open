@@ -20,6 +20,7 @@ extern "C"
 
 
 QnVideoDecoderFactory::CLCodecManufacture QnVideoDecoderFactory::m_codecManufacture = AUTO;
+QnCommonModule* QnVideoDecoderFactory::m_commonModule = nullptr;
 
 QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
     const QnCompressedVideoDataPtr& data,
@@ -44,7 +45,12 @@ QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
             {
                 //searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
                 QnAbstractVideoDecoderPlugin* videoDecoderPlugin = NULL;
-                const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
+                NX_ASSERT(m_commonModule, lit("Common module should be set"));
+                if (!m_commonModule)
+                    return nullptr;
+
+                auto pluginManager = m_commonModule->pluginManager();
+                const auto& plugins = pluginManager->findPlugins<QnAbstractVideoDecoderPlugin>();
                 for( QnAbstractVideoDecoderPlugin* plugin: plugins )
                 {
                     if( !plugin->isHardwareAccelerated() || plugin->supportedCodecTypes().indexOf(data->compressionType) == -1 )
@@ -72,7 +78,7 @@ QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void QnAbstractVideoDecoder::setTryHardwareAcceleration( bool tryHardwareAcceleration )

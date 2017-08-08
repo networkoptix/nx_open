@@ -10,7 +10,7 @@ namespace metadata {
  * Each class that implements AbstractMediaFrame interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::GUID IID_MediaFrame
+static const nxpl::NX_GUID IID_MediaFrame
     = {{0x13, 0x85, 0x3c, 0xd6, 0x13, 0x7e, 0x4d, 0x8b, 0x9b, 0x8e, 0x63, 0xf1, 0x5f, 0x93, 0x2a, 0xc1}};
 
 /**

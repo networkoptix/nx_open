@@ -11,7 +11,7 @@ namespace metadata {
  * Each class that implements AbstractMetadataItem interface
  * should properly handle this GUID in its queryInterface method.
  */
-static const nxpl::GUID IID_MetadataItem
+static const nxpl::NX_GUID IID_MetadataItem
     = {{0xb3, 0x23, 0x89, 0x1d, 0x19, 0x62, 0x44, 0x3c, 0x84, 0x2a, 0x07, 0x50, 0x7d, 0x87, 0xab, 0x4e}};
 
 /**
@@ -24,7 +24,7 @@ public:
     /**
     * @brief Human readable object type (line crossing | human detected | etc)
     */
-    nxpl::GUID eventTypeId;
+    nxpl::NX_GUID eventTypeId;
 
     /**
     * @brief Level of confidence in range (0..1]
@@ -33,5 +33,5 @@ public:
 };
 
 } // namespace metadata
-} // namesapce sdk
+} // namespace sdk
 } // namespace nx

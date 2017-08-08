@@ -1,12 +1,4 @@
-/*
- * plugin_manager.h
- *
- *  Created on: Sep 11, 2012
- *      Author: a.kolesnikov
- */
-
-#ifndef PLUGIN_MANAGER_H
-#define PLUGIN_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
@@ -18,8 +10,12 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "plugin_api.h"
-#include "plugin_container_api.h"
+#include <plugins/plugin_api.h>
+#include <plugins/plugin_container_api.h>
+#include <plugins/metadata/abstract_metadata_plugin.h>
+
+#include <common/common_module.h>
+#include <common/common_module_aware.h>
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -30,26 +26,26 @@
     - process current directory
     - process binary directory
 
-    \note This class implements single-tone
     \note Methods of class are thread-safe
 */
 class PluginManager
 :
     public QObject,
-    public Singleton<PluginManager>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
     enum PluginType
     {
-        QtPlugin = 1, //!< Qt-based plugins.
-        NxPlugin = 2, //!< Plugins, implementing plugin_api.h.
+        QtPlugin = 1, //< Qt-based plugins.
+        NxPlugin = 2, //< Plugins, implementing plugin_api.h.
         
         AllPlugins = QtPlugin | NxPlugin
     };
 
     PluginManager(
+        QnCommonModule* commonModule,
         const QString& pluginDir = QString(),
         nxpl::PluginInterface* const pluginContainer = nullptr);
     virtual ~PluginManager();
@@ -116,5 +112,3 @@ private:
         const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& fullFilePath );
 };
-
-#endif /* PLUGIN_MANAGER_H */

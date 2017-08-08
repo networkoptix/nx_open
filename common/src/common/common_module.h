@@ -18,6 +18,7 @@
 #include <utils/common/value_cache.h>
 #include <analytics/plugins/detection/detection_plugin_factory.h>
 #include <analytics/common/metadata_plugin_factory.h>
+#include <plugins/native_sdk/common_plugin_container.h>
 
 class QSettings;
 class QnSessionManager;
@@ -34,6 +35,7 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
+class PluginManager;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
@@ -181,6 +183,11 @@ public:
         return m_metadataPluginFactory;
     }
 
+    PluginManager* pluginManager() const
+    {
+        return m_pluginManager;
+    }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -320,6 +327,8 @@ private:
 
     nx::analytics::DetectionPluginFactory* m_detectionPluginFactory = nullptr;
     nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
+    CommonPluginContainer m_pluginContainer;
+    PluginManager* m_pluginManager = nullptr;
 
     QnUuid m_videowallGuid;
 };

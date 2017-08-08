@@ -11,7 +11,7 @@ namespace metadata {
  * Each class that implements AbstractEventMetadataPacket interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::GUID IID_EventMetadataPacket
+static const nxpl::NX_GUID IID_EventMetadataPacket
     = {{0x20, 0xfc, 0xa8, 0x08, 0x17, 0x6b, 0x48, 0xa6, 0x92, 0xfd, 0xba, 0xb5, 0x9d, 0x37, 0xd7, 0xc0}};
 
 

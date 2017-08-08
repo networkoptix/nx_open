@@ -13,7 +13,7 @@ namespace metadata {
  * Each class that implements AbstractMetadataPlugin interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::GUID IID_MetadataPlugin
+static const nxpl::NX_GUID IID_MetadataPlugin
     = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9, 0x9f, 0x80, 0x7d, 0x56, 0x91, 0x36, 0x82, 0x94}};
 
 /**
@@ -22,6 +22,7 @@ static const nxpl::GUID IID_MetadataPlugin
  */
 class AbstractMetadataPlugin: public nxpl::Plugin3
 {
+public:
     /**
      * @brief managerForResource creates (or return already existing)
      * metadata manager for the given resource.
@@ -50,9 +51,11 @@ class AbstractMetadataPlugin: public nxpl::Plugin3
      * @return pointer to object that implements AbstractSerializator interface.
      */
     virtual AbstractSerializer* serializerForType(
-        const nxpl::GUID& typeGuid,
+        const nxpl::NX_GUID& typeGuid,
         Error* outError) = 0;
 };
+
+typedef nxpl::PluginInterface* (*CreateNxMetadataPluginProc)();
 
 } // namespace metadata
 } // namespace sdk
@@ -61,11 +64,11 @@ class AbstractMetadataPlugin: public nxpl::Plugin3
 extern "C" {
 
 /**
- * @brief createMetadataPlugin main entry point to plugin.
+ * @brief createNxMetadataPlugin main entry point to plugin.
  * @return pointer to object that implements
  * nx::sdk::metadata::AbstractMetadataPlugin interface.
  * At the same time there MUST exist only one such an object.
  */
-nx::sdk::metadata::AbstractMetadataPlugin* createMetadataPlugin();
+nxpl::PluginInterface* createNxMetadataPlugin();
 
 } // extern "C"

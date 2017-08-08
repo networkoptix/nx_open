@@ -5,9 +5,10 @@
 
 //#include <QtOpenGL/QGLContext>
 
-#include "nx/streaming/media_data_packet.h"
-#include "nx/streaming/video_data_packet.h"
-#include "utils/media/frame_info.h"
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <utils/media/frame_info.h>
+#include <common/common_module.h>
 
 extern "C"
 {
@@ -145,13 +146,20 @@ public:
             bool mtDecoding,
             const QGLContext* glContext = NULL,
             bool allowHardwareDecoding = false );
+
     static void setCodecManufacture( CLCodecManufacture codecman )
     {
         m_codecManufacture = codecman;
     }
 
+    static void setCommonModule(QnCommonModule* commonModule)
+    {
+        m_commonModule = commonModule;
+    }
+
 private:
     static CLCodecManufacture m_codecManufacture;
+    static QnCommonModule* m_commonModule;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

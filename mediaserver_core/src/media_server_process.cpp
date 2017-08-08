@@ -2699,14 +2699,13 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
-    CommonPluginContainer pluginContainer;
-
     //Initializing plugin manager
-    PluginManager pluginManager(QString(), &pluginContainer);
-    PluginManager::instance()->loadPlugins( qnServerModule->roSettings() );
+    auto pluginManager = commonModule()->pluginManager();
+    NX_ASSERT(pluginManager, lit("There is no plugin manager."));
+    pluginManager->loadPlugins(qnServerModule->roSettings());
 
     for (const auto storagePlugin :
-         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+         pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
             storagePlugin->storageType(),

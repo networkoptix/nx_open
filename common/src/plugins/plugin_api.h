@@ -135,6 +135,9 @@ namespace nxpl
         virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
     };
 
+    static const NX_GUID IID_Plugin3
+        = {{0x73, 0x6b, 0xd7, 0xab, 0x46, 0x1c, 0x46, 0xf0, 0x91, 0x92, 0x56, 0x3b, 0x02, 0xed, 0xa1, 0x78}};
+
     class Plugin3
     :
         public Plugin2

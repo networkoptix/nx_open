@@ -1,10 +1,3 @@
-/*
- * pluginmanager.cpp
- *
- *  Created on: Sep 11, 2012
- *      Author: ak
- */
-
 #include "plugin_manager.h"
 
 #include <algorithm>
@@ -16,15 +9,19 @@
 
 #include <nx/utils/log/log.h>
 
-#include "../decoders/abstractclientplugin.h"
-#include "../decoders/abstractvideodecoderplugin.h"
-#include "camera_plugin.h"
+#include <decoders/abstractclientplugin.h>
+#include <decoders/abstractvideodecoderplugin.h>
+#include <plugins/camera_plugin.h>
+#include <plugins/metadata/abstract_metadata_plugin.h>
 
+using namespace nx::sdk;
 
 PluginManager::PluginManager(
+    QnCommonModule* commonModule,
     const QString& pluginDir,
     nxpl::PluginInterface* const pluginContainer)
 :
+    QnCommonModuleAware(commonModule),
     m_pluginDir( pluginDir ),
     m_pluginContainer( pluginContainer )
 {
@@ -154,7 +151,7 @@ bool PluginManager::loadNxPlugin(
     }
 
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
-    if( entryProc == NULL )
+    if (entryProc == NULL)
     {
         NX_LOG( lit("Failed to load %1: no createNXPluginInstance").arg(fullFilePath), cl_logERROR );
         lib.unload();
@@ -169,8 +166,8 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    NX_LOG( lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
-    m_nxPlugins.push_back( obj );
+    NX_LOG(lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING);
+    m_nxPlugins.push_back(obj);
 
     //checking, whther plugin supports nxpl::Plugin interface
     nxpl::Plugin* pluginObj = static_cast<nxpl::Plugin*>(obj->queryInterface( nxpl::IID_Plugin ));
@@ -181,6 +178,7 @@ bool PluginManager::loadNxPlugin(
             pluginObj->setSettings( &settingsForPlugin[0], settingsForPlugin.size() );
 
         pluginObj->releaseRef();
+        return false;
     }
 
     nxpl::Plugin2* plugin2Obj = static_cast<nxpl::Plugin2*>(obj->queryInterface(nxpl::IID_Plugin2));
@@ -189,6 +187,10 @@ bool PluginManager::loadNxPlugin(
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
     }
+
+    nxpl::Plugin3* plugin3Obj = static_cast<nxpl::Plugin3*>(obj->queryInterface(nxpl::IID_Plugin3));
+    if (plugin3Obj)
+        plugin3Obj->setLocale("en_US"); //< Change to real locale.
 
     emit pluginLoaded();
     return true;

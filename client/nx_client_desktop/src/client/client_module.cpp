@@ -560,13 +560,13 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
-    commonModule->store(new PluginManager());
     // client uses ordinary QT file to access file system
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
+    QnVideoDecoderFactory::setCommonModule(commonModule);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 

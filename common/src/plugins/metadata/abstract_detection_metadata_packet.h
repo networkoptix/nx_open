@@ -79,7 +79,7 @@ struct DetectedObject: public AbstractMetadataItem
  * Each class that implements AbstractDetectionMetadataPacket interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::GUID IID_DetectionMetadataPacket
+static const nxpl::NX_GUID IID_DetectionMetadataPacket
     = {{0x89, 0x89, 0xa1, 0x84, 0x72, 0x09, 0x4c, 0xde, 0xbb, 0x46, 0x09, 0xc1, 0x23, 0x2e, 0x31, 0x85}};
 
 /**

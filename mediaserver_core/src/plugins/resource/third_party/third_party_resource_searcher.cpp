@@ -28,7 +28,9 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonMod
     QnMdnsResourceSearcher(commonModule),
     QnUpnpResourceSearcherAsync(commonModule)
 {
-    QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
+    auto pluginManager = commonModule->pluginManager();
+    NX_ASSERT(pluginManager, lit("There is no plugin manager"));
+    QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
         pluginList.begin(),
         pluginList.end(),
