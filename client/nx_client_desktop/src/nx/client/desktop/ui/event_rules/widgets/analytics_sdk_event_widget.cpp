@@ -88,7 +88,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
-    // TODO: #GDM #analytics add a new field
+    // TODO: #GDM #analytics add a new field when event rules will be refactored
     eventParams.inputPortId = ui->sdkEventTypeComboBox->currentData(
         AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>().toString();
     model()->setEventParams(eventParams);
@@ -105,7 +105,7 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    // TODO: #GDM #analytics add a new field
+    // TODO: #GDM #analytics add a new field when event rules will be refactored
     QnUuid eventTypeId = QnUuid::fromStringSafe(model()->eventParams().inputPortId);
     int index = ui->sdkEventTypeComboBox->findData(qVariantFromValue(eventTypeId),
         AnalyticsSdkEventModel::EventTypeIdRole, Qt::MatchExactly);
