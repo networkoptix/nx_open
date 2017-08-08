@@ -1,72 +1,161 @@
-<div class="container">
+<div class="webclient">
+    <table class="webclient-window">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="view-wrapper">
+                        <div class="cameras-panel">
+                            <h3>Test API calls</h3>
+                            <a ng-click="clearActiveFunction()" href="">View all functions</a>
+                            <div ng-repeat="group in apiGroups">
+                                <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
+                                <ul>
+                                    <li ng-repeat="function in group.functions" ng-if="!function.proprietary || allowProprietary">
+                                        <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                        <b><a ng-click="setActiveFunction(group,function)" href="">{{function.name}}</a></b>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="100%">
+                    <div class="view-wrapper">
+                        <div class="cameras-panel api-view">
 
-    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
-    <h1>Test API calls</h1>
-    <p><a href="api.xml" target="_blank">API documentation</a></p>
-    <form class="form-horizontal" novalidate>
-        <div class="form-group">
-            <label class="col-sm-2 control-label">Method</label>
-            <div class="col-sm-10">
-                <select ng-model="session.method.method" class="form-control">
-                    <option>POST</option>
-                    <option>GET</option>
-                </select>
-            </div>
-        </div>
+                            <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
 
-        <div class="form-group">
-            <label class="col-sm-2 control-label">Method</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
-            </div>
-        </div>
+                            <div ng-if="!activeFunction">
+                                <div ng-repeat="group in apiGroups">
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
+                                    <p>{{group.groupDescription}}</p>
+                                    <ul>
+                                        <li ng-repeat="function in group.functions" ng-if="!function.proprietary || allowProprietary">
+                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <b><a ng-click="setActiveFunction(group,function)" href="">{{function.name}}</a></b>
+                                            <span ng-bind-html="function.description.xml" class="api-description-strip"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ng-if="activeFunction">
+                                <h3>
+                                    <span ng-if="activeFunction.method">{{activeFunction.method}}:</span>
+                                    {{activeGroup.urlPrefix}}/{{activeFunction.name}}
+                                </h3>
+                                <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
+                                <p ng-bind-html="activeFunction.description.xml"></p>
+
+                                <div ng-if="activeFunction.params.length>0">
+                                    <b>Parameters:</b>
+                                    <ul>
+                                        <li ng-repeat="param in activeFunction.params" ng-if="!param.proprietary || allowProprietary">
+                                            <span class="label label-danger" ng-if="param.proprietary">proprietary</span>
+                                            <span class="label label-danger" ng-if="param.optional=='false'">required</span>
+                                            <b>{{param.name}}</b>
+                                            <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
+                                            <span ng-if="param.values">
+                                                Values:
+                                                <ul>
+                                                    <li ng-repeat="value in param.values">
+                                                        <b>{{value.name}}</b>
+                                                        <span ng-if="value.description.xml" ng-bind-html="value.description.xml"></span>
+                                                    </li>
+                                                </ul>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div ng-if="activeFunction.result.caption || activeFunction.result.params">
+                                    <b>Result:</b> {{activeFunction.result.caption}}
+                                    <ul ng-if="activeFunction.result.params">
+                                        <li ng-repeat="param in activeFunction.result.params">
+                                            <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
+                                            <div class="label label-danger" ng-if="param.optional=='false'">required</div>
+                                            <b>{{param.name}}</b>
+                                            <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
+                                            <span ng-if="param.values">
+                                                Values:
+                                                <ul>
+                                                    <li ng-repeat="value in param.values">
+                                                        <b>{{value.name}}</b>
+                                                        <span ng-if="value.description.xml" ng-bind-html="value.description.xml"></span>
+                                                    </li>
+                                                </ul>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Method</label>
+                                        <div class="col-sm-10">
+                                            <select ng-model="session.method.method" class="form-control">
+                                                <option>POST</option>
+                                                <option>GET</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Method</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
+                                        </div>
+                                    </div>
 
 
-        <div class="form-group">
-            <label class="col-sm-2 control-label"><b>GET</b>-params</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="session.method.params" placeholder="param1=value1&param2=value2">
-            </div>
-        </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label"><b>GET</b>-params</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" ng-model="session.method.params" placeholder="param1=value1&param2=value2">
+                                        </div>
+                                    </div>
 
 
-        <div class="form-group">
-            <label class="col-sm-2 control-label">Requesting URL</label>
-            <div class="col-sm-10">
-                <p class="form-control-static">{{getDebugUrl()}}</p>
-            </div>
-        </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Requesting URL</label>
+                                        <div class="col-sm-10">
+                                            <p class="form-control-static">{{getDebugUrl()}}</p>
+                                        </div>
+                                    </div>
 
-        <div class="form-group" ng-if="session.method.method=='POST'">
-            <label class="col-sm-2 control-label"><b>POST</b>-params (json)</label>
-            <div class="col-sm-10">
-                <textarea class="form-control" rows="10"
-                          ng-model="session.method.data"></textarea>
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test method</button>
-                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
-            </div>
-        </div>
+                                    <div class="form-group" ng-if="session.method.method=='POST'">
+                                        <label class="col-sm-2 control-label"><b>POST</b>-params (json)</label>
+                                        <div class="col-sm-10">
+                                            <textarea class="form-control" rows="10"
+                                                      ng-model="session.method.data"></textarea>
+                                        </div>
+                                    </div>
 
 
-        <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">Status</label>
-            <div class="col-sm-10">
-                <p class="form-control-static">{{result.status}}</p>
-            </div>
-        </div>
-        <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">Result</label>
-            <div class="col-sm-10">
-                <pre>{{result.result}}</pre>
-            </div>
-        </div>
-    </form>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                                            <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+                                        </div>
+                                    </div>
 
 
+                                    <div class="form-group" ng-if="result.result">
+                                        <label class="col-sm-2 control-label">Status</label>
+                                        <div class="col-sm-10">
+                                            <p class="form-control-static">{{result.status}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="result.result">
+                                        <label class="col-sm-2 control-label">Result</label>
+                                        <div class="col-sm-10">
+                                            <pre>{{result.result}}</pre>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>

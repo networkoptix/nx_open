@@ -534,6 +534,9 @@ angular.module('webadminApp')
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
             },
+            getApiMethods:function(){
+                return wrapGet('api.json');
+            },
             getLanguages:function(){
                 return wrapGet('languages.json').then(function(data){
                     return _.filter(data.data,function(language){

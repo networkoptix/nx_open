@@ -84,7 +84,7 @@ angular.module('webadminApp', [
         })
         .when('/developers/api', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
-            controller: 'DevtoolsCtrl'
+            controller: 'ApiToolCtrl'
         })
         .when('/developers/events', {
             templateUrl: Config.viewsDir + 'devtools/events.html',
