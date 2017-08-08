@@ -385,7 +385,7 @@
                 }
             ],
             "unauthorizedTimeoutSec": 185
-        },        
+        },
         {
             "keys": [
                 "Axis|*"
@@ -462,7 +462,7 @@
                 "Samsung*|SPE-101",
                 "Samsung*|SPE-1600*",
                 "BOSCH|VIDEO JET multi 4000",
-                "DW-CP16|Digital Watchdog*"                
+                "DW-CP16|Digital Watchdog*"
             ],
             "analogEncoder": true
         },
@@ -1489,7 +1489,7 @@
             ]
         },
         {
-            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"], 
+            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"],
             "forcedOnvifParams": {
                 "profiles": ["H.264,MOBILE"]
             }
@@ -1969,7 +1969,8 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P"
+                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P",
+                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A"
             ],
             "2WayAudio":
             {
@@ -1980,7 +1981,7 @@
                 "contentType": "Audio/G.711A",
                 "noAuth": true
             }
-            
+
         },
         {
             "keys": [
@@ -1994,7 +1995,7 @@
                 "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
                 "contentType": "Audio/G.711A"
             }
-            
+
         },
         {
             "keys": [
@@ -2021,6 +2022,10 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [ "DW|DW-CPUHD*" ],
+            "isMacAddressNotMandatory": true
         }
     ]
 }

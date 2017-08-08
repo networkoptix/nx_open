@@ -53,7 +53,7 @@ static const QMargins kReviewMargins(16, 16, 16, 16);
 // Placeholders are allowed only for grids less or equal than 4*4.
 static const int kMaxItemCountWithPlaceholders = 15;
 
-// Grid size less than 2*2 is not allowed;
+// Grid size less than 2*2 is not allowed.
 static const int kMinGridSize = 2;
 
 QRect createItemGrid(int itemCount)
@@ -62,8 +62,8 @@ QRect createItemGrid(int itemCount)
     if (addPlaceholder)
         ++itemCount;
 
-    int h = std::max((int)std::ceil(std::sqrt(itemCount)), kMinGridSize);
-    int w = std::max((int)std::ceil(1.0 * itemCount / h), kMinGridSize);
+    int h = std::max((int) std::ceil(std::sqrt(itemCount)), kMinGridSize);
+    int w = std::max((int) std::ceil(1.0 * itemCount / h), kMinGridSize);
     return QRect(0, 0, w, h);
 }
 

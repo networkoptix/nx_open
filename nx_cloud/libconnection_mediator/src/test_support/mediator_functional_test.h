@@ -73,6 +73,10 @@ public:
     std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         getListeningPeers() const;
 
+protected:
+    virtual void beforeModuleCreation() override;
+    virtual void afterModuleDestruction() override;
+
 private:
     const int m_testFlags;
     QString m_tmpDir;
@@ -80,6 +84,7 @@ private:
     int m_httpPort;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
+    SocketAddress m_stunAddress;
 };
 
 } // namespace hpm

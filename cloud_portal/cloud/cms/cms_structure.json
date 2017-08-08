@@ -30,8 +30,8 @@
       "translatable": true,
       "values":[
         ["static/images/promo/cloud.png", "",
-          "Image for the front page. Image must have transparent background, recommended height is 100px (minimal height is 100px, maximum is 200px).",
-          "Image", {"height_ge": 100, "height_le": 200}],
+          "Image for the front page. Image must have transparent background, recommended height is 200px (that is minimal height).",
+          "Image", {"height_ge": 200}],
         ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}",
           "One line (50-100 symbols)"],
         ["%BLOCK1_TITLE%","Connect from Anywhere",
