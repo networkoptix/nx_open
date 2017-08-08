@@ -34,8 +34,8 @@ class LightweightServersFactory(object):
         else:
             self._lws_host = None
 
-    def __call__(self, server_count):
-        return self._allocate(server_count)
+    def __call__(self, server_count, **kw):
+        return self._allocate(server_count, kw)
 
     def release(self):
         if self._lws_host:
@@ -55,11 +55,11 @@ class LightweightServersFactory(object):
                 return host
         return None
 
-    def _allocate(self, server_count):
+    def _allocate(self, server_count, lws_params):
         if not server_count:
             return []
         if self._lws_host:
-            return list(self._lws_host.allocate(server_count))
+            return list(self._lws_host.allocate(server_count, lws_params))
         else:
             log.warning('No lightweight servers are configured, but requested: %d' % server_count)
             return []
@@ -144,7 +144,7 @@ class LightweightServersHost(object):
         self._init()
 
     # server_count is ignored for now; all servers are allocated on first lightweight installation
-    def allocate(self, server_count):
+    def allocate(self, server_count, lws_params):
         assert not self._allocated, 'Lightweight servers were already allocated by this test'
         pih = self._physical_installation_host
         server_dir = pih.unpacked_mediaserver_dir
@@ -156,7 +156,7 @@ class LightweightServersHost(object):
         self._host.mk_dir(lws_dir)
         self._cleanup_log_files()
         self._host.put_file(self._test_binary_path, lws_dir)
-        self._write_lws_ctl(server_dir, lws_dir, server_count)
+        self._write_lws_ctl(server_dir, lws_dir, server_count, lws_params)
         server_ctl.set_state(is_started=True)
         self._allocated = True  # failure in following code must not prevent from artifacts collection
         for idx in range(server_count):
@@ -188,7 +188,7 @@ class LightweightServersHost(object):
         if file_list:
             self._host.run_command(['rm'] + file_list)
 
-    def _write_lws_ctl(self, server_dist_dir, lws_dir, server_count):
+    def _write_lws_ctl(self, server_dist_dir, lws_dir, server_count, lws_params):
         contents = self._template_renderer.render(
             LWS_CTL_TEMPLATE_PATH,
             SERVER_DIR=lws_dir,
@@ -196,7 +196,7 @@ class LightweightServersHost(object):
             LOG_PATH_BASE=self._installation.log_path_base,
             SERVER_COUNT=server_count,
             PORT_BASE=LWS_PORT_BASE,
-            )
+            **lws_params)
         lws_ctl_path = os.path.join(lws_dir, SERVER_CTL_TARGET_PATH)
         self._host.write_file(lws_ctl_path, contents)
         self._host.run_command(['chmod', '+x', lws_ctl_path])
