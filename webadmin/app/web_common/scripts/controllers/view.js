@@ -27,6 +27,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
+        $scope.cameraLinksEnabled = $location.search().cameraLinks;
+
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
             $scope.toggleCameraPanel = false;
             systemAPI.setCameraPath($scope.storage.cameraId);
@@ -197,8 +199,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             if ($scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.id], systemAPI);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.id], systemAPI, 640);
                 $scope.liveOnly = true;
                 if($scope.canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
@@ -239,7 +241,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }else{
                 playing = Math.round(playing);
             }
-            var cameraId = $scope.activeCamera.physicalId;
+            var cameraId = $scope.activeCamera.id;
             var serverUrl = '';
 
             var resolution = $scope.activeResolution;
