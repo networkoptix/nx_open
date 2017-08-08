@@ -255,7 +255,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
             return;
 
         /* Do not automatically switch if we are creating a new user. */
-        if (m_user && m_user->flags().testFlag(Qn::local))
+        if (m_model->mode() == QnUserSettingsModel::Mode::NewUser)
             return;
 
         auto users = resources.filtered<QnUserResource>();

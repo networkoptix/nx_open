@@ -37,8 +37,8 @@ bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QM
 
     if (l && r)
     {
-        bool leftIncompatible = (l->getStatus() == Qn::Incompatible);
-        bool rightIncompatible = (r->getStatus() == Qn::Incompatible);
+        bool leftIncompatible = (l->resourcePool() && l->getStatus() == Qn::Incompatible);
+        bool rightIncompatible = (r->resourcePool() && r->getStatus() == Qn::Incompatible);
         if (leftIncompatible != rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
             return rightIncompatible;
 
