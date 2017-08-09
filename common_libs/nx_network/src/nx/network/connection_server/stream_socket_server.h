@@ -120,10 +120,10 @@ struct MessageSender
     void operator()(Connection* connection)
     {
         connection->post(
-            [this, connection]() mutable
+            [message = m_message, connection]() mutable
             {
                 connection->sendMessage(
-                    m_message,
+                    std::move(message),
                     [](SystemError::ErrorCode) {});
             });
     }
