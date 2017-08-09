@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
+    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$routeParams',
                                 '$location', 'dialogs', '$timeout', 'systemAPI',
-    function ($scope, mediaserver, $sessionStorage, $routeParams,
+    function ($scope, mediaserver, $routeParams,
               $location, dialogs, $timeout, systemAPI) {
 
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
-        $scope.session = $sessionStorage;
+        $scope.clipboardSupported = true; // presume
 
         if($location.search().proprietary){
             Config.allowProprietary = $location.search().proprietary;
@@ -192,15 +192,7 @@ angular.module('webadminApp')
             var windowHeight = $window.height();
             var headerHeight = $header.outerHeight();
 
-            var topAlertHeight = 0;
-
-            var topAlert = $('.alerts-row>td');
-            //after the user is notified this should not be calculated again
-            if(topAlert.length && !$scope.session.mobileAppNotified){
-                topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
-            }
-
-            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
+            var viewportHeight = (windowHeight - headerHeight) + 'px';
 
             $camerasPanel.css('height',viewportHeight );
             var listWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;

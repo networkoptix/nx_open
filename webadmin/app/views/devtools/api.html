@@ -10,7 +10,8 @@
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
-                                    <li ng-repeat="function in group.functions | orderBy:'name'" ng-if="!function.proprietary || allowProprietary">
+                                    <li ng-repeat="function in group.functions | orderBy:'name'"
+                                        ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
@@ -31,7 +32,8 @@
                                     <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
-                                        <li ng-repeat="function in group.functions | orderBy:'name'" ng-if="!function.proprietary || allowProprietary">
+                                        <li ng-repeat="function in group.functions | orderBy:'name'"
+                                            ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                             <b><a ng-click="setActiveFunction(group,function,$event)"
                                                   ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
@@ -63,7 +65,8 @@
                                             <small ng-if="param.proprietary">(proprietary)</small>
                                         </label>
                                         <div class="col-sm-9">
-                                            <p class="form-control-static" ng-if="param.description.xml" ng-bind-html="param.description.xml"></p>
+                                            <p class="form-control-static" ng-if="param.description.xml"
+                                               ng-bind-html="param.description.xml"></p>
                                             <div class="help-block" ng-if="param.values && param.values.length>0">
                                                 <ul>
                                                     <li ng-repeat="value in param.values">
@@ -125,7 +128,8 @@
                                                            close-text="Close" />
                                                     <span class="input-group-btn">
                                                         <button type="button" class="btn btn-default"
-                                                                ng-click="openDatePicker($event, param.name)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                ng-click="openDatePicker($event, param.name)"><i
+                                                                class="glyphicon glyphicon-calendar"></i></button>
                                                     </span>
                                                 </div>
                                                 <p class="help-block" ng-switch-when="timestamp">
@@ -156,7 +160,8 @@
                                                        placeholder="{{}}">
                                             </div>
 
-                                            <p class="help-block" ng-if="param.description.xml" ng-bind-html="param.description.xml"></p>
+                                            <p class="help-block" ng-if="param.description.xml"
+                                               ng-bind-html="param.description.xml"></p>
                                         </div>
                                     </div>
 
@@ -170,14 +175,21 @@
                                         <label class="col-sm-3 control-label">POST data</label>
                                         <div class="col-sm-9">
                                             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
+                                            <p class="help-block" ng-if="clipboardSupported">
+                                                <a clipboard
+                                                   supported="clipboardSupported"
+                                                   text="getPostData()" href="">Copy to clipboard</a>
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <div class="col-sm-offset-3 col-sm-9">
-                                            <button type="submit" ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
+                                            <button type="submit"
+                                                    ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
                                                     class="btn btn-primary" ng-click="testMethod()">Test method</button>
-                                            <a class="btn btn-default" ng-if="apiMethod.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+                                            <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
+                                               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
                                         </div>
                                     </div>
 
@@ -192,6 +204,10 @@
                                         <label class="col-sm-3 control-label">Response</label>
                                         <div class="col-sm-9">
                                             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
+                                            <p class="help-block" ng-if="clipboardSupported">
+                                                <a clipboard
+                                                   text="result.result" href="">Copy to clipboard</a>
+                                            </p>
                                         </div>
                                     </div>
 
@@ -211,7 +227,8 @@
                                                 <ul>
                                                     <li ng-repeat="value in param.values">
                                                         <b>{{value.name}}</b>
-                                                        <span ng-if="value.description.xml" ng-bind-html="value.description.xml"></span>
+                                                        <span ng-if="value.description.xml"
+                                                              ng-bind-html="value.description.xml"></span>
                                                     </li>
                                                 </ul>
                                             </span>
