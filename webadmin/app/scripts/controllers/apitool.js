@@ -45,10 +45,12 @@ angular.module('webadminApp')
                                 value.label = value.name;
                                 if(value.description.xml){
                                     value.description.xml = value.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
-                                    value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                    if(value.description.xml.trim() != ''){
+                                        value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                    }
                                 }
                             });
-                            if(param.optional == 'true'){
+                            if(param.optional == 'true' && (func.method == 'GET' || func.method == 'POST')){
                                 param.values.unshift({label:'', name:null});
                             }
                         }
@@ -76,18 +78,22 @@ angular.module('webadminApp')
         });
 
         $scope.setActiveFunction = function(group, method, $event){
+            if($scope.activeFunction == method){
+                return;
+            }
+            $scope.result={};
             $scope.activeGroup = group;
             $scope.activeFunction = method;
-            $scope.session.method.method = method.method;
-            $scope.session.method.name = group.urlPrefix + '/' + method.name;
-            $scope.session.method.params = {}
+            $scope.apiMethod.method = method.method;
+            $scope.apiMethod.name = method.url;
+            $scope.apiMethod.params = {}
             _.each(method.params,function(param){
-                $scope.session.method.params[param.name] = null;
+                $scope.apiMethod.params[param.name] = null;
             });
             if($event){
                 $event.preventDefault();
                 $event.stopPropagation();
-                $location.path('/developers/api' + group.urlPrefix + '/' + method.name, false);
+                $location.path('/developers/api' + method.url, false);
             }
             return false;
         }
@@ -102,8 +108,8 @@ angular.module('webadminApp')
         }
 
         /* API Test Tool */
-        if(!$scope.session.method){
-            $scope.session.method = {
+        if(!$scope.apiMethod){
+            $scope.apiMethod = {
                 name:'/api/moduleInformation',
                 data:'',
                 params: '',
@@ -130,20 +136,20 @@ angular.module('webadminApp')
             return newParams;
         };
         $scope.getDebugUrl = function(){
-            if($scope.session.method.method == 'GET'){
-                return mediaserver.debugFunctionUrl($scope.session.method.name, cleanParams($scope.session.method.params));
+            if($scope.apiMethod.method == 'GET'){
+                return mediaserver.debugFunctionUrl($scope.apiMethod.name, cleanParams($scope.apiMethod.params));
             }
-            return mediaserver.debugFunctionUrl($scope.session.method.name);
+            return mediaserver.debugFunctionUrl($scope.apiMethod.name);
         };
 
         $scope.testMethod = function(){
             var getParams = null;
             var postParams = null;
 
-            if($scope.session.method.method == 'GET'){
-                getParams = cleanParams($scope.session.method.params);
+            if($scope.apiMethod.method == 'GET'){
+                getParams = cleanParams($scope.apiMethod.params);
             }else{
-                postParams = cleanParams($scope.session.method.params);
+                postParams = cleanParams($scope.apiMethod.params);
             }
             function formatResult(result){
                 $scope.result.status = result.status +  ':  ' + result.statusText;
@@ -153,8 +159,8 @@ angular.module('webadminApp')
                     $scope.result.result = JSON.stringify(result.data, null,  '  ');
                 }
             }
-            mediaserver.debugFunction($scope.session.method.method,
-                                      $scope.session.method.name,
+            mediaserver.debugFunction($scope.apiMethod.method,
+                                      $scope.apiMethod.name,
                                       getParams, postParams).
                         then(function(success){
                             $scope.result.error = false;

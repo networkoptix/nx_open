@@ -13,7 +13,7 @@
                                     <li ng-repeat="function in group.functions | orderBy:'name'" ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
-                                              ng-href="#/developers/api{{group.urlPrefix}}/{{function.name}}">{{function.name}}</a></b>
+                                              ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
                                     </li>
                                 </ul>
                             </div>
@@ -34,7 +34,7 @@
                                         <li ng-repeat="function in group.functions | orderBy:'name'" ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                             <b><a ng-click="setActiveFunction(group,function,$event)"
-                                                  ng-href="#/developers/api{{group.urlPrefix}}/{{function.name}}">{{function.name}}</a></b>
+                                                  ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
                                             <span ng-bind-html="function.description.xml" class="api-description-strip"></span>
                                         </li>
                                     </ul>
@@ -45,12 +45,49 @@
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
+                                <form class="form-horizontal" novalidate ng-if="!activeGroup.urlPrefix">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
+                                        <div class="col-sm-9">
+                                            <p class="form-control-static">{{activeFunction.url}}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group"
+                                         ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
+                                         ng-if="!param.proprietary || allowProprietary"
+                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
+                                        <label class="col-sm-3 control-label" for="{{param.name}}">
+                                            {{param.name}}
+                                            <small ng-if="param.optional=='false'">(required)</small>
+                                            <small ng-if="param.proprietary">(proprietary)</small>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <p class="form-control-static" ng-if="param.description.xml" ng-bind-html="param.description.xml"></p>
+                                            <div class="help-block" ng-if="param.values && param.values.length>0">
+                                                <ul>
+                                                    <li ng-repeat="value in param.values">
+                                                        <b>{{value.name}}</b><span ng-if="value.description.xml">: </span>
+                                                        <span ng-bind-html="value.description.xml"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">Requesting URL</label>
+                                        <div class="col-sm-9">
+                                            <p class="form-control-static">{{getDebugUrl()}}</p>
+                                        </div>
+                                    </div>
+                                </form>
 
                                 <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">{{session.method.method}}:</label>
+                                        <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
                                         <div class="col-sm-9">
-                                            <p class="form-control-static">{{activeGroup.urlPrefix}}/{{activeFunction.name}}</p>
+                                            <p class="form-control-static">{{activeFunction.url}}</p>
                                         </div>
                                     </div>
 
@@ -72,7 +109,7 @@
                                                         ng-options="value.name as value.label for value in param.values"
                                                         id="{{param.name}}"
                                                         ng-required="param.optional=='false'"
-                                                        ng-model="session.method.params[param.name]">
+                                                        ng-model="apiMethod.params[param.name]">
                                                 </select>
 
                                                 <div class="input-group input-group-sm"
@@ -82,7 +119,7 @@
                                                            class="form-control"
                                                            placeholder="YYYY-MM-DDTHH:mm:ss"
                                                            datepicker-popup="{{Config.dateInternalFormat}}"
-                                                           ng-model="session.method.params[param.name]"
+                                                           ng-model="apiMethod.params[param.name]"
                                                            ng-required="param.optional=='false'"
                                                            is-open="openDate[param.name]"
                                                            close-text="Close" />
@@ -92,13 +129,13 @@
                                                     </span>
                                                 </div>
                                                 <p class="help-block" ng-switch-when="timestamp">
-                                                    <i>Timestamp: {{session.method.params[param.name].getTime()}}</i>
+                                                    <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
                                                 </p>
 
                                                 <input type="text"
                                                        ng-switch-when="camera"
                                                        id="{{param.name}}"
-                                                       ng-model="session.method.params[param.name]"
+                                                       ng-model="apiMethod.params[param.name]"
                                                        typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
                                                        typeahead-focus-on-select="false"
                                                        typeahead-min-length="0"
@@ -107,15 +144,15 @@
                                                        typeahead-editable="false"
                                                        typeahead-focus
                                                        class="form-control input-sm">
-                                                <p class="help-block" ng-if="cameraIds[session.method.params[param.name]]">
-                                                    <i>Selected camera: {{cameraIds[session.method.params[param.name]].name}}</i>
+                                                <p class="help-block" ng-if="cameraIds[apiMethod.params[param.name]]">
+                                                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                                                 </p>
 
                                                 <input type="text" class="form-control input-sm"
                                                        ng-switch-default
                                                        id="{{param.name}}"
                                                        ng-required="param.optional=='false'"
-                                                       ng-model="session.method.params[param.name]"
+                                                       ng-model="apiMethod.params[param.name]"
                                                        placeholder="{{}}">
                                             </div>
 
@@ -132,8 +169,9 @@
 
                                     <div class="form-group">
                                         <div class="col-sm-offset-3 col-sm-9">
-                                            <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test method</button>
-                                            <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+                                            <button type="submit" ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
+                                                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                                            <a class="btn btn-default" ng-if="apiMethod.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
                                         </div>
                                     </div>
 
