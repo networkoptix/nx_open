@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams', '$location', 'dialogs', '$timeout', 'systemAPI',
-    function ($scope, mediaserver, $sessionStorage, $routeParams, $location, dialogs, $timeout, systemAPI) {
+    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
+                                '$location', 'dialogs', '$timeout', 'systemAPI',
+    function ($scope, mediaserver, $sessionStorage, $routeParams,
+              $location, dialogs, $timeout, systemAPI) {
 
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
@@ -56,6 +58,17 @@ angular.module('webadminApp')
                         $scope.setActiveFunction(group, func);
                     }
                 });
+            });
+        });
+
+        systemAPI.getCameras().then(function(data){
+            $scope.cameras = _.sortBy(data.data,function(camera){
+                camera.searchLabel = camera.id + '|' + camera.name + "|" + camera.physicalId;
+                camera.id = camera.id.replace("{","").replace("}","");
+                return camera.name;
+            });
+            $scope.cameraIds = _.indexBy($scope.cameras,function(camera){
+                return camera.id;
             });
         });
 

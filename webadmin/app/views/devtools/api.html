@@ -1,5 +1,5 @@
 <div class="webclient">
-    <table class="webclient-window">
+    <table>
         <tbody>
             <tr>
                 <td>
@@ -88,6 +88,24 @@
                                                         ng-required="param.optional=='false'"
                                                         ng-model="session.method.params[param.name]">
                                                 </select>
+
+
+
+                                                <input type="text"
+                                                       ng-switch-when="camera"
+                                                       id="{{param.name}}"
+                                                       ng-model="session.method.params[param.name]"
+                                                       typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       typeahead-show-hint="true"
+                                                       typeahead-focus-first="false"
+                                                       typeahead-editable="false"
+                                                       typeahead-focus
+                                                       class="form-control">
+                                                <p class="help-block" ng-if="cameraIds[session.method.params[param.name]]">
+                                                    <i>Selected camera: {{cameraIds[session.method.params[param.name]].name}}</i>
+                                                </p>
 
                                                 <input type="text" class="form-control input-sm"
                                                        ng-switch-default
