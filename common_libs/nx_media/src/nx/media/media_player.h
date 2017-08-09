@@ -237,6 +237,9 @@ protected: //< for tests
     virtual QnCommonModule* commonModule() const = 0;
 
 private:
+    bool checkReadyToPlay();
+
+private:
     QScopedPointer<PlayerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(Player)
 };

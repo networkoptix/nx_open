@@ -840,6 +840,17 @@ void Player::setMaxTextureSize(int value)
     d->maxTextureSize = value;
 }
 
+bool Player::checkReadyToPlay()
+{
+    Q_D(Player);
+
+    if (d->archiveReader || d->initDataProvider())
+        return true;
+
+    d->log(lit("play() END: no data"));
+    return false;
+}
+
 void Player::play()
 {
     Q_D(Player);
@@ -851,11 +862,8 @@ void Player::play()
         return;
     }
 
-    if (!d->archiveReader && !d->initDataProvider())
-    {
-        d->log(lit("play() END: no data"));
+    if (!checkReadyToPlay())
         return;
-    }
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
@@ -880,6 +888,10 @@ void Player::preview()
 {
     Q_D(Player);
     d->log(lit("preview()"));
+
+    if (!checkReadyToPlay())
+        return;
+
     d->setState(State::Previewing);
     d->dataConsumer->setAudioEnabled(false);
 }
