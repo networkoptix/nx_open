@@ -59,10 +59,6 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'api_changelog.html',
             controller: 'MainCtrl'
         })
-        .when('/developers', {
-            templateUrl: Config.viewsDir + 'developers.html',
-            controller: 'MainCtrl'
-        })
         .when('/support', {
             templateUrl: Config.viewsDir + 'support.html',
             controller: 'MainCtrl'
@@ -81,6 +77,22 @@ angular.module('webadminApp', [
         .when('/debug', {
             templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
+        })
+        .when('/developers', {
+            templateUrl: Config.viewsDir + 'devtools/developers.html',
+            controller: 'DevtoolsCtrl'
+        })
+        .when('/developers/api/:apiMethod*', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'ApiToolCtrl'
+        })
+        .when('/developers/api', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'ApiToolCtrl'
+        })
+        .when('/developers/events', {
+            templateUrl: Config.viewsDir + 'devtools/events.html',
+            controller: 'DevtoolsCtrl'
         })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',

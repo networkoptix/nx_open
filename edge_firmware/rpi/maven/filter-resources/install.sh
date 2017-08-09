@@ -1,5 +1,7 @@
 #!/bin/bash
 set -x #< Log each command.
+set -u #< Prohibit undefined variables.
+set -e #< Exit on any error.
 
 # Redirect all output of this script to the log file.
 LOG_FILE="/var/log/bpi-upgrade.log"
@@ -8,7 +10,7 @@ exec 2<&- #< Close stderr fd.
 exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
 exec 2>&1 #< Redirect stderr to stdout.
 
-FAILED_FLAG="/var/log/bpi-upgrade-failed.flag"
+FAILURE_FLAG="/var/log/bpi-upgrade-failed.flag"
 CUSTOMIZATION="${deb.customization.company.name}"
 INSTALL_PATH="opt/$CUSTOMIZATION"
 MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
@@ -16,38 +18,51 @@ DISTRIB="${artifact.name.server}"
 STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
 TAR_FILE="./$DISTRIB.tar.gz"
 
-copyFilesToBootPartition()
+# Call the specified command after mounting dev, setting MNT to the mount point.
+# ATTENTION: The command is called without "exit-on-error".
+callMounted() # filesystem dev MNT cmd [args...]
 {
-    local DEV="/dev/mmcblk0p1"
-    local MNT="/mnt/boot"
-    mkdir -p "$MNT" || return $?
-    umount "$DEV" #< Unmount in case it was mounted; ignore errors.
-    mount -t vfat "$DEV" "$MNT" || return $?
-    cp -f "/root/tools/uboot"/* "$MNT" #< When cp omits dirs, it produces an error.
-    umount "$DEV" || return $?
-    rm -rf "$MNT" || return $?
+    local FILESYSTEM_callMounted="$1"; shift
+    local DEV_callMounted="$1"; shift
+    local MNT="$1"; shift
+
+    mkdir -p "$MNT"
+    umount "$DEV_callMounted" || true #< Unmount in case it was mounted.
+    mount -t "$FILESYSTEM_callMounted" "$DEV_callMounted" "$MNT"
+
+    local RESULT_callMounted=0
+    "$@" || RESULT_callMounted=$? #< Called without "exit-on-error" due of "||".
+
+    # Finally, unmount and return the original result of the called function.
+    umount "$DEV_callMounted"
+    rm -rf "$MNT"
+    return $RESULT_callMounted
 }
 
-copyFilesToDataPartition()
+# ATTENTION: Intended to be called without "exit-on-error".
+# [in] MNT
+copyToBootPartition()
 {
-    local DEV="/dev/mmcblk0p2"
-    local MNT="/mnt/data"
-    mkdir -p "$MNT" || return $?
-    umount "$DEV" #< Unmount in case it was mounted; ignore errors.
-    mount -t ext4 "$DEV" "$MNT" || return $?
-    cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "/root/tools/nx/" || return $?
-    rm -rf "$MNT/$INSTALL_PATH" || return $?
+    cp -f "/root/tools/uboot"/* "$MNT" || true #< When cp omits dirs, it produces an error.
+}
+
+# ATTENTION: Intended to be called without "exit-on-error".
+# [in] MNT
+copyToDataPartition()
+{
+    rm -rf "$MNT/$INSTALL_PATH" || true
 
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
 
     mkdir -p "$MNT/$MEDIASERVER_PATH/var" || return $?
     cp -f "/root/tools/nx/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || return $?
+
     local CONF_FILE="$MNT/$MEDIASERVER_PATH/etc/mediaserver.conf"
     local CONF_CONTENT="statisticsReportAllowed=true"
-    grep -q "$CONF_CONTENT" "$CONF_FILE" \
-        && { echo "$CONF_CONTENT" >>"$CONF_FILE" || return $?; }
-    umount "$DEV" || return $?
+    if grep -q "^$CONF_CONTENT$" "$CONF_FILE"; then
+        echo "$CONF_CONTENT" >>"$CONF_FILE" || return $?
+    fi
 }
 
 installDeb() # package version
@@ -63,9 +78,9 @@ installDeb() # package version
 
 upgradeVms()
 {
-    rm -rf "../$DISTRIB.zip" #< Already unzipped, so remove .zip to save space in "/tmp".
-    rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin"/core* #< Ignore errors.
-    tar xfv "$TAR_FILE" -C / || return $? #< Extract the distro to the root.
+    rm -rf "../$DISTRIB.zip" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
+    rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin"/core* || true
+    tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
 
     CIFSUTILS=$(dpkg --get-selections | grep -v deinstall | grep cifs-utils | awk '{print $1}')
@@ -77,33 +92,35 @@ upgradeVms()
         # Avoid grabbing libstdc++ from mediaserver lib folder.
         export LD_LIBRARY_PATH=""
 
-        copyFilesToBootPartition || return $?
+        cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "/root/tools/nx/"
 
-        installDeb libvdpau 0.4.1 || return $?
-        installDeb fontconfig 2.11 || return $?
-        installDeb fonts-takao-mincho "" || return $?
+        callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
+
+        installDeb libvdpau 0.4.1
+        installDeb fontconfig 2.11
+        installDeb fonts-takao-mincho ""
         installDeb fonts-baekmuk "" || return $?
         installDeb fonts-arphic-ukai "" || return $?
 
-        touch "/dev/cedar_dev" || return $?
-        chmod 777 "/dev/disp" || return $?
-        chmod 777 "/dev/cedar_dev" || return $?
-        usermod -aG video root || return $?
+        touch "/dev/cedar_dev"
+        chmod 777 "/dev/disp"
+        chmod 777 "/dev/cedar_dev"
+        usermod -aG video root
 
-        copyFilesToDataPartition || return $?
+        callMounted ext4 "/dev/mmcblk0p2" "/mnt/data" copyToDataPartition
 
-        /etc/init.d/nx1boot upgrade || return $?
+        /etc/init.d/nx1boot upgrade
     fi
 }
 
 getPidWhichUsesPort() # port
 {
     local PORT="$1"
-    netstat -tpan |grep "$PORT" |grep 'LISTEN' |awk '{print $NF}' |grep -o '[0-9]\+'
+    netstat -tpln |grep ":$PORT\s" |head -n 1 |awk '{print $NF}' |grep -o '[0-9]\+'
 }
 
 # Output nothing if the specified pid does not belong to a mediaserver; otherwise, output the pid.
-getMediaserverPid() # pid
+checkMediaserverPid() # pid
 {
     local PID="$1"
 
@@ -112,18 +129,42 @@ getMediaserverPid() # pid
     fi
 }
 
-upgradeVmsAndRestart()
+restartMediaserver()
 {
+    local MEDIASERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
+        |grep '^port=[0-9]\+$' |sed 's/port=//')
+
+    # If the mediaserver cannot start because another process uses its port, kill it and restart.
+    while true; do
+        "$STARTUP_SCRIPT" start || true #< If not started, the loop will try again.
+        sleep 3
+
+        local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$MEDIASERVER_PORT")
+        local MEDIASERVER_PID=$(checkMediaserverPid "$PID_WHICH_USES_PORT")
+        if [ ! -z "$MEDIASERVER_PID" ]; then
+            echo "Upgraded mediaserver is up and running with pid $MEDIASERVER_PID at port $MEDIASERVER_PORT"
+            break
+        fi
+
+        echo "Another process (pid $PID_WHICH_USES_PORT) uses port $MEDIASERVER_PORT:" \
+            "killing it and restarting $CUSTOMIZATION-mediaserver"
+
+        # Just in case - the mediaserver should not be running by now.
+        "$STARTUP_SCRIPT" stop || true
+
+        kill -9 "$PID_WHICH_USES_PORT" || true
+    done
+}
+
+main()
+{
+    rm -rf "$FAILURE_FLAG" || true
+
     echo "Starting VMS upgrade..."
 
-    "$STARTUP_SCRIPT" stop #< Ignore errors - if not stopped, try upgrading as is.
+    "$STARTUP_SCRIPT" stop || true # If not stopped, try upgrading as is.
 
     upgradeVms
-    local RESULT=$?
-    if [ $RESULT != 0 ]; then
-        echo "VMS upgrade failed with exit status $RESULT"
-        return $RESULT;
-    fi
     echo "VMS upgrade succeeded"
 
     sync
@@ -133,40 +174,21 @@ upgradeVmsAndRestart()
         exit 0
     fi
 
-    "$STARTUP_SCRIPT" start #< Ignore errors - if not started, try to restart below.
-
-    sleep 3
-
-    local SERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
-        |grep 'port=' |grep -o '[0-9]\+')
-
-    # If the server cannot start because another process uses its port, kill it and restart.
-    while true; do
-        local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$SERVER_PORT")
-        local SERVER_PID=$(getMediaserverPid "$PID_WHICH_USES_PORT")
-        if [ ! -z "$SERVER_PID" ]; then
-            echo "Upgraded mediaserver is up and running with pid $SERVER_PID at port $SERVER_PORT"
-            break
-        fi
-        echo "Another process (pid $PID_WHICH_USES_PORT) uses port $SERVER_PORT:" \
-            "killing it and restarting $CUSTOMIZATION-mediaserver"
-        "$STARTUP_SCRIPT" stop #< Just in case - the server should not be running at this time.
-        kill -9 "$PID_WHICH_USES_PORT"
-        "$STARTUP_SCRIPT" start #< Ignore errors - if not started, the loop will try again.
-        sleep 3
-    done
+    restartMediaserver
 }
 
-main()
+onExit() # Called on exit via trap.
 {
-    rm -rf "$FAILED_FLAG"
-
-    upgradeVmsAndRestart
     local RESULT=$?
+
+    set +e #< Disable stopping on errors.
+
     if [ $RESULT != 0 ]; then
-        touch "$FAILED_FLAG"
+        touch "$FAILURE_FLAG" || echo "ERROR: Unable to create flag file $FAILURE_FLAG"
+        echo "ERROR: VMS upgrade script failed with exit status $RESULT; created $FAILURE_FLAG"
     fi
     return $RESULT
 }
 
+trap onExit EXIT
 main "$@"
