@@ -52,7 +52,7 @@ struct CreateClientSessionResponse
 {
     std::string sessionId;
     std::chrono::seconds sessionTimeout;
-    std::string redirectHost;
+    std::string redirectUrl;
 };
 
 #define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)

@@ -26,7 +26,7 @@ bool serializeToHeaders(nx_http::HttpHeaders* where, const CreateClientSessionRe
 {
     where->emplace(
         "Location",
-        nx_http::StringType(what.redirectHost.data(), (int) what.redirectHost.size()));
+        nx_http::StringType(what.redirectUrl.data(), (int) what.redirectUrl.size()));
 
     return true;
 }
