@@ -27,14 +27,14 @@ Pipeline::~Pipeline()
 {
 }
 
-int Pipeline::write(const void* data, size_t count)
+int Pipeline::write(const void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_write, data, count);
+    return performSslIoOperation(&SSL_write, data, size);
 }
 
-int Pipeline::read(void* data, size_t count)
+int Pipeline::read(void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_read, data, count);
+    return performSslIoOperation(&SSL_read, data, size);
 }
 
 bool Pipeline::isReadThirsty() const
@@ -105,7 +105,7 @@ void Pipeline::initSslBio(SSL_CTX* context)
 }
 
 template<typename Func, typename Data>
-int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t count)
+int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
 {
     if (m_state < State::handshakeDone)
     {
@@ -116,7 +116,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t count)
     if (m_state < State::handshakeDone)
         return utils::bstream::StreamIoError::wouldBlock;
 
-    const int ret = sslFunc(m_ssl.get(), data, static_cast<int>(count));
+    const int ret = sslFunc(m_ssl.get(), data, static_cast<int>(size));
     return handleSslIoResult(ret);
 }
 
