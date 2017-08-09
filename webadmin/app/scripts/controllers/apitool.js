@@ -35,7 +35,7 @@ angular.module('webadminApp')
                             param.type = 'camera';
                         }
 
-                        if(param.name == 'time' || param.name == 'timestamp'){
+                        if(param.name == 'time' || param.name == 'timestamp' || param.name == 'startTime'){
                             param.type = 'timestamp';
                         }
 
