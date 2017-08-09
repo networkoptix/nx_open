@@ -248,6 +248,8 @@ private:
     int m_internetSynchronizationFailureCount;
     std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
     Settings* m_settings;
+    std::atomic<size_t> m_asyncOperationsInProgress;
+    QnWaitCondition m_asyncOperationsWaitCondition;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,
