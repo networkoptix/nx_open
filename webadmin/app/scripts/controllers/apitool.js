@@ -1,6 +1,14 @@
 'use strict';
 
 angular.module('webadminApp')
+    .filter('highlight', function($sce) {
+        return function(text, phrase) {
+          if (phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
+            '<span class="highlighted">$1</span>')
+
+          return $sce.trustAsHtml(text)
+        }
+      })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', 'dialogs', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,

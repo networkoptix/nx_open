@@ -29,7 +29,8 @@
                                         ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
-                                              ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
+                                              ng-href="#/developers/api{{function.url}}"
+                                              ng-bind-html="function.name | highlight:searchFunc"></a></b>
                                     </li>
                                 </ul>
                             </div>
@@ -51,8 +52,9 @@
                                             ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                             <b><a ng-click="setActiveFunction(group,function,$event)"
-                                                  ng-href="#/developers/api{{function.url}}">{{function.name}}</a></b>
-                                            <span ng-bind-html="function.description.xml" class="api-description-strip"></span>
+                                                  ng-href="#/developers/api{{function.url}}"
+                                                  ng-bind-html="function.name | highlight:searchFunc" >{{function.name}}</a></b>
+                                            <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>
                                 </div>
