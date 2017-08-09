@@ -211,10 +211,16 @@
                                     </div>
 
 
-                                    <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
+                                    <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
                                         <label class="col-sm-3 control-label">Status</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{result.status}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="result.image">
+                                        <label class="col-sm-3 control-label">Response</label>
+                                        <div class="col-sm-9">
+                                            <img style="max-width:100%" ng-src="{{result.image}}">
                                         </div>
                                     </div>
                                     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">

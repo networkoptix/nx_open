@@ -164,6 +164,13 @@ angular.module('webadminApp')
             }else{
                 postParams = cleanParams($scope.apiMethod.params);
             }
+            function processImage(result){
+                var contentType = result.headers('content-type');
+                var blb = new Blob([result.data], {type: contentType});
+                $scope.result.image = (window.URL || window.webkitURL).createObjectURL(blb);
+                $scope.result.status = result.status +  ':  ' + result.statusText;
+            }
+
             function formatResult(result){
                 $scope.result.status = result.status +  ':  ' + result.statusText;
                 if (typeof result.data === 'string' || result.data instanceof String){
@@ -177,6 +184,14 @@ angular.module('webadminApp')
                                       getParams, postParams).
                         then(function(success){
                             $scope.result.error = false;
+
+                            var contentType = success.headers('content-type');
+                            if(contentType.indexOf("image/") == 0){
+                                mediaserver.debugFunction($scope.apiMethod.method,
+                                                          $scope.apiMethod.name,
+                                                          getParams, postParams, true).then(processImage);
+                                return;
+                            }
                             formatResult(success);
                         },function(error){
                             $scope.result.error = true;
