@@ -31,7 +31,7 @@ bool StunOverHttpServer::listen()
 QUrl StunOverHttpServer::getServerUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme("http")
+        .setScheme(nx_http::kUrlSchemeName)
         .setEndpoint(m_httpServer.serverAddress())
         .setPath(kStunOverHttpPath).toUrl();
 }

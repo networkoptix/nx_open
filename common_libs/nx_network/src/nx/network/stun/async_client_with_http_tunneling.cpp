@@ -1,6 +1,7 @@
 #include "async_client_with_http_tunneling.h"
 
 #include <nx/network/stun/stun_over_http_server.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -200,11 +201,13 @@ void AsyncClientWithHttpTunneling::connectInternal(
             handler(sysErrorCode);
         };
 
-    if (m_url.scheme() == "http" || m_url.scheme() == "https")
+    if (m_url.scheme() == nx_http::kUrlSchemeName || 
+        m_url.scheme() == nx_http::kSecureUrlSchemeName)
     {
         openHttpTunnel(lock, m_url, std::move(onConnected));
     }
-    else if (m_url.scheme() == "stun" || m_url.scheme() == "stuns")
+    else if (m_url.scheme() == nx::stun::kUrlSchemeName || 
+        m_url.scheme() == nx::stun::kSecureUrlSchemeName)
     {
         createStunClient(lock, nullptr);
         m_stunClient->connect(m_url, std::move(onConnected));
