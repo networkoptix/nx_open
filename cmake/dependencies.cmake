@@ -139,6 +139,9 @@ function(get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
+        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
+        set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
+        nx_rdep_add_package("vmaxproxy-2.1")
     endif()
 
     if(box STREQUAL "edge1")

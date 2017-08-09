@@ -6,8 +6,6 @@ set(ClientVoxSourceDir "${bin_source_dir}/vox")
 set(ClientQmlDir "${CMAKE_CURRENT_BINARY_DIR}/clientqml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
-set(VC14RedistPath "$ENV{environment}/packages/${rdep_target}/vcredist-2015")
-#set(NxtoolQuickControlsDir ${libdir}\bin\${build.configuration}\qml\QtQuick\Controls)
 
 ExternalProject_Add(
     customactions
@@ -20,7 +18,9 @@ ExternalProject_Add(
 )
 
 nx_copy_bin_resources(${bin_resources} "${CMAKE_CURRENT_BINARY_DIR}")
-nx_copy_bin_resources(${customization_dir}/wixsetup "${CMAKE_CURRENT_BINARY_DIR}")
+nx_copy_bin_resources("${customization_dir}/wixsetup" "${CMAKE_CURRENT_BINARY_DIR}")
+nx_copy_bin_resources("${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}")
+nx_copy_bin_resources("${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}")
 nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
@@ -28,7 +28,7 @@ file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 add_custom_target(wixsetup ALL
     DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions testcamera
     COMMENT "Creating installer..."
-    #TODO move python to cmake
+    # TODO move python to cmake
     COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
     COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
@@ -64,10 +64,10 @@ file(GLOB_RECURSE vc14redist_files
     "${VC14RedistPath}/bin/*"
 )
 
-#processing file lists in order not to pass tons of variables in custom target
+# Processing file lists in order not to pass tons of variables in custom target
 nx_configure_directory("${CMAKE_CURRENT_SOURCE_DIR}/packages" "${CMAKE_CURRENT_BINARY_DIR}/packages")
 
-add_custom_target(pack ALL
+add_custom_target(pack_updates ALL
     DEPENDS wixsetup
     COMMENT "Preparing update and debug packages ..."
     COMMAND

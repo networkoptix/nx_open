@@ -15,7 +15,7 @@ set(customization.dir ${customization_dir})
 set(installer.target.dir ${build.configuration})
 set(bin_source_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
 
-#artifact names
+# Artifact names
 set(artifact.name.client "${client_distribution_name}")
 set(artifact.name.server "${server_distribution_name}")
 set(artifact.name.bundle "${bundle_distribution_name}")
