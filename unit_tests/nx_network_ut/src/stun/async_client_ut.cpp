@@ -413,7 +413,8 @@ public:
 
     QUrl getServerUrl() const
     {
-        return nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
+        return nx::network::url::Builder()
+            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
     }
 
     nx::stun::MessageDispatcher& dispatcher()
@@ -424,16 +425,7 @@ public:
     void sendIndicationThroughEveryConnection(nx::stun::Message message)
     {
         forEachConnection(
-            [message](nx::stun::ServerConnection* connection)
-            {
-                connection->post(
-                    [message, connection]() mutable
-                    {
-                        connection->sendMessage(
-                            std::move(message),
-                            [](SystemError::ErrorCode) {});
-                    });
-            });
+            nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
     }
 
 private:

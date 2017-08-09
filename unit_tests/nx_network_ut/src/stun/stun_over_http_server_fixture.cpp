@@ -45,16 +45,7 @@ void StunOverHttpServer::sendIndicationThroughEveryConnection(
     nx::stun::Message message)
 {
     m_stunOverHttpServer.stunConnectionPool().forEachConnection(
-        [message](nx::stun::ServerConnection* connection)
-        {
-            connection->post(
-                [message, connection]() mutable
-                {
-                    connection->sendMessage(
-                        std::move(message),
-                        [](SystemError::ErrorCode) {});
-                });
-        });
+        nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
 }
 
 std::size_t StunOverHttpServer::connectionCount() const

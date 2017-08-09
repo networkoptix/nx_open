@@ -109,6 +109,29 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
+template<typename Connection>
+struct MessageSender
+{
+    MessageSender(typename Connection::MessageType message):
+        m_message(std::move(message))
+    {
+    }
+
+    void operator()(Connection* connection)
+    {
+        connection->post(
+            [this, connection]() mutable
+            {
+                connection->sendMessage(
+                    m_message,
+                    [](SystemError::ErrorCode) {});
+            });
+    }
+
+private:
+    typename Connection::MessageType m_message;
+};
+
 // TODO: #ak It seems to make sense to decouple 
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 

@@ -45,6 +45,8 @@ template<
     using base_type = BaseServerConnection<CustomConnection>;
 
 public:
+    using MessageType = Message;
+
     BaseStreamProtocolConnection(
         StreamConnectionHolder<CustomConnection>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
