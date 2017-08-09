@@ -24,9 +24,9 @@
                 <div class="view-wrapper">
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
                                   position-provider="positionProvider" system="systemAPI"
-                                  player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
+                                  player="player" current-resolution="currentResolution" show-camera-panel="showCameraPanel"
                                   class="cameras-panel-toggle" camera-links-enabled="cameraLinksEnabled"
-                                  ng-class="{'hide-panel':!toggleCameraPanel}"></camera-panel>
+                                  ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
                 </div>
             </td>
             <td width="100%">
@@ -60,8 +60,8 @@
                                         </span>
                                 </div>
                                 <div class="hide-excess-text video-title-back-button">
-                                        <span class="visible-xs" ng-click="toggleCameraPanel=true"
-                                              ng-class="{'back-button': !toggleCameraPanel}">
+                                        <span class="visible-xs" ng-click="showCameraPanel=true"
+                                              ng-class="{'back-button': !showCameraPanel}">
                                             <span class="glyphicon glyphicon-arrow-left"></span>
                                         </span>
                                         <camera-status camera="activeCamera" type="'video'"></camera-status>
