@@ -118,7 +118,7 @@
                                     <div class="form-group"
                                          ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
                                          ng-if="!param.proprietary || allowProprietary"
-                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
+                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
                                         <label class="col-sm-3 control-label" for="{{param.name}}">
                                             {{param.name}}
                                             <small ng-if="param.optional=='false'">(required)</small>
@@ -169,9 +169,11 @@
                                                        typeahead-editable="false"
                                                        typeahead-focus
                                                        class="form-control input-sm">
-                                                <p class="help-block" ng-if="cameraIds[apiMethod.params[param.name]]">
+                                                <p class="help-block" ng-switch-when="camera">
                                                     <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                                                 </p>
+
+                                                <span ng-switch-when="info"></span>
 
                                                 <input type="text" class="form-control input-sm"
                                                        ng-switch-default
