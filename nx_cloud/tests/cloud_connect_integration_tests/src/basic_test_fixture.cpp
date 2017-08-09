@@ -6,6 +6,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include <libconnection_mediator/src/http/http_api_path.h>
+#include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
 #include <libtraffic_relay/src/model/listening_peer_pool.h>
 
@@ -101,6 +102,11 @@ QUrl BasicTestFixture::relayUrl() const
     return m_relayUrl;
 }
 
+void BasicTestFixture::restartMediator()
+{
+    m_mediator.restart();
+}
+
 void BasicTestFixture::assertConnectionCanBeEstablished()
 {
     m_clientSocket = SocketFactory::createStreamSocket();
@@ -170,6 +176,29 @@ const hpm::api::SystemCredentials& BasicTestFixture::cloudSystemCredentials() co
     return m_cloudSystemCredentials;
 }
 
+void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
+{
+    for (;;)
+    {
+        if (!m_mediator.moduleInstance()->impl()->listeningPeerPool()->findPeersBySystemId(
+                m_cloudSystemCredentials.systemId).empty())
+        {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
+{
+    while (!m_trafficRelay.moduleInstance()->listeningPeerPool().isPeerOnline(
+        m_cloudSystemCredentials.systemId.toStdString()))
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
 void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
 {
     m_remotePeerName = remotePeerName;
@@ -229,12 +258,7 @@ void BasicTestFixture::startHttpServer()
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 
-    // Waiting for server to be registered on relay.
-    while (!m_trafficRelay.moduleInstance()->listeningPeerPool().isPeerOnline(
-                m_cloudSystemCredentials.systemId.toStdString()))
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+    waitUntilServerIsRegisteredOnTrafficRelay();
 }
 
 void BasicTestFixture::onHttpRequestDone(

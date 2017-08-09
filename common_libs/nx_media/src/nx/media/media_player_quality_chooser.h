@@ -57,6 +57,7 @@ Result chooseVideoQuality(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
+    bool allowOverlay,
     const std::vector<AbstractVideoDecoder*>& currentDecoders =
         std::vector<AbstractVideoDecoder*>());
 
