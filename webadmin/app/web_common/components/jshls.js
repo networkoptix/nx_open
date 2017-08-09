@@ -7,7 +7,8 @@ function JsHlsAPI(){
     enableWorker = true,
     //levelCapping = -1,
     defaultAudioCodec = undefined,
-    dumpfMP4 = false;
+    dumpfMP4 = false,
+    autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;

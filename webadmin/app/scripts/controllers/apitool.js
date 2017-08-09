@@ -1,6 +1,31 @@
 'use strict';
 
 angular.module('webadminApp')
+    .filter('highlight', function($sce) {
+        return function(text, phrase) {
+          if (phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
+            '<span class="highlighted">$1</span>')
+
+          return $sce.trustAsHtml(text)
+        }
+    })
+    .filter('escape', function($sce) {
+        var entityMap = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+          '/': '&#x2F;',
+          '`': '&#x60;',
+          '=': '&#x3D;'
+        };
+        return function(text, phrase) {
+            return String(text).replace(/[&<>"'`=\/]/g, function (s) {
+                return entityMap[s];
+            });
+        }
+    })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', 'dialogs', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,
@@ -9,6 +34,7 @@ angular.module('webadminApp')
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
         $scope.session = $sessionStorage;
+        $scope.clipboardSupported = true; // presume
 
         if($location.search().proprietary){
             Config.allowProprietary = $location.search().proprietary;
@@ -45,12 +71,18 @@ angular.module('webadminApp')
                                 value.label = value.name;
                                 if(value.description.xml){
                                     value.description.xml = value.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
-                                    value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                    if(value.description.xml.trim() != ''){
+                                        value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                    }
                                 }
                             });
-                            if(param.optional == 'true'){
+                            if(param.optional == 'true' && (func.method == 'GET' || func.method == 'POST')){
                                 param.values.unshift({label:'', name:null});
                             }
+                        }
+
+                        if(param.name.match(/[{}\.\[\]]/g)){
+                            param.type = 'info';
                         }
                     });
 
@@ -76,24 +108,34 @@ angular.module('webadminApp')
         });
 
         $scope.setActiveFunction = function(group, method, $event){
+            if($scope.activeFunction == method){
+                return;
+            }
+            $scope.result={};
             $scope.activeGroup = group;
             $scope.activeFunction = method;
-            $scope.session.method.method = method.method;
-            $scope.session.method.name = group.urlPrefix + '/' + method.name;
-            $scope.session.method.params = {}
+            $scope.apiMethod.method = method.method;
+            $scope.apiMethod.name = method.url;
+            $scope.apiMethod.params = {}
             _.each(method.params,function(param){
-                $scope.session.method.params[param.name] = null;
+                $scope.apiMethod.params[param.name] = null;
             });
             if($event){
                 $event.preventDefault();
                 $event.stopPropagation();
-                $location.path('/developers/api' + group.urlPrefix + '/' + method.name, false);
+                $location.path('/developers/api' + method.url, false);
             }
             return false;
         }
-        $scope.clearActiveFunction = function(){
+        $scope.clearActiveFunction = function($event){
             $scope.activeGroup = null;
             $scope.activeFunction = null;
+            if($event){
+                $event.preventDefault();
+                $event.stopPropagation();
+                $location.path('/developers/api', false);
+            }
+            return false;
         }
 
         if($scope.Config.developersFeedbackForm){
@@ -102,8 +144,8 @@ angular.module('webadminApp')
         }
 
         /* API Test Tool */
-        if(!$scope.session.method){
-            $scope.session.method = {
+        if(!$scope.apiMethod){
+            $scope.apiMethod = {
                 name:'/api/moduleInformation',
                 data:'',
                 params: '',
@@ -130,21 +172,32 @@ angular.module('webadminApp')
             return newParams;
         };
         $scope.getDebugUrl = function(){
-            if($scope.session.method.method == 'GET'){
-                return mediaserver.debugFunctionUrl($scope.session.method.name, cleanParams($scope.session.method.params));
+            if($scope.apiMethod.method == 'GET'){
+                return mediaserver.debugFunctionUrl($scope.apiMethod.name, cleanParams($scope.apiMethod.params));
             }
-            return mediaserver.debugFunctionUrl($scope.session.method.name);
+            return mediaserver.debugFunctionUrl($scope.apiMethod.name);
+        };
+
+        $scope.getPostData = function(){
+            return JSON.stringify(cleanParams($scope.apiMethod.params), null,  '  ');
         };
 
         $scope.testMethod = function(){
             var getParams = null;
             var postParams = null;
 
-            if($scope.session.method.method == 'GET'){
-                getParams = cleanParams($scope.session.method.params);
+            if($scope.apiMethod.method == 'GET'){
+                getParams = cleanParams($scope.apiMethod.params);
             }else{
-                postParams = cleanParams($scope.session.method.params);
+                postParams = cleanParams($scope.apiMethod.params);
             }
+            function processImage(result){
+                $scope.result.contentType = result.headers('content-type');
+                var blb = new Blob([result.data], {type: $scope.result.contentType});
+                $scope.result.image = (window.URL || window.webkitURL).createObjectURL(blb);
+                $scope.result.status = result.status +  ':  ' + result.statusText;
+            }
+
             function formatResult(result){
                 $scope.result.status = result.status +  ':  ' + result.statusText;
                 if (typeof result.data === 'string' || result.data instanceof String){
@@ -153,11 +206,19 @@ angular.module('webadminApp')
                     $scope.result.result = JSON.stringify(result.data, null,  '  ');
                 }
             }
-            mediaserver.debugFunction($scope.session.method.method,
-                                      $scope.session.method.name,
+            mediaserver.debugFunction($scope.apiMethod.method,
+                                      $scope.apiMethod.name,
                                       getParams, postParams).
                         then(function(success){
                             $scope.result.error = false;
+
+                            var contentType = success.headers('content-type');
+                            if(contentType.indexOf("image/") == 0){
+                                mediaserver.debugFunction($scope.apiMethod.method,
+                                                          $scope.apiMethod.name,
+                                                          getParams, postParams, true).then(processImage);
+                                return;
+                            }
                             formatResult(success);
                         },function(error){
                             $scope.result.error = true;
@@ -182,15 +243,7 @@ angular.module('webadminApp')
             var windowHeight = $window.height();
             var headerHeight = $header.outerHeight();
 
-            var topAlertHeight = 0;
-
-            var topAlert = $('.alerts-row>td');
-            //after the user is notified this should not be calculated again
-            if(topAlert.length && !$scope.session.mobileAppNotified){
-                topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
-            }
-
-            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
+            var viewportHeight = (windowHeight - headerHeight) + 'px';
 
             $camerasPanel.css('height',viewportHeight );
             var listWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;
