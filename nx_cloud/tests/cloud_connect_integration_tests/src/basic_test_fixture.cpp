@@ -83,6 +83,8 @@ void BasicTestFixture::startRelay(int port)
             std::to_string(m_disconnectedPeerTimeout->count()).c_str());
     }
 
+    newRelay->addArg("-publicAddress", "127.0.0.1");
+
     ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
     m_relays.push_back(RelayContext(std::move(newRelay), port));
 }

@@ -58,6 +58,7 @@ public:
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
     const QString& cassandraHost() const;
+    const QString& publicAddress() const;
 
 private:
     utils::log::Settings m_logging;
@@ -65,6 +66,7 @@ private:
     ListeningPeer m_listeningPeer;
     ConnectingPeer m_connectingPeer;
     QString m_cassandraHost;
+    QString m_publicAddress;
 
     virtual void loadSettings() override;
 
@@ -72,6 +74,7 @@ private:
     void loadListeningPeer();
     void loadConnectingPeer();
     void loadCassandraHost();
+    void loadPublicAddress();
 };
 
 } // namespace conf

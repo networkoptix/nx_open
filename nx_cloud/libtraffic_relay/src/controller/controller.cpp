@@ -4,6 +4,7 @@
 #include <thread>
 #include "controller.h"
 #include "../model/model.h"
+#include "settings.h"
 
 namespace nx {
 namespace cloud {
@@ -19,7 +20,7 @@ Controller::Controller(
             &model->clientSessionPool(),
             &model->listeningPeerPool(),
             &m_trafficRelay,
-            discoverPublicIp()))
+            discoverPublicIp(settings)))
 {
 }
 
@@ -28,8 +29,11 @@ controller::AbstractConnectSessionManager& Controller::connectSessionManager()
     return *m_connectSessionManager;
 }
 
-std::string Controller::discoverPublicIp()
+std::string Controller::discoverPublicIp(const conf::Settings& settings)
 {
+    if (!settings.publicAddress().isEmpty())
+        return settings.publicAddress().toStdString();
+
     network::PublicIPDiscovery ipDiscovery;
 
     while (true)

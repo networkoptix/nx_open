@@ -24,7 +24,7 @@ private:
     controller::TrafficRelay m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
 
-    std::string discoverPublicIp();
+    std::string discoverPublicIp(const conf::Settings& settings);
 };
 
 } // namespace relay
