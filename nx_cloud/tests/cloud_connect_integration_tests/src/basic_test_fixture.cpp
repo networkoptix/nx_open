@@ -72,6 +72,8 @@ void BasicTestFixture::startRelay(int port)
     std::string dataDirString = std::string("relay_") + std::to_string(port);
     newRelay->addArg("-dataDir", dataDirString.c_str());
 
+    newRelay->addArg("-listeningPeer/disconnectedPeerTimeout", "1");
+
     ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
     m_relays.push_back(RelayContext(std::move(newRelay), port));
 }
@@ -224,11 +226,30 @@ void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
 {
-    while (!m_relays[0].relay->moduleInstance()->listeningPeerPool().isPeerOnline(
-        m_cloudSystemCredentials.systemId.toStdString()))
-    {
+    waitForServerStatusOnRelay(ServerRelayStatus::registered);
+}
+
+void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
+{
+    waitForServerStatusOnRelay(ServerRelayStatus::unregistered);
+}
+
+void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
+{
+    const auto& listeningPool = m_relays[0].relay->moduleInstance()->listeningPeerPool();
+    auto serverId = m_cloudSystemCredentials.systemId.toStdString();
+    auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
+
+    auto shouldWaitMore =
+        [&]()
+        {
+            return
+                (status == ServerRelayStatus::registered && !getServerStatus())
+                || (status == ServerRelayStatus::unregistered && getServerStatus());
+        };
+
+    while (shouldWaitMore())
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 }
 
 void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)

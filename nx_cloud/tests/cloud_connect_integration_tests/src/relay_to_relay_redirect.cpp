@@ -5,6 +5,7 @@
 #include "model/abstract_remote_relay_peer_pool.h"
 #include <controller/connect_session_manager.h>
 #include <controller/../settings.h>
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace network {
@@ -45,7 +46,8 @@ class RelayToRelayRedirect: public BasicTestFixture
 {
 public:
     RelayToRelayRedirect():
-        BasicTestFixture(3)
+        BasicTestFixture(3),
+        m_removePeerFuture(m_removePeerPromise.get_future())
     {}
 
     virtual void SetUp() override
@@ -131,6 +133,7 @@ public:
     void removePeer(const std::string& domainName)
     {
         m_removedPeer = domainName;
+        m_removePeerPromise.set_value();
     }
 
     void whenServerGoesOffline()
@@ -146,9 +149,17 @@ public:
         ASSERT_TRUE(removedPeer.contains(firstRelayServerId));
     }
 
+    void waitForRemovePeerSignal()
+    {
+        m_removePeerFuture.wait();
+    }
+
 private:
     std::vector<std::pair<std::string, std::string>> m_addedPeers;
     std::string m_removedPeer;
+
+    nx::utils::promise<void> m_removePeerPromise;
+    nx::utils::future<void> m_removePeerFuture;
 };
 
 cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
@@ -174,7 +185,7 @@ TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)
 TEST_F(RelayToRelayRedirect, RecordRemovedOnServerDisconnect)
 {
     whenServerGoesOffline();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    waitForRemovePeerSignal();
     thenItsRecordShouldBeRemovedFromRemoteRelayPool();
 }
 

@@ -85,6 +85,7 @@ protected:
 
     void waitUntilServerIsRegisteredOnMediator();
     void waitUntilServerIsRegisteredOnTrafficRelay();
+    void waitUntilServerIsUnRegisteredOnTrafficRelay();
 
     void setRemotePeerName(const nx::String& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
@@ -96,6 +97,12 @@ private:
     {
         nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
         nx_http::BufferType msgBody;
+    };
+
+    enum class ServerRelayStatus
+    {
+        registered,
+        unregistered
     };
 
     QnMutex m_mutex;
@@ -125,6 +132,7 @@ private:
         std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter);
     void startRelays();
     void startRelay(int port);
+    void waitForServerStatusOnRelay(ServerRelayStatus status);
 };
 
 } // namespace test
