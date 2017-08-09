@@ -27,8 +27,10 @@ add_custom_target(wixsetup ALL
     DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions testcamera
     COMMENT "Creating installer..."
     # TODO move python to cmake
-    COMMAND ${CMAKE_COMMAND} -E copy "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
-    COMMAND ${CMAKE_COMMAND} -E copy "${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}"
     COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
     COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
