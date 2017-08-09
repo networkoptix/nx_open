@@ -41,17 +41,15 @@
                                 </div>
                             </div>
                             <div ng-if="activeFunction">
-                                <h3>
-                                    {{activeFunction.name}}
-                                </h3>
+                                <h2>{{activeFunction.name}}</h2>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
 
                                 <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">Method</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 control-label">Method</label>
+                                        <div class="col-sm-9">
                                             <select ng-model="session.method.method" class="form-control">
                                                 <option>POST</option>
                                                 <option>GET</option>
@@ -60,24 +58,24 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">URL</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 control-label">URL</label>
+                                        <div class="col-sm-9">
                                             <p class="form-control-static">{{activeGroup.urlPrefix}}/{{activeFunction.name}}</p>
                                         </div>
                                     </div>
 
-                                    <b ng-if="activeFunction.params.length>0">Parameters:</b>
+                                    <h3 ng-if="activeFunction.params.length>0">Parameters</h3>
 
                                     <div class="form-group"
                                          ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
                                          ng-if="!param.proprietary || allowProprietary"
-                                         ng-class="{'has-warning':param.proprietary}">
-                                        <label class="col-sm-2 control-label" for="{{param.name}}">
+                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
+                                        <label class="col-sm-3 control-label" for="{{param.name}}">
                                             {{param.name}}
-                                            <b ng-if="param.optional=='false'">*</b>
-                                            <small class="help-block" ng-if="param.proprietary">(proprietary)</small>
+                                            <small ng-if="param.optional=='false'">(required)</small>
+                                            <small ng-if="param.proprietary">(proprietary)</small>
                                         </label>
-                                        <div class="col-sm-10">
+                                        <div class="col-sm-9">
 
                                             <div ng-switch on="param.type">
 
@@ -138,14 +136,14 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">Requesting URL</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 control-label">Requesting URL</label>
+                                        <div class="col-sm-9">
                                             <p class="form-control-static">{{getDebugUrl()}}</p>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
+                                        <div class="col-sm-offset-3 col-sm-9">
                                             <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test method</button>
                                             <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
                                         </div>
@@ -153,23 +151,23 @@
 
 
                                     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-                                        <label class="col-sm-2 control-label">Status</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 control-label">Status</label>
+                                        <div class="col-sm-9">
                                             <p class="form-control-static">{{result.status}}</p>
                                         </div>
                                     </div>
                                     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-                                        <label class="col-sm-2 control-label">Result</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 control-label">Response</label>
+                                        <div class="col-sm-9">
                                             <textarea class="form-control" rows="10">{{result.result}}</textarea>
                                         </div>
                                     </div>
 
                                 </form>
 
-
-                                <div ng-if="activeFunction.result.caption || activeFunction.result.params">
-                                    <b>Result:</b> {{activeFunction.result.caption}}
+                                <div ng-if="activeFunction.result.params || activeFunction.result.caption">
+                                    <h3 ng-if="activeFunction.params.length>0">Result</h3>
+                                    <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
