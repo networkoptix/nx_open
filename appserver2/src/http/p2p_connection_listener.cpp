@@ -269,6 +269,15 @@ void ConnectionProcessor::run()
         nx_http::StatusCode::switchingProtocols,
         nx_http::StringType());
 
+
+    std::function<void()> onConnectionClosedCallback;
+    if (remotePeer.isClient())
+    {
+        auto session = authSession();
+        qnAuditManager->at_connectionOpened(session);
+        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+    }
+
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
@@ -279,7 +288,8 @@ void ConnectionProcessor::run()
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
-        userAccessData(remotePeer));
+        userAccessData(remotePeer),
+        onConnectionClosedCallback);
 }
 
 } // namespace p2p

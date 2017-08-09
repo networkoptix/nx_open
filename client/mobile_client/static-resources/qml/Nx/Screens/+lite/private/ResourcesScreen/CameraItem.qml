@@ -289,6 +289,7 @@ Control
                         playLive()
                 }
                 videoQuality: MediaPlayer.LowVideoQuality
+                allowOverlay: false
             }
 
             Connections

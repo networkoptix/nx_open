@@ -221,6 +221,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         while (m_videoDecoders.size() <= videoChannel)
         {
             auto videoDecoder = new SeamlessVideoDecoder();
+            videoDecoder->setAllowOverlay(m_allowOverlay);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
         }
@@ -511,6 +512,11 @@ void PlayerDataConsumer::setAudioEnabled(bool value)
 bool PlayerDataConsumer::isAudioEnabled() const
 {
     return m_audioEnabled;
+}
+
+void PlayerDataConsumer::setAllowOverlay(bool value)
+{
+    m_allowOverlay = value;
 }
 
 } // namespace media
