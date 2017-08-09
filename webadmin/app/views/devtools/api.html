@@ -89,7 +89,25 @@
                                                         ng-model="session.method.params[param.name]">
                                                 </select>
 
-
+                                                <div class="input-group input-group-sm"
+                                                     ng-switch-when="timestamp">
+                                                    <input type="text"
+                                                           id="{{param.name}}"
+                                                           class="form-control"
+                                                           placeholder="YYYY-MM-DDTHH:mm:ss"
+                                                           datepicker-popup="{{Config.dateInternalFormat}}"
+                                                           ng-model="session.method.params[param.name]"
+                                                           ng-required="param.optional=='false'"
+                                                           is-open="openDate[param.name]"
+                                                           close-text="Close" />
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-default"
+                                                                ng-click="openDatePicker($event, param.name)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                    </span>
+                                                </div>
+                                                <p class="help-block" ng-switch-when="timestamp">
+                                                    <i>Timestamp: {{session.method.params[param.name].getTime()}}</i>
+                                                </p>
 
                                                 <input type="text"
                                                        ng-switch-when="camera"
@@ -102,7 +120,7 @@
                                                        typeahead-focus-first="false"
                                                        typeahead-editable="false"
                                                        typeahead-focus
-                                                       class="form-control">
+                                                       class="form-control input-sm">
                                                 <p class="help-block" ng-if="cameraIds[session.method.params[param.name]]">
                                                     <i>Selected camera: {{cameraIds[session.method.params[param.name]].name}}</i>
                                                 </p>

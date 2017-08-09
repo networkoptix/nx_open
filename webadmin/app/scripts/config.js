@@ -35,6 +35,7 @@ var Config = {
     },
 
     dateSettingsFormat:'dd MMMM yyyy',
+    dateInternalFormat:'yyyy-MM-ddThh:mm:ss',
 
     visualLog: false,
     allowDebugMode: false, // Allow debugging at all. Set to false in production

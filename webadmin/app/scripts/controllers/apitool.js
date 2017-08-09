@@ -121,6 +121,10 @@ angular.module('webadminApp')
                 if(params[key] === null || params[key].toString().trim() === ''){
                     continue;
                 }
+                if(params[key] instanceof Date){
+                    newParams[key] = params[key].getTime();
+                    continue;
+                }
                 newParams[key] = params[key].toString().trim();
             }
             return newParams;
@@ -154,6 +158,13 @@ angular.module('webadminApp')
                             $scope.result.error = true;
                             $scope.result.result =  JSON.stringify(error.data, null,  '  ');
                         });
+        };
+
+        $scope.openDate = {};
+        $scope.openDatePicker = function($event, param_name) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.openDate[param_name] = true;
         };
 
 
