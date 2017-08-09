@@ -779,11 +779,10 @@ QList<nx::api::AnalyticsSupportedEvents> QnSecurityCamResource::analyticsSupport
 void QnSecurityCamResource::setAnalyticsSupportedEvents(
     const QList<nx::api::AnalyticsSupportedEvents>& eventsList)
 {
-    QString value = QString::fromUtf8(QJson::serialized(eventsList));
-    if (value.isNull())
+    if (eventsList.isEmpty())
         setProperty(Qn::kAnalyticsDriversParamName, QVariant());
     else
-        setProperty(Qn::kAnalyticsDriversParamName, value);
+        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventsList)));
 }
 
 void QnSecurityCamResource::setMinDays(int value)

@@ -120,6 +120,10 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
 
 }
 
+// -------------------
+// QnCameraInputPolicy
+// -------------------
+
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
@@ -132,6 +136,10 @@ QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool
     return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have no input ports", "", invalid), invalid);
 }
 
+// -------------------
+// QnCameraOutputPolicy
+// -------------------
+
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
@@ -143,6 +151,10 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
     int invalid = invalidResourcesCount<QnCameraOutputPolicy>(cameras);
     return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
+
+// -------------------
+// QnCameraMotionPolicy
+// -------------------
 
 bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
@@ -164,6 +176,10 @@ QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bo
     return getShortResourceName(camera);
 }
 
+// -------------------
+// QnCameraMotionPolicy
+// -------------------
+
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return !camera->isScheduleDisabled() && camera->hasMotion();
@@ -175,6 +191,10 @@ QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const boo
     int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
     return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
 }
+
+// -------------------
+// QnCameraAudioTransmitPolicy
+// -------------------
 
 bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
@@ -194,6 +214,10 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
         return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
 }
 
+// -------------------
+// QnCameraRecordingPolicy
+// -------------------
+
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return !camera->isScheduleDisabled();
@@ -205,6 +229,56 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
     int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(cameras);
     return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
 }
+
+// -------------------
+// QnCameraAnalyticsPolicy
+// -------------------
+
+bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto supportedEvents = camera->analyticsSupportedEvents();
+
+    QSet<QnUuid> supportedDrivers;
+    for (const auto& supportedEventSet : supportedEvents)
+    {
+        if (supportedEventSet.driverId.isNull())
+            continue;
+
+        if (supportedEventSet.eventTypes.empty())
+            continue;
+
+        supportedDrivers.insert(supportedEventSet.driverId);
+    }
+    if (supportedDrivers.empty())
+        return false;
+
+    const auto server = camera->getParentServer();
+    NX_EXPECT(server);
+    if (!server)
+        return false;
+
+    const auto drivers = server->analyticsDrivers();
+    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
+        [supportedDrivers](const nx::api::AnalyticsDriverManifest& manifest)
+        {
+            return supportedDrivers.contains(manifest.driverId);
+        });
+
+    return driver != drivers.cend();
+}
+
+QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+
+    int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
+    return genericCameraText<QnCameraAnalyticsPolicy>(cameras, detailed,
+        tr("Analytics is not available for %1", "", invalid), invalid);
+}
+
+// -------------------
+// QnSendEmailActionDelegate
+// -------------------
 
 QnSendEmailActionDelegate::QnSendEmailActionDelegate(QWidget* parent):
     QnResourceSelectionDialogDelegate(parent),
@@ -705,47 +779,4 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
     }
 
     return alert.isEmpty() ? alert : kForceHtml.arg(alert);
-}
-
-bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
-{
-    const auto supportedEvents = camera->analyticsSupportedEvents();
-
-    QSet<QnUuid> supportedDrivers;
-    for (auto supportedEventSet: supportedEvents)
-    {
-        if (supportedEventSet.driverId.isNull())
-            continue;
-
-        if (supportedEventSet.eventTypes.empty())
-            continue;
-
-        supportedDrivers.insert(supportedEventSet.driverId);
-    }
-    if (supportedDrivers.empty())
-        return false;
-
-    const auto server = camera->getParentServer();
-    NX_EXPECT(server);
-    if (!server)
-        return false;
-
-    const auto drivers = server->analyticsDrivers();
-    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [supportedDrivers](const nx::api::AnalyticsDriverManifest& manifest)
-        {
-            return supportedDrivers.contains(manifest.driverId);
-        });
-
-    return driver != drivers.cend();
-}
-
-QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
-{
-    const auto cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.empty())
-        return QnBusinessResourceValidationStrings::selectCamera();
-
-    // TODO: #GDM #analytics
-    return QString();
 }

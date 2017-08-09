@@ -5,7 +5,8 @@
 namespace nx {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsSupportedEvents, (json), AnalyticsSupportedEvents_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsSupportedEvents, (json), AnalyticsSupportedEvents_Fields,
+    (brief, true))
 
 } // namespace api
 } // namespace nx

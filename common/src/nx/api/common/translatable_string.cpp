@@ -10,7 +10,8 @@ QString TranslatableString::text(const QString& locale) const
     return localization.value(locale, value);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TranslatableString, (json), TranslatableString_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TranslatableString, (json), TranslatableString_Fields,
+    (brief, true))
 
 } // namespace api
 } // namespace nx
