@@ -25,9 +25,11 @@ angular.module('webadminApp')
             _.each($scope.apiGroups,function(group){
                 _.each(group.functions,function(func){
                     func.url = group.urlPrefix + '/' + func.name;
+                    func.description.xml = func.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
                     _.each(func.params,function(param){
                         // Detecting type for param
                         param.type = 'text';
+                        param.description.xml = param.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
 
                         if(param.name == 'cameraId'){
                             param.type = 'camera';
@@ -42,6 +44,7 @@ angular.module('webadminApp')
                             _.each(param.values,function(value){
                                 value.label = value.name;
                                 if(value.description.xml){
+                                    value.description.xml = value.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
                                     value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
                                 }
                             });

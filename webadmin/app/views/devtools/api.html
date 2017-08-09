@@ -45,7 +45,7 @@
                                     {{activeFunction.name}}
                                 </h3>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
-                                <p ng-bind-html="activeFunction.description.xml"></p>
+                                <div ng-bind-html="activeFunction.description.xml"></div>
 
 
                                 <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
