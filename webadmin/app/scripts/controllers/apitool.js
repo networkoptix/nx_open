@@ -165,8 +165,8 @@ angular.module('webadminApp')
                 postParams = cleanParams($scope.apiMethod.params);
             }
             function processImage(result){
-                var contentType = result.headers('content-type');
-                var blb = new Blob([result.data], {type: contentType});
+                $scope.result.contentType = result.headers('content-type');
+                var blb = new Blob([result.data], {type: $scope.result.contentType});
                 $scope.result.image = (window.URL || window.webkitURL).createObjectURL(blb);
                 $scope.result.status = result.status +  ':  ' + result.statusText;
             }

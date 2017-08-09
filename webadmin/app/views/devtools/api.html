@@ -221,6 +221,9 @@
                                         <label class="col-sm-3 control-label">Response</label>
                                         <div class="col-sm-9">
                                             <img style="max-width:100%" ng-src="{{result.image}}">
+                                            <div class="col-sm-9">
+                                                <p class="help-block">Content-type: {{result.contentType}}</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
