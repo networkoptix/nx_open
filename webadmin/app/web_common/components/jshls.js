@@ -7,9 +7,11 @@ function JsHlsAPI(){
     enableWorker = true,
     //levelCapping = -1,
     defaultAudioCodec = undefined,
-    dumpfMP4 = false;
+    dumpfMP4 = false,
+    autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
+        var jshlsApi = this;
         hls.config.manifestLoadingTimeOut = 30*1000; // 30 seconds to wait for manifest
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
@@ -233,13 +235,13 @@ function JsHlsAPI(){
             switch(data.details) {
                 case Hls.ErrorDetails.MANIFEST_LOAD_ERROR:
                     try {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
                         if(data.response.code === 0) {
                             console.log("this might be a CORS issue, consider installing <a href=\"https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi\">Allow-Control-Allow-Origin</a> Chrome Extension");
                         }
                     }
                     catch(err) {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>Reason:Load " + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>Reason:Load " + data.response.text);
                     }
                     break;
                 case Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT:
@@ -294,7 +296,7 @@ function JsHlsAPI(){
                 console.log('fatal error :' + data.details);
                 switch(data.type) {
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        this.handleMediaError();
+                        jshlsApi.handleMediaError();
                         break;
                     case Hls.ErrorTypes.NETWORK_ERROR:
                         console.log(",network error ...");
@@ -304,7 +306,7 @@ function JsHlsAPI(){
                         hls.destroy();
                         break;
                 }
-                console.log(console.log());
+                jshlsApi.errorHandler("Fatal Error");
             }
             if(!stats) stats = {};
             // track all errors independently
@@ -366,6 +368,7 @@ function JsHlsAPI(){
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
+        this.errorHandler = errorHandler;
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
@@ -434,7 +437,7 @@ function JsHlsAPI(){
     };
 
     var recoverDecodingErrorDate,recoverSwapAudioCodecDate;
-    this.handleMediaError= function(){
+    this.handleMediaError = function(){
         if(autoRecoverError) {
             var now = performance.now();
             if(!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 3000) {
