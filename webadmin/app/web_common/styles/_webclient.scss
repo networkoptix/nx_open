@@ -650,6 +650,11 @@ table.webclient-window>tbody>tr>td{
   margin: auto;
 }
 
+.drop-back{
+  position: absolute !important;
+  z-index: -1;
+}
+
 .rotate90 {
   -ms-transform: rotate(90deg);
   -webkit-transform: rotate(90deg);

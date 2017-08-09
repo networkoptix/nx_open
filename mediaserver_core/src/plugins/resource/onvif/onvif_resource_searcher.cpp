@@ -222,7 +222,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString modelName = resource->getModel();
 
         auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
-        if (resource->getMAC().isNull() && !resData.contains(lit("isMacAddressNotMandatory")))
+        if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
             return resList;
 
         const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, modelName);
