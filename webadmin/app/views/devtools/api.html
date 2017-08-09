@@ -48,23 +48,11 @@
 
                                 <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Method</label>
-                                        <div class="col-sm-9">
-                                            <select ng-model="session.method.method" class="form-control">
-                                                <option>POST</option>
-                                                <option>GET</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">URL</label>
+                                        <label class="col-sm-3 control-label">{{session.method.method}}:</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{activeGroup.urlPrefix}}/{{activeFunction.name}}</p>
                                         </div>
                                     </div>
-
-                                    <h3 ng-if="activeFunction.params.length>0">Parameters</h3>
 
                                     <div class="form-group"
                                          ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
