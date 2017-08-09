@@ -1,4 +1,13 @@
 <div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div>
+        <h3>Developer Tools</h3>
+        <p><a href="#/developers/api">API Testing Tool</a></p>
+        <p><a href="#/developers/events">Generic Events Tool</a></p>
+        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
+
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    </div>
     <div>
         <h3>Server API</h3>
         <p>
@@ -9,7 +18,6 @@
         </p>
         <p><a id="api-doc" href="api.xml" target="_blank">API documentation</a></p>
     </div>
-
     <div>
         <h3>Video Source Integration SDK</h3>
         <p>
