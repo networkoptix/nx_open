@@ -123,9 +123,15 @@ angular.module('webadminApp')
             }
             return false;
         }
-        $scope.clearActiveFunction = function(){
+        $scope.clearActiveFunction = function($event){
             $scope.activeGroup = null;
             $scope.activeFunction = null;
+            if($event){
+                $event.preventDefault();
+                $event.stopPropagation();
+                $location.path('/developers/api', false);
+            }
+            return false;
         }
 
         if($scope.Config.developersFeedbackForm){

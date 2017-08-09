@@ -20,8 +20,6 @@
                                 </div>
                             </div>
 
-                            <h3>Test API calls</h3>
-                            <a ng-click="clearActiveFunction()" href="#/developers/api">View all functions</a>
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
@@ -61,7 +59,12 @@
                                 </div>
                             </div>
                             <div ng-if="activeFunction">
-                                <h2>{{activeFunction.name}}</h2>
+                                <h2>
+                                    {{activeFunction.name}}
+                                    <small><a ng-click="clearActiveFunction($event)"
+                                              title="back to functions list"
+                                              href="#/developers/api">(X)</a></small>
+                                </h2>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
