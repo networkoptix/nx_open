@@ -8,7 +8,24 @@ angular.module('webadminApp')
 
           return $sce.trustAsHtml(text)
         }
-      })
+    })
+    .filter('escape', function($sce) {
+        var entityMap = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+          '/': '&#x2F;',
+          '`': '&#x60;',
+          '=': '&#x3D;'
+        };
+        return function(text, phrase) {
+            return String(text).replace(/[&<>"'`=\/]/g, function (s) {
+                return entityMap[s];
+            });
+        }
+    })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', 'dialogs', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,
