@@ -364,7 +364,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         //timeFromUrl is used if we have a time from the url if not then set to false
-        var timeFromUrl = null;
+        var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
                 return;
