@@ -183,6 +183,9 @@ public:
         Result<MultiServerTimeData>::type callback,
         QThread *targetThread = nullptr);
 
+    Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
+        GetCallback callback, QThread* targetThread = nullptr);
+
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.

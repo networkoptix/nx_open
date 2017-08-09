@@ -53,6 +53,7 @@ private slots:
     void at_message_ruleDeleted(const QnUuid &id);
 
     void at_newRuleButton_clicked();
+    void at_testRuleButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
 
@@ -80,7 +81,8 @@ private:
 
     bool saveAll();
 
-    void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
+    void testRule(const QnBusinessRuleViewModelPtr& ruleModel);
+    void deleteRule(const QnBusinessRuleViewModelPtr& ruleModel);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
