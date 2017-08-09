@@ -142,6 +142,10 @@ angular.module('webadminApp')
             return mediaserver.debugFunctionUrl($scope.apiMethod.name);
         };
 
+        $scope.getPostData = function(){
+            return JSON.stringify(cleanParams($scope.apiMethod.params), null,  '  ');
+        };
+
         $scope.testMethod = function(){
             var getParams = null;
             var postParams = null;
