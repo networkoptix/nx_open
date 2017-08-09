@@ -9,6 +9,7 @@ Control
     property alias timeout: timer.interval
 
     visible: opacity > 0
+    opacity: 0
 
     onContentItemChanged:
     {

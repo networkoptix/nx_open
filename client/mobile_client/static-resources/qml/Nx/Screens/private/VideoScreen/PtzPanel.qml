@@ -11,7 +11,7 @@ Item
 {
     id: control
 
-    property Item preloadersParent
+    property alias preloadersParent: preloadersPanel.parent
 
     readonly property PtzController controller: PtzController
     {
@@ -35,8 +35,6 @@ Item
     PreloadersPanel
     {
         id: preloadersPanel
-
-        parent: preloadersParent
 
         focusPressed: focusControl.focusInPressed || focusControl.focusOutPressed
         zoomInPressed: zoomControl.zoomInPressed

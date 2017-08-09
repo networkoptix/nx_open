@@ -1,6 +1,6 @@
 import QtQuick 2.6
 
-import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils
+import "Ptz/joystick_utils.js" as VectorUtils
 
 Item
 {
@@ -98,7 +98,6 @@ Item
     {
         var emptyPreloader = !preloader
         var immediately = !emptyPreloader
-
         if (loader.item)
             loader.item.hide(immediately)
 
@@ -110,7 +109,7 @@ Item
         loader.item.visibleChanged.connect(
             function()
             {
-                if (loader.item && !loader.item.visible)
+                if (loader && loader.item && !loader.item.visible)
                     loader.sourceComponent = undefined
             })
     }

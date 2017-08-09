@@ -2,7 +2,7 @@ import QtQuick 2.6
 import QtQuick.Window 2.0
 import Nx 1.0
 
-import "../VideoScreen/Ptz/joystick_utils.js" as VectorUtils
+import "Ptz/joystick_utils.js" as VectorUtils
 
 BasePreloader
 {
