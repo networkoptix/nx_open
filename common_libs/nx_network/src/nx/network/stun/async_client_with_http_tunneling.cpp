@@ -137,6 +137,9 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
             if (m_httpClient)
                 m_httpClient.reset();
 
+            if (m_connectHandler)
+                nx::utils::swapAndCall(m_connectHandler, reason);
+
             decltype(m_activeRequests) activeRequests;
             activeRequests.swap(m_activeRequests);
             for (auto& requestContext: activeRequests)
@@ -307,7 +310,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
     {
         NX_DEBUG(this, lm("Connection to %1 failed with error %2").arg(m_url)
             .arg(SystemError::toString(httpClient->lastSysErrorCode())));
-        nx::utils::swapAndCall(m_connectHandler, httpClient->lastSysErrorCode());
+        closeConnection(httpClient->lastSysErrorCode());
         return;
     }
 
@@ -316,7 +319,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
             .arg(m_url)
             .arg(nx_http::StatusCode::toString(httpClient->response()->statusLine.statusCode)));
-        nx::utils::swapAndCall(m_connectHandler, SystemError::connectionRefused);
+        closeConnection(SystemError::connectionRefused);
         return;
     }
 
@@ -327,7 +330,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         const auto sysErrorCode = SystemError::getLastOSErrorCode();
         NX_DEBUG(this, lm("Error changing socket timeout. %1")
             .arg(SystemError::toString(sysErrorCode)));
-        nx::utils::swapAndCall(m_connectHandler, sysErrorCode);
+        closeConnection(sysErrorCode);
         return;
     }
 
@@ -365,8 +368,12 @@ void AsyncClientWithHttpTunneling::onRequestCompleted(
 void AsyncClientWithHttpTunneling::onConnectionClosed(
     SystemError::ErrorCode closeReason)
 {
+    NX_ASSERT(isInSelfAioThread());
+
     NX_DEBUG(this, lm("Connection to %1 has been broken. %2")
         .arg(m_url).arg(SystemError::toString(closeReason)));
+
+    closeConnection(closeReason);
 
     scheduleReconnect();
 }
@@ -397,6 +404,7 @@ void AsyncClientWithHttpTunneling::onReconnectDone(SystemError::ErrorCode sysErr
     {
         NX_DEBUG(this, lm("Reconnect to %1 failed with result %2")
             .arg(m_url).arg(SystemError::toString(sysErrorCode)));
+        closeConnection(sysErrorCode);
         return scheduleReconnect();
     }
 
