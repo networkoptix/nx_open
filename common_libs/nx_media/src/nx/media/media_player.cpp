@@ -163,6 +163,8 @@ public:
     // See property comment.
     int videoQuality;
 
+    bool allowOverlay;
+
     // Video geometry inside the application window.
     QRect videoGeometry;
 
@@ -233,6 +235,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     underflowCounter(0),
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
+    allowOverlay(true),
     isAudioEnabled(true)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
@@ -634,6 +637,7 @@ void PlayerPrivate::applyVideoQuality()
         liveMode,
         positionMs,
         camera,
+        allowOverlay,
         currentVideoDecoders);
 
     switch (result.quality)
@@ -698,6 +702,7 @@ bool PlayerPrivate::initDataProvider()
 
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
+    dataConsumer->setAllowOverlay(allowOverlay);
 
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
@@ -1083,7 +1088,13 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
                     int quality)
         {
             return media_player_quality_chooser::chooseVideoQuality(
-                transcodingCoded, quality, liveMode, positionMs, camera, currentVideoDecoders);
+                transcodingCoded,
+                quality,
+                liveMode,
+                positionMs,
+                camera,
+                true,
+                currentVideoDecoders);
         };
 
     const auto& highQuality = getQuality(HighVideoQuality);
@@ -1128,6 +1139,26 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         return result + customQualities;
 
     return result;
+}
+
+bool Player::allowOverlay() const
+{
+    Q_D(const Player);
+    return d->allowOverlay;
+}
+
+void Player::setAllowOverlay(bool allowOverlay)
+{
+    Q_D(Player);
+
+    if (d->allowOverlay == allowOverlay)
+    {
+        d->log(lit("setAllowOverlay(%1): no change, ignoring").arg(allowOverlay));
+        return;
+    }
+    d->log(lit("setAllowOverlay(%1)").arg(allowOverlay));
+    d->allowOverlay = allowOverlay;
+    emit allowOverlayChanged();
 }
 
 QSize Player::currentResolution() const

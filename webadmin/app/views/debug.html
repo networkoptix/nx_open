@@ -111,7 +111,7 @@
                 <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
                     <label class="col-sm-3 control-label">State</label>
                     <div class="col-sm-5">
-                        <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
+                        <select ng-model="session.event.state" ng-options="state.value as state.label for state in Config.debugEvents.states"
                                 class="form-control"></select>
                     </div>
                 </div>

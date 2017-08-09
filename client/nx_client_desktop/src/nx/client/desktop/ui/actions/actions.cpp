@@ -689,7 +689,11 @@ void initialize(Manager* manager, Action* root)
         .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
 
     factory(AcknowledgeEventAction)
-        .flags(NoTarget);
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::ViewContentPermission)
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
+            && !condition::isSafeMode());
 
     factory(AddCameraBookmarkAction)
         .flags(Slider | SingleTarget)

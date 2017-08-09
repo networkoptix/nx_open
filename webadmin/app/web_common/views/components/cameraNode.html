@@ -6,7 +6,7 @@
         <span ng-if="camera.status == 'Offline' || camera.status == 'Unauthorized'"
              ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
         <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
-                ng-src="{{camera.preview}}" onerror="this.parentNode && this.parentNode.removeChild(this)">
+                ng-src="{{camera.preview}}" preview-image>
     </div>
     <div class="camera-name">{{camera.name}}<br/>
         <small ng-if="toggleInfo">{{camera.url}}</small>

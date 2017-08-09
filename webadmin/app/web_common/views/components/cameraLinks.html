@@ -3,7 +3,7 @@
     <ul>
         <li>Playing: {{transport}} - {{currentResolution}} with {{player}}</li>
         <li>Name: {{activeCamera.name}}</li>
-        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>CameraID: {{activeCamera.id.replace('{','').replace('}','')}}</li>
         <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
         <li ng-repeat="stream in activeCamera.mediaStreams">
             {{streamName(stream)}}:
@@ -33,7 +33,7 @@
             <label title="for transcoding">Resolution: <input type="text" class="input-sm" ng-model="resolution"></label>
         </li>
         <li>
-            <label>Playing position: {{liveMode?'live': position}}</label>
+            <label>Playing position: {{liveMode?'live': position.toFixed(0)}}</label>
         </li>
     </ul>
 </div>
