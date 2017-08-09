@@ -211,6 +211,21 @@ void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
     qnEventRuleProcessor->processEvent(event);
 }
 
+void EventConnector::at_analyticsSdkEvent(const QnResourcePtr& resource,
+    const QnUuid& driverId,
+    const QnUuid& eventId,
+    vms::event::EventState toggleState,
+    qint64 timeStampUsec)
+{
+    if (!resource)
+        return;
+
+    vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
+        resource->toSharedPointer(), driverId, eventId, toggleState, timeStampUsec));
+
+    qnEventRuleProcessor->processEvent(event);
+}
+
 void EventConnector::at_customEvent(const QString& resourceName, const QString& caption,
     const QString& description, const vms::event::EventMetaData& metadata,
     vms::event::EventState eventState, qint64 timeStampUsec)
@@ -472,6 +487,16 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
             at_archiveBackupFinished(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
+            return true;
+        }
+
+        case vms::event::analyticsSdkEvent:
+        {
+            if (!check(resource, lit("'AnalyticsSdkEvent' requires 'resource' parameter")))
+                return false;
+
+            at_analyticsSdkEvent(resource, params.analyticsDriverId(), params.analyticsEventId(),
+                eventState, params.eventTimestampUsec);
             return true;
         }
 

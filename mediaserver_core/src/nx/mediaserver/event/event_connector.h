@@ -120,6 +120,12 @@ public slots:
     void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId,
         const QnUuid& userId, qint64 timeStamp, vms::event::EventState toggleState);
 
+    void at_analyticsSdkEvent(const QnResourcePtr& resource,
+        const QnUuid& driverId,
+        const QnUuid& eventId,
+        vms::event::EventState toggleState,
+        qint64 timeStampUsec);
+
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::event::EventState eventState, const QnUuid& userId = QnUuid(),
         QString* errorMessage = nullptr);
