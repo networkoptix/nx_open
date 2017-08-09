@@ -5,12 +5,27 @@
                 <td>
                     <div class="view-wrapper">
                         <div class="cameras-panel">
+                            <div class="cameras-search" ng-class="{active:searchFunc!=''}"
+                                 ng-model-options="{ updateOn: 'default', debounce: 0 }">
+                                <input type="search" placeholder="{{inputPlaceholder}}" ng-model="searchFunc">
+                                <div class="icon-left" ><span class="glyphicon glyphicon-search"></span></div>
+                                <div class="icons-right" ng-class="{'active':toggleInfo}">
+                                    <div class="clear-divider" ng-hide="!searchFunc || searchFunc==''"></div>
+                                    <div ng-hide="!searchFunc || searchFunc==''" class="clear-button" ng-click="searchFunc=''" >
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </div>
+                                    <div class="info-icon" ng-click="toggleInfo= !toggleInfo">
+                                        <span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <h3>Test API calls</h3>
                             <a ng-click="clearActiveFunction()" href="#/developers/api">View all functions</a>
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
-                                    <li ng-repeat="function in group.functions | orderBy:'name'"
+                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {url:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
@@ -32,7 +47,7 @@
                                     <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
-                                        <li ng-repeat="function in group.functions | orderBy:'name'"
+                                        <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                             <b><a ng-click="setActiveFunction(group,function,$event)"
