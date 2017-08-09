@@ -38,10 +38,8 @@ struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData
 struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
 {
     QnUpdateBookmarkRequestData();
-    QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark);
-    QnUpdateBookmarkRequestData(
-        const QnCameraBookmark& bookmark,
-        const nx::vms::event::AbstractActionPtr& action);
+    QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark,
+        const QnUuid& eventRuleId = QnUuid());
 
     virtual void loadFromParams(QnResourcePool* resourcePool,
         const QnRequestParamList& params) override;
@@ -49,7 +47,7 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
     virtual bool isValid() const override;
 
     QnCameraBookmark bookmark;
-    QnUuid businessRuleId;
+    QnUuid eventRuleId;
 };
 
 struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData

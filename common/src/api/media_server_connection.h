@@ -207,7 +207,7 @@ public:
 
     int acknowledgeEventAsync(
         const QnCameraBookmark& bookmark,
-        const nx::vms::event::AbstractActionPtr& action,
+        const QnUuid& eventRuleId,
         QObject* target,
         const char* slot);
 
