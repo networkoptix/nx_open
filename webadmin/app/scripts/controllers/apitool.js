@@ -1,13 +1,14 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$routeParams',
+    .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', 'dialogs', '$timeout', 'systemAPI',
-    function ($scope, mediaserver, $routeParams,
+    function ($scope, mediaserver, $sessionStorage, $routeParams,
               $location, dialogs, $timeout, systemAPI) {
 
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
+        $scope.session = $sessionStorage;
         $scope.clipboardSupported = true; // presume
 
         if($location.search().proprietary){
