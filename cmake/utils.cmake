@@ -130,6 +130,7 @@ function(nx_copy_package package_dir)
     endif()
 endfunction()
 
+# TODO Extend nx_copy function
 function(nx_copy_bin_resources input output)
   file(GLOB files RELATIVE ${input} ${input}/*)
   foreach(file ${files})
