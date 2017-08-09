@@ -145,18 +145,23 @@ angular.module('webadminApp')
             }else{
                 postParams = cleanParams($scope.session.method.params);
             }
-
+            function formatResult(result){
+                $scope.result.status = result.status +  ':  ' + result.statusText;
+                if (typeof result.data === 'string' || result.data instanceof String){
+                    $scope.result.result = result.data;
+                }else{
+                    $scope.result.result = JSON.stringify(result.data, null,  '  ');
+                }
+            }
             mediaserver.debugFunction($scope.session.method.method,
                                       $scope.session.method.name,
                                       getParams, postParams).
                         then(function(success){
-                            $scope.result.status = success.status +  ':  ' + success.statusText;
                             $scope.result.error = false;
-                            $scope.result.result = JSON.stringify(success.data, null,  '  ');
+                            formatResult(success);
                         },function(error){
-                            $scope.result.status = error.status +  ':  ' + error.statusText;
                             $scope.result.error = true;
-                            $scope.result.result =  JSON.stringify(error.data, null,  '  ');
+                            formatResult(error);
                         });
         };
 
