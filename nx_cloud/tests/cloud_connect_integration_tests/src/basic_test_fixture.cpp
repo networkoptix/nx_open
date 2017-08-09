@@ -4,6 +4,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
+#include <controller/connect_session_manager.h>
 
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
@@ -14,6 +15,8 @@ namespace nx {
 namespace network {
 namespace cloud {
 namespace test {
+
+using namespace nx::cloud::relay;
 
 static const char* const kCloudModulesXmlPath = "/cloud_modules.xml";
 
@@ -31,6 +34,20 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    const std::string& relayHost)
+{
+    m_relayTest->peerAdded(domainName, relayHost);
+    return cf::make_ready_future(true);
+}
+
+cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
+{
+    m_relayTest->peerRemoved(domainName);
+    return cf::make_ready_future(true);
+}
+
 BasicTestFixture::BasicTestFixture(
     int relayCount,
     boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
@@ -45,6 +62,24 @@ BasicTestFixture::BasicTestFixture(
 {
 }
 
+void BasicTestFixture::setUpConnectSessionManagerFactoryFunc()
+{
+    controller::ConnectSessionManagerFactory::setFactoryFunc(
+        [this](
+            const conf::Settings& settings,
+            model::ClientSessionPool* clientSessionPool,
+            model::ListeningPeerPool* listeningPeerPool,
+            controller::AbstractTrafficRelay* trafficRelay)
+    {
+        return std::make_unique<controller::ConnectSessionManager>(
+            settings,
+            clientSessionPool,
+            listeningPeerPool,
+            trafficRelay,
+            std::make_unique<MemoryRemoteRelayPeerPool>("127.0.0.1:20000", this),
+            std::move("127.0.0.1:" + std::to_string(m_relayPort++)));
+    });
+}
 
 BasicTestFixture::~BasicTestFixture()
 {
@@ -83,8 +118,6 @@ void BasicTestFixture::startRelay(int port)
             std::to_string(m_disconnectedPeerTimeout->count()).c_str());
     }
 
-    newRelay->addArg("-publicAddress", "127.0.0.1");
-
     ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
     m_relays.push_back(RelayContext(std::move(newRelay), port));
 }
@@ -92,6 +125,7 @@ void BasicTestFixture::startRelay(int port)
 
 void BasicTestFixture::SetUp()
 {
+    setUpConnectSessionManagerFactoryFunc();
     startRelays();
     ASSERT_GE(m_relays.size(), 1);
 

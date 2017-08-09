@@ -13,6 +13,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/thread/sync_queue.h>
+#include "model/abstract_remote_relay_peer_pool.h"
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 #include <libtraffic_relay/src/test_support/traffic_relay_launcher.h>
@@ -58,6 +59,34 @@ struct RelayContext
 
 using RelayContextList = std::vector<RelayContext>;
 
+class BasicTestFixture;
+
+class MemoryRemoteRelayPeerPool : public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+{
+public:
+    MemoryRemoteRelayPeerPool(const std::string& redirectToRelay, BasicTestFixture* relayTest) :
+        m_redirectToRelay(redirectToRelay),
+        m_relayTest(relayTest)
+    {}
+
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& /*domainName*/) const override
+    {
+        auto redirectToRelayCopy = m_redirectToRelay;
+        return cf::make_ready_future<std::string>(std::move(redirectToRelayCopy));
+    }
+
+    virtual cf::future<bool> addPeer(
+        const std::string& domainName,
+        const std::string& relayHost) override;
+
+    virtual cf::future<bool> removePeer(const std::string& domainName) override;
+
+private:
+    std::string m_redirectToRelay;
+    BasicTestFixture* m_relayTest;
+};
+
 class BasicTestFixture:
     public ::testing::Test
 {
@@ -95,6 +124,8 @@ protected:
     const std::unique_ptr<AbstractStreamSocket>& clientSocket();
 
 private:
+    friend class MemoryRemoteRelayPeerPool;
+
     struct HttpRequestResult
     {
         nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
@@ -125,6 +156,7 @@ private:
 
     RelayContextList m_relays;
     int m_relayCount;
+    int m_relayPort = 20000;
     boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
 
@@ -136,6 +168,10 @@ private:
     void startRelays();
     void startRelay(int port);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
+
+    virtual void peerAdded(const std::string& /*serverName*/, const std::string& /*relay*/) {}
+    virtual void peerRemoved(const std::string& /*serverName*/) {}
+    void setUpConnectSessionManagerFactoryFunc();
 };
 
 } // namespace test
