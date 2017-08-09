@@ -1,7 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DevtoolsCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
+    .controller('DevtoolsCtrl', ['$scope', 'mediaserver', '$sessionStorage',
+                                 '$location', 'dialogs', '$timeout', 'systemAPI',
+    function ($scope, mediaserver, $sessionStorage,
+              $location, dialogs, $timeout, systemAPI) {
 
         $scope.Config = Config;
         $scope.session = $sessionStorage;
@@ -109,4 +112,4 @@ angular.module('webadminApp')
 
 
 
-    });
+    }]);
