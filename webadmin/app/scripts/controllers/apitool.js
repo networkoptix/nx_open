@@ -80,6 +80,10 @@ angular.module('webadminApp')
             $scope.activeFunction = method;
             $scope.session.method.method = method.method;
             $scope.session.method.name = group.urlPrefix + '/' + method.name;
+            $scope.session.method.params = {}
+            _.each(method.params,function(param){
+                $scope.session.method.params[param.name] = null;
+            });
             if($event){
                 $event.preventDefault();
                 $event.stopPropagation();

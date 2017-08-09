@@ -481,7 +481,7 @@ angular.module('webadminApp')
                 if (!window.location.origin) {
                     window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
                 }
-                if(getParams){
+                if(getParams && !_.isEmpty(getParams)){
                     params = delimeter + $.param(getParams);
                 }
 
