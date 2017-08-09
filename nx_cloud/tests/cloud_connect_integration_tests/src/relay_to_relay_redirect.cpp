@@ -46,7 +46,7 @@ class RelayToRelayRedirect: public BasicTestFixture
 {
 public:
     RelayToRelayRedirect():
-        BasicTestFixture(3),
+        BasicTestFixture(3, std::chrono::seconds(1)),
         m_removePeerFuture(m_removePeerPromise.get_future())
     {}
 

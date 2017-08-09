@@ -62,7 +62,9 @@ class BasicTestFixture:
     public ::testing::Test
 {
 public:
-    BasicTestFixture(int relayCount = 1);
+    BasicTestFixture(
+        int relayCount = 1,
+        boost::optional<std::chrono::seconds> disconnectedPeerTimeout = boost::none);
     ~BasicTestFixture();
 
 protected:
@@ -123,6 +125,7 @@ private:
 
     RelayContextList m_relays;
     int m_relayCount;
+    boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
 
     void initializeCloudModulesXmlWithDirectStunPort();

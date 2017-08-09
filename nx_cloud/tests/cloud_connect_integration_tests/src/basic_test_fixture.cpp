@@ -31,13 +31,17 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-BasicTestFixture::BasicTestFixture(int relayCount):
+BasicTestFixture::BasicTestFixture(
+    int relayCount,
+    boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
+    :
     m_staticMsgBody("Hello, hren!"),
     m_mediator(
         nx::hpm::MediatorFunctionalTest::allFlags &
             ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
     m_unfinishedRequestsLeft(0),
-    m_relayCount(relayCount)
+    m_relayCount(relayCount),
+    m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
 }
 
@@ -72,7 +76,12 @@ void BasicTestFixture::startRelay(int port)
     std::string dataDirString = std::string("relay_") + std::to_string(port);
     newRelay->addArg("-dataDir", dataDirString.c_str());
 
-    newRelay->addArg("-listeningPeer/disconnectedPeerTimeout", "1");
+    if ((bool) m_disconnectedPeerTimeout)
+    {
+        newRelay->addArg(
+            "-listeningPeer/disconnectedPeerTimeout",
+            std::to_string(m_disconnectedPeerTimeout->count()).c_str());
+    }
 
     ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
     m_relays.push_back(RelayContext(std::move(newRelay), port));
