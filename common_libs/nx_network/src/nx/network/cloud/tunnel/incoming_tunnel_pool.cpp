@@ -34,7 +34,7 @@ void IncomingTunnelPool::acceptAsync(AcceptCompletionHandler handler)
         if (!m_acceptedSockets.empty())
         {
             lock.unlock();
-            return dispatch([this]() { callAcceptHandler(SystemError::noError); });
+            return post([this]() { callAcceptHandler(SystemError::noError); });
         }
     }
 
@@ -137,8 +137,8 @@ void IncomingTunnelPool::callAcceptHandler(SystemError::ErrorCode resultCode)
 
     if (resultCode != SystemError::noError)
     {
-        const auto handler = std::move(m_acceptHandler);
-        m_acceptHandler = nullptr;
+        decltype(m_acceptHandler) handler;
+        handler.swap(m_acceptHandler);
         lock.unlock();
         return handler(resultCode, nullptr);
     }
@@ -146,8 +146,8 @@ void IncomingTunnelPool::callAcceptHandler(SystemError::ErrorCode resultCode)
     if (m_acceptedSockets.empty())
         return;
 
-    const auto handler = std::move(m_acceptHandler);
-    m_acceptHandler = nullptr;
+    decltype(m_acceptHandler) handler;
+    handler.swap(m_acceptHandler);
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();
