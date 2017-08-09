@@ -47,7 +47,8 @@ class RelayToRelayRedirect: public BasicTestFixture
 public:
     RelayToRelayRedirect():
         BasicTestFixture(3, std::chrono::seconds(1)),
-        m_removePeerFuture(m_removePeerPromise.get_future())
+        m_removePeerFuture(m_removePeerPromise.get_future()),
+        m_addPeerFuture(m_addPeerPromise.get_future())
     {}
 
     virtual void SetUp() override
@@ -128,6 +129,7 @@ public:
     void addPeerRelay(const std::string& domainName, const std::string& relayHost)
     {
         m_addedPeers.push_back(std::make_pair(domainName, relayHost));
+        m_addPeerPromise.set_value();
     }
 
     void removePeer(const std::string& domainName)
@@ -154,12 +156,21 @@ public:
         m_removePeerFuture.wait();
     }
 
+    void waitForAddPeerSignal()
+    {
+        m_addPeerFuture.wait();
+    }
+
+
 private:
     std::vector<std::pair<std::string, std::string>> m_addedPeers;
     std::string m_removedPeer;
 
     nx::utils::promise<void> m_removePeerPromise;
     nx::utils::future<void> m_removePeerFuture;
+
+    nx::utils::promise<void> m_addPeerPromise;
+    nx::utils::future<void> m_addPeerFuture;
 };
 
 cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
@@ -179,6 +190,7 @@ cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domain
 TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)
 {
     assertServerIsAccessibleFromAnotherRelay();
+    waitForAddPeerSignal();
     assertFirstRelayHasBeenAddedToThePool();
 }
 
