@@ -45,7 +45,7 @@
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
-                                <form class="form-horizontal" novalidate ng-if="!activeGroup.urlPrefix">
+                                <form class="form-horizontal" novalidate ng-if="apiMethod.method && !activeGroup.urlPrefix">
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
                                         <div class="col-sm-9">
@@ -83,7 +83,7 @@
                                     </div>
                                 </form>
 
-                                <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
+                                <form class="form-horizontal" novalidate ng-if="apiMethod.method && activeGroup.urlPrefix">
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
                                         <div class="col-sm-9">
