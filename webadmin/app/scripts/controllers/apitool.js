@@ -80,6 +80,10 @@ angular.module('webadminApp')
                                 param.values.unshift({label:'', name:null});
                             }
                         }
+
+                        if(param.name.match(/[{}\.\[\]]/g)){
+                            param.type = 'info';
+                        }
                     });
 
                     if(func.url == activeApiMethod){ // Check if we should select this method (checking url parameter)
