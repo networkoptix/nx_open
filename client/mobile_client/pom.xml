@@ -6,7 +6,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>17.2-SNAPSHOT</version>
+    <version>17.2.4-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -271,6 +271,6 @@
                 <provisioning_profile>${provisioning_profiles_dir}/production.mobileprovision</provisioning_profile>
                 <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
             </properties>
-        </profile>        
+        </profile>
     </profiles>
 </project>
