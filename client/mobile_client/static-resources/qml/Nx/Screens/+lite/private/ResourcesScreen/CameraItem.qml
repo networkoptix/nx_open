@@ -288,7 +288,7 @@ Control
         anchors.fill: parent
         onPreviousRequested: previousCameraRequested()
         onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel.count - 1
+        maxConsequentRequests: camerasModel.count
     }
 
     MouseArea
@@ -334,7 +334,11 @@ Control
 
     onLayoutHelperChanged: updateResourceId()
     Component.onCompleted: updateResourceId()
-    onResourceIdChanged: activityDetected()
+    onResourceIdChanged: {
+        console.log("=== current:", resourceId)
+
+        activityDetected()
+    }
     onActiveChanged:
     {
         if (active)

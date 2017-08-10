@@ -108,7 +108,7 @@ PageBase
         anchors.fill: parent
         onPreviousRequested: previousCameraRequested()
         onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
+        maxConsequentRequests: camerasModel ? camerasModel.count : 0
     }
 
     MouseArea
