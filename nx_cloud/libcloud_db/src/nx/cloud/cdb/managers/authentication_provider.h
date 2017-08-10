@@ -76,12 +76,12 @@ private:
     };
 
     const conf::Settings& m_settings;
+    nx::utils::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
     AbstractAccountManager* m_accountManager;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
-    nx::utils::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
 
     boost::optional<AccountWithEffectivePassword> 
         getAccountByLogin(const std::string& login) const;
