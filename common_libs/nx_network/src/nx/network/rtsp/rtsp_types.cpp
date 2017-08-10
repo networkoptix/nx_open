@@ -8,6 +8,9 @@
 
 namespace nx_rtsp
 {
+    const char* const kUrlSchemeName = "rtsp";
+    const char* const kSecureUrlSchemeName = "rtsps";
+
     namespace
     {
         void extractNptTime( const nx_http::StringType& strValue, qint64* dst )

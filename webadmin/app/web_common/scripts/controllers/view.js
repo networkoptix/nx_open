@@ -29,8 +29,8 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.cameraLinksEnabled = $location.search().cameraLinks;
 
-        if(!$routeParams.cameraId &&  $scope.storage.cameraId){
-            $scope.toggleCameraPanel = false;
+        if(!$routeParams.cameraId && $scope.storage.cameraId){
+            $scope.showCameraPanel = false;
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
@@ -80,10 +80,10 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
-            if(!$scope.storage.cameraId){
-                $scope.toggleCameraPanel = true;
-            }
+        }
 
+        if(!$scope.storage.cameraId){
+            $scope.showCameraPanel = true;
         }
 
 
@@ -364,7 +364,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         //timeFromUrl is used if we have a time from the url if not then set to false
-        var timeFromUrl = null;
+        var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
                 return;
@@ -399,11 +399,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
-                if(!$scope.storage.cameraId)
-                {
-                    $scope.storage.cameraId = $scope.camerasProvider.getFirstCam();
-
-                }
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
 
                 $scope.ready = true;
