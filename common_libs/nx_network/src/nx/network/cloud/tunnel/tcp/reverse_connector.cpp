@@ -62,7 +62,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
         };
 
     m_httpClient.doUpgrade(
-        url::Builder().setScheme("http").setEndpoint(endpoint).toUrl(),
+        url::Builder().setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint).toUrl(),
         kNxRc,
         std::move(onHttpDone));
 }

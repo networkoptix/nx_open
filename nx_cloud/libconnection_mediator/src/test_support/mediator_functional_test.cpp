@@ -108,7 +108,8 @@ bool MediatorFunctionalTest::waitUntilStarted()
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
         network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
-            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
+            nx::network::url::Builder()
+                .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
         network::SocketGlobals::mediatorConnector().enable(true);
     }
 
