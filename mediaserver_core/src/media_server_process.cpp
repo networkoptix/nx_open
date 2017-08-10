@@ -309,7 +309,7 @@ const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode")
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
-static QString kLogTag = toString(typeid(MediaServerProcess));
+static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -888,7 +888,7 @@ void MediaServerProcess::saveStorages(
     ec2::ErrorCode rez;
     while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
-        NX_WARNING(this) "Call to change server's storages failed. Reason: " << rez;
+        NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 }
@@ -1935,7 +1935,7 @@ bool MediaServerProcess::initTcpListener(
     bool acceptSslConnections = true;
     int maxConnections = qnServerModule->roSettings()->value(
         "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
-    NX_INFO(this) lit("Using maxConnections = %1.").arg(maxConnections);
+    NX_INFO(this) << lit("Using maxConnections = %1.").arg(maxConnections);
 
     m_universalTcpListener = new QnUniversalTcpListener(
         commonModule(),

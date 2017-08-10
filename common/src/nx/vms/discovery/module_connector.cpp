@@ -217,12 +217,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id),
     m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    NX_DEBUG(this) "New";
+    NX_DEBUG(this) << "New";
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this) "Delete";
+    NX_DEBUG(this) << "Delete";
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_attemptingReaders.clear();
     m_connectedReader.reset();

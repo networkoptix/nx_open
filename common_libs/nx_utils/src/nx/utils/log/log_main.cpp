@@ -20,7 +20,7 @@ public:
         return m_mainLogger;
     }
 
-    std::shared_ptr<Logger> add(const std::set<QString>& filters)
+    std::shared_ptr<Logger> add(const std::set<Tag>& filters)
     {
         QnMutexLocker lock(&m_mutex);
         const auto logger = std::make_shared<Logger>();
@@ -30,19 +30,19 @@ public:
         return logger;
     }
 
-    std::shared_ptr<Logger> get(const QString& tag, bool allowMain) const
+    std::shared_ptr<Logger> get(const Tag& tag, bool allowMain) const
     {
         QnMutexLocker lock(&m_mutex);
         for (auto& it: m_loggersByTags)
         {
-            if (tag.startsWith(it.first))
+            if (tag.matches(it.first))
                 return it.second;
         }
 
         return allowMain ? m_mainLogger : std::shared_ptr<Logger>();
     }
 
-    void remove(const std::set<QString>& filters)
+    void remove(const std::set<Tag>& filters)
     {
         QnMutexLocker lock(&m_mutex);
         for (const auto f: filters)
@@ -52,7 +52,7 @@ public:
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<Logger> m_mainLogger;
-    std::map<QString, std::shared_ptr<Logger>> m_loggersByTags;
+    std::map<Tag, std::shared_ptr<Logger>> m_loggersByTags;
 };
 
 static LoggerCollection* loggerCollection()
@@ -68,26 +68,31 @@ std::shared_ptr<Logger> mainLogger()
     return loggerCollection()->main();
 }
 
-std::shared_ptr<Logger> addLogger(const std::set<QString>& filters)
+std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters)
 {
     return loggerCollection()->add(filters);
 }
 
-std::shared_ptr<Logger> getLogger(const QString& tag, bool allowMain)
+std::shared_ptr<Logger> getLogger(const Tag& tag, bool allowMain)
 {
     return loggerCollection()->get(tag, allowMain);
 }
 
-void removeLoggers(const std::set<QString>& filters)
+void removeLoggers(const std::set<Tag>& filters)
 {
     loggerCollection()->remove(filters);
 }
 
+bool isToBeLogged(Level level, const Tag& tag)
+{
+    return getLogger(tag)->isToBeLogged(level, tag);
+}
+
 namespace detail {
 
-Helper::Helper(Level level, const QString& tag):
+Helper::Helper(Level level, Tag tag):
     m_level(level),
-    m_tag(tag)
+    m_tag(std::move(tag))
 {
     m_logger = getLogger(m_tag);
     if (!m_logger->isToBeLogged(m_level, m_tag))
@@ -104,15 +109,13 @@ Helper::operator bool() const
     return (bool) m_logger;
 }
 
-Stream::Stream(Level level, const QString& tag):
-    Helper(level, tag)
-{
-}
-
 Stream::~Stream()
 {
-    if (m_logger)
-        log(m_strings.join(' '));
+    if (!m_logger)
+        return;
+
+    NX_EXPECT(!m_strings.isEmpty());
+    log(m_strings.join(' '));
 }
 
 Stream::operator bool() const

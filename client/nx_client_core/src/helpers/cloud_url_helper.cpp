@@ -79,6 +79,6 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 
     QUrl result = uri.toUrl();
     result.setPath(path);
-    NX_DEBUG("CloudURL", result.toString());
+    NX_DEBUG(typeid(QnCloudUrlHelper), result.toString());
     return result;
 }

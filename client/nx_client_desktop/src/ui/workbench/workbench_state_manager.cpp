@@ -23,7 +23,8 @@ namespace {
 
 static const int kSavedStatesLimit = 20;
 
-static const QString kWorkbenchStateTag = lit("__workbenchState");
+// TODO: This tag is better to be bound to QnWorkbenchStateManager.
+static const nx::utils::log::Tag kWorkbenchStateTag(lit("__workbenchState"));
 
 } // namespace
 

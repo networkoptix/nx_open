@@ -2,7 +2,8 @@
 
 #include <map>
 #include <set>
-#include <QtCore/QString>
+
+#include <nx/utils/log/to_string.h>
 
 namespace nx {
 namespace utils {
@@ -32,7 +33,29 @@ QString NX_UTILS_API toString(Level level);
     static constexpr Level kDefaultLevel = Level::info;
 #endif
 
-using LevelFilters = std::map<QString, Level>;
+class Tag
+{
+public:
+    explicit Tag(QString s = {});
+    Tag(const char* s) = delete;
+
+    template<typename T>
+    Tag(const T* pointer): m_value(::toString(pointer)) {}
+    Tag(const std::type_info& info): m_value(::toString(info)) {}
+
+    bool matches(const Tag& mask) const;
+    const QString& toString() const;
+    Tag operator+(const Tag& rhs) const;
+
+    bool operator<(const Tag& rhs) const;
+    bool operator==(const Tag& rhs) const;
+    bool operator!=(const Tag& rhs) const;
+
+private:
+    QString m_value;
+};
+
+using LevelFilters = std::map<Tag, Level>;
 
 struct NX_UTILS_API LevelSettings
 {

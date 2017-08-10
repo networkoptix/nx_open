@@ -220,23 +220,24 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 #endif
 
-    auto supressLog = [](const QString& tag)
+    auto supressLog = [](const nx::utils::log::Tag& tag)
         {
             const auto logger = nx::utils::log::addLogger({tag});
             logger->setDefaultLevel(nx::utils::log::Level::none);
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };
 
-    auto consoleLog = [](const QString& tag)
+    auto consoleLog = [](const nx::utils::log::Tag& tag)
         {
             const auto logger = nx::utils::log::addLogger({tag});
             logger->setDefaultLevel(nx::utils::log::Level::verbose);
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };
 
-    supressLog(lit("__freeSlot"));
-    supressLog(lit("__workbenchState"));
-    supressLog(lit("__itemMap"));
+    // Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
+    supressLog(nx::utils::log::Tag(lit("__freeSlot")));
+    supressLog(nx::utils::log::Tag(lit("__workbenchState")));
+    supressLog(nx::utils::log::Tag(lit("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
 }
 
