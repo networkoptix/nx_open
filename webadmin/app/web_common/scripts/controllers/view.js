@@ -29,6 +29,10 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.cameraLinksEnabled = $location.search().cameraLinks;
 
+        $scope.toggleCameraLinks = function(){
+            $scope.cameraLinksEnabled = !$scope.cameraLinksEnabled;
+        }
+
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             $scope.showCameraPanel = false;
             systemAPI.setCameraPath($scope.storage.cameraId);

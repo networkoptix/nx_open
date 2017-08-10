@@ -23,9 +23,7 @@
             <td>
                 <div class="view-wrapper">
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
-                                  position-provider="positionProvider" system="systemAPI"
-                                  player="player" current-resolution="currentResolution" show-camera-panel="showCameraPanel"
-                                  class="cameras-panel-toggle" camera-links-enabled="cameraLinksEnabled"
+                                  show-camera-panel="showCameraPanel" class="cameras-panel-toggle"
                                   ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
                 </div>
             </td>
@@ -43,16 +41,21 @@
                                         <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
                                             <li class="video-settings-36"><label>Quality</label></li>
                                             <li class="video-settings-separation-line"></li>
-                                            <li ng-repeat="resolution in availableResolutions"><a href="#" class="video-settings-20"
+                                            <li ng-repeat="resolution in availableResolutions"><a class="video-settings-20"
                                                                                                   ng-class="{active:resolution == activeResolution}"
-                                                                                                  ng-click="selectResolution(resolution);$event.preventDefault();">{{resolution}}</a></li>
+                                                                                                  ng-click="selectResolution(resolution)">{{resolution}}</a></li>
 
                                             <li class="video-settings-separation-line"  ng-if="debugMode"></li>
                                             <li class="video-settings-36"               ng-if="debugMode"><label>Video Player</label></li>
                                             <li class="video-settings-separation-line"  ng-if="debugMode"></li>
-                                            <li ng-repeat="format in manualFormats"     ng-if="debugMode"><a href="#" class="video-settings-20"
+                                            <li ng-repeat="format in manualFormats"     ng-if="debugMode"><a class="video-settings-20"
                                                                                                              ng-class="{active:format == activeFormat}"
-                                                                                                             ng-click="selectFormat(format);$event.preventDefault();">{{format}}</a></li>
+                                                                                                             ng-click="selectFormat(format)">{{format}}</a></li>
+                                            <li class="video-settings-separation-line"  ng-if="debugMode"></li>
+                                            <li class=""               ng-if="debugMode" ng-click="toggleCameraLinks()">
+                                                <a class="video-settings-20">Camera Links</a>
+                                            </li>
+                                            <li class="video-settings-separation-line"  ng-if="debugMode"></li>
                                         </ul>
                                     </div>
                                         <span class="video-icon" ng-if="enableFullScreen" ng-click="fullScreen()">
@@ -73,6 +76,14 @@
                         </div>
 
                         <div class="float-size">
+                            <div class="camera-links-panel" ng-if="cameraLinksEnabled">
+                                <div class='close' ng-click="toggleCameraLinks()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </div>
+                                <camera-links system="systemAPI" position="positionProvider.playedPosition"
+                                              live-mode="positionProvider.liveMode" active-camera="activeCamera"
+                                              player="player" current-resolution="currentResolution"></camera-links>
+                            </div>
                             <camera-view-informer flags="{'status':activeCamera.status,
                                                           'positionSelected': positionSelected,
                                                           'iOSVideoTooLarge': iOSVideoTooLarge}">

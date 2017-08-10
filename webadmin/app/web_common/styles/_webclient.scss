@@ -473,6 +473,16 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+.camera-links-panel{
+  background-color: $additional_light2;
+  margin: 48px 0 0 10px;
+  position: absolute;
+  z-index: 1;
+}
+.camera-links-panel>.close{
+  padding: 2px 6px 3px 6px;
+}
+
 /* View */
 
 .view{
