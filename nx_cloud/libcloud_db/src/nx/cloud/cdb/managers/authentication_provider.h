@@ -5,6 +5,7 @@
 #include <QtCore/QByteArray>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "account_manager.h"
 #include "system_sharing_manager.h"
@@ -34,6 +35,7 @@ class AuthenticationProvider:
 public:
     AuthenticationProvider(
         const conf::Settings& settings,
+        nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor,
         AbstractAccountManager* accountManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
@@ -79,12 +81,19 @@ private:
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
+    nx::utils::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
 
     boost::optional<AccountWithEffectivePassword> 
         getAccountByLogin(const std::string& login) const;
-    bool validateNonce(
+    nx::utils::db::DBResult validateNonce(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& nonce,
-        const std::string& systemId) const;
+        const std::string& systemId,
+        std::shared_ptr<bool> isNonceValid);
+    std::tuple<api::ResultCode, api::AuthResponse>
+        prepareAuthenticationResponse(
+            const std::string& systemId,
+            const data::AuthRequest& authRequest);
     api::AuthResponse prepareResponse(
         std::string nonce,
         api::SystemSharingEx systemSharing,
