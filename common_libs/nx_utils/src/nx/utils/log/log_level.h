@@ -36,8 +36,9 @@ QString NX_UTILS_API toString(Level level);
 class Tag
 {
 public:
-    explicit Tag(QString s = {});
+    Tag() = default;
     Tag(const char* s) = delete;
+    explicit Tag(QString s);
 
     template<typename T>
     Tag(const T* pointer): m_value(::toString(pointer)) {}
