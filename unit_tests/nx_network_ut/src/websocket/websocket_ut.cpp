@@ -988,7 +988,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
 TEST_F(WebSocket_PingPong, calcPingTimeoutBySocketTimeout)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ASSERT_EQ(clientWebSocket->pingTimeout(), kAliveTimeout / 4);
+    ASSERT_EQ(clientWebSocket->pingTimeout(), kAliveTimeout / 2);
     unsigned recvTimeout;
     clientWebSocket->socket()->getRecvTimeout(&recvTimeout);
     ASSERT_EQ(recvTimeout, kAliveTimeout.count());

@@ -7,7 +7,7 @@ namespace network {
 namespace websocket {
 
 static const auto kPingTimeout = std::chrono::seconds(100);
-static const int kDefaultPingTimeoutMultiplier = 4;
+static const int kDefaultPingTimeoutMultiplier = 2;
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
