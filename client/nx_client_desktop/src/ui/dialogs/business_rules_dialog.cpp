@@ -607,7 +607,7 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
     if (!connection)
         return;
 
-    auto callback =
+    auto makeCallback =
         [this](const QString& text)
         {
             return
@@ -625,21 +625,21 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
     if (nx::vms::event::hasToggleState(eventType))
     {
         connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::active,
-            [this, id = ruleModel->id(), connection, callback]
+            [this, id = ruleModel->id(), connection, makeCallback]
             (bool success, rest::Handle handle, QnJsonRestResult result)
             {
-                callback(lit("Event Started"))(success, handle, result);
+                makeCallback(lit("Event Started"))(success, handle, result);
                 if (success)
                 {
                     connection->testEventRule(id, nx::vms::event::EventState::inactive,
-                        callback(lit("Event Stopped")), QThread::currentThread());
+                        makeCallback(lit("Event Stopped")), QThread::currentThread());
                 }
             }, QThread::currentThread());
     }
     else
     {
         connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::undefined,
-            callback(lit("Event Occurred")), QThread::currentThread());
+            makeCallback(lit("Event Occurred")), QThread::currentThread());
     }
 
 }
