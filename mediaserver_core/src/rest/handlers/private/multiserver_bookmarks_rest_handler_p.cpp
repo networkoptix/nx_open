@@ -262,7 +262,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     if (!qnServerDb->addBookmark(bookmark))
         return false;
 
-    const auto ruleId = context.request().businessRuleId;
+    const auto ruleId = context.request().eventRuleId;
     const auto rule = commonModule->eventRuleManager()->rule(ruleId);
     if (!rule)
         return true;

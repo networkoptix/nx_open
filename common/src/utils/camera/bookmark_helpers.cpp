@@ -44,10 +44,9 @@ QString helpers::getBookmarkCreatorName(
 
 QnCameraBookmark helpers::bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
-    const QnSecurityCamResourcePtr& camera,
-    QnCommonModule* commonModule)
+    const QnSecurityCamResourcePtr& camera)
 {
-    if (!camera)
+    if (!camera || !camera->commonModule())
     {
         NX_EXPECT(false, "Camera is invalid");
         return QnCameraBookmark();
@@ -71,7 +70,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     bookmark.cameraId = camera->getId();
     bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
 
-    vms::event::StringsHelper helper(commonModule);
+    vms::event::StringsHelper helper(camera->commonModule());
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
