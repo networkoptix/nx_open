@@ -175,9 +175,19 @@ angular.module('nxCommon')
             return this.userRequest;
         };
 
+        ServerConnection.prototype.getRolePermissions = function(roleId) {
+            return this._get('/ec2/getUserRoles', {id:roleId});
+        };
+
         ServerConnection.prototype.checkPermissions = function(flag){
             // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
+            var self = this;
             return this.getCurrentUser().then(function(user) {
+                if(!user.isAdmin && user.userRoleId){
+                    return self.getRolePermissions(user.userRoleId).then(function(role){
+                        return role.data[0].permissions.indexOf(flag)>=0;
+                    });
+                }
                 return user.isAdmin ||
                        user.permissions.indexOf(flag)>=0;
             });
