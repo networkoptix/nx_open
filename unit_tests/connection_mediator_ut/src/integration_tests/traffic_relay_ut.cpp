@@ -140,7 +140,7 @@ private:
 
         m_stunClient = std::make_shared<nx::stun::AsyncClient>();
         m_stunClient->connect(
-            nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
+            nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
         m_serverConnection = 
             std::make_unique<api::MediatorServerTcpConnection>(m_stunClient, this);
 
