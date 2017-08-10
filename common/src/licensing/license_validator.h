@@ -33,7 +33,7 @@ public:
         VM_JustCreated
     };
 
-    QnLicenseValidator(QObject* parent = nullptr);
+    QnLicenseValidator(QnCommonModule* commonModule, QObject* parent = nullptr);
     virtual ~QnLicenseValidator();
 
     /**
