@@ -1,6 +1,6 @@
 #include "log.h"
 
-const nx::utils::log::Tag QnLog::MAIN_LOG_ID;
+const nx::utils::log::Tag QnLog::MAIN_LOG_ID(QString());
 const nx::utils::log::Tag QnLog::CUSTOM_LOG_BASE_ID(lit("CUSTOM"));
 const nx::utils::log::Tag QnLog::HTTP_LOG_INDEX(lit("HTTP"));
 const nx::utils::log::Tag QnLog::EC2_TRAN_LOG(lit("EC2_TRAN"));
