@@ -30,15 +30,10 @@ public:
     {
         DebugIni(): IniConfig("nx_network_debug.ini") { reload(); }
 
-        NX_INI_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
-        NX_INI_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
-        NX_INI_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
-        NX_INI_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
         NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
 
         // TODO: Should be moved to a different flag config, because module finders live in common.
         // This flag resides here just because there are no other flag configs for logging.
-        NX_INI_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
         NX_INI_INT(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
     };
 

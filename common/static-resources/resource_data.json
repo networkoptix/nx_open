@@ -2024,8 +2024,10 @@
             }
         },
         {
-            "keys": [ "DW|DW-CPUHD*" ],
-            "isMacAddressNotMandatory": true
+            "keys": [
+                "DW|DW-CPUHD*"
+            ],
+            "isMacAddressMandatory": false
         }
     ]
 }

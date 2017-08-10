@@ -5,6 +5,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
+#include "stun_types.h"
+
 namespace nx {
 namespace stun {
 
@@ -46,11 +48,20 @@ void AsyncClient::connect(
     const QUrl& url,
     ConnectHandler completionHandler)
 {
+    if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)
+    {
+        return post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                completionHandler(SystemError::invalidData);
+            });
+    }
+
     const auto endpoint = nx::network::url::getEndpoint(url);
 
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = url.scheme() == "stuns";
+    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
     NX_ASSERT(!m_connectCompletionHandler);
     m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);

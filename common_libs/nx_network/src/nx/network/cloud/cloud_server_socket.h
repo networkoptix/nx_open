@@ -27,6 +27,9 @@ class NX_NETWORK_API CloudServerSocket:
     public AbstractSocketAttributesCache<
         AbstractStreamServerSocket, SocketAttributes>
 {
+    using base_type = AbstractSocketAttributesCache<
+        AbstractStreamServerSocket, SocketAttributes>;
+
 public:
     using AcceptorMaker = std::function<
         std::unique_ptr<AbstractTunnelAcceptor>(
@@ -64,7 +67,7 @@ public:
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
-    bool isInSelfAioThread();
+    virtual bool isInSelfAioThread() const override;
 
     /**
      * Invokes listen on mediator.

@@ -288,7 +288,7 @@ protected:
 
         nx_http::AsyncClient httpClient;
         httpClient.doUpgrade(
-            nx::network::url::Builder().setScheme("http")
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setHost("127.0.0.1")
                 .setPort(m_testHttpServer->serverAddress().port)
                 .setPath(kTestPath),

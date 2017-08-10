@@ -441,7 +441,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     {
         int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+            logFileNameSuffix = L'_' + QString::number(idx);
     }
 
     if (logLevel.isEmpty())

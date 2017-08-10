@@ -18,6 +18,8 @@
  * playingSpeed - later
  *
  */
+var flashPlayer = "";
+
 angular.module('nxCommon')
     .directive('videowindow', ['$interval','$timeout','animateScope', '$sce', '$log', function ($interval,$timeout,animateScope, $sce, $log) {
         return {
@@ -278,7 +280,6 @@ angular.module('nxCommon')
                                 if (scope.vgSrc) {
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
-
                                 scope.vgPlayerReady({$API: api});
                             }, function (error) {
                                 $timeout(function () {
@@ -286,8 +287,13 @@ angular.module('nxCommon')
                                     scope.loading = false; // Some error happended - stop loading
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
-                                    scoep.jsHls = false;
+                                    scope.jsHls = false;
                                 });
+
+                                if(scope.vgApi){
+                                    scope.vgApi.kill();
+                                }
+                                scope.vgPlayerReady({$API: null});
                                 console.error(error);
                             }, function (position, duration) {
                                 if (position != 0) {
@@ -321,9 +327,18 @@ angular.module('nxCommon')
                                 });
                             }
                             scope.vgPlayerReady({$API:api});
-                        },  function (api) {
-                            scope.videoFlags.errorLoading = true;
-                            scope.jsHls = false;
+                        },  function (error) {
+                            $timeout(function(){
+                                scope.loading = false;
+                                scope.videoFlags.errorLoading = true;
+                                scope.jsHls = false;
+                            });
+
+                            if(scope.vgApi){
+                                scope.vgApi.kill();
+                            }
+                            scope.vgPlayerReady({$API: null});
+                            console.error(error);
                         });
                         videoPlayers.push(jsHlsAPI);
                     });
@@ -409,25 +424,24 @@ angular.module('nxCommon')
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
                     // TODO: Nick, remove html from js code
-                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
-                    tmp += 'width="100%" height="100%">';
-                    tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
-                    tmp += '\n\t<param name="quality" value="high" />';
-                    tmp += '\n\t<param name="swliveconnect" value="true" />';
-                    tmp += '\n\t<param name="allowScriptAccess" value="always" />';
-                    tmp += '\n\t<param name="bgcolor" value="#1C2327" />';
-                    tmp += '\n\t<param name="allowFullScreen" value="true" />';
-                    tmp += '\n\t<param name="wmode" value="transparent" />';
-                    tmp += '\n\t<param name="FlashVars" value="callback=' + playerId + '" />';
-                    tmp += '\n\t<embed src="'+scope.flashSource+'?inline=1" width="100%" height="100%"';
-                    tmp += ' name="flashvideoembed_'+playerId+'" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
-                    tmp += 'allowScriptAccess="always" type="application/x-shockwave-flash" swliveconnect="true" wmode="transparent"';
-                    tmp += 'FlashVars="callback='+playerId+'">\n\t</embed>\n</object>';
                     
-                    playerId = !scope.playerId ? '' : '#'+playerId;
-                    scope.flashPlayer = $sce.trustAsHtml(tmp);
-                    // TODO: Nick, that is strange. Why do you do it like this?
-                    // TODO: Also, try ng-bind-html instead of setting innerHTML
+                    if(!flashPlayer){
+                        $.ajax({
+                            url: Config.viewsDirCommon + 'components/flashPlayer.html',
+                            success: function(result){
+                                flashPlayer = result;
+                                flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
+                                flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
+                                scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                            },
+                            error: function(){
+                                $log.error("There was a problem with loading the flash player!!!");
+                            }
+                        });
+                    }
+                    else{
+                        scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                    }
                 };
 
                 scope.getRotation = function(){

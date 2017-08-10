@@ -17,7 +17,9 @@ enum class Level
     warning,
     info,
     debug,
-    verbose
+    verbose,
+
+    notConfigured = 0xFF,
 };
 
 //bool NX_UTILS_API operator<=(Level left, Level right);
