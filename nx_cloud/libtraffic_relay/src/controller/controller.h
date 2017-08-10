@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include "connect_session_manager.h"
 #include "traffic_relay.h"
 
