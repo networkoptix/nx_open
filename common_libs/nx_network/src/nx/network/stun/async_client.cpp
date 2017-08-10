@@ -186,16 +186,15 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            if (!m_baseConnection)
+            NX_LOGX(lm("Set keep alive to: %1").arg(options), cl_logDEBUG1);
+            if (!m_baseConnection ||
+                !m_baseConnection->socket()->setKeepAlive(std::move(options)))
             {
-                NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
-                    cl_logDEBUG1);
+                auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOGX(lm("Unable to set keep alive, connection is probably closed. %1")
+                    .arg(SystemError::toString(systemErrorCode)), cl_logDEBUG1);
                 return;
             }
-
-            NX_LOGX(lm("Set keep alive: %1").arg(options), cl_logDEBUG1);
-            const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
-            NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
 }
 
