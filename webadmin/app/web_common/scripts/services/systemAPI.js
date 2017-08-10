@@ -175,16 +175,8 @@ angular.module('nxCommon')
             return this.userRequest;
         };
 
-        ServerConnection.prototype.getRolePermissions = function(id) {
-            var self = this;
-            var params = id ? {'id': this._cleanId(id)} :null;
-            this.requestRolePermissions = this._get('/ec2/getUserRoles', params).then(function(result){
-                return result;
-            });
-            this.requestRolePermissions.finally(function(){
-                self.requestRolePermissions = null;
-            });
-            return $q.resolve(this.requestRolePermissions);
+        ServerConnection.prototype.getRolePermissions = function(roleId) {
+            return this._get('/ec2/getUserRoles', {id:roleId});
         };
 
         ServerConnection.prototype.checkPermissions = function(flag){
