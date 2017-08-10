@@ -82,7 +82,7 @@ protected:
 
     void givenSystemWithNonce()
     {
-        // Nonce is will be created for sure while sharing.
+        // Nonce is created for sure while sharing.
         whenSharingSystem();
     }
 
