@@ -88,7 +88,7 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 
                 if (m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); }))
                 {
-                    NX_LOGX(lm("Shedule retry in %1").str(
+                    NX_LOGX(lm("Scheduled retry in %1").str(
                         std::chrono::duration_cast<std::chrono::milliseconds>(
                             *m_timer->timeToEvent())), cl_logDEBUG2);
                     return;
@@ -109,7 +109,7 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 
             if (isExhausted())
             {
-                NX_LOGX(lm("Exhauted tunnel: %1").arg(SystemError::toString(code)), cl_logDEBUG1);
+                NX_LOGX(lm("Exhausted tunnel: %1").arg(SystemError::toString(code)), cl_logDEBUG1);
                 utils::moveAndCallOptional(m_acceptHandler, code, nullptr);
             }
         });
