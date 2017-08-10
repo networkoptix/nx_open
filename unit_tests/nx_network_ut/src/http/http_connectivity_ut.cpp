@@ -307,12 +307,12 @@ private:
 
 TEST_F(TakingHttpSocketTest, SslSocket)
 {
-    launchTest(lit("https"));
+    launchTest(nx_http::kSecureUrlSchemeName);
 }
 
 TEST_F(TakingHttpSocketTest, TcpSocket)
 {
-    launchTest(lit("http"));
+    launchTest(nx_http::kUrlSchemeName);
 } 
 
 } // namespace nx_http

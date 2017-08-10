@@ -53,7 +53,7 @@ protected:
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
-            nx::network::url::Builder().setScheme("stun").setEndpoint(m_address));
+            nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_address));
     }
 
     nx::stun::MessageDispatcher stunMessageDispatcher;
@@ -88,7 +88,9 @@ TEST_F( ConnectTest, BindConnect )
     stun::AsyncClient msClient;
     auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
-    msClient.connect(nx::network::url::Builder().setScheme("stun").setEndpoint(address()));
+    msClient.connect(
+        nx::network::url::Builder()
+            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address()));
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::extension::methods::bind ) );

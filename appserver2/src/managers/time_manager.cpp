@@ -309,7 +309,8 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
     m_timeSynchronized( false ),
     m_internetSynchronizationFailureCount( 0 ),
-    m_settings(settings)
+    m_settings( settings ),
+    m_asyncOperationsInProgress( 0 )
 {
 }
 
@@ -353,6 +354,10 @@ void TimeSynchronizationManager::pleaseStop()
         m_timeSynchronizer->pleaseStopSync();
         m_timeSynchronizer.reset();
     }
+
+    QnMutexLocker lock( &m_mutex );
+    while( m_asyncOperationsInProgress )
+        m_asyncOperationsWaitCondition.wait( lock.mutex() );
 }
 
 void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection>& connection)
@@ -1322,6 +1327,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
     QN_UNUSED(lock);
+    ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this]
         {
@@ -1335,6 +1341,9 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
             localTimeTran.transactionType = TransactionType::Local;
             db->transactionLog()->fillPersistentInfo(localTimeTran);
             db->executeTransaction(localTimeTran, QByteArray());
+
+            --m_asyncOperationsInProgress;
+            m_asyncOperationsWaitCondition.wakeOne();
         }));
 #endif
 }
@@ -1458,10 +1467,14 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
     });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this, syncTimeToLocalDelta, syncTimeKey]()
         {
             saveSyncTimeSync(syncTimeToLocalDelta, syncTimeKey);
+
+            --m_asyncOperationsInProgress;
+             m_asyncOperationsWaitCondition.wakeOne();
         }));
 #endif
 }
