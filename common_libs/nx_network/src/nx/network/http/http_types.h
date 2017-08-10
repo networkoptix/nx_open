@@ -35,8 +35,8 @@ namespace nx_http {
 const int DEFAULT_HTTP_PORT = 80;
 const int DEFAULT_HTTPS_PORT = 443;
 
-NX_NETWORK_API extern const char* const kUrlSchemeName;
-NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
+NX_NETWORK_API extern const QLatin1String kUrlSchemeName;
+NX_NETWORK_API extern const QLatin1String kSecureUrlSchemeName;
 
 /**
  * TODO: #ak Consider using another container.
