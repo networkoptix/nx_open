@@ -292,7 +292,7 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
     Endpoints::iterator group;
     if (m_id.isNull())
         group = getGroup(kDefault);
-    if (endpoint.address == HostAddress::localhost)
+    else if (endpoint.address == HostAddress::localhost)
         group = getGroup(kLocalHost);
     else if (endpoint.address.isLocal())
         group = getGroup(kLocalNetwork);
@@ -320,6 +320,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         NX_VERBOSE(this, "Refuse to connect in passive mode");
         return;
     }
+
+    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
+        endpointsGroup->first, endpointsGroup->second.size()));
 
     if (endpointsGroup == m_endpoints.end())
     {

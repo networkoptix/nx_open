@@ -379,7 +379,7 @@ void HttpServerConnection::fullMessageHasBeenSent()
 
 void HttpServerConnection::checkForConnectionPersistency(const Message& msg)
 {
-    if (msg.type != MessageType::request)
+    if (msg.type != nx_http::MessageType::request)
         return;
 
     const auto& request = *msg.request;
