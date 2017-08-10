@@ -139,7 +139,6 @@ private:
 
     RelayPtrList m_relays;
     int m_relayCount;
-    int m_relayPort = 20000;
     boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
 
