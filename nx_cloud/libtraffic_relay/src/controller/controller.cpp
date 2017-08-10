@@ -1,8 +1,5 @@
-#include <chrono>
-#include <thread>
 #include "controller.h"
 #include "../model/model.h"
-#include "settings.h"
 
 namespace nx {
 namespace cloud {
