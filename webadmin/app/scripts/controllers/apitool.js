@@ -61,7 +61,8 @@ angular.module('webadminApp')
                             param.type = 'camera';
                         }
 
-                        if(param.name == 'time' || param.name == 'timestamp' || param.name == 'startTime'){
+                        if(param.name == 'time' || param.name == 'timestamp' ||
+                           param.name == 'startTime' || param.name == 'endTime'){
                             param.type = 'timestamp';
                         }
 
@@ -185,6 +186,7 @@ angular.module('webadminApp')
         $scope.testMethod = function(){
             var getParams = null;
             var postParams = null;
+            $scope.result = {};
 
             if($scope.apiMethod.method == 'GET'){
                 getParams = cleanParams($scope.apiMethod.params);
