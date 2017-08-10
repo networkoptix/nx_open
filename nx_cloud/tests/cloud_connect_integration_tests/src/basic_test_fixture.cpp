@@ -48,6 +48,15 @@ cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domain
     return cf::make_ready_future(true);
 }
 
+cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
+    const std::string& /*domainName*/) const
+{
+    auto& firstRelay = m_relayTest->m_relays[0];
+    auto relayPort = firstRelay->moduleInstance()->httpEndpoints()[0].port;
+    auto redirectToHost = "127.0.0.1:" + std::to_string(relayPort);
+    return cf::make_ready_future<std::string>(std::move(redirectToHost));
+}
+
 BasicTestFixture::BasicTestFixture(
     int relayCount,
     boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
@@ -76,8 +85,7 @@ void BasicTestFixture::setUpConnectSessionManagerFactoryFunc()
             clientSessionPool,
             listeningPeerPool,
             trafficRelay,
-            std::make_unique<MemoryRemoteRelayPeerPool>("127.0.0.1:20000", this),
-            std::move("127.0.0.1:" + std::to_string(m_relayPort++)));
+            std::make_unique<MemoryRemoteRelayPeerPool>(this));
     });
 }
 
@@ -98,17 +106,17 @@ BasicTestFixture::~BasicTestFixture()
 void BasicTestFixture::startRelays()
 {
     for (int i = 0; i < m_relayCount; ++i)
-        startRelay(20000 + i);
+        startRelay(i);
 }
 
-void BasicTestFixture::startRelay(int port)
+void BasicTestFixture::startRelay(int index)
 {
     auto newRelay = std::make_unique<Relay>();
 
-    std::string hostString = std::string("0.0.0.0:") + std::to_string(port);
+    std::string hostString = "0.0.0.0:0";
     newRelay->addArg("-http/listenOn", hostString.c_str());
 
-    std::string dataDirString = std::string("relay_") + std::to_string(port);
+    std::string dataDirString = std::string("relay_") + std::to_string(index);
     newRelay->addArg("-dataDir", dataDirString.c_str());
 
     if ((bool) m_disconnectedPeerTimeout)
@@ -119,7 +127,7 @@ void BasicTestFixture::startRelay(int port)
     }
 
     ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
-    m_relays.push_back(RelayContext(std::move(newRelay), port));
+    m_relays.push_back(std::move(newRelay));
 }
 
 
@@ -175,7 +183,7 @@ QUrl BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
-    auto relayPort = m_relays[relayNum].relay->moduleInstance()->httpEndpoints()[0].port;
+    auto relayPort = m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].port;
     auto relayUrlString = lm("http://127.0.0.1:%1/").arg(relayPort).toQString();
 
     return QUrl(relayUrlString);
@@ -242,7 +250,7 @@ nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator()
 
 nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
 {
-    return *m_relays[0].relay;
+    return *m_relays[0];
 }
 
 nx::String BasicTestFixture::serverSocketCloudAddress() const
@@ -281,7 +289,7 @@ void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
 
 void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
 {
-    const auto& listeningPool = m_relays[0].relay->moduleInstance()->listeningPeerPool();
+    const auto& listeningPool = m_relays[0]->moduleInstance()->listeningPeerPool();
     auto serverId = m_cloudSystemCredentials.systemId.toStdString();
     auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
 

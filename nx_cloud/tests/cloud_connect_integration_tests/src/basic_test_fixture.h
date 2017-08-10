@@ -46,35 +46,19 @@ enum class MediatorApiProtocol
 using Relay = nx::cloud::relay::test::Launcher;
 using RelayPtr = std::unique_ptr<Relay>;
 
-struct RelayContext
-{
-    RelayPtr relay;
-    int port;
-
-    RelayContext(RelayPtr relay, int port):
-        relay(std::move(relay)),
-        port(port)
-    {}
-};
-
-using RelayContextList = std::vector<RelayContext>;
+using RelayPtrList = std::vector<RelayPtr>;
 
 class BasicTestFixture;
 
 class MemoryRemoteRelayPeerPool : public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
 {
 public:
-    MemoryRemoteRelayPeerPool(const std::string& redirectToRelay, BasicTestFixture* relayTest) :
-        m_redirectToRelay(redirectToRelay),
+    MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest) :
         m_relayTest(relayTest)
     {}
 
     virtual cf::future<std::string> findRelayByDomain(
-        const std::string& /*domainName*/) const override
-    {
-        auto redirectToRelayCopy = m_redirectToRelay;
-        return cf::make_ready_future<std::string>(std::move(redirectToRelayCopy));
-    }
+        const std::string& /*domainName*/) const override;
 
     virtual cf::future<bool> addPeer(
         const std::string& domainName,
@@ -83,7 +67,6 @@ public:
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
 
 private:
-    std::string m_redirectToRelay;
     BasicTestFixture* m_relayTest;
 };
 
@@ -154,7 +137,7 @@ private:
     nx_http::BufferType m_expectedMsgBody;
     std::unique_ptr<AbstractStreamSocket> m_clientSocket;
 
-    RelayContextList m_relays;
+    RelayPtrList m_relays;
     int m_relayCount;
     int m_relayPort = 20000;
     boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
@@ -166,7 +149,7 @@ private:
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter);
     void startRelays();
-    void startRelay(int port);
+    void startRelay(int index);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
 
     virtual void peerAdded(const std::string& /*serverName*/, const std::string& /*relay*/) {}

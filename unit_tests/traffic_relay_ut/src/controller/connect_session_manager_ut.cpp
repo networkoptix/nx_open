@@ -285,8 +285,7 @@ protected:
                     &clientSessionPool(),
                     &listeningPeerPool(),
                     &m_trafficRelayStub,
-                    std::move(remoteRelayPeerPool),
-                    "127.0.0.1");
+                    std::move(remoteRelayPeerPool));
         }
 
         return *m_connectSessionManager;

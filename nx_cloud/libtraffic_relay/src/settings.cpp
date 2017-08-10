@@ -72,8 +72,6 @@ static const QString kModuleName = lit("traffic_relay");
 static const QString kCassandraHost("cassandra/host");
 static const QString kDefaultCassandraHost("127.0.0.1");
 
-static const QString kPublicAddress("publicAddress");
-
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize)
@@ -150,11 +148,6 @@ const QString& Settings::cassandraHost() const
     return m_cassandraHost;
 }
 
-const QString& Settings::publicAddress() const
-{
-    return m_publicAddress;
-}
-
 void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
@@ -162,7 +155,6 @@ void Settings::loadSettings()
     loadListeningPeer();
     loadConnectingPeer();
     loadCassandraHost();
-    loadPublicAddress();
 }
 
 void Settings::loadHttp()
@@ -237,11 +229,6 @@ void Settings::loadConnectingPeer()
 void Settings::loadCassandraHost()
 {
     m_cassandraHost = settings().value(kCassandraHost, kDefaultCassandraHost).toString();
-}
-
-void Settings::loadPublicAddress()
-{
-    m_publicAddress = settings().value(kPublicAddress).toString();
 }
 
 } // namespace conf

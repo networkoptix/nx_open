@@ -64,22 +64,13 @@ public:
 
     void assertFirstRelayHasBeenAddedToThePool()
     {
-        auto it = std::find_if(
-            m_addedPeers.cbegin(),
-            m_addedPeers.cend(),
-            [this](const std::pair<std::string, std::string>& p)
-        {
-            return
-                nx::String::fromStdString(p.first).contains(this->serverSocketCloudAddress())
-                && p.second == "127.0.0.1:20000";
-        });
-
-        ASSERT_NE(it, m_addedPeers.cend());
+        auto serverId = nx::String::fromStdString(m_addedPeer.first);
+        ASSERT_TRUE(serverId.contains(serverSocketCloudAddress()));
     }
 
     virtual void peerAdded(const std::string& domainName, const std::string& relayHost) override
     {
-        m_addedPeers.push_back(std::make_pair(domainName, relayHost));
+        m_addedPeer = std::make_pair(domainName, relayHost);
         m_addPeerPromise.set_value();
     }
 
@@ -114,7 +105,7 @@ public:
 
 
 private:
-    std::vector<std::pair<std::string, std::string>> m_addedPeers;
+    std::pair<std::string, std::string> m_addedPeer;
     std::string m_removedPeer;
 
     nx::utils::promise<void> m_removePeerPromise;

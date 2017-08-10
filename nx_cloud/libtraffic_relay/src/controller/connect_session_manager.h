@@ -61,8 +61,15 @@ public:
         ConnectToPeerHandler completionHandler) = 0;
 };
 
+class AbstractReportPublicAddressHandler
+{
+public:
+    virtual void onPublicAddressDiscovered(std::string publicAddress) = 0;
+};
+
 class ConnectSessionManager:
-    public AbstractConnectSessionManager
+    public AbstractConnectSessionManager,
+    public AbstractReportPublicAddressHandler
 {
 public:
     ConnectSessionManager(
@@ -70,8 +77,7 @@ public:
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
         controller::AbstractTrafficRelay* trafficRelay,
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool,
-        std::string publicHostString);
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool);
     ~ConnectSessionManager();
 
     virtual void beginListening(
@@ -130,6 +136,8 @@ private:
         std::size_t bytesSent,
         std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
+
+    virtual void onPublicAddressDiscovered(std::string publicAddress) override;
 };
 
 class ConnectSessionManagerFactory
@@ -146,8 +154,7 @@ public:
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
-        controller::AbstractTrafficRelay* trafficRelay,
-        std::string publicHostString);
+        controller::AbstractTrafficRelay* trafficRelay);
     /**
      * @return Previous factory func.
      */

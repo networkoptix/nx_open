@@ -26,8 +26,7 @@ ConnectSessionManager::ConnectSessionManager(
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
     controller::AbstractTrafficRelay* trafficRelay,
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool,
-    std::string publicHostString)
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool)
     :
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
@@ -35,56 +34,6 @@ ConnectSessionManager::ConnectSessionManager(
     m_trafficRelay(trafficRelay),
     m_remoteRelayPool(std::move(remoteRelayPool))
 {
-    nx::utils::SubscriptionId subscriptionId;
-    m_listeningPeerPool->peerConnectedSubscription().subscribe(
-        [this, publicHostString = std::move(publicHostString)](std::string peer)
-        {
-            m_remoteRelayPool->addPeer(peer, publicHostString)
-                .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
-                    {
-                        if (addPeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        &subscriptionId);
-
-    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-
-    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_remoteRelayPool->removePeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> removePeerFuture)
-                    {
-                        if (removePeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        &subscriptionId);
-
-    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
 }
 
 ConnectSessionManager::~ConnectSessionManager()
@@ -355,6 +304,66 @@ void ConnectSessionManager::startRelaying(RelaySession relaySession)
         {std::move(listeningPeerChannel), relaySession.listeningPeerName});
 }
 
+void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
+{
+    nx::utils::SubscriptionId subscriptionId;
+    m_listeningPeerPool->peerConnectedSubscription().subscribe(
+        [this, publicAddress = std::move(publicAddress)](std::string peer)
+        {
+            m_remoteRelayPool->addPeer(peer, publicAddress)
+                .then(
+                    [this, peer](cf::future<bool> addPeerFuture)
+                    {
+                        if (addPeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+
+    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->removePeer(peer)
+                .then(
+                    [this, peer](cf::future<bool> removePeerFuture)
+                    {
+                        if (removePeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // ConnectSessionManagerFactory
 
@@ -364,8 +373,7 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
-    controller::AbstractTrafficRelay* trafficRelay,
-    std::string publicHostString)
+    controller::AbstractTrafficRelay* trafficRelay)
 {
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
@@ -378,8 +386,7 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
         clientSessionPool,
         listeningPeerPool,
         trafficRelay,
-        std::move(remoteRelayPool),
-        std::move(publicHostString));
+        std::move(remoteRelayPool));
 }
 
 ConnectSessionManagerFactory::FactoryFunc
