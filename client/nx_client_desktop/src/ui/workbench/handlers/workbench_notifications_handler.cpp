@@ -195,14 +195,6 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     vms::event::EventParameters params = action->getRuntimeParams();
     vms::event::EventType eventType = params.eventType;
 
-    const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-
-    if (!isAdmin)
-    {
-        if (eventType == vms::event::licenseIssueEvent || eventType == vms::event::networkIssueEvent)
-            return;
-    }
-
     if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
     {
         int healthMessage = eventType - vms::event::systemHealthEvent;
