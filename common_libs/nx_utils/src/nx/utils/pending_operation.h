@@ -14,7 +14,7 @@ namespace utils {
  * when requestOperation() is called but
  * not more often than the given interval.
  */
-class PendingOperation: public QObject
+class NX_UTILS_API PendingOperation: public QObject
 {
 public:
     using Callback = std::function<void()>;
