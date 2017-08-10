@@ -117,11 +117,18 @@ void View::reportPublicListenAddress()
             auto addressString = result.toStdString();
             NX_UTILS_LOG(logLevel, this, message.arg(addressString));
 
-            auto& reportAddressHandler =
-                dynamic_cast<controller::AbstractReportPublicAddressHandler&>(
-                    m_controller->connectSessionManager());
+            try
+            {
+                auto& reportAddressHandler =
+                    dynamic_cast<controller::AbstractReportPublicAddressHandler&>(
+                        m_controller->connectSessionManager());
 
-            reportAddressHandler.onPublicAddressDiscovered(addressString);
+                reportAddressHandler.onPublicAddressDiscovered(addressString);
+            }
+            catch(const std::exception&)
+            {
+                NX_WARNING(this, "Cast to the AbstractReportPublicAddressHandler failed.");
+            }
         };
 
     network::PublicIPDiscovery ipDiscovery;
