@@ -140,7 +140,7 @@ void View::reportPublicListenAddress()
         return;
     }
 
-    for (const auto& listenAddress : m_multiAddressHttpServer->endpoints())
+    for (const auto& listenAddress: m_multiAddressHttpServer->endpoints())
     {
         if (listenAddress.toString() == publicAddress.toString())
         {
