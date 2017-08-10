@@ -459,10 +459,12 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    this.video.src="";
-    //This unbinds all of the event listeners for the video player
-    var cloneVideo = this.video.cloneNode(true);
-    this.video.parentNode.replaceChild(cloneVideo, this.video);
+    if(this.video){
+        this.video.src="";
+        //This unbinds all of the event listeners for the video player
+        var cloneVideo = this.video.cloneNode(true);
+        this.video.parentNode.replaceChild(cloneVideo, this.video);
+    }
     this.hls.destroy();
 };
 
