@@ -23,6 +23,7 @@ angular.module('nxCommon')
                 scope.duration = 5*60;
                 scope.resolution = '640p';
                 scope.useAuth = true;
+                scope.nightMode = Config.webclient.nightMode;
 
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
