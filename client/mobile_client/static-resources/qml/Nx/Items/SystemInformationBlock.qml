@@ -13,6 +13,7 @@ Item
     property string ownerDescription
     property bool cloud: false
     property bool online: true
+    property bool reachable: true
     property string address
     property string user
 

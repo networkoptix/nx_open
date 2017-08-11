@@ -465,7 +465,6 @@ void PlayerPrivate::presentNextFrame()
     if (!videoFrameToRender)
         return;
 
-    setMediaStatus(Player::MediaStatus::Loaded);
     gotDataTimer.restart();
 
     updateCurrentResolution(videoFrameToRender->size());
@@ -501,6 +500,8 @@ void PlayerPrivate::presentNextFrame()
 
     if (videoSurface && videoSurface->isActive() && !skipFrame)
     {
+        setMediaStatus(Player::MediaStatus::Loaded);
+
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
@@ -643,8 +644,8 @@ void PlayerPrivate::applyVideoQuality()
     switch (result.quality)
     {
         case Player::UnknownVideoQuality:
-            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
-            setMediaStatus(Player::MediaStatus::NoMedia);
+            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoVideoStreams)");
+            setMediaStatus(Player::MediaStatus::NoVideoStreams);
             q->stop();
             return;
 
@@ -825,6 +826,7 @@ void Player::setPosition(qint64 value)
     }
 
     d->setLiveMode(value == kLivePosition);
+    d->setMediaStatus(MediaStatus::Loading);
     d->clearCurrentFrame();
     d->at_hurryUp(); //< renew receiving frames
 
@@ -843,6 +845,17 @@ void Player::setMaxTextureSize(int value)
     d->maxTextureSize = value;
 }
 
+bool Player::checkReadyToPlay()
+{
+    Q_D(Player);
+
+    if (d->archiveReader || d->initDataProvider())
+        return true;
+
+    d->log(lit("play() END: no data"));
+    return false;
+}
+
 void Player::play()
 {
     Q_D(Player);
@@ -854,11 +867,8 @@ void Player::play()
         return;
     }
 
-    if (!d->archiveReader && !d->initDataProvider())
-    {
-        d->log(lit("play() END: no data"));
+    if (!checkReadyToPlay())
         return;
-    }
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
@@ -883,6 +893,10 @@ void Player::preview()
 {
     Q_D(Player);
     d->log(lit("preview()"));
+
+    if (!checkReadyToPlay())
+        return;
+
     d->setState(State::Previewing);
     d->dataConsumer->setAudioEnabled(false);
 }
@@ -909,7 +923,8 @@ void Player::stop()
     d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
-    d->setMediaStatus(MediaStatus::NoMedia);
+    if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
+        d->setMediaStatus(MediaStatus::NoMedia);
     d->log(lit("stop() END"));
 }
 
