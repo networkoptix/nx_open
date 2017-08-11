@@ -252,6 +252,7 @@ bool isMessageBodyAllowed(int statusCode)
     {
         case noContent:
         case notModified:
+        case found:
             return false;
 
         default:

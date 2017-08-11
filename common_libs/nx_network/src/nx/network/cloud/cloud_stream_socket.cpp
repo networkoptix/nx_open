@@ -413,7 +413,7 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
 
     if (!m_socketAttributes.nonBlockingMode)
     {
-        // Restoring default non blocking mode on socket.
+        // Restoring default non-blocking mode on socket.
         if (!streamSocket->setNonBlockingMode(false))
         {
             errorCode = SystemError::getLastOSErrorCode();

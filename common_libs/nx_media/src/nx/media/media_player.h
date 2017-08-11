@@ -117,6 +117,7 @@ public:
     enum class MediaStatus
     {
         Unknown,
+        NoVideoStreams,
         NoMedia,
         Loading,
         Loaded,
@@ -241,6 +242,9 @@ protected: //< for tests
     void testSetCamera(const QnResourcePtr& camera);
 
     virtual QnCommonModule* commonModule() const = 0;
+
+private:
+    bool checkReadyToPlay();
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

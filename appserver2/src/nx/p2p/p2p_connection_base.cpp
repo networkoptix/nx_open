@@ -246,7 +246,7 @@ void ConnectionBase::onHttpClientDone()
     using namespace nx::network;
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
-    m_webSocket->setAliveTimeoutEx(m_keepAliveTimeout, 2);
+    m_webSocket->setAliveTimeout(m_keepAliveTimeout);
 
     setState(State::Connected);
 }

@@ -258,7 +258,7 @@ private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_channel;
     AsyncChannel* m_rawDataChannel;
     std::unique_ptr<Converter> m_converter;
-    utils::bstream::ReflectingPipeline m_reflectingPipeline;
+    utils::bstream::Pipe m_reflectingPipeline;
     nx::Buffer m_inputData;
     nx::Buffer m_expectedOutputData;
     nx::Buffer m_outputData;

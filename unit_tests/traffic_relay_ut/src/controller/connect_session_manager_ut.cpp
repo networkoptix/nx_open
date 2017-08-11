@@ -268,6 +268,13 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
+        return customConnectSessionManager(
+            std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
+    }
+
+    controller::ConnectSessionManager& customConnectSessionManager(
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPeerPool)
+    {
         if (!m_connectSessionManager)
         {
             m_settingsLoader.load();
@@ -278,7 +285,7 @@ protected:
                     &clientSessionPool(),
                     &listeningPeerPool(),
                     &m_trafficRelayStub,
-                    std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
+                    std::move(remoteRelayPeerPool));
         }
 
         return *m_connectSessionManager;

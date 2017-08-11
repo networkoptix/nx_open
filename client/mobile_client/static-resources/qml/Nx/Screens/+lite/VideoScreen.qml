@@ -72,7 +72,8 @@ PageBase
         property bool cameraWarningVisible:
             (showOfflineStatus
                 || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
+                || videoScreenController.failed
+                || videoScreenController.noVideoStreams)
             && !videoScreenController.mediaPlayer.playing
 
         Timer

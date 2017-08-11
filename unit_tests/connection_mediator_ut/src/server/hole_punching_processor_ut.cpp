@@ -233,6 +233,20 @@ protected:
 
     void assertMediatorHasDroppedConnectSession()
     {
+        ASSERT_EQ(api::ResultCode::notFound, doConnectResultRequest());
+    }
+
+    void waitForMediatorToDropConnectSession()
+    {
+        while (doConnectResultRequest() != api::ResultCode::notFound)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+private:
+    nx::String m_lastConnectSessionId;
+
+    api::ResultCode doConnectResultRequest()
+    {
         api::ResultCode resultCode = api::ResultCode::ok;
         api::ConnectionResultRequest connectionResult;
         connectionResult.connectSessionId = m_lastConnectSessionId;
@@ -244,11 +258,8 @@ protected:
                     m_udpClient.get(),
                     std::move(connectionResult),
                     std::placeholders::_1));
-        ASSERT_EQ(api::ResultCode::notFound, resultCode);
+        return resultCode;
     }
-
-private:
-    nx::String m_lastConnectSessionId;
 };
 
 TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
@@ -287,7 +298,7 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
         if (actionToTake != MsAction::closeConnectionToMediator)
         {
             // Testing that mediator has cleaned up session data.
-            assertMediatorHasDroppedConnectSession();
+            waitForMediatorToDropConnectSession();
         }
 
         resetUdpClient();
