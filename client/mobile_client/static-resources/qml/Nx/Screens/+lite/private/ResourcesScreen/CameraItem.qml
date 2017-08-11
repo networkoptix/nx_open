@@ -334,11 +334,7 @@ Control
 
     onLayoutHelperChanged: updateResourceId()
     Component.onCompleted: updateResourceId()
-    onResourceIdChanged: {
-        console.log("=== current:", resourceId)
-
-        activityDetected()
-    }
+    onResourceIdChanged: activityDetected()
     onActiveChanged:
     {
         if (active)
