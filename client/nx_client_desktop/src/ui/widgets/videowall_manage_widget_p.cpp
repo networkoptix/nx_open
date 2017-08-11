@@ -198,13 +198,12 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         font.setPixelSize(fontSize());
         QnScopedPainterFontRollback fontRollback(painter, font);
 
-        QRect textRect(0, 0,
-            painter->fontMetrics().width(name),
-            painter->fontMetrics().height());
+        const auto metrics = QFontMetrics(font);
+        auto textRect = metrics.boundingRect(name);
         textRect.moveCenter(body.center());
         textRect.moveTop(body.top() + body.height() * textOffset);
 
-        painter->drawText(textRect, name);
+        painter->drawText(textRect, Qt::TextDontClip, name);
     }
 
     if (editable && hasFlag(StateFlag::Hovered)) {
@@ -387,7 +386,6 @@ QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &r
 {
     name = tr("Display %1").arg(idx + 1);
 
-    qDebug() << name;
     for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
         snap->screenIndex = idx;
         snap->snapIndex = 0;
