@@ -1,6 +1,7 @@
 #include "videowall_manage_widget_p.h"
 
 #include <QtGui/QIcon>
+#include <QtGui/QScreen>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -464,20 +465,34 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
     QObject(),
     q_ptr(q)
 {
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i)
+    if (QnAppInfo::applicationPlatform() == lit("macosx"))
     {
-        auto screen = desktop->screen(i);
-        NX_ASSERT(screen);
-        if (!screen)
-            continue;
+        int screenNumber = 0;
+        for (const auto screen: QGuiApplication::screens())
+        {
+            const auto rect = screen->geometry();
+            m_unitedGeometry = m_unitedGeometry.united(rect);
+            m_screens.append({screenNumber++, rect, q});
+        }
+    }
+    else
+    {
+        const auto desktop = qApp->desktop();
+        for (int screenNumber = 0; screenNumber < desktop->screenCount(); ++screenNumber)
+        {
+            auto screen = desktop->screen(screenNumber);
+            if (!screen)
+            {
+                NX_ASSERT(false, "Invalid screen.");
+                continue;
+            }
 
-        auto rect = screen->geometry();
-        auto dpr = screen->devicePixelRatio();
-        rect.setSize(rect.size() * dpr);
-        m_unitedGeometry = m_unitedGeometry.united(rect);
-
-        m_screens.append({i, rect, q});
+            auto rect = screen->geometry();
+            auto pixelRatio = screen->devicePixelRatio();
+            rect.setSize(rect.size() * pixelRatio);
+            m_unitedGeometry = m_unitedGeometry.united(rect);
+            m_screens.append({screenNumber, rect, q});
+        }
     }
 }
 
