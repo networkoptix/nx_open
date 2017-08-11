@@ -40,12 +40,14 @@ QnCameraListModel::QnCameraListModel(QObject* parent) :
         connect(cache, &QnCameraThumbnailCache::thumbnailUpdated,
                 d, &QnCameraListModelPrivate::at_thumbnailUpdated);
     }
+
+    connect(this, &QnCameraListModel::rowsInserted, this, &QnCameraListModel::countChanged);
+    connect(this, &QnCameraListModel::rowsRemoved, this, &QnCameraListModel::countChanged);
+    connect(this, &QnCameraListModel::modelReset, this, &QnCameraListModel::countChanged);
 }
 
 QnCameraListModel::~QnCameraListModel()
 {
-    connect(this, &QnCameraListModel::rowsInserted, this, &QnCameraListModel::countChanged);
-    connect(this, &QnCameraListModel::rowsRemoved, this, &QnCameraListModel::countChanged);
 }
 
 QHash<int, QByteArray> QnCameraListModel::roleNames() const

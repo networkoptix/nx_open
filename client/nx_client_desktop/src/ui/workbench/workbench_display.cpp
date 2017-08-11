@@ -125,8 +125,14 @@ void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLen
 /** Size multiplier for raised widgets. */
 const qreal focusExpansion = 100.0;
 
-/** Maximal expanded size of a raised widget, relative to viewport size. */
-const qreal maxExpandedSize = 0.5;
+// Raised widget will take 50% of the viewport.
+static constexpr qreal kRaisedWidgetViewportPercentage = 0.5;
+
+// Raised widget in videowall mode will take 80% of the viewport.
+static constexpr qreal kVideoWallRaisedWidgetViewportPercentage = 0.8;
+
+// Raised widget in E-Mapping mode will take 33% of the viewport.
+static constexpr qreal kEMappingRaisedWidgetViewportPercentage = 0.33;
 
 /** The amount of z-space that one layer occupies. */
 const qreal layerZSize = 10000000.0;
@@ -728,18 +734,20 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
 
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
-    qreal magicConst = maxExpandedSize;
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    qreal viewportPercentage = kRaisedWidgetViewportPercentage;
+
+    if (qnRuntime->isVideoWallMode())
     {
-        magicConst = 0.8;   // TODO: #Elric magic const
+        viewportPercentage = kVideoWallRaisedWidgetViewportPercentage;
     }
     else if (canShowLayoutBackground()
-        && (workbench()->currentLayout()->resource()
-            && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()))
+        && workbench()->currentLayout()->resource()
+        && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
     {
-        magicConst = 0.33;  // TODO: #Elric magic const
+        viewportPercentage = kEMappingRaisedWidgetViewportPercentage;
     }
-    QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
+
+    QSizeF maxWidgetSize = viewportGeometry.size() * viewportPercentage;
 
     QPointF viewportCenter = viewportGeometry.center();
 
@@ -762,7 +770,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
         &yp1,
         &yp2);
 
-    return widgetGeometry.adjusted(xp1, yp1, xp2, yp2);;
+    return widgetGeometry.adjusted(xp1, yp1, xp2, yp2);
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)

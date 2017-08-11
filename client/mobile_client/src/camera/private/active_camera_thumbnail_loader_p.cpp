@@ -5,33 +5,27 @@
 #include <api/server_rest_connection.h>
 #include <nx/media/jpeg.h>
 
-namespace
-{
+namespace {
 
-enum
-{
-    refreshInterval = 300
-    , fastTimeout = 100
-    , longTimeout = 230
-};
+constexpr int refreshInterval = 300;
+constexpr int fastTimeout = 100;
+constexpr int longTimeout = 230;
+constexpr int invalidRequest = -1;
 
-enum
-{
-    invalidRequest = -1
-};
-
-} // anonymous namespace
+} // namespace
 
 QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
-        QnActiveCameraThumbnailLoader *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , currentQuality(0)
-    , refreshOperation(new QnPendingOperation([this](){ refresh(); }, refreshInterval, this))
-    , imageProvider(nullptr)
-    , requestId(invalidRequest)
-    , requestNextAfterReply(false)
-    , decompressThread(new QThread(this))
+    QnActiveCameraThumbnailLoader* parent)
+    :
+    QObject(parent),
+    q_ptr(parent),
+    refreshOperation(
+        new nx::utils::PendingOperation(
+            [this]{ refresh(); },
+            refreshInterval,
+            this)),
+    requestId(invalidRequest),
+    decompressThread(new QThread(this))
 {
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
 

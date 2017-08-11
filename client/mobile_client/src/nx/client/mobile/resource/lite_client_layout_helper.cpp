@@ -1,5 +1,7 @@
 #include "lite_client_layout_helper.h"
 
+#include <nx/utils/pending_operation.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -11,6 +13,7 @@ namespace {
 
 const QString kDisplayCellProperty(lit("liteClientDisplayCell"));
 const QPoint kInvalidPoint(-1, -1);
+constexpr int kSaveLayoutTimeout = 500;
 
 QString pointToString(const QPoint& point)
 {
@@ -58,6 +61,11 @@ public:
     void at_layoutPropertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_layoutItemChanged(const QnResourcePtr& resource, const QnLayoutItemData& item);
     void at_layoutItemRemoved(const QnResourcePtr& resource, const QnLayoutItemData& item);
+
+    void saveLayout();
+
+public:
+    utils::PendingOperation* saveOperation = nullptr;
 };
 
 LiteClientLayoutHelper::LiteClientLayoutHelper(QObject* parent):
@@ -129,7 +137,7 @@ QString LiteClientLayoutHelper::cameraIdOnCell(int x, int y) const
 
     for (const auto& item: layout->getItems())
     {
-        if (item.combinedGeometry.x() == x && item.combinedGeometry.y() == y)
+        if (item.combinedGeometry.topLeft().toPoint() == QPoint(x, y))
             return item.resource.id.toString();
     }
 
@@ -146,39 +154,18 @@ void LiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& came
     const auto id = QnUuid::fromStringSafe(cameraId);
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
 
-    auto items = layout->getItems();
-    auto it = std::find_if(items.begin(), items.end(),
-        [x, y](const QnLayoutItemData& item)
-        {
-            return item.combinedGeometry.x() == x && item.combinedGeometry.y() == y;
-        });
-
-    if (it == items.end())
+    for (const auto& item: layout->getItems())
     {
-        if (id.isNull() || camera.isNull())
-            return;
-
-        layout->addItem(createItem(id, camera->getUniqueId(), QRectF(x, y, 1, 1)));
-    }
-    else
-    {
-        if (id.isNull() || camera.isNull())
-        {
-            layout->removeItem(*it);
-        }
-        else
-        {
-            if (it->resource.id == id)
-                return;
-
-            const auto current = *it;
-            layout->removeItem(current);
-            const auto newItem = createItem(id, camera->getUniqueId(), current.combinedGeometry);
-            layout->addItem(newItem);
-        }
+        if (item.combinedGeometry.topLeft().toPoint() == QPoint(x, y))
+            layout->removeItem(item);
     }
 
-    qnResourcesChangesManager->saveLayout(layout, [](const QnLayoutResourcePtr&){});
+    if (id.isNull() || camera.isNull())
+        return;
+
+    layout->addItem(createItem(id, camera->getUniqueId(), QRectF(x, y, 1, 1)));
+
+    d->saveOperation->requestOperation();
 }
 
 QnLayoutResourcePtr LiteClientLayoutHelper::createLayoutForServer(const QnUuid& serverId) const
@@ -220,8 +207,10 @@ QnLayoutResourcePtr LiteClientLayoutHelper::findLayoutForServer(const QnUuid& se
 }
 
 LiteClientLayoutHelper::Private::Private(LiteClientLayoutHelper* parent):
-    q(parent)
+    q(parent),
+    saveOperation(new utils::PendingOperation([this]{ saveLayout(); }, kSaveLayoutTimeout, this))
 {
+    saveOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
 }
 
 void LiteClientLayoutHelper::Private::at_layoutAboutToBeChanged()
@@ -302,6 +291,12 @@ void LiteClientLayoutHelper::Private::at_layoutItemRemoved(
 
     if (QPoint(x, y) == q->displayCell())
         emit q->singleCameraIdChanged();
+}
+
+void LiteClientLayoutHelper::Private::saveLayout()
+{
+    if (const auto& layout = q->layout())
+        qnResourcesChangesManager->saveLayout(layout, [](const QnLayoutResourcePtr&){});
 }
 
 } // namespace resource

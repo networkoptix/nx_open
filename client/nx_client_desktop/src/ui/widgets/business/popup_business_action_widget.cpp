@@ -41,7 +41,8 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     {
         const auto sourceCameraRequired =
             nx::vms::event::isSourceCameraRequired(model()->eventType());
-        ui->forceAcknoledgementCheckBox->setEnabled(sourceCameraRequired);
+        ui->forceAcknoledgementCheckBox->setEnabled(sourceCameraRequired
+            || model()->eventType() >= nx::vms::event::userDefinedEvent);
     }
 
     if (fields.testFlag(Field::actionParams))

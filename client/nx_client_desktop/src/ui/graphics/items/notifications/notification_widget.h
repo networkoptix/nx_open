@@ -64,7 +64,8 @@ public:
         const QString& text,
         const ButtonHandler& handler);
 
-    void setCloseButtonUnavailable();
+    bool isCloseButtonAvailable() const;
+    void setCloseButtonAvailable(bool value = true);
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);

@@ -100,7 +100,7 @@ void QnCachingCameraDataLoader::initLoaders() {
                 {
                     if (dataType == Qn::RecordingContent)
                     {
-                        NX_VERBOSE(this) "Chunks: failed to load";
+                        NX_VERBOSE(this, "Chunks: failed to load");
                     }
                     emit loadingFailed();
                 });
@@ -236,7 +236,7 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
-    NX_VERBOSE(this) "Chunks: clear local cache";
+    NX_VERBOSE(this, "Chunks: clear local cache");
     for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
 
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
@@ -273,5 +273,5 @@ void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodCont
         return;
 
     QString name = m_resource ? m_resource->toResourcePtr()->getName() : lit("_invalid_camera_");
-    NX_VERBOSE(this) lm("Chunks: (cached) (%1) %2").arg(name).arg(message);
+    NX_VERBOSE(this, lm("Chunks: (cached) (%1) %2").arg(name).arg(message));
 }
