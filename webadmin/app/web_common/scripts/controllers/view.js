@@ -401,6 +401,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                if(!$scope.activeCamera){
+                    $scope.showCameraPanel = true;
+                }
 
                 $scope.ready = true;
                 $timeout(updateHeights);
@@ -469,6 +472,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
             $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+            if(!$scope.activeCamera){
+                $scope.showCameraPanel = true;
+            }
         });
 
         $('html').addClass('webclient-page');
