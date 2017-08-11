@@ -492,6 +492,7 @@ table.webclient-window>tbody>tr>td{
       height: 20px;
       
       input{
+        border: 1px solid rgba($light16,0.2);
         margin-bottom: 3px;
       }
     }
@@ -504,7 +505,7 @@ table.webclient-window>tbody>tr>td{
 .camera-links{
   &-break{
     height: 4px;
-    border-bottom: 1px solid $light6;
+    border-bottom: 1px solid rgba($light16,0.2);
     margin: 8px 0;
   }
 
@@ -609,8 +610,7 @@ table.webclient-window>tbody>tr>td{
 
 .video-settings{
   &{
-    right: -25px;
-    min-width: 0px !important;
+    right: -35px;
     left:initial;
     padding: 0px !important;
     background-color: rgba($dark7,0.9) !important;
@@ -618,7 +618,6 @@ table.webclient-window>tbody>tr>td{
 
     color: $light16;
     font-size: 12px;
-    line-height: 18px;
   }
 
   &-options:hover{
@@ -648,6 +647,15 @@ table.webclient-window>tbody>tr>td{
     font-size: 12px !important;
     color: $light1 !important;
   }
+}
+
+.video-settings-36.links-text{
+  color: $light1;
+}
+
+.glyphicon-cog.links-cog{
+  top: 6px;
+  margin-right: 6px;
 }
 
 .no-fullscreen{
