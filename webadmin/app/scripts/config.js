@@ -124,8 +124,7 @@ var Config = {
         useServerTime: true,
         disableVolume: true,
         reloadInterval: 5*1000,
-        leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
-        nightMode: false
+        leftPanelPreviewHeight: 38 // 38px is the height for previews in the left panel
     },
     debugEvents: {
         events: [
