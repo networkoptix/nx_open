@@ -2100,7 +2100,9 @@ void QnMediaResourceWidget::updateDewarpingParams()
 void QnMediaResourceWidget::updateFisheye()
 {
     QnItemDewarpingParams itemParams = item()->dewarpingParams();
-    bool enabled = itemParams.enabled;
+
+    // Zoom windows have no own "dewarping" button, so counting it always pressed.
+    bool enabled = isZoomWindow() || itemParams.enabled;
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 

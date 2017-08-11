@@ -498,6 +498,8 @@ TEST_F(SocketUdt, allDataReadAfterFin)
     for (int i = 0; i < 2; ++i)
     {
         UdtStreamServerSocket server(AF_INET);
+        auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
+
         ASSERT_TRUE(server.setNonBlockingMode(true));
         ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(server.listen());
@@ -562,8 +564,6 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         const auto recvBuffer = readNBytes(acceptedSocket.get(), testMessage.size());
         ASSERT_EQ(testMessage, recvBuffer)
             << SystemError::getLastOSErrorText().toStdString();
-
-        server.pleaseStopSync();
     }
 }
 

@@ -5,6 +5,7 @@ import Nx.Media 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Items.LiteClient 1.0
 import com.networkoptix.qml 1.0
 
 Control
@@ -156,37 +157,10 @@ Control
     {
         id: noCameraComponent
 
-        Rectangle
+        SelectCameraDummy
         {
             width: cameraItem.width
             height: cameraItem.height
-
-            color: ColorTheme.base3
-
-            Column
-            {
-                width: parent.width
-                anchors.centerIn: parent
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Select camera")
-                    color: ColorTheme.base13
-                    font.pixelSize: 24
-                    font.capitalization: Font.AllUppercase
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
-                    color: ColorTheme.base13
-                    font.pixelSize: 11
-                    wrapMode: Text.WordWrap
-                }
-            }
         }
     }
 
@@ -196,30 +170,33 @@ Control
 
         Column
         {
-            width: parent ? parent.width : 0
+            width: parent ? Math.min(800, parent.width, parent.height) : 0
             leftPadding: 8
             rightPadding: 8
 
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
+                source: d.unauthorized
+                    ? lp("/images/lite_client/camera_locked.png")
+                    : lp("/images/lite_client/camera_offline.png")
             }
 
             Text
             {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width - parent.leftPadding - parent.rightPadding
-                height: 32
+                height: 160
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
+                text: d.unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                color: ColorTheme.windowText
+                font.pixelSize: 88
+                font.weight: Font.Light
+                font.capitalization: Font.AllUppercase
+                color: ColorTheme.red_main
             }
         }
     }
@@ -311,7 +288,7 @@ Control
         anchors.fill: parent
         onPreviousRequested: previousCameraRequested()
         onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel.count - 1
+        maxConsequentRequests: camerasModel.count
     }
 
     MouseArea
@@ -357,7 +334,11 @@ Control
 
     onLayoutHelperChanged: updateResourceId()
     Component.onCompleted: updateResourceId()
-    onResourceIdChanged: activityDetected()
+    onResourceIdChanged: {
+        console.log("=== current:", resourceId)
+
+        activityDetected()
+    }
     onActiveChanged:
     {
         if (active)

@@ -449,19 +449,6 @@ class NX_NETWORK_API AbstractEncryptedStreamSocket:
     public AbstractStreamSocket
 {
 public:
-    /**
-     * Connect to remote host without performing SSL handshake.
-     * AbstractCommunicatingSocket::connect connects and performs handshake. 
-     * This method is required for SMTP/TLS, for example.
-     */
-    virtual bool connectWithoutEncryption(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
-
-    /** Do SSL handshake and use encryption on succeeding data exchange. */
-    virtual bool enableClientEncryption() = 0;
-
     /** Has handshake has been initiated. */
     virtual bool isEncryptionEnabled() const = 0;
 };

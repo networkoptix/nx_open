@@ -47,7 +47,8 @@ void initialize(
         }
     }
 
-    const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
+    const nx::utils::log::Tag kStart(lit("START"));
+    const auto write = [&](const Message& message) { logger->log(Level::always, kStart, message); };
     write(QByteArray(80, '='));
     write(lm("%1 started, version: %2, revision: %3").args(
         applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
