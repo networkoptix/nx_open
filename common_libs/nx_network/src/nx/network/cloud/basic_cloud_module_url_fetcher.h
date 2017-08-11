@@ -73,6 +73,14 @@ public:
         m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx_http::kUrlSchemeName);
     }
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+
+        if (m_httpClient)
+            m_httpClient->bindToAioThread(aioThread);
+    }
+
     virtual void stopWhileInAioThread() override
     {
         base_type::stopWhileInAioThread();
@@ -186,6 +194,8 @@ private:
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client)
     {
+        NX_ASSERT(isInSelfAioThread());
+
         QnMutexLocker lk(&m_mutex);
 
         m_httpClient.reset();

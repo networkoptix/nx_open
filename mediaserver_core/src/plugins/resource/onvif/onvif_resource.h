@@ -546,6 +546,7 @@ private:
     /**
      * Used for cameras that do not support renew request.
      */
+    void scheduleRenewSubscriptionTimer(unsigned int timeoutSec);
     void renewPullPointSubscriptionFallback(quint64 timerId);
     void onPullMessagesResponseReceived(
         PullPointSubscriptionWrapper* soapWrapper,
