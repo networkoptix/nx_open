@@ -241,6 +241,6 @@ TEST_P(CloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
     assertInvitedUserIsAuthenticatedSuccessfully();
 }
 
-INSTANTIATE_TEST_CASE_P(P2pMode, FtCloudAuthenticationInviteUser,
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthenticationInviteUser,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
