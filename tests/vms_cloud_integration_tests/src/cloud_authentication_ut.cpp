@@ -183,7 +183,7 @@ TEST_P(CloudAuthentication, one_step_digest_authentication_using_nonce_received_
     thenRequestShouldBeFulfilled();
 }
 
-TEST_F(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_credentials)
+TEST_P(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_credentials)
 {
     givenTemporaryCloudCredentials();
     assertServerAuthorizesCloudUserCredentials();
