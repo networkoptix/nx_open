@@ -12,7 +12,7 @@ Control
 {
     id: cameraItem
 
-    property alias resourceId: resourceHelper.resourceId
+    property alias resourceId: cameraDisplay.resourceId
     property bool paused: false
     property LiteClientLayoutHelper layoutHelper: null
     property int layoutX: -1
@@ -26,54 +26,6 @@ Control
     signal nextCameraRequested()
     signal previousCameraRequested()
 
-    MediaResourceHelper
-    {
-        id: resourceHelper
-    }
-
-    QnThumbnailCacheAccessor
-    {
-        id: thumbnailCacheAccessor
-        resourceId: cameraItem.resourceId
-        onResourceIdChanged: refreshTimer.restart()
-    }
-
-    Timer
-    {
-        id: refreshTimer
-
-        readonly property int initialLoadDelay: 400
-        readonly property int reloadDelay: 60 * 1000
-
-        interval: initialLoadDelay
-        repeat: true
-        running: active
-            && resourceId !== ""
-            && connectionManager.connectionState === QnConnectionManager.Ready
-
-        onTriggered:
-        {
-            interval = reloadDelay
-            thumbnailCacheAccessor.refreshThumbnail()
-        }
-
-        onRunningChanged:
-        {
-            if (!running)
-                interval = initialLoadDelay
-        }
-    }
-
-    QtObject
-    {
-        id: d
-
-        property bool offline: resourceHelper.resourceStatus === MediaResourceHelper.Offline ||
-                               resourceHelper.resourceStatus === MediaResourceHelper.NotDefined ||
-                               resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
-        property bool unauthorized: resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
-    }
-
     background: Rectangle
     {
         color: ColorTheme.windowBackground
@@ -85,21 +37,33 @@ Control
 
         width: parent.availableWidth
         height: parent.availableHeight
-        color: resourceId && d.offline ? ColorTheme.base7 : ColorTheme.base4
+        color: resourceId && cameraDisplay.videoScreenController.offline
+            ? ColorTheme.base7
+            : ColorTheme.base4
 
-        Loader
+        CameraDisplay
         {
-            id: thumbnailContentLoader
+            id: cameraDisplay
 
-            anchors.centerIn: parent
-            sourceComponent:
+            anchors.fill: parent
+
+            camerasModel: camerasModel
+
+            videoScreenController.mediaPlayer.allowOverlay: false
+            videoScreenController.mediaPlayer.videoQuality: MediaPlayer.LowVideoQuality
+
+            onNextCameraRequested: cameraItem.nextCameraRequested()
+            onPreviousCameraRequested: cameraItem.previousCameraRequested()
+            onClicked: cameraItem.clicked()
+            onDoubleClicked: cameraItem.doubleClicked()
+            onActivityDetected: cameraItem.activityDetected()
+
+            videoScreenController.mediaPlayer.onSourceChanged:
             {
-                if (!resourceId)
-                    return noCameraComponent
-                if (d.offline || d.unauthorized)
-                    return dummyComponent
+                if (videoScreenController.mediaPlayer.source)
+                    videoScreenController.start()
                 else
-                    return videoComponent
+                    videoScreenController.stop()
             }
         }
 
@@ -110,11 +74,19 @@ Control
             anchors.fill: parent
 
             opacity: 0.0
-            NumberAnimation on opacity
+            SequentialAnimation
             {
                 id: controlsFadeOutAnimation
-                duration: 1000
-                to: 0.0
+
+                PauseAnimation { duration: 3000 }
+
+                NumberAnimation
+                {
+                    target: controls
+                    property: "opacity"
+                    duration: 1000
+                    to: 0.0
+                }
             }
 
             z: 5
@@ -140,7 +112,7 @@ Control
                         anchors.fill: parent
                         anchors.leftMargin: 6
                         anchors.rightMargin: 6
-                        text: resourceHelper.resourceName
+                        text: cameraDisplay.videoScreenController.resourceHelper.resourceName
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignLeft
                         elide: Text.ElideRight
@@ -153,188 +125,29 @@ Control
         }
     }
 
-    Component
-    {
-        id: noCameraComponent
-
-        SelectCameraDummy
-        {
-            width: cameraItem.width
-            height: cameraItem.height
-        }
-    }
-
-    Component
-    {
-        id: dummyComponent
-
-        Column
-        {
-            width: parent ? Math.min(800, parent.width, parent.height) : 0
-            leftPadding: 8
-            rightPadding: 8
-
-            Image
-            {
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized
-                    ? lp("/images/lite_client/camera_locked.png")
-                    : lp("/images/lite_client/camera_offline.png")
-            }
-
-            Text
-            {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - parent.leftPadding - parent.rightPadding
-                height: 160
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text: d.unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                font.pixelSize: 88
-                font.weight: Font.Light
-                font.capitalization: Font.AllUppercase
-                color: ColorTheme.red_main
-            }
-        }
-    }
-
-    Component
-    {
-        id: videoComponent
-
-        Item
-        {
-            width: mainContainer.width
-            height: mainContainer.height
-
-            VideoPositioner
-            {
-                anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
-                videoRotation: resourceHelper.customRotation
-                sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
-
-                item: videoOutput
-
-                VideoOutput
-                {
-                    id: videoOutput
-
-                    player: mediaPlayer
-                    fillMode: VideoOutput.Stretch
-
-                    QnScenePositionListener
-                    {
-                        item: parent
-                        onScenePosChanged:
-                        {
-                            mediaPlayer.videoGeometry = Qt.rect(
-                                scenePos.x,
-                                scenePos.y,
-                                parent.width,
-                                parent.height)
-                        }
-                    }
-
-                    Connections
-                    {
-                        target: cameraItem
-                        onResourceIdChanged: videoOutput.clear()
-                    }
-                }
-            }
-
-            Image
-            {
-                source: thumbnailCacheAccessor.thumbnailUrl
-                anchors.fill: parent
-                fillMode: Qt.KeepAspectRatio
-                visible: source && mediaPlayer.mediaStatus !== MediaPlayer.Loaded
-            }
-
-            MediaPlayer
-            {
-                id: mediaPlayer
-
-                resourceId: cameraItem.resourceId
-                Component.onCompleted:
-                {
-                    if (!paused)
-                        playLive()
-                }
-                videoQuality: MediaPlayer.LowVideoQuality
-                allowOverlay: false
-            }
-
-            Connections
-            {
-                target: cameraItem
-                onPausedChanged:
-                {
-                    if (cameraItem.paused)
-                        mediaPlayer.stop()
-                    else
-                        mediaPlayer.play()
-                }
-            }
-        }
-    }
-
-    WheelSwitchArea
-    {
-        anchors.fill: parent
-        onPreviousRequested: previousCameraRequested()
-        onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel.count
-    }
-
-    MouseArea
-    {
-        id: mouseArea
-        anchors.fill: parent
-        onClicked: cameraItem.clicked()
-        onDoubleClicked: cameraItem.doubleClicked()
-        hoverEnabled: true
-
-        onMouseXChanged: activityDetected()
-        onMouseYChanged: activityDetected()
-    }
-
-    MaterialEffect
-    {
-        clip: true
-        anchors.fill: parent
-        mouseArea: mouseArea
-        rippleSize: width * 2
-    }
-
-    Timer
-    {
-        id: fadeOutTimer
-        interval: 3000
-        onTriggered:
-        {
-            controlsFadeOutAnimation.start()
-        }
-    }
-
     Connections
     {
         target: layoutHelper
         onCameraIdChanged:
         {
-            if (layoutX == x && layoutY == y)
+            if (layoutX === x && layoutY === y)
                 cameraItem.resourceId = resourceId
         }
         onLayoutChanged: updateResourceId()
     }
 
+    onPausedChanged:
+    {
+        if (cameraItem.paused)
+            cameraDisplay.videoScreenController.stop()
+        else
+            cameraDisplay.videoScreenController.start()
+    }
+
     onLayoutHelperChanged: updateResourceId()
     Component.onCompleted: updateResourceId()
     onResourceIdChanged: activityDetected()
+
     onActiveChanged:
     {
         if (active)
@@ -347,10 +160,11 @@ Control
     {
         if (active)
         {
-            controlsFadeOutAnimation.stop()
             controls.opacity = 1.0
+            cameraDisplay.forceActiveFocus()
         }
-        fadeOutTimer.restart()
+
+        controlsFadeOutAnimation.restart()
     }
 
     function updateResourceId()
@@ -359,29 +173,5 @@ Control
             return
 
         resourceId = layoutHelper.cameraIdOnCell(layoutX, layoutY)
-    }
-
-    Keys.onPressed:
-    {
-        activityDetected()
-
-        if (event.modifiers == Qt.ControlModifier)
-        {
-            if (event.key == Qt.Key_Left)
-            {
-                previousCameraRequested()
-                event.accepted = true
-            }
-            else if (event.key == Qt.Key_Right)
-            {
-                nextCameraRequested()
-                event.accepted = true
-            }
-        }
-        else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter)
-        {
-            doubleClicked()
-            event.accepted = true
-        }
     }
 }

@@ -160,6 +160,7 @@ Object
         if (cameraOffline || cameraUnauthorized || resourceId === "")
             return
 
+        mediaPlayer.maxTextureSize = getMaxTextureSize()
         playLive()
     }
 
