@@ -104,33 +104,6 @@ void View::reportPublicListenAddress()
 {
     NX_ASSERT(!m_multiAddressHttpServer->endpoints().empty());
 
-    auto doReport =
-        [this](const SocketAddress& address, const lm& message, utils::log::Level logLevel)
-        {
-            SocketAddress result = address;
-            if (address.address == HostAddress::anyHost)
-            {
-                auto firstAvailableAddress = allLocalAddresses()[0];
-                result = SocketAddress(firstAvailableAddress.toString(), address.port);
-            }
-
-            auto addressString = result.toStdString();
-            NX_UTILS_LOG(logLevel, this, message.arg(addressString));
-
-            try
-            {
-                auto& reportAddressHandler =
-                    dynamic_cast<controller::AbstractReportPublicAddressHandler&>(
-                        m_controller->connectSessionManager());
-
-                reportAddressHandler.onPublicAddressDiscovered(addressString);
-            }
-            catch(const std::exception&)
-            {
-                NX_WARNING(this, "Cast to the AbstractReportPublicAddressHandler failed.");
-            }
-        };
-
     network::PublicIPDiscovery ipDiscovery;
 
     ipDiscovery.update();
@@ -149,31 +122,8 @@ void View::reportPublicListenAddress()
 
     for (const auto& listenAddress: m_multiAddressHttpServer->endpoints())
     {
-        if (listenAddress.toString() == publicAddress.toString())
-        {
-            doReport(
-                listenAddress,
-                lm("Found public address (%1) amongst listen addresses."),
-                utils::log::Level::info);
-
+        if (endpointReportedAsPublic(listenAddress, publicAddress))
             return;
-        }
-
-        if (listenAddress.address == HostAddress::anyHost)
-        {
-            for (const auto& availableAddress: allLocalAddresses())
-            {
-                if (availableAddress == publicAddress)
-                {
-                    doReport(
-                        listenAddress,
-                        lm("Found public address (%1) amongst listen addresses."),
-                        utils::log::Level::info);
-
-                    return;
-                }
-            }
-        }
     }
 
     doReport(
@@ -181,8 +131,65 @@ void View::reportPublicListenAddress()
         lm("Public address discovered but it wasn't be found amongst listen addresses. \
                 Reporting first available (%1)"),
         utils::log::Level::warning);
+}
 
-    return;
+void View::doReport(const SocketAddress& address, const lm& message, utils::log::Level logLevel)
+{
+    SocketAddress result = address;
+    if (address.address == HostAddress::anyHost)
+    {
+        auto firstAvailableAddress = allLocalAddresses()[0];
+        result = SocketAddress(firstAvailableAddress.toString(), address.port);
+    }
+
+    auto addressString = result.toStdString();
+    NX_UTILS_LOG(logLevel, this, message.arg(addressString));
+
+    try
+    {
+        auto& reportAddressHandler =
+            dynamic_cast<controller::AbstractReportPublicAddressHandler&>(
+                m_controller->connectSessionManager());
+
+        reportAddressHandler.onPublicAddressDiscovered(addressString);
+    }
+    catch (const std::exception&)
+    {
+        NX_WARNING(this, "Cast to the AbstractReportPublicAddressHandler failed.");
+    }
+}
+
+bool View::endpointReportedAsPublic(
+    const SocketAddress& listenAddress,
+    const QHostAddress& publicAddress)
+{
+    if (listenAddress.toString() == publicAddress.toString())
+    {
+        doReport(
+            listenAddress,
+            lm("Found public address (%1) amongst listen addresses."),
+            utils::log::Level::info);
+
+        return true;
+    }
+
+    if (listenAddress.address == HostAddress::anyHost)
+    {
+        for (const auto& availableAddress : allLocalAddresses())
+        {
+            if (availableAddress == publicAddress)
+            {
+                doReport(
+                    listenAddress,
+                    lm("Found public address (%1) amongst listen addresses."),
+                    utils::log::Level::info);
+
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 } // namespace relay

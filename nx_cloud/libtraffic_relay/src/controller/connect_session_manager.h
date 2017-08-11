@@ -65,6 +65,7 @@ class AbstractReportPublicAddressHandler
 {
 public:
     virtual void onPublicAddressDiscovered(std::string publicAddress) = 0;
+    virtual ~AbstractReportPublicAddressHandler() = default;
 };
 
 class ConnectSessionManager:
