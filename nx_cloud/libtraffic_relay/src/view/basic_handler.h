@@ -55,9 +55,11 @@ private:
         api::ResultCode resultCode,
         Response ... response)
     {
-        this->requestCompleted(
-            api::resultCodeToFusionRequestResult(resultCode),
-            std::move(response)...);
+        auto requestResult = api::resultCodeToFusionRequestResult(resultCode);
+        if (resultCode == api::ResultCode::needRedirect)
+            requestResult.setHttpStatusCode(nx_http::StatusCode::found);
+
+        this->requestCompleted(requestResult, std::move(response)...);
     }
 
     void onRequestProcessed(

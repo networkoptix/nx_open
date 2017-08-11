@@ -26,12 +26,14 @@ namespace cdb {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
+    nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor,
     AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
     ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
 :
     m_settings(settings),
+    m_sqlQueryExecutor(sqlQueryExecutor),
     m_accountManager(accountManager),
     m_systemSharingManager(systemSharingManager),
     m_temporaryAccountCredentialsManager(temporaryAccountCredentialsManager),
@@ -81,36 +83,30 @@ void AuthenticationProvider::getAuthenticationResponse(
     const data::AuthRequest& authRequest,
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
+    using namespace std::placeholders;
+
     std::string systemId;
     if (!authzInfo.get(attr::authSystemId, &systemId))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
     if (authRequest.realm != AuthenticationManager::realm())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());
 
-    if (!validateNonce(authRequest.nonce, systemId))
-        return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
+    auto isNonceValid = std::make_shared<bool>(false);
+    m_sqlQueryExecutor->executeSelect(
+        std::bind(&AuthenticationProvider::validateNonce, this, _1,
+            authRequest.nonce, systemId, isNonceValid),
+        [this, completionHandler = std::move(completionHandler), systemId, authRequest, isNonceValid](
+            nx::utils::db::QueryContext* /*queryContext*/,
+            nx::utils::db::DBResult dbResult)
+        {
+            if (dbResult != nx::utils::db::DBResult::ok)
+                return completionHandler(api::ResultCode::dbError, api::AuthResponse());
+            if (!(*isNonceValid))
+                return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
 
-    auto accountWithEffectivePassword = getAccountByLogin(authRequest.username);
-    if (!accountWithEffectivePassword)
-        return completionHandler(api::ResultCode::badUsername, api::AuthResponse());
-
-    // TODO: #ak: We should have used authorization rule tree here
-    if (accountWithEffectivePassword->account.statusCode != api::AccountStatus::activated)
-        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
-    auto systemSharingData =
-        m_systemSharingManager->getSystemSharingData(
-            accountWithEffectivePassword->account.email,
-            systemId);
-    if (!systemSharingData)
-        return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
-
-    api::AuthResponse response = 
-        prepareResponse(
-            std::move(authRequest.nonce),
-            std::move(*systemSharingData),
-            std::move(accountWithEffectivePassword->passwordHa1));
-
-    completionHandler(api::ResultCode::ok, std::move(response));
+            auto response = prepareAuthenticationResponse(systemId, authRequest);
+            completionHandler(std::get<0>(response), std::get<1>(response));
+        });
 }
 
 nx::utils::db::DBResult AuthenticationProvider::afterSharingSystem(
@@ -192,26 +188,69 @@ boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
         std::move(passwordHa1)};
 }
 
-bool AuthenticationProvider::validateNonce(
+nx::utils::db::DBResult AuthenticationProvider::validateNonce(
+    nx::utils::db::QueryContext* queryContext,
     const std::string& nonce,
-    const std::string& systemId) const
+    const std::string& systemId,
+    std::shared_ptr<bool> isNonceValid)
 {
     uint32_t timestamp = 0;
     std::string nonceHash;
     if (!api::parseCloudNonceBase(nonce, &timestamp, &nonceHash))
-        return false;
-
-    if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
-        nx::utils::timeSinceEpoch())
     {
-        return false;
+        *isNonceValid = false;
+        return nx::utils::db::DBResult::ok;
     }
 
     const auto calculatedNonceHash = api::calcNonceHash(systemId, timestamp);
     if (nonceHash != calculatedNonceHash)
-        return false;
+    {
+        *isNonceValid = false;
+        return nx::utils::db::DBResult::ok;
+    }
 
-    return true;
+    auto systemNonce = m_authenticationDataObject->fetchSystemNonce(queryContext, systemId);
+    if (systemNonce && *systemNonce == nonce)
+    {
+        // Nonce of the system is valid regardless of expiration time.
+    }
+    else if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
+        nx::utils::timeSinceEpoch())
+    {
+        *isNonceValid = false;
+        return nx::utils::db::DBResult::ok;
+    }
+
+    *isNonceValid = true;
+    return nx::utils::db::DBResult::ok;
+}
+
+std::tuple<api::ResultCode, api::AuthResponse>
+AuthenticationProvider::prepareAuthenticationResponse(
+    const std::string& systemId,
+    const data::AuthRequest& authRequest)
+{
+    auto accountWithEffectivePassword = getAccountByLogin(authRequest.username);
+    if (!accountWithEffectivePassword)
+        return std::make_tuple(api::ResultCode::badUsername, api::AuthResponse());
+
+    // TODO: #ak: We should have used authorization rule tree here
+    if (accountWithEffectivePassword->account.statusCode != api::AccountStatus::activated)
+        return std::make_tuple(api::ResultCode::forbidden, api::AuthResponse());
+    auto systemSharingData =
+        m_systemSharingManager->getSystemSharingData(
+            accountWithEffectivePassword->account.email,
+            systemId);
+    if (!systemSharingData)
+        return std::make_tuple(api::ResultCode::forbidden, api::AuthResponse());
+
+    api::AuthResponse response =
+        prepareResponse(
+            std::move(authRequest.nonce),
+            std::move(*systemSharingData),
+            std::move(accountWithEffectivePassword->passwordHa1));
+
+    return std::make_tuple(api::ResultCode::ok, std::move(response));
 }
 
 api::AuthResponse AuthenticationProvider::prepareResponse(

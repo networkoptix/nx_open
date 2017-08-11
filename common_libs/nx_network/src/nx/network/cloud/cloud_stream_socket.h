@@ -22,8 +22,8 @@ namespace cloud {
 /**
  * Socket that is able to use hole punching (tcp or udp) and mediator to establish connection.
  * Method to use to connect to remote peer is selected depending on route to the peer
- * If connection to peer requires using udp hole punching than this socket uses UDT.
- * NOTE: Actual socket is instanciated only when address is known 
+ * If connection to peer requires using udp hole punching, then this socket uses UDT.
+ * NOTE: Actual socket is instantiated only when address is known 
  *   (AbstractCommunicatingSocket::connect or AbstractCommunicatingSocket::connectAsync)
  */
 class NX_NETWORK_API CloudStreamSocket:

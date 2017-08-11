@@ -52,10 +52,14 @@ struct CreateClientSessionResponse
 {
     std::string sessionId;
     std::chrono::seconds sessionTimeout;
-    std::string redirectHost;
+    std::string redirectUrl;
 };
 
-#define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)(redirectHost)
+#define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)
+
+NX_NETWORK_API bool serializeToHeaders(
+    nx_http::HttpHeaders* where,
+    const CreateClientSessionResponse& what);
 
 struct ConnectToPeerRequest
 {

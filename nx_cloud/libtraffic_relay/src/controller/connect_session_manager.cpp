@@ -1,9 +1,10 @@
+#include <sstream>
+
 #include "connect_session_manager.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
-#include <nx/network/public_ip_discovery.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -33,74 +34,6 @@ ConnectSessionManager::ConnectSessionManager(
     m_trafficRelay(trafficRelay),
     m_remoteRelayPool(std::move(remoteRelayPool))
 {
-    discoverPublicIp();
-
-    nx::utils::SubscriptionId subscriptionId;
-    m_listeningPeerPool->peerConnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_remoteRelayPool->addPeer(peer, m_publicIpString)
-                .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
-                    {
-                        if (addPeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        &subscriptionId);
-
-    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-
-    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_remoteRelayPool->removePeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> removePeerFuture)
-                    {
-                        if (removePeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        &subscriptionId);
-
-    m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-}
-
-void ConnectSessionManager::discoverPublicIp()
-{
-    network::PublicIPDiscovery ipDiscovery;
-    ipDiscovery.update();
-    ipDiscovery.waitForFinished();
-    auto publicAddress = ipDiscovery.publicIP();
-
-    if (publicAddress.isNull())
-    {
-        NX_ERROR(this, "Failed to discover public relay host address.");
-        return;
-    }
-
-    m_publicIpString = publicAddress.toString().toStdString();
 }
 
 ConnectSessionManager::~ConnectSessionManager()
@@ -189,8 +122,8 @@ void ConnectSessionManager::createClientSession(
             request, this](
                 cf::future<std::string> findRelayFuture) mutable
             {
-                response.redirectHost = findRelayFuture.get();
-                if (response.redirectHost.empty())
+                auto redirectHostString = findRelayFuture.get();
+                if (redirectHostString.empty())
                 {
                     NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
                         .arg(request.desiredSessionId)
@@ -199,6 +132,12 @@ void ConnectSessionManager::createClientSession(
 
                     return cf::unit();
                 }
+
+                std::stringstream ss;
+                ss << "http://" << redirectHostString << "/relay/server/"
+                    << request.targetPeerName << "/client_sessions/";
+
+                response.redirectUrl = ss.str();
                 completionHandler(api::ResultCode::needRedirect, std::move(response));
 
                 return cf::unit();
@@ -365,6 +304,66 @@ void ConnectSessionManager::startRelaying(RelaySession relaySession)
         {std::move(listeningPeerChannel), relaySession.listeningPeerName});
 }
 
+void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
+{
+    nx::utils::SubscriptionId subscriptionId;
+    m_listeningPeerPool->peerConnectedSubscription().subscribe(
+        [this, publicAddress = std::move(publicAddress)](std::string peer)
+        {
+            m_remoteRelayPool->addPeer(peer, publicAddress)
+                .then(
+                    [this, peer](cf::future<bool> addPeerFuture)
+                    {
+                        if (addPeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+
+    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
+        [this](std::string peer)
+        {
+            m_remoteRelayPool->removePeer(peer)
+                .then(
+                    [this, peer](cf::future<bool> removePeerFuture)
+                    {
+                        if (removePeerFuture.get())
+                        {
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                                .arg(peer));
+                        }
+
+                        return cf::unit();
+                    });
+        },
+        &subscriptionId);
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // ConnectSessionManagerFactory
 
@@ -379,10 +378,15 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
 
+    auto cassandraHostCStr = settings.cassandraHost().toLatin1().constData();
+    auto remoteRelayPool = std::make_unique<model::RemoteRelayPeerPool>(cassandraHostCStr);
+
     return std::make_unique<ConnectSessionManager>(
-        settings, clientSessionPool, listeningPeerPool, trafficRelay,
-        std::make_unique<model::RemoteRelayPeerPool>(
-            settings.cassandraHost().toLatin1().constData()));
+        settings,
+        clientSessionPool,
+        listeningPeerPool,
+        trafficRelay,
+        std::move(remoteRelayPool));
 }
 
 ConnectSessionManagerFactory::FactoryFunc

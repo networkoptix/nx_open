@@ -44,6 +44,7 @@ private:
         const nx_http::StringType& method);
 
     void startAcceptor();
+    void reportPublicListenAddress();
 };
 
 } // namespace relay

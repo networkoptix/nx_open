@@ -1,31 +1,37 @@
+#include <array>
+
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 
+#include <nx/cloud/cdb/client/data/auth_data.h>
 #include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
 #include <nx/cloud/cdb/ec2/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/authentication_provider.h>
 #include <nx/cloud/cdb/settings.h>
+#include <nx/cloud/cdb/stree/cdb_ns.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "account_manager_stub.h"
+#include "base_persistent_data_test.h"
 #include "system_sharing_manager_stub.h"
-#include "vms_p2p_command_bus_stub.h"
 #include "temporary_account_password_manager_stub.h"
+#include "vms_p2p_command_bus_stub.h"
 
 namespace nx {
 namespace cdb {
 namespace test {
 
 class AuthenticationProvider:
-    public ::testing::Test
+    public ::testing::Test,
+    public BasePersistentDataTest
 {
 public:
     AuthenticationProvider()
@@ -35,6 +41,9 @@ public:
         m_factoryBak = dao::UserAuthenticationDataObjectFactory::instance().setCustomFunc(
             std::bind(&AuthenticationProvider::createUserAuthenticationDao, this));
 
+        std::array<const char*, 1U> args{"--auth/nonceValidityPeriod=1ms"};
+        m_settings.load(args.size(), args.data());
+
         prepareTestData();
         
         m_vmsP2pCommandBusStub.setOnSaveResourceAttribute(
@@ -42,6 +51,7 @@ public:
 
         m_authenticationProvider = std::make_unique<cdb::AuthenticationProvider>(
             m_settings,
+            &queryExecutor(),
             &m_accountManager,
             &m_systemSharingManager,
             m_temporaryAccountPasswordManager,
@@ -68,6 +78,12 @@ protected:
                 m_ownerAccount.email,
                 api::SystemAccessRole::owner);
         }
+    }
+
+    void givenSystemWithNonce()
+    {
+        // Nonce is created for sure while sharing.
+        whenSharingSystem();
     }
 
     void whenSharingSystem()
@@ -115,6 +131,33 @@ protected:
                 nullptr, m_ownerAccount));
     }
 
+    void whenGeneratedNonceTimeoutHasExpired()
+    {
+        std::this_thread::sleep_for(
+            m_settings.auth().nonceValidityPeriod + std::chrono::seconds(1));
+    }
+
+    void whenRequestAuthenticationResponse()
+    {
+        using namespace std::placeholders;
+
+        nx::utils::stree::ResourceContainer rc;
+        rc.put(nx::cdb::attr::authSystemId, QString::fromStdString(m_systems[0].id));
+
+        const auto nonce = m_userAuthenticationDao->fetchSystemNonce(
+            nullptr, m_systems[0].id);
+
+        data::AuthRequest authRequest;
+        authRequest.nonce = *nonce;
+        authRequest.realm = nx::network::AppInfo::realm().toStdString();
+        authRequest.username = m_ownerAccount.email;
+
+        m_authenticationProvider->getAuthenticationResponse(
+            AuthorizationInfo(std::move(rc)),
+            authRequest,
+            std::bind(&AuthenticationProvider::saveAuthenticationResponse, this, _1, _2));
+    }
+
     void thenValidAuthRecordIsGenerated()
     {
         assertUserAuthRecordsAreValidForSystem(m_systems[0].id);
@@ -159,6 +202,18 @@ protected:
             assertUserAuthRecordsAreValidForSystem(system.id);
     }
 
+    void thenAuthenticationResponseIsProvided()
+    {
+        auto authResponse = m_authResponses.pop();
+        ASSERT_EQ(api::ResultCode::ok, std::get<0>(authResponse));
+    }
+
+    void thenSystemNonceIsValidForAuthentication()
+    {
+        whenRequestAuthenticationResponse();
+        thenAuthenticationResponseIsProvided();
+    }
+
 private:
     conf::Settings m_settings;
     AccountManagerStub m_accountManager;
@@ -175,6 +230,7 @@ private:
     std::map<
         std::pair<std::string, QnUuid>,
         api::AuthInfo> m_updateUserAuthInfoTransactions;
+    nx::utils::SyncQueue<std::tuple<api::ResultCode, api::AuthResponse>> m_authResponses;
 
     std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
     {
@@ -210,11 +266,13 @@ private:
         const std::string& email,
         api::SystemAccessRole accessRole)
     {
-        api::SystemSharing sharing;
+        api::SystemSharingEx sharing;
         sharing.systemId = systemId;
         sharing.accountEmail = email;
         sharing.accessRole = accessRole;
         sharing.vmsUserId = guidFromArbitraryData(email).toSimpleByteArray().toStdString();
+
+        m_systemSharingManager.add(sharing);
 
         ASSERT_EQ(
             nx::utils::db::DBResult::ok,
@@ -275,6 +333,13 @@ private:
             nx::utils::floor<milliseconds>(
                 nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod));
     }
+
+    void saveAuthenticationResponse(
+        api::ResultCode resultCode,
+        api::AuthResponse authResponse)
+    {
+        m_authResponses.push(std::make_tuple(resultCode, authResponse));
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -318,7 +383,12 @@ TEST_F(AuthenticationProvider, each_system_auth_hash_is_updated_on_account_passw
     thenHashForEverySystemHasBeenGenerated();
 }
 
-// TEST_F(AuthenticationProvider, )
+TEST_F(AuthenticationProvider, system_nonce_is_always_valid)
+{
+    givenSystemWithNonce();
+    whenGeneratedNonceTimeoutHasExpired();
+    thenSystemNonceIsValidForAuthentication();
+}
 
 } // namespace test
 } // namespace cdb
