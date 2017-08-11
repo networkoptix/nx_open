@@ -59,7 +59,7 @@ angular.module('nxCommon')
                         replace("{{resolution}}", scope.resolution);
                 };
 
-                scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'webm' : 'hls'});
+                scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'WEBM' : 'HLS'});
 
             }
         };

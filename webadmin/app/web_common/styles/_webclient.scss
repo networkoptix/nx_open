@@ -473,14 +473,33 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.camera-links-panel{
-  background-color: $additional_light2;
-  margin: 48px 0 0 10px;
-  position: absolute;
-  z-index: 1;
-}
-.camera-links-panel>.close{
-  padding: 2px 6px 3px 6px;
+.camera-links{
+  &-panel{
+    background-color: $additional_light2;
+    margin: 40px 0 0 10px;
+    position: absolute;
+    padding: 10px;
+    z-index: 1;
+
+    & table{
+      font-size: 12px;
+    }
+  }
+
+  &-break{
+    height: 4px;
+    border-bottom: 1px solid $light6;
+  }
+
+  &-title{
+    font-size: 14px;
+    font-weight: 500;
+    color: $dark9;
+  }
+  &-info{
+    font-weight: 400;
+    color: $light16;
+  }
 }
 
 /* View */
