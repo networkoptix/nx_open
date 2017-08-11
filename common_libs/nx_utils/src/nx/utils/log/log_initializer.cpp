@@ -19,11 +19,11 @@ void initialize(
     const QString& baseName,
     std::shared_ptr<Logger> logger)
 {
+    if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
+        return;
+
     if (!logger)
         logger = mainLogger();
-
-    if (settings.level.primary == Level::undefined)
-        return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
@@ -36,7 +36,8 @@ void initialize(
             fileSettings.size = settings.maxFileSize;
             fileSettings.count = settings.maxBackupCount;
             fileSettings.name = settings.directory.isEmpty()
-                ? baseName : (settings.directory + lit("/") + baseName);
+                ? baseName
+                : (settings.directory + lit("/") + baseName);
 
             logger->setWriter(std::make_unique<File>(fileSettings));
         }

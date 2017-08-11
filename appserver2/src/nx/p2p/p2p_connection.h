@@ -12,19 +12,23 @@ public:
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        ConnectionLockGuard connectionLockGuard,
         const QUrl& remotePeerUrl,
-        std::unique_ptr<QObject> opaqueObject);
+        std::unique_ptr<QObject> opaqueObject,
+        ConnectionLockGuard connectionLockGuard);
     Connection(
         QnCommonModule* commonModule,
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
-        ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
         const Qn::UserAccessData& userAccessData,
-        std::unique_ptr<QObject> opaqueObject);
+        std::unique_ptr<QObject> opaqueObject,
+        ConnectionLockGuard connectionLockGuard);
+
+    const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
 protected:
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
+private:
+    const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 };
 
 } // namespace p2p

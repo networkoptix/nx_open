@@ -31,6 +31,9 @@ Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     m_appserver2.addArg(dbFileArg.toStdString().c_str());
+
+    const QString p2pModeArg = lit("--p2pMode=%1").arg(GetParam().p2pMode ? 1 : 0);
+    m_appserver2.addArg(p2pModeArg.toStdString().c_str());
 }
 
 Ec2MserverCloudSynchronization::~Ec2MserverCloudSynchronization()

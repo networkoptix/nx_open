@@ -36,6 +36,12 @@ public:
         TimelineButtonsShow,
         TimelineButtonsHide,
 
+        SpeedTooltipShow,
+        SpeedTooltipHide,
+
+        VolumeTooltipShow,
+        VolumeTooltipHide,
+
         ResourcesPanelExpand,
         ResourcesPanelCollapse,
         ResourcesPanelTooltipShow,

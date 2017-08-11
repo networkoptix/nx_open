@@ -942,6 +942,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -2561,7 +2563,8 @@ void MediaServerProcess::run()
         getConnectionFactory(
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
-            commonModule()));
+            commonModule(),
+            settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));

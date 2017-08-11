@@ -56,6 +56,9 @@ angular.module('nxCommon')
         ServerConnection.prototype.connect = connect;
 
 
+        function cleanId(id){
+            return id.replace('{','').replace('}','');
+        }
         /* Helpers */
         ServerConnection.prototype._getUrlBase = function(){
             var urlBase = '';
@@ -172,9 +175,19 @@ angular.module('nxCommon')
             return this.userRequest;
         };
 
+        ServerConnection.prototype.getRolePermissions = function(roleId) {
+            return this._get('/ec2/getUserRoles', {id:roleId});
+        };
+
         ServerConnection.prototype.checkPermissions = function(flag){
             // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
+            var self = this;
             return this.getCurrentUser().then(function(user) {
+                if(!user.isAdmin && user.userRoleId){
+                    return self.getRolePermissions(user.userRoleId).then(function(role){
+                        return role.data[0].permissions.indexOf(flag)>=0;
+                    });
+                }
                 return user.isAdmin ||
                        user.permissions.indexOf(flag)>=0;
             });
@@ -270,9 +283,9 @@ angular.module('nxCommon')
         /* End of Cameras and Servers */
 
         /* Formatting urls */
-        ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
+        ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
-                    physicalId:cameraPhysicalId,
+                    cameraId:cleanId(cameraId),
                     time:time  || 'LATEST'
                 };
 
@@ -289,7 +302,7 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/hls/' + cameraId + '.m3u8?' + resolution, data, this.authGet());
+            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet());
         };
         ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
             var data = {
@@ -298,12 +311,12 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/media/' + cameraId + '.webm?rt' , data, this.authGet());
+            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet());
         };
         /* End of formatting urls */
 
         /* Working with archive*/
-        ServerConnection.prototype.getRecords = function(physicalId, startTime, endTime, detail, limit, label, periodsType){
+        ServerConnection.prototype.getRecords = function(cameraId, startTime, endTime, detail, limit, label, periodsType){
             var d = new Date();
             if(typeof(startTime)==='undefined'){
                 startTime = d.getTime() - 30*24*60*60*1000;
@@ -319,7 +332,7 @@ angular.module('nxCommon')
                 periodsType = 0;
             }
             var params={
-                physicalId: physicalId,
+                cameraId: cleanId(cameraId),
                 startTime: startTime,
                 endTime: endTime,
                 detail: detail,
@@ -338,7 +351,7 @@ angular.module('nxCommon')
             if(this.systemId){
                 systemLink = '/systems/' + this.systemId;
             }
-            $location.path(systemLink + '/view/' + cameraId, false);
+            $location.path(systemLink + '/view/' + cleanId(cameraId), false);
         };
 
         if(Config.webadminSystemApiCompatibility){

@@ -38,6 +38,9 @@ Level levelFromString(const QString& levelString)
     if (level == lit("verbose") || level == lit("debug2") || level == lit("v"))
         return Level::verbose;
 
+    if (level == lit("notconfigured") || level == lit("not_configured"))
+        return Level::notConfigured;
+
     return Level::undefined;
 }
 
@@ -68,10 +71,13 @@ QString toString(Level level)
 
         case Level::verbose:
             return QLatin1String("verbose");
+
+        case Level::notConfigured:
+            return QLatin1String("notConfigured");
     };
 
     NX_ASSERT(false, lm("Unknown level: %1").arg(static_cast<int>(level)));
-    return QLatin1String("unknown");
+    return lm("unknown(%1)").arg(static_cast<int>(level));
 }
 
 

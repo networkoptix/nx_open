@@ -9,6 +9,7 @@ win* {
 
 SOURCES += ${project.build.directory}/libcloud_db_app_info_impl.cpp
 
+# boost-1.60 produces strict aliasing warnings when compiled with gcc 7.1. Probably, boost upgrade will help.
 linux {
-    QMAKE_CXXFLAGS += -Werror
+    QMAKE_CXXFLAGS += -Werror -Wno-error=strict-aliasing
 }

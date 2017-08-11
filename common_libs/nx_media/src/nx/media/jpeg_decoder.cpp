@@ -8,7 +8,7 @@ namespace media {
 //-------------------------------------------------------------------------------------------------
 // JpegDecoderPrivate
 
-class JpegDecoderPrivate : public QObject
+class JpegDecoderPrivate: public QObject
 {
 public:
     JpegDecoderPrivate(): frameNumber(0) {}
@@ -18,13 +18,13 @@ public:
 //-------------------------------------------------------------------------------------------------
 // JpegDecoder
 
-JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
-:
+JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/):
     d_ptr(new JpegDecoderPrivate())
 {
 }
 
-bool JpegDecoder::isCompatible(const AVCodecID codec, const QSize& /*resolution*/)
+bool JpegDecoder::isCompatible(
+    const AVCodecID codec, const QSize& /*resolution*/, bool /*allowOverlay*/)
 {
     return codec == AV_CODEC_ID_MJPEG;
 }

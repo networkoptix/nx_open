@@ -12,8 +12,16 @@
 namespace nx {
 namespace cdb {
 
+struct TestParams
+{
+    TestParams() {}
+    TestParams(bool p2pMode): p2pMode(p2pMode) {}
+
+    bool p2pMode = false;
+};
+
 class Ec2MserverCloudSynchronization:
-    public ::testing::Test
+    public ::testing::TestWithParam<TestParams>
 {
 public:
     Ec2MserverCloudSynchronization();

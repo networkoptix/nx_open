@@ -1577,7 +1577,7 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         else
         {
             isSuccessful = false;
-            NX_LOG(lit("Failed to execute params query. Param: %1, device: %2 (%3), result: %3")
+            NX_LOG(lit("Failed to execute params query. Param: %1, device: %2 (%3), result: %4")
                 .arg(query)
                 .arg(getModel())
                 .arg(getHostAddress())

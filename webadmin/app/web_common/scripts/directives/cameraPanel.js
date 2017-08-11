@@ -10,7 +10,8 @@ angular.module('nxCommon')
                 "system": "=",
                 "currentResolution": "=",
                 "positionProvider": "=",
-                "toggleCameraPanel": "="
+                "showCameraPanel": "=",
+                "cameraLinksEnabled": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
@@ -32,8 +33,8 @@ angular.module('nxCommon')
                 
 
                 scope.selectCamera = function (activeCamera) {
-                    scope.toggleCameraPanel = false;
-                    if(scope.activeCamera && (scope.activeCamera.id === activeCamera.id || scope.activeCamera.physicalId === activeCamera)){
+                    scope.showCameraPanel = false;
+                    if(scope.activeCamera && (scope.activeCamera.id === activeCamera)){
                         return;
                     }
                     scope.activeCamera = activeCamera;

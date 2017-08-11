@@ -28,6 +28,10 @@ public:
     };
     Q_DECLARE_FLAGS(Controls, Control);
 
+    virtual void paint(QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
     void setVisibleControls(Controls controls);
 
     void setIconOverlayPixmap(const QPixmap& pixmap);

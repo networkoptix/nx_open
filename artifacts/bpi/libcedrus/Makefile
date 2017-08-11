@@ -6,7 +6,7 @@ LDFLAGS ?=
 LIBS = -lpthread
 CC ?= gcc
 
-prefix ?= /usr/local
+prefix ?= usr/local
 libdir ?= $(prefix)/lib
 includedir ?= $(prefix)/include
 
@@ -37,6 +37,7 @@ clean:
 install: $(TARGET) $(INC)
 	install -D $(TARGET) $(DESTDIR)/$(libdir)/$(TARGET)
 	ln -sf $(TARGET) $(DESTDIR)/$(libdir)/$(basename $(TARGET))
+	mkdir -p $(DESTDIR)/$(includedir)/cedrus
 	install -D -t $(DESTDIR)/$(includedir)/cedrus/ $(INC)
 
 uninstall:

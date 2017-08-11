@@ -36,14 +36,42 @@
  * and maybe some other values.
  */
 
+struct JsonRestResponse
+{
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    QnJsonRestResult json;
+    bool isUndefinedContentLength = false;
+
+    JsonRestResponse(nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined,
+        QnJsonRestResult json = {}, bool isUndefinedContentLength = false);
+
+    RestResponse toRest(bool extraFormatting) const;
+};
+
+struct JsonRestRequest
+{
+    QString path;
+    QnRequestParams params;
+    const QnRestConnectionProcessor* owner = nullptr;
+
+    JsonRestRequest(const RestRequest& rest);
+    JsonRestRequest(QString path, const QnRequestParams& params, const QnRestConnectionProcessor* owner);
+};
+
 class QnJsonRestHandler: public QnRestRequestHandler
 {
     Q_OBJECT
 
 public:
-    QnJsonRestHandler();
-    virtual ~QnJsonRestHandler();
+    virtual ~QnJsonRestHandler() = default;
 
+    // Interface to implement by inheritors:
+    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
+    virtual JsonRestResponse executeDelete(const JsonRestRequest& request);
+    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+    virtual JsonRestResponse executePut(const JsonRestRequest& request, const QByteArray& body);
+
+    // Old style interface for compatability:
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);
@@ -61,23 +89,44 @@ public:
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
 
 protected:
+    // QnRestRequestHandler interface implemenation:
+    RestResponse executeGet(const RestRequest& request) override final;
+    RestResponse executeDelete(const RestRequest& request) override final;
+    RestResponse executePost(const RestRequest& request, const RestContent& content) override final;
+    RestResponse executePut(const RestRequest& request, const RestContent& content) override final;
+
+    // QnRestRequestHandler old interface locks:
     virtual int executeGet(
-        const QString& path, const QnRequestParamList& params, QByteArray& result,
-        QByteArray& contentType, const QnRestConnectionProcessor* owner) override final;
+        const QString& path,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
+        const QnRestConnectionProcessor* owner) override final;
 
     virtual int executeDelete(
-        const QString& path, const QnRequestParamList& params, QByteArray& result,
-        QByteArray& contentType, const QnRestConnectionProcessor* owner) override final;
+        const QString& path,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
+        const QnRestConnectionProcessor* owner) override final;
 
     virtual int executePost(
-        const QString& path, const QnRequestParamList& params, const QByteArray& body,
-        const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType,
-        const QnRestConnectionProcessor* owner) override;
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QByteArray& srcBodyContentType,
+        QByteArray& result,
+        QByteArray& resultContentType,
+        const QnRestConnectionProcessor* owner) override final;
 
     virtual int executePut(
-        const QString& path, const QnRequestParamList& params, const QByteArray& body,
-        const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType,
-        const QnRestConnectionProcessor* owner) override;
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QByteArray& srcBodyContentType,
+        QByteArray& result,
+        QByteArray& resultContentType,
+        const QnRestConnectionProcessor* owner) override final;
 
     template<class T>
     bool requireParameter(
@@ -112,7 +161,4 @@ protected:
 
 private:
     QnRequestParams processParams(const QnRequestParamList& params) const;
-
-private:
-    QByteArray m_contentType;
 };

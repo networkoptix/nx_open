@@ -120,7 +120,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -440,7 +441,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     {
         int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+            logFileNameSuffix = L'_' + QString::number(idx);
     }
 
     if (logLevel.isEmpty())

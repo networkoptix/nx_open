@@ -18,6 +18,7 @@
                 <include>libvorbis*.dll</include>
                 <include>nx_network.dll</include>
                 <include>nx_utils.dll</include>
+                <include>nx_kit.dll</include>
 
                 <include>swresample*.dll</include>
                 <include>swscale*.dll</include>
@@ -37,7 +38,7 @@
                 <include>Qt5Sql.dll</include>
                 <include>Qt5Xml.dll</include>
             </includes>
-        </fileSet>        
+        </fileSet>
         <fileSet>
             <directory>${VC14RedistPath}/bin</directory>
             <outputDirectory>..</outputDirectory>

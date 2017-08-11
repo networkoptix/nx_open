@@ -673,6 +673,12 @@ module.exports = function (grunt) {
                 branch:'',
                 command: 'python ../../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
             },
+            up_3_2:{
+                command: 'hg up vms_3.2_dev'
+            },
+            up_3_1:{
+                command: 'hg up vms_3.1_web'
+            },
             version: {
                 command: 'hg parent > dist/version.txt'
             },
@@ -880,6 +886,19 @@ module.exports = function (grunt) {
         grunt.task.run([
             'pull:' + branch,
             'push:' + branch
+        ]);
+    });
+
+
+
+    grunt.registerTask('pushdef', function(branch){
+        grunt.task.run([
+            'pull:vms_3.1',
+            'push:vms_3.1',
+            'shell:up_3_2',
+            'pull:vms_3.1',
+            'push:default',
+            'shell:up_3_1'
         ]);
     });
 };

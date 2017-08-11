@@ -8,7 +8,6 @@ QnHudOverlayWidget::QnHudOverlayWidget(QGraphicsItem* parent):
     d_ptr(new QnHudOverlayWidgetPrivate(this))
 {
     setAcceptedMouseButtons(Qt::NoButton);
-    setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 }
 
 QnHudOverlayWidget::~QnHudOverlayWidget()

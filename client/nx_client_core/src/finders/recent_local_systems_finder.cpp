@@ -52,13 +52,13 @@ void QnRecentLocalSystemsFinder::updateSystems()
 
         const auto connection = it.value();
 
-        const bool onlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
+        const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
             [](const QUrl& url)
             {
                 return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
             });
 
-        if (onlyCloudUrls)
+        if (hasOnlyCloudUrls)
             continue;
 
         const auto system = QnLocalSystemDescription::create(

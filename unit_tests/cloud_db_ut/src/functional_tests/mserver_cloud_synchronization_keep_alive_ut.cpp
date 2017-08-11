@@ -31,7 +31,7 @@ protected:
         test::KeepAlivePolicy keepAlivePolicy);
 };
 
-TEST_F(Ec2MserverCloudSynchronizationKeepAlive, connection_break)
+TEST_P(Ec2MserverCloudSynchronizationKeepAlive, connection_break)
 {
     testTransactionConnectionKeepAlive(test::KeepAlivePolicy::noKeepAlive);
 
@@ -43,7 +43,7 @@ TEST_F(Ec2MserverCloudSynchronizationKeepAlive, connection_break)
             m_connectionInactivityTimeout + allowedConnectionClosureTimeError));
 }
 
-TEST_F(Ec2MserverCloudSynchronizationKeepAlive, works)
+TEST_P(Ec2MserverCloudSynchronizationKeepAlive, works)
 {
     testTransactionConnectionKeepAlive(test::KeepAlivePolicy::enableKeepAlive);
 
@@ -87,6 +87,10 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
             m_connectionId,
             timeForConnectionToChangeState));
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, Ec2MserverCloudSynchronizationKeepAlive,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
 
 } // namespace cdb
 } // namespace nx

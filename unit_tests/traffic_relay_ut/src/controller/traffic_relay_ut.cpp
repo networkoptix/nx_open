@@ -90,7 +90,7 @@ protected:
 private:
     struct ChannelContext
     {
-        utils::bstream::ReflectingPipeline input;
+        utils::bstream::Pipe input;
         utils::bstream::test::NotifyingOutput output;
         std::unique_ptr<AsyncChannel> channel;
         AsyncChannel* channelPtr;

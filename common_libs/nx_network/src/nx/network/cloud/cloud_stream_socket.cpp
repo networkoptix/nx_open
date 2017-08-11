@@ -18,8 +18,7 @@ CloudStreamSocket::CloudStreamSocket(int ipVersion):
     m_terminated(false),
     m_ipVersion(ipVersion)
 {
-    //TODO #ak user MUST be able to bind this object to any aio thread
-    //getAioThread binds to an aio thread
+    // TODO: #ak User MUST be able to bind this object to any aio thread
     m_socketAttributes.aioThread = m_aioThreadBinder.getAioThread();
 
     bindToAioThread(m_aioThreadBinder.getAioThread());
@@ -54,8 +53,8 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
-    //TODO #ak just ignoring for now. 
-        //Usually, we do not care about exact port on tcp client socket
+    // TODO: #ak just ignoring for now. 
+    // Usually, we do not care about exact port on tcp client socket.
     static_cast<void>(localAddress);
     return true;
 }
@@ -94,7 +93,7 @@ bool CloudStreamSocket::shutdown()
         m_terminated = true;
     }
 
-    //interrupting blocking calls
+    // Interrupting blocking calls.
     nx::utils::promise<void> stoppedPromise;
     pleaseStop(
         [this, &stoppedPromise]()
@@ -163,7 +162,7 @@ bool CloudStreamSocket::connect(
         remoteAddress,
         [this, &promise](SystemError::ErrorCode code)
         {
-            //to ensure that socket is not used by aio sub-system anymore, we use post
+            // We use post to ensure that socket is not used by aio sub-system anymore.
             m_writeIoBinder.post(
                 [this, code]()
                 {
@@ -414,7 +413,7 @@ SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
 
     if (!m_socketAttributes.nonBlockingMode)
     {
-        //restoring default non blocking mode on socket
+        // Restoring default non-blocking mode on socket.
         if (!streamSocket->setNonBlockingMode(false))
         {
             errorCode = SystemError::getLastOSErrorCode();
@@ -459,11 +458,11 @@ void CloudStreamSocket::cancelIoWhileInAioThread(aio::EventType eventType)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
     {
-        m_asyncConnectGuard->terminate(); // Breaks outgoing connects.
+        m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
         nx::network::SocketGlobals::addressResolver().cancel(this);
     }
 
-    if (eventType == aio::etNone)   // It means we need to cancel all I/O.
+    if (eventType == aio::etNone)   //< It means we need to cancel all I/O.
         m_aioThreadBinder.pleaseStopSync();
 
     if (eventType == aio::etNone || eventType == aio::etTimedOut)
@@ -484,7 +483,7 @@ void CloudStreamSocket::cancelIoWhileInAioThread(aio::EventType eventType)
 
 void CloudStreamSocket::stopWhileInAioThread()
 {
-    m_asyncConnectGuard->terminate(); // Breaks outgoing connects.
+    m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
     nx::network::SocketGlobals::addressResolver().cancel(this);
 
     m_timer.pleaseStopSync();

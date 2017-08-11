@@ -307,6 +307,12 @@ void CloudDbService::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
+        nx_http::Method::get,
+        kEstablishEc2P2pTransactionConnectionPath,
+        &ec2::ConnectionManager::createWebsocketTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
         //api::kPushEc2TransactionPath,
         nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
@@ -418,6 +424,24 @@ void CloudDbService::registerHttpHandler(
         {
             return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
         });
+}
+
+template<typename ManagerType>
+void CloudDbService::registerHttpHandler(
+    nx_http::Method::ValueType method,
+    const char* handlerPath,
+    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+    ManagerType* manager)
+{
+    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
+        handlerPath,
+        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+        {
+            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+        },
+        method);
 }
 
 } // namespace cdb

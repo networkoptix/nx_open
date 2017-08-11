@@ -16,6 +16,7 @@
 #include <controller/traffic_relay.h>
 #include <model/client_session_pool.h>
 #include <model/listening_peer_pool.h>
+#include <model/remote_relay_peer_pool.h>
 #include <settings.h>
 
 #include "../settings_loader.h"
@@ -45,18 +46,18 @@ public:
         AbstractStreamSocket* serverConnection,
         const std::string& listeningPeerName) const
     {
-        using AdapterType = 
+        using AdapterType =
             nx::network::aio::AsyncChannelAdapter<
                 std::unique_ptr<AbstractStreamSocket>>;
 
         for (const auto& relaySession: m_relaySessions)
         {
-            // TODO: #ak Get rid of conversion to AdapterType 
+            // TODO: #ak Get rid of conversion to AdapterType
             //   when AbstractStreamSocket inherits AbstractAsyncChannel.
 
-            auto clientConnectionAdapter = 
+            auto clientConnectionAdapter =
                 dynamic_cast<AdapterType*>(relaySession.clientConnection.connection.get());
-            auto serverConnectionAdapter = 
+            auto serverConnectionAdapter =
                 dynamic_cast<AdapterType*>(relaySession.serverConnection.connection.get());
 
             if (clientConnectionAdapter->adaptee().get() == clientConnection &&
@@ -84,7 +85,7 @@ private:
 
 static constexpr int kMaxPreemptiveConnectionCount = 7;
 static constexpr int kRecommendedPreemptiveConnectionCount = 4;
-static constexpr std::chrono::seconds kConnectSessionIdleTimeout = 
+static constexpr std::chrono::seconds kConnectSessionIdleTimeout =
     std::chrono::seconds(11);
 
 class ConnectSessionManager:
@@ -267,6 +268,13 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
+        return customConnectSessionManager(
+            std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
+    }
+
+    controller::ConnectSessionManager& customConnectSessionManager(
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPeerPool)
+    {
         if (!m_connectSessionManager)
         {
             m_settingsLoader.load();
@@ -276,7 +284,8 @@ protected:
                     m_settingsLoader.settings(),
                     &clientSessionPool(),
                     &listeningPeerPool(),
-                    &m_trafficRelayStub);
+                    &m_trafficRelayStub,
+                    std::move(remoteRelayPeerPool));
         }
 
         return *m_connectSessionManager;
@@ -288,7 +297,7 @@ protected:
         {
             m_settingsLoader.load();
 
-            m_listeningPeerPool = 
+            m_listeningPeerPool =
                 std::make_unique<model::ListeningPeerPool>(
                     m_settingsLoader.settings());
         }
@@ -476,7 +485,7 @@ protected:
     {
         issueCreateSession(std::string());
     }
-    
+
     void whenIssuedCreateSessionWithAlreadyUsedId()
     {
         whenIssuedCreateSessionWithPredefinedId();
