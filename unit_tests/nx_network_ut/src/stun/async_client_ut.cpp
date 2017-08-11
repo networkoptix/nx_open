@@ -337,7 +337,7 @@ TEST_F(StunClient, only_proper_url_scheme_is_supported)
 {
     givenRegularStunServer();
 
-    assertConnectFailsIfUrlSchemeIs(nx_http::kUrlSchemeName.latin1());
+    assertConnectFailsIfUrlSchemeIs(nx_http::kUrlSchemeName);
     assertConnectSucceededIfUrlSchemeIs(nx::stun::kUrlSchemeName);
     assertConnectSucceededIfUrlSchemeIs(nx::stun::kSecureUrlSchemeName);
 }

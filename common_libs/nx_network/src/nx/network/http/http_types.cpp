@@ -16,8 +16,8 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http {
 
-const QLatin1String kUrlSchemeName("http");
-const QLatin1String kSecureUrlSchemeName("https");
+const char* const kUrlSchemeName("http");
+const char* const kSecureUrlSchemeName("https");
 
 int strcasecmp(const StringType& one, const StringType& two)
 {
@@ -34,9 +34,9 @@ int strcasecmp(const StringType& one, const StringType& two)
 
 int defaultPortForScheme(const StringType& scheme)
 {
-    if (strcasecmp(scheme, StringType(kUrlSchemeName.latin1())) == 0)
+    if (strcasecmp(scheme, StringType(kUrlSchemeName)) == 0)
         return DEFAULT_HTTP_PORT;
-    if (strcasecmp(scheme, StringType(kSecureUrlSchemeName.latin1())) == 0)
+    if (strcasecmp(scheme, StringType(kSecureUrlSchemeName)) == 0)
         return DEFAULT_HTTPS_PORT;
     return -1;
 }
