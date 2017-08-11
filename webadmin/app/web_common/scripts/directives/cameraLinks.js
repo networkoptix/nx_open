@@ -23,6 +23,7 @@ angular.module('nxCommon')
                 scope.duration = 5*60;
                 scope.resolution = '640p';
                 scope.useAuth = true;
+                scope.clipboardSupported = true; // presume
 
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
