@@ -1,4 +1,4 @@
-#include "client_video_camera_export_tool.h"
+#include "camera_export_tool.h"
 
 #include <core/resource/media_resource.h>
 

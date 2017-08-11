@@ -5,6 +5,9 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+//TODO: #GDM #export move private to pimpl
+#include <nx/client/desktop/export/data/layout_export_settings.h>
+
 class QnTimePeriod;
 class QnAbstractStreamDataProvider;
 class QnMediaResourceWidget;
@@ -12,6 +15,7 @@ class QnMediaResourceWidget;
 namespace nx {
 namespace client {
 namespace desktop {
+namespace ui {
 
 /**
  * @brief Handler for video and layout export related actions.
@@ -28,13 +32,11 @@ public:
 private:
     bool saveLocalLayout(const QnLayoutResourcePtr& layout,
         bool readOnly,
-        bool cancellable,
-        QObject *target = NULL,
-        const char *slot = NULL);
+        bool cancellable);
 
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod,
         const QnLayoutResourcePtr& layout,
-        Qn::LayoutExportMode mode);
+        LayoutExportSettings::Mode mode);
 
     QString binaryFilterName() const;
 
@@ -43,11 +45,9 @@ private:
     bool saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
         const QnTimePeriod& exportPeriod,
         const QString& layoutFileName,
-        Qn::LayoutExportMode mode,
+        LayoutExportSettings::Mode mode,
         bool readOnly,
-        bool cancellable,
-        QObject *target = NULL,
-        const char *slot = NULL);
+        bool cancellable);
 
     bool lockFile(const QString &filename);
     void unlockFile(const QString &filename);
@@ -97,6 +97,7 @@ private:
     QSet<QString> m_filesIsUse;
 };
 
+} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
