@@ -19,6 +19,7 @@ Object
     readonly property bool cameraUnauthorized:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
+    readonly property bool noVideoStreams: mediaPlayer.noVideoStreams
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
 
@@ -30,6 +31,8 @@ Object
             return "cameraUnauthorized"
         else if (cameraOffline)
             return "cameraOffline"
+        else if (noVideoStreams)
+            return "noVideoStreams"
         else if (failed)
             return "videoLoadingFailed"
         else
@@ -182,6 +185,7 @@ Object
     function pause()
     {
         mediaPlayer.pause()
+        d.savePosition();
     }
 
     function preview()

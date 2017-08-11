@@ -65,13 +65,6 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
-    virtual bool connectWithoutEncryption(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-    virtual bool enableClientEncryption() override;
-    virtual bool isEncryptionEnabled() const override;
-
     virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
@@ -79,22 +72,6 @@ public:
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
 
-    virtual QString idForToStringFromPtr() const override;
-
-protected:
-    Q_DECLARE_PRIVATE(SslSocket);
-    SslSocketPrivate *d_ptr;
-
-    SslSocket(
-        SslSocketPrivate* priv,
-        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
-        bool isServerSide,
-        bool encriptionEnforced);
-
-    int recvInternal(void* buffer, unsigned int bufferLen, int flags);
-    int sendInternal(const void* buffer, unsigned int bufferLen);
-
-public:
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
@@ -111,11 +88,31 @@ public:
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    virtual bool isEncryptionEnabled() const override;
+
+    virtual QString idForToStringFromPtr() const override;
+
+protected:
+    Q_DECLARE_PRIVATE(SslSocket);
+    SslSocketPrivate *d_ptr;
+
+    SslSocket(
+        SslSocketPrivate* priv,
+        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+        bool isServerSide,
+        bool encriptionEnforced);
+
+    int recvInternal(void* buffer, unsigned int bufferLen, int flags);
+    int sendInternal(const void* buffer, unsigned int bufferLen);
+
 private:
+    bool m_underlyingSocketInitialized = false;
+
     bool doHandshake();
     int asyncRecvInternal(void* buffer , unsigned int bufferLen);
     int asyncSendInternal(const void* buffer , unsigned int bufferLen);
-    void init();
+    void initSsl();
+    bool initializeUnderlyingSocketIfNeeded();
 
     static int bioRead(BIO* bio, char* out, int outl);
     static int bioWrite(BIO* bio, const char* in, int inl);

@@ -66,7 +66,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
         return;
 
     if (m_user)
-        disconnect(m_user, NULL, this, NULL);
+        m_user->disconnect(this);
 
     m_user = user;
     m_userPassword = QString();
@@ -76,8 +76,17 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     {
         m_userDigest = m_user->getDigest();
 
-        // TODO: #GDM #Common get rid of resourceChanged
-        connect(m_user, &QnResource::resourceChanged, this,
+        connect(m_user, &QnResource::nameChanged, this,
+            &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::hashChanged, this,
+            &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::passwordChanged, this,
+            &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::digestChanged, this,
+            &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::cryptSha512HashChanged, this,
+            &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::realmChanged, this,
             &QnWorkbenchUserWatcher::at_user_resourceChanged);
     }
 
@@ -123,10 +132,9 @@ void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool value)
         reconnect();
 }
 
-
 QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const
 {
-    for (const QnUserResourcePtr &user : resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
         if (user->getName().toLower() != m_userName.toLower())
             continue;

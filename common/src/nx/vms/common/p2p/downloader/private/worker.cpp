@@ -688,16 +688,13 @@ void Worker::fail()
 
 void Worker::updateLogTag()
 {
-    m_logTag = lit(" [%1]").arg(m_fileName);
+    auto tag = lit(" [%1]").arg(m_fileName);
     if (m_printSelfPeerInLogs)
-    {
-        m_logTag.prepend(
-            lit("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
-    }
+        tag.prepend(lit("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
     else
-    {
-        m_logTag.prepend(::toString(this));
-    }
+        tag.prepend(::toString(this));
+
+    m_logTag = nx::utils::log::Tag(tag);
 }
 
 bool Worker::addAvailableChunksInfo(const QBitArray& chunks)

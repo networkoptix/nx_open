@@ -19,7 +19,12 @@ QString DeveloperSettingsHelper::logLevel() const
 
 void DeveloperSettingsHelper::setLogLevel(QString logLevel)
 {
-    nx::utils::log::mainLogger()->setDefaultLevel(nx::utils::log::levelFromString(logLevel));
+    const auto level = nx::utils::log::levelFromString(logLevel);
+    if (level == nx::utils::log::mainLogger()->defaultLevel())
+        return;
+
+    nx::utils::log::mainLogger()->setDefaultLevel(level);
+    emit logLevelChanged();
 }
 
 } // namespace utils

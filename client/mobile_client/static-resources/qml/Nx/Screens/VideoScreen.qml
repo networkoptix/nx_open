@@ -54,12 +54,14 @@ PageBase
 
         property var videoNavigation: navigationLoader.item
 
+        property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
             (showOfflineStatus
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
+                || videoScreenController.failed
+                || videoScreenController.noVideoStreams)
             && !videoScreenController.mediaPlayer.playing
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
@@ -330,6 +332,8 @@ PageBase
         {
             id: ptzPanel
 
+            preloadersParent: video.item.videoControl ? video.item.videoControl : null
+
             width: parent.width
             anchors.bottom: parent.bottom
 
@@ -454,6 +458,7 @@ PageBase
 
                 VideoNavigation
                 {
+                    animatePlaybackControls: d.animatePlaybackControls
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
                     ptzAvailable: ptzPanel.controller.available
@@ -510,9 +515,11 @@ PageBase
         {
             script:
             {
+                d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
                 video.clear()
+                d.animatePlaybackControls = true
             }
         }
 

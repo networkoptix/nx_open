@@ -15,13 +15,13 @@ public:
     Logger(Level defaultLevel = Level::none, std::unique_ptr<AbstractWriter> writer = nullptr);
 
     /** Writes message to every writer if it is to be logged. */
-    void log(Level level, const QString& tag, const QString& message);
+    void log(Level level, const Tag& tag, const QString& message);
 
     /** Writes message to every writer unconditionally. */
-    void logForced(Level level, const QString& tag, const QString& message);
+    void logForced(Level level, const Tag& tag, const QString& message);
 
     /** Indicates whether this logger is going to log such a message. */
-    bool isToBeLogged(Level level, const QString& tag = {});
+    bool isToBeLogged(Level level, const Tag& tag = {});
 
     /** Makes this logger log all messages with level <= defaultLevel. */
     Level defaultLevel() const;

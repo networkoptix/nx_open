@@ -77,13 +77,13 @@ void QnResourceTreeModelOtherSystemsNode::handleSystemDiscovered(const QnSystemD
     m_disconnectHelpers[id] << connect(system, &QnBaseSystemDescription::isCloudSystemChanged, this,
         [this, system, id]
         {
-            if (canSeeSystem(system))
+            if (canSeeCloudSystem(system))
                 ensureCloudSystemNode(system);
             else
                 removeNode(m_cloudNodes.value(id));
         });
 
-    if (canSeeSystem(system))
+    if (canSeeCloudSystem(system))
         ensureCloudSystemNode(system);
 }
 
@@ -209,9 +209,11 @@ bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
     return isOwner && isAutoDiscoveryEnabled;
 }
 
-bool QnResourceTreeModelOtherSystemsNode::canSeeSystem(const QnSystemDescriptionPtr& system) const
+bool QnResourceTreeModelOtherSystemsNode::canSeeCloudSystem(const QnSystemDescriptionPtr& system) const
 {
-    return system->isCloudSystem() && system->id() != qnGlobalSettings->cloudSystemId();
+    return context()->user()
+        && system->isCloudSystem()
+        && system->id() != qnGlobalSettings->cloudSystemId();
 }
 
 void QnResourceTreeModelOtherSystemsNode::cleanupEmptyLocalNodes()

@@ -217,12 +217,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id),
     m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    NX_DEBUG(this) "New";
+    NX_DEBUG(this) << "New";
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this) "Delete";
+    NX_DEBUG(this) << "Delete";
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_attemptingReaders.clear();
     m_connectedReader.reset();
@@ -321,9 +321,6 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
-    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
-        endpointsGroup->first, endpointsGroup->second.size()));
-
     if (endpointsGroup == m_endpoints.end())
     {
         if (!m_id.isNull())
@@ -336,6 +333,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
         return;
     }
+
+    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
+        endpointsGroup->first, endpointsGroup->second.size()));
 
     if (m_timer.timeToEvent())
         m_timer.cancelSync();

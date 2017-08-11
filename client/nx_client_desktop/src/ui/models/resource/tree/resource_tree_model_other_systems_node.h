@@ -38,7 +38,7 @@ private:
     QnResourceTreeModelNodePtr ensureFakeServerNode(const QnFakeMediaServerResourcePtr& server);
 
     bool canSeeFakeServers() const;
-    bool canSeeSystem(const QnSystemDescriptionPtr& system) const;
+    bool canSeeCloudSystem(const QnSystemDescriptionPtr& system) const;
 
     void cleanupEmptyLocalNodes();
 

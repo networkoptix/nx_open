@@ -17,6 +17,7 @@
 
 #include <network/module_information.h>
 
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
@@ -265,12 +266,26 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidg
 }
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
-    const QString& clientVersion,
-    const QString& serverVersion,
+    const QnConnectionInfo& serverInfo,
     const QString& extraText)
 {
+    const QString clientVersion = qnStaticCommon->engineVersion().toString();
+    const QString serverVersion = serverInfo.version.toString(
+        CompatibilityVersionInstallationDialog::useUpdate(serverInfo.version)
+        ? QnSoftwareVersion::FullFormat
+        : QnSoftwareVersion::MinorFormat);
+
+    QString devModeText;
+    if (qnRuntime->isDevMode())
+    {
+        devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
+        devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
+        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::AppInfo::defaultCloudHost());
+        devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);
+    }
+
     return getDiffVersionsFullText(clientVersion, serverVersion)
-        + L'\n' + extraText;
+        + L'\n' + extraText + devModeText;
 }
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionsText()
@@ -314,15 +329,9 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 ? QnSoftwareVersion::FullFormat
                 : QnSoftwareVersion::MinorFormat);
 
-            auto extras =
-                getDiffVersionFullExtras(qnStaticCommon->engineVersion().toString(), versionString,
-                    tr("You have to download another version of %1 to "
-                        "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
-            if (qnRuntime->isDevMode())
-            {
-                extras += L'\n' + lit("Protocol: %1").arg(connectionInfo.nxClusterProtoVersion);
-                extras += L'\n' + lit("Cloud host: %1").arg(connectionInfo.cloudHost);
-            }
+            auto extras = getDiffVersionFullExtras(connectionInfo,
+                tr("You have to download another version of %1 to "
+                    "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,
@@ -345,8 +354,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         }
 
         //version is installed, trying to run
-        const auto extras = getDiffVersionFullExtras(
-            qnStaticCommon->engineVersion().toString(), connectionInfo.version.toString(),
+        const auto extras = getDiffVersionFullExtras(connectionInfo,
             tr("You have to restart %1 in compatibility"
                 " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 

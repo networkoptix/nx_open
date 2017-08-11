@@ -98,8 +98,10 @@ Page
                 localId: model.localId
                 cloudSystem: model.isCloudSystem
                 ownerDescription: cloudSystem ? model.ownerDescription : ""
-                online: model.isConnectable
+                running: model.isRunning
+                reachable: model.isReachable
                 compatible: model.isCompatible
+
                 invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
             }
         }

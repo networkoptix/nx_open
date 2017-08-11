@@ -31,10 +31,10 @@
 #include <ui/workbench/workbench_utility.h>
 
 #include <utils/common/delayed.h>
-#include <utils/common/pending_operation.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/pending_operation.h>
 
 namespace {
 
@@ -117,14 +117,15 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
                 menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
             m_saveToursQueue.clear();
         };
-    m_saveToursOperation = new QnPendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
+    m_saveToursOperation =
+        new utils::PendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
 
     auto updateItemsLayout = [this]
         {
             this->updateItemsLayout();
         };
-    m_updateItemsLayoutOperation = new QnPendingOperation(updateItemsLayout,
-        kUpdateItemsLayoutIntervalMs, this);
+    m_updateItemsLayoutOperation =
+        new utils::PendingOperation(updateItemsLayout, kUpdateItemsLayoutIntervalMs, this);
 
     connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &LayoutTourReviewController::handleTourChanged);

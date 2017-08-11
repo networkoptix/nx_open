@@ -30,9 +30,9 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
 {
     if (ini().verboseAutoRequestForwarder)
     {
-        const auto logger = nx::utils::log::addLogger({toString(this)});
+        const auto logger = nx::utils::log::addLogger({nx::utils::log::Tag(this)});
         logger->setDefaultLevel(nx::utils::log::Level::verbose);
-        NX_VERBOSE(this) lm("Verbose logging started: .ini verboseAutoRequestForwarder=true");
+        NX_VERBOSE(this) << lm("Verbose logging started: .ini verboseAutoRequestForwarder=true");
     }
 }
 
@@ -45,7 +45,7 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         return;
     }
 
-    NX_VERBOSE(this) lm("Request: [%1]").arg(request->requestLine);
+    NX_VERBOSE(this) << lm("Request: [%1]").arg(request->requestLine);
 
     if (isPathIgnored(request))
         return;
@@ -54,14 +54,14 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
     if (urlQuery.hasQueryItem(Qn::SERVER_GUID_HEADER_NAME)
         || request->headers.find(Qn::SERVER_GUID_HEADER_NAME) != request->headers.end())
     {
-        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
+        NX_VERBOSE(this) << lm("Skipped: Header or param [%1] found")
             .arg(Qn::SERVER_GUID_HEADER_NAME);
         return;
     }
     if (urlQuery.hasQueryItem(Qn::CAMERA_GUID_HEADER_NAME)
         || request->headers.find(Qn::CAMERA_GUID_HEADER_NAME) != request->headers.end())
     {
-        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
+        NX_VERBOSE(this) << lm("Skipped: Header or param [%1] found")
             .arg(Qn::CAMERA_GUID_HEADER_NAME);
         return;
     }
@@ -78,13 +78,13 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         {
             if (addProxyToRequest(request, servers.front()))
             {
-                NX_VERBOSE(this) lm("Cloud request. Forwarding to server %2")
+                NX_VERBOSE(this) << lm("Cloud request. Forwarding to server %2")
                     .arg(servers.front()->getId().toString());
             }
         }
         else
         {
-            NX_VERBOSE(this) lm("Cloud request. Skipped: No servers found");
+            NX_VERBOSE(this) << lm("Cloud request. Skipped: No servers found");
         }
         return;
     }
@@ -120,7 +120,7 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
     }
     if (addProxyToRequest(request, server))
     {
-        NX_VERBOSE(this) lm("Forwarding to server %4 (camera %2, timestamp %3)")
+        NX_VERBOSE(this) << lm("Forwarding to server %4 (camera %2, timestamp %3)")
             .arg(camera->getId().toString())
             .arg(timestampMs == -1
                 ? QString::fromLatin1("live")
@@ -135,13 +135,13 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 {
     if (!server)
     {
-        NX_VERBOSE(this) lm("Skipped: Server not found");
+        NX_VERBOSE(this) << lm("Skipped: Server not found");
         return false;
     }
 
     if (server->getId() == commonModule()->moduleGUID())
     {
-        NX_VERBOSE(this) lm("Skipped: Target server is the current one");
+        NX_VERBOSE(this) << lm("Skipped: Target server is the current one");
         return false;
     }
 
@@ -152,7 +152,7 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
 {
     m_ignoredPathWildcardMarks.append(pathWildcardMask);
-    NX_VERBOSE(this) lm("Added path wildcard mask to ignore: [%1]").arg(pathWildcardMask);
+    NX_VERBOSE(this) << lm("Added path wildcard mask to ignore: [%1]").arg(pathWildcardMask);
 }
 
 bool QnAutoRequestForwarder::isPathIgnored(const nx_http::Request* request)
@@ -171,7 +171,7 @@ bool QnAutoRequestForwarder::isPathIgnored(const nx_http::Request* request)
 
         if (wildcardMatch("*" + mask, path))
         {
-            NX_VERBOSE(this) lm("Skipped: Path [%1] matches wildcard mask [%2]").args(path, mask);
+            NX_VERBOSE(this) << lm("Skipped: Path [%1] matches wildcard mask [%2]").args(path, mask);
             return true;
         }
     }
@@ -188,7 +188,7 @@ void QnAutoRequestForwarder::addAllowedProtocolAndPathPart(
     const auto& scheme = protocol.toLower();
 
     m_allowedPathPartByScheme.insertMulti(scheme, pathPart);
-    NX_VERBOSE(this) lm("Added allowed path part [%1] for protocol [%2]").args(pathPart, protocol);
+    NX_VERBOSE(this) << lm("Added allowed path part [%1] for protocol [%2]").args(pathPart, protocol);
 }
 
 void QnAutoRequestForwarder::addCameraIdUrlParams(
@@ -199,7 +199,7 @@ void QnAutoRequestForwarder::addCameraIdUrlParams(
     NX_ASSERT(!m_cameraIdUrlParamsByPath.contains(path));
 
     m_cameraIdUrlParamsByPath.insert(path, cameraIdUrlParams);
-    NX_VERBOSE(this) lm("Added camera id url params [%1] for path [%2]")
+    NX_VERBOSE(this) << lm("Added camera id url params [%1] for path [%2]")
         .args(cameraIdUrlParams, path);
 }
 
@@ -221,7 +221,7 @@ bool QnAutoRequestForwarder::findCamera(
     if (findCameraInUrlQuery(request, urlQuery, outCamera))
         return true;
 
-    NX_VERBOSE(this) lm("Skipped: Camera not found");
+    NX_VERBOSE(this) << lm("Skipped: Camera not found");
     return false;
 }
 
@@ -236,7 +236,7 @@ QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
     if (it != request.headers.end())
     {
         cameraId = QnUuid::fromStringSafe(it->second);
-        NX_VERBOSE(this) lm("Found camera id %1 in header [%2]")
+        NX_VERBOSE(this) << lm("Found camera id %1 in header [%2]")
             .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
         return cameraId;
     }
@@ -244,7 +244,7 @@ QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
     cameraId = QnUuid::fromStringSafe(request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
     if (!cameraId.isNull())
     {
-        NX_VERBOSE(this) lm("Found camera id %1 in cookie [%2]")
+        NX_VERBOSE(this) << lm("Found camera id %1 in cookie [%2]")
             .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
         return cameraId;
     }
@@ -253,7 +253,7 @@ QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
     cameraId = QnUuid::fromStringSafe(urlQuery.queryItemValue(Qn::CAMERA_GUID_HEADER_NAME));
     if (!cameraId.isNull())
     {
-        NX_VERBOSE(this) lm("Found camera id %1 in url param [%2]")
+        NX_VERBOSE(this) << lm("Found camera id %1 in url param [%2]")
             .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
         return cameraId;
     }
@@ -298,7 +298,7 @@ bool QnAutoRequestForwarder::findCameraInUrlPath(
     if (cameraId.isEmpty())
         return false;
 
-    NX_VERBOSE(this) lm("Found camera id %1 in url path").arg(cameraId);
+    NX_VERBOSE(this) << lm("Found camera id %1 in url path").arg(cameraId);
     *outCamera = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), cameraId);
     return *outCamera != nullptr;
 }
@@ -324,14 +324,14 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
     if (paramNames.isEmpty()) //< Path trailing not found.
         return false;
 
-    NX_VERBOSE(this) lm("Lookingh for camera id in url params [%2]").args(paramNames);
+    NX_VERBOSE(this) << lm("Lookingh for camera id in url params [%2]").args(paramNames);
 
     const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
     QString notFoundCameraId;
     *outCamera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool(), &notFoundCameraId, params, paramNames);
     if (!*outCamera && !notFoundCameraId.isNull())
-        NX_VERBOSE(this) lm("Camera not found by flexible id [%1]").args(notFoundCameraId);
+        NX_VERBOSE(this) << lm("Camera not found by flexible id [%1]").args(notFoundCameraId);
     return *outCamera != nullptr;
 }
 
