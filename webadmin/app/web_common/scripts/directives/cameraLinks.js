@@ -13,7 +13,8 @@ angular.module('nxCommon')
                 position: "=",
                 liveMode: "=",
                 player: "=",
-                currentResolution: "="
+                currentResolution: "=",
+                cameraLinks: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {

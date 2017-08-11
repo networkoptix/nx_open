@@ -27,11 +27,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
-        $scope.cameraLinksEnabled = $location.search().cameraLinks;
-
-        $scope.toggleCameraLinks = function(){
-            $scope.cameraLinksEnabled = !$scope.cameraLinksEnabled;
-        }
+        $scope.cameraLinks = {enabled: $location.search().cameraLinks};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             $scope.showCameraPanel = false;

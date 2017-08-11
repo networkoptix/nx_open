@@ -52,7 +52,8 @@
                                                                                                              ng-class="{active:format == activeFormat}"
                                                                                                              ng-click="selectFormat(format)">{{format}}</a></li>
                                             <li class="video-settings-separation-line"  ng-if="debugMode"></li>
-                                            <li class=""               ng-if="debugMode" ng-click="toggleCameraLinks()">
+                                            <li class="" ng-if="debugMode"
+                                                         ng-click="cameraLinks.enabled=!cameraLinks.enabled">
                                                 <a class="video-settings-20">Camera Links</a>
                                             </li>
                                             <li class="video-settings-separation-line"  ng-if="debugMode"></li>
@@ -76,14 +77,11 @@
                         </div>
 
                         <div class="float-size">
-                            <div class="camera-links-panel" ng-if="cameraLinksEnabled">
-                                <div class='close' ng-click="toggleCameraLinks()">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                </div>
-                                <camera-links system="systemAPI" position="positionProvider.playedPosition"
-                                              live-mode="positionProvider.liveMode" active-camera="activeCamera"
-                                              player="player" current-resolution="currentResolution"></camera-links>
-                            </div>
+                            <camera-links class="camera-links-panel" ng-if="cameraLinks.enabled"
+                                          system="systemAPI" position="positionProvider.playedPosition"
+                                          live-mode="positionProvider.liveMode" active-camera="activeCamera"
+                                          player="player" current-resolution="currentResolution"
+                                          camera-links="cameraLinks"></camera-links>
                             <camera-view-informer flags="{'status':activeCamera.status,
                                                           'positionSelected': positionSelected,
                                                           'iOSVideoTooLarge': iOSVideoTooLarge}">

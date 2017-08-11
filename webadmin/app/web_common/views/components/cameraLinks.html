@@ -1,20 +1,23 @@
+<div class='close' ng-click="cameraLinks.enabled = false">
+    <span class="glyphicon glyphicon-remove"></span>
+</div>
 <div class='camera-links-title'>Camera</div>
 <table>
-    <tr><td style="width:125px;" class="camera-links-info">Playing</td><td>{{transport}} - {{currentResolution}} with {{player}}</td></tr>
-    <tr><td class="camera-links-info">Name</td><td>{{activeCamera.name}}</td></tr>
-    <tr><td class="camera-links-info">CameraID</td><td>{{activeCamera.id.replace('{','').replace('}','')}}</td></tr>
-    <tr><td class="camera-links-info">IP (URL)</td><td><a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></td></tr>
+    <tr><td style="width:125px;">Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
+    <tr><td>Name</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+    <tr><td>CameraID</td><td class="camera-links-info">{{activeCamera.id.replace('{','').replace('}','')}}</td></tr>
+    <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></td></tr>
     <tr ng-repeat="stream in activeCamera.mediaStreams">
-        <td class="camera-links-info">{{streamName(stream)}}</td>
+        <td>{{streamName(stream)}}</td>
         <td>
             <span ng-repeat="transport in stream.transports">
-                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport | uppercase}}</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}" style="text-transform: uppercase;">{{transport}}</a>
                 <span ng-if="stream.transports.length-1 != $index">&nbsp;/&nbsp;</span>
             </span>
         </td>
     </tr>
     <tr>
-        <td class="camera-links-info">Download</td>
+        <td>Download</td>
         <td>
             <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">HIGH</a>
             &nbsp;/&nbsp;
@@ -31,12 +34,12 @@
         <td style="width:125px;"><label><input type="checkbox" ng-model="useAuth">&nbsp;Use auth key</label></td>
     </tr>
     <tr>
-        <td class="camera-links-info">Duration</td><td><input type="text" class="input-sm" ng-model="duration"></td>
+        <td>Duration</td><td><input type="text" class="input-sm camera-links-info" ng-model="duration"></td>
     </tr>
     <tr>
-        <td class="camera-links-info">Resolution</td><td> <input type="text" class="input-sm" ng-model="resolution"></td>
+        <td>Resolution</td><td> <input type="text" class="input-sm camera-links-info" ng-model="resolution"></td>
     </tr>
     <tr>
-        <td class="camera-links-info">Playing position</td><td>{{divveMode?'divve': position.toFixed(0)}}</td>
+        <td>Playing position</td><td class="camera-links-info">{{divveMode?'divve': position.toFixed(0)}}</td>
     </tr>
 </table>

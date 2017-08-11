@@ -473,8 +473,8 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.camera-links{
-  &-panel{
+.camera-links-panel{
+  &{
     background-color: $additional_light2;
     margin: 40px 0 0 10px;
     position: absolute;
@@ -484,8 +484,18 @@ table.webclient-window>tbody>tr>td{
     & table{
       font-size: 12px;
     }
+    & td{
+      font-weight: 400;
+      color: $light16;
+    }
   }
+  &.night-mode{
+    background-color: rgba($dark7,0.9) !important;
+    opacity: 0.8;
+  }
+}
 
+.camera-links{
   &-break{
     height: 4px;
     border-bottom: 1px solid $light6;
@@ -497,8 +507,21 @@ table.webclient-window>tbody>tr>td{
     color: $dark9;
   }
   &-info{
-    font-weight: 400;
-    color: $light16;
+    color: $dark9 !important;
+  }
+}
+.camera-links-panel.night-mode{
+  .camera-links{
+    &-title{
+      color:$light1 !important;
+    }
+    &-info{
+      color: $light1 !important;
+    }
+  }
+
+  input{
+    background-color: transparent;
   }
 }
 
