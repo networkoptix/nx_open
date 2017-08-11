@@ -30,7 +30,7 @@ static const QString kDescriptionParam = lit("description");
 static const QString kTimeoutParam = lit("timeout");
 static const QString kDurationParam = lit("duration");
 static const QString kTagParam = lit("tag");
-static const QString kBusinessRuleIdParam = lit("rule_id");
+static const QString kEventRuleIdParam = lit("rule_id");
 
 static const qint64 kUsPerMs = 1000;
 
@@ -185,21 +185,13 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData():
 {
 }
 
-QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark):
-    QnMultiserverRequestData(),
-    bookmark(bookmark)
-{
-}
-
 QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action)
+    const QnUuid& eventRuleId)
     :
     QnMultiserverRequestData(),
     bookmark(bookmark),
-    businessRuleId(action
-        ? action->getRuleId()
-        : QnUuid())
+    eventRuleId(eventRuleId)
 {
 }
 
@@ -208,10 +200,10 @@ void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmark = bookmarkFromParams(params, resourcePool);
-    if (params.contains(kBusinessRuleIdParam))
+    if (params.contains(kEventRuleIdParam))
     {
-        const auto stringRuleId = params.value(kBusinessRuleIdParam);
-        businessRuleId = QnLexical::deserialized<QnUuid>(stringRuleId);
+        const auto stringRuleId = params.value(kEventRuleIdParam);
+        eventRuleId = QnLexical::deserialized<QnUuid>(stringRuleId);
     }
 }
 
@@ -220,7 +212,7 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
     result.append(bookmarksToParam(bookmark));
-    result.insert(kBusinessRuleIdParam, QnLexical::serialized(businessRuleId));
+    result.insert(kEventRuleIdParam, QnLexical::serialized(eventRuleId));
     return result;
 }
 

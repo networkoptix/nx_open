@@ -14,11 +14,14 @@
 #include <api/helpers/send_statistics_request_data.h>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx_ec/data/api_data.h>
 
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
 #include <nx/fusion/model_functions.h>
 #include <network/router.h>
 #include <nx/network/http/custom_headers.h>
@@ -27,6 +30,7 @@
 #include <utils/common/synctime.h>
 #include <common/common_module.h>
 
+#include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -360,6 +364,60 @@ Handle ServerConnection::fileDownloadStatus(
         QnRequestParamList(),
         callback,
         targetThread);
+}
+
+Handle ServerConnection::getTimeOfServersAsync(
+    Result<MultiServerTimeData>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(lit("/ec2/getTimeOfServers"), QnRequestParamList(), callback, targetThread);
+}
+
+rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
+    nx::vms::event::EventState toggleState,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    auto manager = commonModule()->eventRuleManager();
+    NX_ASSERT(manager);
+    auto rule = manager->rule(ruleId);
+    if (!rule)
+        return 0;
+
+    QnRequestParamList params;
+    params.insert(lit("event_type"), QnLexical::serialized(rule->eventType()));
+    params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
+
+    if (rule->eventResources().size() > 0)
+    {
+        auto randomResource = nx::utils::random::choice(rule->eventResources());
+        params.insert(lit("eventResourceId"), randomResource.toString());
+    }
+    else if (nx::vms::event::isSourceCameraRequired(rule->eventType())
+        || rule->eventType() >= nx::vms::event::userDefinedEvent)
+    {
+        auto randomCamera = nx::utils::random::choice(
+            commonModule()->resourcePool()->getAllCameras(QnResourcePtr(), true));
+        params.insert(lit("eventResourceId"), randomCamera->getId().toString());
+    }
+    else if (nx::vms::event::isSourceServerRequired(rule->eventType()))
+    {
+        auto randomServer = nx::utils::random::choice(
+            commonModule()->resourcePool()->getAllServers(Qn::Online));
+        params.insert(lit("eventResourceId"), randomServer->getId().toString());
+    }
+
+    if (toggleState != nx::vms::event::EventState::undefined)
+        params.insert(lit("state"), QnLexical::serialized(toggleState));
+
+    params.insert(lit("inputPortId"), rule->eventParams().inputPortId);
+    params.insert(lit("source"), rule->eventParams().resourceName);
+    params.insert(lit("caption"), rule->eventParams().caption);
+    params.insert(lit("description"), rule->eventParams().description);
+    params.insert(lit("metadata"), QString::fromUtf8(
+        QJson::serialized(rule->eventParams().metadata)));
+
+    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -724,12 +782,5 @@ void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientP
     if (callback)
         callback(requestId, systemError, statusCode, contentType, messageBody);
 };
-
-Handle ServerConnection::getTimeOfServersAsync(
-    Result<MultiServerTimeData>::type callback,
-    QThread* targetThread)
-{
-    return executeGet(lit("/ec2/getTimeOfServers"), QnRequestParamList(), callback, targetThread);
-}
 
 } // namespace rest

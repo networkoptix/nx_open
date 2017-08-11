@@ -16,9 +16,11 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 class QGraphicsWidget;
-class QnPendingOperation;
 
 namespace nx {
+
+namespace utils { class PendingOperation; }
+
 namespace client {
 namespace desktop {
 namespace ui {
@@ -88,8 +90,8 @@ private:
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
     QSet<QnUuid> m_saveToursQueue;
-    QnPendingOperation* m_saveToursOperation = nullptr;
-    QnPendingOperation* m_updateItemsLayoutOperation = nullptr;
+    utils::PendingOperation* m_saveToursOperation = nullptr;
+    utils::PendingOperation* m_updateItemsLayoutOperation = nullptr;
     bool m_updating = false;
 };
 

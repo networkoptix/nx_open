@@ -653,7 +653,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->addFlags(Qn::local);
     layout->setId(QnUuid::createUuid());
-    layout->setName(tr("Audit log replay"));
+    layout->setName(tr("Audit trail replay"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 

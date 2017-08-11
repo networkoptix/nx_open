@@ -1106,11 +1106,11 @@ int QnMediaServerConnection::recordedTimePeriods(
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action,
+    const QnUuid& eventRuleId,
     QObject* target,
     const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark, action);
+    QnUpdateBookmarkRequestData request(bookmark, eventRuleId);
     return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,
         request.toParams(), nullptr, target, slot);
 }

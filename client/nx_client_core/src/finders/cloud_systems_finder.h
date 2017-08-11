@@ -11,9 +11,8 @@
 #include <watchers/cloud_status_watcher.h>
 
 class QTimer;
-namespace nx_http {
-class AsyncHttpClientPtr;
-}
+
+namespace nx_http { class AsyncHttpClientPtr; }
 
 class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {

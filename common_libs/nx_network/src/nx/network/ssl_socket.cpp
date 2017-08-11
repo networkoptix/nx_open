@@ -955,7 +955,7 @@ public:
     quint8 extraBuffer[32];
     int extraBufferLen;
     //!Socket works as regular socket (without encryption until this flag is set to \a true)
-    bool ecnryptionEnabled;
+    bool encryptionEnabled;
     std::atomic<bool> nonBlockingMode;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
@@ -972,7 +972,7 @@ public:
         ssl(nullptr, SSL_free),
         isServerSide(false),
         extraBufferLen(0),
-        ecnryptionEnabled(false),
+        encryptionEnabled(false),
         nonBlockingMode(false),
         isShutdown(false),
         syncRecvPromise(nullptr),
@@ -1014,32 +1014,15 @@ SslSocket::SslSocket(
     d_ptr(priv)
 {
     Q_D(SslSocket);
+
     d->wrappedSocket = std::move(wrappedSocket);
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
-    d->ecnryptionEnabled = encriptionEnforced;
-    init();
-
-    // NOTE: Currently all IO operations are implemented over async because current SSL
-    //     implementation is too twisted to support runtime mode switches.
-    // TODO: SSL sockets should be reimplemented to simplify overall approach and support
-    //     runtime mode switches.
-    bool nonBlockingMode = false;
-    if (!d->wrappedSocket->getNonBlockingMode(&nonBlockingMode))
-    {
-        NX_ASSERT(false);
-        return;
-    }
-
-    d->nonBlockingMode = nonBlockingMode;
-    if (!nonBlockingMode)
-    {
-        if (!d->wrappedSocket->setNonBlockingMode(true))
-            NX_ASSERT(false);
-    }
+    d->encryptionEnabled = encriptionEnforced;
+    initSsl();
 }
 
-void SslSocket::init()
+void SslSocket::initSsl()
 {
     Q_D(SslSocket);
     static BIO_METHOD kBioMethods =
@@ -1079,6 +1062,33 @@ void SslSocket::init()
         ssl::SslStaticData::instance()->sslSessionId().size());
 
     SSL_set_bio(d->ssl.get(), rbio, wbio);  //d->ssl will free bio when freed
+}
+
+bool SslSocket::initializeUnderlyingSocketIfNeeded()
+{
+    Q_D(SslSocket);
+
+    if (m_underlyingSocketInitialized)
+        return true;
+
+    // NOTE: Currently all I/O operations are implemented over async because current SSL
+    //     implementation is too twisted to support runtime mode switches.
+    // TODO: SSL sockets should be reimplemented to simplify overall approach and support
+    //     runtime mode switches.
+    bool nonBlockingMode = false;
+    if (!d->wrappedSocket->getNonBlockingMode(&nonBlockingMode))
+        return false;
+
+    d->nonBlockingMode = nonBlockingMode;
+    if (!nonBlockingMode)
+    {
+        if (!d->wrappedSocket->setNonBlockingMode(true))
+            return false;
+    }
+
+    m_underlyingSocketInitialized = true;
+
+    return true;
 }
 
 int SslSocket::bioRead(BIO* b, char* out, int outl)
@@ -1227,6 +1237,9 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+        return -1;
+
     Q_D(SslSocket);
     unsigned int timeout = 0;
     if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
@@ -1308,6 +1321,9 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+        return -1;
+
     Q_D(SslSocket);
     unsigned int timeout = 0;
     if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
@@ -1376,8 +1392,11 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
 
 bool SslSocket::reopen()
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+        return false;
+
     Q_D(SslSocket);
-    d->ecnryptionEnabled = false;
+    d->encryptionEnabled = false;
     return d->wrappedSocket->reopen();
 }
 
@@ -1409,8 +1428,11 @@ bool SslSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+        return false;
+
     Q_D(SslSocket);
-    d->ecnryptionEnabled = true;
+    d->encryptionEnabled = true;
 
     if (!d->nonBlockingMode)
     {
@@ -1459,29 +1481,6 @@ bool SslSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
     return d->wrappedSocket->getKeepAlive(result);
 }
 
-bool SslSocket::connectWithoutEncryption(
-    const QString& foreignAddress,
-    unsigned short foreignPort,
-    unsigned int timeoutMillis)
-{
-    Q_D(const SslSocket);
-    return d->wrappedSocket->connect(foreignAddress, foreignPort, timeoutMillis);
-}
-
-bool SslSocket::enableClientEncryption()
-{
-    Q_D(SslSocket);
-    NX_ASSERT(!d->isServerSide);
-    d->ecnryptionEnabled = true;
-    return true;
-}
-
-bool SslSocket::isEncryptionEnabled() const
-{
-    Q_D(const SslSocket);
-    return d->ecnryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
-}
-
 static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType eventType)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
@@ -1522,6 +1521,9 @@ void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
 
 bool SslSocket::setNonBlockingMode(bool value)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+        return false;
+
     Q_D(SslSocket);
     d->nonBlockingMode = value;
     return true;
@@ -1529,6 +1531,9 @@ bool SslSocket::setNonBlockingMode(bool value)
 
 bool SslSocket::getNonBlockingMode(bool* value) const
 {
+    if (!const_cast<SslSocket*>(this)->initializeUnderlyingSocketIfNeeded())
+        return false;
+
     Q_D(const SslSocket);
     *value = d->nonBlockingMode;
     return true;
@@ -1573,6 +1578,12 @@ void SslSocket::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+    {
+        auto sysErrorCode = SystemError::getLastOSErrorCode();
+        return post([handler = std::move(handler), sysErrorCode]() { handler(sysErrorCode); });
+    }
+
     Q_D(const SslSocket);
     return d->wrappedSocket->connectAsync(addr, std::move(handler));
 }
@@ -1604,6 +1615,16 @@ void SslSocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+    {
+        auto sysErrorCode = SystemError::getLastOSErrorCode();
+        return post(
+            [handler = std::move(handler), sysErrorCode]()
+            {
+                handler(sysErrorCode, (std::size_t)-1);
+            });
+    }
+
     Q_D(SslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncRecvPromise.load());
     if (!checkAsyncOperation(&d->isRecvInProgress, &handler, d->wrappedSocket.get(), "SSL read"))
@@ -1624,6 +1645,16 @@ void SslSocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
+    if (!initializeUnderlyingSocketIfNeeded())
+    {
+        auto sysErrorCode = SystemError::getLastOSErrorCode();
+        return post(
+            [handler = std::move(handler), sysErrorCode]()
+            {
+                handler(sysErrorCode, (std::size_t)-1);
+            });
+    }
+
     Q_D(SslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncSendPromise.load());
     if (!checkAsyncOperation(&d->isSendInProgress, &handler, d->wrappedSocket.get(), "SSL send"))
@@ -1671,6 +1702,12 @@ void SslSocket::registerTimer(
 {
     Q_D(SslSocket);
     return d->wrappedSocket->registerTimer(timeoutMs, std::move(handler));
+}
+
+bool SslSocket::isEncryptionEnabled() const
+{
+    Q_D(const SslSocket);
+    return d->encryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
 }
 
 class MixedSslSocketPrivate:

@@ -321,9 +321,6 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
-    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
-        endpointsGroup->first, endpointsGroup->second.size()));
-
     if (endpointsGroup == m_endpoints.end())
     {
         if (!m_id.isNull())
@@ -336,6 +333,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
         return;
     }
+
+    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
+        endpointsGroup->first, endpointsGroup->second.size()));
 
     if (m_timer.timeToEvent())
         m_timer.cancelSync();
