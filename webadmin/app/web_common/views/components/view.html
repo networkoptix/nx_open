@@ -78,6 +78,7 @@
 
                         <div class="float-size">
                             <camera-links class="camera-links-panel" ng-if="cameraLinks.enabled"
+                                          ng-class="{'night-mode': nightMode}"
                                           system="systemAPI" position="positionProvider.playedPosition"
                                           live-mode="positionProvider.liveMode" active-camera="activeCamera"
                                           player="player" current-resolution="currentResolution"

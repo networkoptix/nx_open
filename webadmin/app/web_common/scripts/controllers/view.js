@@ -26,6 +26,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.playerApi = false;
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
+        $scope.nightMode = Config.webclient.nightMode;
 
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
 
