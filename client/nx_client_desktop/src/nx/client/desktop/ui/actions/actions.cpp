@@ -910,6 +910,16 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
+    factory(SaveLocalLayoutAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, All));
+
+    factory(SaveLocalLayoutAsAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, All));
+
     factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)

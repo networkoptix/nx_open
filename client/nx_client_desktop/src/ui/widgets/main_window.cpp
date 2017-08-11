@@ -46,7 +46,7 @@
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <nx/client/desktop/export/ui/workbench/workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
@@ -234,7 +234,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
-    context->instance<QnWorkbenchExportHandler>();
+    context->instance<WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
