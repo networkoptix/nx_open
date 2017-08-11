@@ -16,8 +16,8 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http {
 
-const char* const kUrlSchemeName("http");
-const char* const kSecureUrlSchemeName("https");
+const char* const kUrlSchemeName = "http";
+const char* const kSecureUrlSchemeName = "https";
 
 int strcasecmp(const StringType& one, const StringType& two)
 {

@@ -179,7 +179,7 @@ protected:
             if ((url.scheme() == QLatin1String(nx_http::kUrlSchemeName))
                 && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
             {
-                url.setScheme(nx_http::kSecureUrlSchemeName);
+                url.setScheme(QLatin1String(nx_http::kSecureUrlSchemeName));
             }
         }
 
