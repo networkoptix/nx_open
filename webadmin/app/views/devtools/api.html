@@ -192,6 +192,11 @@
                                         <label class="col-sm-3 control-label">Requesting URL</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{getDebugUrl()}}</p>
+                                            <p class="help-block" ng-if="clipboardSupported">
+                                                <a clipboard
+                                                   supported="clipboardSupported"
+                                                   text="getDebugUrl()" href="">Copy to clipboard</a>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="form-group" ng-if="apiMethod.method=='POST'">
