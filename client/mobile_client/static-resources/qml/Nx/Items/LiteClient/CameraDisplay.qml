@@ -63,7 +63,8 @@ Item
         property bool cameraWarningVisible:
             (videoScreenController.offline
                 || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
+                || videoScreenController.failed
+                || videoScreenController.noVideoStreams)
             && !videoScreenController.mediaPlayer.playing
     }
 
