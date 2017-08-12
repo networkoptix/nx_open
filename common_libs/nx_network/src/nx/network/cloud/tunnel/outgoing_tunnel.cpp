@@ -12,6 +12,8 @@ namespace cloud {
 
 const std::chrono::seconds kCloudConnectorTimeout(10);
 
+constexpr std::chrono::milliseconds AbstractOutgoingTunnel::kNoTimeout;
+
 OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress):
     m_targetPeerAddress(std::move(targetPeerAddress)),
     m_timer(std::make_unique<aio::Timer>()),
