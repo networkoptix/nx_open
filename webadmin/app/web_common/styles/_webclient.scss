@@ -188,7 +188,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel{
-  /*min-width: 320px;*/
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
@@ -315,7 +314,6 @@ table.webclient-window>tbody>tr>td{
     @include placeholder;
   }
 }
-
 
 /* Camera Panel*/
 .server{
@@ -487,6 +485,7 @@ table.webclient-window>tbody>tr>td{
     & td{
       font-weight: 400;
       color: $light16;
+      vertical-align: top;
     }
     & tr{
       height: 20px;
@@ -619,6 +618,9 @@ table.webclient-window>tbody>tr>td{
     color: $light16;
     font-size: 12px;
   }
+  &-icon{
+    margin-top: -6px;
+  }
 
   &-options:hover{
     background-color: $brand-core;
@@ -626,36 +628,43 @@ table.webclient-window>tbody>tr>td{
     font: bold 12px;
   }
 
-  &-separation-line{
+  &-divider{
     height: 1px;
     background-color: $light16;
     opacity: 0.2;  
   }
 
-  &-36{
+  &-title{
     height: 36px;
     line-height: 36px;
-
-    label{
-      margin-left: 8px;    
-    }
+    padding-left: 8px;    
   }
 
-  &-20{
+  &-item,
+  &-item a{
     height: 20px;
     line-height: 13px !important;
     font-size: 12px !important;
     color: $light1 !important;
   }
-}
 
-.video-settings-36.links-text{
-  color: $light1;
-}
+  &-button{
+    &{
+      height: 36px;
+      line-height: 36px;
+      padding-left: 8px;
+      color: $light1;
+    }
 
-.glyphicon-cog.links-cog{
-  top: 6px;
-  margin-right: 6px;
+    .glyphicon-cog{
+      top: 6px;
+      margin-right: 6px;
+    }
+
+    &:hover{
+      background-color: $light16;
+    }
+  }
 }
 
 .no-fullscreen{
@@ -670,8 +679,18 @@ table.webclient-window>tbody>tr>td{
   padding: 8px;
 }
 
-.video-title-back-button{
-  margin-left: 6px;
+.video-title{
+  &{
+    margin-left: 6px;
+  }
+  &-buffer{
+    width:40px;
+    display: inline-block;
+  }
+
+  & .glyphicon-arrow-left{
+    color: $light1;
+  }
 }
 
 .video-preview{
@@ -683,19 +702,6 @@ table.webclient-window>tbody>tr>td{
   left: 50%;
   transform: translate(-50%, -50%);
   opacity:0.5;
-}
-
-
-.min-40{
-  width:40px;
-  display: inline-block;
-}
-
-.pull-up-5{
-  margin-top: -5px;
-}
-.margin-right-8{
-  margin-right: 8px;
 }
 
 /* Special hack for loading invisible flash objects */
@@ -871,8 +877,4 @@ table.webclient-window>tbody>tr>td{
   height: 44px;
   width: 40px;
   display: block;
-}
-
-.video-title-back-button .glyphicon-arrow-left{
-  color: $light1;
 }
