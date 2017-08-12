@@ -27,7 +27,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
-        $scope.cameraLinksEnabled = $location.search().cameraLinks;
+        $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
+        $scope.cameraLinks = {enabled: $location.search().cameraLinks};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             $scope.showCameraPanel = false;
@@ -400,6 +401,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                if(!$scope.activeCamera){
+                    $scope.showCameraPanel = true;
+                }
 
                 $scope.ready = true;
                 $timeout(updateHeights);
@@ -462,12 +466,12 @@ angular.module('nxCommon').controller('ViewCtrl',
             $timeout(updateHeights,50);
         };
 
-        $('.video-icon.pull-left-5').dropdown();
-
-
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
             $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+            if(!$scope.activeCamera){
+                $scope.showCameraPanel = true;
+            }
         });
 
         $('html').addClass('webclient-page');
