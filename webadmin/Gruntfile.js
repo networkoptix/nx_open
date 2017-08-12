@@ -459,7 +459,7 @@ module.exports = function (grunt) {
                         cwd: '<%= yeoman.app %>',
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
-                        src: ['bower_components/sass-bootstrap/fonts/*']
+                        src: ['bower_components/bootstrap-sass/assets/fonts/bootstrap/*']
                     },
                     {
                         expand: true,
@@ -467,8 +467,8 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/components',
                         src: ['bower_components/mediaelement/build/silverlightmediaelement.xap',
-                            'bower_components/mediaelement/build/flashmediaelement.swf',
-                            'bower_components/locomote/dist/Player.swf']
+                              'bower_components/mediaelement/build/flashmediaelement.swf',
+                              'bower_components/locomote/dist/Player.swf']
 
                     },
                     {

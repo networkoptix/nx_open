@@ -27,9 +27,9 @@ angular.module('webadminApp')
         }
     })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
-                                '$location', 'dialogs', '$timeout', 'systemAPI',
+                                '$location', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,
-              $location, dialogs, $timeout, systemAPI) {
+              $location, $timeout, systemAPI) {
 
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
@@ -51,6 +51,7 @@ angular.module('webadminApp')
             _.each($scope.apiGroups,function(group){
                 _.each(group.functions,function(func){
                     func.url = group.urlPrefix + '/' + func.name;
+                    func.searchLabel = func.url + func.caption;
                     func.description.xml = func.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
                     _.each(func.params,function(param){
                         // Detecting type for param
@@ -237,32 +238,39 @@ angular.module('webadminApp')
 
 
         /* Making window have correct size and positioning */
-        var $window = $(window);
-        var $header = $('header');
-        var updateHeights = function() {
-            var $camerasPanel = $('.cameras-panel');
-            var $apiPanel = $('.api-view');
-            var windowHeight = $window.height();
-            var headerHeight = $header.outerHeight();
 
-            var viewportHeight = (windowHeight - headerHeight) + 'px';
+        function initResizing(){
+            var $window = $(window);
+            var $header = $('header');
+            var updateHeights = function() {
+                var $camerasPanel = $('.cameras-panel');
+                var $apiPanel = $('.api-view');
+                var windowHeight = $window.height();
+                var headerHeight = $header.outerHeight();
 
-            $camerasPanel.css('height',viewportHeight );
-            var listWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;
-            $apiPanel.css('width',listWidth + 'px');
-        };
+                var viewportHeight = (windowHeight - headerHeight) + 'px';
 
-        $timeout(updateHeights);
+                $camerasPanel.css('height',viewportHeight );
+                var listWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;
+                $apiPanel.css('width',listWidth + 'px');
+            };
 
-        $header.click(function() {
-            //350ms delay is to give the navbar enough time to collapse
-            $timeout(updateHeights,350);
-        });
+            $timeout(updateHeights);
 
-        $window.resize(updateHeights);
-        $('html').addClass('webclient-page');
-        $scope.$on('$destroy', function( event ) {
-            $window.unbind('resize', updateHeights);
-            $('html').removeClass('webclient-page');
-        });
+            $header.click(function() {
+                //350ms delay is to give the navbar enough time to collapse
+                $timeout(updateHeights,350);
+            });
+
+            $window.resize(updateHeights);
+            $('html').addClass('webclient-page');
+            $scope.$on('$destroy', function( event ) {
+                $window.unbind('resize', updateHeights);
+                $('html').removeClass('webclient-page');
+            });
+        }
+
+        if($('.cameras-panel').length){
+            initResizing();
+        }
     }]);
