@@ -21,6 +21,7 @@
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_license_data.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -42,6 +43,10 @@ class QnLicense
 public:
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+    
+    QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value);
+    static QnLicense* createFromKey(const QByteArray& key);
+
     virtual ~QnLicense();
 
     void loadLicenseBlock( const QByteArray& licenseBlock );

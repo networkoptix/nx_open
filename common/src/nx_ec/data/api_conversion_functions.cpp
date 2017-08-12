@@ -506,7 +506,7 @@ void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst)
 void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
 {
     dst.key = src->key();
-    dst.licenseBlock = src->rawLicense();
+    dst.signature = src->signature();
     dst.name = src->name();
     dst.cameraCount = src->cameraCount();
     dst.hardwareId = src->hardwareId();
