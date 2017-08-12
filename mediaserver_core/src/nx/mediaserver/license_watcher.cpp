@@ -15,6 +15,7 @@
 namespace nx {
 namespace mediaserver {
 
+static const QUrl kLicenseServerUrl("http://nxlicensed.hdw.mx/nxlicensed/api/v1/validate/");
 static const int kCheckIntervalMs = 1000 * 3600 * 24; //< Once a day.
 
 struct ServerInfo
@@ -53,10 +54,16 @@ QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (ServerInfo)(ServerLicenseInfo)(LicenseError)(CheckLicenseResponse),
     (json))
 
-LicenseWatcher::LicenseWatcher(QnCommonModule* commonModule) :
+LicenseWatcher::LicenseWatcher(QnCommonModule* commonModule):
     base_type(commonModule)
 {
     connect(&m_timer, &QTimer::timeout, this, &LicenseWatcher::update);
+}
+
+LicenseWatcher::~LicenseWatcher()
+{
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
 }
 
 void LicenseWatcher::start()
@@ -76,14 +83,14 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
     result.info.latestHwid = LLUtil::getLatestHardwareId();
     result.info.hwids = LLUtil::getAllHardwareIds();
 
-    auto connectionPtr = commonModule()->ec2Connection();
-    if (!connectionPtr)
-        return result;
+    auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return result; //< Server is about to stop.
     QnLicenseList licenseList;
-    auto licenseManager = connectionPtr->getLicenseManager(Qn::kSystemAccess);
+    auto licenseManager = connection->getLicenseManager(Qn::kSystemAccess);
     if (licenseManager->getLicensesSync(&licenseList) != ec2::ErrorCode::ok)
         return result;
-    for (const QnLicensePtr& license: licenseList)
+    for (const auto& license: licenseList)
     {
         ec2::ApiDetailedLicenseData licenseData;
         ec2::fromResourceToApi(license, licenseData);
@@ -95,8 +102,6 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
 
 void LicenseWatcher::update()
 {
-    static const QUrl kLicenseServerUrl("http://nxlicensed.hdw.mx/nxlicensed/api/v1/validate/");
-
     auto requestBody = QJson::serialized(licenseData());
     m_httpClient->setRequestBody(
         std::make_unique<nx_http::BufferSource>(
@@ -110,7 +115,7 @@ void LicenseWatcher::onHttpClientDone()
 {
     auto connection = commonModule()->ec2Connection();
     if (!connection)
-        return; //< Serer is about to stop
+        return; //< Serer is about to stop.
 
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
@@ -129,10 +134,9 @@ void LicenseWatcher::onHttpClientDone()
         return;
     }
 
-    QByteArray response = m_httpClient->fetchMessageBodyBuffer();
-
     bool success = false;
-    auto newLicenses = QJson::deserialized<CheckLicenseResponse>(response, CheckLicenseResponse(), &success);
+    auto response = QJson::deserialized<CheckLicenseResponse>(
+        m_httpClient->fetchMessageBodyBuffer(), CheckLicenseResponse(), &success);
     if (!success)
     {
         NX_WARNING(this, lm("Can't deserialize response from the license server."
@@ -142,9 +146,7 @@ void LicenseWatcher::onHttpClientDone()
 
     auto licenseManager = connection->getLicenseManager(Qn::kSystemAccess);
 
-    for (auto itr = newLicenses.licenseErrors.begin();
-        itr != newLicenses.licenseErrors.end();
-        ++itr)
+    for (auto itr = response.licenseErrors.begin(); itr != response.licenseErrors.end(); ++itr)
     {
         QByteArray licenseKey = itr.key().toUtf8();
         auto errorInfo = itr.value();
@@ -162,11 +164,17 @@ void LicenseWatcher::onHttpClientDone()
                 .arg(ec2::toString(dbErrorCode)));
         }
     }
+    QMap<QString, ec2::ApiDetailedLicenseData> existsLicenses;
+    for (const auto& license: licenseData().licenses)
+        existsLicenses.insert(license.key, license);
 
-    QList<QnLicensePtr> licenses;
-    for (const auto& licenseData: newLicenses.licenses)
-        licenses << QnLicensePtr(new QnLicense(licenseData));
-    auto dbErrorCode = licenseManager->addLicensesSync(licenses);
+    QList<QnLicensePtr> updatedLicenses;
+    for (const auto& licenseData: response.licenses)
+    {
+        if (existsLicenses.value(licenseData.key) != licenseData)
+            updatedLicenses << QnLicensePtr(new QnLicense(licenseData));
+    }
+    auto dbErrorCode = licenseManager->addLicensesSync(updatedLicenses);
     if (dbErrorCode != ec2::ErrorCode::ok)
     {
         NX_WARNING(
@@ -178,4 +186,3 @@ void LicenseWatcher::onHttpClientDone()
 
 } // namespace mediaserver
 } // namespace nx
-

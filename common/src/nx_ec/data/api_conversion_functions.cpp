@@ -510,7 +510,7 @@ void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
     dst.name = src->name();
     dst.cameraCount = src->cameraCount();
     dst.hardwareId = src->hardwareId();
-    dst.licenseType = src->displayName();
+    dst.licenseType = src->xclass();
     dst.version = src->version();
     dst.brand = src->brand();
     dst.expiration = src->expiration();

@@ -18,7 +18,7 @@ struct ApiDetailedLicenseData: ApiData
 {
     QnLatin1Array key;
     QString name;
-    int cameraCount;
+    qint32 cameraCount = 0;
     QString hardwareId;
     QString licenseType;
     QString version;
@@ -28,5 +28,7 @@ struct ApiDetailedLicenseData: ApiData
 };
 #define ApiDetailedLicenseData_Fields \
     (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiLicenseData)(ApiDetailedLicenseData), (eq))
 
 } // namespace ec2

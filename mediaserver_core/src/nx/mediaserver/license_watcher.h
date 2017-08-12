@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include <common/common_module_aware.h>
-#include <nx_ec/data/api_stored_file_data.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx_ec/data/api_fwd.h>
 
@@ -16,7 +15,7 @@ namespace mediaserver {
 struct ServerLicenseInfo;
 
 /**
- * Monitor unused layout's wallpapers in the database and remove it.
+ * Periodically check on license server if license was removed or updated.
  */
 class LicenseWatcher: public QObject, public QnCommonModuleAware
 {
@@ -24,6 +23,7 @@ class LicenseWatcher: public QObject, public QnCommonModuleAware
     using base_type = QnCommonModuleAware;
 public:
     LicenseWatcher(QnCommonModule* commonModule);
+    virtual ~LicenseWatcher();
     void start();
 public slots:
     void update();
