@@ -51,6 +51,7 @@ angular.module('webadminApp')
             _.each($scope.apiGroups,function(group){
                 _.each(group.functions,function(func){
                     func.url = group.urlPrefix + '/' + func.name;
+                    func.searchLabel = func.url + func.caption;
                     func.description.xml = func.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
                     _.each(func.params,function(param){
                         // Detecting type for param
