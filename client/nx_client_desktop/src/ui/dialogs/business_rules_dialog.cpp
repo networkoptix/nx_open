@@ -11,11 +11,15 @@
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QComboBox>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <api/app_server_connection.h>
+#include <api/server_rest_connection.h>
 
 // TODO: #vkutin Think of a better location and namespace.
 #include <business/business_types_comparator.h>
 
+#include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
@@ -29,6 +33,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -196,6 +201,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_popupMenu(new QMenu(this))
 {
     ui->setupUi(this);
+
+    ui->testRuleButton->setVisible(qnRuntime->isDevMode());
+
     retranslateUi();
 
     setWindowFlags(windowFlags()
@@ -291,6 +299,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         &QnBusinessRulesDialog::at_beforeModelChanged);
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::afterModelChanged, this,
         &QnBusinessRulesDialog::at_afterModelChanged);
+
+    connect(ui->testRuleButton, &QPushButton::clicked, this,
+        &QnBusinessRulesDialog::at_testRuleButton_clicked);
 
     connect(ui->eventLogButton, &QPushButton::clicked,
         context()->action(action::OpenBusinessLogAction), &QAction::trigger);
@@ -416,11 +427,16 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     ui->tableView->horizontalHeader()->setSortIndicator(kInvalidSortingColumn, Qt::AscendingOrder);
 }
 
-void QnBusinessRulesDialog::at_deleteButton_clicked() {
-    QnBusinessRuleViewModelPtr model = m_currentDetailsWidget->model();
-    if (!model)
-        return;
-    deleteRule(model);
+void QnBusinessRulesDialog::at_testRuleButton_clicked()
+{
+    if (auto model = m_currentDetailsWidget->model())
+        testRule(model);
+}
+
+void QnBusinessRulesDialog::at_deleteButton_clicked()
+{
+    if (auto model = m_currentDetailsWidget->model())
+        deleteRule(model);
 }
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
@@ -579,7 +595,56 @@ bool QnBusinessRulesDialog::saveAll()
     return true;
 }
 
-void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr &ruleModel) {
+void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel)
+{
+    auto server = commonModule()->currentServer();
+    NX_EXPECT(server);
+    if (!server)
+        return;
+
+    auto connection = server->restConnection();
+    NX_EXPECT(connection);
+    if (!connection)
+        return;
+
+    auto makeCallback =
+        [this](const QString& text)
+        {
+            return
+                [this, text](bool success, rest::Handle handle, QnJsonRestResult result)
+                {
+                    const QString details = result.errorString + L'\n' + result.reply.toString();
+                    if (success)
+                        QnMessageBox::information(this, text, details);
+                    else
+                        QnMessageBox::warning(this, text, details);
+                };
+        };
+
+    auto eventType = ruleModel->eventType();
+    if (nx::vms::event::hasToggleState(eventType))
+    {
+        connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::active,
+            [this, id = ruleModel->id(), connection, makeCallback]
+            (bool success, rest::Handle handle, QnJsonRestResult result)
+            {
+                makeCallback(lit("Event Started"))(success, handle, result);
+                if (success)
+                {
+                    connection->testEventRule(id, nx::vms::event::EventState::inactive,
+                        makeCallback(lit("Event Stopped")), QThread::currentThread());
+                }
+            }, QThread::currentThread());
+    }
+    else
+    {
+        connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::undefined,
+            makeCallback(lit("Event Occurred")), QThread::currentThread());
+    }
+}
+
+void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleModel)
+{
     if (!ruleModel->id().isNull())
         m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
@@ -600,6 +665,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
     m_resetDefaultsButton->setEnabled(hasRights);
 
+    ui->testRuleButton->setEnabled(canDelete);
     ui->deleteRuleButton->setEnabled(canDelete);
     m_deleteAction->setEnabled(canDelete);
 
