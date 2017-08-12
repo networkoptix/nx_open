@@ -466,9 +466,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             $timeout(updateHeights,50);
         };
 
-        $('.video-icon.pull-left-5').dropdown();
-
-
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
             $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
