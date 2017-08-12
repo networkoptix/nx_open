@@ -132,7 +132,7 @@ private:
     {
         auto tunnel = std::make_unique<OutgoingTunnelStub>(targetHost);
         m_lastCreatedTunnel = tunnel.get();
-        return tunnel;
+        return std::move(tunnel);
     }
 
     void saveConnectResult(
