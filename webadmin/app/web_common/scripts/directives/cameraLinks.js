@@ -58,7 +58,7 @@ angular.module('nxCommon')
                     };
 
                     return linkTemplates[transport].
-                        replace("{{credentials}}", scope.useCredentials?(scope.useLogin + ':' + scope.usePassword):'').
+                        replace("{{credentials}}", scope.useCredentials?(scope.useLogin + ':' + scope.usePassword + '@'):'').
                         replace("{{host}}", window.location.host).
                         replace("{{cameraId}}", camera.id.replace('{','').replace('}','')).
                         replace("{{streamIndex}}", stream).
