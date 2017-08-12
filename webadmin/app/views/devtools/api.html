@@ -23,12 +23,12 @@
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
-                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {url:searchFunc}"
+                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
-                                              ng-bind-html="function.name | escape | highlight:searchFunc"></a></b>
+                                              ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
                                     </li>
                                 </ul>
                             </div>
@@ -49,10 +49,13 @@
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
                                             <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
-                                            <span ng-if="function.method">{{function.method}}:</span>
-                                            <b><a ng-click="setActiveFunction(group,function,$event)"
-                                                  ng-href="#/developers/api{{function.url}}"
-                                                  ng-bind-html="function.url | escape | highlight:searchFunc" ></a></b>
+                                            <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}">
+                                                <b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
+                                                <span ng-if="function.method">{{function.method}}:</span>
+                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
+                                            </a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>
@@ -60,7 +63,7 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.name}}
+                                    {{activeFunction.caption || function.name}}
                                     <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
