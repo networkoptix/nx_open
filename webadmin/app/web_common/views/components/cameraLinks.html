@@ -17,7 +17,7 @@
             <td>{{streamName(stream)}}</td>
             <td>
                 <span ng-repeat="transport in stream.transports">
-                    <a class="only-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>
+                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>
                     <span ng-if="stream.transports.length-1 != $index">&nbsp;/&nbsp;</span>
                 </span>
             </td>
