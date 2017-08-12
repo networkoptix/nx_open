@@ -514,8 +514,13 @@ table.webclient-window>tbody>tr>td{
     color: $dark9;
     padding-bottom: 5px;
   }
+
   &-info{
     color: $dark9 !important;
+  }
+
+  &-label{
+    line-height: 33px;
   }
 }
 .camera-links-panel.night-mode{
@@ -530,6 +535,12 @@ table.webclient-window>tbody>tr>td{
 
   input{
     background-color: transparent;
+  }
+  & [type="checkbox"]:not(:checked){
+    opacity: 0.4;
+  }
+  & [type="checkbox"]:checked{
+    opacity: 0.7;
   }
 }
 
