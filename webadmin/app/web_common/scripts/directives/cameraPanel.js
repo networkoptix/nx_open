@@ -6,12 +6,7 @@ angular.module('nxCommon')
             scope:{
                 "activeCamera":"=",
                 "camerasProvider": "=",
-                "player": "=",
-                "system": "=",
-                "currentResolution": "=",
-                "positionProvider": "=",
-                "showCameraPanel": "=",
-                "cameraLinksEnabled": "="
+                "showCameraPanel": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
@@ -45,10 +40,6 @@ angular.module('nxCommon')
                 };
                 
                 function searchCams(){
-                    if(scope.searchCams.toLowerCase() == "links panel"){ // Enable cameras and clean serach fields
-                        scope.cameraLinksEnabled = true;
-                        scope.searchCams = "";
-                    }
                     function has(str, substr){
                         return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
                     }
