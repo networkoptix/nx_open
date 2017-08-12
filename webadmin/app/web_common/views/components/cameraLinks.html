@@ -9,7 +9,7 @@
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info" style="max-width: 140px; padding-bottom: 3px;">{{activeCamera.id.replace('{','').replace('}','')}}
-            <a title="Copy to clipboard" clipboard ng-if="clipboardSupported" supported="clipboardSupported"
+            <a title="{{L.common.cameraLinks.copyToClipboard}}" clipboard ng-if="clipboardSupported" supported="clipboardSupported"
                href="" text="activeCamera.id.replace('{','').replace('}','')"><span class="glyphicon glyphicon-copy"></span></a></td>
         </tr>
         <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>

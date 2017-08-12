@@ -31,6 +31,7 @@ angular.module('nxCommon')
                 scope.useCredentials = false;
                 scope.useLogin = 'login';
                 scope.usePassword = 'password';
+                scope.L = L;
 
                 scope.clipboardSupported = true; // presume
 
