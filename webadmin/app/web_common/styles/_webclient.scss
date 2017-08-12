@@ -30,6 +30,11 @@
 .visibility-hidden{
     visibility:hidden;
 }
+
+.only-uppercase{
+  text-transform: uppercase;
+}
+
 .webclient{
   &{
     height:100%;
@@ -489,6 +494,14 @@ table.webclient-window>tbody>tr>td{
     }
     & tr{
       height: 20px;
+
+      & > :first-child{
+        width: 100px;
+      }
+
+      & > :not(:first-child){
+        width: 140px;
+      }
       
       input{
         border: 1px solid rgba($light16,0.2);
@@ -517,6 +530,10 @@ table.webclient-window>tbody>tr>td{
 
   &-info{
     color: $dark9 !important;
+    
+    &.buffer{
+      padding-bottom: 3px;
+    }
   }
 
   &-label{
@@ -642,7 +659,11 @@ table.webclient-window>tbody>tr>td{
   &-divider{
     height: 1px;
     background-color: $light16;
-    opacity: 0.2;  
+    opacity: 0.2;
+    
+    &.buffer{
+      margin-top:4px;
+    }  
   }
 
   &-title{

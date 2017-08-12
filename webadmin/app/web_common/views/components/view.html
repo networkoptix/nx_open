@@ -46,15 +46,15 @@
                                                    ng-click="selectResolution(resolution)">{{resolution}}</a>
                                             </li>
 
-                                            <li class="video-settings-divider" style="margin-top: 4px;" ng-if="debugMode"></li>
+                                            <li class="video-settings-divider buffer" ng-if="debugMode"></li>
                                             <li class="video-settings-title" ng-if="debugMode">Video Player</li>
                                             <li class="video-settings-divider"  ng-if="debugMode"></li>
                                             <li ng-repeat="format in manualFormats" class="video-settings-item" ng-if="debugMode">
                                                 <a ng-class="{active:format == activeFormat}"
                                                    ng-click="selectFormat(format)">{{format}}</a>
                                                 </li>
-                                            <li class="video-settings-divider" style="margin-top: 4px;" ng-if="isWebAdmin"></li>
-                                            <li class="video-settings-button" ng-if="isWebAdmin"
+                                            <li class="video-settings-divider buffer" ng-if="isWebAdmin || debugMode"></li>
+                                            <li class="video-settings-button" ng-if="isWebAdmin || debugMode"
                                                 ng-click="cameraLinks.enabled=!cameraLinks.enabled">
                                                 <span class="glyphicon glyphicon-cog"></span>Camera Details
                                             </li>
