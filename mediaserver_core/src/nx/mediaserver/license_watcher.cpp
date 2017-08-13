@@ -94,7 +94,8 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
     {
         ec2::ApiDetailedLicenseData licenseData;
         ec2::fromResourceToApi(license, licenseData);
-        result.licenses.push_back(licenseData);
+        if (result.info.hwids.contains(licenseData.hardwareId))
+            result.licenses.push_back(licenseData);
     }
 
     return result;
@@ -102,7 +103,10 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
 
 void LicenseWatcher::update()
 {
-    auto requestBody = QJson::serialized(licenseData());
+    auto data = licenseData();
+    if (data.licenses.empty())
+        return; //< Nothing to update.
+    auto requestBody = QJson::serialized(data);
     m_httpClient->setRequestBody(
         std::make_unique<nx_http::BufferSource>(
             serializationFormatToHttpContentType(Qn::JsonFormat),
