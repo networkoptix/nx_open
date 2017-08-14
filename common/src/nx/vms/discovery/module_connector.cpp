@@ -150,7 +150,7 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 
 void ModuleConnector::Module::ensureConnection()
 {
-    if ((m_id.isNull()) || (m_httpClients.empty() && !m_socket))
+    if (m_id.isNull() || (m_httpClients.empty() && !m_socket))
         connectToGroup(m_endpoints.begin());
 }
 
@@ -180,7 +180,7 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
     Endpoints::iterator group;
     if (m_id.isNull())
         group = getGroup(kDefault);
-    if (endpoint.address == HostAddress::localhost)
+    else if (endpoint.address == HostAddress::localhost)
         group = getGroup(kLocalHost);
     else if (endpoint.address.isLocal())
         group = getGroup(kLocalNetwork);
@@ -220,6 +220,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
         return;
     }
+
+    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
+        endpointsGroup->first, endpointsGroup->second.size()));
 
     if (m_timer.timeToEvent())
         m_timer.cancelSync();

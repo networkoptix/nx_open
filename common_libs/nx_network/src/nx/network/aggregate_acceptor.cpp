@@ -57,7 +57,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
                         nullptr, SystemError::timedOut, nullptr));
             }
 
-            m_acceptAsyncIsInvoked = true;
+            m_acceptAsyncIsBeingInvoked = true;
             for (auto& source: m_acceptors)
             {
                 if (source.isAccepting)
@@ -73,7 +73,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
                 if (!source.isAccepting)
                     break; //< Accept handler has been invoked within acceptAsync call.
             }
-            m_acceptAsyncIsInvoked = false;
+            m_acceptAsyncIsBeingInvoked = false;
         });
 }
 
@@ -197,7 +197,7 @@ void AggregateAcceptor::accepted(
     for (auto& socketContext: m_acceptors)
         socketContext.stopAccepting();
 
-    if (m_acceptAsyncIsInvoked)
+    if (m_acceptAsyncIsBeingInvoked)
     {
         post(
             [handler = std::move(handler), code, socket = std::move(socket)]() mutable

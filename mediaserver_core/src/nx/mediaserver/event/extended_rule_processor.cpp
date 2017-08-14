@@ -508,7 +508,7 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
     if (!camera || !fixActionTimeFields(action))
         return false;
 
-    const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule());
+    const auto bookmark = helpers::bookmarkFromAction(action, camera);
     return qnServerDb->addBookmark(bookmark);
 }
 

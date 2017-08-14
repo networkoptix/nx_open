@@ -14,6 +14,7 @@
 #include <api/helpers/send_statistics_request_data.h>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -39,10 +40,10 @@ static const size_t TcpConnectTimeoutMs = 5 * 1000;
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
-    NX_VERBOSE("rest::ServerConnection") lm("%1 <%2>: %3")
+    NX_VERBOSE("rest::ServerConnection", lm("%1 <%2>: %3")
         .arg(serverId)
         .arg(handle)
-        .arg(message);
+        .arg(message));
 }
 
 } // namepspace
@@ -393,6 +394,19 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     {
         auto randomResource = nx::utils::random::choice(rule->eventResources());
         params.insert(lit("eventResourceId"), randomResource.toString());
+    }
+    else if (nx::vms::event::isSourceCameraRequired(rule->eventType())
+        || rule->eventType() >= nx::vms::event::userDefinedEvent)
+    {
+        auto randomCamera = nx::utils::random::choice(
+            commonModule()->resourcePool()->getAllCameras(QnResourcePtr(), true));
+        params.insert(lit("eventResourceId"), randomCamera->getId().toString());
+    }
+    else if (nx::vms::event::isSourceServerRequired(rule->eventType()))
+    {
+        auto randomServer = nx::utils::random::choice(
+            commonModule()->resourcePool()->getAllServers(Qn::Online));
+        params.insert(lit("eventResourceId"), randomServer->getId().toString());
     }
 
     if (toggleState != nx::vms::event::EventState::undefined)

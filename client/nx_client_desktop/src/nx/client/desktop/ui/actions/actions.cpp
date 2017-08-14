@@ -333,7 +333,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Showreel..."))
             .pulledText(ContextMenu::tr("New Showreel..."))
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({Qn::LayoutsNode, Qn::LayoutToursNode})
+                && condition::treeNodeType({Qn::LayoutToursNode})
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -699,7 +699,11 @@ void initialize(Manager* manager, Action* root)
         .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
 
     factory(AcknowledgeEventAction)
-        .flags(NoTarget);
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::ViewContentPermission)
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
+            && !condition::isSafeMode());
 
     factory(AddCameraBookmarkAction)
         .flags(Slider | SingleTarget)

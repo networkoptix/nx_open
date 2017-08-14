@@ -85,7 +85,7 @@ protected:
 private:
     struct AcceptResult
     {
-        SystemError::ErrorCode sysErrorCode;
+        SystemError::ErrorCode systemErrorCode;
         std::unique_ptr<AbstractStreamSocket> connection;
     };
 
@@ -103,10 +103,10 @@ private:
     }
 
     void onAccepted(
-        SystemError::ErrorCode sysErrorCode,
+        SystemError::ErrorCode systemErrorCode,
         std::unique_ptr<AbstractStreamSocket> connection)
     {
-        m_acceptResults.push({sysErrorCode, std::move(connection)});
+        m_acceptResults.push({systemErrorCode, std::move(connection)});
     }
 };
 

@@ -10,7 +10,8 @@ angular.module('webadminApp', [
     'tc.chartjs',
     'ngStorage',
     'typeahead-focus',
-    'ui.timepicker'
+    'ui.timepicker',
+    'angular-clipboard'
 ]).config(function ($routeProvider) {
 
     var universalResolves = {
@@ -55,10 +56,6 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'info.html',
             controller: 'InfoCtrl'
         })
-        .when('/developers/changelog', {
-            templateUrl: Config.viewsDir + 'api_changelog.html',
-            controller: 'MainCtrl'
-        })
         .when('/support', {
             templateUrl: Config.viewsDir + 'support.html',
             controller: 'MainCtrl'
@@ -84,14 +81,23 @@ angular.module('webadminApp', [
         })
         .when('/developers/api/:apiMethod*', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
-            controller: 'ApiToolCtrl'
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
         })
         .when('/developers/api', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
-            controller: 'ApiToolCtrl'
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
         })
         .when('/developers/events', {
             templateUrl: Config.viewsDir + 'devtools/events.html',
+            controller: 'ApiToolCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.apiMethod = 'api/createEvent'; }]
+            }
+        })
+        .when('/developers/changelog', {
+            templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
             controller: 'DevtoolsCtrl'
         })
         .when('/client', {

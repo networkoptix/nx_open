@@ -77,7 +77,7 @@ protected:
 
         nx::utils::promise<SystemError::ErrorCode> connected;
         m_client.connect(
-            m_server->getServerUrl(),
+            m_serverUrl,
             [&connected](SystemError::ErrorCode resultCode) { connected.set_value(resultCode); });
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
 
@@ -89,6 +89,25 @@ protected:
         givenConnectedClient();
         whenRestartServer();
         thenClientReconnects();
+    }
+
+    void givenBrokenServer()
+    {
+        m_server.reset();
+    }
+
+    void givenDisconnectedClient()
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(m_client.setIndicationHandler(
+            m_indictionMethodToSubscribeTo,
+            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
+            this));
+
+        m_client.connect(
+            m_serverUrl,
+            [](SystemError::ErrorCode /*resultCode*/) {});
     }
 
     void whenRemoveHandler()
@@ -199,6 +218,7 @@ private:
     typename AsyncClientTestTypes::ClientType m_client;
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
+    QUrl m_serverUrl;
     nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
     nx::utils::SyncQueue<RequestResult> m_requestResult;
     nx::utils::SyncQueue<nx::stun::Message> m_indicationsReceived;
@@ -228,6 +248,7 @@ private:
 
         ASSERT_TRUE(m_server->bind(m_serverEndpoint));
         m_serverEndpoint = nx::network::url::getEndpoint(m_server->getServerUrl());
+        m_serverUrl = m_server->getServerUrl();
         ASSERT_TRUE(m_server->listen());
     }
 
@@ -355,6 +376,16 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, scheduled_request_is_completed_after
     this->thenRequestFailureIsReported();
 }
 
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, request_result_is_reported_even_if_connect_always_fails)
+{
+    this->givenBrokenServer();
+    this->givenDisconnectedClient();
+
+    this->whenIssueRequest();
+
+    this->thenRequestFailureIsReported();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
@@ -363,7 +394,8 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     subscription_to_every_indication,
     client_receives_indication_after_reconnect,
     request_scheduled_after_connection_forcibly_closed,
-    scheduled_request_is_completed_after_reconnect);
+    scheduled_request_is_completed_after_reconnect,
+    request_result_is_reported_even_if_connect_always_fails);
 
 } // namespace test
 } // namespace stun

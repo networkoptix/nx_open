@@ -49,8 +49,7 @@ private:
         const QString& serverVersion);
 
     static QString getDiffVersionFullExtras(
-        const QString& clientVersion,
-        const QString& serverVersion,
+        const QnConnectionInfo& serverInfo,
         const QString& extraText);
 
     static void showValidateConnectionErrorMessage(

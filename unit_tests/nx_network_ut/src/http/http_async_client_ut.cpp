@@ -167,7 +167,7 @@ private:
         const auto serverAddress = m_synchronousServer
             ? m_synchronousServer->endpoint()
             : m_httpServer.serverAddress();
-        return nx::network::url::Builder().setScheme("http")
+        return nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
             .setEndpoint(serverAddress).setPath(kTestPath);
     }
 
