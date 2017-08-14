@@ -109,6 +109,6 @@
     "reserved":"予約済み"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} web インターフェイス"
   }
 }

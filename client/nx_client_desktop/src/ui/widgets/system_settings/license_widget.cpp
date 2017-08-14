@@ -4,8 +4,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <QtGui/QClipboard>
-
 #include <common/common_module.h>
 
 #include <licensing/license.h>
@@ -22,7 +20,6 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/ui/common/clipboard_button.h>
-#include <nx/client/desktop/ui/common/line_edit_controls.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -120,26 +117,8 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             setState(Waiting);
         });
 
-    auto copyHwidButton = new ClipboardButton(ClipboardButton::StandardType::copy, this);
-    copyHwidButton->setFocusPolicy(Qt::NoFocus);
-    copyHwidButton->setHidden(true);
-    LineEditControls::get(ui->hardwareIdEdit)->addControl(copyHwidButton);
-
-    connect(copyHwidButton, &QPushButton::clicked, this,
-        [this]() { qApp->clipboard()->setText(ui->hardwareIdEdit->text()); });
-
-    connect(ui->hardwareIdEdit, &QLineEdit::textChanged, copyHwidButton,
-        [copyHwidButton](const QString& text) { copyHwidButton->setHidden(text.isEmpty()); });
-
-    auto pasteKeyButton = new ClipboardButton(ClipboardButton::StandardType::paste, this);
-    pasteKeyButton->setFocusPolicy(Qt::NoFocus);
-    LineEditControls::get(ui->onlineKeyEdit)->addControl(pasteKeyButton);
-
-    connect(pasteKeyButton, &QPushButton::clicked, this,
-        [this]() { ui->onlineKeyEdit->setText(qApp->clipboard()->text()); });
-
-    connect(qApp->clipboard(), &QClipboard::dataChanged, pasteKeyButton,
-        [pasteKeyButton]() { pasteKeyButton->setEnabled(!qApp->clipboard()->text().isEmpty()); });
+    ClipboardButton::createInline(ui->hardwareIdEdit, ClipboardButton::StandardType::copy);
+    ClipboardButton::createInline(ui->onlineKeyEdit, ClipboardButton::StandardType::paste);
 
     updateControls();
 }

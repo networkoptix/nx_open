@@ -1642,7 +1642,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>幻灯片周期</translation>
     </message>
   </context>
   <context>

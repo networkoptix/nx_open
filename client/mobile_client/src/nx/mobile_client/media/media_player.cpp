@@ -16,6 +16,13 @@ MediaPlayer::MediaPlayer(QObject* parent):
             const auto state = playbackState();
             const auto status = mediaStatus();
 
+            const bool noVideoStreams = status == MediaStatus::NoVideoStreams;
+            if (noVideoStreams != m_noVideoStreams)
+            {
+                m_noVideoStreams = noVideoStreams;
+                emit noVideoStreamsChanged();
+            }
+
             const bool failed = ((m_loading || m_playing) && status == MediaStatus::NoMedia);
             if (m_failed != failed)
             {
@@ -83,6 +90,11 @@ bool MediaPlayer::playing() const
 bool MediaPlayer::failed() const
 {
     return m_failed;
+}
+
+bool MediaPlayer::noVideoStreams() const
+{
+    return m_noVideoStreams;
 }
 
 QnCommonModule* MediaPlayer::commonModule() const

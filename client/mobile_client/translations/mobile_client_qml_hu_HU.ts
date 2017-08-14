@@ -598,7 +598,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>n HHHH éééé</translation>
+      <translation>yyyy MMMM d</translation>
     </message>
   </context>
   <context>
