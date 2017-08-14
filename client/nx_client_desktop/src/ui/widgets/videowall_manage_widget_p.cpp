@@ -507,13 +507,6 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
         m_unitedGeometry = m_unitedGeometry.united(rect);
         m_screens.append({screenNumber++, rect, q});
     }
-    if (QnAppInfo::applicationPlatform() == lit("macosx"))
-    {
-        for (const auto screen: QGuiApplication::screens())
-        {
-            const auto rect = screen->geometry();
-        }
-    }
 }
 
 // TODO: #GDM #VW create iterators
