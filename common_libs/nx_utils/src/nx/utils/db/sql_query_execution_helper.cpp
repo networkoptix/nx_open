@@ -38,18 +38,6 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-#ifdef _DEBUG
-bool validateParams(const QSqlQuery& query)
-{
-    for (const auto& value: query.boundValues().values())
-    {
-        if (!value.isValid())
-            return false;
-    }
-    return true;
-}
-#endif
-
 } // namespace
 
 bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details)
@@ -60,7 +48,6 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
 
 bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details)
 {
-    NX_EXPECT(validateParams(*query));
     if (!query->exec())
     {
         auto error = query->lastError();
