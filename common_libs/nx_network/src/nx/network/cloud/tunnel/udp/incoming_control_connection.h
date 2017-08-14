@@ -38,7 +38,7 @@ public:
      *  @param selectedHandler is called when this connection is selected by client*/
     void start(utils::MoveOnlyFunc<void()> selectedHandler);
 
-    const AbstractStreamSocket* socket();
+    AbstractStreamSocket* socket();
     void resetLastKeepAlive();
 
 private:

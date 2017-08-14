@@ -51,7 +51,7 @@ void IncomingControlConnection::resetLastKeepAlive()
     NX_LOGX(lm("Update last keep alive"), cl_logDEBUG2);
 }
 
-const AbstractStreamSocket* IncomingControlConnection::socket()
+AbstractStreamSocket* IncomingControlConnection::socket()
 {
     return m_socket.get();
 }

@@ -22,7 +22,7 @@ static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
 static const std::chrono::milliseconds kSocketTimeout(3000);
 static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
-class IncomingTunnelConnectionTest:
+class UdpIncomingTunnelConnectionTest:
     public ::testing::Test
 {
 protected:
@@ -57,7 +57,7 @@ protected:
                 tmpSocketGuard.disarm();
 
                 cc->start(nullptr /* do not wait for select in test */);
-                m_connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
+                m_connection = std::make_unique<udp::IncomingTunnelConnection>(std::move(cc));
                 
                 acceptForever();
                 startedPromise.set_value();
@@ -129,7 +129,7 @@ protected:
         m_connectSockets.push_back(std::move(socket));
     }
 
-    std::unique_ptr<IncomingTunnelConnection> takeConnection()
+    std::unique_ptr<udp::IncomingTunnelConnection> takeConnection()
     {
         QnMutexLocker lock(&m_mutex);
         auto localConection = std::move(m_connection);
@@ -139,7 +139,7 @@ protected:
 
     QnMutex m_mutex;
     SocketAddress m_connectionAddress;
-    std::unique_ptr<IncomingTunnelConnection> m_connection;
+    std::unique_ptr<udp::IncomingTunnelConnection> m_connection;
     std::unique_ptr<UdtStreamSocket> m_freeSocket;
     utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
     utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
@@ -147,12 +147,12 @@ protected:
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
 };
 
-TEST_F(IncomingTunnelConnectionTest, Timeout)
+TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
 {
     ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
-TEST_F(IncomingTunnelConnectionTest, Connections)
+TEST_F(UdpIncomingTunnelConnectionTest, Connections)
 {
     runConnectingSockets(kTestConnections);
     for (size_t i = 0; i < kTestConnections; ++i)
@@ -168,7 +168,7 @@ TEST_F(IncomingTunnelConnectionTest, Connections)
     ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
-TEST_F(IncomingTunnelConnectionTest, SynAck)
+TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
 {
     // we can connect right after start
     runConnectingSockets();
@@ -260,12 +260,12 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
     ASSERT_EQ(m_acceptResults.pop(), SystemError::invalidData);
 }
 
-TEST_F(IncomingTunnelConnectionTest, PleaseStop)
+TEST_F(UdpIncomingTunnelConnectionTest, PleaseStop)
 {
     // Tests if TearDown() works fine right after SetUp()
 }
 
-TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
+TEST_F(UdpIncomingTunnelConnectionTest, PleaseStopOnRun)
 {
     std::vector<nx::utils::thread> threads;
     for (size_t i = 0; i < kTestConnections; ++i)
@@ -286,8 +286,103 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
     if (const auto connection = takeConnection())
         connection->pleaseStopSync();
 
-    for (auto& thread : threads)
+    for (auto& thread: threads)
         thread.join();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class ServerSocketStub:
+    public TCPServerSocket
+{
+public:
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override
+    {
+        post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::connectionReset, nullptr);
+            });
+    }
+};
+
+} // namespace
+
+class UdpIncomingTunnelConnection:
+    public ::testing::Test
+{
+public:
+    ~UdpIncomingTunnelConnection()
+    {
+        if (m_tunnelConnection)
+            m_tunnelConnection->pleaseStopSync();
+    }
+
+protected:
+    void givenConnectionWithBrokenUnderlyingSocket()
+    {
+        auto controlConnection = createControlConnection();
+        auto controlConnectionSocketPtr = controlConnection->socket();
+        nx::utils::promise<void> created;
+        controlConnectionSocketPtr->post(
+            [this, &created, controlConnection = std::move(controlConnection)]() mutable
+            {
+                m_tunnelConnection = std::make_unique<udp::IncomingTunnelConnection>(
+                    std::move(controlConnection),
+                    std::make_unique<ServerSocketStub>());
+                created.set_value();
+            });
+        created.get_future().wait();
+    }
+
+    void whenInvokeAccept()
+    {
+        using namespace std::placeholders;
+
+        m_tunnelConnection->accept(
+            std::bind(&UdpIncomingTunnelConnection::saveAcceptResult, this, _1, _2));
+    }
+
+    void thenErrorIsReported()
+    {
+        const auto result = m_acceptResults.pop();
+        ASSERT_NE(SystemError::noError, std::get<0>(result));
+        ASSERT_EQ(nullptr, std::get<1>(result));
+    }
+
+private:
+    using AcceptResult = std::tuple<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>;
+
+    nx::utils::SyncQueue<AcceptResult> m_acceptResults;
+    std::unique_ptr<udp::IncomingTunnelConnection> m_tunnelConnection;
+
+    std::unique_ptr<IncomingControlConnection> createControlConnection()
+    {
+        return std::make_unique<IncomingControlConnection>(
+            "connectionId",
+            std::make_unique<UdtStreamSocket>(SocketFactory::udpIpVersion()),
+            nx::hpm::api::ConnectionParameters());
+        return nullptr;
+    }
+
+    void saveAcceptResult(
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<AbstractStreamSocket> connection)
+    {
+        m_acceptResults.push(std::make_tuple(sysErrorCode, std::move(connection)));
+    }
+};
+
+TEST_F(UdpIncomingTunnelConnection, forwards_error_code_from_underlying_socket)
+{
+    givenConnectionWithBrokenUnderlyingSocket();
+    whenInvokeAccept();
+    thenErrorIsReported();
 }
 
 } // namespace test

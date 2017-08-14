@@ -1,7 +1,7 @@
 #include "incoming_tunnel_connection.h"
 
 #include <nx/utils/log/log.h>
-
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -9,12 +9,16 @@ namespace cloud {
 namespace udp {
 
 IncomingTunnelConnection::IncomingTunnelConnection(
-    std::unique_ptr<IncomingControlConnection> controlConnection)
+    std::unique_ptr<IncomingControlConnection> controlConnection,
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket)
 :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),
-    m_serverSocket(new UdtStreamServerSocket(AF_INET))
+    m_serverSocket(std::move(serverSocket))
 {
+    if (!m_serverSocket)
+        m_serverSocket = std::make_unique<UdtStreamServerSocket>(AF_INET);
+
     auto controlSocket = m_controlConnection->socket();
     m_serverSocket->bindToAioThread(controlSocket->getAioThread());
 
@@ -30,11 +34,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
                 m_serverSocket->pleaseStopSync(false); //< We are in AIO thread.
 
             if (m_acceptHandler)
-            {
-                const auto handler = std::move(m_acceptHandler);
-                m_acceptHandler = nullptr;
-                return handler(code, nullptr);
-            }
+                nx::utils::swapAndCall(m_acceptHandler, code, nullptr);
         });
 
     const SocketAddress addressToBind(HostAddress::anyHost, controlSocket->getLocalAddress().port);
@@ -58,7 +58,7 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
     m_serverSocket->post(
-        [this, handler = std::move(handler)]()
+        [this, handler = std::move(handler)]() mutable
         {
             if (m_state != SystemError::noError)
                 return handler(m_state, nullptr);
@@ -75,10 +75,9 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
                     else
                         m_controlConnection->resetLastKeepAlive();
 
-                    decltype(m_acceptHandler) handler;
-                    handler.swap(m_acceptHandler);
-                    handler(
-                        SystemError::noError,
+                    nx::utils::swapAndCall(
+                        m_acceptHandler,
+                        code,
                         std::unique_ptr<AbstractStreamSocket>(socket));
                 });
         });

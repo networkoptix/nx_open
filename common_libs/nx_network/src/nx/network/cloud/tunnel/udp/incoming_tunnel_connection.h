@@ -21,7 +21,8 @@ class NX_NETWORK_API IncomingTunnelConnection
 {
 public:
     IncomingTunnelConnection(
-        std::unique_ptr<IncomingControlConnection> controlConnection);
+        std::unique_ptr<IncomingControlConnection> controlConnection,
+        std::unique_ptr<AbstractStreamServerSocket> serverSocket = nullptr);
 
     void accept(AcceptHandler handler) override;
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -29,7 +30,7 @@ public:
 private:
     SystemError::ErrorCode m_state;
     std::unique_ptr<IncomingControlConnection> m_controlConnection;
-    std::unique_ptr<UdtStreamServerSocket> m_serverSocket;
+    std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     AcceptHandler m_acceptHandler;
 };
 
