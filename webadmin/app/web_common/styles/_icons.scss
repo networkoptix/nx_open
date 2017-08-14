@@ -115,6 +115,7 @@
   }
 }
 /* Check CLOUD-1197 - this style affected some other remove buttons, so we limit its effect to cameras-panel only */
+.camera-links-panel .glyphicon-remove,
 .cameras-panel .glyphicon-remove{
   @include kill-glyphicon;
   height: 10px !important;

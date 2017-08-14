@@ -25,7 +25,8 @@ angular.module('nxCommon')
             id = id.replace('{','').replace('}','');
             for(var serverId in this.cameras) {
                 var cam = _.find(this.cameras[serverId], function (camera) {
-                    return camera.id.replace('{','').replace('}','') === id;
+                    return (camera.id.replace('{','').replace('}','') === id) ||
+                           (camera.physicalId.replace('{','').replace('}','') === id);
                 });
                 if(cam){
                     return cam;
