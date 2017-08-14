@@ -117,6 +117,7 @@ public:
     enum class MediaStatus
     {
         Unknown,
+        NoVideoStreams,
         NoMedia,
         Loading,
         Loaded,

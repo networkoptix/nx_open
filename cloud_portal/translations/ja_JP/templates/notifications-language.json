@@ -12,6 +12,6 @@
     "emailSubject":"ビデオ システム {{message.system_name}} が共有されました"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"バージョン{{message.id}}の準備ができました"
   }
 }
