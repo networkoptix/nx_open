@@ -60,15 +60,3 @@ typedef nxpl::PluginInterface* (*CreateNxMetadataPluginProc)();
 } // namespace metadata
 } // namespace sdk
 } // namespace nx
-
-extern "C" {
-
-/**
- * @brief createNxMetadataPlugin main entry point to plugin.
- * @return pointer to object that implements
- * nx::sdk::metadata::AbstractMetadataPlugin interface.
- * At the same time there MUST exist only one such an object.
- */
-nxpl::PluginInterface* createNxMetadataPlugin();
-
-} // extern "C"

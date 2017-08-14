@@ -86,7 +86,7 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
     if (!commonModule)
         return result;
 
-    auto pluginManager = commonModule->pluginManager();
+    auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, "There should be common module.");
     if (!pluginManager)
         return result;

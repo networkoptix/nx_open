@@ -35,7 +35,6 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
-class PluginManager;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
@@ -183,11 +182,6 @@ public:
         return m_metadataPluginFactory;
     }
 
-    PluginManager* pluginManager() const
-    {
-        return m_pluginManager;
-    }
-
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -325,10 +319,9 @@ private:
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
 
+    // TODO: #dmishin move these factories to server module
     nx::analytics::DetectionPluginFactory* m_detectionPluginFactory = nullptr;
     nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
-    CommonPluginContainer m_pluginContainer;
-    PluginManager* m_pluginManager = nullptr;
 
     QnUuid m_videowallGuid;
 };

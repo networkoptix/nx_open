@@ -36,11 +36,14 @@
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/metadata/event_rule_watcher.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include <plugins/plugin_manager.h>
 
 namespace {
 
@@ -157,6 +160,15 @@ QnMediaServerModule::QnMediaServerModule(
     store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule()));
 
+    m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
+    m_pluginManager->loadPlugins(roSettings());
+
+    m_metadataRuleWatcher = store(
+        new nx::mediaserver::metadata::EventRuleWatcher(
+            commonModule()->eventRuleManager()));
+
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
@@ -196,4 +208,19 @@ QSettings* QnMediaServerModule::runTimeSettings() const
 nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
 {
     return m_unusedWallpapersWatcher;
+}
+
+PluginManager* QnMediaServerModule::pluginManager() const
+{
+    return m_pluginManager;
+}
+
+nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool() const
+{
+    return m_metadataManagerPool;
+}
+
+nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
+{
+    return m_metadataRuleWatcher;
 }

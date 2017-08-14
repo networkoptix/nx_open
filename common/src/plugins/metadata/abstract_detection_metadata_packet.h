@@ -37,42 +37,50 @@ struct Rect
     float height = 0;
 };
 
+
 /**
- * @brief The DetectedObject struct represents the single detected on the scene object.
+ * Each class that implements AbstractDetectedObject interface
+ * should properly handle this GUID in its queryInterface method
  */
-struct DetectedObject: public AbstractMetadataItem
+static const nxpl::NX_GUID IID_DetectedObject
+    = {{0x0f, 0xf4, 0xa4, 0x6f, 0xfd, 0x08, 0x4f, 0x4a, 0x97, 0x88, 0x16, 0xa0, 0x8c, 0xd6, 0x4a, 0x29}};
+
+/**
+ * @brief The AbstarctDetectedObject struct represents the single detected on the scene object.
+ */
+class AbstarctDetectedObject: public AbstractMetadataItem
 {
+public:
     /**
      * @brief id of detected object. If the object (e.g. particular person)
      * is detected on multiple frames this parameter SHOULD be the same every time.
      */
-    nxpl::NX_GUID id;
-
+    virtual nxpl::NX_GUID id() = 0;
 
     /**
-     * @brief (vehicle type | truck | car | e.t.c)
+     * @brief (e.g. vehicle type: truck,  car, etc)
      */
-    NX_ASCII char* objectSubType = nullptr;
+    virtual NX_ASCII const char* objectSubType() = 0;
 
     /**
      * @brief attributes array of object attributes (e.g. age, color).
      */
-    NX_LOCALE_DEPENDENT Attribute* attributes = nullptr;
+    virtual NX_LOCALE_DEPENDENT Attribute* attributes() = 0;
 
     /**
      * @brief attributeCount count of attributes
      */
-    int attributeCount = 0;
+    virtual int attributeCount() = 0;
 
     /**
      * @brief auxilaryData user side data in json format. Null terminated UTF-8 string.
      */
-    char* auxilaryData = nullptr;
+    virtual const char* auxilaryData() = 0;
 
     /**
      * @brief boundingBox bounding box of detected object.
      */
-    Rect boundingBox;
+    virtual Rect boundingBox() = 0;
 };
 
 /**
@@ -94,7 +102,7 @@ public:
      * @return next detected object or null if no more objects left.
      * This functions should not modify objects and behave like a constant iterator.
      */
-    virtual const DetectedObject* nextItem() = 0;
+    virtual AbstarctDetectedObject* nextItem() = 0;
 };
 
 } // namespace metadata

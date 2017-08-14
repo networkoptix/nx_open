@@ -19,6 +19,7 @@
 #include "common/common_module.h"
 #include "plugins/plugin_manager.h"
 #include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
@@ -28,7 +29,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonMod
     QnMdnsResourceSearcher(commonModule),
     QnUpnpResourceSearcherAsync(commonModule)
 {
-    auto pluginManager = commonModule->pluginManager();
+    auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
     QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(

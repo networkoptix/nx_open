@@ -41,6 +41,11 @@ namespace nxpt
             reset();
         }
 
+        operator bool() const
+        {
+            return m_ptr;
+        }
+
         //!Returns protected pointer without releasing it
         T* get()
         {
@@ -247,6 +252,40 @@ namespace nxpt
         nxpl::PluginInterface* m_objToWatch;
         CommonRefManager* m_refCountingDelegate;
     };
+
+    
+    template <typename T>
+    class CommonRefCounter: public T
+    {
+    public:
+        virtual unsigned int addRef() override
+        {
+            return m_refManager.addRef();
+        }
+
+        virtual unsigned int releaseRef() override
+        {
+            return m_refManager.releaseRef();
+        }
+
+    protected:
+        nxpt::CommonRefManager m_refManager;
+
+        CommonRefCounter():
+            m_refManager(static_cast<T*>(this))
+        {
+        }
+
+        CommonRefCounter(nxpt::CommonRefManager* refManager):
+            m_refManager(refManager)
+        {
+        }
+    };
+}
+
+inline bool operator == (const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2)
+{
+    return memcmp(id1.bytes, id2.bytes, sizeof(id1.bytes)) == 0;
 }
 
 #endif  //PLUGIN_TOOLS_H

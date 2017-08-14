@@ -24,12 +24,12 @@ public:
     /**
     * @brief Human readable object type (line crossing | human detected | etc)
     */
-    nxpl::NX_GUID eventTypeId;
+    virtual nxpl::NX_GUID eventTypeId() const = 0;
 
     /**
     * @brief Level of confidence in range (0..1]
     */
-    double confidence = 1.0;
+    virtual float confidence() const = 0;
 };
 
 } // namespace metadata

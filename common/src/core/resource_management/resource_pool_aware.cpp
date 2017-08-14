@@ -21,7 +21,6 @@ ResourcePoolAware::ResourcePoolAware(QnCommonModule* common):
     QObject::connect(
         resourcePool, &QnResourcePool::resourceRemoved,
         this, &ResourcePoolAware::resourceRemoved);
-
 }
 
 ResourcePoolAware::~ResourcePoolAware()

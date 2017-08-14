@@ -58,7 +58,8 @@ enum class Error
 {
     noError,
     unknownError,
-    needMoreBufferSpace
+    needMoreBufferSpace,
+    typeIsNotSupported
 };
 
 } // namespace metadata

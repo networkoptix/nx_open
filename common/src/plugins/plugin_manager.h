@@ -14,9 +14,6 @@
 #include <plugins/plugin_container_api.h>
 #include <plugins/metadata/abstract_metadata_plugin.h>
 
-#include <common/common_module.h>
-#include <common/common_module_aware.h>
-
 
 //!Loads custom application plugins and provides plugin management methods
 /*!
@@ -30,8 +27,7 @@
 */
 class PluginManager
 :
-    public QObject,
-    public QnCommonModuleAware
+    public QObject
 {
     Q_OBJECT
 
@@ -45,9 +41,10 @@ public:
     };
 
     PluginManager(
-        QnCommonModule* commonModule,
+        QObject* parent,
         const QString& pluginDir = QString(),
         nxpl::PluginInterface* const pluginContainer = nullptr);
+
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins

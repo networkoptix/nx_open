@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <plugins/metadata/abstract_data_packet.h>
 
 namespace nx {
@@ -20,12 +22,12 @@ static const nxpl::NX_GUID IID_MetadataPacket =
 class AbstractMetadataPacket: public AbstractDataPacket
 {
 public:
-    virtual int64_t timestampUsec() = 0;
+    virtual int64_t timestampUsec() const = 0;
 
     /**
      * @return duration of packet or zero if not used.
      */
-    virtual int64_t durationUsec() = 0;
+    virtual int64_t durationUsec() const = 0;
 };
 
 } // namespace metadata

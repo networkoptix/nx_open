@@ -22,7 +22,7 @@ static const nxpl::NX_GUID IID_IterableMetadataPacket
 class AbstractIterableMetadataPacket: public AbstractMetadataPacket
 {
 public:
-    virtual const AbstractMetadataItem* nextItem() = 0;
+    virtual AbstractMetadataItem* nextItem() = 0;
 };
 
 } // namespace metadata

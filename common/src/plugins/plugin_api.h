@@ -19,12 +19,6 @@
 */
 namespace nxpl
 {
-    //!Define to mark locale dependent output paramters and return values.
-    #define NX_LOCALE_DEPENDENT
-
-    //!Define to mark ascii only output parameters and return values.
-    #define NX_ASCII
-
     //!GUID of plugin interface
     struct NX_GUID
     {
@@ -153,5 +147,17 @@ namespace nxpl
     //!Type of plugin entry-point function
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
+
+#ifdef _WIN32
+    #define NX_PLUGIN_API __declspec(dllexport)
+#else
+    #defined NX_PLUGIN_API
+#endif
+
+//!Define to mark locale dependent output paramters and return values.
+#define NX_LOCALE_DEPENDENT
+
+//!Define to mark ascii only output parameters and return values.
+#define NX_ASCII
 
 #endif  //NX_PLUGIN_API_H

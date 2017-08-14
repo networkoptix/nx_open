@@ -23,7 +23,7 @@ public:
      */
     virtual void handleMetadata(
         Error error,
-        const AbstractMetadataPacket** outMetadata) = 0;
+        AbstractMetadataPacket* metadata) = 0;
 };
 
 /**
@@ -66,7 +66,7 @@ public:
      * needMoreBufferSpace in case buffer size is not enough.
      * some other value otherwise.
      */
-    virtual const char* capabiltiesManifest() = 0;
+    virtual const char* capabiltiesManifest() const = 0;
 };
 
 } // namespace metadata

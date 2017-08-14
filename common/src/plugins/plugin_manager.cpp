@@ -17,11 +17,11 @@
 using namespace nx::sdk;
 
 PluginManager::PluginManager(
-    QnCommonModule* commonModule,
+    QObject* parent,
     const QString& pluginDir,
     nxpl::PluginInterface* const pluginContainer)
 :
-    QnCommonModuleAware(commonModule),
+    QObject(parent),
     m_pluginDir( pluginDir ),
     m_pluginContainer( pluginContainer )
 {
@@ -150,8 +150,12 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
-    if (entryProc == NULL)
+    nxpl::PluginInterface* (*entryProc)() = (decltype(entryProc))lib.resolve( "createNXPluginInstance" );
+
+    if (entryProc == nullptr)
+        entryProc = (decltype(entryProc))lib.resolve("createNxMetadataPlugin");
+
+    if (entryProc == nullptr)
     {
         NX_LOG( lit("Failed to load %1: no createNXPluginInstance").arg(fullFilePath), cl_logERROR );
         lib.unload();
@@ -178,7 +182,6 @@ bool PluginManager::loadNxPlugin(
             pluginObj->setSettings( &settingsForPlugin[0], settingsForPlugin.size() );
 
         pluginObj->releaseRef();
-        return false;
     }
 
     nxpl::Plugin2* plugin2Obj = static_cast<nxpl::Plugin2*>(obj->queryInterface(nxpl::IID_Plugin2));
@@ -186,11 +189,16 @@ bool PluginManager::loadNxPlugin(
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
+
+        plugin2Obj->releaseRef();
     }
 
     nxpl::Plugin3* plugin3Obj = static_cast<nxpl::Plugin3*>(obj->queryInterface(nxpl::IID_Plugin3));
     if (plugin3Obj)
+    {
         plugin3Obj->setLocale("en_US"); //< Change to real locale.
+        plugin3Obj->releaseRef();
+    }
 
     emit pluginLoaded();
     return true;

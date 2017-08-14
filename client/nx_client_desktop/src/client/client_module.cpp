@@ -35,6 +35,8 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
 
+#include <camera/video_decoder_factory.h>
+
 #include <cloud/cloud_connection.h>
 
 #include <core/resource/client_camera_factory.h>
@@ -565,8 +567,10 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
+    auto pluginManager = commonModule->store(new PluginManager(nullptr));
+
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
-    QnVideoDecoderFactory::setCommonModule(commonModule);
+    QnVideoDecoderFactory::setPluginManager(pluginManager);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
