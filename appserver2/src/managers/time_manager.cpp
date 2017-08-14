@@ -998,7 +998,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
             m_localTimePriorityKey.flags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
 
             const auto maxDifferenceBetweenSynchronizedAndInternetTime =
-                qnGlobalSettings->maxDifferenceBetweenSynchronizedAndInternetTime();
+                m_messageBus->commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
 
             if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > 
                 duration_cast<milliseconds>(
