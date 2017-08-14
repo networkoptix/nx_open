@@ -2,6 +2,8 @@
 
 #include <QtCore/QtEndian>
 
+#include <api/helpers/event_log_request_data.h>
+
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 
@@ -798,97 +800,82 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     return rez;
 }
 
-QString QnServerDb::getRequestStr(
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const QnUuid& eventSubType,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
 {
-    QString request(lit("SELECT * FROM runtime_actions where"));
-    if (!period.isInfinite())
+    QString requestStr(lit("SELECT * FROM runtime_actions where"));
+    if (!request.period.isInfinite())
     {
-        request += QString(lit(" timestamp between '%1' and '%2'"))
-            .arg(period.startTimeMs / 1000).arg(period.endTimeMs() / 1000);
+        requestStr += lit(" timestamp between '%1' and '%2'")
+            .arg(request.period.startTimeMs / 1000).arg(request.period.endTimeMs() / 1000);
     }
     else
     {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs / 1000);
+        requestStr += lit(" timestamp >= '%1'").arg(request.period.startTimeMs / 1000);
     }
 
-    if (resList.size() == 1)
+    if (request.cameras.size() == 1)
     {
-        request += QString(lit(" and event_resource_guid = %1 "))
-            .arg(guidToSqlString(resList[0]->getId()));
+        requestStr += QString(lit(" and event_resource_guid = %1 "))
+            .arg(guidToSqlString(request.cameras[0]->getId()));
     }
-    else if (resList.size() > 1)
+    else if (request.cameras.size() > 1)
     {
         QString idList;
-        for (const QnResourcePtr& res: resList)
+        for (const auto& camera: request.cameras)
         {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
-            idList += guidToSqlString(res->getId());
+            idList += guidToSqlString(camera->getId());
         }
-        request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
+        requestStr += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
-    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
+    if (request.eventType != vms::event::undefinedEvent
+        && request.eventType != vms::event::anyEvent)
     {
-        if (vms::event::hasChild(eventType))
+        if (vms::event::hasChild(request.eventType))
         {
-            QList<vms::event::EventType> events = vms::event::childEvents(eventType);
+            QList<vms::event::EventType> events = vms::event::childEvents(request.eventType);
             QString eventTypeStr;
             for(vms::event::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
             }
-            request += QString(lit(" and event_type in (%1) ")).arg(eventTypeStr);
+            requestStr += QString(lit(" and event_type in (%1) ")).arg(eventTypeStr);
         }
         else
         {
-            request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
+            requestStr += QString(lit(" and event_type = %1 ")).arg((int) request.eventType);
         }
     }
 
-    if (!eventSubType.isNull())
+    if (!request.eventSubtype.isNull())
     {
-        request += lit(" and event_subtype = %1 ").arg(guidToSqlString(eventSubType));
+        requestStr += lit(" and event_subtype = %1 ").arg(guidToSqlString(request.eventSubtype));
     }
 
-    if (actionType != vms::event::undefinedAction)
-        request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
-    if (!businessRuleId.isNull())
+    if (request.actionType != vms::event::undefinedAction)
+        requestStr += QString(lit(" and action_type = %1 ")).arg((int) request.actionType);
+
+    if (!request.ruleId.isNull())
     {
-        request += QString(lit(" and  business_rule_guid = %1 "))
-            .arg(guidToSqlString(businessRuleId));
+        requestStr += QString(lit(" and  business_rule_guid = %1 "))
+            .arg(guidToSqlString(request.ruleId));
     }
 
-    return request;
+    return requestStr;
 }
 
-vms::event::ActionDataList QnServerDb::getActions(
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const QnUuid& eventSubtype,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& request) const
 {
     vms::event::ActionDataList result;
-    QString request = getRequestStr(period,
-        resList,
-        eventType,
-        eventSubtype,
-        actionType,
-        businessRuleId);
+    QString requestStr = getRequestStr(request);
 
     QnWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
-    query.prepare(request);
+    query.prepare(requestStr);
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return result;
 
@@ -929,26 +916,15 @@ inline void appendQnUuidToByteArray(QByteArray& byteArray, const QnUuid& value)
     byteArray.append(value.toRfc4122());
 }
 
-void QnServerDb::getAndSerializeActions(
-    QByteArray& result,
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const QnUuid& eventSubtype,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
+    QByteArray& result) const
 {
-    QString request = getRequestStr(period,
-        resList,
-        eventType,
-        eventSubtype,
-        actionType,
-        businessRuleId);
+    QString requestStr = getRequestStr(request);
 
     QnWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
-    actionsQuery.prepare(request);
+    actionsQuery.prepare(requestStr);
     if (!execSQLQuery(&actionsQuery, Q_FUNC_INFO))
         return;
 

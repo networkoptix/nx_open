@@ -13,6 +13,7 @@
 #include <common/common_module_aware.h>
 
 class QnTimePeriod;
+struct QnEventLogRequestData;
 
 namespace pb {
     class BusinessActionList;
@@ -31,27 +32,12 @@ public:
 
     virtual QnDbTransaction* getTransaction() override;
 
-    void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
     bool removeLogForRes(const QnUuid& resId);
 
-    nx::vms::event::ActionDataList getActions(
-        const QnTimePeriod& period,
-        const QnResourceList& resList,
-        const nx::vms::event::EventType& eventType,
-        const QnUuid& eventSubtype,
-        const nx::vms::event::ActionType& actionType,
-        const QnUuid& businessRuleId) const;
+    nx::vms::event::ActionDataList getActions(const QnEventLogRequestData& request) const;
 
-    void getAndSerializeActions(
-        QByteArray& result,
-        const QnTimePeriod& period,
-        const QnResourceList& resList,
-        const nx::vms::event::EventType& eventType,
-        const QnUuid& eventSubtype,
-        const nx::vms::event::ActionType& actionType,
-        const QnUuid& businessRuleId) const;
-
+    void getAndSerializeActions(const QnEventLogRequestData& request, QByteArray& result) const;
 
     QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
     int auditRecordMaxId() const;
@@ -91,12 +77,7 @@ private:
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
 
-    QString getRequestStr(const QnTimePeriod& period,
-        const QnResourceList& resList,
-        const nx::vms::event::EventType& eventType,
-        const QnUuid& eventSubType,
-        const nx::vms::event::ActionType& actionType,
-        const QnUuid& businessRuleId) const;
+    QString getRequestStr(const QnEventLogRequestData& request) const;
 private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;
