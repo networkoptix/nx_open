@@ -48,6 +48,8 @@ const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
+    lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -199,6 +201,7 @@ public:
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
     bool isSynchronizingTimeWithInternet() const;
+    std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -296,6 +299,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor;
+    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
 
