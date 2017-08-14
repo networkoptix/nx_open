@@ -1003,13 +1003,9 @@ void QnServerDb::getAndSerializeActions(
         appendIntToByteArray(result, actionParams.size());
         result.append(actionParams);
 
-        QVariant eventSubtype = actionsQuery.value(eventSubtypeIdx);
-        if (!eventSubtype.isNull())
-        {
-            QByteArray eventSubtypeData = eventSubtype.toByteArray();
-            result.append(eventSubtypeData);
-            appendIntToByteArray(result, eventSubtypeData.size());
-        }
+        QByteArray eventSubtype = actionsQuery.value(eventSubtypeIdx).toByteArray();
+        appendIntToByteArray(result, eventSubtype.size());
+        result.append(eventSubtype);
 
         ++sizeField;
     }
