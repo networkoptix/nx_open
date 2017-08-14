@@ -1,15 +1,15 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        アカウントが登録されました　<br>{{account.email}} に確認のメッセージを送信します
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        Account is successfully created.
+        アカウントが正常に作成されました。
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">アカウントを作成</h1>
+        <h1 ng-if="!session.fromClient">アカウント作成</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">

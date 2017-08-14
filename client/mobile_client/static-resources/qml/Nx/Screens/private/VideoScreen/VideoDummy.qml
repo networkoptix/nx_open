@@ -58,6 +58,16 @@ DummyMessage
                 title: qsTr("Cannot load video")
                 image: lp("/images/alert_alert.png")
             }
+        },
+        State
+        {
+            name: "noVideoStreams"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Cannot play any video stream")
+                image: lp("/images/alert_alert.png")
+            }
         }
     ]
 }
