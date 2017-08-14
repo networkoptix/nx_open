@@ -32,25 +32,60 @@ QString NX_UTILS_API toString(Level level);
 #else
     static constexpr Level kDefaultLevel = Level::info;
 #endif
+    
 
-class NX_UTILS_API Tag
+class Tag
 {
 public:
     Tag() = default;
     Tag(const char* s) = delete;
-    explicit Tag(QString s);
+    explicit Tag(QString s):
+        m_value(std::move(s))
+    {
+    }
 
     template<typename T>
-    Tag(const T* pointer): m_value(::toString(pointer)) {}
-    Tag(const std::type_info& info): m_value(::toString(info)) {}
+    Tag(const T* pointer):
+        m_value(::toString(pointer))
+    {
+    }
 
-    bool matches(const Tag& mask) const;
-    const QString& toString() const;
-    Tag operator+(const Tag& rhs) const;
+    Tag(const std::type_info& info):
+        m_value(::toString(info))
+    {
+    }
 
-    bool operator<(const Tag& rhs) const;
-    bool operator==(const Tag& rhs) const;
-    bool operator!=(const Tag& rhs) const;
+    bool matches(const Tag& mask) const
+    {
+        // TODO: currently all tags are considered as prefixes, but it might be useful to support
+        // some king of regexp in future.
+        return m_value.startsWith(mask.m_value);
+    }
+
+    const QString& toString() const
+    {
+        return m_value;
+    }
+
+    Tag operator+(const Tag& rhs) const
+    {
+        return Tag(lit("%1::%2").arg(m_value, rhs.m_value));
+    }
+
+    bool operator<(const Tag& rhs) const
+    {
+        return m_value < rhs.m_value;
+    }
+
+    bool operator==(const Tag& rhs) const
+    {
+        return m_value == rhs.m_value;
+    }
+
+    bool operator!=(const Tag& rhs) const
+    {
+        return m_value != rhs.m_value;
+    }
 
 private:
     QString m_value;
