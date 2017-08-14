@@ -139,6 +139,10 @@ private:
     void startRelaying(RelaySession relaySession);
 
     virtual void onPublicAddressDiscovered(std::string publicAddress) override;
+    void subscribeForPeerConnected(
+        nx::utils::SubscriptionId* subscriptionId,
+        std::string publicAddress);
+    void subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId);
 };
 
 class ConnectSessionManagerFactory

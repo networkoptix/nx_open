@@ -155,7 +155,7 @@ void View::doReport(const SocketAddress& address, const lm& message, utils::log:
     }
     catch (const std::exception&)
     {
-        NX_WARNING(this, "Cast to the AbstractReportPublicAddressHandler failed.");
+        NX_CRITICAL("Cast to the AbstractReportPublicAddressHandler failed.");
     }
 }
 
