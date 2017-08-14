@@ -202,6 +202,18 @@ PageBase
         }
     }
 
+    MouseArea
+    {
+        id: toggleMouseArea
+
+        anchors.fill: parent
+        onClicked:
+        {
+            if (!ptzPanel.moveOnTapMode)
+                toggleUi()
+        }
+    }
+
     Loader
     {
         id: video
@@ -234,11 +246,6 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked:
-            {
-                if (!ptzPanel.moveOnTapMode)
-                    toggleUi()
-            }
         }
     }
 
@@ -250,7 +257,6 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
         }
     }
 
@@ -300,12 +306,6 @@ PageBase
                     width: mainWindow.width
                     height: mainWindow.height
                     state: videoScreenController.dummyState
-
-                    MouseArea
-                    {
-                        anchors.fill: parent
-                        onClicked: toggleUi()
-                    }
                 }
             }
         }
