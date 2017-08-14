@@ -492,12 +492,14 @@ angular.module('webadminApp')
                 url = url.replace('//','/');
                 return window.location.origin + url;
             },
-            debugFunction:function(method,url,getParams,postParams){
+            debugFunction:function(method, url, getParams, postParams, binary){
                 switch(method){
                     case 'GET':
-                        return $http.get(this.debugFunctionUrl(url,getParams));
+                        return $http.get(this.debugFunctionUrl(url,getParams),
+                                         binary?{responseType: 'arraybuffer'}:null);
                     case 'POST':
-                        return $http.post(this.debugFunctionUrl(url,getParams), postParams);
+                        return $http.post(this.debugFunctionUrl(url,getParams), postParams,
+                                          binary?{responseType: 'arraybuffer'}:null);
 
                 }
             },

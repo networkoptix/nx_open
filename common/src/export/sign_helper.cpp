@@ -67,7 +67,7 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
     QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
     m_outPacket(av_packet_alloc()),
-    m_licenseValidator(new QnLicenseValidator(this))
+    m_licenseValidator(new QnLicenseValidator(commonModule, this))
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;

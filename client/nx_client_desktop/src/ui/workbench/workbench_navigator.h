@@ -44,8 +44,9 @@ class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnSearchQueryStrategy;
-class QnPendingOperation;
 class VariantAnimator;
+
+namespace nx { namespace utils { class PendingOperation; }}
 
 class QnWorkbenchNavigator:
     public Connective<QObject>,
@@ -315,7 +316,7 @@ private:
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
-    QnPendingOperation *m_sliderBookmarksRefreshOperation;
+    nx::utils::PendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;
 

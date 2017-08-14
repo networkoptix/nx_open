@@ -128,8 +128,8 @@ protected:
 TEST_F(AsyncHttpClient, Https)
 {
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
-    httpsTest(lit("http"), lit("httpOnly"));
-    httpsTest(lit("https"), lit("httpsOnly"));
+    httpsTest(nx_http::kUrlSchemeName, lit("httpOnly"));
+    httpsTest(nx_http::kSecureUrlSchemeName, lit("httpsOnly"));
 }
 
 // TODO: #mux Better create HttpServer test and move it there.

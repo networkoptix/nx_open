@@ -7,7 +7,8 @@ function JsHlsAPI(){
     enableWorker = true,
     //levelCapping = -1,
     defaultAudioCodec = undefined,
-    dumpfMP4 = false;
+    dumpfMP4 = false,
+    autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;
@@ -458,7 +459,13 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    return this.hls.destroy();
+    if(this.video){
+        this.video.src="";
+        //This unbinds all of the event listeners for the video player
+        var cloneVideo = this.video.cloneNode(true);
+        this.video.parentNode.replaceChild(cloneVideo, this.video);
+    }
+    this.hls.destroy();
 };
 
 JsHlsAPI.prototype.play = function(offset){

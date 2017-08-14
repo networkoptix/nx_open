@@ -942,8 +942,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
-//    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-//    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 

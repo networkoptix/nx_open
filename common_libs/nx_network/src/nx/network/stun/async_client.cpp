@@ -5,6 +5,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
+#include "stun_types.h"
+
 namespace nx {
 namespace stun {
 
@@ -46,11 +48,20 @@ void AsyncClient::connect(
     const QUrl& url,
     ConnectHandler completionHandler)
 {
+    if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)
+    {
+        return post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                completionHandler(SystemError::invalidData);
+            });
+    }
+
     const auto endpoint = nx::network::url::getEndpoint(url);
 
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = url.scheme() == "stuns";
+    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
     NX_ASSERT(!m_connectCompletionHandler);
     m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);
@@ -175,16 +186,15 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            if (!m_baseConnection)
+            NX_LOGX(lm("Set keep alive to: %1").arg(options), cl_logDEBUG1);
+            if (!m_baseConnection ||
+                !m_baseConnection->socket()->setKeepAlive(std::move(options)))
             {
-                NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
-                    cl_logDEBUG1);
+                auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOGX(lm("Unable to set keep alive, connection is probably closed. %1")
+                    .arg(SystemError::toString(systemErrorCode)), cl_logDEBUG1);
                 return;
             }
-
-            NX_LOGX(lm("Set keep alive: %1").arg(options), cl_logDEBUG1);
-            const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
-            NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
 }
 

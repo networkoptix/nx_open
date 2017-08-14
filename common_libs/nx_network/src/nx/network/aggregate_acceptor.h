@@ -52,7 +52,7 @@ private:
     aio::Timer m_timer;
     std::list<AcceptorContext> m_acceptors;
     boost::optional<std::chrono::milliseconds> m_acceptTimeout;
-    bool m_acceptAsyncIsInvoked = false;
+    bool m_acceptAsyncIsBeingInvoked = false;
 
     virtual void stopWhileInAioThread() override;
 

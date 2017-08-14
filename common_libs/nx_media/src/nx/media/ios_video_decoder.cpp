@@ -274,7 +274,10 @@ IOSVideoDecoder::~IOSVideoDecoder()
 {
 }
 
-bool IOSVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
+bool IOSVideoDecoder::isCompatible(
+    const AVCodecID codec,
+    const QSize& resolution,
+    bool /*allowOverlay*/)
 {
     if (codec != AV_CODEC_ID_H264 &&
         codec != AV_CODEC_ID_H263 &&
