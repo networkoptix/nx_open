@@ -19,6 +19,7 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -54,7 +55,7 @@ const QVector<qreal> dashPattern(initDashPattern());
 
 int pixelRatio()
 {
-    return QnAppInfo::applicationPlatform() == lit("macosx")
+    return nx::utils::AppInfo::isMacOsX()
         ? 1 //< MacOs automatically manages dpi.
         : qApp->devicePixelRatio();
 }
@@ -63,7 +64,7 @@ QList<QRect> screenGeometries()
 {
     QList<QRect> result;
 
-    if (QnAppInfo::applicationPlatform() == lit("macosx"))
+    if (nx::utils::AppInfo::isMacOsX())
     {
         for (const auto screen: QGuiApplication::screens())
             result.append(screen->geometry());
