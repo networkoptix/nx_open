@@ -8,7 +8,27 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-ExportSettingsDialog::ExportSettingsDialog(QWidget *parent) :
+ExportSettingsDialog::ExportSettingsDialog(
+    QnMediaResourceWidget* widget,
+    const QnTimePeriod& timePeriod,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, parent)
+{
+
+}
+
+ExportSettingsDialog::ExportSettingsDialog(
+    const QnVirtualCameraResourcePtr& camera,
+    const QnTimePeriod& timePeriod,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, parent)
+{
+
+}
+
+ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent):
     base_type(parent),
     d(new Private()),
     ui(new Ui::ExportSettingsDialog)
