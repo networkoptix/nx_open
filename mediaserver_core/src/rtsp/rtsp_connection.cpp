@@ -17,6 +17,7 @@ extern "C"
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/common/guard.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_media_layout.h>
@@ -1621,8 +1622,17 @@ void QnRtspConnectionProcessor::run()
     }
 
     processRequest();
-
     QElapsedTimer t;
+
+    auto guard = makeScopedGuard(
+        [&t, d]()
+        {
+            t.restart();
+            d->deleteDP();
+            d->socket->close();
+            d->trackInfo.clear();
+        });
+
     while (!m_needStop && d->socket->isConnected())
     {
         t.restart();
@@ -1668,14 +1678,6 @@ void QnRtspConnectionProcessor::run()
             break;
         }
     }
-
-    t.restart();
-
-    d->deleteDP();
-    d->socket->close();
-
-    d->trackInfo.clear();
-    //deleteLater(); // does not works for this thread
 }
 
 void QnRtspConnectionProcessor::resetTrackTiming()
