@@ -959,7 +959,6 @@ void QnServerDb::getAndSerializeActions(
     int businessRuleIdx = rec.indexOf(lit("business_rule_guid"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
     int eventTypeIdx = rec.indexOf(lit("event_type"));
-    int eventSubtypeIdx = rec.indexOf(lit("event_subtype"));
     int eventResIdx = rec.indexOf(lit("event_resource_guid"));
     int timestampIdx = rec.indexOf(lit("timestamp"));
     rec.field(timestampIdx).setType(QVariant::LongLong);
@@ -1002,10 +1001,6 @@ void QnServerDb::getAndSerializeActions(
         QByteArray actionParams = actionsQuery.value(actionParamIdx).toByteArray();
         appendIntToByteArray(result, actionParams.size());
         result.append(actionParams);
-
-        QByteArray eventSubtype = actionsQuery.value(eventSubtypeIdx).toByteArray();
-        appendIntToByteArray(result, eventSubtype.size());
-        result.append(eventSubtype);
 
         ++sizeField;
     }
