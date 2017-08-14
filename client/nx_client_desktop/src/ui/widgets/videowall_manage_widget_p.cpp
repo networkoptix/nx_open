@@ -1,6 +1,7 @@
 #include "videowall_manage_widget_p.h"
 
 #include <QtGui/QIcon>
+#include <QtGui/QScreen>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -18,37 +19,77 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
+#include <nx/utils/app_info.h>
 
 namespace {
-    const int frameMargin = 40;
-    const int bodyMargin = 80;
 
-    const qreal opacityChangeSpeed = 0.002;
-    const qreal draggedOpacity = 0.2;
-    const qreal minOpacity = 0.5;
+const int frameMargin = 40;
+const int bodyMargin = 80;
 
-    const qreal minAreaOverlapping = 0.25;
-    const qreal textOffset = 0.7;
-    const qreal partScreenCoeff = 0.65;
-    const qreal deleteButtonOffset = 0.16;
+const qreal opacityChangeSpeed = 0.002;
+const qreal draggedOpacity = 0.2;
+const qreal minOpacity = 0.5;
 
-    const int fillColorAlpha = 180;
-    const int screenBackgroundAlpha = 127;
-    const int roundness = 25;
-    const int borderWidth = 25;
-    const int resizeBorderWidth = 12;
-    const int resizeAnchorSize = 75;
-    const int screenBorderWidth = 10;
-    const int transformationOffset = 50;
-    const int baseIconSize = 200;
-    const int baseFontSize = 120;
+const qreal minAreaOverlapping = 0.25;
+const qreal textOffset = 0.7;
+const qreal partScreenCoeff = 0.65;
+const qreal deleteButtonOffset = 0.16;
 
-    QVector<qreal> initDashPattern() {
-        return QVector<qreal>() << 2 << 3;
-    }
+const int fillColorAlpha = 180;
+const int screenBackgroundAlpha = 127;
+const int roundness = 25;
+const int borderWidth = 25;
+const int resizeBorderWidth = 12;
+const int resizeAnchorSize = 75;
+const int screenBorderWidth = 10;
+const int transformationOffset = 50;
+const int baseIconSize = 200;
+const int baseFontSize = 120;
 
-    const QVector<qreal> dashPattern(initDashPattern());
+QVector<qreal> initDashPattern()
+{
+    return QVector<qreal>() << 2 << 3;
 }
+
+const QVector<qreal> dashPattern(initDashPattern());
+
+int pixelRatio()
+{
+    return nx::utils::AppInfo::isMacOsX()
+        ? 1 //< MacOs automatically manages dpi.
+        : qApp->devicePixelRatio();
+}
+
+QList<QRect> screenGeometries()
+{
+    QList<QRect> result;
+
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        for (const auto screen: QGuiApplication::screens())
+            result.append(screen->geometry());
+    }
+    else
+    {
+        const auto desktop = qApp->desktop();
+        for (int screenNumber = 0; screenNumber < desktop->screenCount(); ++screenNumber)
+        {
+            if (const auto screen = desktop->screen(screenNumber))
+            {
+                const auto rect = screen->geometry();
+                auto pixelRatio = screen->devicePixelRatio();
+                result.append(QRect(rect.topLeft(), rect.size() * pixelRatio));
+            }
+            else
+            {
+                NX_ASSERT(false, "Invalid screen.");
+            }
+        }
+    }
+    return result;
+}
+
+} // namespace
 
 /************************************************************************/
 /* BaseModelItem                                                        */
@@ -125,18 +166,16 @@ QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const
 {
-    const auto dpr = qApp->devicePixelRatio();
-    if (isPartOfScreen())
-        return baseFontSize * partScreenCoeff * dpr;
-    return baseFontSize * dpr;
+    return isPartOfScreen()
+        ? baseFontSize * partScreenCoeff * pixelRatio()
+        : baseFontSize * pixelRatio();
 }
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
 {
-    const auto dpr = qApp->devicePixelRatio();
-    if (isPartOfScreen())
-        return baseIconSize * partScreenCoeff * dpr;
-    return baseIconSize * dpr;
+    return isPartOfScreen()
+        ? baseIconSize * partScreenCoeff * pixelRatio()
+        : baseIconSize * pixelRatio();
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -160,13 +199,12 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         font.setPixelSize(fontSize());
         QnScopedPainterFontRollback fontRollback(painter, font);
 
-        QRect textRect(0, 0,
-            painter->fontMetrics().width(name),
-            painter->fontMetrics().height());
+        const auto metrics = QFontMetrics(font);
+        auto textRect = metrics.boundingRect(name);
         textRect.moveCenter(body.center());
         textRect.moveTop(body.top() + body.height() * textOffset);
 
-        painter->drawText(textRect, name);
+        painter->drawText(textRect, Qt::TextDontClip, name);
     }
 
     if (editable && hasFlag(StateFlag::Hovered)) {
@@ -464,20 +502,11 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
     QObject(),
     q_ptr(q)
 {
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i)
+    int screenNumber = 0;
+    for (const auto rect: screenGeometries())
     {
-        auto screen = desktop->screen(i);
-        NX_ASSERT(screen);
-        if (!screen)
-            continue;
-
-        auto rect = screen->geometry();
-        auto dpr = screen->devicePixelRatio();
-        rect.setSize(rect.size() * dpr);
         m_unitedGeometry = m_unitedGeometry.united(rect);
-
-        m_screens.append({i, rect, q});
+        m_screens.append({screenNumber++, rect, q});
     }
 }
 
@@ -532,23 +561,9 @@ void QnVideowallManageWidgetPrivate::foreachItemConst(std::function<void(const B
     }
 }
 
-void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr &videowall) {
-    QList<QRect> screens;
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i)
-    {
-        auto screen = desktop->screen(i);
-        NX_ASSERT(screen);
-        if (!screen)
-            continue;
-
-        auto rect = screen->geometry();
-        auto dpr = screen->devicePixelRatio();
-        rect.setSize(rect.size() * dpr);
-
-        screens << rect;
-    }
-
+void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr &videowall)
+{
+    QList<QRect> screens = screenGeometries();
     QnUuid pcUuid = qnSettings->pcUuid();
 
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
