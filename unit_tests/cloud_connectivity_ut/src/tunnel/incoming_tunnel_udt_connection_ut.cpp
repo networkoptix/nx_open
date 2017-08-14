@@ -298,10 +298,7 @@ class ServerSocketStub:
     public TCPServerSocket
 {
 public:
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override
+    virtual void acceptAsync(AcceptCompletionHandler handler) override
     {
         post(
             [handler = std::move(handler)]()
