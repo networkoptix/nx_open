@@ -18,6 +18,8 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 
+#include <nx/fusion/model_functions.h>
+
 using namespace nx;
 
 namespace {
@@ -38,6 +40,7 @@ int QnEventLogRestHandler::executeGet(
     QnSecurityCamResourceList resList;
     QString errStr;
     vms::event::EventType eventType = vms::event::undefinedEvent;
+    QnUuid eventSubtype;
     vms::event::ActionType actionType = vms::event::undefinedAction;
     QnUuid businessRuleId;
 
@@ -74,6 +77,10 @@ int QnEventLogRestHandler::executeGet(
                     errStr = QString("Invalid event type %1").arg(params[i].second);
                 }
             }
+            else if (params[i].first == "event_subtype")
+            {
+                eventSubtype = QnLexical::deserialized<QnUuid>(params[i].second);
+            }
             else if (params[i].first == "action")
             {
                 actionType = (vms::event::ActionType) params[i].second.toInt();
@@ -100,6 +107,7 @@ int QnEventLogRestHandler::executeGet(
         period,
         resList,
         eventType,
+        eventSubtype,
         actionType,
         businessRuleId);
 

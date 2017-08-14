@@ -741,15 +741,37 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare(R"(
-        INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params,
-            business_rule_guid, toggle_state, aggregation_count, event_type,
-            event_resource_guid, action_resource_guid)
-        VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid,
-            :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);
+        INSERT INTO runtime_actions (
+            timestamp,
+            action_type,
+            action_params,
+            runtime_params,
+            business_rule_guid,
+            toggle_state,
+            aggregation_count,
+            event_type,
+            event_subtype,
+            event_resource_guid,
+            action_resource_guid)
+        VALUES (
+            :timestamp,
+            :action_type,
+            :action_params,
+            :runtime_params,
+            :business_rule_guid,
+            :toggle_state,
+            :aggregation_count,
+            :event_type,
+            :event_subtype,
+            :event_resource_guid,
+            :action_resource_guid);
     )");
 
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
+    QnUuid eventSubtype;
+    if (action->getRuntimeParams().eventType == nx::vms::event::analyticsSdkEvent)
+        eventSubtype = action->getRuntimeParams().analyticsEventId();
 
     auto actionParams = action->getParams();
 
@@ -762,11 +784,9 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
     insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
+    bindId(&insQuery, ":event_subtype", eventSubtype);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
-    insQuery.bindValue(":action_resource_guid",
-        !actionParams.actionResourceId.isNull()
-            ? actionParams.actionResourceId.toRfc4122()
-            : QByteArray());
+    bindId(&insQuery, ":action_resource_guid", actionParams.actionResourceId);
 
     bool rez = execSQLQuery(&insQuery, Q_FUNC_INFO);
     if (rez)
@@ -782,6 +802,7 @@ QString QnServerDb::getRequestStr(
     const QnTimePeriod& period,
     const QnResourceList& resList,
     const vms::event::EventType& eventType,
+    const QnUuid& eventSubType,
     const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
@@ -831,6 +852,12 @@ QString QnServerDb::getRequestStr(
             request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
         }
     }
+
+    if (!eventSubType.isNull())
+    {
+        request += lit(" and event_subtype = %1 ").arg(guidToSqlString(eventSubType));
+    }
+
     if (actionType != vms::event::undefinedAction)
         request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
     if (!businessRuleId.isNull())
@@ -846,11 +873,17 @@ vms::event::ActionDataList QnServerDb::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList,
     const vms::event::EventType& eventType,
+    const QnUuid& eventSubtype,
     const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
     vms::event::ActionDataList result;
-    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
+    QString request = getRequestStr(period,
+        resList,
+        eventType,
+        eventSubtype,
+        actionType,
+        businessRuleId);
 
     QnWriteLocker lock(&m_mutex);
 
@@ -901,10 +934,16 @@ void QnServerDb::getAndSerializeActions(
     const QnTimePeriod& period,
     const QnResourceList& resList,
     const vms::event::EventType& eventType,
+    const QnUuid& eventSubtype,
     const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
-    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
+    QString request = getRequestStr(period,
+        resList,
+        eventType,
+        eventSubtype,
+        actionType,
+        businessRuleId);
 
     QnWriteLocker lock(&m_mutex);
 
@@ -920,6 +959,7 @@ void QnServerDb::getAndSerializeActions(
     int businessRuleIdx = rec.indexOf(lit("business_rule_guid"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
     int eventTypeIdx = rec.indexOf(lit("event_type"));
+    int eventSubtypeIdx = rec.indexOf(lit("event_subtype"));
     int eventResIdx = rec.indexOf(lit("event_resource_guid"));
     int timestampIdx = rec.indexOf(lit("timestamp"));
     rec.field(timestampIdx).setType(QVariant::LongLong);
@@ -962,6 +1002,14 @@ void QnServerDb::getAndSerializeActions(
         QByteArray actionParams = actionsQuery.value(actionParamIdx).toByteArray();
         appendIntToByteArray(result, actionParams.size());
         result.append(actionParams);
+
+        QVariant eventSubtype = actionsQuery.value(eventSubtypeIdx);
+        if (!eventSubtype.isNull())
+        {
+            QByteArray eventSubtypeData = eventSubtype.toByteArray();
+            result.append(eventSubtypeData);
+            appendIntToByteArray(result, eventSubtypeData.size());
+        }
 
         ++sizeField;
     }
@@ -1428,7 +1476,7 @@ qint64 QnServerDb::getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource)
 
     QSqlQuery query(m_sdb);
     query.prepare(R"(
-        SELECT property_value  
+        SELECT property_value
         FROM local_resource_properties
         WHERE resource_id = :resource_id AND property_name = :property_name)");
 
@@ -1461,11 +1509,11 @@ bool QnServerDb::updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource
 
     QSqlQuery updateQuery(m_sdb);
     updateQuery.prepare(R"(
-        INSERT OR REPLACE INTO local_resource_properties 
+        INSERT OR REPLACE INTO local_resource_properties
             (id, resource_id, property_name, property_value)
-        VALUES 
+        VALUES
             ((  SELECT id
-                FROM local_resource_properties 
+                FROM local_resource_properties
                 WHERE resource_id = :resource_id AND property_name = :property_name),
                 :resource_id,
                 :property_name,

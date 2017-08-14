@@ -38,15 +38,17 @@ public:
     nx::vms::event::ActionDataList getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const nx::vms::event::EventType& eventType = nx::vms::event::undefinedEvent,
-        const nx::vms::event::ActionType& actionType = nx::vms::event::undefinedAction,
-        const QnUuid& businessRuleId = QnUuid()) const;
+        const nx::vms::event::EventType& eventType,
+        const QnUuid& eventSubtype,
+        const nx::vms::event::ActionType& actionType,
+        const QnUuid& businessRuleId) const;
 
     void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
         const QnResourceList& resList,
         const nx::vms::event::EventType& eventType,
+        const QnUuid& eventSubtype,
         const nx::vms::event::ActionType& actionType,
         const QnUuid& businessRuleId) const;
 
@@ -88,10 +90,11 @@ private:
     bool createBookmarkTagTriggersUnderTransaction();
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
-    QString toSQLDate(qint64 timeMs) const;
+
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
         const nx::vms::event::EventType& eventType,
+        const QnUuid& eventSubType,
         const nx::vms::event::ActionType& actionType,
         const QnUuid& businessRuleId) const;
 private:

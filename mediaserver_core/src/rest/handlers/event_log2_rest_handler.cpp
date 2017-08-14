@@ -33,6 +33,7 @@ int QnEventLog2RestHandler::executeGet(
     QnSecurityCamResourceList resList;
     QString errStr;
     vms::event::EventType eventType = vms::event::undefinedEvent;
+    QnUuid eventSubtype;
     vms::event::ActionType actionType = vms::event::undefinedAction;
     QnUuid ruleId;
 
@@ -62,6 +63,10 @@ int QnEventLog2RestHandler::executeGet(
                 errStr = QString("Invalid event type %1").arg(params[i].second);
             }
         }
+        else if (params[i].first == "event_subtype")
+        {
+            eventSubtype = QnLexical::deserialized<QnUuid>(params[i].second);
+        }
         else if (params[i].first == "action_type")
         {
             actionType = QnLexical::deserialized<vms::event::ActionType>(params[i].second);
@@ -80,8 +85,12 @@ int QnEventLog2RestHandler::executeGet(
     vms::event::ActionDataList outputData;
     if (errStr.isEmpty())
     {
-        outputData = qnServerDb->getActions(
-            period, resList, eventType, actionType, ruleId);
+        outputData = qnServerDb->getActions(period,
+            resList,
+            eventType,
+            eventSubtype,
+            actionType,
+            ruleId);
     }
     else
     {
