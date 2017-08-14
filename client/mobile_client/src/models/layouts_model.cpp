@@ -101,7 +101,7 @@ private:
     void at_userChanged(const QnUserResourcePtr& user);
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
-    void handleResourceAccessabilityChanged(const QnResourcePtr& resource);
+    void handleResourceAccessibilityChanged(const QnResourcePtr& resource);
 
     int itemRow(const QnUuid& id) const;
     void updateItem(const QnUuid& id);
@@ -144,7 +144,7 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
             const QnResourcePtr& resource,
             nx::core::access::Source /*value*/)
         {
-            handleResourceAccessabilityChanged(resource);
+            handleResourceAccessibilityChanged(resource);
         };
 
     const auto provider = commonModule()->resourceAccessProvider();
@@ -245,7 +245,7 @@ void QnLayoutsModelUnsorted::resetModel()
     for (const auto& layout : layouts)
     {
         connect(layout, &QnLayoutResource::parentIdChanged,
-                this, &QnLayoutsModelUnsorted::handleResourceAccessabilityChanged);
+                this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
         if (!isLayoutSuitable(layout))
             continue;
@@ -296,7 +296,7 @@ void QnLayoutsModelUnsorted::at_resourceAdded(const QnResourcePtr& resource)
         return;
 
     connect(layout, &QnLayoutResource::parentIdChanged,
-        this, &QnLayoutsModelUnsorted::handleResourceAccessabilityChanged);
+        this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
     if (!isLayoutSuitable(layout))
         return;
@@ -315,7 +315,7 @@ void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
     removeLayout(layout);
 }
 
-void QnLayoutsModelUnsorted::handleResourceAccessabilityChanged(const QnResourcePtr& resource)
+void QnLayoutsModelUnsorted::handleResourceAccessibilityChanged(const QnResourcePtr& resource)
 {
     const auto layout = resource.dynamicCast<QnLayoutResource>();
     if (!layout)
