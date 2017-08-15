@@ -12,6 +12,10 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
+option(addQtPdb
+    "Whether add QT PDB files to debug libs"
+    OFF)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
