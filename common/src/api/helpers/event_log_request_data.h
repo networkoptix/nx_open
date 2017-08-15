@@ -16,6 +16,7 @@ struct QnEventLogRequestData
     QnUuid eventSubtype;
     nx::vms::event::ActionType actionType = nx::vms::event::undefinedAction;
     QnUuid ruleId;
+    Qn::SerializationFormat format = Qn::SerializationFormat::JsonFormat;
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;

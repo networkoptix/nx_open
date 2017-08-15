@@ -46,6 +46,7 @@ struct RestResultWithData: public RestResultWithDataBase
     T data;
 };
 
+using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
 
 class ServerConnection:
@@ -186,7 +187,9 @@ public:
     Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
-    Handle getEvents(Result<nx::vms::event::ActionDataList>::type callback, QThread *targetThread = nullptr);
+    Handle getEvents(QnEventLogRequestData request,
+        Result<EventLogData>::type callback,
+        QThread *targetThread = nullptr);
 
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
@@ -201,7 +204,7 @@ private:
     template <typename ResultType> Handle executeGet(
         const QString& path,
         const QnRequestParamList& params,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePost(
@@ -209,7 +212,7 @@ private:
         const QnRequestParamList& params,
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePut(
@@ -217,19 +220,27 @@ private:
         const QnRequestParamList& params,
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executeDelete(
         const QString& path,
         const QnRequestParamList& params,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType>
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread);
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<QByteArray> callback,
+        QThread* targetThread);
+
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<EmptyResponseType> callback,
+        QThread* targetThread);
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 

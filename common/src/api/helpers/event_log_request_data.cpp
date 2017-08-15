@@ -21,6 +21,7 @@ static const QString kEventTypeParam = lit("event_type");
 static const QString kEventSubtypeParam = lit("event_subtype");
 static const QString kActionTypeParam = lit("action_type");
 static const QString kRuleIdParam = lit("brule_id");
+static const QString kFormatParam(lit("format"));
 
 static constexpr int kInvalidStartTime = -1;
 
@@ -47,15 +48,16 @@ void QnEventLogRequestData::loadFromParams(QnResourcePool* resourcePool,
 
     eventType = QnLexical::deserialized<nx::vms::event::EventType>(
         params.value(kEventTypeParam),
-        nx::vms::event::undefinedEvent);
+        eventType);
 
     eventSubtype = QnLexical::deserialized<QnUuid>(params.value(kEventSubtypeParam));
 
     actionType = QnLexical::deserialized<nx::vms::event::ActionType>(
         params.value(kActionTypeParam),
-        nx::vms::event::undefinedAction);
+        actionType);
 
     ruleId = QnLexical::deserialized<QnUuid>(params.value(kRuleIdParam));
+    format = QnLexical::deserialized(params.value(kFormatParam), format);
 }
 
 QnRequestParamList QnEventLogRequestData::toParams() const
@@ -81,6 +83,8 @@ QnRequestParamList QnEventLogRequestData::toParams() const
 
     if (!ruleId.isNull())
         result.insert(kRuleIdParam, QnLexical::serialized(ruleId));
+
+    result.insert(kFormatParam, QnLexical::serialized(format));
 
     return result;
 }
