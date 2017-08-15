@@ -41,13 +41,10 @@ class QnLicense
 {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-    QnLicense();
+    QnLicense() = default;
     QnLicense(const QByteArray& licenseBlock);
-    
-    QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value);
-    static QnLicense* createFromKey(const QByteArray& key);
-
-    virtual ~QnLicense();
+    QnLicense(const ec2::ApiDetailedLicenseData& value);
+    virtual ~QnLicense() = default;
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
 
@@ -83,6 +80,7 @@ public:
     bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
+    static QnLicensePtr createFromKey(const QByteArray& key);
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);

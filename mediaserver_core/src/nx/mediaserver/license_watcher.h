@@ -7,8 +7,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx_ec/data/api_fwd.h>
 
-class QnCommonModule;
-
 namespace nx {
 namespace mediaserver {
 
@@ -21,17 +19,24 @@ class LicenseWatcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT;
     using base_type = QnCommonModuleAware;
+
 public:
     LicenseWatcher(QnCommonModule* commonModule);
     virtual ~LicenseWatcher();
     void start();
-public slots:
-    void update();
+
+signals:
+    void gotResponse(QByteArray responseData);
+
 private:
-    void onHttpClientDone();
+    void startUpdate();
+    void processResponse(QByteArray responseData);
+    void stopHttpClient();
     ServerLicenseInfo licenseData() const;
+
 private:
     QTimer m_timer;
+    QnMutex m_mutex;
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
 };
 

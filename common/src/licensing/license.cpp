@@ -120,9 +120,6 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
-QnLicense::QnLicense()
-{
-}
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
@@ -145,17 +142,6 @@ QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
 
     auto licenseBlock = params.join('\n');
     loadLicenseBlock(licenseBlock);
-}
-
-QnLicense* QnLicense::createFromKey(const QByteArray& key)
-{
-    QnLicense* result = new QnLicense();
-    result->m_key = key;
-    return result;
-}
-
-QnLicense::~QnLicense()
-{
 }
 
 bool QnLicense::isInfoMode() const
@@ -190,6 +176,13 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
         return QnLicensePtr();
 
     return QnLicensePtr(new QnLicense(licenseBlock));
+}
+
+QnLicensePtr QnLicense::createFromKey(const QByteArray& key)
+{
+    QnLicense* result = new QnLicense();
+    result->m_key = key;
+    return QnLicensePtr(result);
 }
 
 QString QnLicense::displayName() const {

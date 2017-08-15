@@ -13,13 +13,8 @@ class QnStaticCommonModule;
 class QnStorageDbPool;
 class MSSettings;
 
-namespace nx 
-{ namespace mediaserver 
-{ 
-    class UnusedWallpapersWatcher; 
-    class LicenseWatcher;
-} 
-}
+namespace nx { namespace mediaserver { class UnusedWallpapersWatcher; } }
+namespace nx { namespace mediaserver { class LicenseWatcher; } }
 
 class QnMediaServerModule:
     public QObject,
