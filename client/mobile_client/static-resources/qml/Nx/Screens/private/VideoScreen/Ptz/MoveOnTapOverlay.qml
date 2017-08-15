@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Qt.labs.controls 1.0
+import QtQuick.Window 2.2
 
 import Nx 1.0
 import Nx.Controls 1.0
@@ -8,8 +9,8 @@ Popup
 {
     id: popup
 
-    width: parent.width
-    height: parent.height
+    width: applicationInfo.isAndroid() ? Screen.width : parent.width
+    height: applicationInfo.isAndroid() ? Screen.height : parent.height
     background: null
     modal: false
     focus: true

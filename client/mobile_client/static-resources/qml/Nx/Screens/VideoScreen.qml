@@ -315,12 +315,12 @@ PageBase
         {
             width: parent.width
             height: sourceSize.height
-            anchors.bottom: parent.bottom
+            anchors.bottom: moveOnTapOverlay.visible ? moveOnTapOverlay.bottom : parent.bottom
             sourceSize.height: 56 * 2
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || navigationLoader.visible;
+                || ptzPanel.moveOnTapMode || navigationLoader.visible
             opacity: visible ? 1 : 0
 
             Behavior on opacity
