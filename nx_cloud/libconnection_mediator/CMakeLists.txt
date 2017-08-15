@@ -11,7 +11,7 @@ nx_add_target(libconnection_mediator LIBRARY
     PRIVATE_LIBS
         qtservice qtsinglecoreapplication
     PUBLIC_LIBS
-        cloud_db_client common
+        cloud_db_client common nx_network nx_fusion nx_utils
 )
 
 set_target_properties(libconnection_mediator PROPERTIES PREFIX "")

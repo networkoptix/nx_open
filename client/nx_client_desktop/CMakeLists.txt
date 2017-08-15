@@ -75,3 +75,7 @@ endif()
 if(WINDOWS)
     target_link_libraries(nx_client_desktop PRIVATE d3d9 Winmm)
 endif()
+
+if(MACOSX)
+    target_link_libraries(nx_client_desktop PRIVATE termcap)
+endif()

@@ -23,7 +23,7 @@
         <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lcloud_db_client -lnx_network -ludt -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 

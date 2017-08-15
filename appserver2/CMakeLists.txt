@@ -1,1 +1,1 @@
-nx_add_target(appserver2 LIBRARY PUBLIC_LIBS common cloud_db_client)
+nx_add_target(appserver2 LIBRARY PUBLIC_LIBS common cloud_db_client nx_fusion nx_network)
