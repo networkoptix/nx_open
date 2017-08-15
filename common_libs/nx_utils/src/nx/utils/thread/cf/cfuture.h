@@ -1015,7 +1015,7 @@ auto when_any(InputIt first, InputIt last)
 
 namespace detail {
 template<size_t I, typename Context, typename Future>
-void when_any_inner_helper(Context context, Future& f) {
+void when_any_inner_helper(Context context, Future& /*f*/) {
   std::get<I>(context->result.sequence).then(
   [context](Future f) {
     std::lock_guard<std::mutex> lock(context->mutex);
@@ -1046,11 +1046,11 @@ struct when_any_helper_struct {
 template<size_t S>
 struct when_any_helper_struct<S, S> {
   template<typename Context, typename... Futures>
-  static void apply(const Context& context, std::tuple<Futures...>& t) {}
+  static void apply(const Context& /*context*/, std::tuple<Futures...>& /*t*/) {}
 };
 
 template<size_t I, typename Context>
-void fill_result_helper(const Context& context) {}
+void fill_result_helper(const Context& /*context*/) {}
 
 template<size_t I, typename Context, typename FirstFuture, typename... Futures>
 void fill_result_helper(const Context& context, FirstFuture&& f, Futures&&... fs) {

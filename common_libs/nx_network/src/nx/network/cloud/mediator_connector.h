@@ -65,7 +65,7 @@ public:
     void mockupMediatorUrl(const QUrl& mediatorUrl);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
-    virtual boost::optional<SystemCredentials> getSystemCredentials() const;
+    virtual boost::optional<SystemCredentials> getSystemCredentials() const override;
 
     virtual boost::optional<SocketAddress> udpEndpoint() const override;
     virtual bool isConnected() const override;
