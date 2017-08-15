@@ -135,7 +135,7 @@ void BasicTestFixture::SetUp()
 {
     setUpConnectSessionManagerFactoryFunc();
     startRelays();
-    ASSERT_GE(m_relays.size(), 1);
+    ASSERT_GE(m_relays.size(), 1U);
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());
