@@ -23,7 +23,7 @@ public:
      * @param sslContext Caller may use different contexts on client & server sides.
      */
     Pipeline(SSL_CTX* sslContext);
-    virtual ~Pipeline() override;
+    ~Pipeline() = default;
 
     virtual int write(const void* data, size_t size) override;
     virtual int read(void* data, size_t size) override;

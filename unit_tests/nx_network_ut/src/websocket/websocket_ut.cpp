@@ -54,9 +54,6 @@ class TestWebSocket : public nx::network::WebSocket
 {
 public:
     using WebSocket::WebSocket;
-    int pingCount() { return m_pingsReceived; }
-    int pongCount() { return m_pongsReceived; }
-    std::chrono::milliseconds pingTimeout() const { return m_pingTimeout; }
     TestStreamSocketDelegate* socket() { return dynamic_cast<TestStreamSocketDelegate*>(WebSocket::socket()); }
 };
 
@@ -105,11 +102,6 @@ protected:
         startFuture = startPromise.get_future();
         readyFuture = readyPromise.get_future();
 
-    }
-
-    void givenPingTimeout(std::chrono::milliseconds timeout)
-    {
-        kPingTimeout = timeout;
     }
 
     void givenTCPConnectionEstablished()
@@ -265,6 +257,7 @@ protected:
 
     virtual void TearDown() override
     {
+        m_tearDownInProgress = true;
         if (clientWebSocket)
             clientWebSocket->pleaseStopSync();
         if (serverWebSocket)
@@ -321,6 +314,7 @@ protected:
     std::future<void> readyFuture;
 
     Role serverRole = Role::undefined;
+    bool m_tearDownInProgress = false;
 };
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
@@ -492,8 +486,8 @@ protected:
             if (ecode != SystemError::noError)
             {
                 //std::cout << "Client send error: " << ecode << std::endl;
-                pongCount = clientWebSocket->pongCount();
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 processError(ecode);
                 return;
             }
@@ -503,9 +497,8 @@ protected:
 
             if (sentMessageCount >= kTotalMessageCount)
             {
-                pongCount = clientWebSocket->pongCount();
-
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 try { readyPromise.set_value(); } catch (...) {}
                 return;
             }
@@ -519,7 +512,8 @@ protected:
             if (ecode != SystemError::noError || transferred == 0)
             {
                 //std::cout << "Client read error: " << ecode << std::endl;
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 processError(ecode);
 
                 return;
@@ -536,7 +530,8 @@ protected:
             if (ecode != SystemError::noError)
             {
                 //std::cout << "server send error: " << ecode << std::endl;
-                serverWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    serverWebSocket.reset();
                 processError(ecode);
                 return;
             }
@@ -557,15 +552,15 @@ protected:
             if (ecode != SystemError::noError || transferred == 0)
             {
                 //std::cout << "server read error: " << ecode << std::endl;
-                serverWebSocket.reset();
-                //std::cout << "server destroyed" << std::endl;
+                if (!m_tearDownInProgress)
+                    serverWebSocket.reset();
                 processError(ecode);
 
                 return;
             }
 
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
-            if (isServerResponds)
+            if (isServerResponding)
             {
                 if (sendQueue.empty())
                     serverWebSocket->sendAsync(serverReadBuf, serverSendCb);
@@ -592,7 +587,8 @@ protected:
     void start()
     {
         clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
-        clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        if (isClientSending)
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
         if (beforeWaitAction)
@@ -602,32 +598,47 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
+    void whenConnectionIsIdleForSomeTime()
+    {
+        std::thread(
+            [this]()
+            {
+                std::this_thread::sleep_for(kAliveTimeout * 2);
+                try { readyPromise.set_value(); } catch (...) {}
+            }).detach();
+
+        start();
+    }
+
+    void thenItsBeenKeptAliveByThePings()
+    {
+        ASSERT_FALSE(isTimeoutError);
+    }
 
     std::function<void()> beforeWaitAction;
 
-    bool isServerResponds = true;
+    bool isServerResponding = true;
+    bool isClientSending = true;
     bool isTimeoutError = false;
     int sentMessageCount = 0;
     const int kTotalMessageCount = 100;
     std::queue<nx::Buffer> sendQueue;
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
-    int pongCount = 0;
 };
 
 TEST_F(WebSocket_PingPong, PingPong_noPingsBecauseOfData)
 {
     start();
     ASSERT_FALSE(isTimeoutError);
-    ASSERT_EQ(pongCount, 0);
 }
 
 TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
 {
-    isServerResponds = false;
-    start();
+    isServerResponding = false;
+    isClientSending = false;
 
-    ASSERT_FALSE(isTimeoutError);
-    ASSERT_GT(pongCount, 0);
+    whenConnectionIsIdleForSomeTime();
+    thenItsBeenKeptAliveByThePings();
 }
 
 
@@ -985,14 +996,5 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     ASSERT_TRUE(!serverWebSocket);
 }
 
-TEST_F(WebSocket_PingPong, calcPingTimeoutBySocketTimeout)
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ASSERT_EQ(clientWebSocket->pingTimeout(), kAliveTimeout / 2);
-    unsigned recvTimeout;
-    clientWebSocket->socket()->getRecvTimeout(&recvTimeout);
-    ASSERT_EQ(recvTimeout, kAliveTimeout.count());
-}
-
-}
+} // namespace test
 
