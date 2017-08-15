@@ -69,7 +69,7 @@ public:
 
     Tag operator+(const Tag& rhs) const
     {
-        return Tag(lit("%1::%2").arg(m_value, rhs.m_value));
+        return Tag(QString::fromLatin1("%1::%2").arg(m_value, rhs.m_value));
     }
 
     bool operator<(const Tag& rhs) const
