@@ -257,6 +257,7 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
         }
     }
 
