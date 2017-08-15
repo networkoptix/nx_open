@@ -3,7 +3,7 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-if(NOT WINDOWS)
+if(LINUX)
     add_compile_options("-Werror" "-Wall" "-Wextra")
 endif()
 

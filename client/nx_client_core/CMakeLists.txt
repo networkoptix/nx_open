@@ -12,7 +12,7 @@ nx_add_target(nx_client_core LIBRARY
     PUBLIC_LIBS
         Qt5::Quick
         ${Qt5MultimediaQuick_p_LIBRARY}
-        appserver2 nx_vms_utils cloud_db_client nx_media)
+        appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils)
 
 set_target_properties(nx_client_core PROPERTIES PREFIX "")
 
