@@ -13,7 +13,7 @@ option(rdepSync
     ON)
 
 option(addQtPdb
-    "Whether add QT PDB files to debug libs"
+    "Whether add Qt PDB files to debug libs"
     OFF)
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING

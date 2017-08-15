@@ -6,6 +6,7 @@ set(ClientVoxSourceDir "${bin_source_dir}/vox")
 set(ClientQmlDir "${CMAKE_CURRENT_BINARY_DIR}/clientqml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
+set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
 ExternalProject_Add(
     customactions
@@ -73,31 +74,28 @@ set(qt_plugin_group_imageformats qgif qjpeg qtiff)
 set(qt_plugin_group_mediaservice dsengine qtmedia_audioengine)
 
 foreach(qt_plugin_group ${qt_plugins})
-  foreach(plugin ${qt_plugin_group_${qt_plugin_group}})
-    nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.dll"
-        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/pack/${artifact.name.client_update}/${qt_plugin_group}"
-        IF_NEWER IF_DIFFERENT)
-    if(addQtPdb)
-        nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.pdb"
-            DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/pack/${artifact.name.qt_debug}/${qt_plugin_group}"
+    foreach(plugin ${qt_plugin_group_${qt_plugin_group}})
+        nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.dll"
+            DESTINATION "${target_pack_dir}/${artifact.name.client_update}/${qt_plugin_group}"
             IF_NEWER IF_DIFFERENT)
-    endif()
-  endforeach()
+        if(addQtPdb)
+            nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.pdb"
+                DESTINATION "${target_pack_dir}/${artifact.name.qt_debug}/${qt_plugin_group}"
+                IF_NEWER IF_DIFFERENT)
+        endif()
+    endforeach()
 endforeach()
 
-file(GLOB_RECURSE qt_debug_files
-    "${QT_DIR}/bin/Qt5*.pdb"
-)
-
-file(GLOB_RECURSE qt_debug_files_excludes
-    "${QT_DIR}/bin/Qt5*d.pdb"
+file(GLOB_RECURSE
+    qt_debug_files "${QT_DIR}/bin/Qt5*.pdb"
+    qt_debug_files_excludes "${QT_DIR}/bin/Qt5*d.pdb"
 )
 
 foreach(qt_debug_files_exclude ${qt_debug_files_excludes})
     list(REMOVE_ITEM qt_debug_files "${qt_debug_files_exclude}")
 endforeach()
 
-# Processing file lists in order not to pass tons of variables in custom target
+# Processing file lists in order not to pass tons of variables to custom target
 nx_configure_directory("${CMAKE_CURRENT_SOURCE_DIR}/packages" "${CMAKE_CURRENT_BINARY_DIR}/packages")
 
 add_custom_target(pack_updates ALL
@@ -107,7 +105,7 @@ add_custom_target(pack_updates ALL
         "${CMAKE_COMMAND}"
         -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DaddQtPdb=${addQtPdb}
+        -Dtarget_pack_dir=${target_pack_dir}
         -P "${CMAKE_CURRENT_SOURCE_DIR}/pack.cmake"
     COMMAND "pack.bat"
 )

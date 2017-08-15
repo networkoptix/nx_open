@@ -1,5 +1,3 @@
-set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
-
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
     ${PROJECT_SOURCE_DIR}/cmake)
@@ -15,6 +13,9 @@ foreach(fileset ${filesets_to_process})
     include(${CMAKE_CURRENT_BINARY_DIR}/packages/${fileset_name}.cmake)
     message(STATUS "Creating ${artifact.name.${fileset_name}}")
     foreach(item ${${fileset_name}_files})
-        nx_copy("${item}" DESTINATION "${target_pack_dir}/${artifact.name.${fileset_name}}" IF_NEWER IF_DIFFERENT)
+        nx_copy("${item}"
+            DESTINATION "${target_pack_dir}/${artifact.name.${fileset_name}}"
+            IF_NEWER IF_DIFFERENT
+        )
     endforeach()
 endforeach()
