@@ -5,6 +5,8 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
+#include <api/server_rest_connection_fwd.h>
+
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 
@@ -40,10 +42,9 @@ protected:
     void setVisible(bool value) override;
     virtual void retranslateUi() override;
 
-private slots:
+private:
     void reset();
     void updateData();
-    void at_gotEvents(int httpStatus, const nx::vms::event::ActionDataListPtr& events, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButton_clicked();
@@ -52,7 +53,6 @@ private slots:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
-private:
     QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::event::EventType value);
 
     bool isFilterExist() const;
@@ -75,9 +75,9 @@ private:
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_actionTypesModel;
 
-    QSet<int> m_requests;
+    QSet<rest::Handle> m_requests;
 
-    QVector <nx::vms::event::ActionDataListPtr> m_allEvents;
+    nx::vms::event::ActionDataList m_allEvents;
     QSet<QnUuid> m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;

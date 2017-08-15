@@ -6,6 +6,9 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/helpers/event_log_request_data.h>
+#include <api/server_rest_connection.h>
+
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 
@@ -51,9 +54,6 @@ namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 
     const int kQueryTimeoutMs = 15000;
-
-    /* Really here can be any number, that is not equal to zero (success code). */
-    const int kTimeoutStatus = -1;
 
     QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
     {
@@ -187,7 +187,7 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, vms::e
     if (rootItem)
         rootItem->appendRow(item);
 
-    foreach(vms::event::EventType value, vms::event::childEvents(value))
+    for (auto value: vms::event::childEvents(value))
         createEventTree(item, value);
     return item;
 }
@@ -279,23 +279,54 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_requests.clear();
     m_allEvents.clear();
 
+    QnEventLogRequestData request;
+    request.cameras = cameras(m_filterCameraList);
+    request.period = QnTimePeriod(fromMsec, toMsec - fromMsec);
+    request.eventType = eventType;
+    request.actionType = actionType;
+
+    QPointer<QnEventLogDialog> guard(this);
+    auto callback =
+        [this, guard](bool success, rest::Handle handle, rest::EventLogData data)
+        {
+            if (!guard)
+                return;
+
+            if (!m_requests.contains(handle))
+                return;
+            m_requests.remove(handle);
+
+            if (success)
+            {
+                auto& events = data.data;
+                m_allEvents.reserve(m_allEvents.size() + events.size());
+                std::move(events.begin(), events.end(), std::back_inserter(m_allEvents));
+            }
+            else if (!success)
+            {
+                NX_DEBUG(this, lm("Error %1 while requesting even log (%2)")
+                    .args(data.error, data.errorString));
+            }
+
+            if (m_requests.isEmpty())
+                requestFinished();
+        };
+
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for(const QnMediaServerResourcePtr& mserver: onlineServers)
+    for (const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        int handle = mserver->apiConnection()->getEventLogAsync(
-            fromMsec, toMsec,
-            cameras(m_filterCameraList),
-            eventType,
-            actionType,
-            QnUuid(),
-            this, SLOT(at_gotEvents(int, const nx::vms::event::ActionDataListPtr&, int)));
+        auto handle = mserver->restConnection()->getEvents(request,
+            callback, this->thread());
+
+        if (handle <= 0)
+            continue;
 
         m_requests << handle;
 
         const auto timerCallback =
-            [this, handle]
+            [this, handle, callback]
             {
-                at_gotEvents(kTimeoutStatus, vms::event::ActionDataListPtr(), handle);
+                callback(false, handle, rest::EventLogData());
             };
 
         executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
@@ -327,24 +358,9 @@ void QnEventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(action::BusinessEventsAction));
 }
 
-void QnEventLogDialog::at_gotEvents(int httpStatus, const vms::event::ActionDataListPtr& events, int requestNum)
-{
-    if (!m_requests.contains(requestNum))
-        return;
-    m_requests.remove(requestNum);
-
-    if (httpStatus == 0 && events && !events->empty())
-        m_allEvents << events;
-    else if (httpStatus != 0)
-        NX_LOG(lit("Error %1 while requesting even log").arg(httpStatus), cl_logDEBUG1);
-
-    if (m_requests.isEmpty())
-        requestFinished();
-}
-
 void QnEventLogDialog::requestFinished()
 {
-    m_model->setEvents(m_allEvents);
+    m_model->setEvents(std::move(m_allEvents));
     m_allEvents.clear();
     setCursor(Qt::ArrowCursor);
 

@@ -35,7 +35,7 @@ public:
     QnEventLogModel(QObject* parent = nullptr);
     virtual ~QnEventLogModel();
 
-    void setEvents(const QVector<nx::vms::event::ActionDataListPtr> &events);
+    void setEvents(nx::vms::event::ActionDataList events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column>& columns);

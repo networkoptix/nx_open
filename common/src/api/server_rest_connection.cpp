@@ -427,7 +427,7 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     Result<EventLogData>::type callback,
     QThread *targetThread)
 {
-    //request.format = Qn::SerializationFormat::UbjsonFormat;
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
