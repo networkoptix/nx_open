@@ -46,13 +46,17 @@ struct SelectableTextButton::Private
 
 SelectableTextButton::SelectableTextButton(QWidget* parent):
     base_type(parent),
-    d(new Private)
+    d(new Private())
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     connect(this, &QPushButton::clicked, [this]() { setState(State::selected); });
 
     installEventHandler(this, QEvent::PaletteChange, this,
+        &SelectableTextButton::updateDeactivateButtonPalette);
+    connect(this, &QPushButton::pressed, this,
+        &SelectableTextButton::updateDeactivateButtonPalette);
+    connect(this, &QPushButton::released, this,
         &SelectableTextButton::updateDeactivateButtonPalette);
 }
 
@@ -88,6 +92,7 @@ void SelectableTextButton::setState(State value)
             updateDeactivateButtonPalette();
     }
 
+    update();
     emit stateChanged(value);
 }
 
@@ -221,6 +226,7 @@ bool SelectableTextButton::event(QEvent* event)
 {
     switch (event->type())
     {
+        case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
         case QEvent::Shortcut:
         case QEvent::KeyPress:
@@ -243,8 +249,9 @@ void SelectableTextButton::updateDeactivateButtonPalette()
     if (!d->deactivateButton)
         return;
 
-    setPaletteColor(d->deactivateButton.data(), QPalette::Window,
-        palette().color(stateColorGroup(d->state), QPalette::Window));
+    setPaletteColor(d->deactivateButton.data(), QPalette::Window, isDown()
+        ? Qt::transparent
+        : palette().color(stateColorGroup(d->state), QPalette::Window));
 }
 
 void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
