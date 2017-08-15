@@ -68,7 +68,7 @@ public:
 
     void setEvents(vms::event::ActionDataList events)
     {
-        m_events = events;
+        m_events = std::move(events);
         updateIndex();
     }
 
