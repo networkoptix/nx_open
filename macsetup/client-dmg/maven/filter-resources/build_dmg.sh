@@ -28,6 +28,7 @@ mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PR
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
+cp -R "${packages.dir}/any/roboto-fonts/bin/fonts" "${APP_DIR}/Contents/MacOS/"
 
 function hexify
 {
