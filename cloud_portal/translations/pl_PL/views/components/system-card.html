@@ -1,7 +1,7 @@
 
 <div class="panel panel-default" ng-if="system.isMine">
     <div class="panel-body">
-        <h2>Your System</h2>
+        <h2>Twój system</h2>
         <p></p>
         <p>
             <button class="btn btn-default" ng-click="rename()">Rename System</button>
@@ -13,7 +13,7 @@
 
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
-        <h2>Owner</h2>
+        <h2>Właściciel</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>

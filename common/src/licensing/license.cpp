@@ -457,7 +457,7 @@ QnLicensePool::QnLicensePool(QObject* parent):
     QObject(parent),
     QnCommonModuleAware(parent),
     m_mutex(QnMutex::Recursive),
-    m_licenseValidator(new QnLicenseValidator(this))
+    m_licenseValidator(new QnLicenseValidator(commonModule(), this))
 {
     if (!qApp)
         return;

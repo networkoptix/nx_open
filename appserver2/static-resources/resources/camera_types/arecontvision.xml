@@ -25,14 +25,14 @@
                 <param name = "MaxFPS" default_value ="20"/>
             </params>
         </resource>
-        <resource name = "1225" public ="ArecontVision_Abstract">
+        <resource name = "1225" public ="ArecontVision_Abstract,ArecontVision_H264">
             <params>
                 <param name = "MaxSensorWidth" default_value = "1280"/>
                 <param name = "MaxSensorHeight" default_value = "960"/>
                 <param name = "MaxFPS" default_value = "37"/>
             </params>
         </resource>
-        <resource name = "1245" public ="ArecontVision_Abstract">
+        <resource name = "1245" public ="ArecontVision_Abstract,ArecontVision_H264">
             <params>
                 <param name = "MaxSensorWidth" default_value = "1280"/>
                 <param name = "MaxSensorHeight" default_value = "1024"/>
@@ -48,7 +48,7 @@
                 <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
             </params>
         </resource>
-        <resource name = "1555" public = "ArecontVision_Abstract">
+        <resource name = "1555" public = "ArecontVision_Abstract,ArecontVision_H264">
             <params>
                 <param name = "MaxSensorWidth" default_value = "1280"/>
                 <param name = "MaxSensorHeight" default_value = "960"/>
@@ -145,7 +145,7 @@
                 <param name = "VideoLayout" default_value = "width=2;height=1;sensors=1,0"/>
             </params>
         </resource>       
-        <resource name = "6656" public ="ArecontVision_Duo,ArecontVision_Abstract">
+        <resource name = "6656" public ="ArecontVision_Duo,ArecontVision_Abstract,ArecontVision_H264">
             <params>
                 <param name = "MaxSensorWidth" default_value = "3072"/>
                 <param name = "MaxSensorHeight" default_value = "2048"/>
@@ -154,7 +154,7 @@
         </resource>     
         <resource name = "6655" public = "6656"/>
         <resource name = "10655" public = "ArecontVision_Duo,10215"/>
-        <resource name = "4655" public ="ArecontVision_Duo,ArecontVision_Abstract">
+        <resource name = "4655" public ="ArecontVision_Duo,ArecontVision_Abstract,ArecontVision_H264">
             <params>
                 <param name = "MaxSensorWidth" default_value = "2688"/>
                 <param name = "MaxSensorHeight" default_value = "1520"/>

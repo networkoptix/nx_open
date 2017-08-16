@@ -390,10 +390,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>試用</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>類比</translation>
     </message>
@@ -424,10 +420,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>類比編碼器</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>測試用授權</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +468,14 @@
     <message>
       <source>Free license</source>
       <translation>可用授權</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>時效性</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>時效性授權</translation>
     </message>
   </context>
   <context>
@@ -641,10 +641,6 @@
       <translation>未知</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>測試用授權</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>免費授權</translation>
     </message>
@@ -659,6 +655,10 @@
     <message>
       <source>Hardware Id: %1</source>
       <translation>硬體 Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>時效性授權</translation>
     </message>
   </context>
   <context>

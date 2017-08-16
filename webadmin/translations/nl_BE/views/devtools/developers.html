@@ -1,0 +1,34 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div>
+        <h3>Developer tools</h3>
+        <p><a href="#/developers/api">API testtool</a></p>
+        <p><a href="#/developers/changelog">API Changelog</a></p>
+        <p><a href="#/developers/events">Generieke event tool</a></p>
+        <p><a href="#/view/?cameraLinks">Camera stream links</a></p>
+
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Geef feedback</a></p>
+    </div>
+    <div>
+        <h3>Server API</h3>
+        <p>
+            De server API biedt een standaard set van API calls voor 3rd party systemen. Het geeft ontwikkelaars de mogelijkheid om bijna elk systeem-functie die beschikbaar is in de client: systeembronnen (servers, camera's, gebruikers, machtigingen) queries, beheren, live of opgenomen video genereren uit het  systeem, events, regels maken, controle van de PTZ-camera's, en meer.
+        </p>
+        <p><a id="api-doc" href="api.xml" target="_blank">API documentatie</a></p>
+    </div>
+    <div>
+        <h3>Video Source Integratie SDK</h3>
+        <p>
+            Video Source integratie SDK biedt de mogelijkheid om vrijwel elke live of opgenomen videobron (IP-camera's, NVRs, DVRs, enz.) te integreren in het systeem. SDK maakt het mogelijk om methoden voor het ontdekken van, weergeven, analyseren en opnemen van video. Het maakt het ook mogelijk om bijvoorbeeld I/O modules en Video Content Analyse te integreren.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >download SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Storage SDK</h3>
+        <p>
+            De storage SDK biedt de mogelijkheid om diverse opslagmogelijkheden te integreren in het systeem. Het staat ontwikkelaars te lezen van of schrijven naar iedere opslaglocatie: lokaal, extern of in de cloud. Het maken van een opslag plugin vereist de implementatie van standaardfuncties zoals: I/O stream, als bestand bestaat, verwijder bestand, lijst met bestanden in de map, enz. Opslag SDK bevat ook een voorbeeld voor het gebruik van een FTP-server als opslaglocatie.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >download SDK</a></p>
+    </div>
+</div>

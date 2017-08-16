@@ -727,7 +727,7 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ Kontrolü</translation>
     </message>
     <message>
       <location/>
@@ -745,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Giriş kimliği</translation>
     </message>
   </context>
   <context>
@@ -771,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Çıkış Kimliği:</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1515,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Donanım Kimliği</translation>
     </message>
   </context>
   <context>
@@ -1904,7 +1904,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
   </context>
   <context>
@@ -2657,7 +2657,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Simge</translation>
     </message>
   </context>
   <context>
@@ -2772,22 +2772,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Roller</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Tüm kullanıcıları göster</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Kullanıcıları seçin</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Aramanızla eşleşen öğe yok.</translation>
     </message>
   </context>
   <context>
@@ -2823,7 +2823,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Internet üzerinden tarihi eşitle</translation>
     </message>
   </context>
   <context>

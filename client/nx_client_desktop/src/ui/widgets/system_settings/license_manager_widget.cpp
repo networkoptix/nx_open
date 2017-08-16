@@ -151,7 +151,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
-    m_validator(new QnLicenseValidator(this))
+    m_validator(new QnLicenseValidator(commonModule(), this))
 {
     ui->setupUi(this);
 

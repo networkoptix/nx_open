@@ -42,6 +42,8 @@ Item
             else
             {
                 Workflow.openResourcesScreen()
+                if (grid.currentItem)
+                    grid.currentItem.showControls()
             }
         }
     }
@@ -121,6 +123,6 @@ Item
         if (!item || item.objectName !== "videoScreen")
             return
 
-        item.showTransformationsWarningIfNeeded()
+        item.start()
     }
 }

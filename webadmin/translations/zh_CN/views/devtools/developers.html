@@ -1,0 +1,35 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div>
+        <h3>开发者工具</h3>
+        <p><a href="#/developers/api">API 测试工具</a></p>
+        <p><a href="#/developers/changelog">API 的更新日志</a></p>
+        <p><a href="#/developers/events">通用事件工具</a></p>
+        <p><a href="#/view/?cameraLinks">摄像机流链接</a></p>
+
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">留下您的反馈信息</a></p>
+    </div>
+    <div>
+        <h3>服务器 API</h3>
+        <p>
+            伺服器 API 提供一套标准的 API 供第三方厂家呼叫. 让开发者几乎可取用所有在标准 Client 上能操作的系统功能: 调阅/管理系统资源 (伺服器, 摄像机, 使用者, 权限), 从系统中拉取实时流或录像资料, 生成事件, 建立规则, 操控 PTZ 摄像机以及更多.
+        </p>
+        <p><a id="api-doc" href="api.xml" target="_blank">API 文档</a></p>
+    </div>
+    <div>
+        <h3>视频源集成 SDK</h3>
+        <p>
+            影像源整合 SDK 提供整合几乎任何实时流或录影装置的能力
+            (IP摄像机, NVR, DVR等等.) SDK 可使得搜寻, 显示, 分析以及录存影像变得可能. 这也支援整合设备的 I/O 端口和移动侦测资讯.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >获取 SDK</a></p>
+    </div>
+
+    <div>
+        <h3>存储 SDK</h3>
+        <p>
+            存储装置 SDK 提供整合存储装置进入系统. 这使得开发人员可读取或写入任何存储装置︰本地, 远端或云端. 建立一个存储装置插件须可执行标准功能如：I/O串流, 档案是否存在, 删除档案, 列出资料夹所有档案等等. 存储装置 SDK 还包含如何使 FTP 服务器成为存储装置的范例.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >获取 SDK</a></p>
+    </div>
+</div>

@@ -24,7 +24,7 @@
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
   </context>
   <context>
@@ -57,11 +57,11 @@
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Meer informatie over %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -92,7 +92,7 @@
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Verbinden met server</translation>
     </message>
     <message>
       <source>Enter server address</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Verwijder verbinding?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -123,11 +123,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Ontwikkelaarinstellingen</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Log niveau</translation>
     </message>
   </context>
   <context>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
   </context>
   <context>
@@ -224,15 +224,15 @@
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
@@ -280,7 +280,7 @@
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Verbinden</translation>
     </message>
   </context>
   <context>
@@ -298,7 +298,7 @@
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Geen afbeelding</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Niets gevonden</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
@@ -387,7 +387,7 @@
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -417,7 +417,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Gebruikers</translation>
     </message>
   </context>
   <context>
@@ -432,18 +432,18 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBELE</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Verbinding maken met een andere server...</translation>
     </message>
     <message>
       <source>No Systems found</source>
@@ -548,11 +548,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiëren</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Plakken</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -624,7 +624,7 @@
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Overslaan</translation>
     </message>
   </context>
 </TS>

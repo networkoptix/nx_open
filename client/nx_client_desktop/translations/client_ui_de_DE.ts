@@ -1642,7 +1642,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Demoband-Zyklus</translation>
     </message>
   </context>
   <context>
