@@ -48,6 +48,9 @@
           <property name="text">
            <string>Area Width</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
           <property name="buddy">
            <cstring>opacitySlider</cstring>
           </property>
@@ -68,6 +71,9 @@
          <widget class="QLabel" name="fontSizeLabel">
           <property name="text">
            <string>Font Size</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
            <cstring>sizeSlider</cstring>

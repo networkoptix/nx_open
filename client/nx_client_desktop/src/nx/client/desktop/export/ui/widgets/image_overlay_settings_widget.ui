@@ -45,6 +45,9 @@
           <property name="text">
            <string>Opacity</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
           <property name="buddy">
            <cstring>opacitySlider</cstring>
           </property>
@@ -65,6 +68,9 @@
          <widget class="QLabel" name="sizeLabel">
           <property name="text">
            <string>Size</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
            <cstring>sizeSlider</cstring>
