@@ -33,7 +33,7 @@ QString NX_UTILS_API toString(Level level);
     static constexpr Level kDefaultLevel = Level::info;
 #endif
 
-class Tag
+class NX_UTILS_API Tag
 {
 public:
     Tag() = default;
