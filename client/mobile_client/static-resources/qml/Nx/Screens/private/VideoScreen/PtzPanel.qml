@@ -11,7 +11,7 @@ Item
 {
     id: control
 
-    property alias preloadersParent: preloadersPanel.parent
+    property alias preloaders: preloadersPanel
 
     readonly property PtzController controller: PtzController
     {
@@ -40,6 +40,7 @@ Item
         zoomInPressed: zoomControl.zoomInPressed
         zoomOutPressed: zoomControl.zoomOutPressed
         moveDirection: joystick.direction
+
         Connections
         {
             target: focusControl
