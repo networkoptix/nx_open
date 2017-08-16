@@ -14,6 +14,7 @@ Pane
     property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
+    property alias factorySystem: informationBlock.factorySystem
     property alias running: informationBlock.online
     property alias ownerDescription: informationBlock.ownerDescription
     property bool reachable: false
@@ -66,7 +67,14 @@ Pane
 
     background: Rectangle
     {
-        color: control.enabled ? ColorTheme.base7 : ColorTheme.base6
+        color:
+        {
+            if (control.factorySystem)
+                return ColorTheme.base10
+
+            return control.enabled ? ColorTheme.base7 : ColorTheme.base6
+        }
+
         radius: 2
 
         MaterialEffect
@@ -93,6 +101,7 @@ Pane
         enabled: compatible && online
         address: Nx.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
+        factoryDetailsText: d.kFactorySystemDetailsText
     }
 
     IconButton
@@ -158,6 +167,12 @@ Pane
 
     function open()
     {
+        if (factorySystem)
+        {
+            Workflow.openStandardDialog("", d.kFactorySystemDetailsText)
+            return
+        }
+
         if (!compatible)
         {
             if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
@@ -210,6 +225,14 @@ Pane
                     systemId, localId, systemName, informationBlock.address)
             }
         }
+    }
+
+    QtObject
+    {
+        id: d
+
+        readonly property string kFactorySystemDetailsText:
+            qsTr("Connect to this server from web browser or through desktop client to set it up")
     }
 
     Keys.onEnterPressed: open()
