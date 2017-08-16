@@ -57,9 +57,8 @@ void AnalyticsSdkEventWidget::updateTabOrder(QWidget* before, QWidget* after)
 
 void AnalyticsSdkEventWidget::at_model_dataChanged(Fields fields)
 {
-    if (!model())
+    if (!model() || m_updating)
         return;
-
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields.testFlag(Field::eventResources))
@@ -84,6 +83,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
@@ -92,6 +92,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
         AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>());
     eventParams.setAnalyticsDriverId(ui->sdkEventTypeComboBox->currentData(
         AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>());
+
     model()->setEventParams(eventParams);
 }
 
@@ -109,17 +110,18 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
     QnUuid driverId = model()->eventParams().analyticsDriverId();
     QnUuid eventTypeId = model()->eventParams().analyticsEventId();
 
-    bool index = 0;
+    int index = 0;
     for (int i = 0; i < ui->sdkEventTypeComboBox->count(); ++i)
     {
         auto itemDriverId = ui->sdkEventTypeComboBox->itemData(i,
             AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+
         if (itemDriverId != driverId)
             continue;
 
         auto itemEventTypeId = ui->sdkEventTypeComboBox->itemData(i,
             AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
-        if (itemDriverId != eventTypeId)
+        if (itemEventTypeId != eventTypeId)
             continue;
 
         index = i;

@@ -5,7 +5,8 @@
 namespace nx {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(AnalyticsApiTypes, (json), _Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json), AnalyticsDriverManifest_Fields,
+    (brief, true))
 
 } // namespace api
 } // namespace nx

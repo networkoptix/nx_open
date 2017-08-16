@@ -14,6 +14,8 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
+#include <utils/common/connective.h>
+
 class QnEventLogModel;
 namespace nx { namespace vms { namespace event { class StringsHelper; }}}
 
@@ -21,11 +23,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QnSessionAwareDialog
+class QnEventLogDialog: public Connective<QnSessionAwareDialog>
 {
     Q_OBJECT
 
-    typedef QnSessionAwareDialog base_type;
+    using base_type = Connective<QnSessionAwareDialog>;
 
 public:
     explicit QnEventLogDialog(QWidget *parent);
@@ -43,6 +45,8 @@ protected:
     virtual void retranslateUi() override;
 
 private:
+    void initEventsModel();
+
     void reset();
     void updateData();
     void at_eventsGrid_clicked(const QModelIndex & index);
@@ -54,6 +58,8 @@ private:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
     QStandardItem* createEventTree(QStandardItem* rootItem, nx::vms::event::EventType value);
+    void createAnalyticsEventTree(QStandardItem* rootItem);
+    void updateAnalyticsEvents();
 
     bool isFilterExist() const;
     void requestFinished();
@@ -65,7 +71,11 @@ private:
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
-    void query(qint64 fromMsec, qint64 toMsec, nx::vms::event::EventType eventType, nx::vms::event::ActionType actionType);
+    void query(qint64 fromMsec,
+        qint64 toMsec,
+        nx::vms::event::EventType eventType,
+        const QnUuid& eventSubtype,
+        nx::vms::event::ActionType actionType);
 
 
 private:
