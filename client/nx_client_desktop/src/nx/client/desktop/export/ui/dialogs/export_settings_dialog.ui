@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>765</width>
     <height>537</height>
    </rect>
   </property>
@@ -14,8 +14,160 @@
    <string>Image View</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QTabWidget" name="tabWidget"/>
+    <widget class="QTabWidget" name="tabWidget">
+     <widget class="QWidget" name="singleCameraTab">
+      <attribute name="title">
+       <string>Single Camera</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <item>
+        <widget class="QWidget" name="previewWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="QStackedWidget" name="stackedWidget">
+         <property name="minimumSize">
+          <size>
+           <width>280</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>280</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <widget class="nx::client::desktop::ui::ExportSettingsWidget" name="exportSettingsPage"/>
+         <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
+         <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
+         <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
+         <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="buttonsWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>16</number>
+      </property>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="nx::client::desktop::ui::SelectableTextButton" name="exportSettingsButton">
+        <property name="text">
+         <string>Export Settings</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="overlayButtonsWidget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="timestampButton">
+           <property name="text">
+            <string notr="true">&lt;Timestamp&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="imageButton">
+           <property name="text">
+            <string notr="true">&lt;Image&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="textButton">
+           <property name="text">
+            <string notr="true">&lt;Text&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="speedButton">
+           <property name="text">
+            <string notr="true">&lt;Speed&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -30,15 +182,49 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
-     </property>
-     <property name="centerButtons">
-      <bool>true</bool>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::ui::ExportSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/ui/widgets/export_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::SelectableTextButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::TimestampOverlaySettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/ui/widgets/timestamp_overlay_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::ImageOverlaySettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/ui/widgets/image_overlay_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::TextOverlaySettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/ui/widgets/text_overlay_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::RapidReviewSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/ui/widgets/rapid_review_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
