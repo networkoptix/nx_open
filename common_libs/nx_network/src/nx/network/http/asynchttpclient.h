@@ -166,7 +166,6 @@ public:
     void setProxyUserPassword(const QString& userPassword);
     void setAuth(const AuthInfo& auth);
     void setProxyVia(const SocketAddress& proxyEndpoint);
-    void setConnectionHeader(const StringType& value);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
