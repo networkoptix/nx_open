@@ -1,0 +1,8 @@
+<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+       type="success" close="session.hideDevelopersFeedbackForm=true">
+    <p><b>開発者の方へ</b></p>
+    <p>私たちが提供する開発ツール（API、SDKなど）を改善する方法を探しています インテグレーションを開発した場合、または必要な場合は、このフィードバックフォームに記入してください。 3-5 分かかります　<br>あなたのフィードバックは、良い製品・ ソリューションを提供するのに役立ちます<br>
+    </p>
+    <p>また、当社の最新のニュースや計画を取得し、ディスカッションに参加して開発ツールに影響を与える機会があります</p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">レビューを書く</a></p>
+</alert>

@@ -340,12 +340,15 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         && params.reasonCode == vms::event::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
-        for (const QString& stringId : params.description.split(L';'))
+        for (const QString& stringId: params.description.split(L';'))
         {
             QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
             if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
-                tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
+            {
+                if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                    tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
+            }
         }
     }
 

@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -584,7 +584,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
@@ -717,7 +717,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;カメラの設定の最適化有効&quot;はシステムアドミニストレーションで無効になっています</translation>
     </message>
     <message>
       <location/>
@@ -727,17 +727,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZコントロール</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>カメラのプリセットを無効にし、システムプリセットを使用</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>警告！カメラのプリセットは使用できません</translation>
     </message>
   </context>
   <context>
@@ -745,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>入力ID</translation>
     </message>
   </context>
   <context>
@@ -771,7 +771,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>出力ID：</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -1416,7 +1416,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>ハードウェアID:</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1515,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>ハードウェア Id</translation>
     </message>
   </context>
   <context>
@@ -1642,7 +1642,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>シーケンス表示サイクル</translation>
     </message>
   </context>
   <context>
@@ -1711,7 +1711,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -1729,7 +1729,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>要確認</translation>
     </message>
   </context>
   <context>
@@ -1904,7 +1904,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -2241,7 +2241,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>&quot;最高&quot;の画質と解像度には、スペックの高いPCを推奨します</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2307,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2550,7 +2550,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>テキストラベル</translation>
     </message>
   </context>
   <context>
@@ -2647,7 +2647,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>役割</translation>
     </message>
     <message>
       <location/>
@@ -2657,7 +2657,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>アイコン</translation>
     </message>
   </context>
   <context>
@@ -2772,22 +2772,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>役割</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>すべてのユーザーを表示</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>ユーザを選択</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>検索で一致するものはありません</translation>
     </message>
   </context>
   <context>
@@ -2823,7 +2823,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>インターネットで時刻同期</translation>
     </message>
   </context>
   <context>
@@ -2863,8 +2863,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
     </message>
     <message>
       <location/>

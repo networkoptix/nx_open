@@ -53,3 +53,10 @@ Description: Declined EULA
  terms you cannot install this software.
  .
  The installation of this package will be canceled.
+
+Template: ${deb.customization.company.name}-mediaserver/complete-setup-hint
+Type: note
+Description: Complete the setup process
+ Installation is not yet complete.
+ To proceed please run ${display.product.name} Client and click "New System" tile
+ or access server web-page with your browser.

@@ -144,7 +144,10 @@ void QnContext::setScreenOrientation(Qt::ScreenOrientation orientation)
 
 int QnContext::getMaxTextureSize() const
 {
-    return QnTextureSizeHelper::instance()->maxTextureSize();
+    if (const auto textureSizeHelper = QnTextureSizeHelper::instance())
+        return textureSizeHelper->maxTextureSize();
+
+    return -1;
 }
 
 bool QnContext::liteMode() const

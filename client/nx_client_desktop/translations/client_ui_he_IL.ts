@@ -1642,7 +1642,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>מחזור סרטון</translation>
     </message>
   </context>
   <context>
