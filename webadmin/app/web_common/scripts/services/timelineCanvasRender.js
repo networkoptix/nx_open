@@ -9,7 +9,7 @@
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings){
+function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, hasHighDpi){
 
     this.canvas = canvas;
     this.recordsProvider = recordsProvider;
@@ -17,6 +17,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     this.animationState = animationState;
     this.debugEventsMode = debugSettings.debugEventsMode;
     this.allowDebug = debugSettings.allowDebug;
+    this.hasHighDpi = hasHighDpi;
 
     var self = this;
 
@@ -507,7 +508,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                         context.fillStyle = chunkLoadingTexture;
                         chunkLoadingTextureSize = this.width;
                     };
-                    img.src = Config.viewsDirCommon + '../images/timeline-loading@2x.png';
+                    var imagePath = hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
+                    img.src = Config.viewsDirCommon + imagePath;
                     chunkLoadingTextureImg = img;
                 }
                 context.fillStyle = blurColor(timelineConfig.loadingChunkColor,1);
@@ -521,6 +523,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             context.save();
             context.translate(offset_x, 0);
+            context.globalAlpha = 0.3;
 
             context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                             (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
@@ -558,7 +561,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     context.fillStyle = lastMinuteTexture;
                     lastMinuteTextureSize = this.width;
                 };
-                img.src = Config.viewsDirCommon + '../images/timeline-loading@2x.png';
+                var imagePath = hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
+                img.src = Config.viewsDirCommon + imagePath;
                 lastMinuteTextureImg = img;
             }
             context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
@@ -575,7 +579,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         context.save();
         context.translate(offset_x, 0);
-
+        context.globalAlpha = 0.3;
         context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                         (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
