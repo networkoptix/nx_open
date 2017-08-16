@@ -38,7 +38,7 @@ struct ActionData
     };
 
     ActionData(): actionType(undefinedAction), flags(0) {}
-    ActionData(const ActionData&) = delete;
+    ActionData(const ActionData&);
     ActionData(ActionData&&) = default;
     ActionData& operator=(const ActionData&) = delete;
     ActionData& operator=(ActionData&&) = default;
