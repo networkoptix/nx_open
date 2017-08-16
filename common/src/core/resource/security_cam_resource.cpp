@@ -25,8 +25,6 @@
 #include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
-#include <nx/api/analytics/supported_events.h>
-
 #include <nx/utils/log/log.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
@@ -87,7 +85,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedAnalyticsSupportedEvents(
         [this]()
         {
-            return QJson::deserialized<QList<nx::api::AnalyticsSupportedEvents>>(
+            return QJson::deserialized<nx::api::AnalyticsSupportedEvents>(
                 getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
         },
         &m_mutex)
@@ -771,13 +769,13 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
-QList<nx::api::AnalyticsSupportedEvents> QnSecurityCamResource::analyticsSupportedEvents() const
+nx::api::AnalyticsSupportedEvents QnSecurityCamResource::analyticsSupportedEvents() const
 {
     return m_cachedAnalyticsSupportedEvents.get();
 }
 
 void QnSecurityCamResource::setAnalyticsSupportedEvents(
-    const QList<nx::api::AnalyticsSupportedEvents>& eventsList)
+    const nx::api::AnalyticsSupportedEvents& eventsList)
 {
     if (eventsList.isEmpty())
         setProperty(Qn::kAnalyticsDriversParamName, QVariant());

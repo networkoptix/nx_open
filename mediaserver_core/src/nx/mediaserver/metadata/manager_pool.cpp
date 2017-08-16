@@ -93,7 +93,7 @@ void ManagerPool::createMetadataManagersForResource(const QnResourcePtr& resourc
     if (!canFetchMetadataFromResource(resourceId))
         return;
 
-    releaseResourceMetadataManagers(resource);  
+    releaseResourceMetadataManagers(resource);
 
     auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("Can not access PluginManager instance"));
@@ -137,13 +137,12 @@ void ManagerPool::createMetadataManagersForResource(const QnResourcePtr& resourc
 
         if (!nonConstResource)
             return;
-        
+
         auto secRes = nonConstResource.dynamicCast<QnSecurityCamResource>();
 
         nx::api::AnalyticsSupportedEvents analyticsSupportedEvents;
-        analyticsSupportedEvents.driverId = manifest->driverId;
         for (const auto& event: manifest->outputEventTypes)
-            analyticsSupportedEvents.eventTypes.push_back(event.eventTypeId);
+            analyticsSupportedEvents.push_back(event.eventTypeId);
 
         secRes->setAnalyticsSupportedEvents({analyticsSupportedEvents});
 

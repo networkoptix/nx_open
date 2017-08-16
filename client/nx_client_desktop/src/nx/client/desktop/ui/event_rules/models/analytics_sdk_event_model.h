@@ -6,6 +6,8 @@
 
 #include <nx/utils/uuid.h>
 
+namespace nx { namespace api { struct AnalyticsEventTypeWithRef; } }
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -32,16 +34,7 @@ public:
     bool isValid() const;
 
 private:
-    QMap<QnUuid, QString> m_usedDrivers;
-
-    struct Item
-    {
-        QnUuid driverId;
-        QnUuid eventTypeId;
-        QString eventName;
-    };
-
-    QList<Item> m_items;
+    QList<nx::api::AnalyticsEventTypeWithRef> m_items;
     bool m_valid = false;
 };
 

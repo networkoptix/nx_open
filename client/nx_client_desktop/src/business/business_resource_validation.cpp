@@ -236,35 +236,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto supportedEvents = camera->analyticsSupportedEvents();
-
-    QSet<QnUuid> supportedDrivers;
-    for (const auto& supportedEventSet: supportedEvents)
-    {
-        if (supportedEventSet.driverId.isNull())
-            continue;
-
-        if (supportedEventSet.eventTypes.empty())
-            continue;
-
-        supportedDrivers.insert(supportedEventSet.driverId);
-    }
-    if (supportedDrivers.empty())
-        return false;
-
-    const auto server = camera->getParentServer();
-    NX_EXPECT(server);
-    if (!server)
-        return false;
-
-    const auto drivers = server->analyticsDrivers();
-    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [supportedDrivers](const nx::api::AnalyticsDriverManifest& manifest)
-        {
-            return supportedDrivers.contains(manifest.driverId);
-        });
-
-    return driver != drivers.cend();
+    return !camera->analyticsSupportedEvents().isEmpty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

@@ -14,7 +14,10 @@
 #include "network_resource.h"
 #include "common/common_globals.h"
 #include <nx/vms/event/event_fwd.h>
+
 #include "api/model/api_ioport_data.h"
+#include <nx/api/analytics/supported_events.h>
+
 #include "core/dataconsumer/audio_data_transmitter.h"
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -27,9 +30,6 @@ typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
-
-namespace nx { namespace api { struct AnalyticsSupportedEvents; } }
-
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -228,8 +228,8 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
-    QList<nx::api::AnalyticsSupportedEvents> analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const QList<nx::api::AnalyticsSupportedEvents>& eventsList);
+    nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
+    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -394,7 +394,7 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-    CachedValue<QList<nx::api::AnalyticsSupportedEvents>> m_cachedAnalyticsSupportedEvents;
+    CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
 
 private slots:
     void resetCachedValues();

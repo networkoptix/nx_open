@@ -233,14 +233,15 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    nx::vms::event::AnalyticsHelper helper(commonModule());
+    auto allEventTypes = m_filterCameraList.empty()
+        ? nx::vms::event::AnalyticsHelper(commonModule()).analyticsEvents()
+        : nx::vms::event::AnalyticsHelper::analyticsEvents(cameras(m_filterCameraList));
 
-    auto allEventTypes = helper.analyticsEvents();
     if (allEventTypes.empty())
         return;
 
     auto eventName =
-        [hasDifferentDrivers = helper.hasDifferentDrivers(allEventTypes),
+        [hasDifferentDrivers = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(allEventTypes),
             locale = qnRuntime->locale()]
         (const nx::api::AnalyticsEventTypeWithRef& eventType)
         {
@@ -565,6 +566,7 @@ void QnEventLogDialog::setCameraList(const QSet<QnUuid>& ids)
 
     m_filterCameraList = ids;
     retranslateUi();
+    updateAnalyticsEvents();
     updateData();
 }
 

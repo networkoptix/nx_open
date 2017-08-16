@@ -20,7 +20,12 @@ class AnalyticsHelper: public QObject, public QnCommonModuleAware
 public:
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
+    /** Get list of all supported analytics events in the system. */
     QList<nx::api::AnalyticsEventTypeWithRef> analyticsEvents() const;
+
+    /** Get list of all supported analytics events for the given cameras. */
+    static QList<nx::api::AnalyticsEventTypeWithRef> analyticsEvents(
+        const QnVirtualCameraResourceList& cameras);
 
     static bool hasDifferentDrivers(const QList<nx::api::AnalyticsEventTypeWithRef>& events);
 

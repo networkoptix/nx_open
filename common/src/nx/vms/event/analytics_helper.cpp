@@ -5,6 +5,40 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+namespace {
+
+/** Struct for keeping unique list of analytics event types. */
+class AnalyticsEventTypeWithRefStorage
+{
+public:
+    AnalyticsEventTypeWithRefStorage(QList<nx::api::AnalyticsEventTypeWithRef>* data):
+        data(data)
+    {}
+
+    void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
+        const nx::api::AnalyticsEventType& eventType)
+    {
+        nx::api::AnalyticsEventTypeId id(manifest.driverId, eventType.eventTypeId);
+        if (keys.contains(id))
+            return;
+
+        keys.insert(id);
+        nx::api::AnalyticsEventTypeWithRef ref;
+        ref.driverId = manifest.driverId;
+        ref.driverName = manifest.driverName;
+        ref.eventTypeId = eventType.eventTypeId;
+        ref.eventName = eventType.eventName;
+        data->push_back(ref);
+    }
+
+private:
+    QSet<nx::api::AnalyticsEventTypeId> keys;
+    QList<nx::api::AnalyticsEventTypeWithRef>* data;
+};
+
+
+} // namespace
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -18,26 +52,42 @@ AnalyticsHelper::AnalyticsHelper(QnCommonModule* commonModule, QObject* parent):
 QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents() const
 {
     QList<nx::api::AnalyticsEventTypeWithRef> result;
-
-    QSet<nx::api::AnalyticsEventTypeId> addedEvents;
+    AnalyticsEventTypeWithRefStorage storage(&result);
 
     for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
     {
         for (const auto& manifest: server->analyticsDrivers())
         {
             for (const auto& eventType: manifest.outputEventTypes)
-            {
-                nx::api::AnalyticsEventTypeId id(manifest.driverId, eventType.eventTypeId);
-                if (addedEvents.contains(id))
-                    continue;
-                addedEvents.insert(id);
+                storage.addUnique(manifest, eventType);
+        }
+    }
+    return result;
+}
 
-                nx::api::AnalyticsEventTypeWithRef ref;
-                ref.driverId = manifest.driverId;
-                ref.driverName = manifest.driverName;
-                ref.eventTypeId = eventType.eventTypeId;
-                ref.eventName = eventType.eventName;
-                result.push_back(ref);
+QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents(
+    const QnVirtualCameraResourceList& cameras)
+{
+    QList<nx::api::AnalyticsEventTypeWithRef> result;
+    AnalyticsEventTypeWithRefStorage storage(&result);
+
+    for (const auto& camera: cameras)
+    {
+        const auto server = camera->getParentServer();
+        NX_ASSERT(server);
+        if (!server)
+            continue;
+
+        QSet<QnUuid> allowedEvents = camera->analyticsSupportedEvents().toSet();
+
+        for (const auto& manifest: server->analyticsDrivers())
+        {
+            for (const auto& eventType: manifest.outputEventTypes)
+            {
+                if (!allowedEvents.contains(eventType.eventTypeId))
+                    continue;
+
+                storage.addUnique(manifest, eventType);
             }
         }
     }

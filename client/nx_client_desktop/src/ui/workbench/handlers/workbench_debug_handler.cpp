@@ -198,15 +198,14 @@ public:
                         else
                         {
                             nx::api::AnalyticsSupportedEvents supported;
-                            supported.driverId = randomDriver.driverId;
                             std::transform(randomDriver.outputEventTypes.cbegin(),
                                 randomDriver.outputEventTypes.cend(),
-                                std::back_inserter(supported.eventTypes),
+                                std::back_inserter(supported),
                                 [](const nx::api::AnalyticsEventType& eventType)
                                 {
                                     return eventType.eventTypeId;
                                 });
-                            camera->setAnalyticsSupportedEvents({supported});
+                            camera->setAnalyticsSupportedEvents(supported);
                         }
 
                         camera->saveParamsAsync();
