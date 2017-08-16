@@ -42,7 +42,17 @@ endif()
 if(MACOSX)
     find_library(CoreGraphics_LIBRARY CoreGraphics)
     mark_as_advanced(CoreGraphics_LIBRARY)
-    target_link_libraries(common PUBLIC ${CoreGraphics_LIBRARY})
+
+    find_library(CoreFoundation_LIBRARY CoreFoundation)
+    mark_as_advanced(CoreFoundation_LIBRARY)
+
+    find_library(IOKit_LIBRARY IOKit)
+    mark_as_advanced(IOKit_LIBRARY)
+
+    find_library(AppKit_LIBRARY AppKit)
+    mark_as_advanced(AppKit_LIBRARY)
+
+    target_link_libraries(common PUBLIC ${CoreGraphics_LIBRARY} ${CoreFoundation_LIBRARY} ${IOKit_LIBRARY} ${AppKit_LIBRARY})
 endif()
 
 if(targetDevice STREQUAL "isd")
