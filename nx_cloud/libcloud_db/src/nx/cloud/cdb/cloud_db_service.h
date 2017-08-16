@@ -124,6 +124,7 @@ private:
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,
         MaintenanceManager* const maintenanceManager,
+        const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
         const CloudModuleUrlProvider& cloudModuleUrlProvider);
 
     /** input & output */
