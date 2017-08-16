@@ -57,6 +57,31 @@ bool AnalyticsHelper::hasDifferentDrivers(const QList<nx::api::AnalyticsEventTyp
         });
 }
 
+QString AnalyticsHelper::eventName(const QnVirtualCameraResourcePtr& camera,
+    const QnUuid& eventTypeId,
+    const QString& locale)
+{
+    NX_ASSERT(camera);
+    if (!camera)
+        return QString();
+
+    const auto server = camera->getParentServer();
+    NX_ASSERT(server);
+    if (!server)
+        return QString();
+
+    for (const auto& manifest: server->analyticsDrivers())
+    {
+        for (const auto &eventType: manifest.outputEventTypes)
+        {
+            if (eventType.eventTypeId == eventTypeId)
+                return eventType.eventName.text(locale);
+        };
+    }
+
+    return QString();
+}
+
 
 } // namespace event
 } // namespace vms

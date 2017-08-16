@@ -9,9 +9,13 @@
 
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
+
 #include <client_core/client_core_module.h>
+
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -175,7 +179,7 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     m_columns(),
     m_linkBrush(QPalette().link()),
     m_index(new DataIndex(this)),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_stringsHelper(new vms::event::StringsHelper(commonModule()))
 {
 }
 
@@ -290,12 +294,12 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
     NX_EXPECT(numDeleted >= 0);
     if (numDeleted <= 0)
-        return m_helper->actionSubjects(users, roles);
+        return m_stringsHelper->actionSubjects(users, roles);
 
     const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
     return roles.empty() && users.empty()
         ? removedSubjectsText
-        : m_helper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
+        : m_stringsHelper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
 }
 
 QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
@@ -309,7 +313,7 @@ QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
 
     return users.empty() && roles.empty()
         ? kRemovedUserName
-        : m_helper->actionSubjects(users, roles, false);
+        : m_stringsHelper->actionSubjects(users, roles, false);
 }
 
 QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action)
@@ -362,10 +366,9 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
     return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(const QnUuid& id)
+QString QnEventLogModel::getResourceNameString(const QnUuid& id) const
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return QnResourceDisplayInfo(resourcePool->getResourceById(id))
+    return QnResourceDisplayInfo(resourcePool()->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
 }
 
@@ -381,7 +384,26 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             return dt.toString(Qt::DefaultLocaleShortDate);
         }
         case EventColumn:
-            return m_helper->eventName(action.eventParams.eventType);
+        {
+            if (action.eventParams.eventType == nx::vms::event::EventType::analyticsSdkEvent)
+            {
+                const auto camera = resourcePool()->getResourceById(
+                    action.eventParams.eventResourceId).
+                    dynamicCast<QnVirtualCameraResource>();
+
+                QString eventName = camera
+                    ? m_analyticsHelper->eventName(camera,
+                        action.eventParams.analyticsEventId(),
+                        qnRuntime->locale())
+                    : QString();
+
+                if (!eventName.isEmpty())
+                    return eventName;
+            }
+
+            return m_stringsHelper->eventName(action.eventParams.eventType);
+        }
+
         case EventCameraColumn:
         {
             QString result = getResourceNameString(action.eventParams.eventResourceId);
@@ -390,7 +412,8 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             return result;
         }
         case ActionColumn:
-            return m_helper->actionName(action.actionType);
+            return m_stringsHelper->actionName(action.actionType);
+
         case ActionCameraColumn:
         {
             switch (action.actionType)
@@ -444,7 +467,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             }
             else
             {
-                result = m_helper->eventDetails(action.eventParams).join(L'\n');
+                result = m_stringsHelper->eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!vms::event::hasToggleState(eventType))
@@ -575,7 +598,7 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
     if (column != DescriptionColumn || !action.hasFlags(vms::event::ActionData::VideoLinkExists))
         return QString();
 
-    return m_helper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
+    return m_stringsHelper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const
