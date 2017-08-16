@@ -1,0 +1,8 @@
+<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+       type="success" close="session.hideDevelopersFeedbackForm=true">
+    <p><b>האם אתה מפתח?</b></p>
+    <p>אנו מחפשים דרכים לשיפור כלי הפיתוח שאנו מספקים (API, SDK וכו '). אם פיתחתם כל אינטגרציה או שאתם רוצים לפתח אחת, אנא מלאו טופס משוב זה. זה ייקח 3-5 דקות. <br> המשוב שלך יעזור לנו לספק מוצרים ופתרונות טובים יותר עבורך.<br>
+    </p>
+    <p>כמו כן, יש לך הזדמנות לקבל את החדשות האחרונות שלנו תוכניות, להשתתף בדיונים ולכן להשפיע על כלי הפיתוח שלנו.</p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">השאר משוב</a></p>
+</alert>
