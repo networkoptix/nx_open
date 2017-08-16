@@ -30,9 +30,8 @@ class PanicAction;
 typedef QSharedPointer<PanicAction> PanicActionPtr;
 typedef QList<PanicAction> PanicActionList;
 
-class ActionData;
+struct ActionData;
 typedef std::vector<ActionData> ActionDataList;
-typedef QSharedPointer<ActionDataList> ActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
 

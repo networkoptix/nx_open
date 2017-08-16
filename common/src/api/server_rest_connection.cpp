@@ -452,24 +452,24 @@ T parseMessageBody(
     const nx_http::BufferType& msgBody,
     bool* success)
 {
-    switch (format)
-    {
-        case Qn::JsonFormat:
-        {
-            auto restResult = QJson::deserialized(msgBody, QnJsonRestResult(), success);
-            return T(restResult, restResult.deserialized<decltype(T::data)>());
-        }
-        case Qn::UbjsonFormat:
-        {
-            auto restResult = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), success);
-            return T(restResult, restResult.deserialized<decltype(T::data)>());
-        }
-        default:
-            if (success)
-                *success = false;
-            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
-            break;
-    }
+     switch (format)
+     {
+         case Qn::JsonFormat:
+         {
+              auto restResult = QJson::deserialized(msgBody, QnJsonRestResult(), success);
+              return T(restResult, restResult.deserialized<decltype(T::data)>());
+         }
+         case Qn::UbjsonFormat:
+         {
+             auto restResult = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), success);
+             return T(restResult, restResult.deserialized<decltype(T::data)>());
+         }
+         default:
+             if (success)
+                 *success = false;
+             NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+             break;
+     }
     return T();
 }
 
@@ -579,13 +579,16 @@ void invoke(Callback<ResultType> callback,
         trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
     else
         trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
+
     if (targetThread)
     {
-        executeDelayed(
-            [callback, success, id, r = std::move(result)]
-            {
-                callback(success, id, std::move(r));
-            }, 0, targetThread);
+         auto ptr = std::make_shared<ResultType>(std::move(result));
+         executeDelayed([callback, success, id, ptr]() mutable
+             {
+                 callback(success, id, std::move(*ptr));
+             },
+             0,
+             targetThread);
     }
     else
     {
@@ -607,16 +610,28 @@ Handle ServerConnection::executeRequest(
 
         return sendRequest(request,
             [callback, targetThread, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+            (Handle id,
+                SystemError::ErrorCode osErrorCode,
+                int statusCode,
+                nx_http::StringType contentType,
+                nx_http::BufferType msgBody)
             {
                 bool success = false;
-                ResultType result;
                 if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
                 {
-                    Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
-                    result = parseMessageBody<ResultType>(format, msgBody, &success);
+                    const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                    invoke(callback,
+                        targetThread,
+                        success,
+                        id,
+                        parseMessageBody<ResultType>(format, msgBody, &success),
+                        serverId,
+                        timer);
                 }
-                invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
+                else
+                {
+                    invoke(callback, targetThread, success, id, ResultType(), serverId, timer);
+                }
             });
     }
 

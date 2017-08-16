@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include "server_rest_connection_fwd.h"
 
 #include <nx/network/http/http_types.h>
@@ -26,23 +28,28 @@
 
 namespace rest {
 
-struct RestResultWithDataBase: public QnRestResult
+struct RestResultWithDataBase
 {
-    RestResultWithDataBase() {}
-    RestResultWithDataBase(const QnRestResult& other): QnRestResult(other) {}
 };
 
 template <typename T>
 struct RestResultWithData: public RestResultWithDataBase
 {
     RestResultWithData() {}
-
-    RestResultWithData(const QnRestResult& restResult, const T& data):
-        RestResultWithDataBase(restResult),
-        data(data)
+    RestResultWithData(const QnRestResult& restResult, T data):
+        error(restResult.error),
+        errorString(restResult.errorString),
+        data(std::move(data))
     {
     }
 
+    RestResultWithData(const RestResultWithData&) = delete;
+    RestResultWithData(RestResultWithData&&) = default;
+    RestResultWithData& operator=(const RestResultWithData&) = delete;
+    RestResultWithData& operator=(RestResultWithData&&) = default;
+
+    QnRestResult::Error error;
+    QString errorString;
     T data;
 };
 
