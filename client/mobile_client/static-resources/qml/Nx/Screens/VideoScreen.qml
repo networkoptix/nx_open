@@ -1,5 +1,4 @@
 import QtQuick 2.6
-import QtQuick.Window 2.2
 
 import Nx 1.0
 import Nx.Media 1.0
@@ -315,15 +314,10 @@ PageBase
 
         Image
         {
-            width: applicationInfo.isAndroid() ? Screen.width : parent.width
+            width: mainWindow.width
             height: sourceSize.height
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: applicationInfo.isAndroid()
-                ? videoScreen.height - Screen.height
-                : 0
-            anchors.rightMargin: applicationInfo.isAndroid()
-                ? videoScreen.width - Screen.width
-                : 0
+            anchors.bottomMargin: videoScreen.height - mainWindow.height
 
             sourceSize.height: 56 * 2 - anchors.bottomMargin
             source: lp("/images/timeline_gradient.png")
