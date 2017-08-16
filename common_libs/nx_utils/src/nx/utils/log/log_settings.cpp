@@ -6,6 +6,10 @@ namespace nx {
 namespace utils {
 namespace log {
 
+Settings::Settings()
+{
+}
+
 void Settings::load(const QnSettings& settings, const QString& prefix)
 {
     const auto makeKey =
