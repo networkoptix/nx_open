@@ -1,6 +1,6 @@
-New message
+Nieuw bericht
 
 Type: {{message.type}}
-Data: {{{message.data}}}
+Gegevens: {{{message.data}}}
 
-There is no specific template for this type of message
+Er is geen specifiek sjabloon voor dit type bericht

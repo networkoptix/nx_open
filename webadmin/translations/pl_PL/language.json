@@ -19,16 +19,16 @@
   },
   "settings":{
     "tabs":{
-      "server":"Server",
+      "server":"Serwer",
       "system":"System",
-      "device":"Device"
+      "device":"Urządzenie"
     },
     "confirmRestart":"Restart server?",
     "couldntCheckInternet":"Could not check cloud connection",
     "confirmRestoreDefault":"Clear database and settings? This process will take some time and server will be restarted afterwards.",
     "confirmRestoreDefaultTitle":"Restore factory defaults",
     "unexpectedError":"Failed: unexpected error has happened",
-    "connnetionError":"Connection error",
+    "connnetionError":"Błąd połączenia",
     "wrongPassword":"Wrong password.",
     "error":"Error: ",
     "restartNeeded":"Changes saved. Restart server to apply new settings?",
@@ -40,7 +40,7 @@
     "unsafePortConfirm":"It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
     "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
-    "confirmDisconnectFromCloudAction":"Disconnect",
+    "confirmDisconnectFromCloudAction":"Rozłącz",
     "disconnectedSuccess":"System was disconnected successfully",
     "connectedSuccess":"System was connected successfully",
     "createLocalOwner":"",
@@ -76,7 +76,7 @@
     "mergeSucceed":"Merge succeed.",
     "newSystemDisplayName":"New system",
     "incompatibleProtocol":"incompatible version",
-    "incompatibleCloudHost":"cloud conflict",
+    "incompatibleCloudHost":"konflikt w chmurze",
     "incompatibleCloudState":"cloud connected"
   },
   "login":{
@@ -103,7 +103,7 @@
     "selectFiles":"Select files"
   },
   "advanced":{
-    "free":"Free",
+    "free":"Bezpłatna",
     "total":"Total",
     "occupied":"Occupied",
     "reserved":"Reserved"

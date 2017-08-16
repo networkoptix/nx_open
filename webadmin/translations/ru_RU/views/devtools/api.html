@@ -100,7 +100,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Requesting URL</label>
+                                        <label class="col-sm-3 control-label">Запрашиваемый URL</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{getDebugUrl()}}</p>
                                         </div>
@@ -189,7 +189,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Requesting URL</label>
+                                        <label class="col-sm-3 control-label">Запрашиваемый URL</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{getDebugUrl()}}</p>
                                         </div>
@@ -218,7 +218,7 @@
 
 
                                     <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
-                                        <label class="col-sm-3 control-label">Status</label>
+                                        <label class="col-sm-3 control-label">Состояние</label>
                                         <div class="col-sm-9">
                                             <p class="form-control-static">{{result.status}}</p>
                                         </div>
@@ -246,7 +246,7 @@
                                 </form>
 
                                 <div ng-if="activeFunction.result.params || activeFunction.result.caption">
-                                    <h3>Result</h3>
+                                    <h3>Результат</h3>
                                     <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
