@@ -138,6 +138,38 @@ function find_free_port {
     done
 }
 
+function check_new_system {
+    local port=$1
+    set +e
+
+    TRY=1
+    while [ $TRY -le 5 ]
+    do
+        sleep 1
+        echo "[$TRY] Checking if the server is running..."
+        INFO=$(wget "http://localhost:$port/api/moduleInformation" --quiet -O-) && break
+        TRY=$[$TRY + 1]
+    done
+
+    echo "$INFO" | grep -q '"localSystemId":\s*"{00000000-0000-0000-0000-000000000000}"'
+}
+
+function display_complete_setup_hint {
+    local port=$1
+
+    if [ -n "$UPGRADING" ]
+    then
+        return
+    fi
+
+    if check_new_system $port
+    then
+        db_fset ${deb.customization.company.name}-mediaserver/complete-setup-hint seen false
+        db_input critical ${deb.customization.company.name}-mediaserver/complete-setup-hint || true
+        db_go
+    fi
+}
+
 case "$1" in
     configure)
         ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
@@ -251,3 +283,4 @@ fi
 
 service $COMPANY_NAME-mediaserver start || exit $?
 
+display_complete_setup_hint $PORT

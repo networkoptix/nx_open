@@ -1068,7 +1068,7 @@ bool SslSocket::initializeUnderlyingSocketIfNeeded()
 {
     Q_D(SslSocket);
 
-    if (m_underlyingSocketInitialized)
+    if (m_isUnderlyingSocketInitialized)
         return true;
 
     // NOTE: Currently all I/O operations are implemented over async because current SSL
@@ -1086,7 +1086,7 @@ bool SslSocket::initializeUnderlyingSocketIfNeeded()
             return false;
     }
 
-    m_underlyingSocketInitialized = true;
+    m_isUnderlyingSocketInitialized = true;
 
     return true;
 }

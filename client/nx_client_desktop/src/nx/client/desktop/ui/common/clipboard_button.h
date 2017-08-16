@@ -2,6 +2,8 @@
 
 #include <nx/client/desktop/ui/common/button_with_confirmation.h>
 
+class QLineEdit;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -25,6 +27,8 @@ public:
 
     explicit ClipboardButton(const QString& text, const QString& confirmationText,
         QWidget* parent = nullptr);
+
+    static ClipboardButton* createInline(QLineEdit* parent, StandardType type);
 };
 
 } // namespace ui

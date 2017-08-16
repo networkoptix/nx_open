@@ -1,13 +1,13 @@
-Welcome to {{PRODUCT_NAME}}
+Welkom bij {{PRODUCT_NAME}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join {{PRODUCT_NAME}} and shared his system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) nodigt u uit om deel te nemen {{PRODUCT_NAME}} en heeft zijn {{message.system_name}} systeem met u gedeeld.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You are invited you to join {{PRODUCT_NAME}}.
-The system {{message.system_name}} was shared with you.
+U wordt uitgenodigd om deel te nemen aan {{PRODUCT_NAME}}.
+Het systeem {{message.system_name}} is met u gedeeld.
 {{/message.sharer_name}}
 
-Register and view the system: {{config.portal_url}}/register/{{message.code}}
+Registreer en bekijk het systeem: {{config.portal_url}} / register / {{message.code}}
 

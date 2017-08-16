@@ -40,7 +40,7 @@ public:
         const AddressEntry& targetHostAddress,
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
-        OutgoingTunnel::NewConnectionHandler handler);
+        AbstractOutgoingTunnel::NewConnectionHandler handler);
 
     /**
      * @return Peer id for cloud connect.
@@ -64,11 +64,11 @@ public:
 private:
     struct TunnelContext
     {
-        std::unique_ptr<OutgoingTunnel> tunnel;
-        std::list<OutgoingTunnel::NewConnectionHandler> handlers;
+        std::unique_ptr<AbstractOutgoingTunnel> tunnel;
+        std::list<AbstractOutgoingTunnel::NewConnectionHandler> handlers;
     };
 
-    typedef std::map<QString, TunnelContext> TunnelDictionary;
+    typedef std::map<QString, std::unique_ptr<TunnelContext>> TunnelDictionary;
 
     mutable QnMutex m_mutex;
     mutable bool m_isOwnPeerIdAssigned;
@@ -86,8 +86,8 @@ private:
         TunnelAttributes tunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection,
         TunnelContext* tunnelContext,
-        std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter);
-    void onTunnelClosed(OutgoingTunnel* tunnelPtr);
+        std::list<AbstractOutgoingTunnel::NewConnectionHandler>::iterator handlerIter);
+    void onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     static bool s_isOwnPeerIdChangeAllowed;

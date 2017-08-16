@@ -1531,9 +1531,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
             {
                 qint64 delta = timeMSec - m_animatedPosition;
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() || delta * speed() < 0)
+
+                // See VMS-2657
+                const bool canOmitAnimation = m_currentWidget
+                    && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
+                    && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
+
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                    (canOmitAnimation && delta * speed() < 0))
                 {
-                    /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
+                    // If distance is less than 1 pixel or we catch up backwards on
+                    // local media file do it instantly
                     m_animatedPosition = timeMSec;
                     timelineAdvance(timeMSec);
                 }

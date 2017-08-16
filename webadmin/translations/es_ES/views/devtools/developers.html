@@ -1,0 +1,34 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div>
+        <h3>Developer Tools</h3>
+        <p><a href="#/developers/api">API Testing Tool</a></p>
+        <p><a href="#/developers/changelog">API Changelog</a></p>
+        <p><a href="#/developers/events">Generic Events Tool</a></p>
+        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
+
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    </div>
+    <div>
+        <h3>Servidor API</h3>
+        <p>
+            Servidor API proporciona un conjunto estándar de API llamadas para 3 sistemas de partido. Da a los desarrolladores la capacidad para acceder a casi cualquier función de sistema disponible en el cliente regular: consulta y administrar los recursos del sistema (servidores, cámaras, usuarios, permisos), tirar de vivo o video grabado fuera del sistema, generar eventos, crear normas, controlar cámaras PTZ y mucho más.
+        </p>
+        <p><a id="api-doc" href="api.xml" target="_blank">Documentación de la API</a></p>
+    </div>
+    <div>
+        <h3>Fuente de vídeo integración SDK</h3>
+        <p>
+            Video fuente Integration SDK ofrece la posibilidad de integrar sistema de prácticamente cualquier fuente de vídeo grabado o en directo (cámaras IP, NVR, DVR, etcetera). SDK permite crear métodos para descubrir, visualizar, analizar y grabar video. También permite la integración de puertos de E/S de dispositivo y la información de detección de movimiento.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >conseguir el SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Almacenamiento SDK</h3>
+        <p>
+            Almacenamiento SDK ofrece la posibilidad de integrar sistema de almacenamiento posibles. Permite a los desarrolladores leer de o escribir en cualquier lugar de almacenamiento de información: nube local, remota e incluso uno. La creación de un plugin de almacenamiento requiere implementar funciones estándar tales como: stream de I/O, si existe archivo, Borrar archivo, lista de archivos en la carpeta, etcetera. Almacenamiento SDK contiene un ejemplo de uso de un servidor FTP como una ubicación de almacenamiento.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >conseguir el SDK</a></p>
+    </div>
+</div>

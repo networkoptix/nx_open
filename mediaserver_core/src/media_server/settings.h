@@ -99,12 +99,6 @@ namespace nx_ms_conf
     /** Semicolon-separated list of servers to get public ip. */
     static const QLatin1String PUBLIC_IP_SERVERS( "publicIPServers" );
 
-    static const QLatin1String EC2_TRAN_LOG_LEVEL( "tranLogLevel" );
-    static const QLatin1String DEFAULT_EC2_TRAN_LOG_LEVEL( "none" );
-
-    static const QLatin1String HTTP_MSG_LOG_LEVEL( "http-log-level" );
-    static const QLatin1String DEFAULT_HTTP_MSG_LOG_LEVEL( "none" );
-
     //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
     static const QLatin1String EC_DB_READ_ONLY( "ecDbReadOnly" );
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
