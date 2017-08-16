@@ -59,7 +59,8 @@ PageBase
             (showOfflineStatus
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
+                || videoScreenController.failed
+                || videoScreenController.noVideoStreams)
             && !videoScreenController.mediaPlayer.playing
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive

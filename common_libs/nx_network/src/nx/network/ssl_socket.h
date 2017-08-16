@@ -103,7 +103,7 @@ protected:
     int sendInternal(const void* buffer, unsigned int bufferLen);
 
 private:
-    bool m_underlyingSocketInitialized = false;
+    bool m_isUnderlyingSocketInitialized = false;
 
     bool doHandshake();
     int asyncRecvInternal(void* buffer , unsigned int bufferLen);

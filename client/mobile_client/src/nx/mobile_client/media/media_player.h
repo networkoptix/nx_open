@@ -14,6 +14,7 @@ class MediaPlayer: public nx::media::Player
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
     Q_PROPERTY(bool failed READ failed NOTIFY failedChanged)
+    Q_PROPERTY(bool noVideoStreams READ noVideoStreams NOTIFY noVideoStreamsChanged)
 
     using base_type = nx::media::Player;
 
@@ -29,6 +30,7 @@ public:
     bool loading() const;
     bool playing() const;
     bool failed() const;
+    bool noVideoStreams() const;
 
 protected:
     virtual QnCommonModule* commonModule() const override;
@@ -38,12 +40,14 @@ signals:
     void loadingChanged();
     void playingChanged();
     void failedChanged();
+    void noVideoStreamsChanged();
 
 private:
     QString m_resourceId;
     bool m_loading = false;
     bool m_playing = false;
     bool m_failed = false;
+    bool m_noVideoStreams = false;
 };
 
 } // namespace mobile

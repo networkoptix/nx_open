@@ -48,6 +48,26 @@ DummyMessage
                 title: qsTr("Offline")
                 image: lp("/images/lite_client/camera_offline.png")
             }
+        },
+        State
+        {
+            name: "videoLoadingFailed"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Cannot load video")
+                image: lp("/images/lite_client/alert_alert.png")
+            }
+        },
+        State
+        {
+            name: "noVideoStreams"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Cannot play any video stream")
+                image: lp("/images/lite_client/alert_alert.png")
+            }
         }
     ]
 }
