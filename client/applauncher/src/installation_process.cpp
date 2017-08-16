@@ -216,7 +216,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     };
     std::unique_ptr<InstallationProcess, decltype(scopedExitFunc)> removeHttpClientGuard( this, scopedExitFunc );
 
-    if( (m_httpClient->state() != nx_http::AsyncHttpClient::sDone) ||
+    if( (m_httpClient->state() != nx_http::AsyncClient::State::sDone) ||
         !m_httpClient->response() )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
