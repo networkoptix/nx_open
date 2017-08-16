@@ -31,7 +31,7 @@ struct AnalyticsEventTypeWithRef: AnalyticsEventType
  */
 struct AnalyticsEventTypeId
 {
-    AnalyticsEventTypeId();
+    AnalyticsEventTypeId() = default;
     AnalyticsEventTypeId(const QnUuid& driverId, const QnUuid& eventTypeId);
     QnUuid driverId;
     QnUuid eventTypeId;

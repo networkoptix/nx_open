@@ -88,7 +88,7 @@ public:
 
     inline int size() const
     {
-        return m_events.size();
+        return (int) m_events.size();
     }
 
     inline vms::event::ActionData& at(int row)

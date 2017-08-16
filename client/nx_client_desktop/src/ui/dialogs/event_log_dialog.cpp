@@ -265,11 +265,11 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 
 void QnEventLogDialog::updateAnalyticsEvents()
 {
-    QModelIndexList found = m_eventTypesModel->match(
+    const auto found = m_eventTypesModel->match(
         m_eventTypesModel->index(0, 0),
         EventTypeRole,
-        nx::vms::event::EventType::analyticsSdkEvent,
-        1,
+        /*value*/ nx::vms::event::EventType::analyticsSdkEvent,
+        /*hits*/ 1,
         Qt::MatchExactly | Qt::MatchRecursive);
 
     NX_ASSERT(found.size() ==  1);
@@ -540,12 +540,13 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 
 void QnEventLogDialog::setEventType(vms::event::EventType value)
 {
-    QModelIndexList found = m_eventTypesModel->match(
-                m_eventTypesModel->index(0, 0),
-                EventTypeRole,
-                value,
-                1,
-                Qt::MatchExactly | Qt::MatchRecursive);
+    const auto found = m_eventTypesModel->match(
+        m_eventTypesModel->index(0, 0),
+        EventTypeRole,
+        /*value*/value,
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
     if (found.isEmpty())
         ui->eventComboBox->setCurrentIndex(QModelIndex());
     else
@@ -694,8 +695,8 @@ void QnEventLogDialog::updateActionList(bool instantOnly)
     const auto prolongedActions = m_actionTypesModel->match(
         m_actionTypesModel->index(0, 0),
         ProlongedActionRole,
-        true,
-        -1,
+        /*value*/ true,
+        /*hits*/ -1,
         Qt::MatchExactly);
 
     // what type of actions to show: prolonged or instant
