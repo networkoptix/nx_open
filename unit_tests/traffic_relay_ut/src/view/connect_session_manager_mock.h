@@ -10,8 +10,7 @@ namespace relay {
 namespace test {
 
 class ConnectSessionManagerMock:
-    public controller::AbstractConnectSessionManager,
-    public controller::AbstractReportPublicAddressHandler
+    public controller::AbstractConnectSessionManager
 {
 public:
     ConnectSessionManagerMock(

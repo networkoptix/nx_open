@@ -47,12 +47,6 @@ private:
         const nx_http::StringType& method);
 
     void startAcceptor();
-
-    void reportPublicListenAddress();
-    void doReport(const SocketAddress& address, const lm& message, utils::log::Level logLevel);
-    bool endpointReportedAsPublic(
-        const SocketAddress& listenAddress,
-        const QHostAddress& publicAddress);
 };
 
 } // namespace relay

@@ -12,6 +12,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "abstract_listen_address_helper_handler.h"
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -28,7 +30,7 @@ namespace controller {
 
 class AbstractTrafficRelay;
 
-class AbstractConnectSessionManager
+class AbstractConnectSessionManager: public AbstractListenAddressHelperHandler
 {
 public:
     //---------------------------------------------------------------------------------------------
@@ -61,16 +63,7 @@ public:
         ConnectToPeerHandler completionHandler) = 0;
 };
 
-class AbstractReportPublicAddressHandler
-{
-public:
-    virtual void onPublicAddressDiscovered(std::string publicAddress) = 0;
-    virtual ~AbstractReportPublicAddressHandler() = default;
-};
-
-class ConnectSessionManager:
-    public AbstractConnectSessionManager,
-    public AbstractReportPublicAddressHandler
+class ConnectSessionManager: public AbstractConnectSessionManager
 {
 public:
     ConnectSessionManager(
