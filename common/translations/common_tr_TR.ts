@@ -471,7 +471,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Zaman</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -1444,7 +1444,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Tetikleyici Adı</translation>
     </message>
     <message>
       <source>Role</source>

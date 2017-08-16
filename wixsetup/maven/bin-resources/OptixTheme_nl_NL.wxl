@@ -21,7 +21,7 @@
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Sluiten</String>
   <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
-  <String Id="InstallOptionsButton">Options</String>
+  <String Id="InstallOptionsButton">Opties</String>
   <String Id="InstallInstallButton">Install</String>
   <String Id="InstallCloseButton">Sluiten</String>
   <String Id="OptionsHeader">Setup Options</String>
@@ -29,7 +29,7 @@
   <String Id="OptionsBrowseButton">Browse</String>
   <String Id="OptionsOkButton">Oké</String>
   <String Id="OptionsCancelButton">Annuleren</String>
-  <String Id="ProgressHeader">Setup Progress</String>
+  <String Id="ProgressHeader">Voortgang van de installatie</String>
   <String Id="ProgressLabel">Processing...</String>
   <String Id="OverallProgressPackageText">Initializing...</String>
   <String Id="ProgressCancelButton">Annuleren</String>
@@ -51,7 +51,7 @@
   <String Id="FailureRestartButton">Herstarten</String>
   <String Id="FailureCloseButton">Sluiten</String>
   <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
-  <String Id="InstallLicenseLinkText">End User License Agreement</String>
+  <String Id="InstallLicenseLinkText">Eindgebruiker licentieovereenkomst</String>
   <String Id="FilesInUseHeader">Files In Use</String>
   <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
   <String Id="FilesInUseCloseRadioButton">Close the applications and attempt to restart them</String>
@@ -59,7 +59,7 @@
   <String Id="FilesInUseOkButton">Oké</String>
   <String Id="FilesInUseCancelButton">Annuleren</String>
   <String Id="InstallLicenseText">By clicking \"Accept and Install\" you agree to</String>
-  <String Id="Options">Options</String>
+  <String Id="Options">Opties</String>
   <String Id="SelectApps">Select applications to be installed:</String>
   <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>

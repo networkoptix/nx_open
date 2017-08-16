@@ -1,43 +1,34 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>Developer Tools</h3>
-        <p><a href="#/developers/api">API Testing Tool</a></p>
-        <p><a href="#/developers/changelog">API Changelog</a></p>
-        <p><a href="#/developers/events">Generic Events Tool</a></p>
-        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
+        <h3>開発ツール</h3>
+        <p><a href="#/developers/api">API テスト ツール</a></p>
+        <p><a href="#/developers/changelog">API の変更履歴</a></p>
+        <p><a href="#/developers/events">一般的なイベント ツール</a></p>
+        <p><a href="#/view/?cameraLinks">カメラストリームリンク</a></p>
 
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">レビューを書く</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>サーバーAPI</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            サーバー APIは、サードパーティシステムの標準API呼び出しセットを提供します 正規クライアントで利用可能なほとんどすべてのシステムの機能にアクセスすることができます クエリ/管理システム リソース (サーバー、カメラ、ユーザー、権限)、ライブまたは録画したビデオのシステムからイベントを生成するルールを作成、PTZ カメラを制御します
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">API documentation</a></p>
+        <p><a id="api-doc" href="api.xml" target="_blank">APIドキュメント</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>ビデオ ソース インテグレーション SDK</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            ビデオ ソース インテグレーション SDK は、ライブまたは録画したビデオ ソース (IP カメラ、NVRs、Dvr など) をインテグレートする手段を提供します SDK は検索、表示、解析、ビデオ記録方法を作成することが可能です デバイス I/O ポートとモーション検出情報をインテグレートすることができます
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >SDK を取得</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>ストレージ SDK</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            ストレージ SDK は、システムに潜在的なストレージをインテグレートする機能を提供します それにより、開発者は、読み取りまたは任意のストレージの場所に書込み: ローカル、リモート、クラウド ストレージプラグインを作成するには、I / Oストリーム、ファイルが存在する場合はファイルの削除、フォルダ内のファイルのリストなどの標準機能を実装する必要があります　Storage SDKには、FTPサーバーを格納場所として使用する例も含まれています
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >SDK を取得</a></p>
     </div>
 </div>

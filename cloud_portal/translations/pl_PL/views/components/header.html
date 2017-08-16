@@ -5,7 +5,7 @@
             <li uib-dropdown>
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                 <ul uib-dropdown-menu>
-                    <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
+                    <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Ustawienia</a></li>
                     <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
                 </ul>
             </li>
@@ -17,7 +17,7 @@
 
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
-            <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
+            <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Ustawienia</a></li>
             <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
         </ul>
 
@@ -55,9 +55,9 @@
                     <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
                     <li class="hidden-expanded nav-divider" role="separator"></li>
 
-                    <li><a href="/account/">Account Settings</a></li>
+                    <li><a href="/account/">Ustawienia konta</a></li>
                     <li><a href="/account/password/">Change Password</a></li>
-                    <li><a href="" ng-click="logout()">Log Out</a></li>
+                    <li><a href="" ng-click="logout()">Wyloguj</a></li>
 
                     <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
                     <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>

@@ -1904,7 +1904,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
   </context>
   <context>
