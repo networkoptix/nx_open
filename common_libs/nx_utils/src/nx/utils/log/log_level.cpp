@@ -1,5 +1,7 @@
 #include "log_level.h"
 
+#include <QtCore/QStringBuilder>
+
 #include "assert.h"
 #include "log_message.h"
 
@@ -78,6 +80,43 @@ QString toString(Level level)
 
     NX_ASSERT(false, lm("Unknown level: %1").arg(static_cast<int>(level)));
     return lm("unknown(%1)").arg(static_cast<int>(level));
+}
+
+Tag::Tag(QString s):
+    m_value(std::move(s))
+{
+}
+
+bool Tag::matches(const Tag& mask) const
+{
+    // TODO: currently all tags are considered as prefixes, but it might be useful to support
+    // some king of regexp in future.
+    return m_value.startsWith(mask.m_value);
+}
+
+const QString& Tag::toString() const
+{
+    return m_value;
+}
+
+Tag Tag::operator+(const Tag& rhs) const
+{
+    return Tag(m_value % "::" % rhs.m_value);
+}
+
+bool Tag::operator<(const Tag& rhs) const
+{
+    return m_value < rhs.m_value;
+}
+
+bool Tag::operator==(const Tag& rhs) const
+{
+    return m_value == rhs.m_value;
+}
+
+bool Tag::operator!=(const Tag& rhs) const
+{
+    return m_value != rhs.m_value;
 }
 
 LevelSettings::LevelSettings(Level primary, LevelFilters filters):
