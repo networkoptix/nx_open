@@ -644,7 +644,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
 
         QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
         result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80))
-            .arg(camera->getUniqueId()).arg(timeStampMs);
+            .arg(camera->getId().toSimpleString()).arg(timeStampMs);
         return result;
     }
 
