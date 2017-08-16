@@ -54,9 +54,3 @@ QUrl QnMobileAppInfo::oldMobileClientUrl() const
     return QUrl();
 #endif
 }
-
-bool QnMobileAppInfo::isAndroid() const
-{
-    return nx::utils::AppInfo::isAndroid();
-}
-

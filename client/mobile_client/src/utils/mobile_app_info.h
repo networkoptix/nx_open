@@ -16,6 +16,4 @@ public:
     Q_INVOKABLE QString liteDeviceName() const;
 
     Q_INVOKABLE QUrl oldMobileClientUrl() const;
-
-    Q_INVOKABLE bool isAndroid() const;
 };
