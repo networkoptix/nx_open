@@ -1,6 +1,6 @@
 def requestHost(customization, instance)
 {
-    def url = "https://ireg.hdw.mx/api/v1/cloudhostfinder/?group=$instance&vms_customization=$customization"
+    def url = "http://ireg.hdw.mx/api/v1/cloudhostfinder/?group=$instance&vms_customization=$customization"
     println('Requesting cloudHost from ' + url)
     def result = new URL(url).text
     if (result)
