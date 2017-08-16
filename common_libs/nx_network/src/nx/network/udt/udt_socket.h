@@ -198,7 +198,11 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-    std::atomic<size_t> internetBytesTransfered{0};
+    #ifdef __arm__
+        std::atomic<uint32_t> internetBytesTransfered{0};
+    #else
+        std::atomic<uint64_t> internetBytesTransfered{0};
+    #endif
 
     static UdtStatistics global;
 };
