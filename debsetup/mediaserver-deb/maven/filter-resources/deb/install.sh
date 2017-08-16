@@ -4,10 +4,10 @@ DISTRIB=${artifact.name.server}.deb
 
 update () {
     export DEBIAN_FRONTEND=noninteractive
-    CIFSUTILS=$(dpkg --get-selections | grep -v deinstall | grep cifs-utils | awk '{print $1}')
-    if [ -z "$CIFSUTILS" ]; then 
+    CIFSUTILS=$(dpkg -l | grep cifs-utils | grep ii | awk '{print $2}')
+    if [ -z "$CIFSUTILS" ]; then
         dpkg -i cifs-utils/*.deb
-    fi    
+    fi
     dpkg -i $DISTRIB
 }
 

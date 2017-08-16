@@ -17,9 +17,9 @@ bool checkForARMBox(const QString& value)
 
 } // namespace
 
-QnLicenseValidator::QnLicenseValidator(QObject* parent):
+QnLicenseValidator::QnLicenseValidator(QnCommonModule* commonModule, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent)
+    QnCommonModuleAware(commonModule)
 {
 
 }

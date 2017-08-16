@@ -1,3 +1,4 @@
 module Nx.Items.LiteClient
 
+CameraDisplay 1.0 CameraDisplay.qml
 SelectCameraDummy 1.0 SelectCameraDummy.qml

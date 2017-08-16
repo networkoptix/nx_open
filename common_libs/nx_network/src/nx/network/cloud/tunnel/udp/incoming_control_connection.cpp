@@ -63,7 +63,7 @@ void IncomingControlConnection::stopWhileInAioThread()
     m_socket.reset();
 }
 
-const AbstractStreamSocket* IncomingControlConnection::socket()
+AbstractStreamSocket* IncomingControlConnection::socket()
 {
     return m_socket.get();
 }

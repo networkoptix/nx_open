@@ -1,11 +1,7 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include "outgoing_tunnel.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/barrier_handler.h>
 
 #include "connector_factory.h"
@@ -16,8 +12,9 @@ namespace cloud {
 
 const std::chrono::seconds kCloudConnectorTimeout(10);
 
-OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
-:
+constexpr std::chrono::milliseconds AbstractOutgoingTunnel::kNoTimeout;
+
+OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress):
     m_targetPeerAddress(std::move(targetPeerAddress)),
     m_timer(std::make_unique<aio::Timer>()),
     m_terminated(false),
@@ -34,7 +31,7 @@ OutgoingTunnel::~OutgoingTunnel()
 
 void OutgoingTunnel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    BaseType::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
     if (m_timer)
         m_timer->bindToAioThread(aioThread);
     if (m_connector)
@@ -129,17 +126,6 @@ void OutgoingTunnel::establishNewConnection(
             break;
     }
 }
-
-void OutgoingTunnel::establishNewConnection(
-    SocketAttributes socketAttributes,
-    NewConnectionHandler handler)
-{
-    establishNewConnection(
-        std::chrono::milliseconds::zero(),
-        std::move(socketAttributes),
-        std::move(handler));
-}
-
 
 QString OutgoingTunnel::stateToString(State state)
 {
@@ -336,6 +322,26 @@ void OutgoingTunnel::setTunnelConnection(
             });
     }
     m_connectHandlers.clear();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+OutgoingTunnelFactory::OutgoingTunnelFactory():
+    base_type(std::bind(&OutgoingTunnelFactory::defaultFactoryFunction, 
+        this, std::placeholders::_1))
+{
+}
+
+OutgoingTunnelFactory& OutgoingTunnelFactory::instance()
+{
+    static OutgoingTunnelFactory instance;
+    return instance;
+}
+
+std::unique_ptr<AbstractOutgoingTunnel> OutgoingTunnelFactory::defaultFactoryFunction(
+    const AddressEntry& address)
+{
+    return std::make_unique<OutgoingTunnel>(address);
 }
 
 } // namespace cloud

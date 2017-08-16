@@ -11,27 +11,27 @@
     <message>
       <location/>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informacja</translation>
     </message>
     <message>
       <location/>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Twórcy</translation>
     </message>
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>Informacje GPU</translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Wsparcie</translation>
     </message>
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Serwery systemu</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtruj</translation>
     </message>
   </context>
   <context>
@@ -47,32 +47,32 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Poprawianie obrazu</translation>
     </message>
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Włącz poprawianie obrazu</translation>
     </message>
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Poziom czerni</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Poziom bieli</translation>
     </message>
   </context>
   <context>
@@ -80,37 +80,37 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Miksuj audio z 5.1 do 2.1</translation>
     </message>
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Podwójne buforowanie</translation>
     </message>
     <message>
       <location/>
       <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
+      <translation>Wyłącz, jeśli klient zbyt mocno obciąża procesor</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Maksymalna długość bufora na żywo</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation type="unfinished">Browse Logs</translation>
+      <translation>Przeglądaj dzienniki</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Wyczyść lokalną pamięć podręczną</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Zresetuj wszystkie ostrzeżenia</translation>
     </message>
   </context>
   <context>
@@ -118,22 +118,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation type="unfinished">Check to set aggregation period</translation>
+      <translation>Zaznacz, aby ustawić okres agregacji</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation type="unfinished">Interval of action :</translation>
+      <translation>Interwał działania :</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation type="unfinished">No more than once per</translation>
+      <translation>Nie częściej niż co</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Szybko</translation>
     </message>
   </context>
   <context>
@@ -141,27 +141,27 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Dodaj archiwum zewnętrzne...</translation>
     </message>
     <message>
       <location/>
       <source>Version:</source>
-      <translation type="unfinished">Version:</translation>
+      <translation>Wersja:</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Zaznacz</translation>
     </message>
     <message>
       <location/>
       <source>Not Checked</source>
-      <translation type="unfinished">Not Checked</translation>
+      <translation>Niezaznaczony</translation>
     </message>
     <message>
       <location/>
       <source>Get Installed Versions</source>
-      <translation type="unfinished">Get Installed Versions</translation>
+      <translation>Pobierz zainstalowane wersje</translation>
     </message>
   </context>
   <context>
@@ -169,82 +169,82 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Odśwież</translation>
     </message>
     <message>
       <location/>
       <source>User actions</source>
-      <translation type="unfinished">User actions</translation>
+      <translation>Akcje użytkownika</translation>
     </message>
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Przeglądanie archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksportowanie wideo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Podglądanie na żywo</translation>
     </message>
     <message>
       <location/>
       <source>Login/logout</source>
-      <translation type="unfinished">Login/logout</translation>
+      <translation>Zaloguj/Wyloguj</translation>
     </message>
     <message>
       <location/>
       <source>Event rules</source>
-      <translation type="unfinished">Event rules</translation>
+      <translation>Reguły zdarzeń</translation>
     </message>
     <message>
       <location/>
       <source>Server actions</source>
-      <translation type="unfinished">Server actions</translation>
+      <translation>Akcje serwera</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation type="unfinished">System actions</translation>
+      <translation>Akcje systemu</translation>
     </message>
     <message>
       <location/>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
     <message>
       <location/>
       <source>Sessions</source>
-      <translation type="unfinished">Sessions</translation>
+      <translation>Sesje</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Dziennik dostępu</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Wyczyść filtr</translation>
     </message>
     <message>
       <location/>
       <source>Email settings</source>
-      <translation type="unfinished">Email settings</translation>
+      <translation>Ustawienia e-mail</translation>
     </message>
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>Wszystkie serwery są odłączone. Dane z dziennika są niedostępne.</translation>
     </message>
   </context>
   <context>
@@ -252,37 +252,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation type="unfinished">Backup Schedule...</translation>
+      <translation>Harmonogram backupu...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation type="unfinished">Execute backup on the following days:</translation>
+      <translation>Wykonaj backup w następujące dni:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation type="unfinished">Limit Bandwidth to:</translation>
+      <translation>Ograniczaj pasmo do:</translation>
     </message>
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>Ograniczenie pasma może doprowadzić do awarii backupu.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Zakończ</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Start</translation>
     </message>
   </context>
   <context>
@@ -290,37 +290,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>Ustawienia backupu</translation>
     </message>
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Ustawienia serwera</translation>
     </message>
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation type="unfinished">Set Schedule...</translation>
+      <translation>Ustaw harmonogram...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Zostaną zapisane tylko nowe nagrania. Proces zignoruje istniejące materiały wideo.</translation>
     </message>
     <message>
       <location/>
       <source>Execute Backup</source>
-      <translation type="unfinished">Execute Backup</translation>
+      <translation>Wykonaj backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>Twórz backup archiwum z</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Jakość backupu</translation>
     </message>
   </context>
   <context>
@@ -328,27 +328,27 @@
     <message>
       <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Ustalony czas trwania:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sek.</translation>
     </message>
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Tagi:</translation>
     </message>
     <message>
       <location/>
       <source>Pre-recording:</source>
-      <translation type="unfinished">Pre-recording:</translation>
+      <translation>Nagrywanie przedalarmowe:</translation>
     </message>
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation type="unfinished">Post-recording:</translation>
+      <translation>Nagrywanie poalarmowe:</translation>
     </message>
   </context>
   <context>
@@ -356,7 +356,7 @@
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
       <source>Popular tags</source>
-      <translation type="unfinished">Popular tags</translation>
+      <translation>Popularne tagi</translation>
     </message>
     <message>
       <location/>
@@ -366,22 +366,22 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Opis</translation>
     </message>
     <message>
       <location/>
       <source>Timeout</source>
-      <translation type="unfinished">Timeout</translation>
+      <translation>Limit czasu</translation>
     </message>
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tagi</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>Lista tagów rozdzielonych przecinkami</translation>
     </message>
   </context>
   <context>
@@ -389,17 +389,17 @@
     <message>
       <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Odśwież</translation>
     </message>
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Dziennik zakładek</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Wyczyść filtr</translation>
     </message>
   </context>
   <context>
@@ -407,37 +407,37 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Zdarzenie</translation>
     </message>
     <message>
       <location/>
       <source>Schedule...</source>
-      <translation type="unfinished">Schedule...</translation>
+      <translation>Harmonogram...</translation>
     </message>
     <message>
       <location/>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Akcja</translation>
     </message>
     <message>
       <location/>
       <source>Comments:</source>
-      <translation type="unfinished">Comments:</translation>
+      <translation>Komentarze:</translation>
     </message>
     <message>
       <location/>
       <source>When</source>
-      <translation type="unfinished">When</translation>
+      <translation>Kiedy</translation>
     </message>
     <message>
       <location/>
       <source>Do</source>
-      <translation type="unfinished">Do</translation>
+      <translation>Wykonaj</translation>
     </message>
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>W</translation>
     </message>
   </context>
   <context>
@@ -445,7 +445,7 @@
     <message>
       <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Dodaj</translation>
     </message>
     <message>
       <location/>
@@ -455,12 +455,12 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Reguły zdarzeń</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Dziennik zdarzeń...</translation>
     </message>
   </context>
   <context>
@@ -468,102 +468,102 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Serwer jest odłączony</translation>
     </message>
     <message>
       <location/>
       <source>IP, hostname, RTSP link...</source>
-      <translation type="unfinished">IP, hostname, RTSP link...</translation>
+      <translation>IP, nazwa hosta, łącze RTSP...</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adres</translation>
     </message>
     <message>
       <location/>
       <source>Scanning...</source>
-      <translation type="unfinished">Scanning...</translation>
+      <translation>Skanowanie...</translation>
     </message>
     <message>
       <location/>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <location/>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Marka</translation>
     </message>
     <message>
       <location/>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <location/>
       <source>New Scan...</source>
-      <translation type="unfinished">New Scan...</translation>
+      <translation>Nowe skanowanie...</translation>
     </message>
     <message>
       <location/>
       <source>Add device(s)...</source>
-      <translation type="unfinished">Add device(s)...</translation>
+      <translation>Dodaj urządzenia...</translation>
     </message>
     <message>
       <location/>
       <source>Discovered Devices:</source>
-      <translation type="unfinished">Discovered Devices:</translation>
+      <translation>Wykryte urządzenia:</translation>
     </message>
     <message>
       <location/>
       <source>Device Address</source>
-      <translation type="unfinished">Device Address</translation>
+      <translation>Adres urządzenia</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>Początkowe IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>Końcowe IP</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation type="unfinished">Subnet Scan</translation>
+      <translation>Skanowanie podsieci</translation>
     </message>
     <message>
       <location/>
       <source>Discovery Port</source>
-      <translation type="unfinished">Discovery Port</translation>
+      <translation>Port wykrywania</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Hasło</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Skanuj</translation>
     </message>
     <message>
       <location/>
       <source>Add selected</source>
-      <translation type="unfinished">Add selected</translation>
+      <translation>Dodaj wybrane</translation>
     </message>
   </context>
   <context>
@@ -571,12 +571,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Kategoria</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Odśwież</translation>
     </message>
   </context>
   <context>
@@ -584,12 +584,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
       <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
+      <translation>about:blank</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
+      <translation>Ustawienia zaawansowane są niedostępne</translation>
     </message>
   </context>
   <context>
@@ -597,92 +597,92 @@
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
       <source>I have read the manual and understand the risks</source>
-      <translation type="unfinished">I have read the manual and understand the risks</translation>
+      <translation>Przeczytałem podręcznik i jestem świadom ryzyka</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings Control</source>
-      <translation type="unfinished">Camera Settings Control</translation>
+      <translation>Kontrola ustawień kamery</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+      <translation>Uwaga! Spowoduje to, że ustawienia jakości i płynności wideo (kl./s) w harmonogramie nagrywania przestaną mieć znaczenie.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream Control</source>
-      <translation type="unfinished">Secondary Stream Control</translation>
+      <translation>Kontrola drugiego strumienia</translation>
     </message>
     <message>
       <location/>
       <source>Override secondary stream quality</source>
-      <translation type="unfinished">Override secondary stream quality</translation>
+      <translation>Zmień jakość drugiego strumienia</translation>
     </message>
     <message>
       <location/>
       <source>Do not use</source>
-      <translation type="unfinished">Do not use</translation>
+      <translation>Nie używaj</translation>
     </message>
     <message>
       <location/>
       <source>Low quality</source>
-      <translation type="unfinished">Low quality</translation>
+      <translation>Niska jakość</translation>
     </message>
     <message>
       <location/>
       <source>Medium quality</source>
-      <translation type="unfinished">Medium quality</translation>
+      <translation>Średnia jakość</translation>
     </message>
     <message>
       <location/>
       <source>High quality</source>
-      <translation type="unfinished">High quality</translation>
+      <translation>Wysoka jakość</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation type="unfinished">Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
+      <translation>Uwaga! Wybranie wysokiej jakości może spowodować większe obciążenie procesora i sieci, a także może powodować inne problemy.</translation>
     </message>
     <message>
       <location/>
       <source>Archive control</source>
-      <translation type="unfinished">Archive control</translation>
+      <translation>Kontrola archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive primary stream</source>
-      <translation type="unfinished">Do not archive primary stream</translation>
+      <translation>Nie archiwizuj pierwszego strumienia</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation type="unfinished">Do not archive secondary stream</translation>
+      <translation>Nie archiwizuj drugiego strumienia</translation>
     </message>
     <message>
       <location/>
       <source>Media streaming control</source>
-      <translation type="unfinished">Media streaming control</translation>
+      <translation>Kontrola strumieniowania mediów</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport:</source>
-      <translation type="unfinished">RTP transport:</translation>
+      <translation>Transport RTP:</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
@@ -692,52 +692,52 @@
     <message>
       <location/>
       <source>Warning! Low quality may result in low resolution image.</source>
-      <translation type="unfinished">Warning! Low quality may result in low resolution image.</translation>
+      <translation>Uwaga! Ustawienie niskiej jakości spowoduje zmniejszenie szczegółowości obrazu.</translation>
     </message>
     <message>
       <location/>
       <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
+      <translation>Kontrola detekcji ruchu</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
+      <translation>Wymuszaj detekcję ruchu dla strumienia:</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
+      <translation>Przeliczaj bitrate w stosunku do GOP zamiast do czasu (zwiększy to bitrate dla kamery)</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera streams and profiles settings</source>
-      <translation type="unfinished">Keep camera streams and profiles settings</translation>
+      <translation>Zachowaj ustawienia strumieni i profile kamer</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>Opcja &quot;Zezwalaj systemowi na optymalizowanie ustawień w kamerze&quot; jest wyłączona w administracji systemem.</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
+      <translation>Uwaga! Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu.</translation>
     </message>
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>Sterowanie PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Wyłącz ustawienia fabryczne, używaj ustawień systemu</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Uwaga! Fabryczne presety kamery nie będą dostępne.</translation>
     </message>
   </context>
   <context>
@@ -745,7 +745,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>ID wejścia</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Dodaj urządzenie...</translation>
     </message>
   </context>
   <context>
@@ -761,17 +761,17 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Ustalony czas trwania:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sek.</translation>
     </message>
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>ID wyjściowe:</translation>
     </message>
   </context>
   <context>
@@ -779,112 +779,112 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Ustawienia harmonogramu</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>kl./s</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Jakość</translation>
     </message>
     <message>
       <location/>
       <source>Record Always</source>
-      <translation type="unfinished">Record Always</translation>
+      <translation>Nagrywaj zawsze</translation>
     </message>
     <message>
       <location/>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Tylko ruch</translation>
     </message>
     <message>
       <location/>
       <source>Do Not Record</source>
-      <translation type="unfinished">Do Not Record</translation>
+      <translation>Nie nagrywaj</translation>
     </message>
     <message>
       <location/>
       <source>Fixed Archive Length</source>
-      <translation type="unfinished">Fixed Archive Length</translation>
+      <translation>Stała długość archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Min. Days</source>
-      <translation type="unfinished">Min. Days</translation>
+      <translation>Min. dni</translation>
     </message>
     <message>
       <location/>
       <source>Max. Days</source>
-      <translation type="unfinished">Max. Days</translation>
+      <translation>Max. dni</translation>
     </message>
     <message>
       <location/>
       <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
+      <translation>Nagrywanie ruchu</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Nagrywanie przedalarmowe</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Nagrywanie poalarmowe</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule...</source>
-      <translation type="unfinished">Copy Schedule...</translation>
+      <translation>Kopiuj harmonogram...</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Nagrywanie</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktywuj licencję...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>Pokaż jakość</translation>
     </message>
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>Pokaż kl./s</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Kopiowanie harmonogramu</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation type="unfinished">Apply changes before copying schedule.</translation>
+      <translation>Zapisz zmiany przed skopiowaniem harmonogramu.</translation>
     </message>
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>Tryb paniki:</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Ruch + Niska rozdzielczość</translation>
     </message>
   </context>
   <context>
@@ -892,7 +892,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Zmień hasło</translation>
     </message>
   </context>
   <context>
@@ -900,12 +900,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Nie wylogowuj</translation>
     </message>
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Nieprawidłowy e-mail lub hasło</translation>
     </message>
   </context>
   <context>
@@ -913,17 +913,17 @@
     <message>
       <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
       <source>Save connection as...</source>
-      <translation type="unfinished">Save connection as...</translation>
+      <translation>Zapisz połączenie jako...</translation>
     </message>
     <message>
       <location/>
       <source>Enter name:</source>
-      <translation type="unfinished">Enter name:</translation>
+      <translation>Wprowadź nazwę:</translation>
     </message>
     <message>
       <location/>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Zapisz hasło</translation>
     </message>
   </context>
   <context>
@@ -931,12 +931,12 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation type="unfinished">Connection Test</translation>
+      <translation>Test połączenia</translation>
     </message>
     <message>
       <location/>
       <source>Testing connection...</source>
-      <translation type="unfinished">Testing connection...</translation>
+      <translation>Testowanie połączenia...</translation>
     </message>
   </context>
   <context>
@@ -944,22 +944,22 @@
     <message>
       <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
       <source>Source contains:</source>
-      <translation type="unfinished">Source contains:</translation>
+      <translation>Źródło zawiera:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Słowa kluczowe oddzielone spacją</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Nagłówek zawiera:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Opis zawiera:</translation>
     </message>
   </context>
   <context>
@@ -967,12 +967,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation type="unfinished">Create Backup...</translation>
+      <translation>Utwórz backup...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation type="unfinished">Restore from Backup...</translation>
+      <translation>Przywróć z backupu...</translation>
     </message>
   </context>
   <context>
@@ -980,27 +980,27 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Dziennik zdarzeń</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Wyczyść filtr</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Odśwież</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Wszystkie serwery są odłączone. Logi nie są dostępne.</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Reguły zdarzeń...</translation>
     </message>
   </context>
   <context>
@@ -1008,37 +1008,37 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation type="unfinished">HTTP content</translation>
+      <translation>Treść HTTP</translation>
     </message>
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation type="unfinished">Login to authenticate (optional)</translation>
+      <translation>Zaloguj, aby uwierzytelnić (opcjonalne)</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation type="unfinished">Password to authenticate (optional)</translation>
+      <translation>Hasło do uwierzytelnienia (opcjonalne)</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Hasło</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Typ zawartości</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>URL HTTP</translation>
     </message>
   </context>
   <context>
@@ -1046,7 +1046,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation type="unfinished">PTZ preset:</translation>
+      <translation>Preset PTZ:</translation>
     </message>
   </context>
   <context>
@@ -1054,27 +1054,27 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
-      <translation type="unfinished">Export Rapid Review</translation>
+      <translation>Eksportuj szybkie streszczenie</translation>
     </message>
     <message>
       <location/>
       <source>Initial Video Length</source>
-      <translation type="unfinished">Initial Video Length</translation>
+      <translation>Początkowa długość wideo</translation>
     </message>
     <message>
       <location/>
       <source>Exported Video Length</source>
-      <translation type="unfinished">Exported Video Length</translation>
+      <translation>Eksportowana długość wideo</translation>
     </message>
     <message>
       <location/>
       <source>Frames Interval</source>
-      <translation type="unfinished">Frames Interval</translation>
+      <translation>Interwał klatek</translation>
     </message>
     <message>
       <location/>
       <source>Rapid Review speed</source>
-      <translation type="unfinished">Rapid Review speed</translation>
+      <translation>Prędkość szybkiego streszczenia</translation>
     </message>
   </context>
   <context>
@@ -1082,42 +1082,42 @@
     <message>
       <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
-      <translation type="unfinished">Ceiling Mount</translation>
+      <translation>Montaż na suficie</translation>
     </message>
     <message>
       <location/>
       <source>Wall Mount</source>
-      <translation type="unfinished">Wall Mount</translation>
+      <translation>Montaż na ścianie</translation>
     </message>
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation type="unfinished">Floor/Table Mount</translation>
+      <translation>Montaż na podłodze lub na stole</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Fisheye Dewarping</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Automatyczna kalibracja</translation>
     </message>
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>Korekcja kąta montażu:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y przesunięcie</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X przesunięcie</translation>
     </message>
     <message>
       <location/>
@@ -1127,7 +1127,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Eliptyczność</translation>
     </message>
   </context>
   <context>
@@ -1135,27 +1135,27 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Inne</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Auto-pauza</translation>
     </message>
     <message>
       <location/>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>po</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Minuty bezczynności</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Dodaj...</translation>
     </message>
     <message>
       <location/>
@@ -1165,32 +1165,32 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Lokalne foldery multimedialne</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Wejście audio</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Pierwsze źródło</translation>
     </message>
     <message>
       <location/>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Brak</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Drugie źródło</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Uruchom aplikację przy starcie komputera</translation>
     </message>
   </context>
   <context>
@@ -1198,12 +1198,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
       <source>System Settings</source>
-      <translation type="unfinished">System Settings</translation>
+      <translation>Ustawienia systemu</translation>
     </message>
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Backup i przywracanie</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1211,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Kontrola obrazu</translation>
     </message>
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>Współczynnik proporcji</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotacja</translation>
     </message>
   </context>
   <context>
@@ -1229,17 +1229,17 @@
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Widok obrazu</translation>
     </message>
     <message>
       <location/>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>Ładowanie obrazu... Proszę czekać.</translation>
     </message>
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Brak obrazu</translation>
     </message>
   </context>
   <context>
@@ -1247,67 +1247,67 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
       <source>Layout Settings</source>
-      <translation type="unfinished">Layout Settings</translation>
+      <translation>Ustawienia układu</translation>
     </message>
     <message>
       <location/>
       <source>General Settings</source>
-      <translation type="unfinished">General Settings</translation>
+      <translation>Ustawienia ogólne</translation>
     </message>
     <message>
       <location/>
       <source>Layout is Locked</source>
-      <translation type="unfinished">Layout is Locked</translation>
+      <translation>Układ jest zablokowany</translation>
     </message>
     <message>
       <location/>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Tło</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <location/>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Widok...</translation>
     </message>
     <message>
       <location/>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Wyczyść</translation>
     </message>
     <message>
       <location/>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>Przetwarzanie obrazu... Proszę czekać.</translation>
     </message>
     <message>
       <location/>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Zachowaj proporcje formatu</translation>
     </message>
     <message>
       <location/>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Przycinaj do formatu monitora</translation>
     </message>
     <message>
       <location/>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Szerokość:</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Wysokość:</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Przezroczystość:</translation>
     </message>
   </context>
   <context>
@@ -1315,47 +1315,47 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation type="unfinished">ldap(s)://host:port</translation>
+      <translation>ldap(s)://host:port</translation>
     </message>
     <message>
       <location/>
       <source>Optional</source>
-      <translation type="unfinished">Optional</translation>
+      <translation>Opcjonalne</translation>
     </message>
     <message>
       <location/>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Testowanie...</translation>
     </message>
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation type="unfinished">LDAP Settings</translation>
+      <translation>Ustawienia LDAP</translation>
     </message>
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL serwera</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Nazwa DN administratora</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Hasło</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Podstawa wyszukiwania</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>Filtr wyszukiwania</translation>
     </message>
   </context>
   <context>
@@ -1363,27 +1363,27 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Import użytkowników z LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ładowanie...</translation>
     </message>
     <message>
       <location/>
       <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
+      <translation>Błąd połączenia</translation>
     </message>
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>Grupa uprawnień przypisywana do importowanych użytkowników</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>Zablokuj konta importowanym użytkownikom</translation>
     </message>
   </context>
   <context>
@@ -1391,32 +1391,32 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Szczegóły licencji</translation>
     </message>
     <message>
       <location/>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Ogólne</translation>
     </message>
     <message>
       <location/>
       <source>License Type:</source>
-      <translation type="unfinished">License Type:</translation>
+      <translation>Typ licencji:</translation>
     </message>
     <message>
       <location/>
       <source>License Key:</source>
-      <translation type="unfinished">License Key:</translation>
+      <translation>Klucz licencyjny:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Cechy</translation>
     </message>
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Przypisane trwale do ID sprzętu:</translation>
     </message>
   </context>
   <context>
@@ -1424,7 +1424,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation type="unfinished">Active Licenses</translation>
+      <translation>Aktywne licencje</translation>
     </message>
     <message>
       <location/>
@@ -1434,17 +1434,17 @@
     <message>
       <location/>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Nowa licencja</translation>
     </message>
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Szczegóły...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>Oprogramowanie jest licencjonowane dla</translation>
     </message>
   </context>
   <context>
@@ -1452,12 +1452,12 @@
     <message>
       <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Ostrzeżenie</translation>
     </message>
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Problemy z licencją:</translation>
     </message>
   </context>
   <context>
@@ -1465,57 +1465,57 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Aktywacja ręczna</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation type="unfinished">Select License File...</translation>
+      <translation>Wybierz plik licencji...</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation type="unfinished">License will be bound to the current server</translation>
+      <translation>Licencja zostanie przypisana do bieżącego serwera</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Aktywuj licencję bezpłatną</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktywuj licencję</translation>
     </message>
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Aktywacja internetowa</translation>
     </message>
     <message>
       <location/>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Klucz licencyjny</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Nieprawidłowy klucz licencyjny</translation>
     </message>
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation type="unfinished">Activation Key File</translation>
+      <translation>Plik z kluczem aktywacyjnym</translation>
     </message>
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>ID sprzętu</translation>
     </message>
   </context>
   <context>
@@ -1523,12 +1523,12 @@
     <message>
       <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
       <source>Licensing</source>
-      <translation type="unfinished">Licensing</translation>
+      <translation>Licencjonowanie</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktywuj licencję...</translation>
     </message>
   </context>
   <context>
@@ -1536,7 +1536,7 @@
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Ustawienia lokalne</translation>
     </message>
   </context>
   <context>
@@ -1544,7 +1544,7 @@
     <message>
       <location filename="../src/ui/dialogs/login_dialog.ui"/>
       <source>Save...</source>
-      <translation type="unfinished">Save...</translation>
+      <translation>Zapisz...</translation>
     </message>
     <message>
       <location/>
@@ -1554,37 +1554,37 @@
     <message>
       <location/>
       <source>Connection Options:</source>
-      <translation type="unfinished">Connection Options:</translation>
+      <translation>Opcje połączenia:</translation>
     </message>
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Hasło</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <location/>
       <source>Auto-Login</source>
-      <translation type="unfinished">Auto-Login</translation>
+      <translation>Auto-logowanie</translation>
     </message>
   </context>
   <context>
@@ -1592,57 +1592,57 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Wygląd i interfejs</translation>
     </message>
     <message>
       <location/>
       <source>Background Image</source>
-      <translation type="unfinished">Background Image</translation>
+      <translation>Obraz tła</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <location/>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Język</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation type="unfinished">Time Mode</translation>
+      <translation>Tryb czasu</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Obraz</translation>
     </message>
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Tryb</translation>
     </message>
     <message>
       <location/>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensywność</translation>
     </message>
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>Pokaż dodatkowe info w drzewie</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sek.</translation>
     </message>
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Cykl sekwencji</translation>
     </message>
   </context>
   <context>
@@ -1650,7 +1650,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Nie pokazuj ponownie tego komunikatu</translation>
     </message>
   </context>
   <context>
@@ -1658,37 +1658,37 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ogólne</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Uwierzytelnianie</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Hasło:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation type="unfinished">Enable Audio</translation>
+      <translation>Włącz dźwięk</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Nagrywanie</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Ekspert</translation>
     </message>
   </context>
   <context>
@@ -1696,22 +1696,22 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Zarządzaj...</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Głośność:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Odtwarzaj użytkownikom</translation>
     </message>
   </context>
   <context>
@@ -1719,17 +1719,17 @@
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
       <source>Global Notification Settings...</source>
-      <translation type="unfinished">Global Notification Settings...</translation>
+      <translation>Globalne ustawienia powiadomień...</translation>
     </message>
     <message>
       <location/>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>dla</translation>
     </message>
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Wymuszaj potwierdzenie</translation>
     </message>
   </context>
   <context>
@@ -1737,17 +1737,17 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
       <source>Show all notifications</source>
-      <translation type="unfinished">Show all notifications</translation>
+      <translation>Pokaż wszystkie powiadomienia</translation>
     </message>
     <message>
       <location/>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Powiadomienia systemowe</translation>
     </message>
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Zdarzenia</translation>
     </message>
   </context>
   <context>
@@ -1755,22 +1755,22 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Zapisz bieżącą pozycję</translation>
     </message>
     <message>
       <location/>
       <source>Go To Position</source>
-      <translation type="unfinished">Go To Position</translation>
+      <translation>Przejdź do pozycji</translation>
     </message>
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation type="unfinished">Create Tour</translation>
+      <translation>Utwórz cykl</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Rozpocznij cykl</translation>
     </message>
     <message>
       <location/>
@@ -1780,27 +1780,27 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation type="unfinished">No Tour Selected</translation>
+      <translation>Nie wybrano cyklu</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Przegląd</translation>
     </message>
     <message>
       <location/>
       <source>No preview available</source>
-      <translation type="unfinished">No preview available</translation>
+      <translation>Brak przeglądu</translation>
     </message>
     <message>
       <location/>
       <source>Get Preview</source>
-      <translation type="unfinished">Get Preview</translation>
+      <translation>Pobierz przegląd</translation>
     </message>
   </context>
   <context>
@@ -1808,17 +1808,17 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Zapisz pozycję</translation>
     </message>
     <message>
       <location/>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Nazwa:</translation>
     </message>
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Klawisz skrótu:</translation>
     </message>
   </context>
   <context>
@@ -1826,12 +1826,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Dołącz do ściany wideo...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Przegląd</translation>
     </message>
   </context>
   <context>
@@ -1839,7 +1839,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Wybierz kompilację</translation>
     </message>
   </context>
   <context>
@@ -1847,7 +1847,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Zakładka</translation>
     </message>
   </context>
   <context>
@@ -1855,7 +1855,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Instalowanie zgodnej wersji...</translation>
     </message>
   </context>
   <context>
@@ -1863,17 +1863,17 @@
     <message>
       <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
       <source>User:</source>
-      <translation type="unfinished">User:</translation>
+      <translation>Użytkownik:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Hasło:</translation>
     </message>
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation type="unfinished">Enter a valid username and password...</translation>
+      <translation>Wprowadź prawidłową nazwę użytkownika i hasło...</translation>
     </message>
   </context>
   <context>
@@ -1881,12 +1881,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Forma</translation>
     </message>
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Włącz interfejs kafelkowy</translation>
     </message>
   </context>
   <context>
@@ -1894,17 +1894,17 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Zaloguj</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Nie wylogowuj</translation>
     </message>
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Nieprawidłowy e-mail lub hasło</translation>
     </message>
   </context>
   <context>
@@ -1912,7 +1912,7 @@
     <message>
       <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Ustawienia pliku</translation>
     </message>
   </context>
   <context>
@@ -1920,32 +1920,32 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Złącz systemy...</translation>
     </message>
     <message>
       <location/>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>URL serwera:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Hasło:</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Sprawdź</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>Nowy system będzie miał hasło i nazwę z systemu:</translation>
     </message>
   </context>
   <context>
@@ -1953,27 +1953,27 @@
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
       <source>Notification Sounds</source>
-      <translation type="unfinished">Notification Sounds</translation>
+      <translation>Dźwięki powiadomień</translation>
     </message>
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Odtwarzaj</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Dodaj...</translation>
     </message>
     <message>
       <location/>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Zmień nazwę...</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Usuń...</translation>
     </message>
   </context>
   <context>
@@ -1981,7 +1981,7 @@
     <message>
       <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtruj</translation>
     </message>
   </context>
   <context>
@@ -1989,7 +1989,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Dodaj URL</translation>
     </message>
     <message>
       <location/>
@@ -1999,12 +1999,12 @@
     <message>
       <location/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Dodaj</translation>
     </message>
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>Usunięcie tego połączenia może doprowadzić do awarii systemu.</translation>
     </message>
   </context>
   <context>
@@ -2017,32 +2017,32 @@
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
+      <translation>Wygląda na to, że proces aktualizacji zajmuje więcej czasu niż zwykle. Proszę nadal czekać.</translation>
     </message>
     <message>
       <location/>
       <source>Check for updates automatically</source>
-      <translation type="unfinished">Check for updates automatically</translation>
+      <translation>Automatycznie sprawdzaj aktualizacje</translation>
     </message>
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>Aktualizacja do...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Link skopiowany</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>Masz zainstalowaną najnowszą wersję</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>Nie zaleca się instalowania aktualizacji systemu na koniec tygodnia.</translation>
     </message>
   </context>
   <context>
@@ -2050,7 +2050,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administracja systemem</translation>
     </message>
   </context>
   <context>
@@ -2058,22 +2058,22 @@
     <message>
       <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
       <source>Folder:</source>
-      <translation type="unfinished">Folder:</translation>
+      <translation>Folder:</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <location/>
       <source>Filename:</source>
-      <translation type="unfinished">Filename:</translation>
+      <translation>Nazwa pliku:</translation>
     </message>
     <message>
       <location/>
       <source>Format:</source>
-      <translation type="unfinished">Format:</translation>
+      <translation>Format:</translation>
     </message>
     <message>
       <location/>
@@ -2083,7 +2083,7 @@
     <message>
       <location/>
       <source>Warning: file with the same name already exists!</source>
-      <translation type="unfinished">Warning: file with the same name already exists!</translation>
+      <translation>Uwaga: Plik o takiej samej nazwie już istnieje!</translation>
     </message>
   </context>
   <context>
@@ -2091,7 +2091,7 @@
     <message>
       <location filename="../src/ui/dialogs/update_dialog.ui"/>
       <source>Update Servers</source>
-      <translation type="unfinished">Update Servers</translation>
+      <translation>Aktualizuj serwery</translation>
     </message>
   </context>
   <context>
@@ -2099,47 +2099,47 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation type="unfinished">LDAP Settings...</translation>
+      <translation>Ustawienia LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nowy użytkownik...</translation>
     </message>
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Import użytkowników z LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Wyczyść zaznaczenie</translation>
     </message>
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Szukaj użytkowników</translation>
     </message>
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Włącz</translation>
     </message>
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Wyłącz</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Usuń...</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edytuj grupy...</translation>
     </message>
   </context>
   <context>
@@ -2147,17 +2147,17 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Ustawienia ściany wideo</translation>
     </message>
     <message>
       <location/>
       <source>Launch video wall when Windows starts.</source>
-      <translation type="unfinished">Launch video wall when Windows starts.</translation>
+      <translation>Uruchamiaj ścianę wideo przy starcie systemu Windows.</translation>
     </message>
     <message>
       <location/>
       <source>Place shortcut on desktop.</source>
-      <translation type="unfinished">Place shortcut on desktop.</translation>
+      <translation>Umieść skrót na pulpicie.</translation>
     </message>
   </context>
   <context>
@@ -2165,12 +2165,12 @@
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
       <source>Reconnecting...</source>
-      <translation type="unfinished">Reconnecting...</translation>
+      <translation>Ponowne łączenie...</translation>
     </message>
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation type="unfinished">Please wait while the connection is being restored...</translation>
+      <translation>Proszę czekać, trwa przywracanie połączenia...</translation>
     </message>
   </context>
   <context>
@@ -2178,42 +2178,42 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation type="unfinished">Quality:</translation>
+      <translation>Jakość:</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>kl./s</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
       <source>max</source>
-      <translation type="unfinished">max</translation>
+      <translation>max</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording:</source>
-      <translation type="unfinished">Pre-Recording:</translation>
+      <translation>Nagrywanie przedalarmowe:</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording:</source>
-      <translation type="unfinished">Post-Recording:</translation>
+      <translation>Nagrywanie poalarmowe:</translation>
     </message>
     <message>
       <location/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Ustalony czas trwania:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sek.</translation>
     </message>
   </context>
   <context>
@@ -2221,52 +2221,52 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
-      <translation type="unfinished">Temporary Folder</translation>
+      <translation>Folder tymczasowy</translation>
     </message>
     <message>
       <location/>
       <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
+      <translation>Dodatkowe opcje</translation>
     </message>
     <message>
       <location/>
       <source>Disable Aero</source>
-      <translation type="unfinished">Disable Aero</translation>
+      <translation>Wyłącz Aero</translation>
     </message>
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
+      <translation>Przechwyć kursor</translation>
     </message>
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Zalecamy bardzo wydajny komputer dla &quot;najlepszej&quot; jakości i rozdzielczości.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <location/>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Rozdzielczość</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation type="unfinished">Recording Quality</translation>
+      <translation>Jakość nagrywania</translation>
     </message>
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Źródło</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Ekran</translation>
     </message>
   </context>
   <context>
@@ -2274,12 +2274,12 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Zasoby</translation>
     </message>
     <message>
       <location/>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Szukaj</translation>
     </message>
   </context>
   <context>
@@ -2287,27 +2287,27 @@
     <message>
       <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
       <source>Speak the following:</source>
-      <translation type="unfinished">Speak the following:</translation>
+      <translation>Powiedz to:</translation>
     </message>
     <message>
       <location/>
       <source>Type any text here</source>
-      <translation type="unfinished">Type any text here</translation>
+      <translation>Wpisz tutaj dowolny tekst</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Głośność:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Rozmowa z użytkownikami</translation>
     </message>
   </context>
   <context>
@@ -2315,12 +2315,12 @@
     <message>
       <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
       <source>Additional Recipients:</source>
-      <translation type="unfinished">Additional Recipients:</translation>
+      <translation>Dodatkowi odbiorcy:</translation>
     </message>
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation type="unfinished">Global Email Settings...</translation>
+      <translation>Ustawienia globalne e-mail...</translation>
     </message>
   </context>
   <context>
@@ -2328,17 +2328,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Priorytet failover...</translation>
     </message>
     <message>
       <location/>
@@ -2348,12 +2348,12 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Adres IP</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
   </context>
   <context>
@@ -2361,17 +2361,17 @@
     <message>
       <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>dla</translation>
     </message>
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Wymuszaj otwarcie układu alarmowego</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Pokazuj również kamerę źródłową</translation>
     </message>
   </context>
   <context>
@@ -2379,27 +2379,27 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sek.</translation>
     </message>
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation type="unfinished">Display text for:</translation>
+      <translation>Wyświetl tekst przez:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Użyj niestandardowego tekstu:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation type="unfinished">Rule will work only for prolonged events</translation>
+      <translation>Reguła będzie działać tylko w przypadku długotrwałych zdarzeń</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Pokazuj również na kamerze źródłowej</translation>
     </message>
   </context>
   <context>
@@ -2407,17 +2407,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Sprawdzenie znaku wodnego</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Sprawdzony plik:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Rezultat sprawdzenia:</translation>
     </message>
   </context>
   <context>
@@ -2425,67 +2425,67 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ogólne</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adres</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Uwierzytelnianie</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Nagrywanie</translation>
     </message>
     <message>
       <location/>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Ruch</translation>
     </message>
     <message>
       <location/>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Zaawansowane</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Ekspert</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation type="unfinished">Enable Audio</translation>
+      <translation>Włącz dźwięk</translation>
     </message>
     <message>
       <location/>
       <source>Motion is not available for this camera.</source>
-      <translation type="unfinished">Motion is not available for this camera.</translation>
+      <translation>Ruch nie jest dostępny dla tej kamery.</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detekcja ruchu</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
       <source>I/O ports</source>
-      <translation type="unfinished">I/O ports</translation>
+      <translation>Porty I/O</translation>
     </message>
     <message>
       <location/>
@@ -2495,52 +2495,52 @@
     <message>
       <location/>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <location/>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Producent</translation>
     </message>
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Dźwięk</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Hasło</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Adres IP</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Strona WWW</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>Adres MAC</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Czułość</translation>
     </message>
     <message>
       <location/>
@@ -2550,7 +2550,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2558,27 +2558,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation type="unfinished">Unsecure Connection</translation>
+      <translation>Niezabezpieczone połączenie</translation>
     </message>
     <message>
       <location/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(zalecane)</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation type="unfinished">Secure connection using TLS.</translation>
+      <translation>Bezpieczne połączenie przy użyciu protokołu TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation type="unfinished">Secure connection using SSL.</translation>
+      <translation>Bezpieczne połączenie przy użyciu protokołu SSL.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
   </context>
   <context>
@@ -2586,17 +2586,17 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation type="unfinished">Outgoing Email Settings</translation>
+      <translation>Ustawienia poczty wychodzącej</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation type="unfinished">Advanced settings...</translation>
+      <translation>Ustawienia zaawansowane...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -2604,37 +2604,37 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Serwer:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
     <message>
       <location/>
       <source>User:</source>
-      <translation type="unfinished">User:</translation>
+      <translation>Użytkownik:</translation>
     </message>
     <message>
       <location/>
       <source>Security:</source>
-      <translation type="unfinished">Security:</translation>
+      <translation>Zabezpieczenia:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation type="unfinished">Progress:</translation>
+      <translation>Postęp:</translation>
     </message>
     <message>
       <location/>
       <source>Result:</source>
-      <translation type="unfinished">Result:</translation>
+      <translation>Rezultat:</translation>
     </message>
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
@@ -2647,7 +2647,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Dostępne dla</translation>
     </message>
     <message>
       <location/>
@@ -2657,7 +2657,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikona</translation>
     </message>
   </context>
   <context>
@@ -2665,22 +2665,22 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Aktualne statystyki</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Prognoza użycia pełnego archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Additional storage:</source>
-      <translation type="unfinished">Additional storage:</translation>
+      <translation>Dodatkowe archiwum:</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Serwer jest odłączony. Statystyki nie są dostępne.</translation>
     </message>
   </context>
   <context>
@@ -2693,42 +2693,42 @@
     <message>
       <location/>
       <source>Start Backup Now</source>
-      <translation type="unfinished">Start Backup Now</translation>
+      <translation>Uruchom backup teraz</translation>
     </message>
     <message>
       <location/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Dodaj archiwum zewnętrzne...</translation>
     </message>
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Lokalizacje archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Indeksuj archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Indeksuj backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>Backup archiwum</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>Ustawienia backupu...</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
     </message>
   </context>
   <context>
@@ -2744,27 +2744,27 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Dodaj archiwum zewnętrzne...</translation>
     </message>
     <message>
       <location/>
       <source>Protocol:</source>
-      <translation type="unfinished">Protocol:</translation>
+      <translation>Protokół:</translation>
     </message>
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Hasło:</translation>
     </message>
   </context>
   <context>
@@ -2772,22 +2772,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Grupy</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Pokaż wszystkich użytkowników</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Wybierz użytkowników</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Nic nie pasuje do wyszukiwania.</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2795,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(zalecane)</translation>
     </message>
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Włącz dziennik dostępu</translation>
     </message>
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
+      <translation>Wysyłaj anonimowe statystyki użytkowania i awarii do programistów</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+      <translation>Uwaga! Spowoduje to, że ustawienia jakości i płynności wideo (kl./s) w harmonogramie nagrywania przestaną mieć znaczenie.</translation>
     </message>
   </context>
   <context>
@@ -2818,12 +2818,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>Czas systemu</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Synchronizuj czas z Internetem</translation>
     </message>
   </context>
   <context>
@@ -2831,7 +2831,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Zmień hasło...</translation>
     </message>
   </context>
   <context>
@@ -2844,12 +2844,12 @@
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Użytkownicy</translation>
     </message>
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>Usuń grupę</translation>
     </message>
   </context>
   <context>
@@ -2857,19 +2857,18 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>Grupy użytkowników</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Nie ma jeszcze żadnych niestandardowych grup użytkowników. Kliknij przycisk &quot;Nowa grupa&quot;, aby je utworzyć.</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>Nowa grupa</translation>
     </message>
   </context>
   <context>
@@ -2877,17 +2876,17 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>Typ użytkownika</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Grupa</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edytuj grupy...</translation>
     </message>
   </context>
   <context>
@@ -2895,7 +2894,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Strona WWW</translation>
     </message>
   </context>
   <context>
@@ -2903,27 +2902,27 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Ustawienia harmonogramu</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Wł.</translation>
     </message>
     <message>
       <location/>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Wył.</translation>
     </message>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Harmonogram</translation>
     </message>
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation type="unfinished">Note: Schedule is based on server time.</translation>
+      <translation>Uwaga: Harmonogram bazuje na czasie serwera.</translation>
     </message>
   </context>
 </TS>
