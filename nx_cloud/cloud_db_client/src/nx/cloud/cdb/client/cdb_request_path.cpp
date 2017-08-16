@@ -38,7 +38,9 @@ const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/vmsConnectio
 const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/transactionLog";
 const char* const kMaintenanceGetStatistics = "/cdb/maintenance/statistics";
 
-const char* const kCloudModuleXmlPath = "/cdb/cloud_modules.xml";
+const char* const kDeprecatedCloudModuleXmlPath = "/cdb/cloud_modules.xml";
+
+const char* const kDiscoveryCloudModuleXmlPath = "/discovery/cloud_modules.xml";
 
 } // namespace cdb
 } // namespace nx

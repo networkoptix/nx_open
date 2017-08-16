@@ -11,4 +11,5 @@ SOURCES += ${project.build.directory}/libtraffic_relay_app_info_impl.cpp
 
 linux {
     QMAKE_CXXFLAGS += -Werror
+    QMAKE_LFLAGS += -Wl,--no-undefined
 }

@@ -10,8 +10,7 @@ namespace relay {
 namespace test {
 
 class ConnectSessionManagerMock:
-    public controller::AbstractConnectSessionManager,
-    public controller::AbstractReportPublicAddressHandler
+    public controller::AbstractConnectSessionManager
 {
 public:
     ConnectSessionManagerMock(
@@ -31,7 +30,7 @@ public:
         const api::ConnectToPeerRequest& request,
         ConnectToPeerHandler completionHandler) override;
 
-    virtual void onPublicAddressDiscovered(std::string /*publicAddress*/) override {};
+    virtual void onBestEndpointDiscovered(std::string /*endpoint*/) override {};
 
 private:
     utils::SyncQueue<api::BeginListeningRequest>* m_receivedBeginListeningRequests;
