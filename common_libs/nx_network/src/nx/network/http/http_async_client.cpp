@@ -232,6 +232,26 @@ void AsyncClient::doPut(
     doPut(url);
 }
 
+void AsyncClient::doDelete(const QUrl& url)
+{
+    NX_ASSERT(!url.host().isEmpty());
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    composeRequest(nx_http::Method::delete_);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doDelete(
+    const QUrl& url,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doDelete(url);
+}
+
 void AsyncClient::doUpgrade(
     const QUrl& url,
     const StringType& protocolToUpgradeTo,
@@ -490,7 +510,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    m_state = State::sReceivingResponse;
+    m_state = m_expectOnlyBody ? State::sReadingMessageBody : State::sReceivingResponse;
     m_responseBuffer.resize(0);
     if (!m_socket->setRecvTimeout(m_responseReadTimeout))
     {
@@ -687,6 +707,10 @@ size_t AsyncClient::parseReceivedBytes(size_t bytesRead)
 
     // m_httpStreamReader is allowed to process not all bytes from m_responseBuffer.
     std::size_t bytesProcessed = 0;
+
+    if (m_expectOnlyBody)
+        m_httpStreamReader.setState(HttpStreamReader::ReadState::readingMessageBody);
+
     if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
     {
         NX_LOGX(lm("Error parsing http response from %1. %2")
@@ -1145,6 +1169,11 @@ void AsyncClient::removeAdditionalHeader(const StringType& key)
     m_additionalHeaders.erase(key);
 }
 
+void AsyncClient::setAdditionalHeaders(HttpHeaders additionalHeaders)
+{
+    m_additionalHeaders = std::move(additionalHeaders);
+}
+
 void AsyncClient::addRequestHeaders(const HttpHeaders& headers)
 {
     for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
@@ -1343,6 +1372,11 @@ void AsyncClient::forceEndOfMsgBody()
 {
     m_forcedEof = true;
     m_httpStreamReader.forceEndOfMsgBody();
+}
+
+void AsyncClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
+{
+    m_expectOnlyBody = expectOnlyBody;
 }
 
 AsyncClient::Result AsyncClient::emitDone()

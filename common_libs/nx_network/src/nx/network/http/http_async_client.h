@@ -161,6 +161,11 @@ public:
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doDelete(const QUrl& url);
+    void doDelete(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     void doUpgrade(
         const QUrl& url,
         const StringType& protocolToUpgradeTo,
@@ -234,11 +239,7 @@ public:
     void addAdditionalHeader(const StringType& key, const StringType& value);
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const StringType& key);
-    template<class HttpHeadersRef>
-    void setAdditionalHeaders(HttpHeadersRef&& additionalHeaders)
-    {
-        m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
-    }
+    void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
     /**
@@ -247,6 +248,8 @@ public:
      * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
+
+    void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
     static QString endpointWithProtocol(const QUrl& url);
 
@@ -301,6 +304,7 @@ private:
     int m_numberOfRedirectsTried;
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
+    bool m_expectOnlyBody = false;
 
     virtual void stopWhileInAioThread() override;
 
