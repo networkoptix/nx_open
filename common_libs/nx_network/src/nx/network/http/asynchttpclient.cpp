@@ -24,15 +24,6 @@ static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 
 using std::make_pair;
 
-namespace {
-
-static bool logTraffic()
-{
-    return nx::network::SocketGlobals::debugIni().httpClientTraffic;
-}
-
-} // namespace
-
 namespace nx_http {
 
 static constexpr size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
@@ -119,7 +110,7 @@ void AsyncHttpClient::doPost(
     const QUrl& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBodyBuffer,
-    bool includeContentLength)
+    bool /*includeContentLength*/)
 {
     // TODO includeContentLength
     auto messageBody = std::make_unique<BufferSource>(
