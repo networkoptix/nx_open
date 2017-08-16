@@ -1040,7 +1040,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
     commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
         lit("Supported values: none (no logging), always, error, warning, info, debug, verbose. Default: ")
         + toString(nx::utils::log::kDefaultLevel));
-    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
+
     commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
     commandLineParser.addParameter(&m_cmdLineArguments.hwLogLevel, "--hw-log-level", NULL, "Log value for hw_log.log.");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
@@ -2295,9 +2295,9 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.updateDirectoryIfEmpty(getDataDirectory());
-    logSettings.level.parse(cmdLineArguments().logLevel,
-        settings->value("logLevel").toString());
 
+    logSettings.level.parse(cmdLineArguments().logLevel,
+        settings->value("logLevel").toString(), toString(nx::utils::log::kDefaultLevel));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath);
 
@@ -2306,25 +2306,26 @@ void MediaServerProcess::serviceModeInit()
     else
         settings->remove("logFile");
 
-    logSettings.level.parse(
-        cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
-
+    logSettings.level.parse(cmdLineArguments().httpLogLevel,
+        settings->value("http-log-level").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level.reset();
-    logSettings.level.parse(
-        cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
+    logSettings.level.parse(cmdLineArguments().hwLogLevel,
+        settings->value("hwLogLevel").toString(), toString(nx::utils::log::Level::info));
+    nx::utils::log::initialize(
+        logSettings, qApp->applicationName(), binaryPath,
+        QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
+    logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
+        settings->value("tranLogLevel").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level.reset();
-    logSettings.level.parse(
-        cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
-
+    logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
+        settings->value("permissionsLogLevel").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
