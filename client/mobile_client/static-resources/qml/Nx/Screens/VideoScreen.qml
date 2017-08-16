@@ -38,6 +38,7 @@ PageBase
             if (offline)
             {
                 offlineStatusDelay.restart()
+                ptzPanel.moveOnTapMode = false
             }
             else
             {
