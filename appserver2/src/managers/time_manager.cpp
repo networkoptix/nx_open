@@ -857,12 +857,12 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     clientPtr->setUserName( peerIter->second.authData.userName );
     if( peerIter->second.authData.password )
     {
-        clientPtr->setAuthType( nx_http::AsyncHttpClient::authBasicAndDigest );
+        clientPtr->setAuthType( nx_http::AuthType::authBasicAndDigest );
         clientPtr->setUserPassword( peerIter->second.authData.password.get() );
     }
     else if( peerIter->second.authData.ha1 )
     {
-        clientPtr->setAuthType( nx_http::AsyncHttpClient::authDigestWithPasswordHash );
+        clientPtr->setAuthType( nx_http::AuthType::authDigestWithPasswordHash );
         clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
     }
 

@@ -14,11 +14,18 @@
 #include <nx/utils/object_destruction_flag.h>
 
 #include "abstract_msg_body_source.h"
-#include "asynchttpclient.h"
 #include "auth_cache.h"
 #include "http_stream_reader.h"
 
 namespace nx_http {
+
+enum class AuthType
+{
+    authBasicAndDigest,
+    authDigest,
+    authDigestWithPasswordHash,
+    authBasic,
+};
 
 /**
  * HTTP client. All operations are done asynchronously.
@@ -38,15 +45,7 @@ class NX_NETWORK_API AsyncClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    enum AuthType
-    {
-        authBasicAndDigest,
-        authDigest,
-        authDigestWithPasswordHash,
-        authBasic,
-    };
-
-    enum State
+    enum class State
     {
         sInit,
         sWaitingConnectToHost,

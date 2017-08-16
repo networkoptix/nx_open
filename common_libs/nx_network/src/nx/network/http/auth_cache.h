@@ -9,11 +9,20 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/utils/singleton.h>
+#include <nx/network/socket_common.h>
 
 #include "http_types.h"
 
 namespace nx_http {
+
+struct AuthInfo
+{
+    QString username;
+    QString password;
+    QString proxyUsername;
+    QString proxyPassword;
+    SocketAddress proxyEndpoint;
+};
 
 //!This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first
 class NX_NETWORK_API AuthInfoCache
