@@ -20,9 +20,9 @@
         <template>lib</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
-        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
-        <linux.oslibs>-ldl</linux.oslibs>
+        <linux.oslibs>-ldl -lldap</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
