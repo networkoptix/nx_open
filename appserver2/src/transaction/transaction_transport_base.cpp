@@ -1413,7 +1413,7 @@ void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClie
         arg((int)client->state()), cl_logDEBUG2 );
 
     nx_http::AsyncClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed ) {
+    if( state == nx_http::AsyncClient::State::sFailed ) {
         cancelConnecting();
     }
 }

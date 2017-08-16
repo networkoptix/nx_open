@@ -15,7 +15,7 @@ public:
     struct Request
     {
         Request():
-            authType(nx_http::AsyncHttpClient::authBasicAndDigest)
+            authType(nx_http::AuthType::authBasicAndDigest)
         {
         }
 
