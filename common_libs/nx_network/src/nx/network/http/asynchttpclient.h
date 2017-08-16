@@ -14,19 +14,10 @@
 #include "nx/network/aio/timer.h"
 
 #include "auth_cache.h"
+#include "http_async_client.h"
 #include "http_stream_reader.h"
 
 namespace nx_http {
-
-struct AuthInfo
-{
-    QString username;
-    QString password;
-    QString proxyUsername;
-    QString proxyPassword;
-    SocketAddress proxyEndpoint;
-};
-
 
 class AsyncHttpClientPtr;
 
@@ -50,50 +41,8 @@ class NX_NETWORK_API AsyncHttpClient:
     Q_OBJECT
 
 public:
-    enum AuthType
-    {
-        authBasicAndDigest,
-        authDigest,
-        authDigestWithPasswordHash,
-        authBasic,
-    };
-
-    enum State
-    {
-        sInit,
-        sWaitingConnectToHost,
-        sSendingRequest,
-        sReceivingResponse,
-        sResponseReceived,
-        sReadingMessageBody,
-        sFailed,
-        sDone
-    };
-
-    /**
-     * 0 means infinity for any timeout.
-     */
-    class NX_NETWORK_API Timeouts
-    {
-    public:
-        constexpr static const std::chrono::seconds kDefaultSendTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultResponseReadTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultMessageBodyReadTimeout =
-            std::chrono::seconds::zero();  //no timeout
-
-        std::chrono::milliseconds sendTimeout;
-        std::chrono::milliseconds responseReadTimeout;
-        std::chrono::milliseconds messageBodyReadTimeout;
-
-        Timeouts(
-            std::chrono::milliseconds send = kDefaultSendTimeout,
-            std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
-            std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
-
-        bool operator==(const Timeouts& rhs) const;
-    };
+    using State = AsyncClient::State;
+    using Timeouts = AsyncClient::Timeouts;
 
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
@@ -107,7 +56,7 @@ public:
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
-    State state() const;
+    AsyncClient::State state() const;
 
     /**
      * Returns true if no response has been recevied due to transport error.
@@ -519,7 +468,7 @@ void NX_NETWORK_API downloadFileAsync(
     const QUrl& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+    AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 /**
@@ -537,7 +486,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     const QUrl& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+    AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 void downloadFileAsyncEx(
@@ -555,7 +504,7 @@ void NX_NETWORK_API uploadDataAsync(const QUrl &url
     , const QByteArray &contentType
     , const nx_http::HttpHeaders &extraHeaders
     , const UploadCompletionHandler &callback
-    , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+    , const AuthType authType = AuthType::authBasicAndDigest
     , const QString &user = QString()
     , const QString &password = QString());
 
@@ -564,7 +513,7 @@ SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
     , const QByteArray &contentType
     , const QString &user
     , const QString &password
-    , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+    , const AuthType authType = AuthType::authBasicAndDigest
     , nx_http::StatusCode::Value *httpCode = nullptr);
 
 } // namespace nx_http

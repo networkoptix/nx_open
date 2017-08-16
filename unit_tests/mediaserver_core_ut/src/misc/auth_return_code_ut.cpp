@@ -94,7 +94,7 @@ public:
 
     void testServerReturnCodeForWrongPassword(
         const ec2::ApiUserData& userDataToUse,
-        nx_http::AsyncHttpClient::AuthType authType,
+        nx_http::AuthType authType,
         int expectedStatusCode,
         Qn::AuthResult expectedAuthResult)
     {
@@ -142,7 +142,7 @@ public:
     void testServerReturnCode(
         const QString& login,
         const QString& password,
-        nx_http::AsyncHttpClient::AuthType authType,
+        nx_http::AuthType authType,
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
