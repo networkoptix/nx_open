@@ -131,7 +131,8 @@ private:
         std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
 
-    virtual void onPublicAddressDiscovered(std::string publicAddress) override;
+    virtual void onBestEndpointDiscovered(std::string publicAddress) override;
+
     void subscribeForPeerConnected(
         nx::utils::SubscriptionId* subscriptionId,
         std::string publicAddress);

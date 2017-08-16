@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <boost/optional/optional.hpp>
 #include "abstract_listen_address_helper_handler.h"
+#include <nx/utils/log/log.h>
+
 
 namespace nx {
 namespace cloud {

@@ -30,7 +30,7 @@ public:
         const api::ConnectToPeerRequest& request,
         ConnectToPeerHandler completionHandler) override;
 
-    virtual void onPublicAddressDiscovered(std::string /*publicAddress*/) override {};
+    virtual void onBestEndpointDiscovered(std::string /*endpoint*/) override {};
 
 private:
     utils::SyncQueue<api::BeginListeningRequest>* m_receivedBeginListeningRequests;

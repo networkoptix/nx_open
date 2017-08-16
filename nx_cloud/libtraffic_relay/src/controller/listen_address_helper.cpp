@@ -1,6 +1,5 @@
 #include <nx/network/public_ip_discovery.h>
 #include <nx/network/nettools.h>
-#include <nx/utils/log/log.h>
 
 #include "listen_address_helper.h"
 
@@ -61,11 +60,11 @@ void AbstractListenAddressHelper::doReport(
         result = SocketAddress(firstAvailableAddress.toString(), address.port);
     }
 
-    auto addressString = result.toStdString();
-    NX_UTILS_LOG(logLevel, this, message.arg(addressString));
+    auto endpointString = result.toStdString();
+    NX_UTILS_LOG(logLevel, this, message.arg(endpointString));
 
     NX_ASSERT(m_handler);
-    m_handler->onPublicAddressDiscovered(addressString);
+    m_handler->onBestEndpointDiscovered(endpointString);
 }
 
 bool AbstractListenAddressHelper::endpointReportedAsPublic(

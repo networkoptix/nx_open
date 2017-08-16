@@ -304,7 +304,7 @@ void ConnectSessionManager::startRelaying(RelaySession relaySession)
         {std::move(listeningPeerChannel), relaySession.listeningPeerName});
 }
 
-void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
+void ConnectSessionManager::onBestEndpointDiscovered(std::string publicAddress)
 {
     nx::utils::SubscriptionId subscriptionId;
 

@@ -8,7 +8,7 @@ namespace controller {
 class AbstractListenAddressHelperHandler
 {
 public:
-    virtual void onPublicAddressDiscovered(std::string publicAddress) = 0;
+    virtual void onBestEndpointDiscovered(std::string publicAddress) = 0;
     virtual ~AbstractListenAddressHelperHandler() = default;
 };
 
