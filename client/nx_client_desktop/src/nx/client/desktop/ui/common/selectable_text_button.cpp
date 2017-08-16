@@ -303,11 +303,16 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
         const auto iconSize = QnSkin::maximumSize(icon);
         const auto iconRect = QStyle::alignedRect(layoutDirection(),
             Qt::AlignLeft | Qt::AlignVCenter, iconSize, rect);
+
         const auto iconMode = hovered && d->state == State::deactivated
             ? QIcon::Active
             : QIcon::Normal;
 
-        icon.paint(&painter, iconRect, Qt::AlignCenter, iconMode);
+        const auto iconState = d->state == State::selected
+            ? QIcon::On
+            : QIcon::Off;
+
+        icon.paint(&painter, iconRect, Qt::AlignCenter, iconMode, iconState);
         adjustRect(rect, Side::left, iconSize.width() + kIconPadding);
     }
 

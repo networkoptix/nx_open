@@ -12,6 +12,17 @@ namespace ui {
 // It also can be deactivatable and have a clickable [x] control which puts the button
 // into deactivated state with flat appearance and optionally different text and icon.
 // Clicking the button in either deactivated or unselected state puts it into selected state.
+//
+// Palette groups used in button states:
+//     deactivated and unselected: QPalette::Inactive
+//     selected: QPalette::Active
+//
+// QPalette::Disabled is never used; semi-opaque painting is used when the button is disabled.
+//
+// Icon modes and states used in button states:
+//     deactivated: QIcon::Off, QIcon::Normal or QIcon::Active (hovered)
+//     unselected: QIcon::Off, QIcon::Normal
+//     selected: QIcon::On, QIcon::Normal
 
 class SelectableTextButton: public QPushButton
 {
