@@ -474,6 +474,11 @@ table.webclient-window>tbody>tr>td{
 
 .camera-links-panel{
   &{
+    -webkit-user-select: text; /* Chrome, Opera, Safari */
+    -moz-user-select: text; /* Firefox 2+ */
+    -ms-user-select: text; /* IE 10+ */
+    user-select: text; /* Standard syntax */
+
     background-color: $additional_light2;
     margin: 40px 0 0 10px;
     position: absolute;
@@ -497,6 +502,14 @@ table.webclient-window>tbody>tr>td{
 
       & > :not(:first-child){
         width: 140px;
+      }
+
+      a{
+        text-decoration: underline;
+        text-decoration-color: $blue10;
+      }
+      a:hover{
+        text-decoration-color: $blue9 !important;
       }
       
       input{
