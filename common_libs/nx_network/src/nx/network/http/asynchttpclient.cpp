@@ -532,14 +532,15 @@ SystemError::ErrorCode downloadFileSync(
     return resultingErrorCode;
 }
 
-void uploadDataAsync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const nx_http::HttpHeaders &extraHeaders
-    , const UploadCompletionHandler &callback
-    , const AuthType authType
-    , const QString &user
-    , const QString &password)
+void uploadDataAsync(
+    const QUrl& url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const nx_http::HttpHeaders& extraHeaders,
+    const UploadCompletionHandler& callback,
+    const AuthType authType,
+    const QString& user,
+    const QString& password)
 {
     nx_http::AsyncHttpClientPtr httpClientHolder = nx_http::AsyncHttpClient::create();
     httpClientHolder->setAdditionalHeaders(extraHeaders);
@@ -576,13 +577,14 @@ void uploadDataAsync(const QUrl &url
     httpClientHolder->doPost(url, contentType, data);
 }
 
-SystemError::ErrorCode uploadDataSync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const QString &user
-    , const QString &password
-    , const AuthType authType
-    , nx_http::StatusCode::Value *httpCode)
+SystemError::ErrorCode uploadDataSync(
+    const QUrl& url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const QString& user,
+    const QString& password,
+    const AuthType authType,
+    nx_http::StatusCode::Value* httpCode)
 {
     bool done = false;
     SystemError::ErrorCode result = SystemError::noError;

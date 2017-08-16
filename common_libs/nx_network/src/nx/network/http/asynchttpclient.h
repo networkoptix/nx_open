@@ -411,21 +411,23 @@ typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadComple
 /**
  * Uploads specified data using POST.
  */
-void NX_NETWORK_API uploadDataAsync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const nx_http::HttpHeaders &extraHeaders
-    , const UploadCompletionHandler &callback
-    , const AuthType authType = AuthType::authBasicAndDigest
-    , const QString &user = QString()
-    , const QString &password = QString());
+void NX_NETWORK_API uploadDataAsync(
+    const QUrl &url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const nx_http::HttpHeaders& extraHeaders,
+    const UploadCompletionHandler& callback,
+    const AuthType authType = AuthType::authBasicAndDigest,
+    const QString& user = QString(),
+    const QString& password = QString());
 
-SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const QString &user
-    , const QString &password
-    , const AuthType authType = AuthType::authBasicAndDigest
-    , nx_http::StatusCode::Value *httpCode = nullptr);
+SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
+    const QUrl& url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const QString& user,
+    const QString& password,
+    const AuthType authType = AuthType::authBasicAndDigest,
+    nx_http::StatusCode::Value* httpCode = nullptr);
 
 } // namespace nx_http
