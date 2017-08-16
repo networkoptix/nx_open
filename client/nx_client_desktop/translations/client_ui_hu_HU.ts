@@ -1632,7 +1632,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>További információk megjelenítése a faszerkezetben</translation>
+      <translation>Kiegészítő információk megjelenítése az eszközfában</translation>
     </message>
     <message>
       <location/>
@@ -1642,7 +1642,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Showreel ciklus</translation>
     </message>
   </context>
   <context>

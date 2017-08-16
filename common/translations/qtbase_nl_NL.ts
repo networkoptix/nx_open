@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Over</translation>
     </message>
     <message>
       <source>Config</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Opties</translation>
     </message>
     <message>
       <source>Setting</source>
@@ -216,11 +216,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiëren</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Plakken</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -351,7 +351,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Grootte</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -361,7 +361,7 @@ Press ESC to cancel</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -587,7 +587,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -659,11 +659,11 @@ Do you want to delete it anyway?</translation>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -691,7 +691,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Grootte</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -701,7 +701,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -957,11 +957,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Reset</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Herstel standaardwaarden</translation>
     </message>
   </context>
   <context>
@@ -975,7 +975,7 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Alle bestanden (*.*)</translation>
     </message>
   </context>
   <context>
@@ -1084,7 +1084,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Home</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1120,7 +1120,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
   </context>
   <context>

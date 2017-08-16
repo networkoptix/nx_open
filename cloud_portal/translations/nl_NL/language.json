@@ -36,7 +36,7 @@
     "download":"Download {{VMS_NAME}}",
     "downloadPlatform":"Download {{VMS_NAME}} for ",
     "startPage":"",
-    "pageNotFound":"Page not found"
+    "pageNotFound":"Pagina niet gevonden"
   },
   "systemStatuses":{
     "notActivated":"not activated",
@@ -47,11 +47,11 @@
   },
   "accessRoles":{
     "disabled":{
-      "label":"Disabled",
+      "label":"Uitgeschakeld",
       "description":"User is disabled and cannot log in to System"
     },
     "Owner":{
-      "label":"Owner",
+      "label":"Eigenaar",
       "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
     "Viewer":{
@@ -71,7 +71,7 @@
       "description":"Unrestricted access including the ability to share"
     },
     "Custom":{
-      "label":"Custom",
+      "label":"Aangepast",
       "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
     },
     "cloudAdmin":{
@@ -135,7 +135,7 @@
     "permissionsSaved":"New permissions saved"
   },
   "system":{
-    "yourSystem":"Your System",
+    "yourSystem":"Uw systeem",
     "mySystemSearch":"IMeMyMine",
     "unavailable":"System is unreachable",
     "offline":"System is offline",
@@ -158,7 +158,7 @@
   "account":{
     "accountSavedSuccess":"Your account is successfully saved",
     "passwordChangedSuccess":"Your account is successfully saved",
-    "changePassword":"Change Password",
+    "changePassword":"Wijzig wachtwoord",
     "newPasswordLabel":"New password",
     "saveChanges":"Opslaan"
   },
@@ -211,7 +211,7 @@
   },
   "regActions":{
     "passwordLabel":"Wachtwoord",
-    "createAccount":"Create Account"
+    "createAccount":"Account aanmaken"
   },
   "header":{
     "allSystems":"All Systems",

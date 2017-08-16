@@ -1,6 +1,6 @@
 <div class="panel panel-default" process-loading="gettingSystemUsers">
     <div class="panel-body">
-        <h2>Users</h2>
+        <h2>Gebruikers</h2>
     </div>
     <div class="table-responsive">
         <table class="table table-hover" ng-if="system.users.length">
@@ -27,13 +27,13 @@
                        ng-if="system.isAvailable && user.canBeEdited"
                        ng-class="{disabled:locked[user.email]}"
                        title="Edit permissions"
-                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Edit</span></span></a></td>
+                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline"> &nbsp;&nbsp;Bewerken</span></span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
                        ng-class="{disabled:locked[user.email]}"
                        title="Verwijder"
-                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Delete</span></a></td>
+                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Verwijderen</span></a></td>
             </tr>
             </tbody>
         </table>
