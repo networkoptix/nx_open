@@ -29,10 +29,10 @@ Page
         {
             if (sideNavigation.opened)
                 sideNavigation.close()
+            else if (!connectionManager.online) //< We are connecting now.
+                uiController.disconnectFromSystem()
             else if (stackView.depth > 1)
                 Workflow.popCurrentScreen()
-            else if (!connectionManager.online) //< We are connecting now.
-                Workflow.openSessionsScreen()
             else if (event.key != Qt.Key_Escape)
                 quitApplication()
             else
