@@ -1,6 +1,8 @@
 #include "timestamp_overlay_settings_widget.h"
 #include "ui_timestamp_overlay_settings_widget.h"
 
+#include <ui/common/aligner.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -11,6 +13,9 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
     ui(new Ui::TimestampOverlaySettingsWidget())
 {
     ui->setupUi(this);
+
+    auto aligner = new QnAligner(this);
+    aligner->addWidget(ui->sizeLabel);
 }
 
 } // namespace ui

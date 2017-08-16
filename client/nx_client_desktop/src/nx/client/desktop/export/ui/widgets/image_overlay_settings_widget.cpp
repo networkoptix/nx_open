@@ -1,6 +1,8 @@
 #include "image_overlay_settings_widget.h"
 #include "ui_image_overlay_settings_widget.h"
 
+#include <ui/common/aligner.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -11,6 +13,9 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
     ui(new Ui::ImageOverlaySettingsWidget())
 {
     ui->setupUi(this);
+
+    auto aligner = new QnAligner(this);
+    aligner->addWidgets({ ui->sizeLabel, ui->opacityLabel });
 }
 
 } // namespace ui
