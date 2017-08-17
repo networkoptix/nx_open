@@ -37,28 +37,18 @@ WebSocket::~WebSocket()
 {
 }
 
+void WebSocket::start()
+{
+    m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
+    m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
+}
+
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    nx::utils::promise<void> p;
-    auto f = p.get_future();
-
-    dispatch([this, aioThread, p = std::move(p)]() mutable
-    {
-        AbstractAsyncChannel::bindToAioThread(aioThread);
-        m_socket->bindToAioThread(aioThread);
-
-        m_pingTimer->cancelSync();
-        m_pingTimer->bindToAioThread(aioThread);
-        m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
-
-        m_aliveTimer->cancelSync();
-        m_aliveTimer->bindToAioThread(aioThread);
-        m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
-
-        p.set_value();
-    });
-
-    f.wait();
+    AbstractAsyncChannel::bindToAioThread(aioThread);
+    m_socket->bindToAioThread(aioThread);
+    m_pingTimer->bindToAioThread(aioThread);
+    m_aliveTimer->bindToAioThread(aioThread);
 }
 
 std::chrono::milliseconds WebSocket::pingTimeout() const
@@ -263,12 +253,7 @@ void WebSocket::handleAliveTimer()
 
 void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 {
-    post(
-        [this, timeout]()
-        {
-            m_aliveTimeout = timeout;
-            restartTimers();
-        });
+    m_aliveTimeout = timeout;
 }
 
 void WebSocket::sendCloseAsync()
@@ -283,6 +268,12 @@ void WebSocket::sendCloseAsync()
 
 void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
 {
+    if (m_writeQueue.empty())
+    {
+        NX_VERBOSE(this, "write queue is empty");
+        return; // might be the case on object destruction
+    }
+
     auto writeData = m_writeQueue.pop();
     bool queueEmpty = m_writeQueue.empty();
     {
