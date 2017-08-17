@@ -474,10 +474,7 @@ table.webclient-window>tbody>tr>td{
 
 .camera-links-panel{
   &{
-    -webkit-user-select: text; /* Chrome, Opera, Safari */
-    -moz-user-select: text; /* Firefox 2+ */
-    -ms-user-select: text; /* IE 10+ */
-    user-select: text; /* Standard syntax */
+    user-select: text;
 
     background-color: $additional_light2;
     margin: 40px 0 0 10px;
@@ -492,6 +489,13 @@ table.webclient-window>tbody>tr>td{
       font-weight: 400;
       color: $light16;
       vertical-align: top;
+      a{
+        text-decoration: underline;
+        text-decoration-color: $blue10;
+      }
+      a:hover{
+        text-decoration-color: $blue9 !important;
+      }
     }
     & tr{
       height: 20px;
@@ -503,14 +507,6 @@ table.webclient-window>tbody>tr>td{
       & > :not(:first-child){
         width: 140px;
       }
-
-      a{
-        text-decoration: underline;
-        text-decoration-color: $blue10;
-      }
-      a:hover{
-        text-decoration-color: $blue9 !important;
-      }
       
       input{
         border: 1px solid rgba($light16,0.2);
@@ -520,6 +516,11 @@ table.webclient-window>tbody>tr>td{
   }
   &.night-mode{
     background-color: rgba($dark7,0.9) !important;
+  }
+
+  .copy-button{
+    color: $light16 !important;
+    text-decoration: none !important;
   }
 }
 
@@ -547,11 +548,6 @@ table.webclient-window>tbody>tr>td{
 
   &-label{
     line-height: 33px;
-  }
-
-  &-button{
-    color: $light16 !important;
-    text-decoration: none !important;
   }
 }
 .camera-links-panel.night-mode{

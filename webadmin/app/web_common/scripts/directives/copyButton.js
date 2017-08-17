@@ -3,6 +3,8 @@ angular.module('nxCommon')
 		return{
 			restrict: 'E',
         	scope:{
+                copyTitle: '=',
+                copyData: '='
         	},
         	templateUrl: Config.viewsDirCommon + 'components/copyButton.html',
         	link: function(scope){
