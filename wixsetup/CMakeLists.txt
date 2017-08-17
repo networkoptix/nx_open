@@ -86,10 +86,13 @@ foreach(qt_plugin_group ${qt_plugins})
     endforeach()
 endforeach()
 
-file(GLOB_RECURSE
-    qt_debug_files "${QT_DIR}/bin/Qt5*.pdb"
-    qt_debug_files_excludes "${QT_DIR}/bin/Qt5*d.pdb"
-)
+file(GLOB_RECURSE all_qt_debug_files "${QT_DIR}/bin/Qt5*.pdb")
+set(qt_debug_files)
+foreach(file ${all_qt_debug_files})
+    if(NOT file MATCHES ".*d\\.pdb")
+        list(APPEND qt_debug_files ${file})
+    endif()
+endforeach()
 
 foreach(qt_debug_files_exclude ${qt_debug_files_excludes})
     list(REMOVE_ITEM qt_debug_files "${qt_debug_files_exclude}")

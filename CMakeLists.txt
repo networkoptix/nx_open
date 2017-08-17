@@ -103,8 +103,6 @@ if(LINUX)
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
 
-set(qt.dir ${QT_DIR})
-
 if(ANDROID)
     include(android-apk)
 elseif(IOS)
