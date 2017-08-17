@@ -276,13 +276,13 @@ class NX_NETWORK_API StreamServerSocketDelegate:
 public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler);
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(AcceptCompletionHandler handler);
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
-    virtual void cancelIOSync();
+    virtual AbstractStreamSocket* accept() override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void cancelIOSync() override;
 };
 
 } // namespace network

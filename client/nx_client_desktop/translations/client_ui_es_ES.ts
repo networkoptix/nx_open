@@ -137,34 +137,6 @@
     </message>
   </context>
   <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Añadir Almacenamiento externo...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Versión:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Compruebe</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>No comprobado</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Obtener versiones instaladas</translation>
-    </message>
-  </context>
-  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -462,6 +434,11 @@
       <source>Event Log...</source>
       <translation>Registro de eventos...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation type="unfinished">Test</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +560,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>La configuración avanzada no está disponible</translation>
     </message>

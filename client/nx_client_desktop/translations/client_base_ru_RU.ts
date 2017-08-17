@@ -1319,10 +1319,6 @@ to view more bookmarks</source>
       <translation>Выгрузить выбранные записи в файл</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Воспроизвести журнал аудита</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Устройства</translation>
     </message>
@@ -1405,6 +1401,10 @@ to view more bookmarks</source>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

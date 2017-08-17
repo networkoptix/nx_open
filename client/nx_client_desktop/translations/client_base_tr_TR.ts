@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Seçilen Kayıtları Dosyaya Çıkart</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Denetim Günlüğünü Tekrar Oynat</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Aygıtlar</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

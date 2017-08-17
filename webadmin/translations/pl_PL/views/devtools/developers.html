@@ -1,13 +1,36 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>Narzędzia programistyczne</h3>
-        <p><a href="#/developers/api">Narzędzie testowania API</a></p>
-        <p><a href="#/developers/changelog">Dziennik zmian w API</a></p>
-        <p><a href="#/developers/events">Narzędzie do zdarzeń</a></p>
-        <p><a href="#/view/?cameraLinks">Linki do strumieni kamer</a></p>
-
+        <h2>Narzędzia programistyczne</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Wystaw opinię</a></p>
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>ID kamery</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Generic Events Generator</h3>
+        <p>
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
         <h3>API serwera</h3>
@@ -17,7 +40,14 @@
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">Dokumentacja API</a></p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
     </div>
     <div>
         <h3>Video Source Integration SDK</h3>
