@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Exportiere ausgewählte Aufnahmen</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Überwachungsprotokoll wiedergeben</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Geräte</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Diese Ressource wurde vom System entfernt</numerusform>
         <numerusform>Diese Ressourcen wurden vom System entfernt</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

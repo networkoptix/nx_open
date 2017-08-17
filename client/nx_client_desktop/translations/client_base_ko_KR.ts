@@ -1316,10 +1316,6 @@ to view more bookmarks</source>
       <translation>선택된 정보 파일로 저장</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>감사 로고 재생</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>장치</translation>
     </message>
@@ -1392,6 +1388,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>이 리소스는 시스템에서 제거 됩니다.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
