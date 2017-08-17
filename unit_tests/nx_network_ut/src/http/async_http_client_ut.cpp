@@ -369,7 +369,7 @@ TEST_F(AsyncHttpClient, posting_with_content_length)
     thenRequestReceivedContainsContentLength();
 }
 
-// TODO: #ak Revive test. It requires HTTP server with infinte body support.
+// TODO: #ak Revive test. It requires HTTP server with infinite message body support.
 //TEST_F(AsyncHttpClient, posting_without_content_length)
 //{
 //    ASSERT_TRUE(testHttpServer().bindAndListen());
