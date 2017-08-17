@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit log replay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
             <numerusform>This resource is removed from System</numerusform>
             <numerusform>These resources are removed from System</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Audit trail replay</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
