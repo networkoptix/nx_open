@@ -15,9 +15,6 @@ HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 PROTOCOL_HANDLER_APP_NAME="${protocol_handler_app_name}"
 
-AS_SRC=app-store
-PKG_FILE="${artifact.name.client}.pkg"
-
 QT_DIR="${qt.dir}"
 QT_VERSION="${qt.version}"
 
@@ -28,6 +25,7 @@ mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PR
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
+cp -R "${packages.dir}/any/roboto-fonts/bin/fonts" "${APP_DIR}/Contents/MacOS/"
 
 function hexify
 {
@@ -58,36 +56,6 @@ rm "$SRC/DS_Store"
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
-
-# Boris, move this to a separate script (of even folder), please
-rm -rf "$AS_SRC"
-mkdir "$AS_SRC"
-cp -a "$APP_DIR" "$AS_SRC"
-
-if [ '${mac.skip.sign}' == 'false'  ]
-then
-    for f in $AS_SRC/"${display.product.name}".app/Contents/Frameworks/Q*
-    do
-        name=$(basename "$f" .framework)
-        codesign -f -v -s "${mac.app.sign.identity}" "$f/Versions/5/$name"
-    done
-
-    for f in $AS_SRC/"${display.product.name}".app/Contents/Frameworks/lib*
-    do
-        codesign -f -v -s "${mac.app.sign.identity}" "$f"
-    done
-
-    for f in $AS_SRC/"${display.product.name}".app/Contents/MacOS/{imageformats,platforms,styles,audio}/*.dylib
-    do
-        codesign -f -v -s "${mac.app.sign.identity}" "$f"
-    done
-
-    codesign -f -v --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${display.product.name}.app/Contents/MacOS/${display.product.name}"
-
-#    codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${display.product.name}.app"
-    productbuild --component "$AS_SRC/${display.product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "$AS_SRC/${display.product.name}.app/Contents/Info.plist" "$PKG_FILE"
-    # End
-fi
 
 if [ '${mac.skip.sign}' == 'false'  ]
 then

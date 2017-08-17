@@ -32,7 +32,7 @@ public:
     TimeProtocolClient(const SocketAddress& timeServerEndpoint);
 
     virtual void stopWhileInAioThread() override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread);
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual void getTimeAsync(CompletionHandler completionHandler) override;
 

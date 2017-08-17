@@ -8,10 +8,6 @@
       <translation>Wählen Sie eine Kamera</translation>
     </message>
     <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>Drücken Sie Strg + Pfeil oder verwenden Sie das Mausrad</translation>
-    </message>
-    <message>
       <source>Authentication required</source>
       <translation>Authentifizierung erforderlich</translation>
     </message>
@@ -268,6 +264,10 @@
       <source>%1 is offline</source>
       <translation>%1 ist offline</translation>
     </message>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation>Die Software-Bilddrehung wird im Vollbildmodus nicht unterstützt</translation>
+    </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
@@ -391,6 +391,17 @@
     </message>
   </context>
   <context>
+    <name>SelectCameraDummy</name>
+    <message>
+      <source>Select camera</source>
+      <translation>Kamera auswählen</translation>
+    </message>
+    <message>
+      <source>Press Ctrl + Arrow or use mouse wheel</source>
+      <translation>Drücken Sie Strg + Pfeil oder verwenden Sie das Mausrad</translation>
+    </message>
+  </context>
+  <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
@@ -433,6 +444,14 @@
     <message>
       <source>INCOMPATIBLE</source>
       <translation>NICHT KOMPATIBEL</translation>
+    </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation type="unfinished">UNREACHABLE</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
     </message>
   </context>
   <context>
@@ -532,6 +551,10 @@
       <source>Unknown</source>
       <translation>Unbekannt</translation>
     </message>
+    <message>
+      <source>New Server</source>
+      <translation type="unfinished">New Server</translation>
+    </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
@@ -560,6 +583,21 @@
     </message>
   </context>
   <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation>Die Software-Bilddrehung wird im Vollbildmodus nicht unterstützt</translation>
+    </message>
+    <message>
+      <source>Show as is</source>
+      <translation>Istzustand anzeigen</translation>
+    </message>
+    <message>
+      <source>(Space)</source>
+      <translation>(Platz)</translation>
+    </message>
+  </context>
+  <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
@@ -583,6 +621,18 @@
     <message>
       <source>Cannot load video</source>
       <translation>Video kann nicht geladen werden</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation>Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation>Nicht autorisiert</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation>Kann keinen Videostream spielen</translation>
     </message>
   </context>
   <context>
@@ -610,14 +660,6 @@
     <message>
       <source>Information</source>
       <translation>Informationen</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Wählen Sie eine Kamera</translation>
-    </message>
-    <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>Drücken Sie Strg + Pfeil oder verwenden Sie das Mausrad</translation>
     </message>
   </context>
   <context>

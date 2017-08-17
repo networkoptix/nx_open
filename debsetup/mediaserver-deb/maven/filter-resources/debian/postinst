@@ -142,13 +142,11 @@ function check_new_system {
     local port=$1
     set +e
 
-    TRY=1
-    while [ $TRY -le 5 ]
+    for ((i = 1; i <= 5; i++))
     do
         sleep 1
-        echo "[$TRY] Checking if the server is running..."
+        echo "[$i] Checking if the server is running..."
         INFO=$(wget "http://localhost:$port/api/moduleInformation" --quiet -O-) && break
-        TRY=$[$TRY + 1]
     done
 
     echo "$INFO" | grep -q '"localSystemId":\s*"{00000000-0000-0000-0000-000000000000}"'
@@ -157,10 +155,7 @@ function check_new_system {
 function display_complete_setup_hint {
     local port=$1
 
-    if [ -n "$UPGRADING" ]
-    then
-        return
-    fi
+    [ -n "$UPGRADING" ] && return
 
     if check_new_system $port
     then

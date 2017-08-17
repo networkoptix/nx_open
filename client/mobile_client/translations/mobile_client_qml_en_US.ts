@@ -8,10 +8,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press Ctrl + Arrow or use mouse wheel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Authentication required</source>
         <translation type="unfinished"></translation>
     </message>
@@ -268,6 +264,10 @@
         <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Software image rotation is not supported in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LiveVideoNavigation</name>
@@ -391,6 +391,17 @@
     </message>
 </context>
 <context>
+    <name>SelectCameraDummy</name>
+    <message>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ServerOfflineDummy</name>
     <message>
         <source>%1 is offline</source>
@@ -432,6 +443,14 @@
     </message>
     <message>
         <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNREACHABLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to this server from web browser or through desktop client to set it up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -532,6 +551,10 @@
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>New Server</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TestSelectionDialog</name>
@@ -560,6 +583,21 @@
     </message>
 </context>
 <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+        <source>Software image rotation is not supported in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show as is</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VerticalCalendar</name>
     <message>
         <source>Close</source>
@@ -582,6 +620,18 @@
     </message>
     <message>
         <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unauthorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot play any video stream</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -609,14 +659,6 @@
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Press Ctrl + Arrow or use mouse wheel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
