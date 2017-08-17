@@ -508,7 +508,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                         context.fillStyle = chunkLoadingTexture;
                         chunkLoadingTextureSize = this.width;
                     };
-                    var imagePath = hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
+                    var imagePath = hasHighDpi ? '../images/timeline-loading-filled@2x.png' : '../images/timeline-loading-filled.png';
                     img.src = Config.viewsDirCommon + imagePath;
                     chunkLoadingTextureImg = img;
                 }
@@ -523,7 +523,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             context.save();
             context.translate(offset_x, 0);
-            context.globalAlpha = 0.4;
 
             context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                             (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
@@ -579,7 +578,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         context.save();
         context.translate(offset_x, 0);
-        context.globalAlpha = 0.4;
         context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                         (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
