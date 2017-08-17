@@ -13,8 +13,15 @@ namespace client {
 namespace desktop {
 namespace ui {
 
+struct AnalyticsSdkEventModel::Private
+{
+    QList<nx::vms::event::AnalyticsHelper::EventDescriptor> items;
+    bool valid = false;
+};
+
 AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    d(new Private())
 {
 }
 
@@ -22,15 +29,15 @@ int AnalyticsSdkEventModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid()
         ? 0
-        : m_items.size();
+        : d->items.size();
 }
 
 QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() > m_items.size())
+    if (index.row() < 0 || index.row() > d->items.size())
         return QVariant();
 
-    const auto& item = m_items[index.row()];
+    const auto& item = d->items[index.row()];
 
     switch (role)
     {
@@ -40,8 +47,8 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
         {
-            const bool useDriverName = m_valid
-                && nx::vms::event::AnalyticsHelper::hasDifferentDrivers(m_items);
+            const bool useDriverName = d->valid
+                && nx::vms::event::AnalyticsHelper::hasDifferentDrivers(d->items);
             return useDriverName
                 ? lit("%1 - %2")
                     .arg(item.driverName.text(qnRuntime->locale()))
@@ -65,20 +72,20 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
 void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
 {
     beginResetModel();
-    m_items = nx::vms::event::AnalyticsHelper::analyticsEvents(cameras);
-    m_valid = !m_items.empty();
-    if (!m_valid)
+    d->items = nx::vms::event::AnalyticsHelper::analyticsEvents(cameras);
+    d->valid = !d->items.empty();
+    if (!d->valid)
     {
-        nx::api::AnalyticsEventTypeWithRef dummy;
+        nx::vms::event::AnalyticsHelper::EventDescriptor dummy;
         dummy.eventName.value = tr("No event types supported");
-        m_items.push_back(dummy);
+        d->items.push_back(dummy);
     }
     endResetModel();
 }
 
 bool AnalyticsSdkEventModel::isValid() const
 {
-    return m_valid;
+    return d->valid;
 }
 
 } // namespace ui

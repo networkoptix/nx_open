@@ -7,23 +7,44 @@
 
 namespace {
 
+/**
+* Description of the single analytics event type.
+*/
+struct AnalyticsEventTypeId
+{
+    QnUuid driverId;
+    QnUuid eventTypeId;
+
+    bool operator==(const AnalyticsEventTypeId& other) const
+    {
+        return driverId == other.driverId && eventTypeId == other.eventTypeId;
+    }
+
+    friend uint qHash(const AnalyticsEventTypeId& key)
+    {
+        return qHash(key.driverId) ^ qHash(key.eventTypeId);
+    }
+};
+
 /** Struct for keeping unique list of analytics event types. */
 class AnalyticsEventTypeWithRefStorage
 {
+    using EventDescriptor = nx::vms::event::AnalyticsHelper::EventDescriptor;
+
 public:
-    AnalyticsEventTypeWithRefStorage(QList<nx::api::AnalyticsEventTypeWithRef>* data):
+    AnalyticsEventTypeWithRefStorage(QList<EventDescriptor>* data):
         data(data)
     {}
 
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
         const nx::api::AnalyticsEventType& eventType)
     {
-        nx::api::AnalyticsEventTypeId id(manifest.driverId, eventType.eventTypeId);
+        AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
         if (keys.contains(id))
             return;
 
         keys.insert(id);
-        nx::api::AnalyticsEventTypeWithRef ref;
+        EventDescriptor ref;
         ref.driverId = manifest.driverId;
         ref.driverName = manifest.driverName;
         ref.eventTypeId = eventType.eventTypeId;
@@ -32,8 +53,8 @@ public:
     }
 
 private:
-    QSet<nx::api::AnalyticsEventTypeId> keys;
-    QList<nx::api::AnalyticsEventTypeWithRef>* data;
+    QSet<AnalyticsEventTypeId> keys;
+    QList<EventDescriptor>* data;
 };
 
 
@@ -49,9 +70,9 @@ AnalyticsHelper::AnalyticsHelper(QnCommonModule* commonModule, QObject* parent):
 {
 }
 
-QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents() const
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::analyticsEvents() const
 {
-    QList<nx::api::AnalyticsEventTypeWithRef> result;
+    QList<EventDescriptor> result;
     AnalyticsEventTypeWithRefStorage storage(&result);
 
     for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
@@ -65,10 +86,10 @@ QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents() con
     return result;
 }
 
-QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents(
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::analyticsEvents(
     const QnVirtualCameraResourceList& cameras)
 {
-    QList<nx::api::AnalyticsEventTypeWithRef> result;
+    QList<EventDescriptor> result;
     AnalyticsEventTypeWithRefStorage storage(&result);
 
     for (const auto& camera: cameras)
@@ -94,14 +115,14 @@ QList<nx::api::AnalyticsEventTypeWithRef> AnalyticsHelper::analyticsEvents(
     return result;
 }
 
-bool AnalyticsHelper::hasDifferentDrivers(const QList<nx::api::AnalyticsEventTypeWithRef>& events)
+bool AnalyticsHelper::hasDifferentDrivers(const QList<EventDescriptor>& events)
 {
     if (events.empty())
         return false;
 
     const auto firstDriverId = events[0].driverId;
     return std::any_of(events.cbegin() + 1, events.cend(),
-        [&firstDriverId](const nx::api::AnalyticsEventTypeWithRef& eventType)
+        [&firstDriverId](const EventDescriptor& eventType)
         {
             return eventType.driverId != firstDriverId;
         });

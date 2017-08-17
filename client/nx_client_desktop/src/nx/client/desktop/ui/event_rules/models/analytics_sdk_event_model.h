@@ -34,8 +34,8 @@ public:
     bool isValid() const;
 
 private:
-    QList<nx::api::AnalyticsEventTypeWithRef> m_items;
-    bool m_valid = false;
+    struct Private;
+    std::unique_ptr<Private> d;
 };
 
 } // namespace ui

@@ -5,14 +5,7 @@
 namespace nx {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventTypeId, (eq)(hash), AnalyticsEventTypeId_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(AnalyticsApiEventTypes, (json), _Fields, (brief, true))
-
-AnalyticsEventTypeId::AnalyticsEventTypeId(const QnUuid& driverId, const QnUuid& eventTypeId):
-    driverId(driverId),
-    eventTypeId(eventTypeId)
-{
-}
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json), AnalyticsEventType_Fields, (brief, true))
 
 } // namespace api
 } // namespace nx
