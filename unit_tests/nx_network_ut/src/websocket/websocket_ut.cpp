@@ -147,9 +147,8 @@ protected:
     void givenClientServerExchangeMessagesCallbacks()
     {
         clientSendCb =
-            [this](SystemError::ErrorCode ecode, size_t size)
+            [this](SystemError::ErrorCode, size_t)
             {
-                ASSERT_EQ(ecode, SystemError::noError);
                 if (doneCount == kIterations)
                     return;
                 clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
@@ -181,7 +180,7 @@ protected:
             };
 
         serverReadCb =
-            [this](SystemError::ErrorCode ecode, size_t)
+            [this](SystemError::ErrorCode, size_t)
             {
                 if (doneCount == kIterations)
                     return;
@@ -204,10 +203,10 @@ protected:
         clientSendCb =
             [this](SystemError::ErrorCode ecode, size_t)
             {
-            if (ecode == SystemError::connectionAbort)
-            {
-                try { readyPromise.set_value(); } catch (...) {}
-            }
+                if (ecode == SystemError::connectionAbort)
+                {
+                    try { readyPromise.set_value(); } catch (...) {}
+                }
                 if (ecode != SystemError::noError)
                     return;
                 if (doneCount == kIterations)
