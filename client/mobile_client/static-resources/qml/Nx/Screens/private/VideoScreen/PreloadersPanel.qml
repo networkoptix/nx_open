@@ -6,8 +6,6 @@ Item
 {
     id: control
 
-    anchors.fill: parent
-
     property bool zoomInPressed: false
     property bool zoomOutPressed: false
     property bool focusPressed: false
@@ -21,6 +19,9 @@ Item
         privateAutoFocusPressed = true; //< Shows autofocus preloader.
         privateAutoFocusPressed = false;
     }
+
+    implicitWidth: loader.width
+    implicitHeight: loader.height
 
     onZoomInPressedChanged: updatePreloaderState()
     onZoomOutPressedChanged: updatePreloaderState()

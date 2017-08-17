@@ -264,6 +264,10 @@
       <source>%1 is offline</source>
       <translation>%1 ist offline</translation>
     </message>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation>Die Software-Bilddrehung wird im Vollbildmodus nicht unterstützt</translation>
+    </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
@@ -390,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Kamera auswählen</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Drücken Sie Strg + Pfeil oder verwenden Sie das Mausrad</translation>
     </message>
   </context>
   <context>
@@ -440,6 +444,14 @@
     <message>
       <source>INCOMPATIBLE</source>
       <translation>NICHT KOMPATIBEL</translation>
+    </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation type="unfinished">UNREACHABLE</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
     </message>
   </context>
   <context>
@@ -539,6 +551,10 @@
       <source>Unknown</source>
       <translation>Unbekannt</translation>
     </message>
+    <message>
+      <source>New Server</source>
+      <translation type="unfinished">New Server</translation>
+    </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
@@ -570,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Die Software-Bilddrehung wird im Vollbildmodus nicht unterstützt</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Istzustand anzeigen</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Platz)</translation>
     </message>
   </context>
   <context>
@@ -608,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Nicht autorisiert</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Kann keinen Videostream spielen</translation>
     </message>
   </context>
   <context>

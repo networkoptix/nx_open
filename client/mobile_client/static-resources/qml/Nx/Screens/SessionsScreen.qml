@@ -97,10 +97,11 @@ Page
                 systemId: model.systemId
                 localId: model.localId
                 cloudSystem: model.isCloudSystem
+                factorySystem: model.isFactorySystem
                 ownerDescription: cloudSystem ? model.ownerDescription : ""
                 running: model.isRunning
                 reachable: model.isReachable
-                compatible: model.isCompatible
+                compatible: model.isCompatible || model.isFactorySystem
 
                 invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
             }

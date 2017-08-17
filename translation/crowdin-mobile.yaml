@@ -1,0 +1,26 @@
+project_identifier: nx-witness
+api_key: 42f3cd326fea96b19ad3bf2eb9009b45
+base_path: ..
+preserve_hierarchy: true
+
+files:
+  -
+    source: '/common/translations/qtbase.ts'
+    dest: '/Common/qtbase.ts'
+    translation: '/common/translations/qtbase_%locale_with_underscore%.ts'
+  -
+    source: '/common/translations/common_en_US.ts'
+    dest: '/Common/common.ts'
+    translation: '/common/translations/common_%locale_with_underscore%.ts'
+  -
+    source: '/client/nx_client_core/translations/client_core_en_US.ts'
+    dest: '/Client/client_core.ts'
+    translation: '/client/nx_client_core/translations/client_core_%locale_with_underscore%.ts'
+  -
+    source: '/client/mobile_client/translations/mobile_client_base_en_US.ts'
+    dest: '/Mobile/mobile_client_base.ts'
+    translation: '/client/mobile_client/translations/mobile_client_base_%locale_with_underscore%.ts'
+  -
+    source: '/client/mobile_client/translations/mobile_client_qml_en_US.ts'
+    dest: '/Mobile/mobile_client_qml.ts'
+    translation: '/client/mobile_client/translations/mobile_client_qml_%locale_with_underscore%.ts'

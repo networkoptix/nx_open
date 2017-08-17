@@ -4,6 +4,7 @@
 #include <nx/utils/software_version.h>
 #include <utils/common/app_info.h>
 #include <mobile_client/mobile_client_app_info.h>
+#include <nx/utils/app_info.h>
 
 QnMobileAppInfo::QnMobileAppInfo(QObject* parent)
     : QObject(parent)
