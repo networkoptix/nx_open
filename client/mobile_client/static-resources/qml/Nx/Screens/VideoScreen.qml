@@ -254,7 +254,7 @@ PageBase
     Component
     {
         id: fisheyeVideoComponent
-        FisheyeVideo 
+        FisheyeVideo
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
@@ -297,7 +297,11 @@ PageBase
         Loader
         {
             id: dummyLoader
-            anchors.fill: parent
+
+            y: -header.height - parent.y
+            width: mainWindow.width
+            height: mainWindow.height
+
             visible: active
             active: d.cameraWarningVisible
 
@@ -305,9 +309,8 @@ PageBase
             {
                 VideoDummy
                 {
-                    y: -header.height
-                    width: mainWindow.width
-                    height: mainWindow.height
+                    topOffset: header.height
+                    anchors.fill: parent
                     state: videoScreenController.dummyState
                 }
             }
@@ -598,7 +601,7 @@ PageBase
             return
 
         switchToCamera(
-            camerasModel.previousResourceId(videoScreen.resourceId)
+            camerasModel.preiousResourceId(videoScreen.resourceId)
                 || camerasModel.previousResourceId(""))
     }
 
