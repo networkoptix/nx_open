@@ -523,7 +523,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             context.save();
             context.translate(offset_x, 0);
-            context.globalAlpha = 0.3;
+            context.globalAlpha = 0.4;
 
             context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                             (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
@@ -579,7 +579,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         context.save();
         context.translate(offset_x, 0);
-        context.globalAlpha = 0.3;
+        context.globalAlpha = 0.4;
         context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
                         (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
 
