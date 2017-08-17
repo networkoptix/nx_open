@@ -6,6 +6,8 @@
 
 #include <ui/dialogs/common/dialog.h>
 
+#include <utils/common/connective.h>
+
 namespace Ui { class ExportSettingsDialog; }
 
 class QnMediaResourceWidget;
@@ -25,23 +27,27 @@ namespace ui {
  * Export will be automatically cancelled if the provided resource is removed from the resource
  * pool (e.g. if reconnect was cancelled).
  */
-class ExportSettingsDialog: public QnDialog
+class ExportSettingsDialog: public Connective<QnDialog>
 {
     Q_OBJECT
-    using base_type = QnDialog;
+    using base_type = Connective<QnDialog>;
 
 public:
     /** Default mode. Will have both "Single camera" and "Layout" tabs. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
         const QnTimePeriod& timePeriod,
         QWidget* parent = nullptr);
-    ExportSettingsDialog(const QnVirtualCameraResourcePtr& camera,
+    ExportSettingsDialog(const QnMediaResourcePtr& media,
         const QnTimePeriod& timePeriod,
         QWidget* parent = nullptr);
     virtual ~ExportSettingsDialog() override;
 
+    virtual void accept() override;
+
 private:
     ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent = nullptr);
+
+    void setupSettingsButtons();
 
 private:
     class Private;

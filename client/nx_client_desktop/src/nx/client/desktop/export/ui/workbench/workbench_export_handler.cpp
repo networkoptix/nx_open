@@ -260,7 +260,19 @@ QnMediaResourceWidget* WorkbenchExportHandler::extractMediaWidget(const action::
 
 void WorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 {
-    exportTimeSelection(menu()->currentParameters(sender()));
+    // exportTimeSelection(menu()->currentParameters(sender()));
+
+    const auto parameters = menu()->currentParameters(sender());
+
+    const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    const auto widget = extractMediaWidget(parameters);
+    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
+
+    auto dialog = widget
+        ? new ExportSettingsDialog(widget, period, mainWindow())
+        : new ExportSettingsDialog(mediaResource, period, mainWindow());
+    dialog->exec();
 }
 
 

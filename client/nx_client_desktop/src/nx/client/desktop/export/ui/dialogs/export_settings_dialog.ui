@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>537</height>
+    <width>1185</width>
+    <height>757</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Image View</string>
+   <string>Export Video</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -31,14 +31,17 @@
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <widget class="QWidget" name="singleCameraTab">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <property name="tabBarAutoHide">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="cameraTab">
       <attribute name="title">
        <string>Single Camera</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>16</number>
-       </property>
+      <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
         <number>16</number>
        </property>
@@ -51,10 +54,13 @@
        <property name="bottomMargin">
         <number>16</number>
        </property>
-       <item>
-        <widget class="QWidget" name="previewWidget" native="true"/>
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QWidget" name="cameraPreviewWidget" native="true"/>
        </item>
-       <item>
+       <item row="0" column="1">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="minimumSize">
           <size>
@@ -68,11 +74,190 @@
            <height>16777215</height>
           </size>
          </property>
-         <widget class="nx::client::desktop::ui::ExportSettingsWidget" name="exportSettingsPage"/>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="nx::client::desktop::ui::ExportSettingsWidget" name="cameraExportSettingsPage"/>
          <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
          <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
          <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
          <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QWidget" name="buttonsWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <property name="leftMargin">
+           <number>16</number>
+          </property>
+          <property name="topMargin">
+           <number>16</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>16</number>
+          </property>
+          <item>
+           <widget class="nx::client::desktop::ui::SelectableTextButton" name="cameraExportSettingsButton">
+            <property name="text">
+             <string>Export Settings</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="overlayButtonsWidget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="nx::client::desktop::ui::SelectableTextButton" name="timestampButton">
+               <property name="text">
+                <string notr="true">&lt;Timestamp&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="nx::client::desktop::ui::SelectableTextButton" name="imageButton">
+               <property name="text">
+                <string notr="true">&lt;Image&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="nx::client::desktop::ui::SelectableTextButton" name="textButton">
+               <property name="text">
+                <string notr="true">&lt;Text&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="nx::client::desktop::ui::SelectableTextButton" name="speedButton">
+               <property name="text">
+                <string notr="true">&lt;Speed&gt;</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutTab">
+      <attribute name="title">
+       <string>Multi Video</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QWidget" name="layoutPreviewWidget" native="true"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QStackedWidget" name="layoutExportSettingsWidget">
+         <property name="minimumSize">
+          <size>
+           <width>280</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>280</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="layoutExportSettingsPage"/>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QWidget" name="layoutButtonsWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <property name="leftMargin">
+           <number>16</number>
+          </property>
+          <property name="topMargin">
+           <number>16</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>16</number>
+          </property>
+          <item>
+           <widget class="nx::client::desktop::ui::SelectableTextButton" name="layoutExportSettingsButton">
+            <property name="text">
+             <string>Export Settings</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -80,11 +265,8 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="buttonsWidget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>4</number>
-      </property>
+    <widget class="QnPanel" name="filePathPanel" native="true">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>16</number>
       </property>
@@ -97,74 +279,67 @@
       <property name="bottomMargin">
        <number>16</number>
       </property>
-      <item>
-       <widget class="nx::client::desktop::ui::SelectableTextButton" name="exportSettingsButton">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="folderLabel">
         <property name="text">
-         <string>Export Settings</string>
+         <string>Folder</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QWidget" name="overlayButtonsWidget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="timestampButton">
-           <property name="text">
-            <string notr="true">&lt;Timestamp&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="imageButton">
-           <property name="text">
-            <string notr="true">&lt;Image&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="textButton">
-           <property name="text">
-            <string notr="true">&lt;Text&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="speedButton">
-           <property name="text">
-            <string notr="true">&lt;Speed&gt;</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="folderLineEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="0">
+       <widget class="QLabel" name="fileNameLabel">
+        <property name="text">
+         <string>Name</string>
         </property>
-        <property name="sizeHint" stdset="0">
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="browseFolderButton">
+        <property name="minimumSize">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>120</width>
+          <height>0</height>
          </size>
         </property>
-       </spacer>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="fileNameLineEdit"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="formatComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -182,7 +357,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel</set>
      </property>
     </widget>
    </item>
@@ -222,6 +397,12 @@
    <class>nx::client::desktop::ui::RapidReviewSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/ui/widgets/rapid_review_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnPanel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

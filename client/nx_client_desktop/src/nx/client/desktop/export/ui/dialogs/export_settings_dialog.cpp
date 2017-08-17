@@ -2,6 +2,8 @@
 #include "private/export_settings_dialog_p.h"
 #include "ui_export_settings_dialog.h"
 
+#include <ui/dialogs/common/message_box.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 
@@ -20,12 +22,13 @@ ExportSettingsDialog::ExportSettingsDialog(
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
-    const QnVirtualCameraResourcePtr& camera,
+    const QnMediaResourcePtr& media,
     const QnTimePeriod& timePeriod,
     QWidget* parent)
     :
     ExportSettingsDialog(timePeriod, parent)
 {
+    ui->layoutTab->setVisible(false);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent):
@@ -35,10 +38,40 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 {
     ui->setupUi(this);
 
-    ui->exportSettingsButton->setText(tr("Export Settings"));
-    ui->exportSettingsButton->setIcon(qnSkin->icon(
+    setupSettingsButtons();
+
+    auto exportButton = ui->buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
+    setAccentStyle(exportButton);
+
+    connect(d, &Private::stateChanged, this,
+        [this, exportButton](Private::State value)
+        {
+            exportButton->setEnabled(value == Private::State::ready);
+
+            if (value == Private::State::success)
+            {
+                QnMessageBox::success(this, tr("Export completed"));
+                base_type::accept();
+            }
+
+        });
+
+    d->loadSettings();
+}
+
+void ExportSettingsDialog::setupSettingsButtons()
+{
+    ui->cameraExportSettingsButton->setText(tr("Export Settings"));
+    ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
         lit("buttons/settings_hovered.png"),
         lit("buttons/settings_selected.png")));
+    ui->cameraExportSettingsButton->setState(SelectableTextButton::State::selected);
+
+    ui->layoutExportSettingsButton->setText(tr("Export Settings"));
+    ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
+        lit("buttons/settings_hovered.png"),
+        lit("buttons/settings_selected.png")));
+    ui->layoutExportSettingsButton->setState(SelectableTextButton::State::selected);
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
@@ -73,20 +106,20 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
         lit("buttons/rapid_review_selected.png")));
 
     auto group = new SelectableTextButtonGroup(this);
-    group->add(ui->exportSettingsButton);
+    group->add(ui->cameraExportSettingsButton);
     group->add(ui->timestampButton);
     group->add(ui->imageButton);
     group->add(ui->textButton);
     group->add(ui->speedButton);
-    group->setSelectionFallback(ui->exportSettingsButton);
+    group->setSelectionFallback(ui->cameraExportSettingsButton);
 
-    connect(group, &SelectableTextButtonGroup::selectionChanged,
+    connect(group, &SelectableTextButtonGroup::selectionChanged, this,
         [this](SelectableTextButton* /*old*/, SelectableTextButton* selected)
         {
             if (!selected)
                 return;
-            if (selected == ui->exportSettingsButton)
-                ui->stackedWidget->setCurrentWidget(ui->exportSettingsPage);
+            if (selected == ui->cameraExportSettingsButton)
+                ui->stackedWidget->setCurrentWidget(ui->cameraExportSettingsPage);
             else if (selected == ui->timestampButton)
                 ui->stackedWidget->setCurrentWidget(ui->timestampSettingsPage);
             else if (selected == ui->imageButton)
@@ -100,6 +133,20 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
 ExportSettingsDialog::~ExportSettingsDialog()
 {
+}
+
+void ExportSettingsDialog::accept()
+{
+    switch (d->state())
+    {
+        case Private::State::ready:
+            d->exportVideo();
+            return;
+
+        default:
+            break;
+    }
+    base_type::accept();
 }
 
 } // namespace ui
