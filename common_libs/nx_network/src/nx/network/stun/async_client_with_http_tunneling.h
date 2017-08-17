@@ -27,7 +27,7 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
 public:
     AsyncClientWithHttpTunneling(Settings settings = Settings());
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     /**
      * @param url http and stun scheme is supported.

@@ -52,7 +52,7 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    bool isInSelfAioThread() const;
+    virtual bool isInSelfAioThread() const override;
 
     //---------------------------------------------------------------------------------------------
     // Implementation of QnStoppable::*
