@@ -8,10 +8,6 @@
       <translation>カメラを選択</translation>
     </message>
     <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>Ctrl キーを押しながら矢印またはマウス ホイールを使用してください</translation>
-    </message>
-    <message>
       <source>Authentication required</source>
       <translation>認証が必要です</translation>
     </message>
@@ -81,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -100,7 +96,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>&quot;%1&quot; を削除しますか？</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -287,11 +283,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>画像をタップしてカメラの位置を決める</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -319,14 +315,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>プリセット</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ プリセット</translation>
     </message>
   </context>
   <context>
@@ -391,6 +387,17 @@
     </message>
   </context>
   <context>
+    <name>SelectCameraDummy</name>
+    <message>
+      <source>Select camera</source>
+      <translation type="unfinished">Select camera</translation>
+    </message>
+    <message>
+      <source>Press Ctrl + Arrow or use mouse wheel</source>
+      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+    </message>
+  </context>
+  <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
@@ -447,7 +454,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>ネットワーク接続を確認するか、&quot;%1&quot; ボタンを押して、既知のサーバーアドレスを入力してください</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -467,7 +474,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>システム&quot;%1&quot; に接続できません</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -560,6 +567,21 @@
     </message>
   </context>
   <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
+    <message>
+      <source>Show as is</source>
+      <translation type="unfinished">Show as is</translation>
+    </message>
+    <message>
+      <source>(Space)</source>
+      <translation type="unfinished">(Space)</translation>
+    </message>
+  </context>
+  <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
@@ -583,6 +605,18 @@
     <message>
       <source>Cannot load video</source>
       <translation>ビデオを読み込むことができません</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation type="unfinished">Cannot play any video stream</translation>
     </message>
   </context>
   <context>
@@ -610,14 +644,6 @@
     <message>
       <source>Information</source>
       <translation>情報</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>カメラを選択</translation>
-    </message>
-    <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>Ctrl キーを押しながら矢印またはマウス ホイール</translation>
     </message>
   </context>
   <context>

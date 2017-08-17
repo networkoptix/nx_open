@@ -21,6 +21,7 @@
 
         <windows.oslibs>-lws2_32</windows.oslibs>
         <mac.oslibs>-lstdc++ -lpthread -lm</mac.oslibs>
+        <linux.oslibs>-lrt</linux.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <buildLib>sharedLib</buildLib>

@@ -32,19 +32,21 @@ public:
     std::vector<SocketAddress> httpEndpoints() const;
 
 private:
+    using MultiHttpServer = network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>;
+    using MultiHttpServerPtr = std::unique_ptr<MultiHttpServer>;
+
     const conf::Settings& m_settings;
     Controller* m_controller;
     nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx_http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
-    std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
+    MultiHttpServerPtr m_multiAddressHttpServer;
 
     void registerApiHandlers();
     template<typename Handler> void registerApiHandler(
         const nx_http::StringType& method);
 
     void startAcceptor();
-    void reportPublicListenAddress();
 };
 
 } // namespace relay

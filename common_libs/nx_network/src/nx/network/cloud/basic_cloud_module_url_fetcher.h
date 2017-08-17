@@ -73,6 +73,14 @@ public:
         m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx_http::kUrlSchemeName);
     }
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+
+        if (m_httpClient)
+            m_httpClient->bindToAioThread(aioThread);
+    }
+
     virtual void stopWhileInAioThread() override
     {
         base_type::stopWhileInAioThread();
@@ -166,10 +174,13 @@ protected:
             if (it != m_moduleToDefaultUrlScheme.end())
                 url.setScheme(it->second);
             else
-                url.setScheme(nx_http::kUrlSchemeName);
+                url.setScheme(QLatin1String(nx_http::kUrlSchemeName));
 
-            if ((url.scheme() == nx_http::kUrlSchemeName) && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
-                url.setScheme(nx_http::kSecureUrlSchemeName);
+            if ((url.scheme() == QLatin1String(nx_http::kUrlSchemeName))
+                && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+            {
+                url.setScheme(QLatin1String(nx_http::kSecureUrlSchemeName));
+            }
         }
 
         return url;
@@ -186,6 +197,8 @@ private:
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client)
     {
+        NX_ASSERT(isInSelfAioThread());
+
         QnMutexLocker lk(&m_mutex);
 
         m_httpClient.reset();

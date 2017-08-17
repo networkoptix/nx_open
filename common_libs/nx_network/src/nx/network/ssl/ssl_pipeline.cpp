@@ -23,10 +23,6 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
     initSslBio(sslContext);
 }
 
-Pipeline::~Pipeline()
-{
-}
-
 int Pipeline::write(const void* data, size_t size)
 {
     return performSslIoOperation(&SSL_write, data, size);
@@ -76,11 +72,11 @@ void Pipeline::initSslBio(SSL_CTX* context)
         &Pipeline::bioWrite,
         &Pipeline::bioRead,
         &Pipeline::bioPuts,
-        NULL, // bgets
+        NULL, //<< bgets
         &Pipeline::bioCtrl,
         &Pipeline::bioNew,
         &Pipeline::bioFree,
-        NULL, // callback_ctrl
+        NULL, //<< callback_ctrl
     };
 
     BIO* rbio = BIO_new(&kBioMethods);
@@ -92,7 +88,7 @@ void Pipeline::initSslBio(SSL_CTX* context)
     BIO_set_nbio(wbio, 1);
 
     NX_ASSERT(context);
-    m_ssl.reset(SSL_new(context)); // get new SSL state with context
+    m_ssl.reset(SSL_new(context)); //<< Get new SSL state with context.
 
     SSL_set_verify(m_ssl.get(), SSL_VERIFY_NONE, NULL);
     SSL_set_session_id_context(
@@ -101,7 +97,7 @@ void Pipeline::initSslBio(SSL_CTX* context)
             ssl::SslStaticData::instance()->sslSessionId().constData()),
         ssl::SslStaticData::instance()->sslSessionId().size());
 
-    SSL_set_bio(m_ssl.get(), rbio, wbio);  //ssl will free bio when freed
+    SSL_set_bio(m_ssl.get(), rbio, wbio);  //< SSL will free bio when freed.
 }
 
 template<typename Func, typename Data>
@@ -256,13 +252,6 @@ int Pipeline::bioFree(BIO* bio)
     if (bio == NULL) return(0);
     if (bio->shutdown)
     {
-        //if (bio->init)
-        //{
-        //    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(bio));
-        //    if (sslSock)
-        //        sslSock->close();
-        //}
-
         bio->init = 0;
         bio->flags = 0;
     }

@@ -473,7 +473,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
     {
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
-        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        const auto logger = nx::utils::log::addLogger({
+            nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))});
         logger->setDefaultLevel(nx::utils::log::Level::info);
     }
 

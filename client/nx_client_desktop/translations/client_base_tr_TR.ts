@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Yer işaretini baştan oynat</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Yer imini düzenle</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Yer imini sil</translation>
     </message>
   </context>
   <context>
@@ -410,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Video Duvarını Aç</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -430,7 +430,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Video Duvarını Kaydet</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -562,7 +562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Düzenle...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -854,31 +854,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Yer İmi Günlüğü...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Yeni Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Showreel'den kaldır</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Showreel'i başlat</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Showreel'i durdur</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Showreel Oluştur</translation>
     </message>
   </context>
   <context>
@@ -940,35 +940,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Lisans bulunamıyor.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Lisans devre dışı bırakıldı.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Lisans aktif değil.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Geçersiz lisans.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Deneme lisansı.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Lisans deaktif edilmek için bekleniyor. Fakat henüz deaktif edilmedi.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Bu lisans için devreden çıkarma sayısı sınırı aştı.</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>Bu lisansa sahip Sunucu Donanım Kimliği, lisansın etkinleştirildiği Donanım Kimliği ile eşleşmiyor.</translation>
     </message>
   </context>
   <context>
@@ -1030,15 +1030,15 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>"%1" Yolu geçerli değil. Lütfen başka bir yol deneyin.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Kamera "%1" den geçerli pozisyon alınamadı;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1119,7 +1119,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Kamera "%1" için geçerli pozisyon ayarlanamadı;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Seçilen Kayıtları Dosyaya Çıkart</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Denetim Günlüğünü Tekrar Oynat</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Aygıtlar</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1570,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Yedekleme, kameraların mevcut sunucusunda kurulmazsa, arşivleri yedeklenmez.</translation>
     </message>
   </context>
   <context>
@@ -1657,7 +1657,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Açıklama boş olamaz</translation>
     </message>
   </context>
   <context>
@@ -1727,7 +1727,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Yer imleri yöneticisi</translation>
     </message>
   </context>
   <context>
@@ -2102,7 +2102,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>Kamera Id</translation>
     </message>
   </context>
   <context>
@@ -3497,7 +3497,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3555,7 +3555,7 @@ to %1</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -3891,14 +3891,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Lisansları devre dışı bırak?</numerusform>
+        <numerusform>Lisansları devre dışı bırak?</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to deactivate license</source>
-      <translation type="unfinished">Failed to deactivate license</translation>
+      <translation>Lisans devre dışı bırakılırken hata oluştu</translation>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
@@ -4296,7 +4296,7 @@ to %1</source>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>bas ve basılı tut</translation>
     </message>
   </context>
   <context>
@@ -4443,15 +4443,15 @@ to %1</source>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation type="unfinished">B/s</translation>
+      <translation>B/s</translation>
     </message>
     <message>
       <source>MB/s</source>
-      <translation type="unfinished">MB/s</translation>
+      <translation>MB/s</translation>
     </message>
     <message>
       <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
@@ -4595,7 +4595,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Yer imleri yöneticisi</translation>
     </message>
   </context>
   <context>
@@ -6305,7 +6305,7 @@ to %1</source>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>E-posta gönderirken hata oluştu</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
@@ -6417,37 +6417,37 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation type="unfinished">hh:mm</translation>
+      <translation>ss:aa</translation>
     </message>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation type="unfinished">dd</translation>
+      <translation>gg</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation type="unfinished">MMMM</translation>
+      <translation>AAAA</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+      <translation>gg AAAA yyyy ss:dd</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+      <translation>gg AAAA yyyy ss:dd</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
@@ -6457,17 +6457,17 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">dd MMMM yyyy</translation>
+      <translation>gg AAAA yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>AAAA yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
@@ -6946,11 +6946,11 @@ to %1</source>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>URL boş olamaz.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation type="unfinished">Wrong URL format.</translation>
+      <translation>Yanlış URL formatı.</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -7229,7 +7229,7 @@ to %1</source>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation type="unfinished">Connecting to the current System...</translation>
+      <translation>Mevcut Sisteme Bağlanıyor...</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
@@ -7485,11 +7485,11 @@ to %1</source>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Yeni Web Sayfası</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation type="unfinished">Edit Web Page</translation>
+      <translation>Web Sayfasını Düzenle</translation>
     </message>
   </context>
   <context>
@@ -7730,12 +7730,12 @@ to %1</source>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopyalandı</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>Yapıştırıldı</translation>
     </message>
   </context>
   <context>
@@ -7823,7 +7823,7 @@ to %1</source>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>-Birini seçin-</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
@@ -7842,7 +7842,7 @@ to %1</source>
     <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Canlıya Git</translation>
     </message>
   </context>
   <context>

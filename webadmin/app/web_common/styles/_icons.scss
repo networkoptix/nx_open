@@ -126,6 +126,14 @@
     background-position: -73px -61px;
   }
 }
+
+.camera-links-panel .glyphicon-remove{
+  @include kill-glyphicon;
+  height: 18px !important;
+  width: 18px !important;
+  background-position: -148px -52px;
+}
+
 .camera-preview-offline,
 .camera-preview-unauthorized{
   @include icon;

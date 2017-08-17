@@ -124,7 +124,7 @@ void QnModuleInformationRestHandler::afterExecute(
         || !socket->setKeepAlive(kKeepAliveOptions))
     {
         const auto error = SystemError::getLastOSErrorCode();
-        NX_WARNING(this, lm("Failed to configure connection from %1: %2")
+        NX_DEBUG(this, lm("Failed to configure connection from %1: %2")
             .args(socket->getForeignAddress(), SystemError::toString(error)));
         return;
     }

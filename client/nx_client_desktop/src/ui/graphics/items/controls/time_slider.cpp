@@ -46,7 +46,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/pending_operation.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
@@ -705,48 +704,50 @@ bool QnTimeSlider::isWindowBeingDragged() const
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
 {
     const auto bookmarksAtLocationFunc =
-        [this](qint64 location) -> QnCameraBookmarkList
+        [this](qint64 location)
         {
+            if (!m_bookmarksHelper)
+                return QnCameraBookmarkList();
+
             if (m_options.testFlag(StillBookmarksViewer))
                 location = valueFromPosition(QPointF(location, 0));
 
             static const auto searchOptions = QnBookmarkMergeHelper::OnlyTopmost
                 | QnBookmarkMergeHelper::ExpandArea;
 
-            return m_bookmarksHelper
-                ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel, searchOptions)
-                : QnCameraBookmarkList();
+            return m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel, searchOptions);
         };
 
-    const auto getPosFunc = [this](qint64 location) -> QnBookmarksViewer::PosAndBoundsPair
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
+    const auto getPosFunc =
+        [this](qint64 location)
         {
-            if (location >= rect().width())
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
-        else
-        {
-            if (!windowContains(location))
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
+            if (m_options.testFlag(StillBookmarksViewer))
+            {
+                if (location >= rect().width())
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
+            else
+            {
+                if (!windowContains(location))
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
 
-        const auto viewer = bookmarksViewer();
+            const auto viewer = bookmarksViewer();
 
-        qreal pos = m_options.testFlag(StillBookmarksViewer) ?
-            static_cast<qreal>(location) :
-            positionFromValue(location).x();
+            qreal pos = m_options.testFlag(StillBookmarksViewer) ?
+                static_cast<qreal>(location) :
+                positionFromValue(location).x();
 
-        const auto target = QPointF(pos, lineBarRect().top());
+            const auto target = QPointF(pos, lineBarRect().top());
 
-        Q_D(const GraphicsSlider);
+            Q_D(const GraphicsSlider);
 
-        const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
-        const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
-        const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
-        const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
-        return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
-    };
+            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
+        };
 
     return new QnBookmarksViewer(bookmarksAtLocationFunc, getPosFunc, this);
 }

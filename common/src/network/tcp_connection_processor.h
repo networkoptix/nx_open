@@ -85,11 +85,11 @@ protected:
 
     QByteArray createResponse(int httpStatusCode, const QByteArray& contentType,
         const QByteArray& contentEncoding, const QByteArray& multipartBoundary,
-        bool isUndefinedContentLength = false, bool displayDebug = false);
+        bool displayDebug = false, bool isUndefinedContentLength = false);
 
     void sendResponse(int httpStatusCode, const QByteArray& contentType,
         const QByteArray& contentEncoding = {}, const QByteArray& multipartBoundary = {},
-        bool isUndefinedContentLength = false, bool displayDebug = false);
+        bool displayDebug = false, bool isUndefinedContentLength = false);
 
     QString codeToMessage(int code);
 

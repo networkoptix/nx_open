@@ -240,25 +240,10 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
-/*
-            {
-                // TODO: change this
-                for (const auto bookmark: bookmarks)
-                    qnCameraBookmarksManager->addCameraBookmark(bookmark);
-
-                static constexpr int kHintTimeoutMs = 5000;
-                const auto message = bookmarks.count() == 1
-                    ? tr("Bookmark created")
-                    : tr("%n bookmarks created", "", bookmarks.count());
-                QnGraphicsMessageBox::information(message, kHintTimeoutMs);
-
-                action(action::BookmarksModeAction)->setChecked(true);
-            });
-    */
-
-void QnNotificationsCollectionWidget::handleShowPopupAction(
-    const vms::event::AbstractActionPtr& action,
-    QnNotificationWidget* widget)
+void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
+    QnNotificationWidget* widget,
+    const QnVirtualCameraResourcePtr& camera,
+    const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
     {
@@ -269,14 +254,21 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
         return;
 
-    const auto params = action->getParams();
-    if (!params.requireConfirmation(action->getRuntimeParams().eventType))
+    const auto actionParams = action->getParams();
+    if (!actionParams.requireConfirmation(action->getRuntimeParams().eventType))
         return;
 
-    widget->setCloseButtonUnavailable();
+    if (!camera)
+        return;
+
+    NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
+    if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
+        return
+
+    widget->setCloseButtonAvailable(false);
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
     widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
-        [this, action]()
+        [this, camera, action]()
         {
             auto& actionParams = action->getParams();
             actionParams.recordBeforeMs = 0;
@@ -286,9 +278,11 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
 
             // Action will trigger additional event loop, which will cause problems here.
             executeDelayedParented(
-                [this, action]
+                [this, camera, action]
                 {
-                    menu()->trigger(action::AcknowledgeEventAction, {Qn::ActionDataRole, action});
+                    action::Parameters params(camera);
+                    params.setArgument(Qn::ActionDataRole, action);
+                    menu()->trigger(action::AcknowledgeEventAction, params);
                 }, kDefaultDelay, this);
         });
 
@@ -346,15 +340,17 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         && params.reasonCode == vms::event::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
-        for (const QString& stringId : params.description.split(L';'))
+        for (const QString& stringId: params.description.split(L';'))
         {
             QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
             if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
-                tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
+            {
+                if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                    tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
+            }
         }
     }
-
 
     QnNotificationWidget* item = new QnNotificationWidget(m_list);
     item->setText(title);
@@ -367,6 +363,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
     switch (action->actionType())
     {
+        // TODO: #GDM not the best place for it.
         case vms::event::playSoundAction:
         {
             QString soundUrl = action->getParams().url;
@@ -374,9 +371,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
             break;
         }
-        case vms::event::showPopupAction:
-            handleShowPopupAction(action, item);
-            break;
         default:
             break;
     };
@@ -406,6 +400,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
+                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -418,6 +413,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
+                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -431,6 +427,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
+                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -483,6 +480,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                         action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
+                    addAcknoledgeButtonIfNeeded(item, sourceCameras.first(), action);
                 }
                 break;
             }
@@ -505,12 +503,8 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
     const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
-    const bool isAcknowledgmentAction =
-        action->actionType() == vms::event::showPopupAction
-        && action->getParams().requireConfirmation(action->getRuntimeParams().eventType)
-        && context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
 
-    const bool isLockedItem = isPlaySoundAction || isAcknowledgmentAction;
+    const bool isLockedItem = isPlaySoundAction || !item->isCloseButtonAvailable();
     m_list->addItem(item, isLockedItem);
 }
 

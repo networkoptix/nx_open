@@ -236,7 +236,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
 
 QByteArray QnTCPConnectionProcessor::createResponse(
     int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
-    const QByteArray& multipartBoundary, bool isUndefinedContentLength, bool displayDebug)
+    const QByteArray& multipartBoundary, bool displayDebug, bool isUndefinedContentLength)
 {
     Q_D(QnTCPConnectionProcessor);
     d->response.statusLine.version = d->request.requestLine.version;
@@ -289,11 +289,11 @@ QByteArray QnTCPConnectionProcessor::createResponse(
 
 void QnTCPConnectionProcessor::sendResponse(
     int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
-    const QByteArray& multipartBoundary, bool isUndefinedContentLength, bool displayDebug)
+    const QByteArray& multipartBoundary, bool displayDebug, bool isUndefinedContentLength)
 {
     Q_D(QnTCPConnectionProcessor);
     auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary,
-        isUndefinedContentLength, displayDebug);
+        displayDebug, isUndefinedContentLength);
 
     QnMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());

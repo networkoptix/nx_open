@@ -12,10 +12,6 @@
             </div>
         </div>
     </div>
-    <camera-links ng-if="cameraLinksEnabled" system="system"
-                  position="positionProvider.playedPosition"
-                  live-mode="positionProvider.liveMode"
-                  active-camera="activeCamera" player="player" current-resolution="currentResolution"></camera-links>
     <ul class="tree nav" >
         <li ng-repeat="server in mediaServers" ng-if="server.visible">
             <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "

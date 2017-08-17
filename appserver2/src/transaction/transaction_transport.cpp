@@ -107,7 +107,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+                httpClient->setAuthType(nx_http::AuthType::authDigestWithPasswordHash);
             }
         }
         else

@@ -99,6 +99,8 @@ upgradeVms()
         installDeb libvdpau 0.4.1
         installDeb fontconfig 2.11
         installDeb fonts-takao-mincho ""
+        installDeb fonts-baekmuk "" || return $?
+        installDeb fonts-arphic-ukai "" || return $?
 
         touch "/dev/cedar_dev"
         chmod 777 "/dev/disp"

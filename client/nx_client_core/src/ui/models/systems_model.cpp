@@ -11,6 +11,8 @@
 #include <network/connection_validator.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 
 namespace
 {
@@ -157,7 +159,11 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             QString hosts;
             for (const auto& moduleInfo : system->servers())
             {
-                hosts.append(system->getServerHost(moduleInfo.id).host());
+                const auto host = system->getServerHost(moduleInfo.id).host();
+                if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
+                    continue;
+
+                hosts.append(host);
                 hosts.append(lit(" "));
             }
 

@@ -26,7 +26,9 @@ function(detect_package_versions)
 
     if(MACOSX)
         set(_qt_version "5.6.2-2")
-        set(_quazip_version "0.7.2")
+        set(_ffmpeg_version "3.1.1-2")
+        set(_openssl_version "1.0.2e-2")
+        set(_quazip_version "0.7.3")
         set(_festival_version "2.1")
     endif()
 

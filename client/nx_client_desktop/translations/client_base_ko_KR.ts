@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>처음부터 북마크를 재생</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>북마크 편집</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>북마크 삭제</translation>
     </message>
   </context>
   <context>
@@ -410,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>비디오 월 열기</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -1316,10 +1316,6 @@ to view more bookmarks</source>
       <translation>선택된 정보 파일로 저장</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>감사 로고 재생</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>장치</translation>
     </message>
@@ -1392,6 +1388,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>이 리소스는 시스템에서 제거 됩니다.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

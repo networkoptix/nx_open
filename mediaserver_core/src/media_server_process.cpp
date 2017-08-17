@@ -309,7 +309,7 @@ const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode")
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
-static QString kLogTag = toString(typeid(MediaServerProcess));
+static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -888,7 +888,7 @@ void MediaServerProcess::saveStorages(
     ec2::ErrorCode rez;
     while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
-        NX_WARNING(this) "Call to change server's storages failed. Reason: " << rez;
+        NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 }
@@ -1038,19 +1038,14 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 {
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
-        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
-#ifdef _DEBUG
-        "DEBUG"
-#else
-        "INFO"
-#endif
-    );
-    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL,
-        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
-        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
-        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
+        lit("Supported values: none (no logging), always, error, warning, info, debug, verbose. Default: ")
+        + toString(nx::utils::log::kDefaultLevel));
+
+    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.hwLogLevel, "--hw-log-level", NULL, "Log value for hw_log.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,"Log value for permissions.log.");
+
     commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&m_cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -1101,16 +1096,6 @@ void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings
 
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
         m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
-
-    if (m_cmdLineArguments.httpLogLevel.isEmpty())
-        m_cmdLineArguments.httpLogLevel = settings->roSettings()->value(
-            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
-            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
-
-    if (m_cmdLineArguments.ec2TranLogLevel.isEmpty())
-        m_cmdLineArguments.ec2TranLogLevel = settings->roSettings()->value(
-            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
-            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL).toString();
 }
 
 MediaServerProcess::~MediaServerProcess()
@@ -1935,7 +1920,7 @@ bool MediaServerProcess::initTcpListener(
     bool acceptSslConnections = true;
     int maxConnections = qnServerModule->roSettings()->value(
         "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
-    NX_INFO(this) lit("Using maxConnections = %1.").arg(maxConnections);
+    NX_INFO(this) << lit("Using maxConnections = %1.").arg(maxConnections);
 
     m_universalTcpListener = new QnUniversalTcpListener(
         commonModule(),
@@ -2310,9 +2295,9 @@ void MediaServerProcess::serviceModeInit()
     logSettings.directory = settings->value("logDir").toString();
     logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
     logSettings.updateDirectoryIfEmpty(getDataDirectory());
-    logSettings.level.parse(cmdLineArguments().logLevel,
-        settings->value("logLevel").toString());
 
+    logSettings.level.parse(cmdLineArguments().logLevel,
+        settings->value("logLevel").toString(), toString(nx::utils::log::kDefaultLevel));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath);
 
@@ -2321,25 +2306,26 @@ void MediaServerProcess::serviceModeInit()
     else
         settings->remove("logFile");
 
-    logSettings.level.parse(
-        cmdLineArguments().httpLogLevel, settings->value("http-log-level").toString());
-
+    logSettings.level.parse(cmdLineArguments().httpLogLevel,
+        settings->value("http-log-level").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level.reset();
-    logSettings.level.parse(
-        cmdLineArguments().ec2TranLogLevel, settings->value("tranLogLevel").toString());
+    logSettings.level.parse(cmdLineArguments().hwLogLevel,
+        settings->value("hwLogLevel").toString(), toString(nx::utils::log::Level::info));
+    nx::utils::log::initialize(
+        logSettings, qApp->applicationName(), binaryPath,
+        QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
+    logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
+        settings->value("tranLogLevel").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level.reset();
-    logSettings.level.parse(
-        cmdLineArguments().permissionsLogLevel, settings->value("permissionsLogLevel").toString());
-
+    logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
+        settings->value("permissionsLogLevel").toString(), toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));

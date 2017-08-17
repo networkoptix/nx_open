@@ -64,11 +64,16 @@ TEST(LogLevel, ToString)
     ASSERT_EQ("notConfigured", toString(Level::notConfigured));
 }
 
-void testParsing(const QString& s, Level p, LevelFilters f = {})
+void testParsing(const QString& s, Level p, std::map<const char*, Level> fs = {})
 {
     LevelSettings settings;
     settings.parse(s);
-    EXPECT_EQ(LevelSettings(p, f), settings) << s.toStdString();
+
+    LevelFilters filters;
+    for (const auto& f: fs)
+        filters.emplace(Tag(QString::fromUtf8(f.first)), f.second);
+
+    EXPECT_EQ(LevelSettings(p, filters), settings) << s.toStdString();
 }
 
 TEST(LogLevelSettings, Parse)

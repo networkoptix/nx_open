@@ -38,7 +38,9 @@ extern const char* const kMaintenanceGetVmsConnections;
 extern const char* const kMaintenanceGetTransactionLog;
 extern const char* const kMaintenanceGetStatistics;
 
-extern const char* const kCloudModuleXmlPath;
+extern const char* const kDeprecatedCloudModuleXmlPath;
+
+extern const char* const kDiscoveryCloudModuleXmlPath;
 
 } // namespace cdb
 } // namespace nx

@@ -30,6 +30,8 @@ public:
         const api::ConnectToPeerRequest& request,
         ConnectToPeerHandler completionHandler) override;
 
+    virtual void onBestEndpointDiscovered(std::string /*endpoint*/) override {};
+
 private:
     utils::SyncQueue<api::BeginListeningRequest>* m_receivedBeginListeningRequests;
     utils::SyncQueue<api::CreateClientSessionRequest>* m_receivedCreateClientSessionRequests;

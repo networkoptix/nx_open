@@ -113,8 +113,8 @@ void BasicTestFixture::startRelay(int index)
 {
     auto newRelay = std::make_unique<Relay>();
 
-    std::string hostString = "0.0.0.0:0";
-    newRelay->addArg("-http/listenOn", hostString.c_str());
+    std::string endpointString = "0.0.0.0:0";
+    newRelay->addArg("-http/listenOn", endpointString.c_str());
 
     std::string dataDirString = std::string("relay_") + std::to_string(index);
     newRelay->addArg("-dataDir", dataDirString.c_str());
@@ -135,7 +135,7 @@ void BasicTestFixture::SetUp()
 {
     setUpConnectSessionManagerFactoryFunc();
     startRelays();
-    ASSERT_GE(m_relays.size(), 1);
+    ASSERT_GE(m_relays.size(), 1U);
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());

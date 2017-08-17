@@ -304,9 +304,27 @@ void ConnectSessionManager::startRelaying(RelaySession relaySession)
         {std::move(listeningPeerChannel), relaySession.listeningPeerName});
 }
 
-void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
+void ConnectSessionManager::onBestEndpointDiscovered(std::string publicAddress)
 {
     nx::utils::SubscriptionId subscriptionId;
+
+    subscribeForPeerConnected(&subscriptionId, std::move(publicAddress));
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+
+    subscribeForPeerDisconnected(&subscriptionId);
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
+    }
+}
+
+void ConnectSessionManager::subscribeForPeerConnected(
+    nx::utils::SubscriptionId* subscriptionId,
+    std::string publicAddress)
+{
     m_listeningPeerPool->peerConnectedSubscription().subscribe(
         [this, publicAddress = std::move(publicAddress)](std::string peer)
         {
@@ -328,13 +346,11 @@ void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
                         return cf::unit();
                     });
         },
-        &subscriptionId);
+        subscriptionId);
+}
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-    }
-
+void ConnectSessionManager::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId)
+{
     m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
         [this](std::string peer)
         {
@@ -356,13 +372,9 @@ void ConnectSessionManager::onPublicAddressDiscovered(std::string publicAddress)
                         return cf::unit();
                     });
         },
-        &subscriptionId);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-    }
+        subscriptionId);
 }
+
 
 //-------------------------------------------------------------------------------------------------
 // ConnectSessionManagerFactory

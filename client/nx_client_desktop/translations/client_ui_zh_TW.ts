@@ -137,34 +137,6 @@
     </message>
   </context>
   <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>新增外部儲存...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>版本:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>檢查</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>未檢查</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>取得安裝的版本</translation>
-    </message>
-  </context>
-  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -462,6 +434,11 @@
       <source>Event Log...</source>
       <translation>事件日誌...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation type="unfinished">Test</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +560,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>進階設定不可用</translation>
     </message>
@@ -1642,7 +1614,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>幻燈片週期</translation>
     </message>
   </context>
   <context>

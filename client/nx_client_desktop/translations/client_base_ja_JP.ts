@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>ブックマークを最初から再生する</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>ブックマークの編集</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>ブックマークを削除</translation>
     </message>
   </context>
   <context>
@@ -410,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>ビデオウォールを開く</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -430,7 +430,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>ビデオウォールの保存</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -562,7 +562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>編集...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -854,31 +854,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>ブックマークログ</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>シーケンス表示...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>新規シーケンス表示...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>シーケンス表示から削除</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>シーケンス表示開始</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>シーケンス表示停止</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>シーケンス表示作成</translation>
     </message>
   </context>
   <context>
@@ -940,35 +940,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>ライセンスがありません</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>ライセンスは無効です</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>ライセンスはアクティブではありません</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>無効なライセンス</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>ライセンスは試用版です</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>保留中のライセンスは非アクティブ状態ですが、まだ非アクティブ化されていません</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>非アクティブの数がこのライセンスの上限を超えました</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>このサーバーのハードウェアIDは、ライセンスがアクティブ化されたハードウェアIDと一致しません</translation>
     </message>
   </context>
   <context>
@@ -1030,15 +1030,15 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>パス&quot;%1&quot; は無効です　別のパスを試してください</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>ファイル&quot;%1&quot; は既に存在します　別の名前をお試しください</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています　別の名前をお試しください</translation>
     </message>
   </context>
   <context>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>カメラから現在位置を取得できません&quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1119,7 +1119,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>カメラの現在位置を設定できません&quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1316,10 +1316,6 @@ to view more bookmarks</source>
       <translation>ファイルにエクスポート</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>操作履歴ログ再表示</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>デバイス</translation>
     </message>
@@ -1392,6 +1388,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>これらのリソースはシステムから削除されます</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -1563,7 +1563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>バックアップでは、このサーバでカメラが設定されていない場合、そのアーカイブはバックアップされません</translation>
     </message>
   </context>
   <context>
@@ -1649,7 +1649,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>説明は空にできません</translation>
     </message>
   </context>
   <context>
@@ -1716,7 +1716,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>ブックマークの管理</translation>
     </message>
   </context>
   <context>
@@ -1879,7 +1879,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation type="unfinished">Restore all rules to default?</translation>
+      <translation>すべてのルールを既定に戻しますか？</translation>
     </message>
   </context>
   <context>
@@ -2082,11 +2082,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation type="unfinished">I/O Module Id</translation>
+      <translation>I/O モジュール Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>カメラ Id</translation>
     </message>
   </context>
   <context>
@@ -2330,7 +2330,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+      <translation>このカメラのモーション感度設定の最大数は%1で、現在%2の設定が選択されています</translation>
     </message>
   </context>
   <context>
@@ -2419,7 +2419,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>サポートされていることを確認して有効にするには、カメラ設定の&quot;Motion&quot;タブにアクセスしてください</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
@@ -2435,7 +2435,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>有効または調整するには、カメラ設定の&quot;Motion&quot;タブに移動します</translation>
     </message>
   </context>
   <context>
@@ -2850,7 +2850,7 @@ to %1</source>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
-      <translation type="unfinished">This user is disabled by system administrator.</translation>
+      <translation>このユーザーはシステム管理者によって無効になっています</translation>
     </message>
   </context>
   <context>
@@ -2970,7 +2970,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -3001,15 +3001,15 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>44.1 kHzと48 kHzのオーディオ形式は、オーディオキャプチャデバイスではサポートされていません　別のオーディオデバイスを選択するか、スクリーン録画設定で&quot;なし&quot;を選択してください</translation>
     </message>
   </context>
   <context>
@@ -3184,13 +3184,13 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n削除したサブジェクト</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>サブジェクト削除</translation>
     </message>
   </context>
   <context>
@@ -3464,7 +3464,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3497,7 +3497,7 @@ to %1</source>
     <name>QnLayoutExportTool</name>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>&quot;%1&quot; にエクスポート中...</translation>
     </message>
     <message>
       <source>Could not export device %1.</source>
@@ -3522,7 +3522,7 @@ to %1</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています　別の名前をお試しください</translation>
     </message>
   </context>
   <context>
@@ -3678,7 +3678,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation type="unfinished">Locked to Hardware Id</translation>
+      <translation>ハードウェアID</translation>
     </message>
   </context>
   <context>
@@ -3854,52 +3854,52 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>ライセンスを無効にしますか？</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to deactivate license</source>
-      <translation type="unfinished">Failed to deactivate license</translation>
+      <translation>ライセンスの無効化に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>%nライセンスの無効化に失敗しました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%n ライセンスの %1 を無効化することはできません</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>ライセンスを無効にできません</numerusform>
       </translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>ライセンスサーバーに接続できません</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation>サーバーがインターネットに接続されているか、ファイアウォールの設定を確認してください</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation type="unfinished">License Server error</translation>
+      <translation>ライセンスサーバーエラー</translation>
     </message>
     <message>
       <source>License deactivated</source>
-      <translation type="unfinished">License deactivated</translation>
+      <translation>ライセンス無効</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%nライセンス無効</numerusform>
       </translation>
     </message>
     <message>
@@ -3908,22 +3908,22 @@ to %1</source>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation type="unfinished">Deactivate</translation>
+      <translation>無効化</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%nチャンネル</numerusform>
       </translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>サポートにお問合せください.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>無効化%nその他</numerusform>
       </translation>
     </message>
     <message>
@@ -3932,27 +3932,27 @@ to %1</source>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+      <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
     </message>
     <message>
       <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+      <translation>手動でライセンス キーをアクティベートするにはカスタマー サポートに連絡してください</translation>
     </message>
     <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+      <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+      <translation>このライセンスは既にアクティベートされハードウェア Id %1 にリンクされています</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+      <translation>このライセンスは既にアクティベートされ %2 のハードウェア Id %1 にリンクされています</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+      <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
     </message>
   </context>
   <context>
@@ -3979,11 +3979,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
     </message>
   </context>
   <context>
@@ -4227,7 +4227,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1（ツアー&quot;%2&quot; が有効）</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4243,12 +4243,12 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+      <translation>トリガ%1（%2）の呼び出しに失敗しました</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>押したまま</translation>
     </message>
   </context>
   <context>
@@ -4303,7 +4303,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>データベースの同期が完了すると、他のシステムのサーバーがリソースツリーに表示されます</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
@@ -4341,7 +4341,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+      <translation>録画を&quot;常時&quot;に設定する</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -4353,7 +4353,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+      <translation>&quot;モーション+低解像度&quot;録画オプションを設定できません</translation>
     </message>
   </context>
   <context>
@@ -4395,15 +4395,15 @@ to %1</source>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation type="unfinished">B/s</translation>
+      <translation>B/s</translation>
     </message>
     <message>
       <source>MB/s</source>
-      <translation type="unfinished">MB/s</translation>
+      <translation>MB/s</translation>
     </message>
     <message>
       <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
@@ -4481,7 +4481,7 @@ to %1</source>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>承認</translation>
     </message>
   </context>
   <context>
@@ -4539,14 +4539,14 @@ to %1</source>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+      <translation>PTZ、デバイス出力、双方向オーディオ、ソフトトリガー</translation>
     </message>
   </context>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>ブックマークの管理</translation>
     </message>
   </context>
   <context>
@@ -4663,11 +4663,11 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+      <translation>プリセット&quot;%1&quot; で使用されているホットキー</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+      <translation>ツアー&quot;%1&quot; で使用されているホットキー</translation>
     </message>
   </context>
   <context>
@@ -4892,35 +4892,35 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation type="unfinished">Role %1 has no %2 permission</translation>
+      <translation>役割%1には%2権限がありません</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected roles have no %1 permission</translation>
+      <translation>選択した役割には%1権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>選択した%1個のうち%n個の役割に%2権限がありません</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permission</translation>
+      <translation>ユーザー%1には%2権限がありません</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected users have no %1 permission</translation>
+      <translation>選択したユーザーには%1権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>選択した%1個のうち%n個のユーザーに%2権限がありません</numerusform>
       </translation>
     </message>
   </context>
@@ -5020,11 +5020,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>シーケンス表示</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>シーケンス表示</translation>
     </message>
   </context>
   <context>
@@ -5118,11 +5118,11 @@ to %1</source>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>登録日時</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>登録ユーザー</translation>
     </message>
   </context>
   <context>
@@ -5211,27 +5211,27 @@ to %1</source>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation type="unfinished">User %1 has invalid email address</translation>
+      <translation>ユーザー %1 の無効なメール アドレス</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%1 ユーザーの %n は、無効なEmailアドレスです</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>無効なメール アドレス %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%1 中の%n 追加Emailアドレスは有効ではありません</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation type="unfinished">Send email to %1</translation>
+      <translation>%1 にメールを送信</translation>
     </message>
   </context>
   <context>
@@ -5557,7 +5557,7 @@ to %1</source>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation type="unfinished">Html tags could be used within custom text:
+      <translation>Html タグはカスタムテキストで使用します:
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
   </context>
@@ -5620,7 +5620,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+      <translation>録画を&quot;常時&quot;に設定する</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -5636,7 +5636,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+      <translation>&quot;モーション+低解像度&quot;録画オプションを設定できません</translation>
     </message>
   </context>
   <context>
@@ -5706,7 +5706,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
+      <translation>プリセットが見つかりません &quot;アドバンス&quot;オプションを使用してください</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5908,7 +5908,7 @@ to %1</source>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation type="unfinished">Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</translation>
+      <translation>バックアップを有効にするには、上記のストレージの一部を&quot;メイン&quot;から&quot;バックアップ&quot;に変更してください</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -5936,11 +5936,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>アーカイブバックアップは&lt;b&gt;%1&lt;/b&gt;まで完了</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>次のバックアップは&lt;b&gt;%1&lt;/b&gt;にスケジュールされています</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6031,7 +6031,7 @@ to %1</source>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>容量が小さくて、他に十分な領域があるストレージがある場合には書込み先として使用されません</translation>
     </message>
   </context>
   <context>
@@ -6057,7 +6057,7 @@ to %1</source>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\ &lt; コンピューター名 &gt; \ &lt; フォルダー &gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
@@ -6216,56 +6216,56 @@ to %1</source>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+      <translation>%1 をチェックしてください &amp;mdash; 何処からでもサーバーに接続可能!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+      <translation>システム通知メールを受信できません</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+      <translation>システム通知メールを受信できません</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>Email送信中のエラー</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>リモートアーカイブの同期が開始されました</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>リモートアーカイブの同期が完了しました</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>リモートアーカイブの同期が進行中です</translation>
     </message>
     <message>
       <source>Error occured during remote archive synchronization</source>
-      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+      <translation>リモートアーカイブの同期中にエラーが発生しました</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>次のデバイスのリモートアーカイブ同期が開始されました：</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>次のデバイスのリモートアーカイブ同期が完了しました：</translation>
     </message>
   </context>
   <context>
@@ -6329,15 +6329,15 @@ to %1</source>
     <name>QnTimeServerSelectionWidget</name>
     <message>
       <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
+      <translation>システム時間はインターネットと同期され、サーバーの現地時間とは関係ありません</translation>
     </message>
     <message>
       <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+      <translation>システム時間は、選択されたサーバーの現地時間と同期され、他のサーバーから独立しています</translation>
     </message>
     <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
+      <translation>インターネットにアクセスできるサーバーはありません　時間は同期されていません</translation>
     </message>
   </context>
   <context>
@@ -6353,27 +6353,27 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation type="unfinished">hh:mm</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation type="unfinished">dd</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation type="unfinished">MMMM</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
@@ -6398,22 +6398,22 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h:mm ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6731,7 +6731,7 @@ to %1</source>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>このユーザーはまだ%1にサインアップしていません</translation>
     </message>
   </context>
   <context>
@@ -6786,7 +6786,7 @@ to %1</source>
     </message>
     <message>
       <source>Cloud user with specified email already exists.</source>
-      <translation type="unfinished">Cloud user with specified email already exists.</translation>
+      <translation>そのEmailのクラウド ユーザーは既に存在します</translation>
     </message>
   </context>
   <context>
@@ -6828,7 +6828,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+      <translation>&quot;%1&quot; を削除しますか？</translation>
     </message>
   </context>
   <context>
@@ -6875,11 +6875,11 @@ to %1</source>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>URLは空にできません</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation type="unfinished">Wrong URL format.</translation>
+      <translation>URL形式が間違っています</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -6974,7 +6974,7 @@ to %1</source>
     </message>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>&quot;%1&quot; にエクスポート中...</translation>
     </message>
     <message>
       <source>Export Layout As...</source>
@@ -7157,15 +7157,15 @@ to %1</source>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation type="unfinished">Connecting to the current System...</translation>
+      <translation>システムに接続...</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>データベースの同期が完了すると、リソースツリーに表示されます</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
-      <translation type="unfinished">Server will be connected to System shortly</translation>
+      <translation>サーバーはすぐにシステムに接続されます</translation>
     </message>
   </context>
   <context>
@@ -7408,11 +7408,11 @@ to %1</source>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>新規ウェブページ</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation type="unfinished">Edit Web Page</translation>
+      <translation>ウェブページの編集</translation>
     </message>
   </context>
   <context>
@@ -7563,16 +7563,16 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>既存のシーケンス表示を上書きしますか？</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>同じ名前の別のシーケンス表示があります</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>シーケンス表示から%nアイテムを削除しますか？</numerusform>
       </translation>
     </message>
   </context>
@@ -7635,12 +7635,12 @@ to %1</source>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>コピー</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>貼付け</translation>
     </message>
   </context>
   <context>
@@ -7654,7 +7654,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>レイアウトやカメラをドラッグしてシーケンス表示に追加する</translation>
     </message>
   </context>
   <context>
@@ -7665,7 +7665,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>カスタムユーザー</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -7676,11 +7676,11 @@ to %1</source>
     <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
+      <translation>ホットキーで切替え</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
+      <translation>時間で切替え</translation>
     </message>
   </context>
   <context>
@@ -7700,7 +7700,7 @@ to %1</source>
     <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+      <translation>自分とライセンスを無効化する理由をご記入ください。</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7708,11 +7708,11 @@ to %1</source>
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
+      <translation>名前が必要です</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
+      <translation>理由が必要です</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7724,30 +7724,30 @@ to %1</source>
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>無効化の理由</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- いずれかを選択 -</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>誤って別のPCにライセンスを割り当てた</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>その他の理由</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>PCをアップグレードしています</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>ライブ</translation>
     </message>
   </context>
   <context>
@@ -7772,24 +7772,24 @@ to %1</source>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>サーバー&quot;%1&quot; は応答していません</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>サーバー&quot;%1&quot; は%nデバイスにアクセスできません　移動しますか？</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>サーバー&quot;%1&quot; は%nカメラにアクセスできません　移動しますか？</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>サーバー&quot;%1&quot; は%n Ioモジュールにアクセスできません　移動しますか？</numerusform>
       </translation>
     </message>
     <message>
@@ -7935,41 +7935,41 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <translation>キーボードの矢印キーでカメラの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
     <message>
       <source>Switch by %1</source>
-      <translation type="unfinished">Switch by %1</translation>
+      <translation>%1で切替え</translation>
     </message>
     <message>
       <source>Display for</source>
-      <translation type="unfinished">Display for</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>Display selected for</source>
-      <translation type="unfinished">Display selected for</translation>
+      <translation>表示</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Delete layout tour %1?</source>
-      <translation type="unfinished">Delete layout tour %1?</translation>
+      <translation>レイアウトツアー%1を削除しますか？</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>シーケンス表示</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>シーケンス表示 %1</translation>
     </message>
   </context>
   <context>

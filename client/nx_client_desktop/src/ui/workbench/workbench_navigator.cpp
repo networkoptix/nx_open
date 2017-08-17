@@ -40,6 +40,7 @@ extern "C"
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/pending_operation.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 
@@ -64,7 +65,6 @@ extern "C"
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
-#include <utils/common/pending_operation.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/string.h>
 #include <utils/common/synctime.h>
@@ -138,7 +138,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
-    m_sliderBookmarksRefreshOperation(new QnPendingOperation([this]() { updateSliderBookmarks(); }, kUpdateBookmarksInterval, this)),
+    m_sliderBookmarksRefreshOperation(
+        new nx::utils::PendingOperation(
+            [this]{ updateSliderBookmarks(); },
+            kUpdateBookmarksInterval,
+            this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0),
     m_hasArchive(false),
@@ -1527,9 +1531,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
             {
                 qint64 delta = timeMSec - m_animatedPosition;
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() || delta * speed() < 0)
+
+                // See VMS-2657
+                const bool canOmitAnimation = m_currentWidget
+                    && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
+                    && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
+
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                    (canOmitAnimation && delta * speed() < 0))
                 {
-                    /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
+                    // If distance is less than 1 pixel or we catch up backwards on
+                    // local media file do it instantly
                     m_animatedPosition = timeMSec;
                     timelineAdvance(timeMSec);
                 }

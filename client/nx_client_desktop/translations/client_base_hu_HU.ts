@@ -859,27 +859,27 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Új showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Eltávolítás a showreelből</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Showreel indítása</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Showreel leállítása</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Showreel készítése</translation>
     </message>
   </context>
   <context>
@@ -1318,10 +1318,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Kiválasztott felvételek exportálása fájlba</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Audit napló visszajátszás</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Eszközök</translation>
     </message>
@@ -1399,6 +1395,10 @@ több könyvjelző megjelenítéséhez</translation>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -2352,7 +2352,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+      <translation>A maximális mozgásérzékenység beállítások száma bármennyi szenzor esetén erre a kamera %1, és %2 már ki van jelölve.</translation>
     </message>
   </context>
   <context>
@@ -5080,11 +5080,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreelek</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
   </context>
   <context>
@@ -6440,47 +6440,47 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>éééé</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>nn HHHH éééé óó:pp</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>nn HHHH éééé óó:pp</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>nn HHHH éééé ó ap</translation>
+      <translation>yyyy MMMM dd h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>nn HHHH éééé</translation>
+      <translation>yyyy MMMM dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>HHHH éééé</translation>
+      <translation>yyyy MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>éééé</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h:mm ap</translation>
+      <translation>ó:pp ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>yyyy MMMM dd hh:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6804,7 +6804,7 @@ to %1</source>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Ez a felhasználó még nem jelentkezett be %1 felhőre</translation>
     </message>
   </context>
   <context>
@@ -7659,17 +7659,17 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Felülírja a meglévő showreelt?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Ugyanezzel a névvel már létezik egy showreel.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
+        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
       </translation>
     </message>
   </context>
@@ -7752,7 +7752,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Húzza az elrendezést vagy a kamerát a showreelhez</translation>
     </message>
   </context>
   <context>
@@ -8040,11 +8040,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Elrendezések váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <translation>Kamerák váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
   </context>
   <context>
@@ -8070,11 +8070,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>%1 showreel</translation>
     </message>
   </context>
   <context>

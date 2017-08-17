@@ -74,38 +74,6 @@ private:
     boost::optional<SocketFactory::CreateStreamServerSocketFuncType> m_createStreamServerSocketFunc;
 };
 
-
-class TestHandler:
-    public nx_http::AbstractHttpRequestHandler
-{
-public:
-    TestHandler(const nx_http::StringType& mimeType, QByteArray response)
-    :
-        m_mimeType(mimeType),
-        m_response(std::move(response))
-    {
-    }
-
-    virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        const nx_http::Request& /*request*/,
-        nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
-    {
-        completionHandler(
-            nx_http::StatusCode::ok,
-            std::unique_ptr< nx_http::AbstractMsgBodySource >() );
-    }
-
-private:
-    const nx_http::StringType m_mimeType;
-    const QByteArray m_response;
-};
-
-
 namespace {
 
 void onAcceptedConnection(
@@ -129,17 +97,6 @@ TEST_F(SocketUdt, cancelConnect)
     serverSocket.listen();
     using namespace std::placeholders;
     serverSocket.acceptAsync(std::bind(onAcceptedConnection, &serverSocket, _1, _2));
-
-    //TestHttpServer testHttpServer;
-    //ASSERT_TRUE(testHttpServer.bindAndListen());
-    //testHttpServer.registerRequestProcessor< TestHandler >(
-    //    "/test",
-    //    []() -> std::unique_ptr< TestHandler >
-    //    {
-    //        return std::make_unique< TestHandler >(
-    //            "application/octet-stream",
-    //            QByteArray());
-    //    });
 
     for (int i = 0; i < 100; ++i)
     {
@@ -498,6 +455,8 @@ TEST_F(SocketUdt, allDataReadAfterFin)
     for (int i = 0; i < 2; ++i)
     {
         UdtStreamServerSocket server(AF_INET);
+        auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
+
         ASSERT_TRUE(server.setNonBlockingMode(true));
         ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(server.listen());
@@ -562,8 +521,6 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         const auto recvBuffer = readNBytes(acceptedSocket.get(), testMessage.size());
         ASSERT_EQ(testMessage, recvBuffer)
             << SystemError::getLastOSErrorText().toStdString();
-
-        server.pleaseStopSync();
     }
 }
 
@@ -613,7 +570,7 @@ protected:
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         socketConfig(socket.get());
         EXPECT_TRUE((bool) socket->connect(address));
-        return std::move(socket);
+        return socket;
     }
 
     std::unique_ptr<AbstractStreamSocket> accept() const
@@ -630,7 +587,7 @@ protected:
         EXPECT_TRUE(socket->bind(SocketAddress::anyPrivateAddress));
         EXPECT_TRUE(socket->setSendBufferSize(4 * 1024 * 1024));
         EXPECT_TRUE(socket->setRecvBufferSize(4 * 1024 * 1024));
-        return std::move(socket);
+        return socket;
     }
 
     void socketConfig(AbstractSocket* /*socket*/) const

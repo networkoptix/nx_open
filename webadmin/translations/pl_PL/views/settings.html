@@ -43,7 +43,7 @@
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>Uruchom ponownie</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
@@ -58,7 +58,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Zmień hasło</button>
                             </div>
                         </form>
                     </div>
@@ -126,8 +126,8 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Time zone</label></td>
-                                        <td><label for="date">Date</label></td>
-                                        <td><label for="time">Time</label></td>
+                                        <td><label for="date">Data</label></td>
+                                        <td><label for="time">Czas</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

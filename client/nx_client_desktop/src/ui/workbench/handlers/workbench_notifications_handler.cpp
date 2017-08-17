@@ -11,14 +11,16 @@
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
+
 #include <common/common_module.h>
-#include <core/resource/resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/camera_bookmark.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/media_server_resource.h>
+
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -45,22 +47,6 @@ using namespace nx::client::desktop::ui;
 namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
-
-QnCameraBookmark extractBookmarkFromAction(
-    const nx::vms::event::AbstractActionPtr& action,
-    QnCommonModule* commonModule)
-{
-    const auto resourcePool = commonModule->resourcePool();
-    const auto cameraResourceId = action->getRuntimeParams().eventResourceId;
-    const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(cameraResourceId);
-    if (!camera)
-    {
-        NX_EXPECT(false, "Invalid camera resource");
-        return QnCameraBookmark();
-    }
-
-    return helpers::bookmarkFromAction(action, camera, commonModule);
-}
 
 } // namespace
 
@@ -146,8 +132,9 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto actionParams = menu()->currentParameters(sender());
     const auto businessAction =
         actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
+    const auto camera = actionParams.resource().dynamicCast<QnVirtualCameraResource>();
 
-    auto bookmark = extractBookmarkFromAction(businessAction, commonModule());
+    auto bookmark = helpers::bookmarkFromAction(businessAction, camera);
     if (!bookmark.isValid())
         return;
 
@@ -191,7 +178,8 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     bookmark.creatorId = currentUserId;
     bookmark.creationTimeStampMs = currentTimeMs;
 
-    qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction, creationCallback);
+    qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction->getRuleId(),
+        creationCallback);
 
     // Hiding notification instantly to keep UX smooth.
     emit notificationRemoved(businessAction);
@@ -206,14 +194,6 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
 {
     vms::event::EventParameters params = action->getRuntimeParams();
     vms::event::EventType eventType = params.eventType;
-
-    const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-
-    if (!isAdmin)
-    {
-        if (eventType == vms::event::licenseIssueEvent || eventType == vms::event::networkIssueEvent)
-            return;
-    }
 
     if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
     {

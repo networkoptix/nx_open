@@ -103,6 +103,8 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
                 return;
             }
 
+            NX_ASSERT(socket);
+
             acceptTunnel(connection);
 
             {

@@ -188,7 +188,8 @@ void QnRestConnectionProcessor::run()
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
 
     sendResponse(response.statusCode, response.content.type, contentEncoding,
-        QByteArray(), response.isUndefinedContentLength);
+        /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
+        response.isUndefinedContentLength);
 
     if (handler)
         handler->afterExecute(request, response.content.body);

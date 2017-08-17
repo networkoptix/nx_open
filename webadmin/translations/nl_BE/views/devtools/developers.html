@@ -1,0 +1,64 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div>
+        <h2>Developer tools</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Geef feedback</a></p>
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Generic Events Generator</h3>
+        <p>
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
+    </div>
+    <div>
+        <h3>Server API</h3>
+        <p>
+            De server API biedt een standaard set van API calls voor 3rd party systemen. Het geeft ontwikkelaars de mogelijkheid om bijna elk systeem-functie die beschikbaar is in de client: systeembronnen (servers, camera's, gebruikers, machtigingen) queries, beheren, live of opgenomen video genereren uit het  systeem, events, regels maken, controle van de PTZ-camera's, en meer.
+        </p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Video Source Integratie SDK</h3>
+        <p>
+            Video Source integratie SDK biedt de mogelijkheid om vrijwel elke live of opgenomen videobron (IP-camera's, NVRs, DVRs, enz.) te integreren in het systeem. SDK maakt het mogelijk om methoden voor het ontdekken van, weergeven, analyseren en opnemen van video. Het maakt het ook mogelijk om bijvoorbeeld I/O modules en Video Content Analyse te integreren.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >download SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Storage SDK</h3>
+        <p>
+            De storage SDK biedt de mogelijkheid om diverse opslagmogelijkheden te integreren in het systeem. Het staat ontwikkelaars te lezen van of schrijven naar iedere opslaglocatie: lokaal, extern of in de cloud. Het maken van een opslag plugin vereist de implementatie van standaardfuncties zoals: I/O stream, als bestand bestaat, verwijder bestand, lijst met bestanden in de map, enz. Opslag SDK bevat ook een voorbeeld voor het gebruik van een FTP-server als opslaglocatie.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >download SDK</a></p>
+    </div>
+</div>

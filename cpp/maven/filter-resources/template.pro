@@ -227,7 +227,11 @@ unix: {
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized -Wno-error=maybe-uninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+
+  linux {
+      QMAKE_CXXFLAGS += -Wno-error=maybe-uninitialized
+  }
 }
 
 !win32 {
@@ -256,7 +260,7 @@ linux*:!android {
     QMAKE_CXXFLAGS += -fno-omit-frame-pointer
     CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
   }
-  QMAKE_LFLAGS += -rdynamic
+  QMAKE_LFLAGS += -rdynamic -Wl,--no-undefined
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX

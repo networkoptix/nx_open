@@ -82,6 +82,7 @@ class ModuleFinder
 {
 public:
     QString cloudModulesXmlTemplatePath;
+    QString newCloudModulesXmlTemplatePath;
 };
 
 class Http
