@@ -304,11 +304,11 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
     if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
-        ui->checkBoxDisableNativePtzPresets->setChecked(Qt::Checked);
+        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
     else if (disabledNativePtzCount != 0)
-        ui->checkBoxDisableNativePtzPresets->setChecked(Qt::PartiallyChecked);
+        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::PartiallyChecked);
     else
-        ui->checkBoxDisableNativePtzPresets->setChecked(Qt::Unchecked);
+        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
 
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium

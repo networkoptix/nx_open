@@ -32,7 +32,7 @@ public:
         const QString& /*localName*/,
         const QString& qName,
         const QXmlAttributes& atts ) override;
-    virtual bool characters(const QString& ch);
+    virtual bool characters(const QString& ch) override;
     virtual bool endElement(
         const QString& namespaceURI,
         const QString& localName,

@@ -1317,10 +1317,6 @@ to view more bookmarks</translation>
       <translation>ระเบียนที่เลือกส่งออกไปยังแฟ้ม</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>ตรวจสอบการเล่นใหม่ ล็อก</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>อุปกรณ์</translation>
     </message>
@@ -1393,6 +1389,10 @@ to view more bookmarks</translation>
       <translation type="unfinished">
         <numerusform>These resources are removed from System</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
