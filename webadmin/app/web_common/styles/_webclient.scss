@@ -550,11 +550,8 @@ table.webclient-window>tbody>tr>td{
   }
 
   &-button{
-    padding:0 10px;
-    display: inline-block;
-    vertical-align: middle;
-    text-align: center;
-    cursor:pointer;
+    color: $light16 !important;
+    text-decoration: none !important;
   }
 }
 .camera-links-panel.night-mode{

@@ -6,14 +6,14 @@ angular.module('nxCommon')
         	},
         	templateUrl: Config.viewsDirCommon + 'components/copyButton.html',
         	link: function(scope){
-        		scope.buttonText = "Copy";
+        		scope.copyText = "Copy";
 
         		function resetButton(){
-        			scope.buttonText = "Copy";
+        			scope.copyText = "Copy";
         		}
 
         		scope.alertClick = function(){
-        			scope.buttonText = "Link Copied";
+        			scope.copyText = "Link Copied";
         			$timeout(function(){resetButton();}, 3000);
         		};
         	}
