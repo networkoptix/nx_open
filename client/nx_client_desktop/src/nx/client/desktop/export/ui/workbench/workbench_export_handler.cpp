@@ -84,6 +84,7 @@ static const int kMsPerSecond = 1000;
 
 static const int kBitsPerByte = 8;
 
+
 /** Calculate estimated video size in megabytes. */
 qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint64 lengthMs)
 {
