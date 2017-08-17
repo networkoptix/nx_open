@@ -152,7 +152,7 @@ if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
 endif()
 
 if(MACOSX)
