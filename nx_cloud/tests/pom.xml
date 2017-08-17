@@ -19,13 +19,41 @@
         <qt.libs/>
     </properties>
 
-    <modules>
-        <module>cloud_connect_integration_tests</module>
-    </modules>
-
     <profiles>
         <profile>
-            <id>linux-arm-bpi</id>
+            <id>windows-nomobile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+				<module>cloud_connect_integration_tests</module>
+			</modules>
+		</profile>
+
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>!ios</value>
+                </property>
+            </activation>
+            <modules>
+				<module>cloud_connect_integration_tests</module>
+			</modules>
+		</profile>
+
+        <profile>
+            <id>linux-noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -33,14 +61,14 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>box</name>
-                    <value>bpi</value>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <modules>
-                <module>../libtraffic_relay</module> <!-- Required by cloud_connect_integration_tests. -->
-            </modules>
-        </profile>
+				<module>cloud_connect_integration_tests</module>
+			</modules>
+		</profile>
     </profiles>
 
 </project>
