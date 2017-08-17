@@ -548,6 +548,14 @@ table.webclient-window>tbody>tr>td{
   &-label{
     line-height: 33px;
   }
+
+  &-button{
+    padding:0 10px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    cursor:pointer;
+  }
 }
 .camera-links-panel.night-mode{
   .camera-links{
