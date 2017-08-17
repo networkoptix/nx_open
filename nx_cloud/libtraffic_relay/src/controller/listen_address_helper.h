@@ -43,7 +43,6 @@ private:
     boost::optional<HostAddress> m_publicAddress;
 
     virtual boost::optional<HostAddress> publicAddress() const override;
-
 };
 
 } // namespace controller
