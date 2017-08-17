@@ -178,7 +178,7 @@ private:
             "plain/text",
             "Hello, world",
             includeContentLength,
-            [&promise](AsyncHttpClientPtr ptr)
+            [&promise](AsyncHttpClientPtr /*ptr*/)
             {
                  promise.set_value();
             });
