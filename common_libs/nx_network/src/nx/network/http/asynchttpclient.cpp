@@ -106,16 +106,48 @@ void AsyncHttpClient::doGet(
     m_delegate.doGet(url);
 }
 
+namespace {
+
+class CustomBufferSource:
+    public BufferSource
+{
+    using base_type = BufferSource;
+
+public:
+    CustomBufferSource(
+        const StringType& mimeType,
+        const BufferType& msgBody,
+        bool includeContentLength)
+        :
+        base_type(mimeType, msgBody),
+        m_includeContentLength(includeContentLength)
+    {
+    }
+
+    virtual boost::optional<uint64_t> contentLength() const override
+    {
+        if (m_includeContentLength)
+            return base_type::contentLength();
+        else
+            return boost::none;
+    }
+
+private:
+    bool m_includeContentLength;
+};
+
+} // namespace
+
 void AsyncHttpClient::doPost(
     const QUrl& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBodyBuffer,
-    bool /*includeContentLength*/)
+    bool includeContentLength)
 {
-    // TODO includeContentLength
-    auto messageBody = std::make_unique<BufferSource>(
+    auto messageBody = std::make_unique<CustomBufferSource>(
         contentType,
-        std::move(messageBodyBuffer));
+        std::move(messageBodyBuffer),
+        includeContentLength);
     m_delegate.setRequestBody(std::move(messageBody));
     m_delegate.doPost(url);
 }
