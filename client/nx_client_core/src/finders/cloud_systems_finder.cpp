@@ -171,7 +171,7 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serve
 void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 {
     auto client = nx_http::AsyncHttpClient::create();
-    client->setAuthType(nx_http::AsyncHttpClient::authBasicAndDigest);
+    client->setAuthType(nx_http::AuthType::authBasicAndDigest);
     // First connection to a system (cloud and not cloud) may take a long time
     // because it may require hole punching.
     client->setSendTimeoutMs(kSystemConnectTimeout.count());

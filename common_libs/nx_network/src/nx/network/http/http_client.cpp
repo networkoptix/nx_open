@@ -202,7 +202,7 @@ void HttpClient::setUserPassword(const QString& userPassword)
         m_asyncHttpClient->setUserPassword(userPassword);
 }
 
-void HttpClient::setAuthType(AsyncHttpClient::AuthType value)
+void HttpClient::setAuthType(AuthType value)
 {
     m_authType = value;
     if (m_asyncHttpClient)
@@ -332,10 +332,10 @@ bool HttpClient::doRequest(AsyncClientFunc func)
     func(m_asyncHttpClient.get());
 
     m_msgBodyBuffer.clear();
-    while (!m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived))
+    while (!m_terminated && (m_asyncHttpClient->state() < AsyncClient::State::sResponseReceived))
         m_cond.wait(lk.mutex());
 
-    return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
+    return m_asyncHttpClient->state() != AsyncClient::State::sFailed;
 }
 
 void HttpClient::onResponseReceived()
