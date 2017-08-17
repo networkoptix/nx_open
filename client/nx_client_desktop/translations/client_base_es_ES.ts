@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Exportar los registros seleccionados a un archivo</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Reproducción del registro de auditoría</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Dispositivos</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Este recurso es eliminado del sistema</numerusform>
         <numerusform>Este recurso es eliminado del sistema</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

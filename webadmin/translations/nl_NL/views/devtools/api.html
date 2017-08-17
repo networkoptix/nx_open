@@ -23,12 +23,12 @@
                             <div ng-repeat="group in apiGroups">
                                 <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
-                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {url:searchFunc}"
+                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
                                         <span class="label label-danger" ng-if="function.proprietary">merkgebonden</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
-                                              ng-bind-html="function.name | escape | highlight:searchFunc"></a></b>
+                                              ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
                                     </li>
                                 </ul>
                             </div>
@@ -48,10 +48,14 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">merkgebonden</span>                                             <span ng-if="function.method">{{function.method}}:</span>
-                                            <b><a ng-click="setActiveFunction(group,function,$event)"
-                                                  ng-href="#/developers/api{{function.url}}"
-                                                  ng-bind-html="function.url | escape | highlight:searchFunc" ></a></b>
+                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}">
+                                                <b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
+                                                <span ng-if="function.method">{{function.method}}:</span>
+                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
+                                            </a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>
@@ -59,7 +63,7 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.name}}
+                                    {{activeFunction.caption || function.name}}
                                     <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
@@ -67,181 +71,8 @@
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">merkgebonden</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
-                                <form class="form-horizontal" novalidate ng-if="apiMethod.method && !activeGroup.urlPrefix">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static">{{activeFunction.url}}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group"
-                                         ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
-                                         ng-if="!param.proprietary || allowProprietary"
-                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
-                                        <label class="col-sm-3 control-label" for="{{param.name}}">
-                                            {{param.name}}
-                                            <small ng-if="param.optional=='false'">(required)</small>
-                                            <small ng-if="param.proprietary">(proprietary)</small>
-                                        </label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static" ng-if="param.description.xml"
-                                               ng-bind-html="param.description.xml"></p>
-                                            <div class="help-block" ng-if="param.values && param.values.length>0">
-                                                <ul>
-                                                    <li ng-repeat="value in param.values">
-                                                        <b>{{value.name}}</b><span ng-if="value.description.xml">: </span>
-                                                        <span ng-bind-html="value.description.xml"></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">URL aanvragen</label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static">{{getDebugUrl()}}</p>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <form class="form-horizontal" novalidate ng-if="apiMethod.method && activeGroup.urlPrefix">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{{apiMethod.method}}:</label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static">{{activeFunction.url}}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group"
-                                         ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
-                                         ng-if="!param.proprietary || allowProprietary"
-                                         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
-                                        <label class="col-sm-3 control-label" for="{{param.name}}">
-                                            {{param.name}}
-                                            <small ng-if="param.optional=='false'">(required)</small>
-                                            <small ng-if="param.proprietary">(proprietary)</small>
-                                        </label>
-                                        <div class="col-sm-9">
-
-                                            <div ng-switch on="param.type">
-
-                                                <select class="form-control input-sm"
-                                                        ng-switch-when="enum"
-                                                        ng-options="value.name as value.label for value in param.values"
-                                                        id="{{param.name}}"
-                                                        ng-required="param.optional=='false'"
-                                                        ng-model="apiMethod.params[param.name]">
-                                                </select>
-
-                                                <div class="input-group input-group-sm"
-                                                     ng-switch-when="timestamp">
-                                                    <input type="text"
-                                                           id="{{param.name}}"
-                                                           class="form-control"
-                                                           placeholder="JJJJ-MM-DDTuu:mm:ss"
-                                                           datepicker-popup="{{Config.dateInternalFormat}}"
-                                                           ng-model="apiMethod.params[param.name]"
-                                                           ng-required="param.optional=='false'"
-                                                           is-open="openDate[param.name]"
-                                                           close-text="Close" />
-                                                    <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-default"
-                                                                ng-click="openDatePicker($event, param.name)"><i
-                                                                class="glyphicon glyphicon-calendar"></i></button>
-                                                    </span>
-                                                </div>
-                                                <p class="help-block" ng-switch-when="timestamp">
-                                                    <i>Timestempel: {{apiMethod.params[param.name].getTime()}}</i>
-                                                </p>
-
-                                                <input type="text"
-                                                       ng-switch-when="camera"
-                                                       id="{{param.name}}"
-                                                       ng-model="apiMethod.params[param.name]"
-                                                       typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
-                                                       typeahead-focus-on-select="false"
-                                                       typeahead-min-length="0"
-                                                       typeahead-show-hint="true"
-                                                       typeahead-focus-first="false"
-                                                       typeahead-editable="false"
-                                                       typeahead-focus
- class="form-control input-sm">
-                                                <p class="help-block" ng-switch-when="camera">
-                                                    <i>Geselecteerde camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
-                                                </p>
-
-                                                <span ng-switch-when="info"></span>
-
-                                                <input type="text" class="form-control input-sm"
-                                                       ng-switch-default
- id="{{param.name}}"
-                                                       ng-required="param.optional=='false'"
-                                                       ng-model="apiMethod.params[param.name]"
-                                                       placeholder="{{}}">
-                                            </div>
-
-                                            <p class="help-block" ng-if="param.description.xml"
-                                               ng-bind-html="param.description.xml"></p>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">URL aanvragen</label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static">{{getDebugUrl()}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" ng-if="apiMethod.method=='POST'">
-                                        <label class="col-sm-3 control-label">POST data</label>
-                                        <div class="col-sm-9">
-                                            <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
-                                            <p class="help-block" ng-if="clipboardSupported">
-                                                <a clipboard
- supported="clipboardSupported"
-                                                   text="getPostData()" href="">Naar klembord kopiëren</a>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-3 col-sm-9">
-                                            <button type="submit"
-                                                    ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                                                    class="btn btn-primary" ng-click="testMethod()"> Testmethode </button> <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-                                               ng-href="{{getDebugUrl()}}" target="_blank"> Open in een nieuw tabblad </a>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
-                                        <label class="col-sm-3 control-label">Status</label>
-                                        <div class="col-sm-9">
-                                            <p class="form-control-static">{{result.status}}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" ng-if="result.image">
-                                        <label class="col-sm-3 control-label">Reactie</label>
-                                        <div class="col-sm-9">
-                                            <img style="max-width:100%" ng-src="{{result.image}}">
-                                            <div class="col-sm-9">
-                                                <p class="help-block">Content-type: {{result.contentType}}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-                                        <label class="col-sm-3 control-label">Reactie</label>
-                                        <div class="col-sm-9">
-                                            <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
-                                            <p class="help-block" ng-if="clipboardSupported">
-                                                <a clipboard
- text="result.result" href="">Naar klembord kopiëren</a>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </form>
+                                <ng-include src="Config.viewsDir + 'devtools/api_form.html'"
+                                            ng-if="apiMethod.method"></ng-include>
 
                                 <div ng-if="activeFunction.result.params || activeFunction.result.caption">
                                     <h3>Resultaat</h3>

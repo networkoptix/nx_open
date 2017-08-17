@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>匯出所選錄影資料至檔案</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>使用者行為記錄重播</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>裝置</translation>
     </message>
@@ -1393,6 +1389,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>這些資源已從系統中被移除</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

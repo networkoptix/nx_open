@@ -1317,10 +1317,6 @@ to view more bookmarks</translation>
       <translation>Xuất khẩu chọn lọc hồ sơ vào một tập tin</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Kiểm toán log replay</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>thiết bị</translation>
     </message>
@@ -1393,6 +1389,10 @@ to view more bookmarks</translation>
       <translation type="unfinished">
         <numerusform>These resources are removed from System</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

@@ -1,13 +1,36 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>Developer Tools</h3>
-        <p><a href="#/developers/api">API Testing Tool</a></p>
-        <p><a href="#/developers/changelog">API Changelog</a></p>
-        <p><a href="#/developers/events">Generic Events Tool</a></p>
-        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
-
+        <h2>Developer Tools</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Kamera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Generic Events Generator</h3>
+        <p>
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
         <h3>Sunucu API</h3>
@@ -17,7 +40,14 @@
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">API dökümantasyonu</a></p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
     </div>
     <div>
         <h3>Vidyo Kaynak Entegrasyonu SDK</h3>
