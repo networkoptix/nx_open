@@ -81,7 +81,7 @@ void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncClient::authDigestWithPasswordHash);
+                httpClient->setAuthType(nx_http::AuthType::authDigestWithPasswordHash);
             }
         }
         else

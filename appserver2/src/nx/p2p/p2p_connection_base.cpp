@@ -138,7 +138,7 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 void ConnectionBase::onHttpClientDone()
 {
     nx_http::AsyncClient::State state = m_httpClient->state();
-    if (state == nx_http::AsyncClient::sFailed)
+    if (state == nx_http::AsyncClient::State::sFailed)
     {
         cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
         return;
