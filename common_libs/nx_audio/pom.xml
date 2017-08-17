@@ -22,6 +22,7 @@
         <linux.oslibs>-lopenal</linux.oslibs>
         <mac.oslibs>-framework OpenAL</mac.oslibs>
         <ios.oslibs>-framework OpenAL</ios.oslibs>
+        <mac.oslibs>-framework OpenAL</mac.oslibs>
         <rdep.windows.packages>openal</rdep.windows.packages>
         <rdep.android.packages>openal</rdep.android.packages>
     </properties>
