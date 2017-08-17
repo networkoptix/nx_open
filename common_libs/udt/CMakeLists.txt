@@ -14,5 +14,5 @@ if(WINDOWS)
 endif()
 
 if(LINUX)
-    target_link_libraries(rt)
+    target_link_libraries(udt rt pthread)
 endif()
