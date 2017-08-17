@@ -49,10 +49,10 @@ public:
   template<typename F>
   movable_func(F f) : held_(new holder<F>(std::move(f))) {}
   movable_func() : held_(nullptr) {}
-  movable_func(movable_func<R(Args...)>&& other) = default;
-  movable_func& operator = (movable_func<R(Args...)>&& other) = default;
-  movable_func(const movable_func<R(Args...)>& other) = delete;
-  movable_func& operator = (const movable_func<R(Args...)>& other) = delete;
+  movable_func(movable_func<R(Args...)>&&) = default;
+  movable_func& operator = (movable_func<R(Args...)>&&) = default;
+  movable_func(const movable_func<R(Args...)>&) = delete;
+  movable_func& operator = (const movable_func<R(Args...)>&) = delete;
   bool empty() const { return !held_; }
 
   R operator() (Args... args) const {
