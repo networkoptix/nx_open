@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Onbekende fout.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Kan de audio encoder niet initialiseren.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -384,7 +384,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Kan de video encoder niet initialiseren.</translation>
     </message>
   </context>
   <context>
@@ -411,11 +411,11 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O module</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -455,7 +455,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Ongeldig</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tijd</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Tijdlicenties</translation>
     </message>
   </context>
   <context>
@@ -521,7 +521,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>De licentie is verlopen</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -548,7 +548,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nieuwe server</translation>
     </message>
   </context>
   <context>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>camera</source>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation type="unfinished">I/O Modules</translation>
+      <translation>I/O Modules</translation>
     </message>
     <message>
       <source>I/O modules</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O module</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation type="unfinished">FREE License</translation>
+      <translation>Gratis licensie</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -668,14 +668,14 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Tijdlicentie</translation>
     </message>
   </context>
   <context>
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Laagste</translation>
     </message>
     <message>
       <source>Low</source>
@@ -691,7 +691,7 @@
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Beste</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -811,7 +811,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -894,9 +894,9 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>seconden</numerusform>
+        <numerusform>seconden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -971,11 +971,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Eigenaar</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -987,7 +987,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Live Viewer</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1030,11 +1030,11 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bladwijzer</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Paniek opname</translation>
     </message>
     <message>
       <source>Write to log</source>
@@ -1074,11 +1074,11 @@
     </message>
     <message>
       <source>Device output</source>
-      <translation type="unfinished">Device output</translation>
+      <translation>Apparaatuitgang</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation type="unfinished">Camera output</translation>
+      <translation>Camera uitgang</translation>
     </message>
     <message>
       <source>Device recording</source>
@@ -1101,19 +1101,19 @@
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation type="unfinished">Storage Failure</translation>
+      <translation>Opslag fout</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Netwerkprobleem</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Sensor fout</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Serverconflict</translation>
     </message>
     <message>
       <source>Server Started</source>
@@ -1444,17 +1444,17 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Trigger naam</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rol</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1470,7 +1470,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Alle gebruikers</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1494,7 +1494,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Bevestigen</translation>
     </message>
   </context>
   <context>

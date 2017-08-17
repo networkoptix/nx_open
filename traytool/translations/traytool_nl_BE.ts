@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Server webpagina</translation>
     </message>
     <message>
       <source>stopped</source>

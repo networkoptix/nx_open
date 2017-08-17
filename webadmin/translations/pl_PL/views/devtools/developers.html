@@ -1,23 +1,23 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>Developer Tools</h3>
-        <p><a href="#/developers/api">API Testing Tool</a></p>
-        <p><a href="#/developers/changelog">API Changelog</a></p>
-        <p><a href="#/developers/events">Generic Events Tool</a></p>
-        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
+        <h3>Narzędzia programistyczne</h3>
+        <p><a href="#/developers/api">Narzędzie testowania API</a></p>
+        <p><a href="#/developers/changelog">Dziennik zmian w API</a></p>
+        <p><a href="#/developers/events">Narzędzie do zdarzeń</a></p>
+        <p><a href="#/view/?cameraLinks">Linki do strumieni kamer</a></p>
 
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Wystaw opinię</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>API serwera</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
+            API serwera zawiera standardowy zestaw wywołań API dla systemów innych firm. It gives developers the ability to
             access almost every system feature available in the regular client: query/manage system resources (servers,
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">API documentation</a></p>
+        <p><a id="api-doc" href="api.xml" target="_blank">Dokumentacja API</a></p>
     </div>
     <div>
         <h3>Video Source Integration SDK</h3>
@@ -27,17 +27,17 @@
             displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
             information.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >pobierz SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK archiwum</h3>
         <p>
             Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
             read from or write to any storage location: local, remote, and even cloud one. Creating a storage
             plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
             files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >pobierz SDK</a></p>
     </div>
 </div>

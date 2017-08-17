@@ -19,7 +19,7 @@
                         Free Space
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Zarezerwowana przestrzeń
                     </th>
                     <th >
                     </th>
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Niedostępny
                             </div>
                         </div>
                     </td>
@@ -114,10 +114,10 @@
         <button class="btn btn-warning" ng-click="cancel()">Anuluj</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Ustawienia dziennika</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+            <label class="col-sm-4">Poziom dziennika głównego</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
@@ -132,7 +132,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">Transaction log level</label>
+            <label class="col-sm-4">Poziom dziennika transakcji</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
                     <option value="NONE">None: Log disabled.</option>

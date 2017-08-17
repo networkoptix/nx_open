@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>时效性</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>时效性授权</translation>
     </message>
   </context>
   <context>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>时效性授权</translation>
     </message>
   </context>
   <context>

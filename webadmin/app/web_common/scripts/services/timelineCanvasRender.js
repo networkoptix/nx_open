@@ -558,7 +558,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     context.fillStyle = lastMinuteTexture;
                     lastMinuteTextureSize = this.width;
                 };
-                img.src = Config.viewsDirCommon + '../images/lastminute.png';
+                img.src = Config.viewsDirCommon + '../images/timeline-loading@2x.png';
                 lastMinuteTextureImg = img;
             }
             context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
