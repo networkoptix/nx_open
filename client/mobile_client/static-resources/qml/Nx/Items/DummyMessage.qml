@@ -7,6 +7,7 @@ Pane
 {
     id: dummy
 
+    property real topOffset: 0
     property alias title: title.text
     property alias description: description.text
     property alias buttonText: button.text
@@ -29,7 +30,7 @@ Pane
         Column
         {
             width: parent.width
-            y: (parent.height - height) / (centered ? 2 : 4)
+            y: dummy.topOffset + (parent.height - dummy.topOffset - height) / (centered ? 2 : 4)
 
             Image
             {

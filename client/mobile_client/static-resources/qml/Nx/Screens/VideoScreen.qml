@@ -600,8 +600,9 @@ PageBase
         if (!camerasModel)
             return
 
+
         switchToCamera(
-            camerasModel.preiousResourceId(videoScreen.resourceId)
+            camerasModel.previousResourceId(videoScreen.resourceId)
                 || camerasModel.previousResourceId(""))
     }
 
