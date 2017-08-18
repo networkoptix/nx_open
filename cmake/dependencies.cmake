@@ -43,7 +43,6 @@ function(detect_package_versions)
     if(box MATCHES "bpi|bananapi")
         set(_openssl_version "1.0.0j")
         set(_quazip_version "0.7")
-        set(_festival_version "2.1x")
     endif()
 
     if(box STREQUAL "bananapi")
