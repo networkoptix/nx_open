@@ -160,7 +160,6 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -83,5 +83,8 @@ if(MACOSX)
     find_library(IOKit_LIBRARY IOKit)
     mark_as_advanced(IOKit_LIBRARY)
 
-    target_link_libraries(nx_client_desktop PRIVATE termcap ${CoreServices_LIBRARY} ${IOKit_LIBRARY})
+    find_library(OpenGL_LIBRARY OpenGL)
+    mark_as_advanced(OpenGL_LIBRARY)
+
+    target_link_libraries(nx_client_desktop PRIVATE ${CoreServices_LIBRARY} ${IOKit_LIBRARY} ${OpenGL_LIBRARY})
 endif()

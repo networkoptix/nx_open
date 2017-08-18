@@ -11,5 +11,5 @@ if(MACOSX)
     find_library(AudioToolbox_LIBRARY AudioToolbox)
     mark_as_advanced(AudioToolbox_LIBRARY)
 
-    target_link_libraries(nx_speech_synthesizer PUBLIC ${CoreServices_LIBRARY} ${IOKit_LIBRARY} ${AudioToolbox_LIBRARY} termcap)
+    target_link_libraries(nx_speech_synthesizer PUBLIC ${CoreServices_LIBRARY} ${IOKit_LIBRARY} ${AudioToolbox_LIBRARY})
 endif()
