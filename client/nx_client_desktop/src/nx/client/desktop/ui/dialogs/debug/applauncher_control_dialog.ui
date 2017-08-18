@@ -10,9 +10,6 @@
     <height>441</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Add External Storage...</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -22,24 +19,28 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Version:</string>
+           <string notr="true">Version:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="checkVersionlineEdit"/>
+         <widget class="QLineEdit" name="checkVersionlineEdit">
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="checkVersionButton">
           <property name="text">
-           <string>Check</string>
+           <string notr="true">Check</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLabel" name="checkVersionLabel">
           <property name="text">
-           <string>Not Checked</string>
+           <string notr="true">Not Checked</string>
           </property>
          </widget>
         </item>
@@ -54,7 +55,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Get Installed Versions</string>
+         <string notr="true">Get Installed Versions</string>
         </property>
        </widget>
       </item>
@@ -68,8 +69,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>661</width>
-           <height>305</height>
+           <width>645</width>
+           <height>244</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -88,7 +89,7 @@
           <item>
            <widget class="QLabel" name="getVersionsLabel">
             <property name="text">
-             <string/>
+             <string notr="true"/>
             </property>
            </widget>
           </item>

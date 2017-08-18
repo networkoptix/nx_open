@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Geselecteerde data exporteren naar een bestand</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Systeemrapportage herhalen</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Apparaten</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Deze bron wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

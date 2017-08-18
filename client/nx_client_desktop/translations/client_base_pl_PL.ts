@@ -1318,10 +1318,6 @@ to view more bookmarks</source>
       <translation>Eksportuj zaznaczone rekordy do pliku</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Przegląd dziennika dostępu</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Urządzenia</translation>
     </message>
@@ -1404,6 +1400,10 @@ to view more bookmarks</source>
         <numerusform>These resources are removed from System</numerusform>
         <numerusform>These resources are removed from System</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

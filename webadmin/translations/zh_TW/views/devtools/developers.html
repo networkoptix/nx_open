@@ -1,20 +1,50 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>開發者工具</h3>
-        <p><a href="#/developers/api">API 測試工具</a></p>
-        <p><a href="#/developers/changelog">API 更新日誌</a></p>
-        <p><a href="#/developers/events">通用事件工具</a></p>
-        <p><a href="#/view/?cameraLinks">攝影機串流連結</a></p>
-
+        <h2>開發者工具</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">給予回饋意見</a></p>
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>攝影機 ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Generic Events Generator</h3>
+        <p>
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
         <h3>伺服器 API</h3>
         <p>
             伺服器 API 提供一套標準的 API 供第三方廠商呼叫. 讓開發者可取用所有在 Client 上能操作的系統功能: 調閱/管理系統資源 (伺服器, 攝影機, 使用者, 權限), 從系統中索取即時影像或錄影資料, 生成事件, 建立規則, 操控 PTZ 攝影機以及更多功能.
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">API 文件</a></p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
     </div>
     <div>
         <h3>影像來源整合 SDK</h3>

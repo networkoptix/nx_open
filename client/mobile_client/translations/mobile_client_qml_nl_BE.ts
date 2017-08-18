@@ -8,10 +8,6 @@
       <translation>Selecteer camera</translation>
     </message>
     <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
-    </message>
-    <message>
       <source>Authentication required</source>
       <translation type="unfinished">Authentication required</translation>
     </message>
@@ -391,6 +387,17 @@
     </message>
   </context>
   <context>
+    <name>SelectCameraDummy</name>
+    <message>
+      <source>Select camera</source>
+      <translation type="unfinished">Select camera</translation>
+    </message>
+    <message>
+      <source>Press Ctrl + Arrow or use mouse wheel</source>
+      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+    </message>
+  </context>
+  <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
@@ -560,6 +567,21 @@
     </message>
   </context>
   <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
+    <message>
+      <source>Show as is</source>
+      <translation type="unfinished">Show as is</translation>
+    </message>
+    <message>
+      <source>(Space)</source>
+      <translation type="unfinished">(Space)</translation>
+    </message>
+  </context>
+  <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
@@ -583,6 +605,18 @@
     <message>
       <source>Cannot load video</source>
       <translation type="unfinished">Cannot load video</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation type="unfinished">Cannot play any video stream</translation>
     </message>
   </context>
   <context>
@@ -610,14 +644,6 @@
     <message>
       <source>Information</source>
       <translation>Informatie</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Selecteer camera</translation>
-    </message>
-    <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
     </message>
   </context>
   <context>
