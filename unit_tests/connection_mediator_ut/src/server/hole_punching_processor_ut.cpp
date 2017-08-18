@@ -9,12 +9,12 @@
 #include <gmock/gmock.h>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/utils/sync_call.h>
-
+#include <relay/relay_cluster_client.h>
 #include <server/hole_punching_processor.h>
 #include <settings.h>
 #include <statistics/collector.h>
@@ -375,11 +375,13 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
+        m_relayClusterClient(m_settings),
         m_holePunchingProcessor(
             m_settings,
             &m_cloudData,
             &m_dispatcher,
             &m_listeningPeerPool,
+            &m_relayClusterClient,
             &m_statisticsCollector)
     {
         const char* args[] = {
@@ -454,6 +456,7 @@ private:
     nx::stun::MessageDispatcher m_dispatcher;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
+    RelayClusterClient m_relayClusterClient;
     hpm::HolePunchingProcessor m_holePunchingProcessor;
     nx::utils::SyncQueue<ConnectResponse> m_responses;
 

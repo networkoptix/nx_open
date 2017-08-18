@@ -9,6 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "udp_hole_punching_connection_initiation_fsm.h"
+#include "../relay/abstract_relay_cluster_client.h"
 #include "../request_processor.h"
 
 namespace nx {
@@ -35,6 +36,7 @@ public:
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* listeningPeerPool,
+        AbstractRelayClusterClient* relayClusterClient,
         stats::AbstractCollector* statisticsCollector);
     virtual ~HolePunchingProcessor();
 
@@ -68,6 +70,7 @@ private:
     QnMutex m_mutex;
     //map<id, connection initiation>
     ConnectSessionsDictionary m_activeConnectSessions;
+    AbstractRelayClusterClient* m_relayClusterClient;
 
     std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         validateConnectRequest(

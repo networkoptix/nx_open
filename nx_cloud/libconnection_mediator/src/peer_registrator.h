@@ -10,6 +10,7 @@
 #include <nx/network/cloud/data/resolve_domain_data.h>
 #include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/utils/counter.h>
 
 #include "data/listening_peer.h"
 #include "request_processor.h"
@@ -21,13 +22,13 @@ namespace nx { namespace hpm { namespace data { struct ListeningPeers; } } }
 namespace nx {
 namespace hpm {
 
+class AbstractRelayClusterClient;
 class ListeningPeerPool;
 
 /**
  * Registers peers which desire to accept cloud connections, resolves such peers address.
  */
-class PeerRegistrator
-:
+class PeerRegistrator:
     protected RequestProcessor
 {
 public:
@@ -35,7 +36,9 @@ public:
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
-        ListeningPeerPool* const listeningPeerPool);
+        ListeningPeerPool* const listeningPeerPool,
+        AbstractRelayClusterClient* const relayClusterClient);
+    virtual ~PeerRegistrator() override;
 
     data::ListeningPeers getListeningPeers() const;
 
@@ -83,13 +86,21 @@ private:
         std::list<SocketAddress> tcpReverseEndpoints;
     };
 
-    typedef std::map<nx::String, ClientBindInfo> BoundClients;
-    nx::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
+    using BoundClients = std::map<nx::String, ClientBindInfo>;
 
     const conf::Settings& m_settings;
     mutable QnMutex m_mutex;
     BoundClients m_boundClients;
     ListeningPeerPool* const m_listeningPeerPool;
+    AbstractRelayClusterClient* const m_relayClusterClient;
+    nx::utils::Counter m_counter;
+
+    void sendListenResponse(
+        const ConnectionStrongRef& connection,
+        boost::optional<QUrl> trafficRelayInstanceUrl,
+        std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
+    void sendClientBindIndications(const ConnectionStrongRef& connection);
+    nx::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
 };
 
 } // namespace hpm
