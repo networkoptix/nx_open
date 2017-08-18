@@ -40,7 +40,6 @@ var Config = {
     visualLog: false,
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
-        video: true, // videowindow.js - disable loader, allow rightclick
         chunksOnTimeline: false, // timeline.js - draw debug events
     },
     helpLinks: [
