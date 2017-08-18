@@ -278,10 +278,6 @@ macx {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
-
-  contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup
-  }
 }
 
 ## ANDROID
