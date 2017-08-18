@@ -298,10 +298,11 @@ PageBase
         {
             id: dummyLoader
 
-            y: item.onlyCompactTitleIsVisible ? -header.height : 0
+            readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
+
+            y: needOffset ? -header.height : 0
             width: mainWindow.width
-            height: mainWindow.height - toolBar.statusBarHeight
-                - (item.onlyCompactTitleIsVisible ? 0 : header.height)
+            height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible
