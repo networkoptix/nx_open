@@ -22,10 +22,10 @@ angular.module('nxCommon')
         			scope.copyText = scope.copyDefaultText;
         		}
 
-                var revertText = Config.webclient.resetCopyText;
+                var revertCopyTextTimer = Config.webclient.resetCopyTextTimer;
         		scope.alertClick = function(){
         			scope.copyText = scope.copyActiveText;
-        			$timeout(function(){resetButton();}, revertText);
+        			$timeout(function(){resetButton();}, resetCopyTextTimer);
         		};
         	}
 		};

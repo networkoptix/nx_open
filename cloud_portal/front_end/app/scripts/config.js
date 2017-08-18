@@ -201,7 +201,7 @@ var Config = {
         disableVolume: true,
         reloadInterval: 5*1000,
         leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
-        resetCopyText: 3 * 1000
+        resetCopyTextTimer: 3 * 1000
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
