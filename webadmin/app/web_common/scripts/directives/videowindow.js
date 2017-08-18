@@ -47,9 +47,6 @@ angular.module('nxCommon')
                 };
                 scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
-                scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
-                scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
-                scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
                 scope.videoFlags = {};
                 scope.loading = false; // Initiate state - not loading (do nothing)
                 
@@ -263,7 +260,7 @@ angular.module('nxCommon')
                     }
                     
                     scope.flashSource = "web_common/components/flashlsChromeless.swf";
-                    if(scope.debugMode && scope.debugFormat){
+                    if(scope.debugMode){
                         scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
                     }
 
@@ -314,7 +311,7 @@ angular.module('nxCommon')
 
                     $timeout(function(){
                         var jsHlsAPI = new JsHlsAPI();
-                        jsHlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
+                        jsHlsAPI.init( element.find(".videoplayer"), scope.debugMode, function (api) {
                             scope.vgApi = api;
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
