@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.2
 import Nx 1.0
 
 ShaderEffect
@@ -55,6 +56,9 @@ ShaderEffect
         id: shaderSource
         hideSource: true
         visible: false
+        textureSize: Qt.size(
+            sourceItem.width / Screen.devicePixelRatio, 
+            sourceItem.height / Screen.devicePixelRatio)
     }
 
     readonly property var sourceTexture: shaderSource
