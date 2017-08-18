@@ -735,6 +735,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider)
         .separator();
 
+    factory(ExportVideoAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Video..."))
+        .requiredTargetPermissions(Qn::ExportPermission)
+        .condition(condition::hasTimePeriod());
+
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))

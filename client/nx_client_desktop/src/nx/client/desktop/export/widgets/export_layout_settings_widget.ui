@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ExportSettingsWidget</class>
- <widget class="QWidget" name="ExportSettingsWidget">
+ <class>ExportLayoutSettingsWidget</class>
+ <widget class="QWidget" name="ExportLayoutSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

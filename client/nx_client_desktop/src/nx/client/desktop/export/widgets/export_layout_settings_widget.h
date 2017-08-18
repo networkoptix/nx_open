@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-namespace Ui { class ExportSettingsWidget; }
+namespace Ui { class ExportLayoutSettingsWidget; }
 
 class QnMediaResourceWidget;
 class QnTimePeriod;
@@ -13,16 +13,16 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-class ExportSettingsWidget: public QWidget
+class ExportLayoutSettingsWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    ExportSettingsWidget(QWidget* parent = nullptr);
+    ExportLayoutSettingsWidget(QWidget* parent = nullptr);
 
 private:
-    QScopedPointer<Ui::ExportSettingsWidget> ui;
+    QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;
 };
 
 } // namespace ui

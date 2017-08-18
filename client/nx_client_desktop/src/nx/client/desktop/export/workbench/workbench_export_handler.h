@@ -5,8 +5,9 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-//TODO: #GDM #export move private to pimpl
-#include <nx/client/desktop/export/data/layout_export_settings.h>
+#include <nx/client/desktop/export/data/export_layout_settings.h>
+
+#include <utils/common/connective.h>
 
 class QnTimePeriod;
 class QnAbstractStreamDataProvider;
@@ -15,19 +16,22 @@ class QnMediaResourceWidget;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ExportManager;
+struct ExportProcessInfo;
+
 namespace ui {
 
 /**
  * @brief Handler for video and layout export related actions.
  */
-class WorkbenchExportHandler: public QObject, public QnWorkbenchContextAware
+class WorkbenchExportHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 public:
     WorkbenchExportHandler(QObject *parent = NULL);
-
 
 private:
     bool saveLocalLayout(const QnLayoutResourcePtr& layout,
@@ -36,7 +40,7 @@ private:
 
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod,
         const QnLayoutResourcePtr& layout,
-        LayoutExportSettings::Mode mode);
+        ExportLayoutSettings::Mode mode);
 
     QString binaryFilterName() const;
 
@@ -45,7 +49,7 @@ private:
     bool saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
         const QnTimePeriod& exportPeriod,
         const QString& layoutFileName,
-        LayoutExportSettings::Mode mode,
+        ExportLayoutSettings::Mode mode,
         bool readOnly,
         bool cancellable);
 
@@ -74,6 +78,10 @@ private:
     /** Check if exe file will be greater than 4 Gb. */
     bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, const QnTimePeriod& period) const;
 
+    void exportProcessUpdated(const ExportProcessInfo& info);
+
+    void at_exportVideoAction_triggered();
+
 private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
@@ -95,6 +103,7 @@ private slots:
 
 private:
     QSet<QString> m_filesIsUse;
+    QScopedPointer<ExportManager> m_exportManager;
 };
 
 } // namespace ui

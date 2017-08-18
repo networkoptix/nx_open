@@ -3,6 +3,7 @@
 #include "ui_export_settings_dialog.h"
 
 #include <ui/dialogs/common/message_box.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
@@ -19,6 +20,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     :
     ExportSettingsDialog(timePeriod, parent)
 {
+    d->setMediaResource(widget->resource());
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -29,9 +31,11 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, parent)
 {
     ui->layoutTab->setVisible(false);
+    d->setMediaResource(media);
 }
 
-ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent):
+ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent)
+    :
     base_type(parent),
     d(new Private()),
     ui(new Ui::ExportSettingsDialog)
@@ -43,20 +47,18 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     auto exportButton = ui->buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
     setAccentStyle(exportButton);
 
-    connect(d, &Private::stateChanged, this,
-        [this, exportButton](Private::State value)
+    connect(d, &Private::statusChanged, this,
+        [this, exportButton](Private::ErrorCode value)
         {
-            exportButton->setEnabled(value == Private::State::ready);
-
-            if (value == Private::State::success)
-            {
-                QnMessageBox::success(this, tr("Export completed"));
-                base_type::accept();
-            }
-
+            exportButton->setEnabled(Private::isExportAllowed(value));
         });
 
     d->loadSettings();
+
+    d->setTimePeriod(timePeriod);
+
+    connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
+
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -119,7 +121,7 @@ void ExportSettingsDialog::setupSettingsButtons()
             if (!selected)
                 return;
             if (selected == ui->cameraExportSettingsButton)
-                ui->stackedWidget->setCurrentWidget(ui->cameraExportSettingsPage);
+                ui->stackedWidget->setCurrentWidget(ui->exportMediaSettingsPage);
             else if (selected == ui->timestampButton)
                 ui->stackedWidget->setCurrentWidget(ui->timestampSettingsPage);
             else if (selected == ui->imageButton)
@@ -135,18 +137,19 @@ ExportSettingsDialog::~ExportSettingsDialog()
 {
 }
 
-void ExportSettingsDialog::accept()
+ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
 {
-    switch (d->state())
-    {
-        case Private::State::ready:
-            d->exportVideo();
-            return;
+    return d->mode();
+}
 
-        default:
-            break;
-    }
-    base_type::accept();
+const ExportMediaSettings& ExportSettingsDialog::exportMediaSettings() const
+{
+    return d->exportMediaSettings();
+}
+
+const ExportLayoutSettings& ExportSettingsDialog::exportLayoutSettings() const
+{
+    return d->exportLayoutSettings();
 }
 
 } // namespace ui

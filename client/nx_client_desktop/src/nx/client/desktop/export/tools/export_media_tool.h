@@ -4,29 +4,28 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <recording/time_period.h>
 #include <recording/stream_recorder.h>
-#include <transcoding/filters/filter_helper.h>
 
 #include <utils/common/connective.h>
 
 class QnClientVideoCamera;
 
-class QnClientVideoCameraExportTool : public Connective<QObject>
+namespace nx {
+namespace client {
+namespace desktop {
+
+struct ExportMediaSettings;
+
+class ExportMediaTool : public Connective<QObject>
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    QnClientVideoCameraExportTool(
-            const QnMediaResourcePtr &mediaResource,
-            const QnTimePeriod &timePeriod,
-            const QString &fileName,
-            const QnImageFilterHelper &imageParameters,
-            qint64 serverTimeZoneMs,
-            qint64 timelapseFrameStepMs = 0, /* 0 means disabled timelapse */
-            QObject *parent = 0);
-    virtual ~QnClientVideoCameraExportTool();
+    ExportMediaTool(
+        const ExportMediaSettings& settings,
+        QObject* parent = 0);
+    virtual ~ExportMediaTool();
 
 
     /**
@@ -75,11 +74,10 @@ private:
     void finishExport(bool success);
 
 private:
-    QScopedPointer<QnClientVideoCamera> m_camera;
-    QnTimePeriod m_timePeriod;
-    QString m_fileName;
-    QnImageFilterHelper m_parameters;
-    qint64 m_serverTimeZoneMs;
-    qint64 m_timelapseFrameStepMs;
-    StreamRecorderError m_status;
+    struct Private;
+    QScopedPointer<Private> d;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

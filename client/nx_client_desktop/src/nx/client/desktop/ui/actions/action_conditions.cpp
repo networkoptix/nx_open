@@ -1732,6 +1732,26 @@ ConditionWrapper canSavePtzPosition()
         });
 }
 
+ConditionWrapper hasTimePeriod()
+{
+    return new CustomCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            if (!parameters.hasArgument(Qn::TimePeriodRole))
+                return InvisibleAction;
+
+            QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+            if (periodType(period) != NormalTimePeriod)
+                return DisabledAction;
+
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
+            if (!periods.intersects(period))
+                return DisabledAction;
+
+            return EnabledAction;
+        });
+}
+
 } // namespace condition
 
 

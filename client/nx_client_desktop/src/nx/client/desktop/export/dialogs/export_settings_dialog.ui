@@ -77,7 +77,7 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="nx::client::desktop::ui::ExportSettingsWidget" name="cameraExportSettingsPage"/>
+         <widget class="nx::client::desktop::ui::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
          <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
          <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
          <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
@@ -216,7 +216,7 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="layoutExportSettingsPage"/>
+         <widget class="nx::client::desktop::ui::ExportLayoutSettingsWidget" name="exportLayoutSettingsPage"/>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
@@ -265,84 +265,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnPanel" name="filePathPanel" native="true">
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>16</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>16</number>
-      </property>
-      <property name="spacing">
-       <number>8</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="folderLabel">
-        <property name="text">
-         <string>Folder</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="folderLineEdit">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="fileNameLabel">
-        <property name="text">
-         <string>Name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="browseFolderButton">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>120</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="fileNameLineEdit"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="formatComboBox">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>120</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <widget class="nx::client::desktop::FilenamePanel" name="filenamePanel" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -365,9 +288,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::ui::ExportSettingsWidget</class>
+   <class>nx::client::desktop::ui::ExportMediaSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/export/ui/widgets/export_settings_widget.h</header>
+   <header location="global">nx/client/desktop/export/widgets/export_media_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::ExportLayoutSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/widgets/export_layout_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -378,67 +307,34 @@
   <customwidget>
    <class>nx::client::desktop::ui::TimestampOverlaySettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/export/ui/widgets/timestamp_overlay_settings_widget.h</header>
+   <header location="global">nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::ui::ImageOverlaySettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/export/ui/widgets/image_overlay_settings_widget.h</header>
+   <header location="global">nx/client/desktop/export/widgets/image_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::ui::TextOverlaySettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/export/ui/widgets/text_overlay_settings_widget.h</header>
+   <header location="global">nx/client/desktop/export/widgets/text_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::ui::RapidReviewSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/export/ui/widgets/rapid_review_settings_widget.h</header>
+   <header location="global">nx/client/desktop/export/widgets/rapid_review_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::FilenamePanel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/filename_panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>ExportSettingsDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>ExportSettingsDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

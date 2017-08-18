@@ -1,14 +1,14 @@
-#include "export_settings_widget.h"
-#include "ui_export_settings_widget.h"
+#include "export_media_settings_widget.h"
+#include "ui_export_media_settings_widget.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 
-ExportSettingsWidget::ExportSettingsWidget(QWidget* parent):
+ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::ExportSettingsWidget())
+    ui(new Ui::ExportMediaSettingsWidget())
 {
     ui->setupUi(this);
 }

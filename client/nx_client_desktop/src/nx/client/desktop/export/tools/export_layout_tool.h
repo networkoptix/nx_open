@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/client/desktop/export/data/layout_export_settings.h>
+#include <nx/client/desktop/export/data/export_layout_settings.h>
 
 #include <recording/time_period.h>
 #include <recording/stream_recorder.h>
@@ -24,11 +24,11 @@ namespace desktop {
  * every new export process. Correct behaviour while re-using is not guarantied. Notifies about
  * progress of the process.
  */
-class LayoutExportTool : public QObject, public QnWorkbenchContextAware
+class ExportLayoutTool : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
-    explicit LayoutExportTool(LayoutExportSettings settings, QObject* parent = nullptr);
+    explicit ExportLayoutTool(ExportLayoutSettings settings, QObject* parent = nullptr);
 
     /**
      * @brief start                             Start exporting. Async.
@@ -45,7 +45,7 @@ public:
      * @brief mode                              Current export mode.
      * @return
      */
-    LayoutExportSettings::Mode mode() const;
+    ExportLayoutSettings::Mode mode() const;
 
     /**
      * @brief errorMessage                      Last error message. Filled if process finished incorrectly.
@@ -115,7 +115,7 @@ private:
     bool writeData(const QString &fileName, const QByteArray &data);
 
 private:
-    const LayoutExportSettings m_settings;
+    const ExportLayoutSettings m_settings;
 
     /** Copy of the provided layout. */
     QnLayoutResourcePtr m_layout;

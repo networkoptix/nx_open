@@ -946,6 +946,11 @@ enum IDType
     /**
      * Exports selected range.
      */
+    ExportVideoAction,
+
+    /**
+     * Exports selected range.
+     */
     ExportTimeSelectionAction,
 
     /**

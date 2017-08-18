@@ -1,4 +1,4 @@
-#include "layout_export_tool.h"
+#include "export_layout_tool.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
@@ -48,18 +48,18 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-LayoutExportTool::ItemInfo::ItemInfo()
+ExportLayoutTool::ItemInfo::ItemInfo()
     : name()
     , timezone(0)
 {}
 
-LayoutExportTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
+ExportLayoutTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
     : name(name)
     , timezone(timezone)
 {}
 
 
-LayoutExportTool::LayoutExportTool(LayoutExportSettings settings, QObject* parent) :
+ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_settings(settings),
@@ -71,12 +71,12 @@ LayoutExportTool::LayoutExportTool(LayoutExportSettings settings, QObject* paren
     m_layout->update(m_settings.layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
-    if (m_settings.mode != LayoutExportSettings::Mode::LocalSave)
+    if (m_settings.mode != ExportLayoutSettings::Mode::LocalSave)
         m_layout->setId(QnUuid::createUuid());
 }
 
 
-bool LayoutExportTool::prepareStorage()
+bool ExportLayoutTool::prepareStorage()
 {
     const bool isExeFile = nx::utils::AppInfo::isWindows()
         ? m_settings.filename.endsWith(lit(".exe"))
@@ -110,7 +110,7 @@ bool LayoutExportTool::prepareStorage()
     return true;
 }
 
-LayoutExportTool::ItemInfoList LayoutExportTool::prepareLayout()
+ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 {
     ItemInfoList result;
 
@@ -148,7 +148,7 @@ LayoutExportTool::ItemInfoList LayoutExportTool::prepareLayout()
 }
 
 
-bool LayoutExportTool::exportMetadata(const LayoutExportTool::ItemInfoList &items) {
+bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &items) {
 
     /* Names of exported resources. */
     {
@@ -262,7 +262,7 @@ bool LayoutExportTool::exportMetadata(const LayoutExportTool::ItemInfoList &item
     return true;
 }
 
-bool LayoutExportTool::start() {
+bool ExportLayoutTool::start() {
     if (!prepareStorage())
         return false;
 
@@ -279,7 +279,7 @@ bool LayoutExportTool::start() {
     return exportNextCamera();
 }
 
-void LayoutExportTool::stop() {
+void ExportLayoutTool::stop() {
     m_stopped = true;
     m_resources.clear();
     m_errorMessage = QString(); //suppress error by manual canceling
@@ -292,15 +292,15 @@ void LayoutExportTool::stop() {
     }
 }
 
-LayoutExportSettings::Mode LayoutExportTool::mode() const {
+ExportLayoutSettings::Mode ExportLayoutTool::mode() const {
     return m_settings.mode;
 }
 
-QString LayoutExportTool::errorMessage() const {
+QString ExportLayoutTool::errorMessage() const {
     return m_errorMessage;
 }
 
-bool LayoutExportTool::exportNextCamera() {
+bool ExportLayoutTool::exportNextCamera() {
     if (m_stopped)
         return false;
 
@@ -313,7 +313,7 @@ bool LayoutExportTool::exportNextCamera() {
     }
 }
 
-void LayoutExportTool::finishExport(bool success)
+void ExportLayoutTool::finishExport(bool success)
 {
     if (!success)
     {
@@ -330,7 +330,7 @@ void LayoutExportTool::finishExport(bool success)
 
     switch (m_settings.mode)
     {
-        case LayoutExportSettings::Mode::LocalSave:
+        case ExportLayoutSettings::Mode::LocalSave:
         {
             /* Update existing layout. */
             NX_ASSERT(existing);
@@ -341,8 +341,8 @@ void LayoutExportTool::finishExport(bool success)
             }
             break;
         }
-        case LayoutExportSettings::Mode::LocalSaveAs:
-        case LayoutExportSettings::Mode::Export:
+        case ExportLayoutSettings::Mode::LocalSaveAs:
+        case ExportLayoutSettings::Mode::Export:
         {
             /* Existing is present if we did 'Save As..' with another existing layout name. */
             if (existing)
@@ -393,10 +393,10 @@ void LayoutExportTool::finishExport(bool success)
 
 }
 
-bool LayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
+bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     m_currentCamera = new QnClientVideoCamera(resource);
     connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this,   SLOT(at_camera_progressChanged(int)));
-    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &LayoutExportTool::at_camera_exportFinished);
+    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &ExportLayoutTool::at_camera_exportFinished);
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
@@ -427,7 +427,7 @@ bool LayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     return true;
 }
 
-void LayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
+void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
     const QString& filename)
 {
     Q_UNUSED(filename)
@@ -482,18 +482,18 @@ void LayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     }
 }
 
-void LayoutExportTool::at_camera_exportStopped() {
+void ExportLayoutTool::at_camera_exportStopped() {
     if (m_currentCamera)
         m_currentCamera->deleteLater();
 
     finishExport(false);
 }
 
-void LayoutExportTool::at_camera_progressChanged(int progress) {
+void ExportLayoutTool::at_camera_progressChanged(int progress) {
     emit valueChanged(m_offset * 100 + progress);
 }
 
-bool LayoutExportTool::tryAsync( std::function<bool()> handler ) {
+bool ExportLayoutTool::tryAsync( std::function<bool()> handler ) {
     if (!handler)
         return false;
 
@@ -524,7 +524,7 @@ bool LayoutExportTool::tryAsync( std::function<bool()> handler ) {
     return false;
 }
 
-bool LayoutExportTool::writeData( const QString &fileName, const QByteArray &data ) {
+bool ExportLayoutTool::writeData( const QString &fileName, const QByteArray &data ) {
     return tryAsync([this, fileName, data] {
         QScopedPointer<QIODevice> file(m_storage->open(fileName, QIODevice::WriteOnly));
         if (!file)

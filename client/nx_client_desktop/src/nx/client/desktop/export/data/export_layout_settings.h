@@ -8,7 +8,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct LayoutExportSettings
+struct ExportLayoutSettings
 {
     enum class Mode
     {
@@ -17,8 +17,8 @@ struct LayoutExportSettings
         Export          //< Add new exported layout.
     };
 
-    LayoutExportSettings() = default;
-    LayoutExportSettings(QnLayoutResourcePtr layout,
+    ExportLayoutSettings() = default;
+    ExportLayoutSettings(QnLayoutResourcePtr layout,
         QnTimePeriod period,
         QString filename,
         Mode mode,
