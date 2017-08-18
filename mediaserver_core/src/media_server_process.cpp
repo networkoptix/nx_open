@@ -3102,7 +3102,9 @@ void MediaServerProcess::run()
 
     qnBackupStorageMan->scheduleSync()->start();
     serverModule->unusedWallpapersWatcher()->start();
-    serverModule->licenseWatcher()->start();
+    if (m_serviceMode)
+        serverModule->licenseWatcher()->start();
+
     emit started();
     exec();
 
