@@ -66,11 +66,11 @@ private:
 
     const conf::Settings& m_settings;
     ListeningPeerPool* m_listeningPeerPool;
+    AbstractRelayClusterClient* m_relayClusterClient;
     stats::AbstractCollector* m_statisticsCollector;
     QnMutex m_mutex;
     //map<id, connection initiation>
     ConnectSessionsDictionary m_activeConnectSessions;
-    AbstractRelayClusterClient* m_relayClusterClient;
 
     std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         validateConnectRequest(
