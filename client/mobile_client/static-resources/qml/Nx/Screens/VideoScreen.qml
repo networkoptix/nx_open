@@ -602,7 +602,6 @@ PageBase
         if (!camerasModel)
             return
 
-
         switchToCamera(
             camerasModel.previousResourceId(videoScreen.resourceId)
                 || camerasModel.previousResourceId(""))
