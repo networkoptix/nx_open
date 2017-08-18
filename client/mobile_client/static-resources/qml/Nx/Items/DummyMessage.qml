@@ -7,12 +7,11 @@ Pane
 {
     id: dummy
 
-    property real topOffset: 0
     property alias title: title.text
     property alias description: description.text
     property alias buttonText: button.text
     property alias image: image.source
-    property bool compact: height < 540
+    property bool compact: false
     property bool centered: false
 
     signal buttonClicked()
@@ -30,7 +29,7 @@ Pane
         Column
         {
             width: parent.width
-            y: dummy.topOffset + (parent.height - dummy.topOffset - height) / (centered ? 2 : 4)
+            y: (parent.height - height) / (centered ? 2 : 4)
 
             Image
             {

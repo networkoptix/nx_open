@@ -269,7 +269,7 @@ PageBase
         width: parent.width
         height: width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
-        visible: status == Image.Ready
+        visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
 
@@ -298,9 +298,10 @@ PageBase
         {
             id: dummyLoader
 
-            y: -header.height - parent.y
+            y: item.onlyCompactTitleIsVisible ? -header.height : 0
             width: mainWindow.width
-            height: mainWindow.height
+            height: mainWindow.height - toolBar.statusBarHeight
+                - (item.onlyCompactTitleIsVisible ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible
@@ -309,8 +310,9 @@ PageBase
             {
                 VideoDummy
                 {
-                    topOffset: header.height
-                    anchors.fill: parent
+                    readonly property bool onlyCompactTitleIsVisible:
+                        compact && title != "" && description == "" && buttonText == ""
+                    compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
                 }
             }
