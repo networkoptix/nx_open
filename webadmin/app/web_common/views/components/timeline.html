@@ -49,7 +49,7 @@
             <!--Gonna have to move this later-->
         </div>
     </div>
-    <div class="mobile-controls visible-xs" ng-class="{'no-border': !emptyArchive || !liveOnly}">
+    <div class="mobile-controls visible-xs" ng-class="{'no-border': !loading && (!emptyArchive || !liveOnly)}">
         <div class="text-right pull-right" ng-class="{'no-volume':disableVolume}">
             <span class="live-button inline-block pull-left "
                 ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"

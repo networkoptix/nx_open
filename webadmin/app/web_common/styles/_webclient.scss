@@ -30,6 +30,7 @@
 .visibility-hidden{
     visibility:hidden;
 }
+
 .webclient{
   &{
     height:100%;
@@ -188,7 +189,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel{
-  /*min-width: 320px;*/
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
@@ -315,7 +315,6 @@ table.webclient-window>tbody>tr>td{
     @include placeholder;
   }
 }
-
 
 /* Camera Panel*/
 .server{
@@ -473,6 +472,91 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+.camera-links-panel{
+  &{
+    background-color: $additional_light2;
+    margin: 40px 0 0 10px;
+    position: absolute;
+    padding: 10px;
+    z-index: 1;
+
+    & table{
+      font-size: 12px;
+    }
+    & td{
+      font-weight: 400;
+      color: $light16;
+      vertical-align: top;
+    }
+    & tr{
+      height: 20px;
+
+      & > :first-child{
+        width: 100px;
+      }
+
+      & > :not(:first-child){
+        width: 140px;
+      }
+      
+      input{
+        border: 1px solid rgba($light16,0.2);
+        margin-bottom: 3px;
+      }
+    }
+  }
+  &.night-mode{
+    background-color: rgba($dark7,0.9) !important;
+  }
+}
+
+.camera-links{
+  &-break{
+    height: 4px;
+    border-bottom: 1px solid rgba($light16,0.2);
+    margin: 8px 0;
+  }
+
+  &-title{
+    font-size: 14px;
+    font-weight: 500;
+    color: $dark9;
+    padding-bottom: 5px;
+  }
+
+  &-info{
+    color: $dark9 !important;
+    
+    &.buffer{
+      padding-bottom: 3px;
+    }
+  }
+
+  &-label{
+    line-height: 33px;
+  }
+}
+.camera-links-panel.night-mode{
+  .camera-links{
+    &-title{
+      color:$light1 !important;
+    }
+    &-info{
+      color: $light1 !important;
+    }
+  }
+
+  input{
+    background-color: transparent;
+  }
+  & [type="checkbox"]:not(:checked){
+    opacity: 0.4;
+  }
+  & [type="checkbox"]:checked{
+    opacity: 0.7;
+  }
+}
+
 /* View */
 
 .view{
@@ -549,8 +633,7 @@ table.webclient-window>tbody>tr>td{
 
 .video-settings{
   &{
-    right: -25px;
-    min-width: 0px !important;
+    right: -35px;
     left:initial;
     padding: 0px !important;
     background-color: rgba($dark7,0.9) !important;
@@ -558,7 +641,9 @@ table.webclient-window>tbody>tr>td{
 
     color: $light16;
     font-size: 12px;
-    line-height: 18px;
+  }
+  &-icon{
+    margin-top: -6px;
   }
 
   &-options:hover{
@@ -567,26 +652,46 @@ table.webclient-window>tbody>tr>td{
     font: bold 12px;
   }
 
-  &-separation-line{
+  &-divider{
     height: 1px;
     background-color: $light16;
-    opacity: 0.2;  
+    opacity: 0.2;
+    
+    &.buffer{
+      margin-top:4px;
+    }  
   }
 
-  &-36{
+  &-title{
     height: 36px;
     line-height: 36px;
-
-    label{
-      margin-left: 8px;    
-    }
+    padding-left: 8px;    
   }
 
-  &-20{
+  &-item,
+  &-item a{
     height: 20px;
     line-height: 13px !important;
     font-size: 12px !important;
     color: $light1 !important;
+  }
+
+  &-button{
+    &{
+      height: 36px;
+      line-height: 36px;
+      padding-left: 8px;
+      color: $light1;
+    }
+
+    .glyphicon-cog{
+      top: 6px;
+      margin-right: 6px;
+    }
+
+    &:hover{
+      background-color: $light16;
+    }
   }
 }
 
@@ -602,8 +707,18 @@ table.webclient-window>tbody>tr>td{
   padding: 8px;
 }
 
-.video-title-back-button{
-  margin-left: 6px;
+.video-title{
+  &{
+    margin-left: 6px;
+  }
+  &-buffer{
+    width:40px;
+    display: inline-block;
+  }
+
+  & .glyphicon-arrow-left{
+    color: $light1;
+  }
 }
 
 .video-preview{
@@ -615,19 +730,6 @@ table.webclient-window>tbody>tr>td{
   left: 50%;
   transform: translate(-50%, -50%);
   opacity:0.5;
-}
-
-
-.min-40{
-  width:40px;
-  display: inline-block;
-}
-
-.pull-up-5{
-  margin-top: -5px;
-}
-.margin-right-8{
-  margin-right: 8px;
 }
 
 /* Special hack for loading invisible flash objects */
@@ -648,6 +750,11 @@ table.webclient-window>tbody>tr>td{
   text-align:center;
   background-color: $dark1;
   margin: auto;
+}
+
+.drop-back{
+  position: absolute !important;
+  z-index: -1;
 }
 
 .rotate90 {
@@ -798,8 +905,4 @@ table.webclient-window>tbody>tr>td{
   height: 44px;
   width: 40px;
   display: block;
-}
-
-.video-title-back-button .glyphicon-arrow-left{
-  color: $light1;
 }

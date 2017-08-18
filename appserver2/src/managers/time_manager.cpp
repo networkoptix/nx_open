@@ -268,8 +268,6 @@ static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
 //static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
 /** Considering internet time equal to local time if difference is no more than this value. */
 static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT_MS = 10*MILLIS_PER_SEC;
-/** Maximum allowed drift between synchronized time and time received via internet. */
-static const qint64 MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS = 20*MILLIS_PER_SEC;
 static const int MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES = 15;
 static const int MAX_RTT_TIME_MS = 10 * 1000;
 /** Maximum time drift between servers that we want to keep up to. */
@@ -309,7 +307,8 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
     m_timeSynchronized( false ),
     m_internetSynchronizationFailureCount( 0 ),
-    m_settings(settings)
+    m_settings( settings ),
+    m_asyncOperationsInProgress( 0 )
 {
 }
 
@@ -353,6 +352,10 @@ void TimeSynchronizationManager::pleaseStop()
         m_timeSynchronizer->pleaseStopSync();
         m_timeSynchronizer.reset();
     }
+
+    QnMutexLocker lock( &m_mutex );
+    while( m_asyncOperationsInProgress )
+        m_asyncOperationsWaitCondition.wait( lock.mutex() );
 }
 
 void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection>& connection)
@@ -970,6 +973,8 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 
 void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
 {
+    using namespace std::chrono;
+
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;
     {
@@ -992,7 +997,12 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
             const auto localTimePriorityKeyBak = m_localTimePriorityKey;
             m_localTimePriorityKey.flags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
 
-            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS )
+            const auto maxDifferenceBetweenSynchronizedAndInternetTime =
+                m_messageBus->commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
+
+            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > 
+                duration_cast<milliseconds>(
+                    maxDifferenceBetweenSynchronizedAndInternetTime).count() )
             {
                 //TODO #ak use rtt here instead of constant?
                 //considering synchronized time as inaccurate, even if it is marked as received from internet
@@ -1010,7 +1020,8 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
                     m_monotonicClock.elapsed(),
                     millisFromEpoch,
                     m_localTimePriorityKey,
-                    MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS );
+                    duration_cast<milliseconds>(
+                        maxDifferenceBetweenSynchronizedAndInternetTime).count() );
             }
         }
         else
@@ -1321,6 +1332,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
         });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this]
         {
@@ -1334,6 +1346,9 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
             localTimeTran.transactionType = TransactionType::Local;
             db->transactionLog()->fillPersistentInfo(localTimeTran);
             db->executeTransaction(localTimeTran, QByteArray());
+
+            --m_asyncOperationsInProgress;
+            m_asyncOperationsWaitCondition.wakeOne();
         }));
 #endif
 }
@@ -1457,10 +1472,14 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
     });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this, syncTimeToLocalDelta, syncTimeKey]()
         {
             saveSyncTimeSync(syncTimeToLocalDelta, syncTimeKey);
+
+            --m_asyncOperationsInProgress;
+             m_asyncOperationsWaitCondition.wakeOne();
         }));
 #endif
 }

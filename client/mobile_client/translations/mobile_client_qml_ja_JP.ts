@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>&quot;%1&quot; を削除しますか？</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>画像をタップしてカメラの位置を決める</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>プリセット</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ プリセット</translation>
     </message>
   </context>
   <context>
@@ -447,7 +447,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>ネットワーク接続を確認するか、&quot;%1&quot; ボタンを押して、既知のサーバーアドレスを入力してください</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -467,7 +467,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>システム&quot;%1&quot; に接続できません</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>

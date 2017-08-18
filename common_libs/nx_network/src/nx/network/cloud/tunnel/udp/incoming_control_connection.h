@@ -47,7 +47,7 @@ public:
      */
     void start(utils::MoveOnlyFunc<void()> selectedHandler);
 
-    const AbstractStreamSocket* socket();
+    AbstractStreamSocket* socket();
     void resetLastKeepAlive();
 
 private:

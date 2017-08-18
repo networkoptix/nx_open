@@ -82,7 +82,7 @@ bool ProxyVideoDecoder::isCompatible(
         [&](bool returnValue)
         {
             return lm("isCompatible(%1, %2 x %3, allowOverlay: %4) -> %5")
-                .strs(avcodec_get_name(codec), resolution.width(), resolution.height(),
+                .args(avcodec_get_name(codec), resolution.width(), resolution.height(),
                     allowOverlay, returnValue);
         };
 

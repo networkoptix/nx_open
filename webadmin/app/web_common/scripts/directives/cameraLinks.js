@@ -4,6 +4,11 @@
 
 
 angular.module('nxCommon')
+    .filter('checkProtocol', function(){
+        return function(url){
+            return url.indexOf('//') >= 0 ? url : "//"+url;
+        };
+    })
     .directive('cameraLinks', [function () {
         return {
             restrict: 'E',
@@ -13,7 +18,8 @@ angular.module('nxCommon')
                 position: "=",
                 liveMode: "=",
                 player: "=",
-                currentResolution: "="
+                currentResolution: "=",
+                cameraLinks: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
@@ -21,7 +27,13 @@ angular.module('nxCommon')
                 scope.position = 0;
                 scope.duration = 5*60;
                 scope.resolution = '640p';
-                scope.useAuth = true;
+                scope.useAuth = false;
+                scope.useCredentials = false;
+                scope.useLogin = 'login';
+                scope.usePassword = 'password';
+                scope.L = L;
+
+                scope.clipboardSupported = true; // presume
 
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
@@ -37,18 +49,19 @@ angular.module('nxCommon')
 
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
-                        'preview': 'http://{{host}}/ec2/cameraThumbnail?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
-                        'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
-                        'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
-                        'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
-                        'webm':'http://{{host}}/media/{{physicalId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
-                        'mjpeg':'http://{{host}}/media/{{physicalId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
-                        'download':'http://{{host}}/hls/{{physicalId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
+                        'preview': 'http://{{credentials}}{{host}}/ec2/cameraThumbnail?cameraId={{cameraId}}{{previewPosition}}{{auth}}',
+                        'hls':'http://{{credentials}}{{host}}/hls/{{cameraId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
+                        'rtsp':'rtsp://{{credentials}}{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}{{auth}}',
+                        'transrtsp':'rtsp://{{credentials}}{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
+                        'webm':'http://{{credentials}}{{host}}/media/{{cameraId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
+                        'mjpeg':'http://{{credentials}}{{host}}/media/{{cameraId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
+                        'download':'http://{{credentials}}{{host}}/hls/{{cameraId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
 
                     return linkTemplates[transport].
+                        replace("{{credentials}}", scope.useCredentials?(scope.useLogin + ':' + scope.usePassword + '@'):'').
                         replace("{{host}}", window.location.host).
-                        replace("{{physicalId}}", camera.physicalId).
+                        replace("{{cameraId}}", camera.id.replace('{','').replace('}','')).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
                         replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
@@ -59,7 +72,7 @@ angular.module('nxCommon')
                         replace("{{resolution}}", scope.resolution);
                 };
 
-                scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'webm' : 'hls'});
+                scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'WEBM' : 'HLS'});
 
             }
         };

@@ -33,6 +33,7 @@
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
 #include <database/migrations/add_default_webpages_migration.h>
+#include <database/migrations/cleanup_removed_transactions.h>
 
 #include <network/system_helpers.h>
 
@@ -1530,6 +1531,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
         return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
+        return ec2::db::cleanupClientInfoList(m_sdb);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

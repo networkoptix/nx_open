@@ -643,8 +643,8 @@ void PlayerPrivate::applyVideoQuality()
     switch (result.quality)
     {
         case Player::UnknownVideoQuality:
-            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
-            setMediaStatus(Player::MediaStatus::NoMedia);
+            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoVideoStreams)");
+            setMediaStatus(Player::MediaStatus::NoVideoStreams);
             q->stop();
             return;
 
@@ -909,7 +909,8 @@ void Player::stop()
     d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
-    d->setMediaStatus(MediaStatus::NoMedia);
+    if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
+        d->setMediaStatus(MediaStatus::NoMedia);
     d->log(lit("stop() END"));
 }
 

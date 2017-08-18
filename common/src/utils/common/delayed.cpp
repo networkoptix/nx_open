@@ -56,6 +56,9 @@ QTimer *executeDelayedParented(const Callback &callback
 
 void executeInThread(QThread* thread, const Callback& callback)
 {
+    NX_EXPECT(thread);
+    NX_EXPECT(callback);
+
     if (!callback)
         return;
 

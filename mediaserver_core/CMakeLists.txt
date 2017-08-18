@@ -36,7 +36,9 @@ foreach(dependency ${apidoctool_deps})
 endforeach()
 
 add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     MAIN_DEPENDENCY "${apidoctool_jar}"
     DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
@@ -47,10 +49,15 @@ add_custom_command(
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+        -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
 )
 
 nx_add_target(mediaserver_core LIBRARY
@@ -61,6 +68,7 @@ nx_add_target(mediaserver_core LIBRARY
         "${customization_dir}/icons/all/favicon.ico"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
         onvif sigar

@@ -140,12 +140,11 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     RequestObject object = static_cast<RequestObject>(obj);
-    NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
+    NX_VERBOSE("QnMediaServerConnection", lm("QnMediaServerConnection %1 <%2>: %3 %4")
         .arg(serverId)
         .arg(handle)
         .arg(message)
-        .arg(QnLexical::serialized(object)),
-        cl_logDEBUG1);
+        .arg(QnLexical::serialized(object)));
 }
 
 } // namespace
@@ -1110,11 +1109,11 @@ int QnMediaServerConnection::recordedTimePeriods(
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action,
+    const QnUuid& eventRuleId,
     QObject* target,
     const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark, action);
+    QnUpdateBookmarkRequestData request(bookmark, eventRuleId);
     return sendAsyncGetRequestLogged(ec2BookmarkAcknowledgeObject,
         request.toParams(), nullptr, target, slot);
 }

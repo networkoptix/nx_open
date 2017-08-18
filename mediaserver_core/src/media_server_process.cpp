@@ -1040,20 +1040,14 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 {
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
-        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
-#ifdef _DEBUG
-        "DEBUG"
-#else
-        "INFO"
-#endif
-    );
+        lit("Supported values: none (no logging), always, error, warning, info, debug, verbose. Default: ")
+        + toString(nx::utils::log::Settings::kDefaultLevel));
     commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
-    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
-        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
-        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
-        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.hwLogLevel, "--hw-log-level", NULL, "Log value for hw_log.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,"Log value for permissions.log.");
+
     commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&m_cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -1104,16 +1098,6 @@ void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings
 
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
         m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
-
-    if (m_cmdLineArguments.msgLogLevel.isEmpty())
-        m_cmdLineArguments.msgLogLevel = settings->roSettings()->value(
-            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
-            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
-
-    if (m_cmdLineArguments.ec2TranLogLevel.isEmpty())
-        m_cmdLineArguments.ec2TranLogLevel = settings->roSettings()->value(
-            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
-            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL).toString();
 }
 
 MediaServerProcess::~MediaServerProcess()
@@ -2317,16 +2301,20 @@ void MediaServerProcess::serviceModeInit()
     // TODO: Generalize nx::utils::log::Settings parsing from QSetting and cmdLineArguments
     // for mediaserver and all clients.
     const auto makeLevel =
-        [&](const QString& agrValue, const QString& settingsKey)
+        [&](const QString& argValue, const QString& settingsKey, const QString& defaultValue)
         {
             const auto settingsValue = settings->value(settingsKey);
             const auto settingsLevel = nx::utils::log::levelFromString(settingsValue.toString());
             if (settingsLevel != nx::utils::log::Level::undefined)
                 return settingsLevel;
 
-            const auto argLevel = nx::utils::log::levelFromString(agrValue);
+            const auto argLevel = nx::utils::log::levelFromString(argValue);
             if (argLevel != nx::utils::log::Level::undefined)
                 return argLevel;
+
+            const auto defaultLevel = nx::utils::log::levelFromString(defaultValue);
+            if (defaultLevel != nx::utils::log::Level::undefined)
+                return defaultLevel;
 
             return nx::utils::log::Settings::kDefaultLevel;
         };
@@ -2334,7 +2322,7 @@ void MediaServerProcess::serviceModeInit()
     for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
         logSettings.exceptionFilers.insert(filter);
 
-    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
+    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel", "");
     nx::utils::log::initialize(logSettings, qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
@@ -2342,17 +2330,22 @@ void MediaServerProcess::serviceModeInit()
     else
         settings->remove("logFile");
 
-    logSettings.level = makeLevel(cmdLineArguments().msgLogLevel, "http-log-level");
+    logSettings.level = makeLevel(cmdLineArguments().httpLogLevel, "http-log-level", "none");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel");
+    logSettings.level = makeLevel(cmdLineArguments().hwLogLevel, "hwLoglevel", "info");
+    nx::utils::log::initialize(
+        logSettings, qApp->applicationName(), binaryPath,
+        QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
+
+    logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel");
+    logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel", "none");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));

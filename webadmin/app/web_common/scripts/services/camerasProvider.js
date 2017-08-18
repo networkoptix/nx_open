@@ -19,12 +19,14 @@ angular.module('nxCommon')
 
         //getters
         camerasProvider.prototype.getCamera = function(id){
-            if(!this.cameras) {
+            if(!this.cameras || ! id) {
                 return null;
             }
+            id = id.replace('{','').replace('}','');
             for(var serverId in this.cameras) {
                 var cam = _.find(this.cameras[serverId], function (camera) {
-                    return camera.id === id || camera.physicalId === id;
+                    return (camera.id.replace('{','').replace('}','') === id) ||
+                           (camera.physicalId.replace('{','').replace('}','') === id);
                 });
                 if(cam){
                     return cam;
@@ -92,8 +94,8 @@ angular.module('nxCommon')
 
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
-                camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, Config.webclient.leftPanelPreviewHeight);
-                camera.fullPreview = self.systemAPI.previewUrl(camera.physicalId, false, null, window.screen.availHeight);
+                camera.preview = self.systemAPI.previewUrl(camera.id, false, null, Config.webclient.leftPanelPreviewHeight);
+                camera.fullPreview = self.systemAPI.previewUrl(camera.id, false, null, window.screen.availHeight);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';

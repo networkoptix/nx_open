@@ -67,7 +67,7 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
     QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
     m_outPacket(av_packet_alloc()),
-    m_licenseValidator(new QnLicenseValidator(this))
+    m_licenseValidator(new QnLicenseValidator(commonModule, this))
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -78,7 +78,7 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = licensePool()->getLicenses();
-    m_licensedToStr = tr("Trial License");
+    m_licensedToStr = tr("Time License");
     for (const QnLicensePtr& license: list)
     {
         if (license->type() != Qn::LC_Trial && m_licenseValidator->isValid(license))

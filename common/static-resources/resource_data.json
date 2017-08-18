@@ -761,7 +761,10 @@
             }
         },
         {
-            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "keys": [
+                "Hikvision|DS-2CD63C2F-IS",
+                "Hikvision|DS-2CD2132F-IWS"
+            ],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
@@ -2024,8 +2027,10 @@
             }
         },
         {
-            "keys": [ "DW|DW-CPUHD*" ],
-            "isMacAddressNotMandatory": true
+            "keys": [
+                "DW|DW-CPUHD*"
+            ],
+            "isMacAddressMandatory": false
         }
     ]
 }

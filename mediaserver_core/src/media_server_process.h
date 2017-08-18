@@ -48,8 +48,8 @@ public:
     QString logLevel;
     QString exceptionFilters;
 
-    // Log level of http requests log.
-    QString msgLogLevel;
+    QString httpLogLevel;
+    QString hwLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 

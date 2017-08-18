@@ -274,6 +274,9 @@ protected:
     static void createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps);
     static void enumerateSteps(QVector<QnTimeStep>& steps);
 
+    virtual void setupShowAnimator(VariantAnimator* animator) const override;
+    virtual void setupHideAnimator(VariantAnimator* animator) const override;
+
 private:
     enum Marker
     {

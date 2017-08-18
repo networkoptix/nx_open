@@ -4,199 +4,101 @@ import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Items.LiteClient 1.0
 import com.networkoptix.qml 1.0
 
 import "../private/VideoScreen"
+import "private/VideoScreen"
 
 PageBase
 {
     id: videoScreen
     objectName: "videoScreen"
 
-    property alias resourceId: videoScreenController.resourceId
-    property alias initialScreenshot: screenshot.source
-    property LiteClientLayoutHelper layoutHelper: null
-    property QnCameraListModel camerasModel: null
+    property alias resourceId: cameraDisplay.resourceId
+    property string initialScreenshot
+    property alias layoutHelper: cameraDisplay.layoutHelper
+    property alias camerasModel: cameraDisplay.camerasModel
 
     signal nextCameraRequested()
     signal previousCameraRequested()
 
-    VideoScreenController
+    CameraDisplay
     {
-        id: videoScreenController
-
-        mediaPlayer.onPlayingChanged:
-        {
-            if (mediaPlayer.playing)
-                screenshot.source = ""
-        }
-
-        mediaPlayer.onSourceChanged:
-        {
-            if (mediaPlayer.source)
-                mediaPlayer.playLive()
-            else
-                mediaPlayer.stop()
-        }
-
-        onOfflineChanged:
-        {
-            if (offline)
-            {
-                offlineStatusDelay.restart()
-            }
-            else
-            {
-                offlineStatusDelay.stop()
-                d.showOfflineStatus = false
-            }
-        }
-    }
-
-    Object
-    {
-        id: d
-
-        property bool showOfflineStatus: false
-        property bool cameraWarningVisible:
-            (showOfflineStatus
-                || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
-            && !videoScreenController.mediaPlayer.playing
-
-        Timer
-        {
-            id: offlineStatusDelay
-            interval: 2000
-            onTriggered: d.showOfflineStatus = true
-        }
-    }
-
-    ScalableVideo
-    {
-        id: video
+        id: cameraDisplay
 
         anchors.fill: parent
-        visible: !dummyLoader.visible && !screenshot.visible
 
-        mediaPlayer: videoScreenController.mediaPlayer
-        resourceHelper: videoScreenController.resourceHelper
-    }
+        useClickEffect: false
 
-    Image
-    {
-        id: screenshot
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectFit
-        visible: status == Image.Ready
-    }
-
-    Loader
-    {
-        id: dummyLoader
-        anchors.fill: parent
-        visible: active
-        sourceComponent: Component
+        onNextCameraRequested:
         {
-            VideoDummy
-            {
-                width: videoScreen.width
-                state: videoScreenController.dummyState
-                centered: true
-            }
+            layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
+            videoScreen.start()
+        }
+        onPreviousCameraRequested:
+        {
+            layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+            videoScreen.start()
         }
 
-        active: d.cameraWarningVisible
-    }
-
-    Loader
-    {
-        id: noCameraDummyLoader
-        anchors.fill: parent
-        visible: active
-        sourceComponent: Rectangle
-        {
-            color: ColorTheme.base3
-
-            Column
-            {
-                width: parent.width
-                anchors.centerIn: parent
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Select camera")
-                    color: ColorTheme.base13
-                    font.pixelSize: 24
-                    font.capitalization: Font.AllUppercase
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Press Ctrl + Arrow or use mouse wheel")
-                    color: ColorTheme.base13
-                    font.pixelSize: 11
-                    wrapMode: Text.WordWrap
-                }
-            }
-        }
-
-        active: resourceId == ""
-    }
-
-    Keys.onPressed:
-    {
-        if (event.modifiers == Qt.ControlModifier)
-        {
-            if (event.key == Qt.Key_Left)
-            {
-                previousCameraRequested()
-                event.accepted = true
-            }
-            else if (event.key == Qt.Key_Right)
-            {
-                nextCameraRequested()
-                event.accepted = true
-            }
-        }
-        else if (event.key == Qt.Key_Enter || event.key == Qt.Key_Return)
-        {
-            Workflow.popCurrentScreen()
-            event.accepted = true
-        }
-    }
-
-    WheelSwitchArea
-    {
-        anchors.fill: parent
-        onPreviousRequested: previousCameraRequested()
-        onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel ? camerasModel.count - 1 : 0
-    }
-
-    MouseArea
-    {
-        anchors.fill: parent
         onDoubleClicked: Workflow.popCurrentScreen()
+
+        Component.onCompleted: forceActiveFocus()
     }
 
-    onResourceIdChanged: video.clear()
+    Loader
+    {
+        id: transformationsWarningLoader
+        anchors.fill: parent
+        visible: active
+        active: false
 
-    onNextCameraRequested:
-    {
-        layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
-    }
-    onPreviousCameraRequested:
-    {
-        layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+        sourceComponent: TransformationsNotSupportedWarning
+        {
+            onCloseClicked:
+            {
+                transformationsWarningLoader.active = false
+                cameraDisplay.videoScreenController.start()
+                cameraDisplay.forceActiveFocus()
+            }
+
+            Keys.forwardTo: cameraDisplay
+        }
     }
 
     onActivePageChanged:
     {
-        if (activePage)
-            videoScreenController.start()
+        if (activePage && !transformationsWarningLoader.active)
+            cameraDisplay.videoScreenController.start()
+    }
+
+    onResourceIdChanged: hideTransformationsWarning()
+
+    function hideTransformationsWarning()
+    {
+        transformationsWarningLoader.active = false
+        cameraDisplay.forceActiveFocus()
+    }
+
+    function start()
+    {
+        var resourceHelper = cameraDisplay.videoScreenController.resourceHelper
+
+        transformationsWarningLoader.active =
+            resourceId !== ""
+                && !cameraDisplay.cameraWarningVisible
+                && (resourceHelper.customRotation !== 0
+                    || resourceHelper.customAspectRatio !== 0.0)
+
+        if (transformationsWarningLoader.active)
+        {
+            cameraDisplay.videoScreenController.stop()
+        }
+        else
+        {
+            cameraDisplay.videoScreenController.start()
+            cameraDisplay.forceActiveFocus()
+        }
     }
 }

@@ -3,7 +3,8 @@
         "highStream": "High stream",
         "lowStream": "Low stream",
         "transcoding": "Transcoding",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "copyToClipboard": "Copy to clipboard"
     },
     "systemOffline":"System Offline",
     "cameraStates":{

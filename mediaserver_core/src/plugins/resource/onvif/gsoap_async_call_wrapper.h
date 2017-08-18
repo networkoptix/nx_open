@@ -255,6 +255,7 @@ private:
 
     void onRequestSent( SystemError::ErrorCode errorCode, size_t bytesSent )
     {
+        NX_VERBOSE( this, lm("Send size=%1: %2").args(bytesSent, SystemError::toString(errorCode)) );
         if( errorCode )
         {
             m_state = done;
@@ -279,14 +280,22 @@ private:
 
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
     {
+        NX_VERBOSE( this, lm("Read size=%1: %2").args(bytesRead, SystemError::toString(errorCode)) );
         if (m_useHttpReader)
             parseBytesWithHttpReader(errorCode, bytesRead);
         else
             parseBytesTillConnectionClosure(errorCode, bytesRead);
     }
 
-    void parseBytesWithHttpReader(SystemError::ErrorCode /*errorCode*/, std::size_t bytesRead)
+    void parseBytesWithHttpReader(SystemError::ErrorCode errorCode, std::size_t bytesRead)
     {
+        if (errorCode != SystemError::noError || bytesRead == 0)
+        {
+            m_state = done;
+            m_resultHandler(SOAP_FAULT);
+            return;
+        }
+
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;
 
@@ -294,13 +303,13 @@ private:
             QnByteArrayConstRef(m_responseBuffer, m_totalBytesRead, bytesRead));
 
         bool stateIsOk = m_httpStreamReader.state() != nx_http::HttpStreamReader::parseError;
-
         m_totalBytesRead += bytesRead;
 
         if (!parseResult || !stateIsOk)
         {
             m_state = done;
             m_resultHandler(SOAP_FAULT);
+            return;
         }
 
         if (m_httpStreamReader.state() == nx_http::HttpStreamReader::messageDone)

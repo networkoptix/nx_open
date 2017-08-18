@@ -30,12 +30,14 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
 
 using namespace nx::cdb;
+using namespace nx::client::desktop::ui;
 
 namespace {
 QString kCreateAccountPath = lit("/static/index.html#/register");
@@ -269,6 +271,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
     Q_Q(QnConnectToCloudDialog);
 
     linkedSuccessfully = true;
+    q->menu()->trigger(action::HideCloudPromoAction);
 
     QnMessageBox::success(q->parentWidget(),
         tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")

@@ -42,7 +42,7 @@ public:
     /// @param callback         Callback with operation result.
     void addAcknowledge(
         const QnCameraBookmark &bookmark,
-        const nx::vms::event::AbstractActionPtr& action,
+        const QnUuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.

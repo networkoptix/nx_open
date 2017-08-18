@@ -719,7 +719,6 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>

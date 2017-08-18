@@ -49,13 +49,6 @@
 
 using namespace nx::client::desktop::ui;
 
-namespace {
-
-/* Speed and volume slider tooltip autohide delay: */
-static constexpr int kToolTipHideDelayMs = 100;
-
-} // namespace
-
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent->toGraphicsObject()),
@@ -128,14 +121,12 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->installEventFilter(this);
     m_speedSlider->setPreferredHeight(28.0);
-    m_speedSlider->setToolTipHideDelayMs(kToolTipHideDelayMs);
     context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->toolTipItem()->setParentItem(parent);
     m_volumeSlider->setPreferredHeight(28.0);
-    m_volumeSlider->setToolTipHideDelayMs(kToolTipHideDelayMs);
 
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
