@@ -24,6 +24,16 @@ Page
         }
     }
 
+    Connections
+    {
+        target: sideNavigation
+        onOpenedChanged:
+        {
+            if (page.activePage)
+                forceActiveFocus()
+        }
+    }
+
     Keys.onPressed:
     {
         if (Utils.keyIsBack(event.key))
