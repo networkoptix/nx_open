@@ -1,6 +1,6 @@
 <div class="videowindow">
-    <img class="video-preview" ng-if="loading" ng-src="{{preview}}" preview-image>
-    <camera-view-informer flags="videoFlags" preloader="loading"></camera-view-informer>
+    <img class="video-preview" ng-if="loading && !debugMode" ng-src="{{preview}}" preview-image>
+    <camera-view-informer ng-if="!debugMode" flags="videoFlags" preloader="loading"></camera-view-informer>
 
     <div class="videoplayer" id="{{playerId}}" ng-if="flashls" ng-class="[loading ? 'drop-back' : '', getRotation()]"
     										   ng-init="initFlash()" ng-bind-html="flashPlayer">

@@ -46,7 +46,7 @@ angular.module('nxCommon')
                     'mp4': 'video/mp4'
                 };
                 scope.Config = Config;
-                scope.debugMode = Config.debug.video && Config.allowDebugMode;
+                scope.debugMode = Config.allowDebugMode;
                 scope.videoFlags = {};
                 scope.loading = false; // Initiate state - not loading (do nothing)
                 

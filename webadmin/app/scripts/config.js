@@ -41,10 +41,7 @@ var Config = {
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//'flashls', // videowindow.js - force video player
         chunksOnTimeline: false, // timeline.js - draw debug events
-        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
-        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
     },
     helpLinks: [
         // Additional Links to show in help
