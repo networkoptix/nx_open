@@ -12,7 +12,7 @@
 #include <decoders/abstractclientplugin.h>
 #include <decoders/abstractvideodecoderplugin.h>
 #include <plugins/camera_plugin.h>
-#include <plugins/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 
 using namespace nx::sdk;
 

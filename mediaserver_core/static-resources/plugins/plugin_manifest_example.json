@@ -5,7 +5,7 @@
         "value": "Example Driver",
         "localization": {
             "ru_RU": "Пример драйвера",
-            "uk_UA": "Прiмер драївера"
+            "uk_UA": "Приклад драйвера"
             }
     },
     "acceptedDataTypes": ["compressedVideo", "decompressedVideo"],

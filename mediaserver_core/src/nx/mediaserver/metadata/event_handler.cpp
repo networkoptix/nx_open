@@ -1,44 +1,40 @@
 #include "event_handler.h"
 
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_internal_tools.h>
 
-#include <plugins/metadata/abstract_event_metadata_packet.h>
-#include <plugins/metadata/abstract_detection_metadata_packet.h>
+#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
 
 #include <nx/mediaserver/event/event_connector.h>
-
-#ifdef Q_OS_WIN
-#include <WinSock2.h>
-#else
-#include <arpa/inet.h>
-#endif
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-namespace metadata_sdk = nx::sdk::metadata; 
+using namespace nx::sdk;
+using namespace nx::sdk::metadata;
 
 void EventHandler::handleMetadata(
-    metadata_sdk::Error error,
-    metadata_sdk::AbstractMetadataPacket* metadata)
+    Error error,
+    AbstractMetadataPacket* metadata)
 {
     // TODO: #dmishin check reference counting here;
-    nxpt::ScopedRef<metadata_sdk::AbstractMetadataPacket> metadataPacket(metadata);
-    if (error != metadata_sdk::Error::noError)
+    nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
+    if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<metadata_sdk::AbstractEventMetadataPacket> eventPacket(
-        (metadata_sdk::AbstractEventMetadataPacket*)
-        metadata->queryInterface(metadata_sdk::IID_EventMetadataPacket));
+    nxpt::ScopedRef<AbstractEventMetadataPacket> eventPacket(
+        (AbstractEventMetadataPacket*)
+        metadata->queryInterface(IID_EventMetadataPacket), false);
 
     if (!eventPacket)
         return;
 
     while(true)
     {
-        nxpt::ScopedRef<metadata_sdk::AbstractDetectedEvent> eventData(
-            eventPacket->nextItem());
+        nxpt::ScopedRef<AbstractDetectedEvent> eventData(
+            eventPacket->nextItem(), false);
 
         if (!eventData)
             return;
@@ -47,29 +43,17 @@ void EventHandler::handleMetadata(
             ? nx::vms::event::EventState::active
             : nx::vms::event::EventState::inactive;
 
+        nxpl::NX_GUID kMd = {{0xF1, 0xF7, 0x23, 0xBB, 0x20, 0xC8, 0x45, 0x3A, 0xAF, 0xCE, 0x86, 0xF3, 0x18, 0xCB, 0xF0, 0x97}};
+        if (eventData->eventTypeId() == kMd)
+            qDebug() << "HANDLING MOTION DETECTION!" << eventData->isActive();
+
         qnEventRuleConnector->at_analyticsSdkEvent(
             m_resource,
             m_pluginId,
-            fromPluginGuidToQnUuid(eventData->eventTypeId()),
+            nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId()),
             eventState,
             eventPacket->timestampUsec());
     }
-}
-
-QnUuid EventHandler::fromPluginGuidToQnUuid(nxpl::NX_GUID& guid)
-{
-    return QnUuid(QUuid(
-        ntohl(*(unsigned int*)guid.bytes),
-        ntohs(*(unsigned short*)(guid.bytes + 4)),
-        ntohs(*(unsigned short*)(guid.bytes + 6)),
-        guid.bytes[8],
-        guid.bytes[9],
-        guid.bytes[10],
-        guid.bytes[11],
-        guid.bytes[12],
-        guid.bytes[13],
-        guid.bytes[14],
-        guid.bytes[15]));
 }
 
 void EventHandler::setResource(const QnResourcePtr& resource)

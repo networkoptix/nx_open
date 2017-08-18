@@ -1,7 +1,7 @@
 #pragma once
 
-#include <plugins/metadata/abstract_metadata_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 
 namespace nx {
 namespace sdk {
@@ -27,6 +27,8 @@ public:
     virtual AbstractSerializer* serializerForType(
         const nxpl::NX_GUID& typeGuid,
         Error* outError) override;
+
+    virtual const char* capabilitiesManifest(Error* error) const override;
 };
 
 } // namespace metadata

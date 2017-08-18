@@ -2,9 +2,9 @@
 
 #include <plugins/plugin_api.h>
 
-#include <plugins/metadata/abstract_data_packet.h>
-#include <plugins/metadata/abstract_metadata_packet.h>
-#include <plugins/metadata/utils.h>
+#include <nx/sdk/common.h>
+#include <nx/sdk/metadata/abstract_data_packet.h>
+#include <nx/sdk/metadata/abstract_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
@@ -58,15 +58,9 @@ public:
     /**
      * @brief provides null terminated UTF8 string containing json manifest
      * according to nx_metadata_plugin_manifest.schema.json.
-     * @param buffer buffer for the manifest
-     * @param inOutBufferSize size of the manifest buffer. If buffer is too small
-     * then this method MUST return needMoreBufferSpace and set inOutBufferSize
-     * to the desired value.
-     * @return noError in case of success,
-     * needMoreBufferSpace in case buffer size is not enough.
-     * some other value otherwise.
+     * @return pointer to c-style string which MUST be valid till manager object exists 
      */
-    virtual const char* capabiltiesManifest() const = 0;
+    virtual const char* capabilitiesManifest(Error* error) const = 0;
 };
 
 } // namespace metadata

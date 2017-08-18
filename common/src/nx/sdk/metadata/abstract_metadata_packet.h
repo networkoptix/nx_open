@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include <plugins/metadata/abstract_data_packet.h>
+#include <nx/sdk/metadata/abstract_data_packet.h>
 
 namespace nx {
 namespace sdk {

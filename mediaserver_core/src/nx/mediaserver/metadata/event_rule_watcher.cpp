@@ -10,21 +10,23 @@ namespace metadata {
 using namespace nx::vms;
 
 EventRuleWatcher::EventRuleWatcher(QObject* parent):
-    QObject(parent)
+    Connective<QObject>(parent)
 {
+    qRegisterMetaType<std::set<QnUuid>>();
+
     auto ruleManager = qnServerModule
         ->commonModule()
         ->eventRuleManager();
 
-    QObject::connect(
+    connect(
         ruleManager, &event::RuleManager::rulesReset,
         this, &EventRuleWatcher::at_rulesReset);
 
-    QObject::connect(
+    connect(
         ruleManager, &event::RuleManager::ruleAddedOrUpdated,
         this, &EventRuleWatcher::at_ruleAddedOrUpdated);
 
-    QObject::connect(
+    connect(
         ruleManager, &event::RuleManager::ruleRemoved,
         this, &EventRuleWatcher::at_ruleRemoved);
 }

@@ -78,6 +78,43 @@ AbstractSerializer* StubMetadataPlugin::serializerForType(
     return nullptr;
 }
 
+const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const
+{
+    *error = Error::noError;
+
+    return R"manifest(
+    {
+        "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
+        "driverName": {
+            "value": "Stub Driver",
+            "localization": {
+                "ru_RU": "Stub driver (translated to Russian)"
+            }
+        },
+        "outputEventTypes": [
+            {
+                "eventTypeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                "eventName": {
+                    "value": "Line crossing",
+                    "localization": {
+                        "ru_RU": "Line crossing (translated to Russian)"
+                    }
+                }
+            },
+            {
+                "eventTypeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
+                "eventName": {
+                    "value": "Object in the area",
+                    "localization": {
+                        "ru_RU": "Object in the area (translated to Russian)"
+                    }
+                }
+            }
+        ]
+    }
+    )manifest";
+}
+
 } // namespace metadata
 } // namespace sdk
 } // namespace nx

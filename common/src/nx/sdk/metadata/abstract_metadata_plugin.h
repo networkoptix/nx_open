@@ -1,9 +1,9 @@
 #pragma once
 
 #include <plugins/plugin_api.h>
-#include <plugins/metadata/abstract_metadata_manager.h>
-#include <plugins/metadata/abstract_serializer.h>
-#include <plugins/metadata/utils.h>
+#include <nx/sdk/common.h>
+#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/abstract_serializer.h>
 
 namespace nx {
 namespace sdk {
@@ -53,6 +53,12 @@ public:
     virtual AbstractSerializer* serializerForType(
         const nxpl::NX_GUID& typeGuid,
         Error* outError) = 0;
+    /**
+     * @brief provides null terminated UTF8 string containing json manifest
+     * according to nx_metadata_plugin_manifest.schema.json.     
+     * @return pointer to c-style string which MUST be valid till plugin object exists 
+     */
+    virtual const char* capabilitiesManifest(Error* error) const = 0;
 };
 
 typedef nxpl::PluginInterface* (*CreateNxMetadataPluginProc)();

@@ -1,33 +1,38 @@
 #include "manager_pool.h"
 
-#include <common/common_module.h>
 #include <media_server/media_server_module.h>
+
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/serialization/json.h>
+
 #include <nx/mediaserver/metadata/event_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+
 #include <nx/api/analytics/supported_events.h>
+#include <nx/api/analytics/device_manifest.h>
 
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-namespace metadata_sdk = nx::sdk::metadata;
+using namespace nx::sdk;
+using namespace nx::sdk::metadata;
 
 ResourceMetadataContext::ResourceMetadataContext(
-    metadata_sdk::AbstractMetadataManager* metadataManager,
-    metadata_sdk::AbstractMetadataHandler* metadataHandler)
-    :
+    AbstractMetadataManager* metadataManager,
+    AbstractMetadataHandler* metadataHandler)
+:
     manager(
         metadataManager,
         ManagerDeleter(
-            [](metadata_sdk::AbstractMetadataManager* metadataManager)
+            [](AbstractMetadataManager* metadataManager)
             {
                 metadataManager->stopFetchingMetadata();
                 metadataManager->releaseRef();
@@ -37,168 +42,169 @@ ResourceMetadataContext::ResourceMetadataContext(
 }
 
 ManagerPool::ManagerPool(QnCommonModule* commonModule):
-    nx::core::resource::ResourcePoolAware(commonModule)
+    QnCommonModuleAware(commonModule)
 {
-    QObject::connect(
+    auto resourcePool = commonModule->resourcePool();
+    
+    connect(
+        resourcePool, &QnResourcePool::resourceAdded,
+        this, &ManagerPool::at_resourceAdded);
+
+    connect(
+        resourcePool, &QnResourcePool::resourceRemoved,
+        this, &ManagerPool::at_resourceRemoved);
+
+    connect(
         qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
-        this, &ManagerPool::rulesUpdated);
+        this, &ManagerPool::at_rulesUpdated);
 }
 
-void ManagerPool::resourceAdded(const QnResourcePtr& resource)
+void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
-    QnMutexLocker lock(&m_mutex);
-    QObject::connect(
+    connect(
         resource.data(), &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
-    QObject::connect(
+    connect(
         resource.data(), &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
-    handleResourceChangesUnsafe(resource);
+    handleResourceChanges(resource);
 }
 
-void ManagerPool::resourceRemoved(const QnResourcePtr& resource)
+void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
 {
-    QnMutexLocker lock(&m_mutex);
-    releaseResourceMetadataManagers(resource);
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
+    releaseResourceMetadataManagers(camera);
 }
 
-void ManagerPool::rulesUpdated(const std::set<QnUuid>& affectedResources)
+void ManagerPool::at_rulesUpdated(const std::set<QnUuid>& affectedResources)
 {
-    QnMutexLocker lock(&m_mutex);
     for (const auto& resourceId: affectedResources)
     {
-        handleResourceChangesUnsafe(
-            commonModule()
-                ->resourcePool()
-                ->getResourceById(resourceId));
+        auto resource = commonModule()
+            ->resourcePool()
+            ->getResourceById(resourceId);
+
+        handleResourceChanges(resource);
     }
 }
 
-metadata_sdk::AbstractMetadataHandler* ManagerPool::createMetadataHandler(
-    const QnResourcePtr& resource,
-    const nx::api::AnalyticsDriverManifest& manifest)
+nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
-    auto handler = new EventHandler();
-    handler->setResource(resource);
-    handler->setPluginId(manifest.driverId);
-
-    return handler;
-}
-
-void ManagerPool::createMetadataManagersForResource(const QnResourcePtr& resource)
-{
-    auto resourceId = resource->getId();
-    if (!canFetchMetadataFromResource(resourceId))
-        return;
-
-    releaseResourceMetadataManagers(resource);
-
     auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("Can not access PluginManager instance"));
     if (!pluginManager)
+        return PluginList();
+
+    return pluginManager->findNxPlugins<AbstractMetadataPlugin>(
+        IID_MetadataPlugin);
+}
+
+void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera)
+{
+    NX_ASSERT(camera);
+    if (!camera)
         return;
 
-    auto plugins = pluginManager->findNxPlugins<metadata_sdk::AbstractMetadataPlugin>(
-        metadata_sdk::IID_MetadataPlugin);
+    auto cameraId = camera->getId();
+    if (!canFetchMetadataFromResource(camera))
+        return;
+
+    releaseResourceMetadataManagers(camera);
+
+    auto plugins = availablePlugins();
 
     for (auto& plugin: plugins)
     {
-        metadata_sdk::Error error = metadata_sdk::Error::noError;
-        metadata_sdk::ResourceInfo resourceInfo;
-        bool success = resourceInfoFromResource(resource, &resourceInfo);
-        if (!success)
-            return;
-
-        nxpt::ScopedRef<metadata_sdk::AbstractMetadataManager> manager(
-            plugin->managerForResource(resourceInfo, &error));
-
+        auto manager = createMetadataManager(camera, plugin);
         if (!manager)
             continue;
 
-        auto manifest = deserializeManifest(manager->capabiltiesManifest());
-        if (!manifest.is_initialized())
+        nxpt::ScopedRef<AbstractMetadataManager> managerGuard(manager, false);
+
+        auto pluginManifest = addManifestToServer(plugin);
+        if (!pluginManifest)
             continue;
 
-        auto server = commonModule()
-            ->resourcePool()
-            ->getResourceById(commonModule()->moduleGUID())
-                .dynamicCast<QnMediaServerResource>();
+        auto deviceManifest = addManifestToCamera(camera, manager);
+        if (!deviceManifest)
+            continue;
 
-        if (!server)
-            return;
-
-        server->setAnalyticsDrivers({*manifest});
-
-        auto nonConstResource = commonModule()
-            ->resourcePool()
-            ->getResourceById(resource->getId());
-
-        if (!nonConstResource)
-            return;
-
-        auto secRes = nonConstResource.dynamicCast<QnSecurityCamResource>();
-
-        nx::api::AnalyticsSupportedEvents analyticsSupportedEvents;
-        for (const auto& event: manifest->outputEventTypes)
-            analyticsSupportedEvents.push_back(event.eventTypeId);
-
-        secRes->setAnalyticsSupportedEvents({analyticsSupportedEvents});
-
-        auto handler = createMetadataHandler(secRes, *manifest);
+        auto handler = createMetadataHandler(camera, pluginManifest->driverId);
         if (!handler)
             continue;
 
         m_contexts.emplace(
-            resource->getId(),
-            ResourceMetadataContext(manager.get(), handler));
+            camera->getId(),
+            ResourceMetadataContext(manager, handler));
+
+        managerGuard.release();
     }
 }
 
-void ManagerPool::releaseResourceMetadataManagers(const QnResourcePtr& resource)
+AbstractMetadataManager* ManagerPool::createMetadataManager(
+    const QnSecurityCamResourcePtr& camera,
+    AbstractMetadataPlugin* plugin) const
+{
+    Error error = Error::noError;
+    ResourceInfo resourceInfo;
+    bool success = resourceInfoFromResource(camera, &resourceInfo);
+    if (!success)
+        return nullptr;
+
+    return plugin->managerForResource(resourceInfo, &error);
+}
+
+void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
 {
     auto id = resource->getId();
     auto range  = m_contexts.erase(id);
 }
 
+AbstractMetadataHandler* ManagerPool::createMetadataHandler(
+    const QnResourcePtr& resource,
+    const QnUuid& pluginId)
+{
+    auto handler = new EventHandler();
+    handler->setResource(resource);
+    handler->setPluginId(pluginId);
+
+    return handler;
+}
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
-    QnMutexLocker lock(&m_mutex);
-    handleResourceChangesUnsafe(resource);
-}
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
 
-void ManagerPool::handleResourceChangesUnsafe(const QnResourcePtr& resource)
-{
-    auto resourceId = resource->getId();
+    auto resourceId = camera->getId();
     auto& events = qnServerModule
         ->metadataRuleWatcher()
         ->watchedEventsForResource(resourceId);
 
-    if (canFetchMetadataFromResource(resourceId))
+    if (canFetchMetadataFromResource(camera))
     {
         auto context = m_contexts.find(resourceId);
         if (context == m_contexts.cend())
-            createMetadataManagersForResource(resource);
+            createMetadataManagersForResource(camera);
     }
 
     fetchMetadataForResource(resourceId, events);
 }
 
-bool ManagerPool::canFetchMetadataFromResource(const QnUuid& resourceId) const
+bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& camera) const
 {
-    auto resource = commonModule()
-        ->resourcePool()
-        ->getResourceById(resourceId);
-
-    if (!resource)
+    if (!camera)
         return false;
 
-    auto status = resource->getStatus();
-    return !resource->hasFlags(Qn::foreigner | Qn::desktop_camera)
-        && (status == Qn::Online || status == Qn::Recording)
-        && resource.dynamicCast<QnSecurityCamResource>();
+    const auto status = camera->getStatus();
+    return !camera->hasFlags(Qn::foreigner | Qn::desktop_camera)
+        && (status == Qn::Online || status == Qn::Recording);
 }
 
 bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, std::set<QnUuid>& eventTypeIds)
@@ -209,76 +215,111 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, std::set<Qn
 
     auto& manager = context->second.manager;
     auto& handler = context->second.handler;
-    metadata_sdk::Error result = metadata_sdk::Error::unknownError;
+    Error result = Error::unknownError;
 
     if (eventTypeIds.empty())
         result = manager->stopFetchingMetadata();
     else
         result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
 
-    return result == metadata_sdk::Error::noError;
+    return result == Error::noError;
+}
+
+boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServer(
+    AbstractMetadataPlugin* plugin)
+{
+    auto server = commonModule()
+        ->resourcePool()
+        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+
+    if (!server)
+        return boost::none;
+
+    Error error = Error::noError;
+    auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
+        plugin->capabilitiesManifest(&error));
+
+    if (!pluginManifest || error != Error::noError)
+        boost::none;
+
+    auto existingManifests = server->analyticsDrivers();
+    for (const auto& existingManifest : existingManifests)
+    {
+        if (existingManifest.driverId == pluginManifest->driverId)
+            return pluginManifest;
+    }
+
+    existingManifests.push_back(*pluginManifest);
+    server->setAnalyticsDrivers(existingManifests);
+    server->saveParams();
+
+    return pluginManifest;
+}
+
+boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCamera(
+    const QnSecurityCamResourcePtr& camera,
+    AbstractMetadataManager* manager)
+{
+    NX_ASSERT(manager);
+    NX_ASSERT(camera);
+
+    Error error = Error::noError;
+    auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
+        manager->capabilitiesManifest(&error));
+
+    if (!deviceManifest || error != Error::noError)
+        return boost::none;
+
+    camera->setAnalyticsSupportedEvents(deviceManifest->supportedEventTypes);
+    camera->saveParams();
+
+    return deviceManifest;
 }
 
 bool ManagerPool::resourceInfoFromResource(
-    const QnResourcePtr& resource,
-    metadata_sdk::ResourceInfo* outResourceInfo) const
+    const QnSecurityCamResourcePtr& camera,
+    ResourceInfo* outResourceInfo) const
 {
-    auto secRes = resource.dynamicCast<QnSecurityCamResource>();
-    if (!secRes)
-        return false;
+    NX_ASSERT(camera);
+    NX_ASSERT(outResourceInfo);
 
     strncpy(
         outResourceInfo->vendor,
-        secRes->getVendor().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        camera->getVendor().toUtf8().data(),
+        ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->model,
-        secRes->getModel().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        camera->getModel().toUtf8().data(),
+        ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->firmware,
-        secRes->getFirmware().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        camera->getFirmware().toUtf8().data(),
+        ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->uid,
-        secRes->getId().toByteArray().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        camera->getId().toByteArray().data(),
+        ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->url,
-        secRes->getUrl().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kTextParameterMaxLength);
+        camera->getUrl().toUtf8().data(),
+        ResourceInfo::kTextParameterMaxLength);
 
-    auto auth = secRes->getAuth();
+    auto auth = camera->getAuth();
     strncpy(
         outResourceInfo->login,
         auth.user().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->password,
         auth.password().toUtf8().data(),
-        metadata_sdk::ResourceInfo::kStringParameterMaxLength);
+        ResourceInfo::kStringParameterMaxLength);
 
     return true;
-}
-
-boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::deserializeManifest(
-    const char* manifestString) const
-{
-    bool success = false;
-    auto deserialized =  QJson::deserialized<nx::api::AnalyticsDriverManifest>(
-        QString(manifestString).toUtf8(),
-        nx::api::AnalyticsDriverManifest(),
-        &success);
-
-    if (!success)
-        return boost::none;
-
-    return deserialized;
 }
 
 } // namespace metadata

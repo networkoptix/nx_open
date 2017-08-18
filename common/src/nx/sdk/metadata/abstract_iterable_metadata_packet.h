@@ -1,8 +1,8 @@
 #pragma once
 
 #include <plugins/plugin_api.h>
-#include <plugins/metadata/abstract_metadata_packet.h>
-#include <plugins/metadata/abstract_metadata_item.h>
+#include <nx/sdk/metadata/abstract_metadata_packet.h>
+#include <nx/sdk/metadata/abstract_metadata_item.h>
 
 namespace nx {
 namespace sdk {

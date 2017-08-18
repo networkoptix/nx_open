@@ -24,14 +24,15 @@ std::set<QnUuid> RuleHolder::updateRule(const nx::vms::event::RulePtr& rule)
     auto ruleId = rule->id();
     bool watched = isRuleBeingWatched(ruleId);
     bool analyticsSdkEventRule = isAnalyticsSdkEventRule(rule);
+    bool disabled = rule->isDisabled();
 
     if (!watched && !analyticsSdkEventRule)
         return result;
 
-    if (watched && !analyticsSdkEventRule)
+    if (watched && (!analyticsSdkEventRule || disabled))
         return removeRuleUnsafe(ruleId);
 
-    if (!watched && analyticsSdkEventRule)
+    if (!watched && analyticsSdkEventRule && !disabled)
         return addRuleUnsafe(rule);
 
     auto eventTypeId = rule->eventParams().analyticsEventId();
@@ -160,8 +161,9 @@ std::set<QnUuid> RuleHolder::watchedEvents(const QnUuid& resourceId) const
 std::set<QnUuid> RuleHolder::addRuleUnsafe(const nx::vms::event::RulePtr& rule)
 {
     std::set<QnUuid> result;
+    const bool disabled = rule->isDisabled();
 
-    if (!isAnalyticsSdkEventRule(rule))
+    if (!isAnalyticsSdkEventRule(rule) || disabled)
         return result;
 
     auto ruleId = rule->id();

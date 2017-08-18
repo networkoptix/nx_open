@@ -4,7 +4,6 @@
 
 namespace nx {
 namespace sdk {
-namespace metadata {
 
 struct ResourceInfo
 {
@@ -59,9 +58,9 @@ enum class Error
     noError,
     unknownError,
     needMoreBufferSpace,
-    typeIsNotSupported
+    typeIsNotSupported,
+    networkError
 };
 
-} // namespace metadata
 } // namespace sdk
 } // namespace nx

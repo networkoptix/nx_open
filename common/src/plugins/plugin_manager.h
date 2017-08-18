@@ -12,7 +12,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
-#include <plugins/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 
 
 //!Loads custom application plugins and provides plugin management methods

@@ -1,11 +1,11 @@
 #include "stub_metadata_manager.h"
-#include "common_event_metadata_packet.h"
-#include "common_detected_event.h"
 
 #include <iostream>
 #include <chrono>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/sdk/metadata/common_detected_event.h>
 
 namespace nx {
 namespace sdk {
@@ -44,7 +44,7 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::metadata::Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
+Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     
@@ -72,38 +72,17 @@ Error StubMetadataManager::stopFetchingMetadata()
     return stopFetchingMetadataUnsafe();
 }
 
-const char* StubMetadataManager::capabiltiesManifest() const
+const char* StubMetadataManager::capabilitiesManifest(Error* error) const
 {
+    *error = Error::noError;
+
     return R"manifest(
-    {
-        "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
-        "driverName": {
-            "value": "Stub Driver",
-            "localization": {
-                "ru_RU": "Stub driver (translated to Russian)"
-            }
-        },
-        "outputEventTypes": [
-            {
-                "eventTypeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
-                "eventName": {
-                    "value": "Line crossing",
-                    "localization": {
-                        "ru_RU": "Line crossing (translated to Russian)"
-                    }
-                }
-            },
-            {
-                "eventTypeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
-                "eventName": {
-                    "value": "Object in the area",
-                    "localization": {
-                        "ru_RU": "Object in the area (translated to Russian)"
-                    }
-                }
-            }
-        ]
-    }
+        {
+            "supportedEventTypes": [
+                "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
+            ]
+        }
     )manifest";
 }
 
@@ -114,7 +93,7 @@ StubMetadataManager::~StubMetadataManager()
 }
 
 
-nx::sdk::metadata::Error StubMetadataManager::stopFetchingMetadataUnsafe()
+Error StubMetadataManager::stopFetchingMetadataUnsafe()
 {
     m_stopping = true; //< looks like bsht
     if (m_thread)
@@ -163,7 +142,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
 int64_t StubMetadataManager::usSinceEpoch() const
 {
     using namespace std::chrono;
-    return duration_cast<milliseconds>(
+    return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
 

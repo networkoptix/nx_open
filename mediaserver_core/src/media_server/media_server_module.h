@@ -14,6 +14,7 @@ class QnStorageDbPool;
 class MSSettings;
 class PluginManager;
 class CommonPluginContainer;
+class QThread;
 
 namespace nx { 
 namespace mediaserver {
@@ -75,6 +76,7 @@ private:
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
+    QThread* m_metadataManagerPoolThread = nullptr;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

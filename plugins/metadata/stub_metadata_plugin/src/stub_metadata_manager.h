@@ -5,8 +5,8 @@
 #include <memory>
 #include <mutex>
 
-#include <plugins/metadata/abstract_metadata_manager.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/abstract_metadata_manager.h>
 
 
 namespace nx {
@@ -26,7 +26,7 @@ public:
 
     virtual Error stopFetchingMetadata() override;
 
-    virtual const char* capabiltiesManifest() const override;
+    virtual const char* capabilitiesManifest(Error* error) const override;
 
 private:
     Error stopFetchingMetadataUnsafe();

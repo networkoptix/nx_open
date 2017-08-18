@@ -1,6 +1,7 @@
 #include "media_server_module.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -167,7 +168,10 @@ QnMediaServerModule::QnMediaServerModule(
         new nx::mediaserver::metadata::EventRuleWatcher(
             commonModule()->eventRuleManager()));
 
+    m_metadataManagerPoolThread = new QThread(this);
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+    m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
+    m_metadataManagerPoolThread->start();
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -177,6 +181,8 @@ QnMediaServerModule::~QnMediaServerModule()
 {
     m_commonModule->resourcePool()->clear();
     m_context.reset();
+    m_metadataManagerPoolThread->exit();
+    m_metadataManagerPoolThread->wait();
     clear();
 }
 

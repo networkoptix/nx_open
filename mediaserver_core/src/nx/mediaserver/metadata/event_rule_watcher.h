@@ -3,6 +3,8 @@
 #include <map>
 #include <set>
 
+#include <utils/common/connective.h>
+
 #include <nx/vms/event/rule_manager.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 
@@ -10,9 +12,9 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventRuleWatcher: public QObject
+class EventRuleWatcher: public Connective<QObject>
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     EventRuleWatcher(QObject* parent);
     virtual ~EventRuleWatcher();
@@ -29,6 +31,8 @@ signals:
 private:
     RuleHolder m_ruleHolder;
 };
+
+Q_DECLARE_METATYPE(std::set<QnUuid>);
 
 } // namespace metadata
 } // namespace mediaserver
