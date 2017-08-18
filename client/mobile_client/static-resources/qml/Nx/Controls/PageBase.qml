@@ -29,7 +29,7 @@ Page
         target: sideNavigation
         onOpenedChanged:
         {
-            if (page.activePage)
+            if (!sideNavigation.opened && page.activePage)
                 forceActiveFocus()
         }
     }
