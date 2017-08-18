@@ -54,14 +54,20 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
+     * Should be called before first read/send. Typically after instantiation and bindToAioThread().
+     * If you need to call it on working socket, first call cancelIOSync().
+     */
+    void start();
+
+    /**
      * Makes sense only in multiFrameMessage mode.
      * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     /**
-     * After this timeout expired without any read activity
-     * read handler (if any) will be invoked with SystemError::timedOut.
+     * After this timeout expired without any read activity read handler (if any) will be invoked
+     * with SystemError::timedOut. Should be called before start().
      */
     void setAliveTimeout(std::chrono::milliseconds timeout);
     AbstractStreamSocket* socket() { return m_socket.get(); }

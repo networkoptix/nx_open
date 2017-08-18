@@ -266,7 +266,6 @@ linux*:!android {
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 
   equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
-  contains(TEMPLATE, "lib"): LIBS += "-Wl,--allow-shlib-undefined"
 }
 
 ## MAC OS
@@ -279,10 +278,6 @@ macx {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
-
-  contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup
-  }
 }
 
 ## ANDROID
