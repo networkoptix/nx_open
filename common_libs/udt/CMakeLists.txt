@@ -13,6 +13,6 @@ if(WINDOWS)
     target_link_libraries(udt ws2_32)
 endif()
 
-if(LINUX)
+if(LINUX AND NOT ANDROID)
     target_link_libraries(udt rt pthread)
 endif()
