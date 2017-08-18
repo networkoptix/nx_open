@@ -776,6 +776,7 @@
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
                 <qt.version>5.6.2-2</qt.version>
+                <festival.version>2.1</festival.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
