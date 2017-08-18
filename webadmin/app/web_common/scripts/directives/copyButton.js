@@ -1,32 +1,36 @@
 angular.module('nxCommon')
-	.directive('copyButton', ['$timeout', function ($timeout) {
+	.directive('copyButton', ['$timeout', '$log', function ($timeout, $Log) {
 		return{
 			restrict: 'E',
         	scope:{
-                clipboardSupported: "=",
-                copyDefaultText: "@",
-                copyActiveText: "@",
-                copyTitle: '@',
+                defaultText: "@",
+                activeText: "@",
+                hoverText: '@',
                 copyData: '='
         	},
         	templateUrl: Config.viewsDirCommon + 'components/copyButton.html',
         	link: function(scope){
                 
-                scope.copyTitle = scope.copyTitle || L.common.cameraLinks.copyToClipboard;
-                scope.copyDefaultText = scope.copyDefaultText || L.common.cameraLinks.copyDefaultText;
-                scope.copyActiveText = scope.copyActiveText || L.common.cameraLinks.copyActiveText;
+                scope.hoverText = scope.hoverText || L.common.cameraLinks.copyToClipboard;
+                scope.defaultText = scope.defaultText || L.common.cameraLinks.copyDefaultText;
+                scope.activeText = scope.activeText || L.common.cameraLinks.copyActiveText;
+                scope.clipboardSupported = true; // presume
                 
-                scope.copyText = scope.copyDefaultText;
-        		
+                scope.displayedText = scope.defaultText;
+
                 function resetButton(){
-        			scope.copyText = scope.copyDefaultText;
+        			scope.displayedText = scope.defaultText;
         		}
 
-                var revertCopyTextTimer = Config.webclient.resetCopyTextTimer;
-        		scope.alertClick = function(){
-        			scope.copyText = scope.copyActiveText;
-        			$timeout(function(){resetButton();}, resetCopyTextTimer);
+                var resetDisplayedTextTimer = Config.webclient.resetDisplayedTextTimer;
+        		scope.copySuccess = function(){
+        			scope.displayedText = scope.activeText;
+        			$timeout(resetButton, resetDisplayedTextTimer);
         		};
+
+                scope.copyError = function(err){
+                    $log.error('Clipboard error: %s', err);
+                };
         	}
 		};
 	}]);
