@@ -1,2 +1,3 @@
-<a class="copy-button" clipboard href="" title="{{copyTitle}}"
-   text="copyData" ng-click="alertClick()" >{{copyText}}</a>
+<a class="copy-button" clipboard href=""
+   title="{{copyTitle}}" text="copyData"
+   ng-click="alertClick()" ng-if="clipboardSupported">{{copyText}}</a>

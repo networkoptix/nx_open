@@ -9,7 +9,7 @@
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
-                <copy-button ng-if="clipboardSupported" copy-title="L.common.cameraLinks.copyToClipboard"
+                <copy-button clipboard-supported="clipboardSupported"
                              copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>
