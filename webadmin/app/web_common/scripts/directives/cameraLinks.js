@@ -33,8 +33,6 @@ angular.module('nxCommon')
                 scope.usePassword = 'password';
                 scope.L = L;
 
-                scope.clipboardSupported = true; // presume
-
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
                         case 0:
