@@ -491,10 +491,10 @@ table.webclient-window>tbody>tr>td{
       vertical-align: top;
       a{
         text-decoration: underline;
-        text-decoration-color: $blue10;
+        text-decoration-color: $link-color;
       }
       a:hover{
-        text-decoration-color: $blue9 !important;
+        text-decoration-color: $link-hover-color !important;
       }
     }
     & tr{

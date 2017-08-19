@@ -134,10 +134,8 @@
         <label class="col-sm-2 control-label">POST data</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
-            <p class="help-block" ng-if="clipboardSupported">
-                <a clipboard
-                   supported="clipboardSupported"
-                   text="getPostData()" href="">Copy to clipboard</a>
+            <p class="help-block">
+                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </p>
         </div>
     </div>
@@ -172,9 +170,8 @@
         <label class="col-sm-2 control-label">Response</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
-            <p class="help-block" ng-if="clipboardSupported">
-                <a clipboard
-                   text="result.result" href="">Copy to clipboard</a>
+            <p class="help-block">
+                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </p>
         </div>
     </div>

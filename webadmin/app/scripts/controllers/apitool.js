@@ -34,7 +34,6 @@ angular.module('webadminApp')
         var activeApiMethod = $routeParams.apiMethod;
         $scope.Config = Config;
         $scope.session = $sessionStorage;
-        $scope.clipboardSupported = true; // presume
 
         if($location.search().proprietary){
             Config.allowProprietary = $location.search().proprietary;
