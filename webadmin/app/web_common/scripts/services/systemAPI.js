@@ -73,6 +73,12 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
+        ServerConnection.prototype.apiHost = function(){
+            if(this.systemId){
+                return window.location.host + Config.gatewayUrl + '/' + this.systemId;
+            }
+            return window.location.host;
+        };
         ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
             var auth = method=='GET'? this.authGet() : this.authPost();

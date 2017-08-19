@@ -9,7 +9,7 @@ angular.module('nxCommon')
             return url.indexOf('//') >= 0 ? url : "//"+url;
         };
     })
-    .directive('cameraLinks', [function () {
+    .directive('cameraLinks', ['systemAPI', function (systemAPI) {
         return {
             restrict: 'E',
             scope: {
@@ -58,7 +58,7 @@ angular.module('nxCommon')
 
                     return linkTemplates[transport].
                         replace("{{credentials}}", scope.useCredentials?(scope.useLogin + ':' + scope.usePassword + '@'):'').
-                        replace("{{host}}", window.location.host).
+                        replace("{{host}}", systemAPI.apiHost()). // window.location.host
                         replace("{{cameraId}}", camera.id.replace('{','').replace('}','')).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').

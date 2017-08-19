@@ -338,6 +338,10 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
             archiveReadyDefer.resolve(false);
             return; //No chunks for this camera
         }
+        if(self.chunksTree.start > timeManager.nowToDisplay()){
+            archiveReadyDefer.resolve(false);
+            return; //Chunks are from future
+        }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start, width);
