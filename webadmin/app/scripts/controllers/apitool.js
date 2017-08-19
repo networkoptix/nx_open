@@ -149,7 +149,10 @@ angular.module('webadminApp')
                 name:'/api/moduleInformation',
                 data:'',
                 params: '',
-                method:'GET'
+                method:'GET',
+                addCredentials: false,
+                login: 'login',
+                password: 'password'
             };
         }
 
@@ -173,9 +176,12 @@ angular.module('webadminApp')
         };
         $scope.getDebugUrl = function(){
             if($scope.apiMethod.method == 'GET'){
-                return mediaserver.debugFunctionUrl($scope.apiMethod.name, cleanParams($scope.apiMethod.params));
+                return mediaserver.debugFunctionUrl($scope.apiMethod.name,
+                                                    cleanParams($scope.apiMethod.params),
+                                                    $scope.apiMethod.addCredentials && $scope.apiMethod);
             }
-            return mediaserver.debugFunctionUrl($scope.apiMethod.name);
+            return mediaserver.debugFunctionUrl($scope.apiMethod.name, null,
+                                                $scope.apiMethod.addCredentials && $scope.apiMethod);
         };
 
         $scope.getPostData = function(){
