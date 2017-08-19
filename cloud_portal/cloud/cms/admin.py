@@ -61,7 +61,7 @@ admin.site.register(Context, ContextAdmin)
 
 class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'name', 'description', 'translatable', 'type')
-    list_filter = ('context', 'translatable', 'language')
+    list_filter = ('context', 'translatable')
     search_fields = ('context__name', 'name', 'description', 'type')
 
 admin.site.register(DataStructure, DataStructureAdmin)
