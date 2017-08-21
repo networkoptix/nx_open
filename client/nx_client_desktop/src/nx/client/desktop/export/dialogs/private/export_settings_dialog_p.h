@@ -9,7 +9,7 @@
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
-#include <nx/client/desktop/export/widgets/overlay_label_widget.h>
+#include <nx/client/desktop/export/widgets/export_overlay_widget.h>
 
 #include <utils/common/connective.h>
 

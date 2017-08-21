@@ -1,4 +1,4 @@
-#include "overlay_label_widget.h"
+#include "export_overlay_widget.h"
 
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
