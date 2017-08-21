@@ -313,6 +313,8 @@ PageBase
                 {
                     readonly property bool onlyCompactTitleIsVisible:
                         compact && title != "" && description == "" && buttonText == ""
+
+                    contentItem.anchors.rightMargin: 8 + (width - videoScreen.width)
                     compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
                 }
