@@ -33,10 +33,12 @@ bool SelectableTextButtonGroup::add(SelectableTextButton* button)
     connect(button, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
         {
+            const auto button = static_cast<SelectableTextButton*>(sender());
+            emit buttonStateChanged(button);
+
             if (m_selectionChanging)
                 return;
 
-            const auto button = static_cast<SelectableTextButton*>(sender());
             if (state == SelectableTextButton::State::selected)
                 setSelected(button);
             else if (button == m_selected)

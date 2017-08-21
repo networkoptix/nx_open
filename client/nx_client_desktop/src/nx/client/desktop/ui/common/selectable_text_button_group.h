@@ -39,6 +39,8 @@ signals:
     void selectionChanged(SelectableTextButton* oldButton, SelectableTextButton* newButton);
         //< oldButton might be already destroyed.
 
+    void buttonStateChanged(SelectableTextButton* button);
+
 private:
     QSet<SelectableTextButton*> m_buttons;
     SelectableTextButton* m_selected = nullptr;
