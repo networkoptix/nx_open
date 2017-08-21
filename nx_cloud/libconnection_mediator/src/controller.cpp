@@ -33,7 +33,8 @@ Controller::Controller(
         stunMessageDispatcher,
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
-        &m_statsManager.collector())
+        &m_statsManager.collector()),
+    m_discoveredPeerPool(settings.discovery())
 {
     if (!m_cloudDataProvider)
     {
@@ -49,6 +50,11 @@ PeerRegistrator& Controller::listeningPeerRegistrator()
 ListeningPeerPool& Controller::listeningPeerPool()
 {
     return m_listeningPeerPool;
+}
+
+nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
+{
+    return m_discoveredPeerPool;
 }
 
 void Controller::stop()

@@ -68,7 +68,10 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         &stunServer->dispatcher());
     m_controller = &controller;
 
-    http::Server httpServer(settings, controller.listeningPeerRegistrator());
+    http::Server httpServer(
+        settings,
+        controller.listeningPeerRegistrator(),
+        &controller.discoveredPeerPool());
     m_httpServer = &httpServer;
 
     // TODO: #ak Following call should be removed. 
