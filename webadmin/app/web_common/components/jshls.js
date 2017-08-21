@@ -460,13 +460,6 @@ function JsHlsAPI(manifestLoadingTimeOut){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    if(this.video){
-        //This unbinds all of the event listeners for the video player
-        var cloneVideo = this.video.cloneNode(true);
-        if(this.video.parentNode){
-            this.video.parentNode.replaceChild(cloneVideo, this.video);
-        }
-    }
     this.hls.destroy();
 };
 
