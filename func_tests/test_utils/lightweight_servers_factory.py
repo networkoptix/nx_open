@@ -70,6 +70,7 @@ class LightweightServersInstallation(object):
     def __init__(self, host, dir):
         self.host = host
         self.dir = dir
+        self.test_tmp_dir = os.path.join(dir, 'tmp')
         self.log_path_base = os.path.join(dir, 'lws')
 
     def cleanup_var_dir(self):
@@ -81,6 +82,9 @@ class LightweightServersInstallation(object):
     def cleanup_core_files(self):
         for path in self.list_core_files():
             self.host.run_command(['rm', path])
+
+    def cleanup_test_tmp_dir(self):
+        self.host.rm_tree(self.test_tmp_dir, ignore_errors=True)
 
     def reset_config(self, **kw):
         self._not_supported()
@@ -177,11 +181,8 @@ class LightweightServersHost(object):
         self._allocated = False
 
     def _init(self):
-        self._cleanup_core_files()
-
-    def _cleanup_core_files(self):
-        for path in self._installation.list_core_files():
-            self._host.run_command(['rm', path])
+        self._installation.cleanup_core_files()
+        self._installation.cleanup_test_tmp_dir()
 
     def _cleanup_log_files(self):
         file_list = self._host.expand_glob(os.path.join(self._installation.dir, 'lws*.log'))
@@ -196,6 +197,7 @@ class LightweightServersHost(object):
             LOG_PATH_BASE=self._installation.log_path_base,
             SERVER_COUNT=server_count,
             PORT_BASE=LWS_PORT_BASE,
+            TEST_TMP_DIR=self._installation.test_tmp_dir,
             **lws_params)
         lws_ctl_path = os.path.join(lws_dir, SERVER_CTL_TARGET_PATH)
         self._host.write_file(lws_ctl_path, contents)
