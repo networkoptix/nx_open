@@ -150,6 +150,24 @@ void QnGLRenderer::beforeDestroy()
 	m_vertices.clear();
 }
 
+bool QnGLRenderer::isBlurEnabled() const
+{
+    return m_blurEnabled;
+}
+
+void QnGLRenderer::setBlurEnabled(bool value)
+{
+    if (m_blurEnabled == value)
+        return;
+
+    m_blurEnabled = value;
+    if (!value)
+    {
+        m_blurBufferA.reset();
+        m_blurBufferB.reset();
+    }
+}
+
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 {
     // normalize the values
@@ -161,6 +179,8 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 
 Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
 {
+    NX_ASSERT(QOpenGLFramebufferObject::hasOpenGLFramebufferObjects());
+
     QSize result;
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
     if (!picLock.get())
@@ -175,6 +195,10 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
         qreal ar = result.width() / (qreal) result.height();
         result = QSize(kMaxBlurSize, kMaxBlurSize / ar);
     }
+
+    // QOpenGLFramebufferObject texture size must be power of 2 for compatibility reasons.
+    result.setWidth(minPow2(result.width()));
+    result.setHeight(minPow2(result.height()));
 
     if (!m_blurBufferA || m_blurBufferA->size() != result)
     {
@@ -244,6 +268,8 @@ void QnGLRenderer::setBlurFactor(qreal value)
 
 Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 {
+    NX_ASSERT(QOpenGLFramebufferObject::hasOpenGLFramebufferObjects());
+
     GLint prevViewPort[4];
     glGetIntegerv(GL_VIEWPORT, prevViewPort);
 
@@ -289,7 +315,9 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
 
-    if (qFuzzyEquals(m_blurFactor, 0.0))
+    if (!m_blurEnabled
+        || !QOpenGLFramebufferObject::hasOpenGLFramebufferObjects()
+        || qFuzzyEquals(m_blurFactor, 0.0))
     {
         m_blurBufferA.reset();
         m_blurBufferB.reset();
