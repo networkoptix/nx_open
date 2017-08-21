@@ -31,7 +31,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
         addArg("-http/sslSupport", "false");
     }
 
-    // Do not allow VmsGateway initialize it's own log.
+    // Do not allow VmsGateway to reinitialize log.
     addArg("-log/logLevel", "notConfigured");
 
     if (startAndWaitUntilStarted())
