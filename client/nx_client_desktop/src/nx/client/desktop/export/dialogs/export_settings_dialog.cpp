@@ -41,6 +41,7 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     ui(new Ui::ExportSettingsDialog)
 {
     ui->setupUi(this);
+    d->createOverlays(ui->cameraPreviewWidget);
 
     setupSettingsButtons();
 
@@ -59,15 +60,24 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
+    // FIXME!
+    // TODO: #vkutin Update model, not overlay widget.
+    connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged, this,
+        [this]() { d->overlay(Private::OverlayType::text)->setText(ui->textSettingsPage->text()); });
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
 {
+    static const auto kPagePropertyName = "_qn_ExportSettingsPage";
+    static const auto kOverlayPropertyName = "_qn_ExportSettingsOverlay";
+
     ui->cameraExportSettingsButton->setText(tr("Export Settings"));
     ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
         lit("buttons/settings_hovered.png"),
         lit("buttons/settings_selected.png")));
     ui->cameraExportSettingsButton->setState(SelectableTextButton::State::selected);
+    ui->cameraExportSettingsButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->exportMediaSettingsPage));
 
     ui->layoutExportSettingsButton->setText(tr("Export Settings"));
     ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
@@ -82,6 +92,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->timestampButton->setIcon(qnSkin->icon(
         lit("buttons/timestamp_hovered.png"),
         lit("buttons/timestamp_selected.png")));
+    ui->timestampButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->timestampSettingsPage));
+    ui->timestampButton->setProperty(kOverlayPropertyName,
+        qVariantFromValue(d->overlay(Private::OverlayType::timestamp)));
 
     ui->imageButton->setDeactivatable(true);
     ui->imageButton->setDeactivatedText(tr("Add Image"));
@@ -90,6 +104,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setIcon(qnSkin->icon(
         lit("buttons/image_hovered.png"),
         lit("buttons/image_selected.png")));
+    ui->imageButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->imageSettingsPage));
+    ui->imageButton->setProperty(kOverlayPropertyName,
+        qVariantFromValue(d->overlay(Private::OverlayType::image)));
 
     ui->textButton->setDeactivatable(true);
     ui->textButton->setDeactivatedText(tr("Add Text"));
@@ -98,6 +116,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setIcon(qnSkin->icon(
         lit("buttons/text_hovered.png"),
         lit("buttons/text_selected.png")));
+    ui->textButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->textSettingsPage));
+    ui->textButton->setProperty(kOverlayPropertyName,
+        qVariantFromValue(d->overlay(Private::OverlayType::text)));
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
@@ -106,6 +128,8 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->speedButton->setIcon(qnSkin->icon(
         lit("buttons/rapid_review_hovered.png"),
         lit("buttons/rapid_review_selected.png")));
+    ui->speedButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->rapidReviewSettingsPage));
 
     auto group = new SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
@@ -120,16 +144,18 @@ void ExportSettingsDialog::setupSettingsButtons()
         {
             if (!selected)
                 return;
-            if (selected == ui->cameraExportSettingsButton)
-                ui->stackedWidget->setCurrentWidget(ui->exportMediaSettingsPage);
-            else if (selected == ui->timestampButton)
-                ui->stackedWidget->setCurrentWidget(ui->timestampSettingsPage);
-            else if (selected == ui->imageButton)
-                ui->stackedWidget->setCurrentWidget(ui->imageSettingsPage);
-            else if (selected == ui->textButton)
-                ui->stackedWidget->setCurrentWidget(ui->textSettingsPage);
-            else if (selected == ui->speedButton)
-                ui->stackedWidget->setCurrentWidget(ui->rapidReviewSettingsPage);
+
+            const auto page = selected->property(kPagePropertyName).value<QWidget*>();
+            ui->stackedWidget->setCurrentWidget(page);
+        });
+
+    connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
+        [this](SelectableTextButton* button)
+        {
+            NX_EXPECT(button);
+            const auto overlay = button->property(kOverlayPropertyName).value<QWidget*>();
+            if (overlay)
+                overlay->setHidden(button->state() == SelectableTextButton::State::deactivated);
         });
 }
 

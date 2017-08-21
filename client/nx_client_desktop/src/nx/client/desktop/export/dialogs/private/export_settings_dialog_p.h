@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
@@ -7,8 +9,11 @@
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
+#include <nx/client/desktop/export/widgets/overlay_label_widget.h>
 
 #include <utils/common/connective.h>
+
+class QWidget;
 
 namespace nx {
 namespace client {
@@ -24,6 +29,14 @@ public:
     enum class ErrorCode
     {
         ok,
+    };
+
+    enum class OverlayType
+    {
+        timestamp,
+        image,
+        text,
+        overlayCount
     };
 
     explicit Private(QObject* parent = nullptr);
@@ -43,6 +56,11 @@ public:
     const ExportMediaSettings& exportMediaSettings() const;
     const ExportLayoutSettings& exportLayoutSettings() const;
 
+    void createOverlays(QWidget* overlayContainer);
+
+    OverlayLabelWidget* overlay(OverlayType type);
+    const OverlayLabelWidget* overlay(OverlayType type) const;
+
 signals:
     void statusChanged(ErrorCode value);
 
@@ -54,6 +72,9 @@ private:
     ErrorCode m_status = ErrorCode::ok;
     ExportMediaSettings m_exportMediaSettings;
     ExportLayoutSettings m_exportLayoutSettings;
+
+    static constexpr size_t overlayCount = size_t(OverlayType::overlayCount);
+    std::array<OverlayLabelWidget*, overlayCount> m_overlays {};
 };
 
 } // namespace ui

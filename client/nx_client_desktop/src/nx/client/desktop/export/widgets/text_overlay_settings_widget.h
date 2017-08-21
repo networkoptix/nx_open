@@ -18,6 +18,12 @@ class TextOverlaySettingsWidget: public QWidget
 public:
     TextOverlaySettingsWidget(QWidget* parent = nullptr);
 
+    QString text() const;
+    void setText(const QString& value);
+
+signals:
+    void dataChanged();
+
 private:
     QScopedPointer<Ui::TextOverlaySettingsWidget> ui;
 };

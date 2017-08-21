@@ -52,12 +52,12 @@
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
-           <cstring>opacitySlider</cstring>
+           <cstring>widthSlider</cstring>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSlider" name="opacitySlider">
+         <widget class="QSlider" name="widthSlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -76,12 +76,12 @@
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
-           <cstring>sizeSlider</cstring>
+           <cstring>fontSizeSlider</cstring>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSlider" name="sizeSlider">
+         <widget class="QSlider" name="fontSizeSlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -109,8 +109,8 @@
  </widget>
  <tabstops>
   <tabstop>plainTextEdit</tabstop>
-  <tabstop>opacitySlider</tabstop>
-  <tabstop>sizeSlider</tabstop>
+  <tabstop>widthSlider</tabstop>
+  <tabstop>fontSizeSlider</tabstop>
  </tabstops>
  <resources/>
  <connections/>

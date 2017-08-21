@@ -16,6 +16,25 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});
+
+    connect(ui->plainTextEdit, &QPlainTextEdit::textChanged,
+        [this]() { emit dataChanged(); });
+
+    connect(ui->fontSizeSlider, &QAbstractSlider::valueChanged,
+        this, &TextOverlaySettingsWidget::dataChanged);
+
+    connect(ui->widthSlider, &QAbstractSlider::valueChanged,
+        this, &TextOverlaySettingsWidget::dataChanged);
+}
+
+QString TextOverlaySettingsWidget::text() const
+{
+    return ui->plainTextEdit->toPlainText();
+}
+
+void TextOverlaySettingsWidget::setText(const QString& value)
+{
+    ui->plainTextEdit->setPlainText(value);
 }
 
 } // namespace ui

@@ -2,7 +2,9 @@
 
 #include <QtCore/QFileInfo>
 
+#include <ui/style/skin.h>
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -13,12 +15,10 @@ namespace ui {
 ExportSettingsDialog::Private::Private(QObject* parent):
     base_type(parent)
 {
-
 }
 
 ExportSettingsDialog::Private::~Private()
 {
-
 }
 
 void ExportSettingsDialog::Private::loadSettings()
@@ -81,6 +81,40 @@ void ExportSettingsDialog::Private::setStatus(ErrorCode value)
 
     m_status = value;
     emit statusChanged(value);
+}
+
+void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
+{
+    if (m_overlays[0])
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "ExportSettingsDialog::Private::createOverlays called twice");
+        return;
+    }
+
+    for (size_t index = 0; index != overlayCount; ++index)
+    {
+        m_overlays[index] = new OverlayLabelWidget(overlayContainer);
+        m_overlays[index]->setHidden(true);
+    }
+
+    overlay(OverlayType::timestamp)->setText(
+        qnSyncTime->currentDateTime().toString(Qt::DefaultLocaleLongDate));
+
+    overlay(OverlayType::image)->setPixmap(qnSkin->pixmap(lit("welcome_page/logo.png")));
+
+    static constexpr int kDefaultTextWidth = 160;
+    overlay(OverlayType::text)->setFixedWidth(kDefaultTextWidth);
+    overlay(OverlayType::text)->setWordWrap(true);
+}
+
+OverlayLabelWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
+{
+    return m_overlays[int(type)];
+}
+
+const OverlayLabelWidget* ExportSettingsDialog::Private::overlay(OverlayType type) const
+{
+    return m_overlays[int(type)];
 }
 
 } // namespace ui
