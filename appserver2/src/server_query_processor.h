@@ -12,6 +12,10 @@
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
+
+#include <nx/vms/event/rule.h>
+#include "nx_ec/data/api_conversion_functions.h"
+
 #include "utils/common/threadqueue.h"
 #include <transaction/message_bus_adapter.h>
 
@@ -648,13 +652,17 @@ private:
             tran.transactionType,
             m_db.getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsPostProcessList);
-        if(errorCode != ErrorCode::ok)
+
+        if (errorCode != ErrorCode::ok)
             return errorCode;
+
+        ApiBusinessRuleDataList defaultRules;
+        fromResourceListToApi(nx::vms::event::Rule::getDefaultRules(), defaultRules);
 
         return processMultiUpdateSync(
             ApiCommand::saveEventRule,
             tran.transactionType,
-            tran.params.defaultRules,
+            defaultRules,
             transactionsPostProcessList);
     }
 
