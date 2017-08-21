@@ -68,7 +68,7 @@ private:
         void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnection();
         void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
-        QString idForToStringFromPtr() const;
+        QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
