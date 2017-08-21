@@ -141,7 +141,7 @@ private:
         nx::utils::promise<boost::optional<InstanceInformation>> done;
         httpClient.execute(
             [&done](
-                SystemError::ErrorCode systemErrorCode,
+                SystemError::ErrorCode /*systemErrorCode*/,
                 const nx_http::Response* response,
                 InstanceInformation instanceInformation)
             {
