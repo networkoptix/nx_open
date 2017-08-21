@@ -8,22 +8,26 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-class OverlayLabelWidget: public QWidget
+class ExportOverlayWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    OverlayLabelWidget(QWidget* parent = nullptr);
+    ExportOverlayWidget(QWidget* parent = nullptr);
 
     QString text() const;
     void setText(const QString& value);
 
-    bool wordWrap() const;
-    void setWordWrap(bool value);
+    int textWidth() const;
+    void setTextWidth(int value);
 
-    QPixmap pixmap() const;
-    void setPixmap(const QPixmap& value);
+    QImage image() const;
+    void setImage(const QImage& value);
+    void setImage(const QPixmap& value);
+
+    qreal scale() const;
+    void setScale(qreal value);
 
     bool borderVisible() const;
     void setBorderVisible(bool value);
@@ -46,7 +50,6 @@ private:
 
 private:
     struct Private;
-    class FrameWidget;
     QScopedPointer<Private> d;
 };
 

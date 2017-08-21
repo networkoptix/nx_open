@@ -93,26 +93,25 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
 
     for (size_t index = 0; index != overlayCount; ++index)
     {
-        m_overlays[index] = new OverlayLabelWidget(overlayContainer);
+        m_overlays[index] = new ExportOverlayWidget(overlayContainer);
         m_overlays[index]->setHidden(true);
     }
 
     overlay(OverlayType::timestamp)->setText(
         qnSyncTime->currentDateTime().toString(Qt::DefaultLocaleLongDate));
 
-    overlay(OverlayType::image)->setPixmap(qnSkin->pixmap(lit("welcome_page/logo.png")));
+    overlay(OverlayType::image)->setImage(qnSkin->pixmap(lit("welcome_page/logo.png")));
 
     static constexpr int kDefaultTextWidth = 160;
-    overlay(OverlayType::text)->setFixedWidth(kDefaultTextWidth);
-    overlay(OverlayType::text)->setWordWrap(true);
+    overlay(OverlayType::text)->setTextWidth(kDefaultTextWidth);
 }
 
-OverlayLabelWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
+ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
 {
     return m_overlays[int(type)];
 }
 
-const OverlayLabelWidget* ExportSettingsDialog::Private::overlay(OverlayType type) const
+const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type) const
 {
     return m_overlays[int(type)];
 }

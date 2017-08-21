@@ -58,8 +58,8 @@ public:
 
     void createOverlays(QWidget* overlayContainer);
 
-    OverlayLabelWidget* overlay(OverlayType type);
-    const OverlayLabelWidget* overlay(OverlayType type) const;
+    ExportOverlayWidget* overlay(OverlayType type);
+    const ExportOverlayWidget* overlay(OverlayType type) const;
 
 signals:
     void statusChanged(ErrorCode value);
@@ -74,7 +74,7 @@ private:
     ExportLayoutSettings m_exportLayoutSettings;
 
     static constexpr size_t overlayCount = size_t(OverlayType::overlayCount);
-    std::array<OverlayLabelWidget*, overlayCount> m_overlays {};
+    std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
 };
 
 } // namespace ui
