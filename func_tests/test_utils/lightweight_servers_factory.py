@@ -3,10 +3,10 @@
 import os.path
 import logging
 import datetime
-import time
 from requests.exceptions import ReadTimeout
 from .template_renderer import TemplateRenderer
 from . import utils
+from .utils import GrowingDelay
 from .core_file_traceback import create_core_file_traceback
 from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
@@ -116,6 +116,7 @@ class LightweightServer(Server):
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')
+        growing_delay = GrowingDelay()
         start_time = utils.datetime_utc_now()
         while utils.datetime_utc_now() - start_time < timeout:
             try:
@@ -127,7 +128,7 @@ class LightweightServer(Server):
             if response['serverFlags'] == 'SF_P2pSyncDone':
                 log.info('Lightweight servers merged between themselves in %s' % (utils.datetime_utc_now() - start_time))
                 return
-            time.sleep(10)
+            growing_delay.sleep()
         assert False, 'Lightweight servers did not merge between themselves in %s' % timeout
 
 

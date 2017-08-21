@@ -6,13 +6,13 @@
 import pytest
 import yaml
 import logging
-import time
 import requests
 import datetime
 import traceback
 import json
 from functools import wraps
 import test_utils.utils as utils
+from test_utils.utils import GrowingDelay
 from test_utils.compare import compare_values
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
@@ -24,7 +24,6 @@ import transaction_log
 log = logging.getLogger(__name__)
 
 
-MERGE_DONE_CHECK_PERIOD = datetime.timedelta(seconds=10)
 SET_RESOURCE_STATUS_CMD = '202'
 
 
@@ -201,6 +200,7 @@ def save_json_artifact(artifact_factory, api_method, side_name, server, value):
 
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
+    growing_delay = GrowingDelay()
     api_call_start_time = utils.datetime_utc_now()
     while True:
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)
@@ -231,7 +231,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
             save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
             pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
                 merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
-        time.sleep(MERGE_DONE_CHECK_PERIOD.total_seconds())
+        growing_delay.sleep()
 
 
 def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
