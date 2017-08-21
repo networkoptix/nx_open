@@ -374,10 +374,11 @@ angular.module('nxCommon')
 
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
+                        //Turn off all players to reset ng-class for rotation
+                        scope.native = false;
+                        scope.flashls = false;
+                        scope.jsHls = false;
                         if(!format){
-                            scope.native = false;
-                            scope.flashls = false;
-                            scope.jsHls = false;
                             scope.loading = false; // no supported format - no loading
                             recyclePlayer(null); //There is no player so it should be set to null
                             return;
@@ -390,10 +391,9 @@ angular.module('nxCommon')
                         if(videoPlayers){
                             videoPlayers.pop();
                         }
-                        $timeout(initNewPlayer);
 
+                        $timeout(initNewPlayer);
                         $timeout(updateWidth);
-                        
                     }
                 }
 
