@@ -391,10 +391,6 @@ angular.module('nxCommon')
                             videoPlayers.pop();
                         }
                         $timeout(initNewPlayer);
-
-                        if(scope.rotation != 0 && scope.rotation != 180){
-                            updateWidth();
-                        }
                     }
                 }
 
@@ -445,6 +441,7 @@ angular.module('nxCommon')
                     if(format == "webm"){
                         return "";
                     }
+                    updateWidth();
                     switch(scope.rotation){
                         case 90:
                             return "rotate90";
