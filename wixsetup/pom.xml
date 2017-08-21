@@ -239,7 +239,6 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
@@ -270,7 +269,6 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.server_update}</finalName>
                         </configuration>
@@ -286,7 +284,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_debug}</finalName>
                         </configuration>
@@ -302,7 +299,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.server_debug}</finalName>
                         </configuration>
@@ -318,7 +314,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.misc_debug}</finalName>
                         </configuration>
@@ -334,7 +329,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.libs_debug}</finalName>
                         </configuration>
@@ -350,7 +344,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.cloud_debug}</finalName>
                         </configuration>
@@ -391,6 +384,43 @@
             <properties>
                 <paxton>true</paxton>
             </properties>
+        </profile>
+        <profile>
+            <id>add-qt-pdb</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>addQtPdb</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.2</version>
+                        <executions>
+                            <execution>
+                                <id>pack-debug-qt.xml</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>${project.build.directory}/assembly-debug-qt.xml</descriptor>
+                                    </descriptors>
+                                    <outputDirectory>${project.build.directory}/pack</outputDirectory>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <finalName>${artifact.name.qt_debug}</finalName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

@@ -146,6 +146,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <paxton>false</paxton>
+        <addQtPdb>false</addQtPdb>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -277,6 +278,7 @@
         <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
         <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.qt_debug>${artifact.name.prefix}-qt_debug-${artifact.name.suffix}</artifact.name.qt_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
         <nxcloud.version>latest</nxcloud.version>
