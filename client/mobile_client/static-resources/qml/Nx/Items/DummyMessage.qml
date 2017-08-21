@@ -23,8 +23,8 @@ Pane
     contentItem: Item
     {
         anchors.fill: parent
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.leftMargin: 8 + dummy.leftPadding
+        anchors.rightMargin: 8 + dummy.rightPadding
 
         Column
         {
