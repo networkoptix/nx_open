@@ -1,5 +1,6 @@
 #include "developer_settings_helper.h"
 
+#include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -10,6 +11,7 @@ namespace utils {
 DeveloperSettingsHelper::DeveloperSettingsHelper(QObject* parent):
     QObject(parent)
 {
+    setLogLevel(qnSettings->logLevel());
 }
 
 QString DeveloperSettingsHelper::logLevel() const
@@ -24,6 +26,9 @@ void DeveloperSettingsHelper::setLogLevel(QString logLevel)
         return;
 
     nx::utils::log::mainLogger()->setDefaultLevel(level);
+    qnSettings->setLogLevel(nx::utils::log::toString(level));
+    qnSettings->save();
+
     emit logLevelChanged();
 }
 
