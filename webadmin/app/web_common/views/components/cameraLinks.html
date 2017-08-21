@@ -4,7 +4,7 @@
     </div>
     <div class='camera-links-title'>Camera Details</div>
     <table>
-        <tr><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
+        <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
         <tr><td>Name</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
