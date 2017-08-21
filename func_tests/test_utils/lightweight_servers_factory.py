@@ -6,7 +6,7 @@ import datetime
 from requests.exceptions import ReadTimeout
 from .template_renderer import TemplateRenderer
 from . import utils
-from .utils import GrowingDelay
+from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
@@ -116,7 +116,7 @@ class LightweightServer(Server):
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')
-        growing_delay = GrowingDelay()
+        growing_delay = GrowingSleep()
         start_time = utils.datetime_utc_now()
         while utils.datetime_utc_now() - start_time < timeout:
             try:

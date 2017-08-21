@@ -12,7 +12,7 @@ import traceback
 import json
 from functools import wraps
 import test_utils.utils as utils
-from test_utils.utils import GrowingDelay
+from test_utils.utils import GrowingSleep
 from test_utils.compare import compare_values
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
@@ -200,7 +200,7 @@ def save_json_artifact(artifact_factory, api_method, side_name, server, value):
 
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
-    growing_delay = GrowingDelay()
+    growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
     while True:
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)

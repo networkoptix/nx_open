@@ -23,7 +23,7 @@ class SimpleNamespace:
         return self.__dict__ == other.__dict__
 
 
-class GrowingDelay(object):
+class GrowingSleep(object):
 
     _delay_levels = [10, 20, 30, 60]  # seconds
     _calls_per_level = 10
