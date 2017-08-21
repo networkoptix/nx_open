@@ -70,6 +70,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
             renderingTools.uploader->setForceSoftYUV( qnRuntime->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
+            renderingTools.renderer->setBlurEnabled(qnSettings->isGLBlurEnabled());
             renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
             renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
@@ -410,7 +411,7 @@ QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
 
 int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
 {
-    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(), 
+    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(),
         [](const std::pair<int, int>& l, const std::pair<int, int>& r)
         {
             return l.second < r.second;
