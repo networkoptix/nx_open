@@ -310,7 +310,7 @@ angular.module('nxCommon')
                     scope.jsHls = true;
 
                     $timeout(function(){
-                        var jsHlsAPI = new JsHlsAPI();
+                        var jsHlsAPI = new JsHlsAPI(Config.webclient.hlsManifestLoadingTimeout);
                         jsHlsAPI.init( element.find(".videoplayer"), scope.debugMode, function (api) {
                             scope.vgApi = api;
                             if (scope.vgSrc) {

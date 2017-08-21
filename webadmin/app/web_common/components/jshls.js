@@ -1,6 +1,6 @@
 'use strict';
 
-function JsHlsAPI(){
+function JsHlsAPI(manifestLoadingTimeOut){
     var events, stats, fmp4Data,
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
@@ -11,7 +11,9 @@ function JsHlsAPI(){
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;
-        hls.config.manifestLoadingTimeOut = Config.webclient.hlsManifestLoadingTimeout; // 30 seconds to wait for manifest
+        if(manifestLoadingTimeOut){
+            hls.config.manifestLoadingTimeOut = manifestLoadingTimeOut;
+        }
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
