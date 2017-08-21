@@ -10,10 +10,11 @@
 
 
 namespace nx {
-namespace sdk {
-namespace metadata {
+namespace mediaserver {
+namespace plugins {
 
-class StubMetadataManager: public nxpt::CommonRefCounter<AbstractMetadataManager>
+class StubMetadataManager: 
+    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
 public:
     StubMetadataManager();
@@ -22,15 +23,17 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual Error startFetchingMetadata(AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error startFetchingMetadata(
+        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
 
-    virtual Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error stopFetchingMetadata() override;
 
-    virtual const char* capabilitiesManifest(Error* error) const override;
+    virtual const char* capabilitiesManifest(
+        nx::sdk::Error* error) const override;
 
 private:
-    Error stopFetchingMetadataUnsafe();
-    AbstractMetadataPacket* cookSomeEvents();
+    nx::sdk::Error stopFetchingMetadataUnsafe();
+    nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
 
     int64_t usSinceEpoch() const;
 
@@ -38,11 +41,11 @@ private:
     mutable std::mutex m_mutex;
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping;
-    AbstractMetadataHandler* m_handler;
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
     int m_counter = 0;
     nxpl::NX_GUID m_eventTypeId;
 };
 
-} // namespace metadata
-} // namespace sdk
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx

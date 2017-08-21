@@ -2,8 +2,11 @@
 #include "stub_metadata_manager.h"
 
 namespace nx {
-namespace sdk {
-namespace metadata {
+namespace mediaserver {
+namespace plugins {
+
+using namespace nx::sdk;
+using namespace nx::sdk::metadata;
 
 void* StubMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
@@ -115,15 +118,15 @@ const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const
     )manifest";
 }
 
-} // namespace metadata
-} // namespace sdk
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx
 
 extern "C" {
 
     NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
     {
-        return new nx::sdk::metadata::StubMetadataPlugin();
+        return new nx::mediaserver::plugins::StubMetadataPlugin();
     }
 
 } // extern "C"

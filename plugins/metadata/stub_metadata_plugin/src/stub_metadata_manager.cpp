@@ -8,8 +8,8 @@
 #include <nx/sdk/metadata/common_detected_event.h>
 
 namespace nx {
-namespace sdk {
-namespace metadata {
+namespace mediaserver {
+namespace plugins {
 
 namespace {
 
@@ -21,6 +21,8 @@ static const nxpl::NX_GUID kObjectInTheAreaEventGuid
 
 } // namespace 
 
+using namespace nx::sdk;
+using namespace nx::sdk::metadata;
 
 StubMetadataManager::StubMetadataManager():
     m_eventTypeId(kLineCrossingEventGuid)
@@ -146,6 +148,6 @@ int64_t StubMetadataManager::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-} // namespace metadata
-} // namespace sdk
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx
