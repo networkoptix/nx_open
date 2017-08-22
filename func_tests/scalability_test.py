@@ -45,11 +45,12 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     if not config.USE_LIGHTWEIGHT_SERVERS:
         return []
-    log.info('Creating lightweight servers:')
+    lws_count = config.SERVER_COUNT - 1
+    log.info('Creating %d lightweight servers:', lws_count)
     start_time = utils.datetime_utc_now()
     # at least one full/real server is required for testing
     lws_list = lightweight_servers_factory(
-        config.SERVER_COUNT - 1,
+        lws_count,
         CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
         USERS_PER_SERVER=config.USERS_PER_SERVER,
         PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
@@ -246,6 +247,10 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
         wait_for_method_matched(artifact_factory, servers, 'GET', 'ec2', api_method, start_time, merge_timeout)
 
 
+def collect_additional_metrics(metrics_saver, lightweight_servers):
+    reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
+    metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
+
 def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
@@ -266,6 +271,7 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
         merge_duration = utils.datetime_utc_now() - start_time
         metrics_saver.save('merge_duration', merge_duration)
+        collect_additional_metrics(metrics_saver, lightweight_servers)
     finally:
         servers[0].load_system_settings(log_settings=True)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False
