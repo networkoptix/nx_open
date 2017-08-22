@@ -307,13 +307,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
     function drawLabel( context, date, level, alpha,
                         labelFormat, labelFixed, levelTop, levelHeight, font, labelAlign, bgColor, markColor, labelPositionFix, markAttach, markHeight){
-        var coordinate = self.scaleManager.dateToScreenCoordinate(date);
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
         if(labelFormat) {
             context.font = formatFont(font);
 
             var nextDate = level.interval.addToDate(date);
-            var stopCoordinate = self.scaleManager.dateToScreenCoordinate(nextDate);
+            var stopCoordinate = self.scaleManager.dateToScreenCoordinate(nextDate, self.pixelAspectRatio);
             //var nextLevel = labelFixed?level:RulerModel.findBestLevel(nextDate);
             //var nextLabel = dateFormat(new Date(nextDate), nextLevel[labelFormat]);
 
@@ -462,8 +462,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     var chunkLoadingTextureImg = false;
     var chunkLoadingTextureSize = 0;
     function drawEvent(context, chunk, levelIndex, debug, targetLevelIndex){
-        var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
-        var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
+        var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start, self.pixelAspectRatio);
+        var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end, self.pixelAspectRatio);
 
         var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
@@ -518,7 +518,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             //Give the texture the appearance of moving
             var start = self.scaleManager.lastMinute();
-            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start);
+            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start, self.pixelAspectRatio);
             
             var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize);
 
@@ -569,8 +569,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         // 3. Draw last minute with texture
-        var startCoordinate = self.scaleManager.dateToScreenCoordinate(start);
-        var endCoordinate = self.scaleManager.dateToScreenCoordinate(end);
+        var startCoordinate = self.scaleManager.dateToScreenCoordinate(start, self.pixelAspectRatio);
+        var endCoordinate = self.scaleManager.dateToScreenCoordinate(end, self.pixelAspectRatio);
 
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
         var height = timelineConfig.chunkHeight * self.canvas.height;
@@ -662,7 +662,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawMarker(context, date, markerColor, textColor){
-        var coordinate =  self.scaleManager.dateToScreenCoordinate(date);
+        var coordinate =  self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
         if(coordinate < 0 || coordinate > self.canvas.width ) {
             return;

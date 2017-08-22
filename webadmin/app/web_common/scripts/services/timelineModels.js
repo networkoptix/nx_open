@@ -1215,8 +1215,9 @@ ScaleManager.prototype.dateToCoordinate = function(date){
     return  (date - this.start) / this.msPerPixel;
 };
 
-ScaleManager.prototype.dateToScreenCoordinate = function(date){
-    return this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart);
+ScaleManager.prototype.dateToScreenCoordinate = function(date, pixelAspectRatio){
+    pixelAspectRatio = pixelAspectRatio || 1;
+    return pixelAspectRatio * (this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart));
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
     return this.coordinateToDate(coordinate + this.dateToCoordinate(this.visibleStart));
