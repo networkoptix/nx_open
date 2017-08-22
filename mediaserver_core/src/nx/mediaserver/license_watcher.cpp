@@ -9,7 +9,6 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec_api.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/json.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
