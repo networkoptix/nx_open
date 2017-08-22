@@ -1,0 +1,16 @@
+{{event}} {{triggerName}} has been activated
+
+{{#count}}
+    {{#aggregated}}
+        {{index}}: {{source}} ({{sourceIp}}) - {{user}} - {{timestampDate}} {{timestampTime}
+    {{/aggregated}}
+
+    Trigger has been activated {{count}} times, first:
+    {{timestampDate}} {{timestampTime}}
+{{/count}}
+
+{{^count}}
+    {{#aggregated}}
+        {{source}} ({{sourceIp}}) - {{user}} - {{timestampDate}} {{timestampTime}}
+    {{/aggregated}}
+{{/count}}
