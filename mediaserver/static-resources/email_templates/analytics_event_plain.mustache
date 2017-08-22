@@ -8,9 +8,16 @@
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
-{{event}}{{#source}} {{source}}{{/source}}
-{{analyticsSdkEventType}}
-{{#aggregated}} {{timestampDate}} {{timestampTime}} {{/aggregated}}
+{{#analyticsSdkEventType}}
+    {{analyticsSdkEventType}} {{source}}
+{{/analyticsSdkEventType}}
+{{^analyticsSdkEventType}}
+    {{event}} {{source}}
+{{/analyticsSdkEventType}}
+
+Trigger has been activated {{count}} times, first:
+{{timestampDate}} {{timestampTime}}
+
 {{#urlint}}
 Play archive from the local network: {{urlint}}
 {{/urlint}} {{#urlext}}
