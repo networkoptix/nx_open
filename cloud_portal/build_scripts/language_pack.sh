@@ -24,6 +24,13 @@ cp -rf ../front_end/app/views/*  $DIRECTORY/views
 echo "Copy language.json"
 cp -rf ../front_end/app/language.json  $DIRECTORY/
 
+
+echo "Copy web_common"
+mkdir $DIRECTORY/web_common
+mkdir $DIRECTORY/web_common/views
+cp -rf ../../webadmin/app/web_common/views/*  $DIRECTORY/web_common/views || true
+cp -rf ../../webadmin/app/web_common/commonLanguage.json  $DIRECTORY/web_common || true
+
 echo "Copy crowdin yaml"
 cat crowdin.yaml >> $DIRECTORY/crowdin.yaml
 

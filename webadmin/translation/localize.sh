@@ -18,6 +18,16 @@ do
 
     echo "Overwrite them with localized sources"
     cp -rf $lang_dir/views/* ../static/lang_$LANG/views/ || true
+
+
+    mkdir ../static/lang_$LANG/web_common/
+    mkdir ../static/lang_$LANG/web_common/views/
+    echo "Copy web_common default views - with default language"
+    cp -rf ../static/web_common/views/* ../static/lang_$LANG/web_common/views/
+
+    echo "Overwrite them with localized sources"
+    cp -rf $lang_dir/web_common/views/* ../static/lang_$LANG/web_common/views/ || true
+
 done
 
 echo "Generate language.json"
