@@ -11,15 +11,8 @@
 #include <functional> /* For std::function. */
 
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
-
-class QnMediaStreamEventReceiver
-{
-public:
-    virtual void onKeyFrame(quint64 currentPacketTimestampUSec) = 0;
-    virtual void onDiscontinue() = 0;
-    virtual ~QnMediaStreamEventReceiver() {}
-};
 
 namespace detail
 {
@@ -103,14 +96,8 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    /*!
-        \return id of event receiver
-    */
-    void addEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
-    /*!
-        \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
-    */
-    void removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
+    nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& onKeyFrameSubscription();
+    nx::utils::Subscription<>& onDiscontinueSubscription();
 
     //!Prevents data starting with \a timestamp from removal
     /*!
