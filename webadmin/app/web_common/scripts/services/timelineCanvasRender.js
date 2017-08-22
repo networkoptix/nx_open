@@ -739,15 +739,19 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
+        mouseX *= self.pixelAspectRatio
+        var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
         var canScrollRight = self.scaleManager.canScroll(false);
-        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth && mouseX < self.canvas.width;
+        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth * self.pixelAspectRatio &&
+                                   mouseX < self.canvas.width;
         var mouseOverRightScrollButton = canScrollRight &&
-                                        (mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width);
+                                        (mouseX > self.canvas.width - scrollButtonsWidth &&
+                                        mouseX < self.canvas.width);
 
         var canScrollLeft = self.scaleManager.canScroll(true);
-        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth && mouseX > 0;
+        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth * self.pixelAspectRatio && mouseX > 0;
         var mouseOverLeftScrollButton = canScrollLeft &&
-                                        (mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0);
+                                        (mouseX < scrollButtonsWidth && mouseX > 0);
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;
@@ -800,24 +804,27 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawScrollButton(context, left, hover, active){
+        var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
+        var scrollButtonsArrowWidth = timelineConfig.scrollButtonsArrow.width * self.pixelAspectRatio;
+        var scrollButtonsArrowHeight = timelineConfig.scrollButtonsArrow.size * self.pixelAspectRatio;
 
         context.fillStyle = hover? blurColor(timelineConfig.scrollButtonsHoverColor,1):blurColor(timelineConfig.scrollButtonsColor,1);
         if(active)
             context.fillStyle = blurColor(timelineConfig.scrollButtonsActiveColor,1);
 
-        var startCoordinate = left ? 0: self.canvas.width - timelineConfig.scrollButtonsWidth;
+        var startCoordinate = left ? 0: self.canvas.width - scrollButtonsWidth;
         var height = timelineConfig.scrollButtonsHeight * self.canvas.height;
-        var marginBottom = timelineConfig.scrollButtonMarginBottom;
-        context.fillRect(startCoordinate, self.canvas.height - height - marginBottom, timelineConfig.scrollButtonsWidth, height);
+        var marginBottom = timelineConfig.scrollButtonMarginBottom * self.pixelAspectRatio;
+        context.fillRect(startCoordinate, self.canvas.height - height - marginBottom, scrollButtonsWidth, height);
 
         context.lineWidth = timelineConfig.scrollButtonsArrowLineWidth;
         context.strokeStyle =  active? blurColor(timelineConfig.scrollButtonsArrowActiveColor,1):blurColor(timelineConfig.scrollButtonsArrowColor,1);
 
-        var leftCoordinate = startCoordinate + ( timelineConfig.scrollButtonsWidth - timelineConfig.scrollButtonsArrow.width)/2;
-        var rightCoordinate = leftCoordinate + timelineConfig.scrollButtonsArrow.width;
+        var leftCoordinate = startCoordinate + ( scrollButtonsWidth - scrollButtonsArrowWidth)/2;
+        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth;
 
-        var topCoordinate = self.canvas.height - (height + timelineConfig.scrollButtonsArrow.size) / 2;
-        var bottomCoordinate = topCoordinate + timelineConfig.scrollButtonsArrow.size;
+        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2;
+        var bottomCoordinate = topCoordinate + scrollButtonsArrowHeight;
 
 
         context.beginPath();
