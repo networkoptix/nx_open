@@ -345,7 +345,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
-    virtual QString idForToStringFromPtr() const;
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
 private:
     void readAsyncAtLeastImpl(
@@ -502,7 +502,7 @@ public:
      */
     virtual void cancelIOSync() = 0;
 
-    virtual QString idForToStringFromPtr() const;
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

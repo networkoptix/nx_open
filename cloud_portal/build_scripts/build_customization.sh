@@ -108,6 +108,19 @@ dir=../customizations/$CUSTOMIZATION/
 
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/ || true
+
+
+
+        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/
+        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
+
+
+        echo "Copy web_common default views - with default language"
+        cp -rf $TARGET_DIR/$CUSTOMIZATION/source/static/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
+
+        echo "Overwrite them with localized sources"
+        cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/ || true
+
     done
     rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
 
