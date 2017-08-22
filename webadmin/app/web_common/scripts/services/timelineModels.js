@@ -939,7 +939,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
-                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, $q){
+                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, pixelAspectRatio, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.minScrollBarWidth = minScrollBarWidth;
@@ -947,6 +947,7 @@ function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initial
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
+    this.pixelAspectRatio = pixelAspectRatio || 1;
     this.$q = $q;
 
     this.levels = {
@@ -1183,7 +1184,7 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= this.minPixelsPerLevel) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel / this.pixelAspectRatio) {
             // minMsPerPixel
             break;
         }

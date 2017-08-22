@@ -91,6 +91,7 @@ angular.module('nxCommon')
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
                     timelineConfig.minScrollBarWidth,
+                    pixelAspectRatio,
                     $q); //Init boundariesProvider
 
                 var animationState = {
