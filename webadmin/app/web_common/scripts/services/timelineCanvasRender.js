@@ -9,7 +9,7 @@
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, hasHighDpi){
+function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, pixelAspectRatio){
 
     this.canvas = canvas;
     this.recordsProvider = recordsProvider;
@@ -17,7 +17,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     this.animationState = animationState;
     this.debugEventsMode = debugSettings.debugEventsMode;
     this.allowDebug = debugSettings.allowDebug;
-    this.hasHighDpi = hasHighDpi;
+    this.hasHighDpi = pixelAspectRatio > 1;
+    this.pixelAspectRatio = pixelAspectRatio || 1;
 
     var self = this;
 
@@ -44,7 +45,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             alpha + ')';
     }
     function formatFont(font){
-        return font.weight + ' ' + font.size.toFixed(4) + 'px ' + font.face;
+        return font.weight + ' ' + (font.size * self.pixelAspectRatio).toFixed(4) + 'px ' + font.face;
     }
 
     function clearTimeline(){
@@ -508,7 +509,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                         context.fillStyle = chunkLoadingTexture;
                         chunkLoadingTextureSize = this.width;
                     };
-                    var imagePath = hasHighDpi ? '../images/timeline-loading-filled@2x.png' : '../images/timeline-loading-filled.png';
+                    var imagePath = self.hasHighDpi ? '../images/timeline-loading-filled@2x.png' : '../images/timeline-loading-filled.png';
                     img.src = Config.viewsDirCommon + imagePath;
                     chunkLoadingTextureImg = img;
                 }
@@ -560,7 +561,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     context.fillStyle = lastMinuteTexture;
                     lastMinuteTextureSize = this.width;
                 };
-                var imagePath = hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
+                var imagePath = self.hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
                 img.src = Config.viewsDirCommon + imagePath;
                 lastMinuteTextureImg = img;
             }
@@ -670,10 +671,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         date = new Date(date);
 
         var height = timelineConfig.markerHeight * self.canvas.height;
+        var width = timelineConfig.markerWidth * self.pixelAspectRatio;
+        var triangleHeight = timelineConfig.markerTriangleHeight * self.pixelAspectRatio;
+        var offset = timelineConfig.markerPullDown * self.pixelAspectRatio;
 
         // Line
 
         context.lineWidth = markerColor == timelineConfig.timeMarkerColor ? timelineConfig.timeMarkerLineWidth: timelineConfig.timeMarkerPointerLineWidth;
+        context.lineWidth *= self.pixelAspectRatio;
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
@@ -681,32 +686,32 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         context.beginPath();
         context.moveTo(0.5 + coordinate, top);
-        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - (timelineConfig.scrollBarHeight) * self.canvas.height)  - 2);
+        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) - 2);
         context.stroke();
 
-        var startCoord = coordinate - timelineConfig.markerWidth /2;
+        var startCoord = coordinate - width/2;
         if(startCoord < 0){
             startCoord = 0;
         }
-        if(startCoord > self.canvas.width - timelineConfig.markerWidth){
-            startCoord = self.canvas.width - timelineConfig.markerWidth;
+        if(startCoord > self.canvas.width - width){
+            startCoord = self.canvas.width - width;
         }
 
         // Bubble
-        context.fillRect(startCoord, timelineConfig.markerPullDown, timelineConfig.markerWidth, height );
+        context.fillRect(startCoord, offset, width, height );
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
-        context.lineTo(0.5 + coordinate, height + timelineConfig.triangleHeightOffset + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
+        context.moveTo(0.5 + coordinate + triangleHeight * self.canvas.height, height + offset);
+        context.lineTo(0.5 + coordinate, height + offset + triangleHeight * self.canvas.height);
+        context.lineTo(0.5 + coordinate - triangleHeight * self.canvas.height, height + offset);
         context.closePath();
         context.fill();
 
         // Labels
         context.fillStyle = blurColor(textColor,1);
         context.font = formatFont(timelineConfig.markerDateFont);
-        coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
+        coordinate = startCoord + width/2; // Set actual center of the marker
 
         var dateString = dateFormat(date, timelineConfig.dateFormat);
         var dateWidth = context.measureText(dateString).width;

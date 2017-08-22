@@ -64,23 +64,21 @@ angular.module('nxCommon')
                 scope.toggleActive = function(){
                     scope.activeVolume = !scope.activeVolume;
                 };
+                var pixelAspectRatio = function(){
+                    if(window.devicePixelRatio > 1)
+                    {
+                        return window.devicePixelRatio;
+                    }
 
-                var hasHighDpi = function(){
                     var mediaQuery = "(-webkit-min-device-pixel-ratio: 1.5),\
                                       (min--moz-device-pixel-ratio: 1.5),\
                                       (-o-min-device-pixel-ratio: 3/2),\
                                       (min-resolution: 1.5dppx)";
-                    if(window.devicePixelRatio > 1)
-                    {
-                        return true;
-                    }
-
                     if( window.matchMedia && window.matchMedia(mediaQuery).matches){
-                        return true;
+                        return 2;
                     }
-                    return false;
+                    return 1;
                 }();
-
 
                 var timelineConfig = TimelineConfig();
 
@@ -110,7 +108,7 @@ angular.module('nxCommon')
                         debugEventsMode:debugEventsMode,
                         allowDebug:Config.allowDebugMode
                     },
-                    hasHighDpi);
+                    pixelAspectRatio);
 
                 var timelineActions = new TimelineActions(
                     timelineConfig,
@@ -122,11 +120,11 @@ angular.module('nxCommon')
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
-                    canvas.height = element.find('.viewport').height();
+                    canvas.height = element.find('.viewport').height() * pixelAspectRatio;
                 }
                 function updateTimelineWidth(){
                     scope.viewportWidth = element.find('.viewport').width();
-                    canvas.width  = scope.viewportWidth;
+                    canvas.width  = scope.viewportWidth * pixelAspectRatio;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                     $timeout(function(){
                         scope.scaleManager.checkZoom();
