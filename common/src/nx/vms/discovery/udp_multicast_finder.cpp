@@ -74,7 +74,7 @@ void UdpMulticastFinder::updateInterfaces()
     for (const auto& ip: getLocalIpV4AddressList())
         localIpList.insert(ip);
 
-    NX_LOGX(lm("Update interfaces to %1").container(localIpList), cl_logDEBUG2);
+    NX_LOGX(lm("Update interfaces to %1").container(localIpList), cl_logDEBUG1);
     for (auto it = m_senders.begin(); it != m_senders.end(); )
     {
         if (localIpList.find(it->first) == localIpList.end())
@@ -103,6 +103,9 @@ void UdpMulticastFinder::updateInterfaces()
 
         receiveModuleInformation();
     }
+
+    NX_LOGX(lm("Schedule update interfaces in %1").arg(m_updateInterfacesInterval), cl_logDEBUG2);
+    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfaces(); });
 }
 
 void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
@@ -122,7 +125,7 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketA
     if (socket->setNonBlockingMode(true)
         && socket->setReuseAddrFlag(true) && socket->bind(endpoint))
     {
-        NX_LOGX(lm("New socket %1").arg(socket->getLocalAddress()), cl_logDEBUG2);
+        NX_LOGX(lm("New socket %1").arg(socket->getLocalAddress()), cl_logDEBUG1);
         return socket;
     }
 
@@ -139,7 +142,7 @@ void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
 
     if (m_receiver->joinGroup(m_multicastEndpoint.address.toString(), ip.toString()))
     {
-        NX_LOGX(lm("Joined group %1 on %2").args(m_multicastEndpoint.address, ip), cl_logDEBUG2);
+        NX_LOGX(lm("Joined group %1 on %2").args(m_multicastEndpoint.address, ip), cl_logDEBUG1);
         return; //< Ok.
     }
 
@@ -200,7 +203,7 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
             if (code == SystemError::noError)
             {
                 NX_LOGX(lm("Successfully sent from %1 to %2").args(
-                    socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG1);
+                    socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG2);
 
                 socket->registerTimer(m_sendInterval,
                     [this, senderIterator](){ sendModuleInformation(senderIterator); });
