@@ -1296,6 +1296,17 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new AutoStartAllowedCondition())
             && !condition::isSafeMode());
 
+    factory(ConvertCameraToEntropix)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .dynamicText(new ConvertToEntropixTextFactory(manager))
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::hasFlags(Qn::live_cam, Any)
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
+
     factory(ServerAddCameraManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here

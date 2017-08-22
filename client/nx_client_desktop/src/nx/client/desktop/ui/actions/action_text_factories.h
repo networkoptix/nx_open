@@ -38,6 +38,13 @@ private:
     const QnCameraDeviceStringSet m_stringSet;
 };
 
+class ConvertToEntropixTextFactory: public TextFactory
+{
+public:
+    ConvertToEntropixTextFactory(QObject* parent);
+    virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const override;
+};
+
 } // namespace action
 } // namespace ui
 } // namespace desktop
