@@ -29,6 +29,8 @@ public:
     SensorDescription(const QRectF& geometry = QRectF(), Type type = Type::regular);
 
     bool isValid() const;
+
+    QRect frameSubRect(const QSize& frameSize) const;
 };
 
 class CombinedSensorsDescription: public QList<SensorDescription>
@@ -36,7 +38,11 @@ class CombinedSensorsDescription: public QList<SensorDescription>
 public:
     using QList<SensorDescription>::QList;
 
+    SensorDescription getSensor(SensorDescription::Type type) const;
+
     SensorDescription mainSensor() const;
+    SensorDescription colorSensor() const;
+    SensorDescription blackAndWhiteSensor() const;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(SensorDescription, (json))

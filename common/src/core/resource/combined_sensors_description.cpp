@@ -18,23 +18,57 @@ SensorDescription::SensorDescription(const QRectF& geometry, SensorDescription::
 {
 }
 
-SensorDescription CombinedSensorsDescription::mainSensor() const
+bool SensorDescription::isValid() const
+{
+    return geometry.isValid();
+}
+
+QRect SensorDescription::frameSubRect(const QSize& frameSize) const
+{
+    if (!isValid())
+        return QRect();
+
+    return QRectF(
+        frameSize.width() * geometry.x(),
+        frameSize.height() * geometry.y(),
+        frameSize.width() * geometry.width(),
+        frameSize.height() * geometry.height()).toRect();
+}
+
+SensorDescription CombinedSensorsDescription::getSensor(SensorDescription::Type type) const
 {
     if (isEmpty())
         return SensorDescription();
 
     const auto it = std::find_if(begin(), end(),
-        [](const SensorDescription& sensor)
+        [type](const SensorDescription& sensor)
         {
-            return sensor.type == SensorDescription::Type::regular;
+            return sensor.type == type;
         });
 
-    return it != end() ? *it : first();
+    return it != end() ? *it : SensorDescription();
 }
 
-bool SensorDescription::isValid() const
+SensorDescription CombinedSensorsDescription::mainSensor() const
 {
-    return geometry.isValid();
+    if (isEmpty())
+        return SensorDescription();
+
+    const auto& sensor = colorSensor();
+    if (sensor.isValid())
+        return sensor;
+
+    return first();
+}
+
+SensorDescription CombinedSensorsDescription::colorSensor() const
+{
+    return getSensor(SensorDescription::Type::regular);
+}
+
+SensorDescription CombinedSensorsDescription::blackAndWhiteSensor() const
+{
+    return getSensor(SensorDescription::Type::blackAndWhite);
 }
 
 } // namespace resource

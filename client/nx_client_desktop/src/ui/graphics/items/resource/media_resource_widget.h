@@ -34,6 +34,9 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class EntropixImageEnchancer;
+
 namespace ui {
 namespace graphics {
 
@@ -236,6 +239,9 @@ private slots:
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
+    void at_entropixEnchancementButton_clicked();
+    void at_entropixImageLoaded(const QImage& image);
+
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
@@ -387,6 +393,9 @@ private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+
+    QScopedPointer<nx::client::desktop::EntropixImageEnchancer> m_entropixEnchancer;
+    QImage m_entropixEnchancedImage;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

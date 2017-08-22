@@ -53,6 +53,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/desktop/utils/entropix_image_enchancer.h>
+
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/recording_status_helper.h>
@@ -601,6 +603,16 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
+    {
+        auto entropixEnhancementButton =
+            createStatisticAwareButton(lit("media_widget_entropix_enchancement"));
+        entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+        entropixEnhancementButton->setToolTip(tr("Entropix Image Enhancement"));
+        connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
+            &QnMediaResourceWidget::at_entropixEnchancementButton_clicked);
+        titleBar()->rightButtonsBar()->addButton(
+            Qn::EntropixEnhancementButton, entropixEnhancementButton);
+    }
 }
 
 void QnMediaResourceWidget::createPtzController()
@@ -1208,6 +1220,14 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
                     updateIoModuleVisibility(animationAllowed());
             });
 
+        if (const auto archiveReader = m_display->archiveReader())
+        {
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+        }
+
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
@@ -1765,7 +1785,15 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result |= Qn::EnhancementButton;
 
     if (isZoomWindow())
+    {
+        if (m_display && m_display->isPaused()
+            && m_camera && m_camera->hasCombinedSensors())
+        {
+            result |= Qn::EntropixEnhancementButton;
+        }
+
         return result;
+    }
 
     if (hasVideo && base_type::resource()->hasFlags(Qn::motion))
     {
@@ -2103,6 +2131,22 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
 
     if (fields & (Qn::ActiveObjectPtzField | Qn::ToursPtzField))
         updateTitleText();
+}
+
+void QnMediaResourceWidget::at_entropixEnchancementButton_clicked()
+{
+    using nx::client::desktop::EntropixImageEnchancer;
+
+    m_entropixEnchancer.reset(new EntropixImageEnchancer(m_camera));
+    connect(m_entropixEnchancer, &EntropixImageEnchancer::cameraScreenshotReady,
+        this, &QnMediaResourceWidget::at_entropixImageLoaded);
+
+    m_entropixEnchancer->requestScreenshot(m_display->currentTimeUSec() / 1000);
+}
+
+void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
+{
+    m_entropixEnchancedImage = image;
 }
 
 void QnMediaResourceWidget::updateDewarpingParams()
