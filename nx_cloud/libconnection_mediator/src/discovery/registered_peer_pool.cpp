@@ -93,7 +93,7 @@ void RegisteredPeerPool::onBytesRead(
     }
 
     if (systemErrorCode == SystemError::noError)
-        peerIter->second->moduleInformationJson = peerIter->second->readBuffer;
+        peerIter->second->moduleInformationJson = peerIter->second->readBuffer.toStdString();
     peerIter->second->readBuffer.clear();
 
     peerIter->second->readBuffer.reserve(kReadBufferSize);

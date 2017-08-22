@@ -180,7 +180,7 @@ protected:
                     &readBuf,
                     std::placeholders::_1));
 
-            if (systemErrorCode == SystemError::noError && bytesRead == 0 ||
+            if ((systemErrorCode == SystemError::noError && bytesRead == 0) ||
                 nx::network::socketCannotRecoverFromError(systemErrorCode))
             {
                 break;
