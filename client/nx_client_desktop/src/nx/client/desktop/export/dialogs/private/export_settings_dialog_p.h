@@ -56,6 +56,8 @@ public:
     const ExportMediaSettings& exportMediaSettings() const;
     const ExportLayoutSettings& exportLayoutSettings() const;
 
+    void setExportMediaSettings(const ExportMediaSettings& settings);
+
     void createOverlays(QWidget* overlayContainer);
 
     ExportOverlayWidget* overlay(OverlayType type);
@@ -66,6 +68,7 @@ signals:
 
 private:
     void setStatus(ErrorCode value);
+    void updateOverlays();
 
 private:
     ExportSettingsDialog::Mode m_mode = Mode::Media;

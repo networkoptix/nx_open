@@ -39,6 +39,7 @@ struct SelectableTextButton::Private
     State state = State::unselected;
     QScopedPointer<QToolButton> deactivateButton;
     QString deactivatedText;
+    QString deactivationToolTip;
     bool deactivatedTextSet = false;
     QIcon deactivatedIcon;
     bool deactivatedIconSet = false;
@@ -111,6 +112,7 @@ void SelectableTextButton::setDeactivatable(bool value)
         d->deactivateButton.reset(new QToolButton(this));
         d->deactivateButton->setIcon(qnSkin->icon(lit("buttons/clear.png")));
         d->deactivateButton->setFixedSize({ kDeactivateButtonSize, kDeactivateButtonSize });
+        d->deactivateButton->setToolTip(d->deactivationToolTip);
         updateDeactivateButtonPalette();
 
         auto anchor = new QnWidgetAnchor(d->deactivateButton.data());
@@ -196,6 +198,21 @@ void SelectableTextButton::unsetDeactivatedIcon()
 QIcon SelectableTextButton::effectiveIcon() const
 {
     return d->state == State::deactivated ? deactivatedIcon() : icon();
+}
+
+QString SelectableTextButton::deactivationToolTip() const
+{
+    return d->deactivationToolTip;
+}
+
+void SelectableTextButton::setDeactivationToolTip(const QString& value)
+{
+    if (d->deactivationToolTip == value)
+        return;
+
+    d->deactivationToolTip = value;
+    if (d->deactivateButton)
+        d->deactivateButton->setToolTip(d->deactivationToolTip);
 }
 
 QSize SelectableTextButton::sizeHint() const

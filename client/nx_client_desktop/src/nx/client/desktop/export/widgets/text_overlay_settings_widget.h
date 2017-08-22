@@ -3,6 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/client/desktop/export/data/export_media_settings.h>
+
 namespace Ui { class TextOverlaySettingsWidget; }
 
 namespace nx {
@@ -17,15 +19,23 @@ class TextOverlaySettingsWidget: public QWidget
 
 public:
     TextOverlaySettingsWidget(QWidget* parent = nullptr);
+    virtual ~TextOverlaySettingsWidget() override;
 
-    QString text() const;
-    void setText(const QString& value);
+    const ExportTextOverlaySettings& data() const;
+    void setData(const ExportTextOverlaySettings& data);
+
+    int maximumWidth() const;
+    void setMaximumWidth(int value);
 
 signals:
-    void dataChanged();
+    void dataChanged(const ExportTextOverlaySettings& data);
+
+private:
+    void updateControls();
 
 private:
     QScopedPointer<Ui::TextOverlaySettingsWidget> ui;
+    ExportTextOverlaySettings m_data;
 };
 
 } // namespace ui

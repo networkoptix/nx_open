@@ -55,7 +55,7 @@ public:
     void setDeactivatedText(const QString& value);
     void unsetDeactivatedText();
 
-    // Text for current state:
+    // Text for current state.
     QString effectiveText() const;
 
     // Icon for deactivated state. If not set, icon() is used instead.
@@ -63,8 +63,12 @@ public:
     void setDeactivatedIcon(const QIcon& value);
     void unsetDeactivatedIcon();
 
-    // Icon for current state:
+    // Icon for current state.
     QIcon effectiveIcon() const;
+
+    // Tooltip for deactivation button.
+    QString deactivationToolTip() const;
+    void setDeactivationToolTip(const QString& value);
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;

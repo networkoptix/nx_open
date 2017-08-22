@@ -2,11 +2,21 @@
 #include "ui_text_overlay_settings_widget.h"
 
 #include <ui/common/aligner.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
+
+namespace {
+
+static constexpr int kMinimumWidth = 60;
+
+static constexpr int kMinimumFontSize = 6;
+static constexpr int kMaximumFontSize = 48;
+
+} // namespace
 
 TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
     base_type(parent),
@@ -17,24 +27,68 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});
 
+    // Synchronize slider with spin box.
+    connect(ui->widthSlider, &QSlider::rangeChanged, ui->widthSpinBox, &QSpinBox::setRange);
+    connect(ui->widthSlider, &QSlider::valueChanged, ui->widthSpinBox, &QSpinBox::setValue);
+    connect(ui->widthSpinBox, QnSpinboxIntValueChanged, ui->widthSlider, &QSlider::setValue);
+
+    ui->widthSlider->setRange(kMinimumWidth, m_data.overlayWidth * 2);
+    ui->fontSizeSpinBox->setRange(kMinimumFontSize, kMaximumFontSize);
+    updateControls();
+
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged,
-        [this]() { emit dataChanged(); });
+        [this]()
+        {
+            m_data.text = ui->plainTextEdit->toPlainText();
+            emit dataChanged(m_data);
+        });
 
-    connect(ui->fontSizeSlider, &QAbstractSlider::valueChanged,
-        this, &TextOverlaySettingsWidget::dataChanged);
+    connect(ui->fontSizeSpinBox, QnSpinboxIntValueChanged,
+        [this](int value)
+        {
+            m_data.fontSize = value;
+            emit dataChanged(m_data);
+        });
 
-    connect(ui->widthSlider, &QAbstractSlider::valueChanged,
-        this, &TextOverlaySettingsWidget::dataChanged);
+    connect(ui->widthSlider, &QSlider::valueChanged,
+        [this](int value)
+        {
+            m_data.overlayWidth = value;
+            emit dataChanged(m_data);
+        });
 }
 
-QString TextOverlaySettingsWidget::text() const
+TextOverlaySettingsWidget::~TextOverlaySettingsWidget()
 {
-    return ui->plainTextEdit->toPlainText();
 }
 
-void TextOverlaySettingsWidget::setText(const QString& value)
+void TextOverlaySettingsWidget::updateControls()
 {
-    ui->plainTextEdit->setPlainText(value);
+    ui->plainTextEdit->setPlainText(m_data.text);
+    ui->fontSizeSpinBox->setValue(m_data.fontSize);
+    ui->widthSlider->setValue(m_data.overlayWidth);
+}
+
+const ExportTextOverlaySettings& TextOverlaySettingsWidget::data() const
+{
+    return m_data;
+}
+
+void TextOverlaySettingsWidget::setData(const ExportTextOverlaySettings& data)
+{
+    m_data = data;
+    updateControls();
+    emit dataChanged(m_data);
+}
+
+int TextOverlaySettingsWidget::maximumWidth() const
+{
+    return ui->widthSlider->maximum();
+}
+
+void TextOverlaySettingsWidget::setMaximumWidth(int value)
+{
+    ui->widthSlider->setMaximum(value);
 }
 
 } // namespace ui

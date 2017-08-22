@@ -60,10 +60,23 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
-    // FIXME!
-    // TODO: #vkutin Update model, not overlay widget.
+    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged, this,
-        [this]() { d->overlay(Private::OverlayType::text)->setText(ui->textSettingsPage->text()); });
+        [this](const ExportTextOverlaySettings& data)
+        {
+            auto settings = d->exportMediaSettings();
+            settings.textOverlay = data;
+            d->setExportMediaSettings(settings);
+        });
+
+    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
+    connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::dataChanged, this,
+        [this](const ExportImageOverlaySettings& data)
+        {
+            auto settings = d->exportMediaSettings();
+            settings.imageOverlay = data;
+            d->setExportMediaSettings(settings);
+        });
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -87,6 +100,7 @@ void ExportSettingsDialog::setupSettingsButtons()
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
+    ui->timestampButton->setDeactivationToolTip(tr("Delete Timestamp"));
     ui->timestampButton->setText(tr("Timestamp"));
     ui->timestampButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/timestamp.png")));
     ui->timestampButton->setIcon(qnSkin->icon(
@@ -96,9 +110,12 @@ void ExportSettingsDialog::setupSettingsButtons()
         qVariantFromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::timestamp)));
+    connect(d->overlay(Private::OverlayType::timestamp), &ExportOverlayWidget::pressed,
+        ui->timestampButton, &SelectableTextButton::click);
 
     ui->imageButton->setDeactivatable(true);
     ui->imageButton->setDeactivatedText(tr("Add Image"));
+    ui->imageButton->setDeactivationToolTip(tr("Delete Image"));
     ui->imageButton->setText(tr("Image"));
     ui->imageButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/image.png")));
     ui->imageButton->setIcon(qnSkin->icon(
@@ -108,9 +125,12 @@ void ExportSettingsDialog::setupSettingsButtons()
         qVariantFromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::image)));
+    connect(d->overlay(Private::OverlayType::image), &ExportOverlayWidget::pressed,
+        ui->imageButton, &SelectableTextButton::click);
 
     ui->textButton->setDeactivatable(true);
     ui->textButton->setDeactivatedText(tr("Add Text"));
+    ui->textButton->setDeactivationToolTip(tr("Delete Text"));
     ui->textButton->setText(tr("Text"));
     ui->textButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/text.png")));
     ui->textButton->setIcon(qnSkin->icon(
@@ -120,6 +140,8 @@ void ExportSettingsDialog::setupSettingsButtons()
         qVariantFromValue(ui->textSettingsPage));
     ui->textButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::text)));
+    connect(d->overlay(Private::OverlayType::text), &ExportOverlayWidget::pressed,
+        ui->textButton, &SelectableTextButton::click);
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
@@ -153,9 +175,12 @@ void ExportSettingsDialog::setupSettingsButtons()
         [this](SelectableTextButton* button)
         {
             NX_EXPECT(button);
-            const auto overlay = button->property(kOverlayPropertyName).value<QWidget*>();
+            const auto overlay = button->property(kOverlayPropertyName).value<ExportOverlayWidget*>();
             if (overlay)
+            {
                 overlay->setHidden(button->state() == SelectableTextButton::State::deactivated);
+                overlay->setBorderVisible(button->state() == SelectableTextButton::State::selected);
+            }
         });
 }
 

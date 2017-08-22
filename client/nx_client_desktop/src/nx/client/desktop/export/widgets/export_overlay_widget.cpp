@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
+#include <utils/common/html.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -31,8 +33,10 @@ struct ExportOverlayWidget::Private
     }
 
     QScopedPointer<QTextDocument> document;
+    int overlayWidth = -1; //< -1 means content-defined
     bool borderVisible = true;
-    qreal roundingRadius = 4.0;
+    qreal roundingRadius = 0.0;
+    qreal opacity = 1.0;
     qreal scale = 1.0;
     QString text;
     QImage image;
@@ -68,6 +72,20 @@ void ExportOverlayWidget::setScale(qreal value)
     updateLayout();
 }
 
+qreal ExportOverlayWidget::opacity() const
+{
+    return d->opacity;
+}
+
+void ExportOverlayWidget::setOpacity(qreal value)
+{
+    if (qFuzzyIsNull(d->opacity - value))
+        return;
+
+    d->opacity = value;
+    update();
+}
+
 QString ExportOverlayWidget::text() const
 {
     return d->text;
@@ -80,20 +98,39 @@ void ExportOverlayWidget::setText(const QString& value)
 
     d->text = value;
 
-    if (Qt::mightBeRichText(value))
+    if (mightBeHtml(value))
         d->document->setHtml(value);
     else
         d->document->setPlainText(value);
 }
 
-int ExportOverlayWidget::textWidth() const
+int ExportOverlayWidget::overlayWidth() const
 {
-    return d->document->textWidth();
+    return d->overlayWidth;
 }
 
-void ExportOverlayWidget::setTextWidth(int value)
+void ExportOverlayWidget::setOverlayWidth(int value)
 {
+    if (d->overlayWidth == value)
+        return;
+
+    d->overlayWidth = value;
     d->document->setTextWidth(value);
+    updateLayout();
+}
+
+int ExportOverlayWidget::textIndent() const
+{
+    return d->document->documentMargin();
+}
+
+void ExportOverlayWidget::setTextIndent(int value)
+{
+    if (qFuzzyIsNull(d->document->documentMargin() - value))
+        return;
+
+    d->document->setDocumentMargin(value);
+    updateLayout();
 }
 
 QImage ExportOverlayWidget::image() const
@@ -142,9 +179,16 @@ void ExportOverlayWidget::setRoundingRadius(qreal value)
 
 void ExportOverlayWidget::updateLayout()
 {
-    const auto size = QSizeF(minimumSize())
-        .expandedTo(d->document->size())
-        .expandedTo(d->image.size())
+    QSizeF textSize = (d->text.isEmpty() && !d->image.isNull()) ? QSizeF() : d->document->size();
+    QSizeF imageSize = d->image.size();
+
+    if (d->overlayWidth >= 0)
+    {
+        textSize.setWidth(d->overlayWidth);
+        imageSize *= d->overlayWidth / imageSize.width();
+    }
+
+    const auto size = QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
         .expandedTo(QApplication::globalStrut());
 
     const QRectF geometry(pos(), size * d->scale);
@@ -174,8 +218,12 @@ void ExportOverlayWidget::updatePosition(const QPoint& pos)
 
 void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    // Paint background.
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    // Paint background.
     painter.setBrush(palette().window());
     painter.setPen(Qt::NoPen);
     const auto radius = d->roundingRadius * d->scale;
@@ -183,13 +231,18 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
 
     // Paint scaled contents.
     painter.scale(d->scale, d->scale);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.setOpacity(d->opacity);
 
     if (!d->image.isNull())
-        painter.drawImage(QPoint(), d->image);
+        painter.drawImage(rect(), d->image);
 
     if (!d->text.isEmpty())
-        d->document->drawContents(&painter);
+    {
+        QAbstractTextDocumentLayout::PaintContext context;
+        context.palette = palette();
+        context.clip = rect();
+        d->document->documentLayout()->draw(&painter, context);
+    }
 
     // Paint border.
     if (d->borderVisible)
@@ -197,6 +250,7 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
         painter.setBrush(Qt::NoBrush);
         painter.setPen(QPen(palette().link(), kBorderThickness, Qt::DashLine));
         painter.resetTransform();
+        painter.setOpacity(1.0);
         painter.drawRect(rect());
     }
 }
@@ -207,6 +261,7 @@ void ExportOverlayWidget::mousePressEvent(QMouseEvent* event)
     d->dragging = true;
     updateCursor();
     event->accept();
+    emit pressed();
 }
 
 void ExportOverlayWidget::mouseMoveEvent(QMouseEvent* event)
@@ -227,6 +282,7 @@ void ExportOverlayWidget::mouseReleaseEvent(QMouseEvent* event)
     d->dragging = false;
     updateCursor();
     event->accept();
+    emit released();
 }
 
 bool ExportOverlayWidget::eventFilter(QObject* watched, QEvent* event)
@@ -265,6 +321,12 @@ bool ExportOverlayWidget::event(QEvent* event)
         case QEvent::LayoutRequest:
         {
             updateLayout();
+            break;
+        }
+
+        case QEvent::FontChange:
+        {
+            d->document->setDefaultFont(font());
             break;
         }
 

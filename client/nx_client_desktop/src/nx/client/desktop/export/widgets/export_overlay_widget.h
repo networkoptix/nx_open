@@ -19,8 +19,11 @@ public:
     QString text() const;
     void setText(const QString& value);
 
-    int textWidth() const;
-    void setTextWidth(int value);
+    int overlayWidth() const;
+    void setOverlayWidth(int value);
+
+    int textIndent() const;
+    void setTextIndent(int value);
 
     QImage image() const;
     void setImage(const QImage& value);
@@ -34,6 +37,13 @@ public:
 
     qreal roundingRadius() const;
     void setRoundingRadius(qreal value);
+
+    qreal opacity() const;
+    void setOpacity(qreal value);
+
+signals:
+    void pressed();
+    void released();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

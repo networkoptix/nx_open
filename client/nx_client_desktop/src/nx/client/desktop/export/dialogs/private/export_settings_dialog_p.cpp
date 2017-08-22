@@ -23,6 +23,13 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
+    m_exportMediaSettings.imageOverlay.image =
+        qnSkin->pixmap(lit("welcome_page/logo.png")).toImage();
+
+    m_exportMediaSettings.imageOverlay.overlayWidth =
+        m_exportMediaSettings.imageOverlay.image.width();
+
+    updateOverlays();
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
@@ -74,6 +81,45 @@ const ExportLayoutSettings& ExportSettingsDialog::Private::exportLayoutSettings(
     return m_exportLayoutSettings;
 }
 
+void ExportSettingsDialog::Private::setExportMediaSettings(const ExportMediaSettings& settings)
+{
+    m_exportMediaSettings = settings;
+    updateOverlays();
+}
+
+void ExportSettingsDialog::Private::updateOverlays()
+{
+    // Text overlay.
+    auto textOverlay = overlay(OverlayType::text);
+    const auto& textData = m_exportMediaSettings.textOverlay;
+
+    textOverlay->setText(textData.text);
+    textOverlay->setTextIndent(textData.indent);
+    textOverlay->setOverlayWidth(textData.overlayWidth);
+    textOverlay->setRoundingRadius(textData.roundingRadius);
+
+    auto font = textOverlay->font();
+    font.setPixelSize(textData.fontSize);
+    textOverlay->setFont(font);
+
+    auto palette = textOverlay->palette();
+    palette.setColor(QPalette::Text, textData.foreground);
+    palette.setColor(QPalette::Window, textData.background);
+    textOverlay->setPalette(palette);
+
+    // Image overlay.
+    auto imageOverlay = overlay(OverlayType::image);
+    const auto& imageData = m_exportMediaSettings.imageOverlay;
+
+    imageOverlay->setImage(imageData.image);
+    imageOverlay->setOverlayWidth(imageData.overlayWidth);
+    imageOverlay->setOpacity(imageData.opacity);
+
+    palette = imageOverlay->palette();
+    palette.setColor(QPalette::Window, imageData.background);
+    imageOverlay->setPalette(palette);
+}
+
 void ExportSettingsDialog::Private::setStatus(ErrorCode value)
 {
     if (value == m_status)
@@ -99,11 +145,6 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
 
     overlay(OverlayType::timestamp)->setText(
         qnSyncTime->currentDateTime().toString(Qt::DefaultLocaleLongDate));
-
-    overlay(OverlayType::image)->setImage(qnSkin->pixmap(lit("welcome_page/logo.png")));
-
-    static constexpr int kDefaultTextWidth = 160;
-    overlay(OverlayType::text)->setTextWidth(kDefaultTextWidth);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
