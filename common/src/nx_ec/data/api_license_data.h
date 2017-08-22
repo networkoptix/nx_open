@@ -14,17 +14,21 @@ struct ApiLicenseData: ApiData
 };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 
-struct ApiDetailedLicenseData: ApiLicenseData
+struct ApiDetailedLicenseData: ApiData
 {
+    QnLatin1Array key;
     QString name;
-    qint32 cameraCount;
+    qint32 cameraCount = 0;
     QString hardwareId;
     QString licenseType;
     QString version;
     QString brand;
     QString expiration;
+    QnLatin1Array signature;
 };
-#define ApiDetailedLicenseData_Fields ApiLicenseData_Fields \
-    (name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)
+#define ApiDetailedLicenseData_Fields \
+    (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiLicenseData)(ApiDetailedLicenseData), (eq))
 
 } // namespace ec2
