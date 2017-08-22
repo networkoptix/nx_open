@@ -41,14 +41,6 @@ protected:
     {
         return resourceAccessProvider();
     }
-
-    QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
-    {
-        auto layout = createLayout();
-        layout->setParentId(videoWall->getId());
-        resourcePool()->addResource(layout);
-        return layout;
-    }
 };
 
 TEST_F(QnCachedResourceAccessProviderTest, checkInvalidAccess)

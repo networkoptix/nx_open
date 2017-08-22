@@ -586,6 +586,10 @@ TEST_F(QnDirectResourceAccessManagerTest, checkCameraOnVideoWall)
     auto videoWall = addVideoWall();
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
     auto layout = createLayout(Qn::remote, false, videoWall->getId());
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
     QnLayoutItemData item;
     item.resource.id = target->getId();
     item.resource.uniqueId = target->getUniqueId();

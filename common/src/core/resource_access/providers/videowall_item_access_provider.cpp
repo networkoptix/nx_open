@@ -13,6 +13,39 @@
 
 using namespace nx::core::access;
 
+namespace {
+
+/**
+ * We may have layout resources which have videowall as a parent but actually not located on the
+ * videowall. Such are temporary layouts, that were saved to matrix. We must keep them alive to be
+ * able to load matrix at any time, but these layouts must not provide access to the cameras.
+ */
+bool layoutBelongsToVideoWall(const QnResourcePtr& layout)
+{
+    NX_EXPECT(layout && layout->hasFlags(Qn::layout) && layout.dynamicCast<QnLayoutResource>());
+    if (!layout)
+        return false;
+
+    const auto parentResource = layout->getParentResource();
+    if (!parentResource || !parentResource->hasFlags(Qn::videowall))
+        return false;
+
+    const auto videowall = parentResource.dynamicCast<QnVideoWallResource>();
+    NX_EXPECT(videowall);
+    if (!videowall)
+        return false;
+
+    const auto items = videowall->items()->getItems();
+    return std::any_of(items.cbegin(), items.cend(),
+        [id = layout->getId()](const QnVideoWallItem& item)
+        {
+            return item.layout == id;
+        });
+}
+
+}
+
+
 QnVideoWallItemAccessProvider::QnVideoWallItemAccessProvider(
     Mode mode,
     QObject* parent)
@@ -53,10 +86,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
     if (mode() == Mode::direct)
     {
         if (resource->hasFlags(Qn::layout))
-        {
-            auto parentResource = resource->getParentResource();
-            return parentResource && parentResource->hasFlags(Qn::videowall);
-        }
+            return layoutBelongsToVideoWall(resource);
 
         if (!QnResourceAccessFilter::isShareableMedia(resource))
             return false;
@@ -66,8 +96,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         const auto resourceId = resource->getId();
         for (const auto& resource: commonModule()->resourcePool()->getResourcesWithFlag(Qn::layout))
         {
-            auto parentResource = resource->getParentResource();
-            if (!parentResource || !parentResource->hasFlags(Qn::videowall))
+            if (!layoutBelongsToVideoWall(resource))
                 continue;
 
             const auto layout = resource.dynamicCast<QnLayoutResource>();
@@ -110,9 +139,8 @@ void QnVideoWallItemAccessProvider::fillProviders(
 
     if (resource->hasFlags(Qn::layout))
     {
-        auto parentResource = resource->getParentResource();
-        if (parentResource && parentResource->hasFlags(Qn::videowall))
-            providers << parentResource;
+        if (layoutBelongsToVideoWall(resource))
+            providers << resource->getParentResource();
         return;
     }
 
@@ -126,20 +154,20 @@ void QnVideoWallItemAccessProvider::fillProviders(
     {
         for (const auto& resource: commonModule()->resourcePool()->getResourcesWithFlag(Qn::layout))
         {
-            auto parentResource = resource->getParentResource();
-            if (!parentResource || !parentResource->hasFlags(Qn::videowall))
+            if (!layoutBelongsToVideoWall(resource))
                 continue;
 
             const auto layout = resource.dynamicCast<QnLayoutResource>();
             NX_EXPECT(layout);
             if (!layout)
                 continue;
+
             for (const auto& item: layout->getItems())
             {
                 if (item.resource.id != resourceId)
                     continue;
-                providers << parentResource << layout;
-                break; /*< for item: getItems */
+                providers << resource->getParentResource() << layout;
+                break; //< 'for item: getItems()', go to the next layout.
             }
         }
 
@@ -192,6 +220,50 @@ QnLayoutResourceList QnVideoWallItemAccessProvider::getLayoutsForVideoWall(const
     return commonModule()->resourcePool()->getResourcesByParentId(videoWall->getId()).filtered<QnLayoutResource>();
 }
 
+void QnVideoWallItemAccessProvider::handleVideowallItemAdded(
+    const QnVideoWallResourcePtr& videowall,
+    const QnVideoWallItem& item)
+{
+    if (item.layout.isNull())
+        return;
+
+    // Layouts can be added to the pool after the videowall.
+    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    if (!layout || layout->getParentId() != videowall->getId())
+        return;
+
+    if (m_itemAggregator->addWatchedLayout(layout))
+        updateAccessToResource(layout);
+}
+
+void QnVideoWallItemAccessProvider::handleVideowallItemChanged(
+    const QnVideoWallResourcePtr& videowall,
+    const QnVideoWallItem& item,
+    const QnVideoWallItem& oldItem)
+{
+    if (item.layout == oldItem.layout)
+        return;
+
+    handleVideowallItemRemoved(videowall, oldItem);
+    handleVideowallItemAdded(videowall, item);
+}
+
+void QnVideoWallItemAccessProvider::handleVideowallItemRemoved(
+    const QnVideoWallResourcePtr& /*videowall*/,
+    const QnVideoWallItem &item)
+{
+    if (item.layout.isNull())
+        return;
+
+    // Layouts can be deleted before they are removed from the videowall.
+    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    if (!layout)
+        return;
+
+    if (m_itemAggregator->removeWatchedLayout(layout))
+        updateAccessToResource(layout);
+}
+
 void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
     NX_EXPECT(mode() == Mode::cached);
@@ -234,22 +306,25 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
     /* Layouts and videowalls can be added independently. */
     for (auto layout: getLayoutsForVideoWall(videoWall))
     {
-        if (m_itemAggregator->addWatchedLayout(layout))
+        if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
             updateAccessToResource(layout);
     }
+
+    connect(videoWall, &QnVideoWallResource::itemAdded, this,
+        &QnVideoWallItemAccessProvider::handleVideowallItemAdded);
+    connect(videoWall, &QnVideoWallResource::itemChanged, this,
+        &QnVideoWallItemAccessProvider::handleVideowallItemChanged);
+    connect(videoWall, &QnVideoWallResource::itemRemoved, this,
+        &QnVideoWallItemAccessProvider::handleVideowallItemRemoved);
 }
 
 void QnVideoWallItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
     NX_EXPECT(mode() == Mode::cached);
 
-    /* Layouts and videowalls can be added independently. */
-    auto parent = layout->getParentResource();
-    if (parent && parent->hasFlags(Qn::videowall))
-    {
-        if (m_itemAggregator->addWatchedLayout(layout))
-            updateAccessToResource(layout);
-    }
+    // Layouts and videowalls can be added independently.
+    if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
+        updateAccessToResource(layout);
 }
 
 void QnVideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)

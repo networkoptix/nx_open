@@ -410,7 +410,7 @@ QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
 
 int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
 {
-    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(), 
+    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(),
         [](const std::pair<int, int>& l, const std::pair<int, int>& r)
         {
             return l.second < r.second;
