@@ -10,7 +10,9 @@ namespace nx_http {
 namespace server {
 namespace handler {
 
-template<typename TunnelledConnection>
+/**
+ * Upgrades HTTP connection to the protocol specified.
+ */
 class CreateTunnelHandler:
     public AbstractHttpRequestHandler
 {

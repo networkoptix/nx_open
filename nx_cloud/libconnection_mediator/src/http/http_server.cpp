@@ -38,9 +38,14 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
-nx_http::MessageDispatcher& Server::messageDispatcher()
+nx_http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
+}
+
+std::vector<SocketAddress> Server::httpEndpoints() const
+{
+    return m_httpEndpoints;
 }
 
 bool Server::launchHttpServerIfNeeded(
@@ -50,7 +55,7 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_LOGX("Bringing up HTTP server", cl_logINFO);
 
-    m_httpMessageDispatcher = std::make_unique<nx_http::MessageDispatcher>();
+    m_httpMessageDispatcher = std::make_unique<nx_http::server::rest::MessageDispatcher>();
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(

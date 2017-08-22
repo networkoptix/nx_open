@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 
 namespace nx {
 namespace cloud {
@@ -12,14 +12,14 @@ class HttpServer
 {
 public:
     HttpServer(
-        nx_http::MessageDispatcher* httpMessageDispatcher,
+        nx_http::server::rest::MessageDispatcher* httpMessageDispatcher,
         RegisteredPeerPool* registeredPeerPool);
 
 private:
-    nx_http::MessageDispatcher* m_httpMessageDispatcher;
+    nx_http::server::rest::MessageDispatcher* m_httpMessageDispatcher;
     RegisteredPeerPool* m_registeredPeerPool;
 };
 
-} // namespace nx
-} // namespace cloud
 } // namespace discovery
+} // namespace cloud
+} // namespace nx

@@ -11,9 +11,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace nx
-} // namespace cloud
 } // namespace discovery
+} // namespace cloud
+} // namespace nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::discovery, ResultCode,
     (nx::cloud::discovery::ResultCode::ok, "ok")

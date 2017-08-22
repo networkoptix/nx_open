@@ -14,7 +14,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <discovery/discovery_client.h>
-#include <http/http_api_path.h>
+#include <discovery/discovery_http_api_path.h>
 
 #include "../integration_tests/mediator_relay_integration_test_setup.h"
 
@@ -28,6 +28,11 @@ struct InstanceInformation:
     nx::cloud::discovery::BasicInstanceInformation
 {
     static const char* const kTypeName;
+
+    InstanceInformation():
+        nx::cloud::discovery::BasicInstanceInformation(kTypeName)
+    {
+    }
 };
 
 const char* const InstanceInformation::kTypeName = "TestModule";
@@ -132,7 +137,7 @@ private:
         const auto url = nx::network::url::Builder()
             .setScheme(nx_http::kUrlSchemeName).setEndpoint(httpEndpoint())
             .setPath(nx_http::rest::substituteParameters(
-                http::kDiscoveryModulePath, {m_relayId.c_str()})
+                nx::cloud::discovery::http::kDiscoveredModulePath, {m_relayId.c_str()})
             ).toUrl();
 
         nx_http::FusionDataHttpClient<void, InstanceInformation> httpClient(

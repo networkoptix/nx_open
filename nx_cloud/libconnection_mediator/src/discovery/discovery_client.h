@@ -41,12 +41,18 @@ namespace discovery {
 
 struct BasicInstanceInformation
 {
+    std::string type;
     std::string id;
     QUrl apiUrl;
     PeerStatus status = PeerStatus::offline;
+
+    BasicInstanceInformation(std::string type):
+        type(type)
+    {
+    }
 };
 
-#define BasicInstanceInformation_Fields (id)(apiUrl)(status)
+#define BasicInstanceInformation_Fields (type)(id)(apiUrl)(status)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (BasicInstanceInformation),
@@ -103,6 +109,6 @@ public:
     }
 };
 
-} // namespace nx
-} // namespace cloud
 } // namespace discovery
+} // namespace cloud
+} // namespace nx

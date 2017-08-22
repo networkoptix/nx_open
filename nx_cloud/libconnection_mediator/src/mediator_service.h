@@ -37,8 +37,8 @@ class MediatorProcess:
 public:
     MediatorProcess(int argc, char **argv);
 
-    const std::vector<SocketAddress>& httpEndpoints() const;
-    const std::vector<SocketAddress>& stunEndpoints() const;
+    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<SocketAddress> stunEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;
 
 protected:
