@@ -57,6 +57,7 @@
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -666,13 +667,20 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (!qFuzzyIsNull(result))
         return result;
 
+    const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+
     if (m_renderer && !m_renderer->sourceSize().isEmpty())
     {
-        const QSize sourceSize = m_renderer->sourceSize();
+        auto sourceSize = m_renderer->sourceSize();
+
+        const auto& sensor = camera->combinedSensorsDescription().mainSensor();
+        if (sensor.isValid())
+            sourceSize = QnGeometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
+
         return QnGeometry::aspectRatio(sourceSize);
     }
 
-    if (const auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+    if (camera)
     {
         const auto cameraAr = camera->aspectRatio();
         if (cameraAr.isValid())
@@ -1311,7 +1319,14 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     const QRectF& channelRect,
     const QRectF& paintRect)
 {
-    const QRectF sourceSubRect = toSubRect(channelRect, paintRect);
+    QRectF sourceSubRect = toSubRect(channelRect, paintRect);
+
+    if (m_camera && m_camera->hasCombinedSensors())
+    {
+        const auto& sensor = m_camera->combinedSensorsDescription().mainSensor();
+        if (sensor.isValid())
+            sourceSubRect = subRect(sensor.geometry, sourceSubRect);
+    }
 
     Qn::RenderStatus result = Qn::NothingRendered;
     {
@@ -1958,6 +1973,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         ensureTwoWayAudioWidget();
+    else if (key == Qn::kCombinedSensorsDescriptionParamName)
+        updateAspectRatio();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
