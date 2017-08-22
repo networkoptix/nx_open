@@ -590,11 +590,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
 
         var scrollSlider = self.scaleManager.scrollSlider();
-        var startCoordinate = scrollSlider.start;
-        var scrollBarSliderWidth = scrollSlider.width;
+        var startCoordinate = scrollSlider.start * self.pixelAspectRatio;
+        var scrollBarSliderWidth = scrollSlider.width * self.pixelAspectRatio;
 
-        var mouseInScrollbarRow = mouseY >= top;
-        var mouseInScrollbarSlider = mouseX >= startCoordinate && mouseX <= startCoordinate + scrollBarSliderWidth && mouseY >= top;
+        var mouseInScrollbarRow = mouseY * self.pixelAspectRatio >= top;
+        var mouseInScrollbarSlider = mouseX * self.pixelAspectRatio >= startCoordinate &&
+                                     mouseX * self.pixelAspectRatio <= startCoordinate + scrollBarSliderWidth &&
+                                     mouseY * self.pixelAspectRatio>= top;
 
         if(context) {
             //1. DrawBG
@@ -628,8 +630,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawScrollbarMarks(context, centerOfScrollBar, topOfScrollBar){
-        var marksHeightOffset = timelineConfig.scrollBarMarksHeightOffset;
-        var marksSpacing = timelineConfig.scrollBarMarksSpacing;
+        var marksHeightOffset = timelineConfig.scrollBarMarksHeightOffset * self.pixelAspectRatio;
+        var marksSpacing = timelineConfig.scrollBarMarksSpacing * self.pixelAspectRatio;
     
         context.beginPath();
         context.strokeStyle = blurColor(timelineConfig.scrollBarMarksColor,1);
