@@ -24,14 +24,6 @@ protected:
     {
         return new QnVideoWallItemAccessProvider(Mode::cached, commonModule());
     }
-
-    QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
-    {
-        auto layout = createLayout();
-        layout->setParentId(videoWall->getId());
-        resourcePool()->addResource(layout);
-        return layout;
-    }
 };
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkSource)
@@ -101,6 +93,57 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowall)
+{
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    auto videoWall = createVideoWall();
+
+    /* What's going on on drop. */
+    auto layout = addLayoutForVideoWall(videoWall);
+
+    awaitAccessValue(user, layout, Source::videowall);
+    resourcePool()->addResource(videoWall);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+}
+
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowallItem)
+{
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    auto videoWall = addVideoWall();
+
+    auto layout = createLayout();
+    layout->setParentId(videoWall->getId());
+    resourcePool()->addResource(layout);
+
+    awaitAccessValue(user, layout, Source::videowall);
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+}
+
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedAfterVideowallItem)
+{
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    auto videoWall = addVideoWall();
+
+    auto layout = createLayout();
+    layout->setParentId(videoWall->getId());
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
+    awaitAccessValue(user, layout, Source::videowall);
+    resourcePool()->addResource(layout);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+}
+
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
 {
     auto target = addCamera();
@@ -129,6 +172,10 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoW
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
 
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
     awaitAccessValue(user, target, Source::videowall);
     resourcePool()->addResource(layout);
 
@@ -149,6 +196,10 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
     resourcePool()->addResource(layout);
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
 
     awaitAccessValue(user, target, Source::videowall);
     layout->setParentId(videoWall->getId());

@@ -22,6 +22,8 @@ public:
     Rule();
     virtual ~Rule() override;
 
+    static const QByteArray kGuidPostfix;
+
     QString getUniqueId() const;
 
     QnUuid id() const;
