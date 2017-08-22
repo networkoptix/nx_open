@@ -314,7 +314,8 @@ PageBase
                     readonly property bool onlyCompactTitleIsVisible:
                         compact && title != "" && description == "" && buttonText == ""
 
-                    rightPadding: width - videoScreen.width
+                    rightPadding: 8 + width - videoScreen.width
+                    leftPadding: 8
                     compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
                 }
