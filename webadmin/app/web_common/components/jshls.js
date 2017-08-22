@@ -1,19 +1,15 @@
 'use strict';
 
-function JsHlsAPI(manifestLoadingTimeOut){
+function JsHlsAPI(){
     var events, stats, fmp4Data,
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
     //levelCapping = -1,
-    defaultAudioCodec = undefined,
     dumpfMP4 = false,
     autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;
-        if(manifestLoadingTimeOut){
-            hls.config.manifestLoadingTimeOut = manifestLoadingTimeOut;
-        }
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
@@ -351,7 +347,7 @@ function JsHlsAPI(manifestLoadingTimeOut){
         });
     };
 
-    this.init = function(element, jshlsDebugMode, readyHandler, errorHandler){
+    this.init = function(element, manifestLoadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
         
         debugMode = jshlsDebugMode;
@@ -365,7 +361,11 @@ function JsHlsAPI(manifestLoadingTimeOut){
         recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
         fmp4Data = { 'audio': [], 'video': [] };
 
-        this.hls = new Hls({debug:debugMode, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+        this.hls = new Hls({
+            debug: debugMode,
+            enableWorker: enableWorker,
+            manifestLoadingTimeOut: manifestLoadingTimeOut
+        });
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
