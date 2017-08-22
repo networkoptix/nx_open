@@ -15,7 +15,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_packet.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace detail {
