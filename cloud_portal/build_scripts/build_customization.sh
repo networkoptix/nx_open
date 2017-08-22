@@ -15,8 +15,7 @@ dir=../customizations/$CUSTOMIZATION/
     echo "============================================================"
     echo "Building customization: $CUSTOMIZATION $dir"
     rm -rf $TARGET_DIR/$CUSTOMIZATION || true
-    mkdir $TARGET_DIR/$CUSTOMIZATION
-    mkdir $TARGET_DIR/$CUSTOMIZATION/source
+    mkdir -p $TARGET_DIR/$CUSTOMIZATION/source
 
     echo "------------------------------"
     echo "Copy config"
@@ -40,8 +39,7 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "Move fonts"
     rm -rf $TARGET_DIR/common || true
-    mkdir $TARGET_DIR/common
-    mkdir $TARGET_DIR/common/static
+    mkdir -p $TARGET_DIR/common/static
     mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
 
     echo "Move front_end to destination"
@@ -59,7 +57,7 @@ dir=../customizations/$CUSTOMIZATION/
     echo "------------------------------"
     echo "Building templates - for each language"
 
-    mkdir $TARGET_DIR/$CUSTOMIZATION/source/templates/
+    mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/templates/
     cp -rf $dir/templates/* $TARGET_DIR/$CUSTOMIZATION/source/templates
 
     for lang_dir in ../translations/*/
@@ -69,8 +67,7 @@ dir=../customizations/$CUSTOMIZATION/
 
         echo "$TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG"
 
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG/src
+        mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG/src
 
         echo "Copy template sources - with default language"
         cp -rf ../cloud/notifications/static/templates/* $TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG/src/
@@ -100,8 +97,7 @@ dir=../customizations/$CUSTOMIZATION/
 
         echo "$TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/"
 
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/
+        mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/
 
         echo "Copy default views - with default language"
         cp -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/
@@ -110,10 +106,7 @@ dir=../customizations/$CUSTOMIZATION/
         cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/ || true
 
 
-
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/
-        mkdir $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
-
+        mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
 
         echo "Copy web_common default views - with default language"
         cp -rf $TARGET_DIR/$CUSTOMIZATION/source/static/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/

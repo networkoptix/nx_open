@@ -248,7 +248,6 @@ angular.module('nxCommon')
                     });
                 }
 
-
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
@@ -259,9 +258,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = "web_common/components/flashlsChromeless.swf";
+                    scope.flashSource = Config.webclient.flashChromelessPath;
                     if(scope.debugMode){
-                        scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
+                        scope.flashSource = Config.webclient.flashChromelessDebugPath;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -342,7 +341,6 @@ angular.module('nxCommon')
                                       });
                         videoPlayers.push(jsHlsAPI);
                     });
-
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
