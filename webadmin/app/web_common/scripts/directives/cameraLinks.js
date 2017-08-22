@@ -23,6 +23,8 @@ angular.module('nxCommon')
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
+                scope.debugMode = Config.allowDebugMode;
+                
                 var systemAPI = scope.system;
                 scope.linkSettings = {
                     duration: 5*60,
