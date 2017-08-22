@@ -113,16 +113,6 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'view.html',
             reloadOnSearch: false
         })
-        .when('/viewdebug', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
-            reloadOnSearch: false
-        })
-        .when('/viewdebug/:cameraId', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
-            reloadOnSearch: false
-        })
         .when('/sdkeula', {
             templateUrl: Config.viewsDir + 'sdkeula.html',
             controller: 'SdkeulaCtrl'

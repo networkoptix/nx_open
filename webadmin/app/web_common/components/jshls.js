@@ -5,13 +5,11 @@ function JsHlsAPI(){
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
     //levelCapping = -1,
-    defaultAudioCodec = undefined,
     dumpfMP4 = false,
     autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;
-        hls.config.manifestLoadingTimeOut = 30*1000; // 30 seconds to wait for manifest
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
@@ -349,7 +347,7 @@ function JsHlsAPI(){
         });
     };
 
-    this.init = function(element, jshlsDebugMode, readyHandler, errorHandler){
+    this.init = function(element, manifestLoadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
         
         debugMode = jshlsDebugMode;
@@ -363,7 +361,11 @@ function JsHlsAPI(){
         recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
         fmp4Data = { 'audio': [], 'video': [] };
 
-        this.hls = new Hls({debug:debugMode, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+        this.hls = new Hls({
+            debug: debugMode,
+            enableWorker: enableWorker,
+            manifestLoadingTimeOut: manifestLoadingTimeOut
+        });
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
@@ -458,13 +460,6 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    if(this.video){
-        //This unbinds all of the event listeners for the video player
-        var cloneVideo = this.video.cloneNode(true);
-        if(this.video.parentNode){
-            this.video.parentNode.replaceChild(cloneVideo, this.video);
-        }
-    }
     this.hls.destroy();
 };
 
