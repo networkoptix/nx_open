@@ -35,6 +35,15 @@ private:
     void handleItemAdded(const QnUuid& resourceId);
     void handleItemRemoved(const QnUuid& resourceId);
     QnLayoutResourceList getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall) const;
+
+    void handleVideowallItemAdded(const QnVideoWallResourcePtr& videowall,
+        const QnVideoWallItem& item);
+    void handleVideowallItemChanged(const QnVideoWallResourcePtr& videowall,
+        const QnVideoWallItem& item,
+        const QnVideoWallItem& oldItem);
+    void handleVideowallItemRemoved(const QnVideoWallResourcePtr& videowall,
+        const QnVideoWallItem &item);
+
 private:
     /* Only resources with valid id can be accessible through layouts. */
     QScopedPointer<QnLayoutItemAggregator> m_itemAggregator;

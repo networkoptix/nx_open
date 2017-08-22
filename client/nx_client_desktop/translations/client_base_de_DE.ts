@@ -858,27 +858,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Demoband...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Neues Demoband...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Vom Demoband entfernen</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Demoband starten</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Demoband stoppen</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Demoband erstellen</translation>
     </message>
   </context>
   <context>
@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Exportiere ausgewählte Aufnahmen</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Überwachungsprotokoll wiedergeben</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Geräte</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Diese Ressource wurde vom System entfernt</numerusform>
         <numerusform>Diese Ressourcen wurden vom System entfernt</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -2351,7 +2351,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+      <translation>Die maximale Anzahl an Bewegungsempfindlichkeitseinstellungen für jeden Sensor der aktuellen Kamera beträgt %1, und %2 Bewegungsempfindlichkeitseinstellungen sind derzeit ausgewählt.</translation>
     </message>
   </context>
   <context>
@@ -5077,11 +5077,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Demobänder</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Demoband</translation>
     </message>
   </context>
   <context>
@@ -6472,12 +6472,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h:mm ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6801,7 +6801,7 @@ to %1</source>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Dieser Benutzer hat sich noch nicht für %1 angemeldet</translation>
     </message>
   </context>
   <context>
@@ -7656,17 +7656,17 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Vorhandenes Demoband überschreiben?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Es gibt ein anderes Demoband mit dem gleichen Namen.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>%n Item vom Demoband entfernen?</numerusform>
+        <numerusform>%n Items vom Demoband entfernen?</numerusform>
       </translation>
     </message>
   </context>
@@ -7749,7 +7749,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Ziehen Sie das Layout oder die Kamera hierher, um es dem Demoband hinzuzufügen</translation>
     </message>
   </context>
   <context>
@@ -8037,11 +8037,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Das Demoband kann durch drücken von ESC beendet werden.</translation>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <translation>Verwenden Sie Pfeiltasten, um Kameras zu wechseln. Das Demoband kann durch drücken von ESC beendet werden.</translation>
     </message>
   </context>
   <context>
@@ -8067,11 +8067,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Demoband</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>Demoband %1</translation>
     </message>
   </context>
   <context>

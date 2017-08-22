@@ -1,43 +1,64 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div>
-        <h3>Developer Tools</h3>
-        <p><a href="#/developers/api">API Testing Tool</a></p>
-        <p><a href="#/developers/changelog">API Changelog</a></p>
-        <p><a href="#/developers/events">Generic Events Tool</a></p>
-        <p><a href="#/view/?cameraLinks">Camera Stream Links</a></p>
-
+        <h2>Developer Tools</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>Camera Details Panel</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            Special panel for a webclient which displays additional information for cameras:
         </p>
-        <p><a id="api-doc" href="api.xml" target="_blank">API documentation</a></p>
+        <ul>
+            <li>ID de cámara</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Generic Events Generator</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
+    </div>
+    <div>
+        <h3>Servidor API</h3>
+        <p>
+            Servidor API proporciona un conjunto estándar de API llamadas para 3 sistemas de partido. Da a los desarrolladores la capacidad para acceder a casi cualquier función de sistema disponible en el cliente regular: consulta y administrar los recursos del sistema (servidores, cámaras, usuarios, permisos), tirar de vivo o video grabado fuera del sistema, generar eventos, crear normas, controlar cámaras PTZ y mucho más.
+        </p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Fuente de vídeo integración SDK</h3>
+        <p>
+            Video fuente Integration SDK ofrece la posibilidad de integrar sistema de prácticamente cualquier fuente de vídeo grabado o en directo (cámaras IP, NVR, DVR, etcetera). SDK permite crear métodos para descubrir, visualizar, analizar y grabar video. También permite la integración de puertos de E/S de dispositivo y la información de detección de movimiento.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >conseguir el SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>Almacenamiento SDK</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Almacenamiento SDK ofrece la posibilidad de integrar sistema de almacenamiento posibles. Permite a los desarrolladores leer de o escribir en cualquier lugar de almacenamiento de información: nube local, remota e incluso uno. La creación de un plugin de almacenamiento requiere implementar funciones estándar tales como: stream de I/O, si existe archivo, Borrar archivo, lista de archivos en la carpeta, etcetera. Almacenamiento SDK contiene un ejemplo de uso de un servidor FTP como una ubicación de almacenamiento.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >conseguir el SDK</a></p>
     </div>
 </div>

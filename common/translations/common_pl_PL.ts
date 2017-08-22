@@ -357,77 +357,77 @@
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation type="unfinished">Could not create output context for format %1.</translation>
+      <translation>Nie można utworzyć kontekstu wyjściowego dla formatu %1.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Nie można przydzielić strumienia wyjściowego dla nagrywania.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation type="unfinished">Could not perform direct stream copy because frame size is undefined.</translation>
+      <translation>Nie można wykonać bezpośredniej kopii strumienia, ponieważ rozmiar ramki nie jest zdefiniowany.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation type="unfinished">Could not find codec %1.</translation>
+      <translation>Nie można znaleźć kodeka %1.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with container %1.</translation>
+      <translation>Kodek wideo lub audio jest niezgodny z kontenerem %1.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>Nie można znaleźć enkodera dla kodeka %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Nie można zainicjować enkodera wideo.</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Analogowy</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Professional</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Ściana wideo</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Moduł I/O</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Enkoder analogowy</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>Licencje analogowe</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>Licencje Professional</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Czas</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Licencje okresowe</translation>
     </message>
   </context>
   <context>
@@ -576,8 +576,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation type="unfinished">
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Device(s)</numerusform>
       </translation>
     </message>
@@ -678,7 +678,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Licencja okresowa</translation>
     </message>
   </context>
   <context>
@@ -689,126 +689,126 @@
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Niski</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Średni</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Wysoki</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Najlepszy</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Niezdefiniowany</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Najniż.</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Ni</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Śr</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Wy</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Naj</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Pset</translation>
     </message>
   </context>
   <context>
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>Nie znaleziono odpowiedniego kontenera w bibliotece FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Nie można utworzyć pliku wyjściowego do nagrywania wideo.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Nie można przydzielić strumienia wyjściowego dla nagrywania.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Nie można przydzielić strumienia wyjściowego audio.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Nieprawidłowe informacje o kodeku audio.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Kodek wideo lub audio jest niezgodny z wybranym formatem %1.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Błąd zapisu pliku. Za mało wolnej przestrzeni.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Nieprawidłowy typ zasobu do eksportowania danych.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>System bez nazwy</translation>
     </message>
   </context>
   <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
-      <translation type="unfinished">Not Found</translation>
+      <translation>Nie znaleziono</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation type="unfinished">Not Implemented</translation>
+      <translation>Nie zaimplementowano</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
-      <translation type="unfinished">Unsupported Transport</translation>
+      <translation>Nieobsługiwany transport</translation>
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation type="unfinished">Internal Server Error</translation>
+      <translation>Wewnętrzny błąd serwera</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
-      <translation type="unfinished">Invalid Parameter</translation>
+      <translation>Nieprawidłowy parametr</translation>
     </message>
   </context>
   <context>
@@ -816,88 +816,88 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>g</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>t</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>r</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>sek.</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min.</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>godz.</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>dni</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>tyg.</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>mies.</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>lat</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
+        <numerusform>milisekund</numerusform>
         <numerusform>milliseconds</numerusform>
         <numerusform>milliseconds</numerusform>
       </translation>
@@ -905,17 +905,17 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>sekund</numerusform>
+        <numerusform>sek.</numerusform>
+        <numerusform>sek.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation type="unfinished">
-        <numerusform>minutes</numerusform>
+        <numerusform>minut</numerusform>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
       </translation>
@@ -924,25 +924,25 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+        <numerusform>godzin</numerusform>
+        <numerusform>godzin</numerusform>
         <numerusform>hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>weeks</numerusform>
+        <numerusform>tygodni</numerusform>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
@@ -951,7 +951,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation type="unfinished">
-        <numerusform>months</numerusform>
+        <numerusform>miesięcy</numerusform>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
@@ -960,7 +960,7 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>years</numerusform>
+        <numerusform>lat</numerusform>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
@@ -970,194 +970,194 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation type="unfinished">OpenCL transcoding is not implemented.</translation>
+      <translation>Transkodowanie OpenCL nie jest zaimplementowane.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation type="unfinished">Unknown transcoding method.</translation>
+      <translation>Nieznana metoda transkodowania.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation type="unfinished">OpenCLTranscode is not implemented.</translation>
+      <translation>Transkodowanie OpenCL nie jest zaimplementowane.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation type="unfinished">Unknown transcode method</translation>
+      <translation>Nieznana metoda transkodowania.</translation>
     </message>
   </context>
   <context>
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Właściciel</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Zaawansowany użytkownik</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Użytkownik</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Użytkownik podglądu na żywo</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation type="unfinished">Custom Role</translation>
+      <translation>Grupa niestandardowa</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Niestandardowa</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
+      <translation>Może zarządzać wszystkimi kamerami i zakładkami.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation type="unfinished">Can view all cameras and export video.</translation>
+      <translation>Może wyświetlać wszystkie kamery i eksportować wideo.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>Może podglądać na żywo wszystkie kamery.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>Niestandardowa grupa użytkowników.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>Niestandardowe uprawnienia.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>Ma dostęp do całego systemu i może zrobić wszystko.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>Ma dostęp do całego systemu i może nim zarządzać. Może tworzyć użytkowników.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Zakładka</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Nagrywanie w trybie paniki</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation type="unfinished">Write to log</translation>
+      <translation>Zapisz w dzienniku</translation>
     </message>
     <message>
       <source>Show notification</source>
-      <translation type="unfinished">Show notification</translation>
+      <translation>Pokaż powiadomienie</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation type="unfinished">Repeat sound</translation>
+      <translation>Powtórz dźwięk</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation type="unfinished">Play sound</translation>
+      <translation>Odtwórz dźwięk</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Powiedz</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation type="unfinished">Execute PTZ preset</translation>
+      <translation>Ustaw preset PTZ</translation>
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Wyświetl tekst na obrazie</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Pokaż w układzie alarmowym</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
-      <translation type="unfinished">Do HTTP request</translation>
+      <translation>Wyślij polecenie HTTP</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation type="unfinished">Device output</translation>
+      <translation>Wyjście urządzenia</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation type="unfinished">Camera output</translation>
+      <translation>Wyjście kamery</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation type="unfinished">Device recording</translation>
+      <translation>Nagrywanie urządzenia</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation type="unfinished">Camera recording</translation>
+      <translation>Nagrywanie kamery</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Zdarzenie generowane</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
+        <numerusform>Ruch na kamerach</numerusform>
         <numerusform>Motion on Cameras</numerusform>
         <numerusform>Motion on Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation type="unfinished">Storage Failure</translation>
+      <translation>Błąd archiwum</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Problem z siecią</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Błąd serwera</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Konflikt serwera</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Uruchomiono serwer</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Problem z licencją</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
-      <translation type="unfinished">Archive backup finished</translation>
+      <translation>Zakończono backup archiwum</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation type="unfinished">Any Server Issue</translation>
+      <translation>Dowolny problem z serwerem</translation>
     </message>
     <message>
       <source>Any Event</source>
-      <translation type="unfinished">Any Event</translation>
+      <translation>Dowolne zdarzenie</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
+        <numerusform>Sygnał wejściowy na urządzeniach</numerusform>
         <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Input Signal on Devices</numerusform>
       </translation>
@@ -1165,7 +1165,7 @@
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
+        <numerusform>Sygnał wejściowy na kamerach</numerusform>
         <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Input Signal on Cameras</numerusform>
       </translation>
@@ -1173,7 +1173,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
+        <numerusform>Urządzenia odłączone</numerusform>
         <numerusform>Devices Disconnected</numerusform>
         <numerusform>Devices Disconnected</numerusform>
       </translation>
@@ -1181,7 +1181,7 @@
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
+        <numerusform>Kamery odłączone</numerusform>
         <numerusform>Cameras Disconnected</numerusform>
         <numerusform>Cameras Disconnected</numerusform>
       </translation>
@@ -1189,7 +1189,7 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
+        <numerusform>Konflikt urządzeń IP</numerusform>
         <numerusform>Devices IP Conflict</numerusform>
         <numerusform>Devices IP Conflict</numerusform>
       </translation>
@@ -1197,145 +1197,145 @@
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
+        <numerusform>Konflikt kamer IP</numerusform>
         <numerusform>Cameras IP Conflict</numerusform>
         <numerusform>Cameras IP Conflict</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation type="unfinished">Any Device Issue</translation>
+      <translation>Dowolny problem z urządzeniem</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation type="unfinished">Any Camera Issue</translation>
+      <translation>Dowolny problem z kamerą</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation type="unfinished">Undefined event has occurred on %1</translation>
+      <translation>Niezdefiniowane zdarzenie na %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>Urządzenie %1 zostało odłączone</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>Kamera %1 została odłączona</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>Moduł I/O %1 został odłączony</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Wejście na %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Ruchu na %1</translation>
     </message>
     <message>
       <source>Storage Failure at %1</source>
-      <translation type="unfinished">Storage Failure at %1</translation>
+      <translation>Błąd archiwum na %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Problem z siecią na %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Awaria serwera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Konflikt urządzeń IP na %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Konflikt kamer IP na %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Konflikt serwera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Uruchomiono serwer &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Serwer &quot;%1&quot; ma problem z licencją</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Serwer &quot;%1&quot; zakończył backup archiwum</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Zdarzenie generowane na %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation type="unfinished">An unknown event has occurred</translation>
+      <translation>Wystąpiło nieznane zdarzenie</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Wystąpiło wiele zdarzeń %1</translation>
     </message>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Zdarzenie: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Źródło: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Tytuł: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Port wejściowy: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Przyczyna: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Adres powodujący konflikt: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Serwery w konflikcie # %1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Serwer w konflikcie: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Wyzwalacz: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n razy, pierwszy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
@@ -1343,13 +1343,13 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Czas: %1 na %2</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        <numerusform>Pierwsze wystąpienie: %1 na %2 (łącznie %n razy)</numerusform>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
@@ -1357,181 +1357,181 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Połączenie z urządzeniem zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Połączenie z kamerą (pierwszy strumień) zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Połączenie z kamerą (drugi strumień) zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation type="unfinished">RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
+      <translation>Wykryto utratę pakietu RTP, poprzednia sekwencja = %1, następna sekwencja = %2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Wykryto utratę pakietu RTP.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Urządzenie nie reaguje na zapytania sieciowe.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Połączenie z serwerem zostało utracone.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Nieoczekiwane zatrzymanie pracy serwera.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Wystąpił błąd I/O na %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Brak wystarczającej szybkości dysków do nagrywania na %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Dysk &quot;%1&quot; jest pełny. Dysk zawiera zbyt wiele danych, które nie są zarządzane przez VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Dysk systemowy &quot;%1&quot; jest prawie pełny.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation type="unfinished">Archive backup failed: No available backup storages with sufficient free space</translation>
+      <translation>Nie udało się wykonać backupu archiwum: brak dostępnej przestrzeni dyskowej</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation type="unfinished">Archive backup failed: Target storage failure</translation>
+      <translation>Nie udało się wykonać backupu archiwum: błąd docelowego magazynu danych</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation type="unfinished">Archive backup failed: Source file open/read error</translation>
+      <translation>Nie udało się wykonać backupu archiwum: błąd otwarcia/odczytania pliku źródłowego</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation type="unfinished">Archive backup failed: Target file create/write error</translation>
+      <translation>Nie udało się wykonać backupu archiwum: błąd tworzenia/zapisu pliku docelowego</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation type="unfinished">Archive backup failed: File catalog error</translation>
+      <translation>Nie udało się wykonać backupu archiwum: błąd katalogu plików</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>Zakończono backup archiwum, ale nie zrealizowano go w całości ze względu na limit czasu. Dane zapisano do %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation type="unfinished">Archive backup is successfully completed</translation>
+      <translation>Zakończono pomyślnie backup archiwum</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup is canceled by user. Data is backed up to %1</translation>
+      <translation>Backup archiwum został anulowany przez użytkownika. Dane zapisano do %1</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>Nie ma wystarczających licencji. Nagrywanie zostało wyłączone na następujących urządzeniach:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>Nie ma wystarczających licencji. Nagrywanie zostało wyłączone na następujących kamerach:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>Nie ma wystarczających licencji. Nagrywanie zostało wyłączone na następujących modułach I/O:</translation>
     </message>
     <message>
       <source>start</source>
-      <translation type="unfinished">start</translation>
+      <translation>start</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation type="unfinished">stop</translation>
+      <translation>stop</translation>
     </message>
     <message>
       <source>While %1</source>
-      <translation type="unfinished">While %1</translation>
+      <translation>Kiedy %1</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation type="unfinished">On %1 %2</translation>
+      <translation>Na %1 %2</translation>
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Nazwa wyzwalacza</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Grupa</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Grup</numerusform>
         <numerusform>%n Roles</numerusform>
         <numerusform>%n Roles</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Wszyscy administratorzy</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Wszyscy użytkownicy</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Wybierz co najmniej jednego użytkownika</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Wyzwalacz programowy</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Wyzwalacz programowy %1 w %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Wyzwalacz programowy %1 został wywołany wielokrotnie</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Wyślij e-mail</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Potwierdź</translation>
     </message>
   </context>
   <context>
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Usunięta kamera</translation>
     </message>
   </context>
 </TS>

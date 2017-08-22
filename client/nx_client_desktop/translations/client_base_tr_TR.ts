@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Yer işaretini baştan oynat</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Yer imini düzenle</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Yer imini sil</translation>
     </message>
   </context>
   <context>
@@ -858,27 +858,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Yeni Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Showreel'den kaldır</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Showreel'i başlat</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Showreel'i durdur</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Showreel Oluştur</translation>
     </message>
   </context>
   <context>
@@ -960,15 +960,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Lisans deaktif edilmek için bekleniyor. Fakat henüz deaktif edilmedi.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Bu lisans için devreden çıkarma sayısı sınırı aştı.</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>Bu lisansa sahip Sunucu Donanım Kimliği, lisansın etkinleştirildiği Donanım Kimliği ile eşleşmiyor.</translation>
     </message>
   </context>
   <context>
@@ -1030,15 +1030,15 @@ to view more bookmarks</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>"%1" Yolu geçerli değil. Lütfen başka bir yol deneyin.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Kamera "%1" den geçerli pozisyon alınamadı;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1119,7 +1119,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Kamera "%1" için geçerli pozisyon ayarlanamadı;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Seçilen Kayıtları Dosyaya Çıkart</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Denetim Günlüğünü Tekrar Oynat</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Aygıtlar</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1570,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Yedekleme, kameraların mevcut sunucusunda kurulmazsa, arşivleri yedeklenmez.</translation>
     </message>
   </context>
   <context>
@@ -1657,7 +1657,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Açıklama boş olamaz</translation>
     </message>
   </context>
   <context>
@@ -1727,7 +1727,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Yer imleri yöneticisi</translation>
     </message>
   </context>
   <context>
@@ -3555,7 +3555,7 @@ to %1</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -4595,7 +4595,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Yer imleri yöneticisi</translation>
     </message>
   </context>
   <context>

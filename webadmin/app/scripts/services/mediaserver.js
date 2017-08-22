@@ -475,12 +475,16 @@ angular.module('webadminApp')
                 });
             },
 
-            debugFunctionUrl:function(url, getParams){
+            debugFunctionUrl:function(url, getParams, credentials){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
                 var params = '';
-                if (!window.location.origin) {
-                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-                }
+
+                credentials = credentials ? (credentials.login + ":" + credentials.password + "@") : "";
+                var host = window.location.protocol + "//" +
+                           credentials +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+
                 if(getParams && !_.isEmpty(getParams)){
                     params = delimeter + $.param(getParams);
                 }
@@ -490,7 +494,7 @@ angular.module('webadminApp')
                     url = '/' + url;
                 }
                 url = url.replace('//','/');
-                return window.location.origin + url;
+                return host + url;
             },
             debugFunction:function(method, url, getParams, postParams, binary){
                 switch(method){

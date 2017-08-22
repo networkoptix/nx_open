@@ -471,7 +471,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Time Licenses</source>

@@ -779,6 +779,9 @@
                 <artifact.name.platform>mac</artifact.name.platform>
                 <qt.version>5.6.2-2</qt.version>
                 <festival.version>2.1</festival.version>
+                <openssl.version>1.0.2e-2</openssl.version>
+                <quazip.version>0.7.3</quazip.version>
+                <ffmpeg.version>3.1.1-2</ffmpeg.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>

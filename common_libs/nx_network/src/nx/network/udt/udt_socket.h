@@ -187,9 +187,9 @@ public:
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     // AbstractStreamServerSocket -------------- interface
-    virtual bool listen(int queueLen = 128);
-    virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(AcceptCompletionHandler handler);
+    virtual bool listen(int queueLen = 128) override;
+    virtual AbstractStreamSocket* accept() override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 

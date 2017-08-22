@@ -51,6 +51,8 @@ namespace ec2
 
     struct ApiResetBusinessRuleData: ApiData
     {
+        // TODO: #rvasilenko these rules are not used right now. Cannot remove as this type is used
+        // to deduct transaction type by template substitution.
         ApiBusinessRuleDataList defaultRules;
     };
 #define ApiResetBusinessRuleData_Fields (defaultRules)
