@@ -249,6 +249,8 @@ angular.module('nxCommon')
                 }
 
 
+                var flashChromeless = Config.webclient.flashChromelessPath;
+                var flashChromelessDebug = Config.webclient.flashChromelessDebugPath;
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
@@ -259,9 +261,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = "web_common/components/flashlsChromeless.swf";
+                    scope.flashSource = flashChromeless;
                     if(scope.debugMode){
-                        scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
+                        scope.flashSource = flashChromelessDebug;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
