@@ -248,9 +248,6 @@ angular.module('nxCommon')
                     });
                 }
 
-
-                var flashChromeless = Config.webclient.flashChromelessPath;
-                var flashChromelessDebug = Config.webclient.flashChromelessDebugPath;
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
@@ -261,9 +258,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = flashChromeless;
+                    scope.flashSource = Config.webclient.flashChromelessPath;
                     if(scope.debugMode){
-                        scope.flashSource = flashChromelessDebug;
+                        scope.flashSource = Config.webclient.flashChromelessDebugPath;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -344,7 +341,6 @@ angular.module('nxCommon')
                                       });
                         videoPlayers.push(jsHlsAPI);
                     });
-
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
