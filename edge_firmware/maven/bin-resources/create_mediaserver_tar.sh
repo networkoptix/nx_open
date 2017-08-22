@@ -2,21 +2,14 @@
 set -e
 shopt -s nullglob
 
-CUSTOMIZATION="${deb.customization.company.name}"
-PRODUCT_NAME="${product.name.short}"
-VERSION="${release.version}.${buildNumber}"
-MAJOR_VERSION="${parsedVersion.majorVersion}"
-MINOR_VERSION="${parsedVersion.minorVersion}"
-BUILD_VERSION="${parsedVersion.incrementalVersion}"
-TAR_FILENAME="${artifact.name.server}.tar.gz"
-ZIP_FILENAME="${artifact.name.server_update}.zip"
-SRC_DIR="${project.build.directory}"
-BUILD_DIR="${libdir}"
-LIB_BUILD_DIR="$BUILD_DIR/lib/${build.configuration}"
-BIN_BUILD_DIR="$BUILD_DIR/bin/${build.configuration}"
-QT_DIR="${qt.dir}"
-BOX="${box}"
-VOX_SOURCE_DIR="${ClientVoxSourceDir}"
+# TODO: #mshevchenko: REMOVE
+#echo "####### STUB: create_mediaserver_tar.sh called"
+#exit 0
+
+source create_mediaserver_tar.conf
+
+LIB_BUILD_DIR="$BUILD_DIR/lib/$BUILD_CONFIGURATION"
+BIN_BUILD_DIR="$BUILD_DIR/bin/$BUILD_CONFIGURATION"
 
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
@@ -25,8 +18,6 @@ if [ "$BOX" = "edge1" ]; then
 else
     INSTALL_PATH="opt/$CUSTOMIZATION"
 fi
-
-PACKAGES_DIR="${packages.dir}/${rdep.target}"
 
 if [ "$BOX" = "bpi" ]; then
     LIB_INSTALL_PATH="$INSTALL_PATH/lib"

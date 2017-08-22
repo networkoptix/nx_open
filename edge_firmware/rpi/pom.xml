@@ -39,6 +39,10 @@
                             <encoding>ISO-8859-1</encoding>
                             <resources>
                                 <resource>
+                                    <directory>${basedir}/../maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                                <resource>
                                     <directory>${basedir}/../maven/filter-resources</directory>
                                     <filtering>true</filtering>
                                 </resource>
