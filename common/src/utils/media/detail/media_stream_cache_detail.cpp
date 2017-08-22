@@ -10,7 +10,7 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/scope_guard.h>
+#include <utils/common/guard.h>
 
 namespace detail
 {
@@ -42,7 +42,7 @@ bool MediaStreamCache::canAcceptData() const
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     std::vector<std::function<void()>> eventsToDeliver;
-    auto eventsToDeliverGuard = makeScopeGuard(
+    auto eventsToDeliverGuard = makeScopedGuard(
         [&eventsToDeliver, this]()
         {
             for (auto& deliverEvent: eventsToDeliver)

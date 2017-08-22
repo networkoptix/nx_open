@@ -13,7 +13,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <nx/utils/subscription.h>
+#include <utils/common/subscription.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace detail
