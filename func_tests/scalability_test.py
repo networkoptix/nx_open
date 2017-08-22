@@ -20,6 +20,7 @@ from test_utils.utils import SimpleNamespace
 from multiprocessing import Pool as ThreadPool
 from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT
 import transaction_log
+from memory_usage_metrics import load_host_memory_usage
 
 log = logging.getLogger(__name__)
 
@@ -247,9 +248,21 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
         wait_for_method_matched(artifact_factory, servers, 'GET', 'ec2', api_method, start_time, merge_timeout)
 
 
-def collect_additional_metrics(metrics_saver, lightweight_servers):
+def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
     reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
     metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
+    if lightweight_servers:
+        # for test with lightweight servers pick only hosts with lightweight servers
+        host_set = set(server.host for server in lightweight_servers)
+    else:
+        host_set = set(server.host for server in servers)
+    for host in host_set:
+        metrics = load_host_memory_usage(host)
+        for name in 'total used free used_swap mediaserver lws'.split():
+            metric_name = 'host_memory_usage.%s.%s' % (host.name, name)
+            metric_value = getattr(metrics, name)
+            metrics_saver.save(metric_name, metric_value)
+
 
 def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
@@ -271,7 +284,7 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
         merge_duration = utils.datetime_utc_now() - start_time
         metrics_saver.save('merge_duration', merge_duration)
-        collect_additional_metrics(metrics_saver, lightweight_servers)
+        collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
         servers[0].load_system_settings(log_settings=True)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False
