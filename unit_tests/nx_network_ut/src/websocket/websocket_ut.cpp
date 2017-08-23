@@ -234,11 +234,7 @@ protected:
 
     void whenServerStartsAnsweringPings()
     {
-        serverReadCb =
-            [this](SystemError::ErrorCode ecode, size_t)
-            {
-            };
-
+        serverReadCb = [this](SystemError::ErrorCode, size_t) {};
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
     }
 
