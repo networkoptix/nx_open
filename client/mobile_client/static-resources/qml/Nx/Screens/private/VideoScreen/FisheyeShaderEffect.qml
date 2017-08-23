@@ -88,7 +88,7 @@ ShaderEffect
         OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? 100 : 120
 
     readonly property string commonShaderHeader: "
-        #version "+ shaderVersion + "
+        #version " + shaderVersion + "
         /* This is required to counter QOpenGLShaderProgram code prefixing: */
         #undef lowp
         #undef mediump
