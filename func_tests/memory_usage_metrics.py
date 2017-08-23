@@ -25,7 +25,7 @@ _PsMemory = namedtuple('_PsMemory', 'mediaserver lws')
 # Swap:      33452028      586264    32865764
 
 def _load_host_free_memory(host):
-    lines = host.run_command(['free']).splitlines()
+    lines = host.run_command(['free', '--bytes']).splitlines()
     key2line = dict([line.split(':') for line in lines[1:]])  # skip first line with titles
     mem_counts = key2line['Mem'].split()
     buf_cache_line = key2line.get('-/+ buffers/cache')
@@ -53,7 +53,7 @@ def _load_server_memory_usage(host):
     for line in lines[1:]:
         column2value = {idx2column[idx].lower(): value for idx, value in enumerate(line.split(None, len(idx2column) - 1))}
         cmdline = column2value['command']
-        rss = int(column2value['rss'])
+        rss = int(column2value['rss']) * 1024  # ps output is in kilobytes
         if MEDIASERVER_BINARY_NAME in cmdline:
             mediaserver_usage += rss
         if LIGHTWEIGHT_SERVER_BINARY_NAME in cmdline:

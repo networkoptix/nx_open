@@ -23,7 +23,18 @@
             </includes>
             <excludes>
                 <exclude>**/*d.pdb</exclude>
+                <exclude>Qt5WebEngine*.pdb</exclude>
             </excludes>
         </fileSet>
     </fileSets>
+    <fileSet>
+        <directory>${qt.dir}/qml</directory>
+        <outputDirectory>qml</outputDirectory>
+        <includes>
+            <include>**/*.pdb</include>
+        </includes>
+        <excludes>
+            <exclude>**/*d.pdb</exclude>
+        </excludes>
+    </fileSet>
 </assembly>

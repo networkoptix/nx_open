@@ -381,7 +381,7 @@ bool ModuleConnector::Module::saveConnection(
             ensureConnection(); //< Reconnect attempt.
 
             // Make sure we report disconnect in a limited time.
-            m_disconnectTimer.start(m_parent->m_disconnectTimeout,
+            m_disconnectTimer.start(m_parent->m_disconnectTimeout * m_endpoints.size(),
                 [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
