@@ -15,6 +15,7 @@
 
 #include <utils/common/synctime.h>
 #include <analytics/plugins/detection/config.h>
+#include <analytics/plugins/detection/naive_object_tracker.h>
 
 namespace nx {
 namespace analytics {
@@ -45,7 +46,8 @@ const int kMaxIdLength = 255;
 
 } // namespace
 
-DetectionPluginWrapper::DetectionPluginWrapper()
+DetectionPluginWrapper::DetectionPluginWrapper():
+    m_objectTracker(new NaiveObjectTracker())
 {
 }
 
@@ -172,7 +174,7 @@ QnObjectDetectionMetadataPtr DetectionPluginWrapper::rectsToObjectDetectionMetad
         metadata->detectedObjects.push_back(info);
     }
 
-    m_objectTracker.filterAndTrack(metadata);
+    m_objectTracker->filterAndTrack(metadata);
 
     for (const auto& obj: metadata->detectedObjects)
     {

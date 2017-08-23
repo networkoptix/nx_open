@@ -16,6 +16,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <analytics/plugins/detection/naive_detection_smoother.h>
 
 #include <common/common_module.h>
 
@@ -54,6 +55,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
     m_softMotionRole(Qn::CR_Default),
+    m_detectionSmoother(new nx::analytics::NaiveDetectionSmoother()),
     m_softMotionLastChannel(0),
     m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
@@ -737,7 +739,7 @@ void QnLiveStreamProvider::emitAnalyticsEventIfNeeded(
     if (!metadata)
         return;
 
-    auto result = m_detectionSmoother.smooth(metadata);
+    auto result = m_detectionSmoother->smooth(metadata);
 
     if (result == nx::analytics::DetectionEventState::started)
     {

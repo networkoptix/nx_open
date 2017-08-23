@@ -21,11 +21,18 @@
 #include <core/resource/resource_media_layout.h>
 
 #include <analytics/common/video_metadata_plugin.h>
-#include <analytics/plugins/detection/naive_detection_smoother.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
+
+namespace nx {
+namespace analytics {
+
+class NaiveDetectionSmoother;
+
+} // namespace analytics
+} // namespace nx
 
 class QnLiveStreamProvider;
 
@@ -137,7 +144,7 @@ private:
 #endif
 
     std::unique_ptr<nx::analytics::VideoMetadataPlugin> m_videoMetadataPlugin;
-    nx::analytics::NaiveDetectionSmoother m_detectionSmoother;
+    std::unique_ptr<nx::analytics::NaiveDetectionSmoother> m_detectionSmoother;
 
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;

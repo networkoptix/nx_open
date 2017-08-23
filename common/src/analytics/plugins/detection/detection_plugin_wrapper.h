@@ -8,10 +8,11 @@
 #include <nx/streaming/media_data_packet.h>
 #include <analytics/common/video_metadata_plugin.h>
 #include <analytics/common/object_detection_metadata.h>
-#include <analytics/plugins/detection/naive_object_tracker.h>
 
 namespace nx {
 namespace analytics {
+
+class NaiveObjectTracker;
 
 class DetectionPluginWrapper: public VideoMetadataPlugin
 {
@@ -40,7 +41,7 @@ private:
         int rectangleCount) const;
 
 private:
-    mutable NaiveObjectTracker m_objectTracker;
+    mutable std::unique_ptr<NaiveObjectTracker> m_objectTracker;
     std::unique_ptr<AbstractDetectionPlugin> m_detector;
     AbstractDetectionPlugin::Rect m_detections[kMaxRectanglesNumber];
 };
