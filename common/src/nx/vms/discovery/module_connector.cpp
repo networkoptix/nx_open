@@ -12,14 +12,21 @@ namespace discovery {
 static const auto kUrl =
     lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream");
 
-std::chrono::seconds kDisconnectTimeout(10);
+std::chrono::seconds kDefaultDisconnectTimeout(10);
 static const network::RetryPolicy kDefaultRetryPolicy(
     network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
+    m_disconnectTimeout(kDefaultDisconnectTimeout),
     m_retryPolicy(kDefaultRetryPolicy)
 {
+}
+
+void ModuleConnector::setDisconnectTimeout(std::chrono::milliseconds value)
+{
+    NX_ASSERT(m_modules.size() == 0);
+    m_disconnectTimeout = value;
 }
 
 void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
@@ -215,7 +222,8 @@ void ModuleConnector::InformationReader::readUntilError()
 ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
     m_id(id),
-    m_timer(parent->m_retryPolicy, parent->getAioThread())
+    m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
+    m_disconnectTimer(parent->getAioThread())
 {
     NX_DEBUG(this) << "New";
 }
@@ -223,7 +231,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
 ModuleConnector::Module::~Module()
 {
     NX_DEBUG(this) << "Delete";
-    NX_ASSERT(m_timer.isInSelfAioThread());
+    NX_ASSERT(m_reconnectTimer.isInSelfAioThread());
     m_attemptingReaders.clear();
     m_connectedReader.reset();
 }
@@ -268,6 +276,27 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
+ModuleConnector::Module::Priority
+    ModuleConnector::Module::hostPriority(const HostAddress& host) const
+{
+    if (m_id.isNull())
+        return kDefault;
+
+    if (host == HostAddress::localhost)
+        return kLocalHost;
+
+    if (host.isLocal())
+        return kLocalNetwork;
+
+    if (host.isIpAddress())
+        return kIp; //< TODO: Consider to check if we have such interface.
+
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
+        return kCloud;
+
+    return kOther;
+}
+
 QString ModuleConnector::Module::idForToStringFromPtr() const
 {
     return m_id.toSimpleString();
@@ -289,18 +318,7 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
             return group.insert(std::move(endpoint)).second;
         };
 
-    Endpoints::iterator group;
-    if (m_id.isNull())
-        group = getGroup(kDefault);
-    else if (endpoint.address == HostAddress::localhost)
-        group = getGroup(kLocalHost);
-    else if (endpoint.address.isLocal())
-        group = getGroup(kLocalNetwork);
-    else if (endpoint.address.isIpAddress())
-        group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
-    else
-        group = getGroup(kOther);
-
+    const auto group = getGroup(hostPriority(endpoint.address));
     if (insertIntoGroup(group, endpoint))
     {
         NX_DEBUG(this, lm("Save endpoint %1 to %2").args(endpoint, group->first));
@@ -325,20 +343,19 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
-            const auto reconnectInterval = m_parent->m_retryPolicy;
-            m_timer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_timer.currentDelay()));
+            m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
         }
 
         return;
     }
 
-    NX_VERBOSE(this, lm("Connect to group %1 with %2 endpoints").args(
-        endpointsGroup->first, endpointsGroup->second.size()));
+    NX_VERBOSE(this, lm("Connect to group %1: %2").args(
+        endpointsGroup->first, containerString(endpointsGroup->second)));
 
-    if (m_timer.timeToEvent())
-        m_timer.cancelSync();
+    if (m_reconnectTimer.timeToEvent())
+        m_reconnectTimer.cancelSync();
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
@@ -427,10 +444,10 @@ bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
 
             NX_VERBOSE(this, lm("Connection to %1 is closed: %2").args(endpoint, description));
             m_connectedReader.reset();
-            connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
+            ensureConnection(); //< Reconnect attempt.
 
-            m_disconnectTimer.reset(new network::aio::Timer(m_timer.getAioThread()));
-            m_disconnectTimer->start(kDisconnectTimeout,
+            m_disconnectTimer.start(
+                m_parent->m_disconnectTimeout * m_endpoints.size(),
                 [this]()
                 {
                     NX_VERBOSE(this, lm("Reconnect did not happen in %1").arg(kDisconnectTimeout));
@@ -439,7 +456,8 @@ bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
         });
 
     m_parent->m_connectedHandler(information, std::move(endpoint), m_connectedReader->ip());
-    m_timer.reset();
+    m_reconnectTimer.reset();
+    m_disconnectTimer.cancelSync();
     return true;
 }
 

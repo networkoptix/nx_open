@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/vms/discovery/module_connector.h>
@@ -11,27 +12,64 @@ namespace vms {
 namespace discovery {
 namespace test {
 
+static const HostAddress kLocalDnsHost("local-doman-name.com");
+static const HostAddress kLocalCloudHost(QnUuid::createUuid().toSimpleString());
+
 class DiscoveryModuleConnector: public testing::Test
 {
 public:
     DiscoveryModuleConnector()
     {
+        connector.setDisconnectTimeout(std::chrono::seconds(1));
         connector.setReconnectPolicy(network::RetryPolicy(network::RetryPolicy::kInfiniteRetries,
-            std::chrono::seconds(1), 1, std::chrono::seconds(1)));
+            std::chrono::milliseconds(100), 2, std::chrono::seconds(1)));
 
         connector.setConnectHandler(
             [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
             {
-                connectedQueue.push(information.id, std::move(endpoint));
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    auto& knownEndpoint = m_knownServers[information.id];
+                    if (knownEndpoint == endpoint)
+                        return;
+
+                    NX_INFO(this) "NEW!!" << endpoint;
+                    knownEndpoint = endpoint;
+                }
+
+                connectedQueue.push(std::move(information.id), std::move(endpoint));
             });
 
-        connector.setDisconnectHandler(disconnectedQueue.pusher());
+        connector.setDisconnectHandler(
+            [this](QnUuid id)
+            {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    if (m_knownServers.erase(id) == 0)
+                        return;
+                }
+
+                NX_INFO(this) "LOSS!!";
+                disconnectedQueue.push(std::move(id));
+            });
+
         connector.activate();
+
+        auto& dnsResolver = network::SocketGlobals::addressResolver().dnsResolver();
+        dnsResolver.addEtcHost(kLocalDnsHost.toString(), {HostAddress::localhost});
+        dnsResolver.addEtcHost(kLocalCloudHost.toString(), {HostAddress::localhost});
     }
 
     ~DiscoveryModuleConnector()
     {
         connector.pleaseStopSync();
+
+        auto& dnsResolver = network::SocketGlobals::addressResolver().dnsResolver();
+        dnsResolver.removeEtcHost(kLocalDnsHost.toString());
+        dnsResolver.removeEtcHost(kLocalCloudHost.toString());
+
+        EXPECT_TRUE(connectedQueue.isEmpty());
+        EXPECT_TRUE(disconnectedQueue.isEmpty());
     }
 
     void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
@@ -62,6 +100,9 @@ public:
         NX_INFO(this, lm("Module %1 started with endpoint %2").args(module.id, endpoint));
         return endpoint;
     }
+
+    QnMutex m_mutex;
+    std::map<QnUuid, SocketAddress> m_knownServers;
 
     ModuleConnector connector;
     utils::TestSyncMultiQueue<QnUuid, SocketAddress> connectedQueue;
@@ -122,7 +163,6 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
     connector.newEndpoints({endpoint2}, id);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_TRUE(connectedQueue.isEmpty()); //< No connects on disabled connector.
-    ASSERT_EQ(id, disconnectedQueue.pop()); //< Disconnect is reported anyway.
 
     connector.activate();
     expectConnect(id, endpoint2); //< Connect right after reactivate.
@@ -148,8 +188,35 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     mediaservers.erase(localEndpoint);
     expectConnect(id, networkEndpoint);  //< Network is a second choice.
 
+    const auto newLocalEndpoint = addMediaserver(id);
+    connector.newEndpoints({newLocalEndpoint}, id);
+    expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
+
+    const auto dnsRealEndpoint = addMediaserver(id);
+    const auto cloudRealEndpoint = addMediaserver(id);
+    const SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
+    const SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
+    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
+
     mediaservers.erase(networkEndpoint);
-    ASSERT_EQ(id, disconnectedQueue.pop()); //< Finally no endpoint avaliable.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_TRUE(connectedQueue.isEmpty()); // Not any reconnects are expected.
+    ASSERT_TRUE(disconnectedQueue.isEmpty());
+
+    mediaservers.erase(newLocalEndpoint);
+    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized now.
+
+    mediaservers.erase(dnsRealEndpoint);
+    expectConnect(id, cloudEndpoint);  //< Cloud endpoint is the last possible option.
+
+    const auto newDnsRealEndpoint = addMediaserver(id);
+    const SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
+    connector.newEndpoints({newDnsEndpoint}, id);
+    expectConnect(id, newDnsEndpoint);  //< Expected switch to DNS as better choise than cloud.
+
+    mediaservers.erase(cloudRealEndpoint);
+    mediaservers.erase(newDnsRealEndpoint);
+    ASSERT_EQ(id, disconnectedQueue.pop()); //< Finally no endpoints avaliable.
 }
 
 TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)

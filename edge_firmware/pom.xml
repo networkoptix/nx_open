@@ -2,28 +2,28 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.1.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.1.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>edge_firmware</artifactId>
     <packaging>pom</packaging>
-    <name>Common POM for ARM projects</name>	
+    <name>Common POM for ARM projects</name>
 
     <dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>mediaserver</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>system</scope>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mediaserver</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
             <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>
-		</dependency>			
-    </dependencies>		
-	
+        </dependency>
+    </dependencies>
+
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>
@@ -31,7 +31,7 @@
 
     <build>
         <directory>target-${box}</directory>
-        <plugins>	
+        <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -49,7 +49,7 @@
                                 </exec>
                             </target>
                         </configuration>
-                    </execution>	
+                    </execution>
                     <execution>
                         <id>pack</id>
                         <phase>package</phase>
@@ -57,15 +57,15 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target>							
-                                <chmod file="${project.build.directory}/*.sh" perm="755"/>							
-                                <exec dir="${project.build.directory}" executable="${project.build.directory}/create_mediaserver_tar.sh" failonerror="true" failifexecutionfails="true" />                                        
+                            <target>
+                                <chmod file="${project.build.directory}/*.sh" perm="755"/>
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/create_mediaserver_tar.sh" failonerror="true" failifexecutionfails="true" />
                             </target>
                         </configuration>
-                    </execution>					
+                    </execution>
                 </executions>
-            </plugin>	
-    
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -91,7 +91,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>        
-        </plugins>        
-    </build>				
+            </plugin>
+        </plugins>
+    </build>
 </project>

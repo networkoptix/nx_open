@@ -1684,7 +1684,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(PinCalendarAction)
-        .flags(NoTarget);
+        .flags(NoTarget)
+        .checkable();
 
     factory(MinimizeDayTimeViewAction)
         .text(ContextMenu::tr("Minimize")) //< To be displayed on button tooltip

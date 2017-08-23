@@ -24,7 +24,10 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
+
+    void setDisconnectTimeout(std::chrono::milliseconds value);
     void setReconnectPolicy(network::RetryPolicy value);
+
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
@@ -71,9 +74,10 @@ private:
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
-        enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
+        enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther, kCloud };
         typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
 
+        Priority hostPriority(const HostAddress& host) const;
         boost::optional<Endpoints::iterator> saveEndpoint(SocketAddress endpoint);
         void connectToGroup(Endpoints::iterator endpointsGroup);
         void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
@@ -85,17 +89,19 @@ private:
         const QnUuid m_id;
         Endpoints m_endpoints;
         std::set<SocketAddress> m_forbiddenEndpoints;
-        network::RetryTimer m_timer;
+        network::RetryTimer m_reconnectTimer;
         std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
         std::unique_ptr<InformationReader> m_connectedReader;
-        std::unique_ptr<network::aio::Timer> m_disconnectTimer;
+        network::aio::Timer m_disconnectTimer;
     };
 
     Module* getModule(const QnUuid& id);
 
 private:
     bool m_isPassiveMode = true;
+    std::chrono::milliseconds m_disconnectTimeout;
     network::RetryPolicy m_retryPolicy;
+
     ConnectedHandler m_connectedHandler;
     DisconnectedHandler m_disconnectedHandler;
     std::map<QnUuid, std::unique_ptr<Module>> m_modules;

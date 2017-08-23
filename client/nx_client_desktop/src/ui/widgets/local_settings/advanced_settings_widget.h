@@ -37,6 +37,9 @@ private:
     bool isDoubleBufferingEnabled() const;
     void setDoubleBufferingEnabled(bool value);
 
+    bool isBlurEnabled() const;
+    void setBlurEnabled(bool value);
+
     int  maximumLiveBufferMs() const;
     void setMaximumLiveBufferMs(int value);
 

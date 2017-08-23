@@ -69,6 +69,7 @@ protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
+    void initMetadata();
     AVFormatContext* getFormatContext();
 
 private:
