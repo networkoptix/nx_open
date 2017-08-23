@@ -243,7 +243,8 @@ protected:
         assertCbErrorCode(SystemError::noError,
             [this]()
             {
-                serverWebSocket->sendAsync("hellohellohellohello",
+                serverSendBuf = "hello";
+                serverWebSocket->sendAsync(serverSendBuf,
                     [this](SystemError::ErrorCode ecode, size_t)
                     {
                         NX_ASSERT(ecode == SystemError::noError);
