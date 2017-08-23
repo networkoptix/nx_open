@@ -347,7 +347,7 @@ function JsHlsAPI(){
         });
     };
 
-    this.init = function(element, manifestLoadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
+    this.init = function(element, loadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
         
         debugMode = jshlsDebugMode;
@@ -364,7 +364,9 @@ function JsHlsAPI(){
         this.hls = new Hls({
             debug: debugMode,
             enableWorker: enableWorker,
-            manifestLoadingTimeOut: manifestLoadingTimeOut
+            manifestLoadingTimeOut: loadingTimeOut,
+            levelLoadingTimeOut: loadingTimeOut, // used by playlist-loader
+            fragLoadingTimeOut: loadingTimeOut
         });
 
         this.initHlsEvents(this.hls);        
