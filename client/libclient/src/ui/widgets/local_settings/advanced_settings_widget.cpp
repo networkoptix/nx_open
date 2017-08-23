@@ -90,7 +90,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     qnSettings->setAudioDownmixed(isAudioDownmixed());
     qnSettings->setGLDoubleBuffer(isDoubleBufferingEnabled());
     qnSettings->setMaximumLiveBufferMSecs(maximumLiveBufferMs());
-    qnSettings->setGLBlurEnabled(isBlurEnabled());
+    qnSettings->setGlBlurEnabled(isBlurEnabled());
 }
 
 void QnAdvancedSettingsWidget::loadDataToUi()
@@ -98,14 +98,15 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setAudioDownmixed(qnSettings->isAudioDownmixed());
     setDoubleBufferingEnabled(qnSettings->isGlDoubleBuffer());
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMSecs());
-    setBlurEnabled(qnSettings->isGLBlurEnabled());
+    setBlurEnabled(qnSettings->isGlBlurEnabled());
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
 {
     return qnSettings->isAudioDownmixed() != isAudioDownmixed()
         || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
-        || qnSettings->maximumLiveBufferMSecs() != maximumLiveBufferMs();
+        || qnSettings->maximumLiveBufferMSecs() != maximumLiveBufferMs()
+        || qnSettings->isGlBlurEnabled() != isBlurEnabled();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const
