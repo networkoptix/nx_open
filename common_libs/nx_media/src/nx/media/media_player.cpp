@@ -886,7 +886,8 @@ void Player::pause()
     d->log(lit("pause()"));
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
-    d->dataConsumer->setAudioEnabled(false);
+    if (d->dataConsumer)
+        d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::preview()
