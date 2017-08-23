@@ -151,7 +151,7 @@ namespace nxpl
 #ifdef _WIN32
     #define NX_PLUGIN_API __declspec(dllexport)
 #else
-    #defined NX_PLUGIN_API
+    #define NX_PLUGIN_API
 #endif
 
 //!Define to mark locale dependent output paramters and return values.
