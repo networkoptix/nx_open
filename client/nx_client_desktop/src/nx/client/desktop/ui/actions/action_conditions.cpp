@@ -1729,11 +1729,19 @@ ConditionWrapper canSavePtzPosition()
                 return widget->item()->dewarpingParams().enabled;
 
             return true;
+    });
+}
+
+ConditionWrapper valueIsTrue(bool value)
+{
+    return new CustomBoolCondition(
+        [value](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        {
+            return value;
         });
 }
 
 } // namespace condition
-
 
 } // namespace action
 } // namespace ui

@@ -19,6 +19,8 @@
 
 #include <nx/utils/app_info.h>
 
+#include <ini.h>
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
 namespace nx {
@@ -1301,7 +1303,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .dynamicText(new ConvertToEntropixTextFactory(manager))
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::hasFlags(Qn::live_cam, Any)
+        .condition(condition::valueIsTrue(ini().enableEntropixEnchancer)
+            && condition::hasFlags(Qn::live_cam, Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()

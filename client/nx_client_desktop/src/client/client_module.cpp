@@ -102,6 +102,8 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <ini.h>
+
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -163,6 +165,8 @@ namespace
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent)
 {
+    ini().reload();
+
     initThread();
     initMetaInfo();
     initApplication();

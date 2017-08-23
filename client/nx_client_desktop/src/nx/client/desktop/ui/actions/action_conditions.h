@@ -608,6 +608,8 @@ ConditionWrapper tourIsRunning();
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();
 
+ConditionWrapper valueIsTrue(bool value);
+
 } // namespace condition
 
 } // namespace action
