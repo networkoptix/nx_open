@@ -43,7 +43,21 @@ public:
     QRectF zoomRect;
     QScopedPointer<QnSingleThumbnailLoader> thumbnailLoader;
 
+    enum class Step
+    {
+        gettingScreenshot,
+        waitingForImageProcessed,
+        downloadingImage,
+
+        stepsCount
+    };
+    Step currentStep = Step::gettingScreenshot;
+    int stepProgress = 0;
+    int progress = 0;
+
     void cancel();
+
+    void setProgress(Step step, int stepProgress = 0);
 
     void enchanceScreenchot(const QImage& colorImage, const QImage& blackAndWhiteImage);
 
@@ -61,18 +75,39 @@ EntropixImageEnchancer::Private::Private(EntropixImageEnchancer* parent):
 
 void EntropixImageEnchancer::Private::cancel()
 {
-    NX_DEBUG(q, "Request cancelled");
     if (thumbnailLoader)
         thumbnailLoader.reset();
 
     if (m_reply)
         delete m_reply;
+
+    NX_DEBUG(q, "Request cancelled");
+
+    setProgress(Step::gettingScreenshot);
+}
+
+void EntropixImageEnchancer::Private::setProgress(
+    EntropixImageEnchancer::Private::Step step, int stepProgress)
+{
+    constexpr int count = static_cast<int>(Step::stepsCount);
+    constexpr int stepSize = 100 / count;
+
+    const int intStep = static_cast<int>(step);
+
+    const int newProgress = intStep * 100 / count + stepSize * stepProgress / 100;
+
+    if (newProgress != progress)
+    {
+        progress = newProgress;
+        emit q->progressChanged(progress);
+    }
 }
 
 void EntropixImageEnchancer::Private::enchanceScreenchot(
     const QImage& colorImage, const QImage& blackAndWhiteImage)
 {
     m_replyData.clear();
+    setProgress(Step::waitingForImageProcessed);
 
     const auto& colorImageData = imageToByteArray(colorImage);
     const auto& blackAndWhiteImageData = imageToByteArray(blackAndWhiteImage);
@@ -152,6 +187,9 @@ void EntropixImageEnchancer::Private::at_replyReadyRead()
 
     m_replyData.append(m_reply->readAll());
     NX_VERBOSE(q, lm("Reading data: %1").arg(m_replyData.size()));
+
+    const auto size = m_reply->size();
+    setProgress(Step::downloadingImage, size > 0 ? m_replyData.size() * 100 / size : 0);
 }
 
 void EntropixImageEnchancer::Private::at_replyFinished()
@@ -176,6 +214,8 @@ void EntropixImageEnchancer::Private::at_replyFinished()
     const auto& image = QImage::fromData(m_replyData);
 
     NX_DEBUG(q, lm("Got image of size %1x%2").arg(image.width()).arg(image.height()));
+
+    setProgress(Step::stepsCount);
 
     emit q->cameraScreenshotReady(image);
 }

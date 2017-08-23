@@ -25,9 +25,11 @@ public:
 
     void requestScreenshot(qint64 timestamp, const QRectF& zoomRect = QRectF());
     void cancelRequest();
+    int progress() const;
 
 signals:
     void cameraScreenshotReady(const QImage& image);
+    void progressChanged(int progress);
 
 private:
     class Private;
