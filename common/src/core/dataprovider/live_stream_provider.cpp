@@ -5,6 +5,7 @@
 #include <motion/motion_detection.h>
 #include <analytics/common/video_metadata_plugin.h>
 #include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/metadata_plugin_factory.h>
 #include <analytics/plugins/detection/config.h>
 
 #include <nx/utils/log/log.h>

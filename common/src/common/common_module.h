@@ -16,8 +16,6 @@
 #include <network/module_information.h>
 #include <nx_ec/data/api_runtime_data.h>
 #include <utils/common/value_cache.h>
-#include <analytics/plugins/detection/detection_plugin_factory.h>
-#include <analytics/common/metadata_plugin_factory.h>
 #include <plugins/native_sdk/common_plugin_container.h>
 
 class QSettings;
@@ -40,6 +38,15 @@ namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
+
+namespace nx {
+namespace analytics {
+
+class DetectionPluginFactory;
+class MetadataPluginFactory;
+
+} // namespace analytics
+} // namespace nx
 
 struct BeforeRestoreDbData
 {

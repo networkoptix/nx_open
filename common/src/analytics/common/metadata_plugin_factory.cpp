@@ -2,6 +2,8 @@
 
 #include <nx/utils/std/cpp14.h>
 #include <common/common_module.h>
+
+#include <analytics/plugins/detection/detection_plugin_factory.h>
 #include <analytics/plugins/detection/detection_plugin_wrapper.h>
 #include <analytics/plugins/detection/config.h>
 

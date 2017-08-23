@@ -49,6 +49,9 @@
 #include <api/session_manager.h>
 #include <network/router.h>
 
+#include <analytics/plugins/detection/detection_plugin_factory.h>
+#include <analytics/common/metadata_plugin_factory.h>
+
 using namespace nx;
 
 namespace {
