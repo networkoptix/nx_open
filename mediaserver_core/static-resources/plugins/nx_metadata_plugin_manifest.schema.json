@@ -16,7 +16,7 @@
                     "metadata"]
             },
             "minItems": 1,
-            "uniqueItems": true,
+            "uniqueItems": true
         },
         "supportedCodecs": {
             "type": "array",
