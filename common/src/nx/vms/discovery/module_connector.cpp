@@ -111,10 +111,11 @@ void ModuleConnector::stopWhileInAioThread()
     m_modules.clear();
 }
 
-ModuleConnector::InformationReader::InformationReader(network::aio::AbstractAioThread* thread):
+ModuleConnector::InformationReader::InformationReader(const ModuleConnector* parent):
+    m_parent(parent),
     m_httpClient(nx_http::AsyncHttpClient::create())
 {
-    m_httpClient->bindToAioThread(thread);
+    m_httpClient->bindToAioThread(parent->getAioThread());
 }
 
 ModuleConnector::InformationReader::~InformationReader()
@@ -143,7 +144,7 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
             m_buffer = client->fetchMessageBodyBuffer();
             m_socket = client->takeSocket();
 
-            if (!m_socket->setRecvTimeout(kDisconnectTimeout))
+            if (!m_socket->setRecvTimeout(m_parent->m_disconnectTimeout))
                 return nx::utils::swapAndCall(m_handler, boost::none, SystemError::getLastOSErrorText());
 
             readUntilError();
@@ -351,6 +352,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
+    if (m_connectedReader)
+        return;
+
     NX_VERBOSE(this, lm("Connect to group %1: %2").args(
         endpointsGroup->first, containerString(endpointsGroup->second)));
 
@@ -377,7 +381,7 @@ void ModuleConnector::Module::connectToEndpoint(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
     NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
-    m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_timer.getAioThread()));
+    m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_parent));
 
     const auto readerIt = m_attemptingReaders.begin();
     (*readerIt)->start(endpoint);
@@ -430,7 +434,7 @@ bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
 
     NX_VERBOSE(this, lm("Save connection to %1").args(endpoint));
     m_attemptingReaders.clear();
-    m_disconnectTimer.reset();
+    m_disconnectTimer.cancelSync();
 
     m_connectedReader = std::move(reader);
     m_connectedReader->setHandler(
@@ -446,11 +450,12 @@ bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
             m_connectedReader.reset();
             ensureConnection(); //< Reconnect attempt.
 
-            m_disconnectTimer.start(
-                m_parent->m_disconnectTimeout * m_endpoints.size(),
-                [this]()
+            const auto reconnectTimeout = m_parent->m_disconnectTimeout
+                * std::chrono::milliseconds::rep(m_endpoints.size());
+            m_disconnectTimer.start(reconnectTimeout,
+                [this, reconnectTimeout]()
                 {
-                    NX_VERBOSE(this, lm("Reconnect did not happen in %1").arg(kDisconnectTimeout));
+                    NX_VERBOSE(this, lm("Reconnect did not happen in %1").arg(reconnectTimeout));
                     m_parent->m_disconnectedHandler(m_id);
                 });
         });

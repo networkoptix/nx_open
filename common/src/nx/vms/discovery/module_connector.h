@@ -44,7 +44,7 @@ private:
     class InformationReader
     {
     public:
-        InformationReader(network::aio::AbstractAioThread* thread);
+        InformationReader(const ModuleConnector* parent);
         ~InformationReader();
 
         void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
@@ -54,6 +54,7 @@ private:
     private:
         void readUntilError();
 
+        const ModuleConnector* const m_parent;
         nx_http::AsyncHttpClientPtr m_httpClient;
         SocketAddress m_endpoint;
         nx::Buffer m_buffer;

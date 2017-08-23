@@ -33,7 +33,6 @@ public:
                     if (knownEndpoint == endpoint)
                         return;
 
-                    NX_INFO(this) "NEW!!" << endpoint;
                     knownEndpoint = endpoint;
                 }
 
@@ -49,7 +48,6 @@ public:
                         return;
                 }
 
-                NX_INFO(this) "LOSS!!";
                 disconnectedQueue.push(std::move(id));
             });
 

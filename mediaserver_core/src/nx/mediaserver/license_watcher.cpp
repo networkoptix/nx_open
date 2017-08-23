@@ -95,7 +95,7 @@ void LicenseWatcher::startUpdate()
             const auto guard = makeScopeGuard([this](){ stopHttpClient(); });
 
             nx_http::AsyncClient::State state = m_httpClient->state();
-            if (state == nx_http::AsyncClient::sFailed)
+            if (state == nx_http::AsyncClient::State::sFailed)
             {
                 NX_WARNING(this,
                     lm("Can't update license list. HTTP request to the license server failed: %1")
