@@ -2161,7 +2161,7 @@ void QnMediaResourceWidget::at_entropixEnchancementButton_clicked()
     connect(m_entropixEnchancer, &EntropixImageEnchancer::cameraScreenshotReady,
         this, &QnMediaResourceWidget::at_entropixImageLoaded);
 
-    m_entropixEnchancer->requestScreenshot(m_display->currentTimeUSec() / 1000);
+    m_entropixEnchancer->requestScreenshot(m_display->currentTimeUSec() / 1000, zoomRect());
 }
 
 void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
@@ -2648,7 +2648,10 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 
 void QnMediaResourceWidget::clearEntropixEnchancedImage()
 {
-    m_entropixEnchancedImage = QImage();
+    if (m_entropixEnchancer)
+        m_entropixEnchancer->cancelRequest();
+    if (!m_entropixEnchancedImage.isNull())
+        m_entropixEnchancedImage = QImage();
 };
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)

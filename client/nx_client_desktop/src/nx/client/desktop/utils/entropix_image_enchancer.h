@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRectF>
 
 #include <core/resource/resource_fwd.h>
 
@@ -22,7 +23,7 @@ public:
         QObject* parent = nullptr);
     ~EntropixImageEnchancer();
 
-    void requestScreenshot(qint64 timestamp);
+    void requestScreenshot(qint64 timestamp, const QRectF& zoomRect = QRectF());
     void cancelRequest();
 
 signals:

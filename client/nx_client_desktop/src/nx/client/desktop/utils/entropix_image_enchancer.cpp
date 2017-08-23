@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/camera_resource.h>
 #include <camera/single_thumbnail_loader.h>
+#include <ui/common/geometry.h>
 
 namespace nx {
 namespace client {
@@ -39,6 +40,7 @@ public:
 
     QnVirtualCameraResourcePtr camera;
     qint64 timestamp;
+    QRectF zoomRect;
     QScopedPointer<QnSingleThumbnailLoader> thumbnailLoader;
 
     void cancel();
@@ -59,6 +61,7 @@ EntropixImageEnchancer::Private::Private(EntropixImageEnchancer* parent):
 
 void EntropixImageEnchancer::Private::cancel()
 {
+    NX_DEBUG(q, "Request cancelled");
     if (thumbnailLoader)
         thumbnailLoader.reset();
 
@@ -73,6 +76,7 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
 
     const auto& colorImageData = imageToByteArray(colorImage);
     const auto& blackAndWhiteImageData = imageToByteArray(blackAndWhiteImage);
+    const auto& rect = QnGeometry::subRect(colorImage.rect(), zoomRect).toRect();
 
     auto makePart =
         [](const QByteArray& name, const QByteArray& body)
@@ -99,10 +103,10 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
         };
 
     auto multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    multiPart->append(makePart("x", "0"));
-    multiPart->append(makePart("y", "0"));
-    multiPart->append(makePart("width", QByteArray::number(colorImage.width())));
-    multiPart->append(makePart("height", QByteArray::number(colorImage.height())));
+    multiPart->append(makePart("x", QByteArray::number(rect.x())));
+    multiPart->append(makePart("y", QByteArray::number(rect.y())));
+    multiPart->append(makePart("width", QByteArray::number(rect.width())));
+    multiPart->append(makePart("height", QByteArray::number(rect.height())));
     multiPart->append(makeImagePart("cimg", "color.png", colorImageData));
     multiPart->append(makeImagePart("pimg", "bw.png", blackAndWhiteImageData));
 
@@ -121,6 +125,7 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
 void EntropixImageEnchancer::Private::at_imageLoaded(const QByteArray& imageData)
 {
     const auto& image = QImage::fromData(imageData);
+    NX_DEBUG(q, lm("Got screenshot with size %1x%2").arg(image.width()).arg(image.height()));
 
     const auto& sensors = camera->combinedSensorsDescription();
 
@@ -130,6 +135,7 @@ void EntropixImageEnchancer::Private::at_imageLoaded(const QByteArray& imageData
     if (!colorSensor.isValid() || !blackAndWhiteSensor.isValid())
     {
         emit q->cameraScreenshotReady(image);
+        NX_ERROR(q, "Cannot extract separate sensors from the screenshot.");
         return;
     }
 
@@ -188,14 +194,19 @@ EntropixImageEnchancer::~EntropixImageEnchancer()
 {
 }
 
-void EntropixImageEnchancer::requestScreenshot(qint64 timestamp)
+void EntropixImageEnchancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
 {
+    d->zoomRect = zoomRect;
+
     if (!d->thumbnailLoader)
         d->thumbnailLoader.reset(new QnSingleThumbnailLoader(d->camera, timestamp));
 
     connect(d->thumbnailLoader.data(), &QnSingleThumbnailLoader::imageLoaded,
         d.data(), &Private::at_imageLoaded);
 
+    NX_DEBUG(this,
+        lm("Requesting screenshot from server for camera %2 at %1")
+            .arg(timestamp).arg(d->camera->getName()));
     d->thumbnailLoader->loadAsync();
 }
 
