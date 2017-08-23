@@ -196,7 +196,7 @@ struct LineEditControls::Private
             if (!control || controls.contains(control))
                 continue;
 
-            control->setParent(contents.data());
+            control->setParent(contents);
             controls << control;
 
             // Remove if deleted.
@@ -204,7 +204,7 @@ struct LineEditControls::Private
                 [this](QObject* what) { removeControl(static_cast<QWidget*>(what), true); });
 
             // Remove if reparented.
-            installEventHandler(control, QEvent::ParentChange, contents.data(),
+            installEventHandler(control, QEvent::ParentChange, contents,
                 [this](QObject* what) { removeControl(static_cast<QWidget*>(what), false); });
         }
 
@@ -216,7 +216,7 @@ struct LineEditControls::Private
     QnWidgetAnchor* const anchor = nullptr;
     int spacing = kDefaultSpacing;
 
-    const QScopedPointer<QWidget> contents;
+    const QWidget* contents;
     const QMargins initialMargins; //< Initial contents margins of line edit.
     QList<QWidget*> controls;
 };
