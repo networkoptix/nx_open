@@ -249,9 +249,9 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
 
 
 def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
-    reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
-    metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
     if lightweight_servers:
+        reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
+        metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
         host_set = set(server.host for server in lightweight_servers)
     else:

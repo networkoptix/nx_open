@@ -72,7 +72,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
             renderingTools.uploader->setForceSoftYUV( qnRuntime->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
-            renderingTools.renderer->setBlurEnabled(qnSettings->isGLBlurEnabled());
+            renderingTools.renderer->setBlurEnabled(qnSettings->isGlBlurEnabled());
             renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
             renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
