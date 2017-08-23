@@ -11,6 +11,8 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("desktop_client.ini") {}
 
     NX_INI_FLAG(0, enableEntropixEnchancer, "Enable Entropix image enchancement controls.");
+    NX_INI_STRING("http://96.64.226.250:8888/image",
+        entropixEnchancerUrl, "URL of Entropix image enchancement API.");
 };
 
 inline Ini& ini()

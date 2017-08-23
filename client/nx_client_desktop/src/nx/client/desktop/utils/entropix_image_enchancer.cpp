@@ -9,13 +9,13 @@
 #include <camera/single_thumbnail_loader.h>
 #include <ui/common/geometry.h>
 
+#include <ini.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
 
 namespace  {
-
-static const QUrl kEntropixUrl(lit("http://96.64.226.250:8888/image"));
 
 QByteArray imageToByteArray(const QImage& image)
 {
@@ -160,12 +160,14 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
     multiPart->append(makeImagePart("cimg", "color.png", colorImageData));
     multiPart->append(makeImagePart("pimg", "bw.png", blackAndWhiteImageData));
 
+    const QUrl url(QLatin1String(ini().entropixEnchancerUrl));
+
     NX_DEBUG(q,
         lm("Requesting enchanced image of size %1x%2 from %3")
             .arg(colorImage.width())
             .arg(colorImage.height())
-            .arg(kEntropixUrl.toString()));
-    m_reply = m_networkAccessManager->post(QNetworkRequest(kEntropixUrl), multiPart);
+            .arg(url));
+    m_reply = m_networkAccessManager->post(QNetworkRequest(url), multiPart);
     multiPart->setParent(m_reply);
 
     connect(m_reply, &QNetworkReply::readyRead, this, &Private::at_replyReadyRead);
