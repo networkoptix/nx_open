@@ -9,12 +9,20 @@
 
 #include <QtWebKitWidgets/QWebView>
 
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include <common/common_module.h>
 
+#include <client_core/client_core_settings.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/user_resource.h>
+
+#include <helpers/system_helpers.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
@@ -31,6 +39,9 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
+
+#include <utils/common/url.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -141,6 +152,41 @@ public:
             {
                 runTilesTest();
                 close();
+            });
+
+        addButton(lit("Change password"),
+            [this]
+            {
+                auto user = context()->user();
+                if (!user)
+                    return;
+
+                const QString newPassword = lit("qweasd123");
+
+                user->setPassword(newPassword);
+                user->generateHash();
+                context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+                QUrl url = commonModule()->currentUrl();
+                url.setPassword(newPassword);
+
+                if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+                    connection->updateConnectionUrl(url);
+
+                using namespace nx::client::core::helpers;
+                const auto localSystemId = commonModule()->globalSettings()->localSystemId();
+                if (getCredentials(localSystemId, url.userName()).isValid())
+                    storeCredentials(localSystemId, QnEncodedCredentials(url));
+                qnClientCoreSettings->save();
+
+                auto lastUsed = qnSettings->lastUsedConnection();
+                if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))
+                {
+                    lastUsed.url = url;
+                    qnSettings->setLastUsedConnection(lastUsed);
+                    qnSettings->save();
+                }
+                qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr& user){});
+                user->setPassword(QString());
             });
 
     }
