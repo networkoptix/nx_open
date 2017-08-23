@@ -238,12 +238,6 @@ ng-include{
     margin: 40px auto;
   }
 
-  &.active{
-    background-color: $light5;
-    border-left: 1px solid $light8;
-    border-right: 1px solid $light7; 
-  }
-
   &:hover{
     background-color: $additional_light3;
     border-left: 1px solid $light6;
@@ -256,7 +250,7 @@ ng-include{
     border-right: 1px solid $light6; 
   }
 
-  &:active,
+  &.active, &:active,
   &.active:active {
     background-color: $light5;
     border-left: 1px solid $light8;
