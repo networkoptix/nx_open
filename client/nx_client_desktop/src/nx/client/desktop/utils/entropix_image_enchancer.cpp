@@ -254,6 +254,8 @@ EntropixImageEnchancer::~EntropixImageEnchancer()
 
 void EntropixImageEnchancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
 {
+    d->setProgress(Private::Step::gettingScreenshot);
+
     d->zoomRect = zoomRect;
 
     if (!d->thumbnailLoader)
