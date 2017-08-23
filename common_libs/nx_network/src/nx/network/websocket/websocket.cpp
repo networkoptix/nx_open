@@ -191,7 +191,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError == SystemError::connectionAbort)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
@@ -212,7 +212,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError == SystemError::connectionAbort)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
