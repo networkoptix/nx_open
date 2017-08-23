@@ -237,7 +237,7 @@ class LightweightServersHost(object):
 
     def _check_if_server_is_online(self):
         if not self._allocated: return
-        if self._first_server.is_started() and not self._first_server.is_server_online():
+        if self._first_server and self._first_server.is_started() and not self._first_server.is_server_online():
             log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
             self._first_server.make_core_dump()
 
