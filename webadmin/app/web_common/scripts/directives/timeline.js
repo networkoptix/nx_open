@@ -97,7 +97,10 @@ angular.module('nxCommon')
                 var animationState = {
                     targetLevels : scope.scaleManager.levels,
                     currentLevels: {events:{index:0},labels:{index:0},middle:{index:0},small:{index:0},marks:{index:0}},
-                    zooming:1
+                    labels:1,
+                    middle:1,
+                    small:1,
+                    marks:1
                 };
 
                 var timelineRender = new TimelineCanvasRender(canvas,

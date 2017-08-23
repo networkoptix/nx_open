@@ -226,48 +226,49 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
     var self = this;
     function levelsChanged(newLevels,oldLevels){
+        var changedLevels = [];
         if(newLevels && (!oldLevels || !oldLevels.labels)){
-            return true;
+            return ['labels', 'middle', 'small', 'marks'];
         }
 
         if(newLevels.labels.index != oldLevels.labels.index) {
-            return true;
+            changedLevels.push('labels');
         }
 
         if(newLevels.middle.index != oldLevels.middle.index) {
-            return true;
+            changedLevels.push('middle');
         }
 
         if(newLevels.small.index != oldLevels.small.index) {
-            return true;
+            changedLevels.push('small');
         }
 
         if(newLevels.marks.index != oldLevels.marks.index) {
-            return true;
+            changedLevels.push('marks');
         }
 
-        return false;
+        return changedLevels;
     }
 
     //Find final levels for this zoom and run animation:
     var newTargetLevels = self.scaleManager.targetLevels(zoomTarget);
-    if(levelsChanged(newTargetLevels, self.animationState.targetLevels)){
+    var changedLevels = levelsChanged(newTargetLevels, self.animationState.targetLevels);
+    if(changedLevels.length>0){
         self.animationState.targetLevels = newTargetLevels;
+    }
+    for(var i in changedLevels){
+        var changedLevel = changedLevels[i];
 
-        if( self.animationState.zooming == 1){ // We need to run animation again
-            self.animationState.zooming = 0;
-        }
-
-        // This allows us to continue (and slowdown, mb) animation every time
-        self.scope.zooming = self.animationState.zooming;
-
-        self.animateScope.animate(self.scope,'zooming',1,'dryResistance').then(function(){
-            self.animationState.currentLevels = self.scaleManager.levels;
-        },function(){
-            // ignore animation re-run
-        },function(value){
-            self.animationState.zooming = value;
-        });
+        self.animationState[changedLevel] = 0; // Start animation over
+        (function(changedLevel){
+            self.animateScope.progress(self.scope, 'zooming' + changedLevel, 'dryResistance').then(function(){
+                self.animationState.currentLevels[changedLevel] = self.scaleManager.levels[changedLevel];
+            },function(){
+                // ignore animation re-run
+            },function(value){
+                self.animationState[changedLevel] = value;
+            });
+        })(changedLevel);
     }
 
 };

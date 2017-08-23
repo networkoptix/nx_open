@@ -99,7 +99,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             context,
             animationState.currentLevels.labels.index,
             animationState.targetLevels.labels.index,
-            self.animationState.zooming,
+            self.animationState.labels,
             'format',
             timelineConfig.labelFixed,
             timelineConfig.topLabelHeight,
@@ -121,7 +121,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             context,
             animationState.currentLevels.marks.index,
             animationState.targetLevels.marks.index,
-            self.animationState.zooming,
+            self.animationState.marks,
             false,// No format
             'none',
             timelineConfig.topLabelHeight,
@@ -150,7 +150,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         //3. Animation includes changing of height and font-size and transparency for colors
 
         function getPointAnimation(pointLevelIndex, levelName){ // Get transition value for animation for this level
-            var animation = self.animationState.zooming;
+            var animation = self.animationState[levelName];
 
             var minLevel = getLevelMinValue(levelName);
 
