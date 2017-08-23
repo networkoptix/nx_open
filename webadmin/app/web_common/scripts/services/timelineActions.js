@@ -259,7 +259,8 @@ TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
         }
 
         // This allows us to continue (and slowdown, mb) animation every time
-        self.zooming = self.animationState.zooming;
+        self.scope.zooming = self.animationState.zooming;
+
         self.animateScope.animate(self.scope,'zooming',1,'dryResistance').then(function(){
             self.animationState.currentLevels = self.scaleManager.levels;
         },function(){

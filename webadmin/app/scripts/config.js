@@ -122,7 +122,7 @@ var Config = {
         reloadInterval: 5*1000,
         leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
         resetDisplayedTextTimer: 3 * 1000,
-        hlsManifestLoadingTimeout: 60 * 1000,
+        hlsLoadingTimeout: 60 * 1000,
             // One minute timeout for manifest:
             // * 30 seconds for server to init camera
             // * 20 seconds for chunks
