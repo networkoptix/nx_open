@@ -135,6 +135,11 @@ void SelectableTextButton::setDeactivatable(bool value)
     updateGeometry();
 }
 
+void SelectableTextButton::deactivate()
+{
+    setState(State::deactivated);
+}
+
 QString SelectableTextButton::deactivatedText() const
 {
     return d->deactivatedTextSet ? d->deactivatedText : text();

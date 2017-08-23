@@ -26,6 +26,7 @@ public:
 
 signals:
     void dataChanged(const ExportTimestampOverlaySettings& data);
+    void deleteClicked();
 
 private:
     void updateControls();

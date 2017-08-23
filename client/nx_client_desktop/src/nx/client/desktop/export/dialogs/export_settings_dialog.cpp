@@ -71,6 +71,15 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged,
         d, &Private::setTextOverlaySettings);
+
+    connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
+        ui->timestampButton, &SelectableTextButton::deactivate);
+
+    connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::deleteClicked,
+        ui->imageButton, &SelectableTextButton::deactivate);
+
+    connect(ui->textSettingsPage, &TextOverlaySettingsWidget::deleteClicked,
+        ui->textButton, &SelectableTextButton::deactivate);
 }
 
 void ExportSettingsDialog::setupSettingsButtons()

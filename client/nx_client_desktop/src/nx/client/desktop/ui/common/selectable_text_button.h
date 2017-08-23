@@ -50,6 +50,8 @@ public:
     bool deactivatable() const;
     void setDeactivatable(bool value);
 
+    void deactivate(); //< Helper slot. Equivalent to setState(State::deactivated).
+
     // Text for deactivated state. If not set, text() is used instead.
     QString deactivatedText() const;
     void setDeactivatedText(const QString& value);

@@ -2,6 +2,7 @@
 #include "ui_text_overlay_settings_widget.h"
 
 #include <ui/common/aligner.h>
+#include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx {
@@ -56,6 +57,11 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
             m_data.overlayWidth = value;
             emit dataChanged(m_data);
         });
+
+    ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
+
+    connect(ui->deleteButton, &QPushButton::clicked,
+        this, &TextOverlaySettingsWidget::deleteClicked);
 }
 
 TextOverlaySettingsWidget::~TextOverlaySettingsWidget()

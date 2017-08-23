@@ -7,6 +7,7 @@
 #include <client/client_settings.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/style/skin.h>
 
 namespace nx {
 namespace client {
@@ -45,6 +46,11 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
             m_data.opacity = value / 100.0;
             emit dataChanged(m_data);
         });
+
+    ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
+
+    connect(ui->deleteButton, &QPushButton::clicked,
+        this, &ImageOverlaySettingsWidget::deleteClicked);
 }
 
 ImageOverlaySettingsWidget::~ImageOverlaySettingsWidget()

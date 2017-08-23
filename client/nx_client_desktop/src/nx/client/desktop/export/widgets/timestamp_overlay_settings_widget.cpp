@@ -2,6 +2,7 @@
 #include "ui_timestamp_overlay_settings_widget.h"
 
 #include <ui/common/aligner.h>
+#include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx {
@@ -46,6 +47,11 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
             m_data.format = static_cast<Qt::DateFormat>(ui->formatComboBox->itemData(index).toInt());
             emit dataChanged(m_data);
         });
+
+    ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
+
+    connect(ui->deleteButton, &QPushButton::clicked,
+        this, &TimestampOverlaySettingsWidget::deleteClicked);
 }
 
 TimestampOverlaySettingsWidget::~TimestampOverlaySettingsWidget()

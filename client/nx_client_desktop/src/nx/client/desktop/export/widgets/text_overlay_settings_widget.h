@@ -29,6 +29,7 @@ public:
 
 signals:
     void dataChanged(const ExportTextOverlaySettings& data);
+    void deleteClicked();
 
 private:
     void updateControls();

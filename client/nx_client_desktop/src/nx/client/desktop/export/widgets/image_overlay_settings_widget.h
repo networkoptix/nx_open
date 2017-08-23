@@ -29,6 +29,7 @@ public:
 
 signals:
     void dataChanged(const ExportImageOverlaySettings& data);
+    void deleteClicked();
 
 private:
     void updateControls();
