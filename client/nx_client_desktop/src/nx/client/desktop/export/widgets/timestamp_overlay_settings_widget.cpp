@@ -24,7 +24,7 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     auto aligner = new QnAligner(this);
-    aligner->addWidget(ui->fontSizeLabel);
+    aligner->addWidgets({ui->fontSizeLabel, ui->formatLabel});
 
     ui->formatComboBox->addItem(tr("Long"), Qt::DefaultLocaleLongDate);
     ui->formatComboBox->addItem(tr("Short"), Qt::DefaultLocaleShortDate);
