@@ -44,9 +44,13 @@ public:
      */
     QnAspectRatio imageAspectRatio() const;
 
+    bool hasAviMetadata() const;
+    const QnAviArchiveMetadata& aviMetadata() const;
     void setAviMetadata(const QnAviArchiveMetadata& value);
 
     virtual QnMediaDewarpingParams getDewarpingParams() const override;
+    virtual void setDewarpingParams(const QnMediaDewarpingParams& params) override;
+
     virtual qreal customAspectRatio() const override;
 
 private:

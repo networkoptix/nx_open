@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
+    <width>443</width>
     <height>371</height>
    </rect>
   </property>
@@ -15,6 +15,16 @@
     <widget class="QCheckBox" name="downmixAudioCheckBox">
      <property name="text">
       <string>Downmix Audio from 5.1 to 2.1</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="disableBlurCheckbox">
+     <property name="toolTip">
+      <string>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</string>
+     </property>
+     <property name="text">
+      <string>Disable blur</string>
      </property>
     </widget>
    </item>

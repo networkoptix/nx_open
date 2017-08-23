@@ -95,6 +95,20 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
     return videoWall;
 }
 
+QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
+    const QnVideoWallResourcePtr& videoWall)
+{
+    auto layout = createLayout();
+    layout->setParentId(videoWall->getId());
+    resourcePool()->addResource(layout);
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
+    return layout;
+}
+
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));

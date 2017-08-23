@@ -269,6 +269,11 @@ namespace ec2
             return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode removeLicenseSync(const QnLicensePtr& license)
+        {
+            int(AbstractLicenseManager::*fn)(const QnLicensePtr&, impl::SimpleHandlerPtr) = &AbstractLicenseManager::removeLicense;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, license, std::placeholders::_1));
+        }
 
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;

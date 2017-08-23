@@ -197,16 +197,15 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 {
     NX_EXPECT(mode() == Mode::cached);
 
-    disconnect(resource, nullptr, this, nullptr);
+    resource->disconnect(this);
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        handleSubjectRemoved(user);
 
     if (isUpdating())
         return;
 
     auto resourceId = resource->getId();
-
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-        handleSubjectRemoved(user);
-
     for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
         if (subject.id() == resourceId)
@@ -236,11 +235,11 @@ void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     NX_EXPECT(mode() == Mode::cached);
+    handleSubjectRemoved(userRole);
 
     if (isUpdating())
         return;
 
-    handleSubjectRemoved(userRole);
     for (auto subject : resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateAccessBySubject(subject);
 }

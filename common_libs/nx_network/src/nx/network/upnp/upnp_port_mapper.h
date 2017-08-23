@@ -110,8 +110,6 @@ private:
     void ensureMapping( Device& device, quint16 inPort, Protocol protocol );
     void makeMapping( Device& device, quint16 inPort, Protocol protocol, size_t retries = 5 );
 
-    std::list< Guard > changeIpEvents( Device& device, HostAddress oldIp );
-
 protected: // for testing only
     QnMutex m_mutex;
     bool m_isEnabled;

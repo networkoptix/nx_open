@@ -973,12 +973,29 @@ bool QnDbManager::updateGuids()
         return false;
 
     // update default rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE (id between 1 and 19) or (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
+    guids = getGuidList(
+        R"sql(
+            SELECT id, id
+            FROM vms_businessrule
+            WHERE (id between 1 and 19) or (id between 10020 and 10023)
+            ORDER BY id
+        )sql",
+        CM_INT,
+        nx::vms::event::Rule::kGuidPostfix);
+
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
     // update user's rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE guid is null ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
+    guids = getGuidList(
+        R"sql(
+            SELECT id, id
+            FROM vms_businessrule
+            WHERE guid is null
+            ORDER BY id
+        )sql",
+        CM_INT,
+        QnUuid::createUuid().toByteArray());
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
@@ -2246,17 +2263,6 @@ ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::dbError;
     }
-}
-
-qint32 QnDbManager::getBusinessRuleInternalId( const QnUuid& guid )
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id from vms_businessrule where guid = :guid");
-    query.bindValue(":guid", guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-    return query.value("id").toInt();
 }
 
 ErrorCode QnDbManager::removeUser( const QnUuid& guid )
