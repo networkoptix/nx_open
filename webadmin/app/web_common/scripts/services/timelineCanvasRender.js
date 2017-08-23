@@ -520,7 +520,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             var start = self.scaleManager.lastMinute();
             var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start, self.pixelAspectRatio);
             
-            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize);
+            var offset_x = - Math.floor(((start - absoluteStartCoordinate) / timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize) * self.pixelAspectRatio;
 
             context.save();
             context.translate(offset_x, 0);
@@ -575,7 +575,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
         var height = timelineConfig.chunkHeight * self.canvas.height;
 
-        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize;
+        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize * self.pixelAspectRatio;
 
         context.save();
         context.translate(offset_x, 0);
