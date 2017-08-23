@@ -10,6 +10,7 @@ ApplicationWindow
 {
     id: mainWindow
 
+    property real leftPadding: 0
     property real rightPadding: 0
     property real bottomPadding: 0
     readonly property real keyboardHeight: Qt.inputMethod.visible
@@ -17,8 +18,10 @@ ApplicationWindow
             / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
         : 0
 
-    readonly property real availableWidth: width - rightPadding
+    readonly property real availableWidth: width - rightPadding - leftPadding
     readonly property real availableHeight: height - bottomPadding
+
+    contentItem.x: leftPadding
 
     visible: true
     color: ColorTheme.windowBackground
@@ -105,19 +108,29 @@ ApplicationWindow
         if (Qt.platform.os !== "android")
             return
 
-        if (getDeviceIsPhone() && Screen.primaryOrientation === Qt.LandscapeOrientation)
-        {
-            rightPadding = getNavigationBarHeight()
-            bottomPadding = 0
-        }
-        else
+        if (!getDeviceIsPhone() || Screen.orientation === Qt.PortraitOrientation
+            || Screen.orientation === Qt.InvertedPortraitOrientation)
         {
             rightPadding = 0
+            leftPadding = 0
             bottomPadding = getNavigationBarHeight()
+            return
         }
+
+        var couldBeLeftSideNavigationBar = true
+        var leftSideNavigationBar =
+            Screen.orientation === Qt.InvertedLandscapeOrientation && couldBeLeftSideNavigationBar
+
+        leftPadding = leftSideNavigationBar ? getNavigationBarHeight() : 0
+        rightPadding = leftSideNavigationBar ? 0 : getNavigationBarHeight()
+        bottomPadding = 0
     }
 
-    Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
+    Screen.orientationUpdateMask:
+        Qt.LandscapeOrientation | Qt.InvertedLandscapeOrientation
+        | Qt.PortraitOrientation | Qt.InvertedPortraitOrientation
+
+    Screen.onOrientationChanged: updateNavigationBarPadding()
 
     onActiveFocusItemChanged:
     {

@@ -221,6 +221,7 @@ PageBase
         id: video
 
         y: -header.height
+        x: -mainWindow.leftPadding
         width: mainWindow.width
         height: mainWindow.height
 
@@ -301,6 +302,7 @@ PageBase
             readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
 
             y: needOffset ? -header.height : 0
+            x: mainWindow.leftPadding ? -mainWindow.leftPadding : 0
             width: mainWindow.width
             height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
 
@@ -324,6 +326,7 @@ PageBase
 
         Image
         {
+            x: -mainWindow.leftPadding
             width: mainWindow.width
             height: sourceSize.height
             anchors.bottom: parent.bottom
@@ -422,6 +425,9 @@ PageBase
         {
             id: moveOnTapOverlay
 
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: mainWindow.height
             parent: videoScreen
         }
 
@@ -508,7 +514,7 @@ PageBase
         color: ColorTheme.base3
         width: mainWindow.width - parent.width
         height: video.height
-        anchors.left: parent.right
+        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
         opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
     }
