@@ -63,6 +63,7 @@ public:
     Q_INVOKABLE void copyToClipboard(const QString &text);
 
     Q_INVOKABLE int getStatusBarHeight() const;
+    Q_INVOKABLE bool getNavigationBarIsLeftSide() const;
     Q_INVOKABLE int getNavigationBarHeight() const;
     Q_INVOKABLE bool getDeviceIsPhone() const;
 

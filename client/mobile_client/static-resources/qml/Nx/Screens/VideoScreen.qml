@@ -267,9 +267,10 @@ PageBase
     Image
     {
         id: screenshot
-        width: parent.width
+        width: mainWindow.width
         height: width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
+        x: -mainWindow.leftPadding
         visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
@@ -316,8 +317,10 @@ PageBase
                     readonly property bool onlyCompactTitleIsVisible:
                         compact && title != "" && description == "" && buttonText == ""
 
-                    rightPadding: 8 + width - videoScreen.width
-                    leftPadding: 8
+                    property bool leftSideNavigationBar: mainWindow.leftPadding > 0
+                    readonly property real navigationBarOffset: width - videoScreen.width
+                    rightPadding: 8 + (leftSideNavigationBar ? 0 : navigationBarOffset)
+                    leftPadding: 8 + (leftSideNavigationBar ? navigationBarOffset : 0)
                     compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
                 }

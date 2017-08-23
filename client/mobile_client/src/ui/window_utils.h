@@ -11,6 +11,7 @@ void hideSystemUi();
 void showSystemUi();
 
 int statusBarHeight();
+bool isLeftSideNavigationBar();
 int navigationBarHeight();
 bool isPhone();
 

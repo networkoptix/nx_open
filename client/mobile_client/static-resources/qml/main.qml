@@ -117,10 +117,7 @@ ApplicationWindow
             return
         }
 
-        var couldBeLeftSideNavigationBar = true
-        var leftSideNavigationBar =
-            Screen.orientation === Qt.InvertedLandscapeOrientation && couldBeLeftSideNavigationBar
-
+        var leftSideNavigationBar = getNavigationBarIsLeftSide()
         leftPadding = leftSideNavigationBar ? getNavigationBarHeight() : 0
         rightPadding = leftSideNavigationBar ? 0 : getNavigationBarHeight()
         bottomPadding = 0
@@ -130,7 +127,24 @@ ApplicationWindow
         Qt.LandscapeOrientation | Qt.InvertedLandscapeOrientation
         | Qt.PortraitOrientation | Qt.InvertedPortraitOrientation
 
-    Screen.onOrientationChanged: updateNavigationBarPadding()
+    Timer
+    {
+        // We have to use this workaround timer because of orientation changed
+        // notification order. Without it at time when we update navigation bar
+        // paddings we have old values for window insets.
+        id: androidOrientationChangedWorkaroundTimer
+        interval: 100
+
+        onTriggered: updateNavigationBarPadding()
+    }
+
+    Screen.onOrientationChanged:
+    {
+        if (Qt.platform.os == "android")
+            androidOrientationChangedWorkaroundTimer.restart()
+        else
+            updateNavigationBarPadding()
+    }
 
     onActiveFocusItemChanged:
     {

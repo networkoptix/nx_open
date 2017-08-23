@@ -125,6 +125,11 @@ int QnContext::getStatusBarHeight() const {
     return statusBarHeight();
 }
 
+bool QnContext::getNavigationBarIsLeftSide() const
+{
+    return ::isLeftSideNavigationBar();
+}
+
 int QnContext::getNavigationBarHeight() const {
     return navigationBarHeight();
 }

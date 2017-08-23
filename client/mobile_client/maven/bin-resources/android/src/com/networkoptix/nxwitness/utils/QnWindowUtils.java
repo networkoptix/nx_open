@@ -102,6 +102,15 @@ public class QnWindowUtils {
         activity.runOnUiThread(new VisibilityChanger(activity, VisibilityChanger.Operation.Hide));
     }
 
+    public static boolean isLeftSideNavigationBar()
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+            return false;
+
+        View view = QtNative.activity().getWindow().getDecorView();
+        return view.getRootWindowInsets().getSystemWindowInsetLeft() > 0;
+    }
+
     public static boolean hasNavigationBar() {
         Activity activity = QtNative.activity();
         Display d = activity.getWindow().getWindowManager().getDefaultDisplay();

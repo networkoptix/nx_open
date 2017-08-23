@@ -60,6 +60,11 @@ int statusBarHeight()
     return static_cast<int>(size / qApp->devicePixelRatio());
 }
 
+bool isLeftSideNavigationBar()
+{
+    return QAndroidJniObject::callStaticMethod<jboolean>(kUtilsClass, "isLeftSideNavigationBar");
+}
+
 int navigationBarHeight()
 {
     const int size = QAndroidJniObject::callStaticMethod<jint>(kUtilsClass, "getNavigationBarHeight");
