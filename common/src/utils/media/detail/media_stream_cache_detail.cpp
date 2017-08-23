@@ -10,7 +10,7 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
-
+#include <nx/utils/scope_guard.h>
 
 namespace detail
 {
@@ -41,6 +41,14 @@ bool MediaStreamCache::canAcceptData() const
 //!Implementation of QnAbstractDataReceptor::putData
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
+    std::vector<std::function<void()>> eventsToDeliver;
+    auto eventsToDeliverGuard = makeScopeGuard(
+        [&eventsToDeliver, this]()
+        {
+            for (auto& deliverEvent: eventsToDeliver)
+                deliverEvent();
+        });
+
     QnMutexLocker lk( &m_mutex );
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
@@ -54,10 +62,8 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
         m_prevPacketSrcTimestamp = data->timestamp;
 
     if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
-    {
-        for( auto eventReceiver: m_eventReceivers )
-            eventReceiver->onDiscontinue();
-    }
+        eventsToDeliver.push_back([this]() { m_onDiscontinue.notify(); });
+
     m_prevPacketSrcTimestamp = data->timestamp;
 
     //searching position to insert to. in most cases (or in every case in case of h.264@baseline) insertion is done to the end
@@ -101,9 +107,12 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
         malloc_statsCounter = 0;
     }
 #endif
-
-    for( auto eventReceiver: m_eventReceivers )
-        eventReceiver->onKeyFrame(data->timestamp);
+    
+    eventsToDeliver.push_back(
+        [this, timestamp = data->timestamp]()
+        {
+            m_onKeyFrame.notify(timestamp); 
+        });
 }
 
 void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
@@ -264,16 +273,14 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return it->packet;
 }
 
-void MediaStreamCache::addEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
+nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& MediaStreamCache::onKeyFrameSubscription()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_eventReceivers.emplace(eventReceiver);
+    return m_onKeyFrame;
 }
 
-void MediaStreamCache::removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
+nx::utils::Subscription<>& MediaStreamCache::onDiscontinueSubscription()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_eventReceivers.erase( eventReceiver );
+    return m_onDiscontinue;
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )

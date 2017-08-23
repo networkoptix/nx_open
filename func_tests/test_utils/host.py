@@ -64,12 +64,14 @@ class SshHostConfig(object):
         assert isinstance(d, dict), 'ssh location should be dict: %r'  % d
         assert 'host' in d, '"host" is required parameter for host location'
         return cls(
+            name=d.get('name') or d['host'],
             host=d['host'],
             user=d.get('user'),
             key_file_path=d.get('key_file'),
             )
 
-    def __init__(self, host, user=None, key_file_path=None):
+    def __init__(self, name, host, user=None, key_file_path=None):
+        self.name = name
         self.host = host
         self.user = user
         self.key_file_path = key_file_path
@@ -80,7 +82,7 @@ class SshHostConfig(object):
 
 def host_from_config(config):
     if config:
-        return RemoteSshHost(config.host, config.user, config.key_file_path)
+        return RemoteSshHost(config.name, config.host, config.user, config.key_file_path)
     else:
         return LocalHost()
 
@@ -88,6 +90,11 @@ def host_from_config(config):
 class Host(object):
 
     __metaclass__ = abc.ABCMeta
+
+    @property
+    @abc.abstractmethod
+    def name(self):
+        pass
 
     @property
     @abc.abstractmethod
@@ -161,6 +168,10 @@ class LocalHost(Host):
 
     def __repr__(self):
         return 'LocalHost'
+
+    @property
+    def name(self):
+        return 'localhost'
 
     @property
     def host(self):
@@ -299,10 +310,11 @@ class LocalHost(Host):
 
 class RemoteSshHost(Host):
 
-    def __init__(self, host, user, key_file_path=None, ssh_config_path=None, proxy_host=None):
+    def __init__(self, name, host, user, key_file_path=None, ssh_config_path=None, proxy_host=None):
         assert proxy_host is None or isinstance(proxy_host, Host), repr(proxy_host)
         self._proxy_host = proxy_host or LocalHost()
-        self._host = host
+        self._name = name
+        self._host = host  # may be different from name, for example, IP address
         self._user = user
         self._key_file_path = key_file_path
         self._ssh_config_path = ssh_config_path
@@ -313,6 +325,10 @@ class RemoteSshHost(Host):
 
     def __repr__(self):
         return 'RemoteSshHost(%s)' % self
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def host(self):
