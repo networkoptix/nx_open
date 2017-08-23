@@ -98,8 +98,8 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& onKeyFrameSubscription();
-    nx::utils::Subscription<>& onDiscontinueSubscription();
+    nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& keyFrameFoundSubscription();
+    nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();
 
     //!Prevents data starting with \a timestamp from removal
     /*!
