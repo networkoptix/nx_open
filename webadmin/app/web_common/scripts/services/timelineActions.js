@@ -189,19 +189,18 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 
     this.updateZoomLevels(zoomTarget);
     function setZoom(value){
-
-    // Actually, we'd better use zoom around coordinate instead of date?
+        // Actually, we'd better use zoom around coordinate instead of date?
         self.scaleManager.zoomAroundPoint(
             value,
             zoomCoordinate
         );
-        self.scaleManager.checkZoomAsync().then(function(){
-            // TODO: here we need to apply the change to scope - call digest if anything changed
-            self.scope.$digest();
-        });
         self.delayWatchingPlayingPosition();
     }
 
+
+    self.scaleManager.checkZoomAsync(zoomTarget).then(function(){
+        self.scope.$digest();
+    });
 
     if(!instant) {
         if(!self.scope.zoomTarget) {

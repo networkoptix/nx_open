@@ -131,7 +131,7 @@ angular.module('nxCommon')
                     canvas.width  = scope.viewportWidth * pixelAspectRatio;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                     $timeout(function(){
-                        scope.scaleManager.checkZoom();
+                        scope.scaleManager.checkZoom(scope.scaleManager.zoom());
                     });
                 }
                 function initTimeline(){

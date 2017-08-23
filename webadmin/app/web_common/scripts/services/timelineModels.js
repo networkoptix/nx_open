@@ -1371,27 +1371,30 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
-ScaleManager.prototype.checkZoomOut = function(){
+ScaleManager.prototype.checkZoomOut = function(zoomTarget){
     var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
     this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs;
     return !this.disableZoomOut;
 
 };
-ScaleManager.prototype.checkZoomIn = function(){
-    this.disableZoomIn = this.zoom() <= this.fullZoomInValue();
+ScaleManager.prototype.checkZoomIn = function(zoomTarget){
+    this.disableZoomIn = zoomTarget <= this.fullZoomInValue();
 };
-ScaleManager.prototype.checkZoom = function(){
-    this.checkZoomOut();
-    this.checkZoomIn();
+ScaleManager.prototype.checkZoom = function(zoomTarget){
+    if(typeof(zoomTarget)=='undefined'){
+        console.error("checkZoom without target");
+    }
+    this.checkZoomOut(zoomTarget);
+    this.checkZoomIn(zoomTarget);
 };
-ScaleManager.prototype.checkZoomAsync = function(){
+ScaleManager.prototype.checkZoomAsync = function(zoomTarget){
     var self = this;
     var result = self.$q.defer();
     setTimeout(function(){
         var oldDisableZoomOut = self.disableZoomOut;
         var oldDisableZoomIn = self.disableZoomIn;
 
-        self.checkZoom();
+        self.checkZoom(zoomTarget);
 
         if(oldDisableZoomOut != self.disableZoomOut ||
             oldDisableZoomIn != self.disableZoomIn){
