@@ -11,17 +11,17 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EntropixImageEnchancer: public QObject
+class EntropixImageEnhancer: public QObject
 {
     Q_OBJECT
 
     using base_type = QObject;
 
 public:
-    EntropixImageEnchancer(
+    EntropixImageEnhancer(
         const QnVirtualCameraResourcePtr& camera,
         QObject* parent = nullptr);
-    ~EntropixImageEnchancer();
+    ~EntropixImageEnhancer();
 
     void requestScreenshot(qint64 timestamp, const QRectF& zoomRect = QRectF());
     void cancelRequest();

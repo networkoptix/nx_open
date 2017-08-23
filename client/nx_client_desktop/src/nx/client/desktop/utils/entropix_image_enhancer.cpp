@@ -1,4 +1,4 @@
-#include "entropix_image_enchancer.h"
+#include "entropix_image_enhancer.h"
 
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
@@ -27,16 +27,16 @@ QByteArray imageToByteArray(const QImage& image)
 
 } // namespace
 
-class EntropixImageEnchancer::Private: public QObject
+class EntropixImageEnhancer::Private: public QObject
 {
-    EntropixImageEnchancer* q = nullptr;
+    EntropixImageEnhancer* q = nullptr;
 
     QNetworkAccessManager* m_networkAccessManager = nullptr;
     QPointer<QNetworkReply> m_reply;
     QByteArray m_replyData;
 
 public:
-    Private(EntropixImageEnchancer* parent);
+    Private(EntropixImageEnhancer* parent);
 
     QnVirtualCameraResourcePtr camera;
     qint64 timestamp;
@@ -59,7 +59,7 @@ public:
     void setProgress(Step step, int stepProgress = 0);
     void setProgress(int progress);
 
-    void enchanceScreenchot(const QImage& colorImage, const QImage& blackAndWhiteImage);
+    void enhanceScreenshot(const QImage& colorImage, const QImage& blackAndWhiteImage);
 
     void at_imageLoaded(const QByteArray& imageData);
 
@@ -67,13 +67,13 @@ public:
     void at_replyFinished();
 };
 
-EntropixImageEnchancer::Private::Private(EntropixImageEnchancer* parent):
+EntropixImageEnhancer::Private::Private(EntropixImageEnhancer* parent):
     q(parent),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
 }
 
-void EntropixImageEnchancer::Private::cancel()
+void EntropixImageEnhancer::Private::cancel()
 {
     if (thumbnailLoader)
         thumbnailLoader.reset();
@@ -86,8 +86,8 @@ void EntropixImageEnchancer::Private::cancel()
     setProgress(Step::idle);
 }
 
-void EntropixImageEnchancer::Private::setProgress(
-    EntropixImageEnchancer::Private::Step step, int stepProgress)
+void EntropixImageEnhancer::Private::setProgress(
+    EntropixImageEnhancer::Private::Step step, int stepProgress)
 {
     if (step == Step::idle)
     {
@@ -109,7 +109,7 @@ void EntropixImageEnchancer::Private::setProgress(
     }
 }
 
-void EntropixImageEnchancer::Private::setProgress(int progress)
+void EntropixImageEnhancer::Private::setProgress(int progress)
 {
     if (progress == this->progress)
         return;
@@ -118,7 +118,7 @@ void EntropixImageEnchancer::Private::setProgress(int progress)
     emit q->progressChanged(progress);
 }
 
-void EntropixImageEnchancer::Private::enchanceScreenchot(
+void EntropixImageEnhancer::Private::enhanceScreenshot(
     const QImage& colorImage, const QImage& blackAndWhiteImage)
 {
     m_replyData.clear();
@@ -160,10 +160,10 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
     multiPart->append(makeImagePart("cimg", "color.png", colorImageData));
     multiPart->append(makeImagePart("pimg", "bw.png", blackAndWhiteImageData));
 
-    const QUrl url(QLatin1String(ini().entropixEnchancerUrl));
+    const QUrl url(QLatin1String(ini().entropixEnhancerUrl));
 
     NX_DEBUG(q,
-        lm("Requesting enchanced image of size %1x%2 from %3")
+        lm("Requesting enhanced image of size %1x%2 from %3")
             .arg(colorImage.width())
             .arg(colorImage.height())
             .arg(url));
@@ -174,7 +174,7 @@ void EntropixImageEnchancer::Private::enchanceScreenchot(
     connect(m_reply, &QNetworkReply::finished, this, &Private::at_replyFinished);
 }
 
-void EntropixImageEnchancer::Private::at_imageLoaded(const QByteArray& imageData)
+void EntropixImageEnhancer::Private::at_imageLoaded(const QByteArray& imageData)
 {
     const auto& image = QImage::fromData(imageData);
     NX_DEBUG(q, lm("Got screenshot with size %1x%2").arg(image.width()).arg(image.height()));
@@ -194,10 +194,10 @@ void EntropixImageEnchancer::Private::at_imageLoaded(const QByteArray& imageData
     const auto& colorImage = image.copy(colorSensor.frameSubRect(image.size()));
     const auto& blackAndWhiteImage = image.copy(blackAndWhiteSensor.frameSubRect(image.size()));
 
-    enchanceScreenchot(colorImage, blackAndWhiteImage);
+    enhanceScreenshot(colorImage, blackAndWhiteImage);
 }
 
-void EntropixImageEnchancer::Private::at_replyReadyRead()
+void EntropixImageEnhancer::Private::at_replyReadyRead()
 {
     if (sender() != m_reply)
         return;
@@ -209,7 +209,7 @@ void EntropixImageEnchancer::Private::at_replyReadyRead()
     setProgress(Step::downloadingImage, size > 0 ? m_replyData.size() * 100 / size : 0);
 }
 
-void EntropixImageEnchancer::Private::at_replyFinished()
+void EntropixImageEnhancer::Private::at_replyFinished()
 {
     if (sender() != m_reply)
         return;
@@ -238,7 +238,7 @@ void EntropixImageEnchancer::Private::at_replyFinished()
     emit q->cameraScreenshotReady(image);
 }
 
-EntropixImageEnchancer::EntropixImageEnchancer(
+EntropixImageEnhancer::EntropixImageEnhancer(
     const QnVirtualCameraResourcePtr& camera,
     QObject* parent)
     :
@@ -248,11 +248,11 @@ EntropixImageEnchancer::EntropixImageEnchancer(
     d->camera = camera;
 }
 
-EntropixImageEnchancer::~EntropixImageEnchancer()
+EntropixImageEnhancer::~EntropixImageEnhancer()
 {
 }
 
-void EntropixImageEnchancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
+void EntropixImageEnhancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
 {
     d->setProgress(Private::Step::gettingScreenshot);
 
@@ -270,7 +270,7 @@ void EntropixImageEnchancer::requestScreenshot(qint64 timestamp, const QRectF& z
     d->thumbnailLoader->loadAsync();
 }
 
-void EntropixImageEnchancer::cancelRequest()
+void EntropixImageEnhancer::cancelRequest()
 {
     d->cancel();
 }

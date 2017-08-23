@@ -1303,7 +1303,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .dynamicText(new ConvertToEntropixTextFactory(manager))
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::valueIsTrue(ini().enableEntropixEnchancer)
+        .condition(condition::valueIsTrue(ini().enableEntropixEnhancer)
             && condition::hasFlags(Qn::live_cam, Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,

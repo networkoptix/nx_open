@@ -54,7 +54,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
-#include <nx/client/desktop/utils/entropix_image_enchancer.h>
+#include <nx/client/desktop/utils/entropix_image_enhancer.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
@@ -472,9 +472,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 
     connect(this, &QnMediaResourceWidget::positionChanged, this,
-        &QnMediaResourceWidget::clearEntropixEnchancedImage);
+        &QnMediaResourceWidget::clearEntropixEnhancedImage);
     connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
-        &QnMediaResourceWidget::clearEntropixEnchancedImage);
+        &QnMediaResourceWidget::clearEntropixEnhancedImage);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -572,7 +572,7 @@ void QnMediaResourceWidget::createButtons()
     }
 
     {
-        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enchancement"));
+        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enhancement"));
         enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         enhancementButton->setCheckable(true);
         enhancementButton->setToolTip(tr("Image Enhancement"));
@@ -611,11 +611,11 @@ void QnMediaResourceWidget::createButtons()
 
     {
         auto entropixEnhancementButton =
-            createStatisticAwareButton(lit("media_widget_entropix_enchancement"));
+            createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
         entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         entropixEnhancementButton->setToolTip(tr("Entropix Image Enhancement"));
         connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
-            &QnMediaResourceWidget::at_entropixEnchancementButton_clicked);
+            &QnMediaResourceWidget::at_entropixEnhancementButton_clicked);
         titleBar()->rightButtonsBar()->addButton(
             Qn::EntropixEnhancementButton, entropixEnhancementButton);
     }
@@ -1233,7 +1233,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
             connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
                 this, &QnMediaResourceWidget::updateButtonsVisibility);
             connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
-                this, &QnMediaResourceWidget::clearEntropixEnchancedImage);
+                this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
         }
 
         setChannelLayout(m_display->videoLayout());
@@ -1251,7 +1251,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         Qn::WritePermission);
     setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
 
-    clearEntropixEnchancedImage();
+    clearEntropixEnhancedImage();
 
     emit displayChanged();
 }
@@ -1360,13 +1360,13 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 
     Qn::RenderStatus result = Qn::NothingRendered;
 
-    if (!m_entropixEnchancedImage.isNull())
+    if (!m_entropixEnhancedImage.isNull())
     {
         const PainterTransformScaleStripper scaleStripper(painter);
         painter->drawImage(
             scaleStripper.mapRect(paintRect),
-            m_entropixEnchancedImage,
-            m_entropixEnchancedImage.rect());
+            m_entropixEnhancedImage,
+            m_entropixEnhancedImage.rect());
         result = Qn::NewFrameRendered;
     }
     else
@@ -2179,25 +2179,25 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
         updateTitleText();
 }
 
-void QnMediaResourceWidget::at_entropixEnchancementButton_clicked()
+void QnMediaResourceWidget::at_entropixEnhancementButton_clicked()
 {
-    using nx::client::desktop::EntropixImageEnchancer;
+    using nx::client::desktop::EntropixImageEnhancer;
 
-    m_entropixEnchancer.reset(new EntropixImageEnchancer(m_camera));
-    connect(m_entropixEnchancer, &EntropixImageEnchancer::cameraScreenshotReady,
+    m_entropixEnhancer.reset(new EntropixImageEnhancer(m_camera));
+    connect(m_entropixEnhancer, &EntropixImageEnhancer::cameraScreenshotReady,
         this, &QnMediaResourceWidget::at_entropixImageLoaded);
-    connect(m_entropixEnchancer, &EntropixImageEnchancer::progressChanged, this,
+    connect(m_entropixEnhancer, &EntropixImageEnhancer::progressChanged, this,
         [this](int progress)
         {
             m_entropixProgress = progress < 100 ? progress : -1;
         });
 
-    m_entropixEnchancer->requestScreenshot(m_display->currentTimeUSec() / 1000, zoomRect());
+    m_entropixEnhancer->requestScreenshot(m_display->currentTimeUSec() / 1000, zoomRect());
 }
 
 void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
 {
-    m_entropixEnchancedImage = image;
+    m_entropixEnhancedImage = image;
 }
 
 void QnMediaResourceWidget::updateDewarpingParams()
@@ -2677,12 +2677,12 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
     m_softwareTriggers.erase(iter);
 }
 
-void QnMediaResourceWidget::clearEntropixEnchancedImage()
+void QnMediaResourceWidget::clearEntropixEnhancedImage()
 {
-    if (m_entropixEnchancer)
-        m_entropixEnchancer->cancelRequest();
-    if (!m_entropixEnchancedImage.isNull())
-        m_entropixEnchancedImage = QImage();
+    if (m_entropixEnhancer)
+        m_entropixEnhancer->cancelRequest();
+    if (!m_entropixEnhancedImage.isNull())
+        m_entropixEnhancedImage = QImage();
 };
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)

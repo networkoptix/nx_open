@@ -35,7 +35,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EntropixImageEnchancer;
+class EntropixImageEnhancer;
 
 namespace ui {
 namespace graphics {
@@ -240,7 +240,7 @@ private slots:
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
-    void at_entropixEnchancementButton_clicked();
+    void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);
 
     void at_item_imageEnhancementChanged();
@@ -249,7 +249,7 @@ private slots:
     void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_eventRuleRemoved(const QnUuid& ruleId);
 
-    void clearEntropixEnchancedImage();
+    void clearEntropixEnhancedImage();
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -397,8 +397,8 @@ private:
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 
-    QScopedPointer<nx::client::desktop::EntropixImageEnchancer> m_entropixEnchancer;
-    QImage m_entropixEnchancedImage;
+    QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
+    QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
 };
 
