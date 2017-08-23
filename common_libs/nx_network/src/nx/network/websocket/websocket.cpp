@@ -280,7 +280,6 @@ void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSe
             writeData.handler(ecode, writeData.buffer.writeSize);
         if (watcher.objectDestroyed())
             return;
-        // restartTimers();
     }
     if (!queueEmpty)
         m_socket->sendAsync(
