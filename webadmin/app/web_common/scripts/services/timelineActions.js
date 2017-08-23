@@ -176,6 +176,7 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
 // gets absolute zoom value - to target level from 0 to 1
 TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant){
     var self = this;
+    var originalZoomTarget = zoomTarget;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
 
     if(typeof(zoomCoordinate)=='undefined'){
@@ -208,7 +209,9 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         }
 
         self.delayWatchingPlayingPosition();
-        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
+        // If we animate - we animate not to bound zoom, but to original value
+        // we need this to keep constant zooming speed
+        self.animateScope.animate(self.scope, 'zoomTarget', originalZoomTarget, 'dryResistance').then(
             function () {
                 self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
             },
