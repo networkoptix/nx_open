@@ -19,6 +19,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -122,6 +123,7 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
@@ -130,6 +132,7 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
