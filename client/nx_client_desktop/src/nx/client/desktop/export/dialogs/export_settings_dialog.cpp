@@ -181,8 +181,11 @@ void ExportSettingsDialog::setupSettingsButtons()
             const auto overlay = button->property(kOverlayPropertyName).value<ExportOverlayWidget*>();
             if (overlay)
             {
+                const bool selected = button->state() == SelectableTextButton::State::selected;
                 overlay->setHidden(button->state() == SelectableTextButton::State::deactivated);
-                overlay->setBorderVisible(button->state() == SelectableTextButton::State::selected);
+                overlay->setBorderVisible(selected);
+                if (selected)
+                    overlay->raise();
             }
         });
 }
