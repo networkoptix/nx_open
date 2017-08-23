@@ -58,6 +58,10 @@ public:
 
     void setExportMediaSettings(const ExportMediaSettings& settings);
 
+    void setTimestampOverlaySettings(const ExportTimestampOverlaySettings& settings);
+    void setImageOverlaySettings(const ExportImageOverlaySettings& settings);
+    void setTextOverlaySettings(const ExportTextOverlaySettings& settings);
+
     void createOverlays(QWidget* overlayContainer);
 
     ExportOverlayWidget* overlay(OverlayType type);
@@ -68,7 +72,9 @@ signals:
 
 private:
     void setStatus(ErrorCode value);
+    void updateOverlay(OverlayType type);
     void updateOverlays();
+    void updateTimestampText();
 
 private:
     ExportSettingsDialog::Mode m_mode = Mode::Media;

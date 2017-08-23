@@ -66,22 +66,6 @@
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="resolutionLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Resolution</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="resolutionComboBox"/>
-      </item>
-      <item>
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -91,7 +75,7 @@
       <item>
        <widget class="QLabel" name="warningLabel">
         <property name="text">
-         <string>Applying filters, changing resolution and adding overlays requires transcoding which will increase CPU usage and may take significant time.</string>
+         <string>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

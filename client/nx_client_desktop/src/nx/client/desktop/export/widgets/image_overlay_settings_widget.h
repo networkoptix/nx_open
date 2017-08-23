@@ -32,10 +32,12 @@ signals:
 
 private:
     void updateControls();
+    void browseForFile();
 
 private:
     QScopedPointer<Ui::ImageOverlaySettingsWidget> ui;
     ExportImageOverlaySettings m_data;
+    QString m_lastImageDir;
 };
 
 } // namespace ui

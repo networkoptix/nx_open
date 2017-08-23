@@ -3,6 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/client/desktop/export/data/export_media_settings.h>
+
 namespace Ui { class TimestampOverlaySettingsWidget; }
 
 namespace nx {
@@ -17,9 +19,20 @@ class TimestampOverlaySettingsWidget: public QWidget
 
 public:
     TimestampOverlaySettingsWidget(QWidget* parent = nullptr);
+    virtual ~TimestampOverlaySettingsWidget() override;
+
+    const ExportTimestampOverlaySettings& data() const;
+    void setData(const ExportTimestampOverlaySettings& data);
+
+signals:
+    void dataChanged(const ExportTimestampOverlaySettings& data);
+
+private:
+    void updateControls();
 
 private:
     QScopedPointer<Ui::TimestampOverlaySettingsWidget> ui;
+    ExportTimestampOverlaySettings m_data;
 };
 
 } // namespace ui

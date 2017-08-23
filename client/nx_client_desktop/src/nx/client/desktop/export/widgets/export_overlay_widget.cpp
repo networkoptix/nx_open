@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
+#include <QtWidgets/private/qpixmapfilter_p.h>
+
 #include <utils/common/html.h>
 
 namespace nx {
@@ -33,6 +35,7 @@ struct ExportOverlayWidget::Private
     }
 
     QScopedPointer<QTextDocument> document;
+    QScopedPointer<QPixmapDropShadowFilter> shadow;
     int overlayWidth = -1; //< -1 means content-defined
     bool borderVisible = true;
     qreal roundingRadius = 0.0;
@@ -43,6 +46,10 @@ struct ExportOverlayWidget::Private
 
     QPoint initialPos;
     bool dragging = false;
+
+    QPixmap shadowSource;
+    QPointF filterOffset;
+    int shadowIterations; //< TODO: #vkutin Temporary way to increase shadow density.
 };
 
 ExportOverlayWidget::ExportOverlayWidget(QWidget* parent):
@@ -177,6 +184,34 @@ void ExportOverlayWidget::setRoundingRadius(qreal value)
     update();
 }
 
+bool ExportOverlayWidget::hasShadow() const
+{
+    return !d->shadow.isNull();
+}
+
+void ExportOverlayWidget::setShadow(const QColor& color, const QPointF& offset, qreal blurRadius,
+    int iterations)
+{
+    if (d->shadow.isNull())
+        d->shadow.reset(new QPixmapDropShadowFilter);
+
+    d->shadow->setColor(color);
+    d->shadow->setOffset(offset);
+    d->shadow->setBlurRadius(blurRadius);
+    d->shadowIterations = iterations;
+
+    updateLayout();
+}
+
+void ExportOverlayWidget::removeShadow()
+{
+    if (d->shadow.isNull())
+        return;
+
+    d->shadow.reset();
+    updateLayout();
+}
+
 void ExportOverlayWidget::updateLayout()
 {
     QSizeF textSize = (d->text.isEmpty() && !d->image.isNull()) ? QSizeF() : d->document->size();
@@ -188,8 +223,16 @@ void ExportOverlayWidget::updateLayout()
         imageSize *= d->overlayWidth / imageSize.width();
     }
 
-    const auto size = QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
+    auto size = QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
         .expandedTo(QApplication::globalStrut());
+
+    if (d->shadow)
+    {
+        const auto effectRect = d->shadow->boundingRectFor(QRectF(QPointF(), size));
+        d->filterOffset = -effectRect.topLeft();
+        d->shadowSource = QPixmap(); //< Invalidate cache.
+        size = effectRect.size();
+    }
 
     const QRectF geometry(pos(), size * d->scale);
     setGeometry(geometry.toAlignedRect());
@@ -233,15 +276,26 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
     painter.scale(d->scale, d->scale);
     painter.setOpacity(d->opacity);
 
-    if (!d->image.isNull())
-        painter.drawImage(rect(), d->image);
-
-    if (!d->text.isEmpty())
+    if (d->shadow)
     {
-        QAbstractTextDocumentLayout::PaintContext context;
-        context.palette = palette();
-        context.clip = rect();
-        d->document->documentLayout()->draw(&painter, context);
+        if (d->shadowSource.isNull())
+        {
+            const int devicePixelRatio = qApp->devicePixelRatio();
+            d->shadowSource = QPixmap(size() * devicePixelRatio);
+            d->shadowSource.setDevicePixelRatio(devicePixelRatio);
+            d->shadowSource.fill(Qt::transparent);
+
+            QPainter pixmapPainter(&d->shadowSource);
+            pixmapPainter.translate(d->filterOffset);
+            renderContent(pixmapPainter);
+        }
+
+        for (int i = 0; i < d->shadowIterations; ++i)
+            d->shadow->draw(&painter, QPointF(), d->shadowSource);
+    }
+    else
+    {
+        renderContent(painter);
     }
 
     // Paint border.
@@ -252,6 +306,20 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
         painter.resetTransform();
         painter.setOpacity(1.0);
         painter.drawRect(rect());
+    }
+}
+
+void ExportOverlayWidget::renderContent(QPainter& painter)
+{
+    if (!d->image.isNull())
+        painter.drawImage(rect(), d->image);
+
+    if (!d->text.isEmpty())
+    {
+        QAbstractTextDocumentLayout::PaintContext context;
+        context.palette = palette();
+        context.clip = rect();
+        d->document->documentLayout()->draw(&painter, context);
     }
 }
 

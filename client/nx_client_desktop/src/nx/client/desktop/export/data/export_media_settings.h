@@ -28,6 +28,13 @@ struct ExportImageOverlaySettings
     QColor background = Qt::transparent;
 };
 
+struct ExportTimestampOverlaySettings
+{
+    Qt::DateFormat format = Qt::DefaultLocaleLongDate;
+    int fontSize = 18;
+    QColor foreground = Qt::white;
+};
+
 struct ExportMediaSettings
 {
     QnMediaResourcePtr mediaResource;
@@ -37,8 +44,9 @@ struct ExportMediaSettings
     qint64 serverTimeZoneMs = 0;
     qint64 timelapseFrameStepMs = 0; //< 0 means disabled timelapse.
 
-    ExportTextOverlaySettings textOverlay;
+    ExportTimestampOverlaySettings timestampOverlay;
     ExportImageOverlaySettings imageOverlay;
+    ExportTextOverlaySettings textOverlay;
 };
 
 } // namespace desktop

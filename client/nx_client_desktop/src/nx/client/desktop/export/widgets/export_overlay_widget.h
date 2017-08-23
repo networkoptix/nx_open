@@ -3,6 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+class QPixmapFilter;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -41,6 +43,10 @@ public:
     qreal opacity() const;
     void setOpacity(qreal value);
 
+    bool hasShadow() const;
+    void setShadow(const QColor& color, const QPointF& offset, qreal blurRadius, int iterations = 5);
+    void removeShadow();
+
 signals:
     void pressed();
     void released();
@@ -57,6 +63,7 @@ private:
     void updateLayout();
     void updateCursor();
     void updatePosition(const QPoint& pos);
+    void renderContent(QPainter& painter);
 
 private:
     struct Private;

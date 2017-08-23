@@ -60,23 +60,17 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
-    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
-    connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged, this,
-        [this](const ExportTextOverlaySettings& data)
-        {
-            auto settings = d->exportMediaSettings();
-            settings.textOverlay = data;
-            d->setExportMediaSettings(settings);
-        });
+    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
+    connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
+        d, &Private::setTimestampOverlaySettings);
 
     ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
-    connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::dataChanged, this,
-        [this](const ExportImageOverlaySettings& data)
-        {
-            auto settings = d->exportMediaSettings();
-            settings.imageOverlay = data;
-            d->setExportMediaSettings(settings);
-        });
+    connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::dataChanged,
+        d, &Private::setImageOverlaySettings);
+
+    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
+    connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged,
+        d, &Private::setTextOverlaySettings);
 }
 
 void ExportSettingsDialog::setupSettingsButtons()

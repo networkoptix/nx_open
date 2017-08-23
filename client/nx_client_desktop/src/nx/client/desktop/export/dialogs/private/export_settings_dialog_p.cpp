@@ -87,37 +87,89 @@ void ExportSettingsDialog::Private::setExportMediaSettings(const ExportMediaSett
     updateOverlays();
 }
 
+void ExportSettingsDialog::Private::setTimestampOverlaySettings(
+    const ExportTimestampOverlaySettings& settings)
+{
+    m_exportMediaSettings.timestampOverlay = settings;
+    updateOverlay(OverlayType::timestamp);
+}
+
+void ExportSettingsDialog::Private::setImageOverlaySettings(
+    const ExportImageOverlaySettings& settings)
+{
+    m_exportMediaSettings.imageOverlay = settings;
+    updateOverlay(OverlayType::image);
+}
+
+void ExportSettingsDialog::Private::setTextOverlaySettings(
+    const ExportTextOverlaySettings& settings)
+{
+    m_exportMediaSettings.textOverlay = settings;
+    updateOverlay(OverlayType::text);
+}
+
 void ExportSettingsDialog::Private::updateOverlays()
 {
-    // Text overlay.
-    auto textOverlay = overlay(OverlayType::text);
-    const auto& textData = m_exportMediaSettings.textOverlay;
+    for (size_t i = 0; i != overlayCount; ++i)
+        updateOverlay(static_cast<OverlayType>(i));
+}
 
-    textOverlay->setText(textData.text);
-    textOverlay->setTextIndent(textData.indent);
-    textOverlay->setOverlayWidth(textData.overlayWidth);
-    textOverlay->setRoundingRadius(textData.roundingRadius);
+void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
+{
+    auto overlay = this->overlay(type);
+    switch (type)
+    {
+        case OverlayType::timestamp:
+        {
+            const auto& data = m_exportMediaSettings.timestampOverlay;
+            auto font = overlay->font();
+            font.setPixelSize(data.fontSize);
+            overlay->setFont(font);
 
-    auto font = textOverlay->font();
-    font.setPixelSize(textData.fontSize);
-    textOverlay->setFont(font);
+            auto palette = overlay->palette();
+            palette.setColor(QPalette::Text, data.foreground);
+            overlay->setPalette(palette);
 
-    auto palette = textOverlay->palette();
-    palette.setColor(QPalette::Text, textData.foreground);
-    palette.setColor(QPalette::Window, textData.background);
-    textOverlay->setPalette(palette);
+            updateTimestampText();
+            break;
+        }
 
-    // Image overlay.
-    auto imageOverlay = overlay(OverlayType::image);
-    const auto& imageData = m_exportMediaSettings.imageOverlay;
+        case OverlayType::image:
+        {
+            const auto& data = m_exportMediaSettings.imageOverlay;
+            overlay->setImage(data.image);
+            overlay->setOverlayWidth(data.overlayWidth);
+            overlay->setOpacity(data.opacity);
 
-    imageOverlay->setImage(imageData.image);
-    imageOverlay->setOverlayWidth(imageData.overlayWidth);
-    imageOverlay->setOpacity(imageData.opacity);
+            auto palette = overlay->palette();
+            palette.setColor(QPalette::Window, data.background);
+            overlay->setPalette(palette);
+            break;
+        }
 
-    palette = imageOverlay->palette();
-    palette.setColor(QPalette::Window, imageData.background);
-    imageOverlay->setPalette(palette);
+        case OverlayType::text:
+        {
+            const auto& data = m_exportMediaSettings.textOverlay;
+            overlay->setText(data.text);
+            overlay->setTextIndent(data.indent);
+            overlay->setOverlayWidth(data.overlayWidth);
+            overlay->setRoundingRadius(data.roundingRadius);
+
+            auto font = overlay->font();
+            font.setPixelSize(data.fontSize);
+            overlay->setFont(font);
+
+            auto palette = overlay->palette();
+            palette.setColor(QPalette::Text, data.foreground);
+            palette.setColor(QPalette::Window, data.background);
+            overlay->setPalette(palette);
+            break;
+        }
+
+        default:
+            NX_ASSERT(false); //< Should not happen.
+            break;
+    }
 }
 
 void ExportSettingsDialog::Private::setStatus(ErrorCode value)
@@ -143,8 +195,24 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
         m_overlays[index]->setHidden(true);
     }
 
-    overlay(OverlayType::timestamp)->setText(
-        qnSyncTime->currentDateTime().toString(Qt::DefaultLocaleLongDate));
+    auto timestampOverlay = overlay(OverlayType::timestamp);
+    timestampOverlay->setTextIndent(0);
+
+    auto timer = new QTimer(timestampOverlay);
+    QObject::connect(timer, &QTimer::timeout, [this]() { updateTimestampText(); });
+    timer->start(1000); //< Once a second.
+
+    static constexpr qreal kShadowBlurRadius = 3.0;
+    timestampOverlay->setShadow(Qt::black, QPointF(), kShadowBlurRadius);
+}
+
+void ExportSettingsDialog::Private::updateTimestampText()
+{
+    auto currentDayTime = qnSyncTime->currentDateTime();
+    currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
+
+    overlay(OverlayType::timestamp)->setText(currentDayTime.toString(
+        m_exportMediaSettings.timestampOverlay.format));
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
