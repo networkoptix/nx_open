@@ -193,6 +193,7 @@ protected:
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
+    void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
@@ -398,6 +399,7 @@ private:
 
     QScopedPointer<nx::client::desktop::EntropixImageEnchancer> m_entropixEnchancer;
     QImage m_entropixEnchancedImage;
+    int m_entropixProgress = -1;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

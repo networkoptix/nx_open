@@ -6,6 +6,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyleOptionProgressBar>
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
@@ -1399,6 +1400,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
+
+    if (m_entropixProgress >= 0)
+        paintProgress(painter, rect, m_entropixProgress);
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion)
@@ -1489,6 +1493,28 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
     painter->scale(rect.width() / Qn::kMotionGridWidth, rect.height() / Qn::kMotionGridHeight);
     painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
+}
+
+void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect, int progress)
+{
+    QnScopedPainterBrushRollback brushRollback(painter, Qt::transparent);
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Light)));
+
+    const PainterTransformScaleStripper scaleStripper(painter);
+
+    const auto& widgetRect = scaleStripper.mapRect(rect);
+
+    constexpr int kProgressBarPadding = 32;
+    constexpr int kProgressBarHeight = 32;
+
+    QRectF progressBarRect(
+        widgetRect.x() + kProgressBarPadding, widgetRect.center().y() - kProgressBarHeight / 2,
+        widgetRect.width() - kProgressBarPadding * 2, kProgressBarHeight);
+
+    painter->drawRect(progressBarRect);
+    painter->fillRect(
+        subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
+        palette().highlight());
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect)
@@ -2160,6 +2186,11 @@ void QnMediaResourceWidget::at_entropixEnchancementButton_clicked()
     m_entropixEnchancer.reset(new EntropixImageEnchancer(m_camera));
     connect(m_entropixEnchancer, &EntropixImageEnchancer::cameraScreenshotReady,
         this, &QnMediaResourceWidget::at_entropixImageLoaded);
+    connect(m_entropixEnchancer, &EntropixImageEnchancer::progressChanged, this,
+        [this](int progress)
+        {
+            m_entropixProgress = progress < 100 ? progress : -1;
+        });
 
     m_entropixEnchancer->requestScreenshot(m_display->currentTimeUSec() / 1000, zoomRect());
 }

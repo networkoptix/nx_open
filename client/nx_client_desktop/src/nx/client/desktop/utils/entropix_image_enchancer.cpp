@@ -45,19 +45,19 @@ public:
 
     enum class Step
     {
+        idle = -1,
         gettingScreenshot,
         waitingForImageProcessed,
         downloadingImage,
 
         stepsCount
     };
-    Step currentStep = Step::gettingScreenshot;
-    int stepProgress = 0;
-    int progress = 0;
+    int progress = -1;
 
     void cancel();
 
     void setProgress(Step step, int stepProgress = 0);
+    void setProgress(int progress);
 
     void enchanceScreenchot(const QImage& colorImage, const QImage& blackAndWhiteImage);
 
@@ -83,12 +83,18 @@ void EntropixImageEnchancer::Private::cancel()
 
     NX_DEBUG(q, "Request cancelled");
 
-    setProgress(Step::gettingScreenshot);
+    setProgress(Step::idle);
 }
 
 void EntropixImageEnchancer::Private::setProgress(
     EntropixImageEnchancer::Private::Step step, int stepProgress)
 {
+    if (step == Step::idle)
+    {
+        setProgress(-1);
+        return;
+    }
+
     constexpr int count = static_cast<int>(Step::stepsCount);
     constexpr int stepSize = 100 / count;
 
@@ -101,6 +107,15 @@ void EntropixImageEnchancer::Private::setProgress(
         progress = newProgress;
         emit q->progressChanged(progress);
     }
+}
+
+void EntropixImageEnchancer::Private::setProgress(int progress)
+{
+    if (progress == this->progress)
+        return;
+
+    this->progress = progress;
+    emit q->progressChanged(progress);
 }
 
 void EntropixImageEnchancer::Private::enchanceScreenchot(
@@ -206,6 +221,7 @@ void EntropixImageEnchancer::Private::at_replyFinished()
     else
     {
         NX_ERROR(q, lm("Request failed: %1").arg(m_reply->errorString()));
+        setProgress(Step::idle);
         return;
     }
 
@@ -215,7 +231,7 @@ void EntropixImageEnchancer::Private::at_replyFinished()
 
     NX_DEBUG(q, lm("Got image of size %1x%2").arg(image.width()).arg(image.height()));
 
-    setProgress(Step::stepsCount);
+    setProgress(Step::idle);
 
     emit q->cameraScreenshotReady(image);
 }
