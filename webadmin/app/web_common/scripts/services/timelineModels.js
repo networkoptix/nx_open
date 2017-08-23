@@ -987,7 +987,7 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline. Live mode must be supported here
-    var needZoomOut = !this.checkZoomOut();
+    var needZoomOut = this.checkZoomedOutNow();
 
     var end = timeManager.nowToDisplay();
     if(this.playedPosition > this.end && this.liveMode){
@@ -1371,19 +1371,21 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
-ScaleManager.prototype.checkZoomOut = function(zoomTarget){
+ScaleManager.prototype.checkZoomedOutNow = function(){
     var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
+    return invisibleInterval <= this.zoomAccuracyMs;
+};
+ScaleManager.prototype.checkZoomOut = function(zoomTarget){
+    // Anticipate visible interval after setting zoomTarget
+    var msPerPixel = this.zoomToMs(zoomTarget);
+    var visibleInterval = msPerPixel  * this.viewportWidth;
+    var invisibleInterval = (this.end - this.start) - visibleInterval;
     this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs;
-    return !this.disableZoomOut;
-
 };
 ScaleManager.prototype.checkZoomIn = function(zoomTarget){
     this.disableZoomIn = zoomTarget <= this.fullZoomInValue();
 };
 ScaleManager.prototype.checkZoom = function(zoomTarget){
-    if(typeof(zoomTarget)=='undefined'){
-        console.error("checkZoom without target");
-    }
     this.checkZoomOut(zoomTarget);
     this.checkZoomIn(zoomTarget);
 };

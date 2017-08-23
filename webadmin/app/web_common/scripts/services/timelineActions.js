@@ -310,6 +310,7 @@ TimelineActions.prototype.zoomingStop = function() {
     var animation = this.animateScope.animating(self.scope, 'zoomTarget');
     if(animation){
         animation.breakAnimation();
+        this.scaleManager.checkZoomAsync(this.scaleManager.zoom());
     }
 };
 
