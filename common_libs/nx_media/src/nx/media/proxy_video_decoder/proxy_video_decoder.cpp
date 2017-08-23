@@ -101,9 +101,10 @@ bool ProxyVideoDecoder::isCompatible(
 
     if (!allowOverlay)
     {
-        if (!ini().largeOnly)
+        if (ini().alwaysAllowOverlay)
         {
-            NX_PRINT << "isCompatible() ignores allowOverlay because conf.largeOnly is set";
+            NX_PRINT << "isCompatible(): "
+                << "ignoring allowOverlay being false, because .ini alwaysAllowOverlay=true";
         }
         else
         {

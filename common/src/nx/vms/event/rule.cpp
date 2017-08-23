@@ -19,6 +19,8 @@ static const QList<QnUuid> kOwnerRoleIds {
 
 } // namespace
 
+const QByteArray Rule::kGuidPostfix("vms_businessrule");
+
 Rule::Rule() :
     m_id(),
     m_eventType(undefinedEvent),
@@ -201,7 +203,8 @@ Rule::Rule(
     m_disabled = false;
     m_eventState = EventState::undefined;
 
-    m_id = intToGuid(internalId, "vms_businessrule");
+    m_id = intToGuid(internalId, kGuidPostfix);
+
     m_aggregationPeriod = aggregationPeriod;
     m_system = isSystem;
     m_actionType = bActionType;
@@ -266,10 +269,10 @@ RuleList Rule::getDefaultRules()
     result << RulePtr(new Rule(10, 21600,   0, sendMailAction,    cameraIpConflictEvent, kOwnerRoleIds));
     result << RulePtr(new Rule(11, 21600,   0, sendMailAction,    serverFailureEvent,    kOwnerRoleIds));
     result << RulePtr(new Rule(12, 21600,   0, sendMailAction,    serverConflictEvent,   kOwnerRoleIds));
-    result << RulePtr(new Rule(20, 21600,   0, sendMailAction,    serverStartEvent,      kOwnerRoleIds));
+    result << RulePtr(new Rule(10020, 21600,0, sendMailAction,    serverStartEvent,      kOwnerRoleIds));
 
-    result << RulePtr(new Rule(22, 21600,   0, sendMailAction,    licenseIssueEvent,     kOwnerRoleIds));
-    result << RulePtr(new Rule(23, 30,      0, showPopupAction,   licenseIssueEvent,     {}, true));
+    result << RulePtr(new Rule(10022, 21600,0, sendMailAction,    licenseIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(10023, 30,   0, showPopupAction,   licenseIssueEvent,     {}, true));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;

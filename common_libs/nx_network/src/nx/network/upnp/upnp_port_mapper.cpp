@@ -248,29 +248,39 @@ void PortMapper::removeMapping( PortId portId )
 
 void PortMapper::updateExternalIp( Device& device )
 {
-    if( !device.failCounter.isOk() )
+    if (!device.failCounter.isOk())
         return;
 
     m_upnpClient->externalIp(
-        device.url, [ this, &device ]( HostAddress externalIp )
+        device.url, [this, &device](HostAddress externalIp)
     {
-        std::list< Guard > callbackGuards;
+        std::list<Guard> callbackGuards;
+
+        QnMutexLocker lock(&m_mutex);
+        NX_LOGX(lit("externalIp='%1' on device %2")
+                 .arg(externalIp.toString())
+                 .arg(device.url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+
+        // All mappings with old IPs are not valid.
+        if (device.externalIp != externalIp && device.externalIp != HostAddress())
         {
-            QnMutexLocker lock( &m_mutex );
-            NX_LOGX( lit( "externalIp='%1' on device %2" )
-                     .arg( externalIp.toString() )
-                     .arg( device.url.toString(QUrl::RemovePassword) ), cl_logDEBUG1 );
-
-            if( externalIp == HostAddress() )
+            for(auto& map : device.mapped)
             {
-                device.failCounter.failure();
-                return;
+                const auto it = m_mapRequests.find(map.first);
+                if(it != m_mapRequests.end())
+                {
+                    callbackGuards.push_back(Guard(std::bind(
+                        it->second, SocketAddress(device.externalIp, 0))));
+                }
             }
-
-            device.failCounter.success();
-            if( device.externalIp != externalIp )
-                callbackGuards = changeIpEvents( device, std::move(externalIp) );
         }
+
+        if (externalIp != HostAddress())
+            device.failCounter.success();
+        else
+            device.failCounter.failure();
+
+        device.externalIp.swap(externalIp);
     });
 }
 
@@ -311,7 +321,8 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
                 ensureMapping(device, inPort, protocol);
 
             lk.unlock();
-            return callback(std::move(address));
+            if (address.address != HostAddress())
+                return callback(std::move(address));
         });
 }
 
@@ -357,7 +368,8 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
                     device.mapped[ PortId( inPort, protocol ) ] = mapping.externalPort;
 
                     lk.unlock();
-                    callback( SocketAddress( device.externalIp, mapping.externalPort ) );
+                    if( device.externalIp != HostAddress() )
+                        callback( SocketAddress( device.externalIp, mapping.externalPort ) );
                 }
 
                 return;
@@ -374,7 +386,8 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
             device.mapped.erase( deviceMap );
 
             lk.unlock();
-            callback( invalid );
+            if( invalid.address != HostAddress() )
+                callback( invalid );
         }
     } );
 }
@@ -437,33 +450,9 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
         device.engagedPorts.insert( PortId( desiredPort, protocol ) );
 
         lk.unlock();
-        callback( SocketAddress( externalIp, desiredPort ) );
+        if (externalIp != HostAddress())
+            callback( SocketAddress( externalIp, desiredPort ) );
     } );
-}
-
-std::list< Guard > PortMapper::changeIpEvents( Device& device, HostAddress externalIp )
-{
-    std::list< Guard > callbackGuards;
-
-    device.externalIp.swap(externalIp);
-    for( auto& map : device.mapped )
-    {
-        const auto it = m_mapRequests.find( map.first );
-        if( it != m_mapRequests.end() )
-        {
-            if( externalIp != HostAddress() )
-            {
-                // all mappings with old ip are not valid
-                callbackGuards.push_back( Guard( std::bind(
-                    it->second, SocketAddress( externalIp, 0 ) ) ) );
-            }
-
-            callbackGuards.push_back( Guard( std::bind(
-                it->second, SocketAddress( device.externalIp, map.second ) ) ) );
-        }
-    }
-
-    return callbackGuards;
 }
 
 } // namespace nx_upnp
