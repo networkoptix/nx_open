@@ -17,7 +17,7 @@
             <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                title="{{server.url}}"
                ng-click="toggleServerCollapsed(server)"
-               class="webclint-panel server-link collapse-group"
+               class="server-link collapse-group"
                ng-class="{offline:server.status!='Online'}">
                 <div class="pull-right">
                     <span>
@@ -26,7 +26,12 @@
                     </span>
                 </div>
                 <div class="hide-excess-text">
-                    <span class="glyphicon" ng-class="server.status == 'Online' ? 'glyphicon-server-active' : 'glyphicon-server-offline'"></span>
+                    <span ng-if="server.id == activeCamera.parentId"
+                          class="glyphicon glyphicon-server-active"></span>
+                    <span ng-if="server.status == 'Online' && server.id != activeCamera.parentId"
+                          class="glyphicon glyphicon-server-online"></span>
+                    <span ng-if="server.status != 'Online' && server.id != activeCamera.parentId"
+                          class="glyphicon glyphicon-server-offline"></span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>
             </a>
