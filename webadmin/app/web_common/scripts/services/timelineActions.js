@@ -260,6 +260,7 @@ TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
         var changedLevel = changedLevels[i];
 
         self.animationState[changedLevel] = 0; // Start animation over
+        self.animationState.currentLevels[changedLevel] = self.scaleManager.levels[changedLevel]; // force old animation to complete
         (function(changedLevel){
             self.animateScope.progress(self.scope, 'zooming' + changedLevel, 'dryResistance').then(function(){
                 self.animationState.currentLevels[changedLevel] = self.scaleManager.levels[changedLevel];
