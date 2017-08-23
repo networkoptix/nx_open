@@ -7,6 +7,7 @@
 #include <client/client_settings.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 
 namespace nx {
@@ -20,6 +21,12 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
     m_lastImageDir(qnSettings->backgroundsFolder())
 {
     ui->setupUi(this);
+
+    ui->sizeSlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+
+    ui->opacitySlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ ui->sizeLabel, ui->opacityLabel });

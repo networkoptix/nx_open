@@ -2,6 +2,7 @@
 #include "ui_text_overlay_settings_widget.h"
 
 #include <ui/common/aligner.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -24,6 +25,9 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
     ui(new Ui::TextOverlaySettingsWidget())
 {
     ui->setupUi(this);
+
+    ui->widthSlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});
