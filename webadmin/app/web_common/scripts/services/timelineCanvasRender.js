@@ -322,8 +322,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             var textWidth = context.measureText(label).width;
 
             var textStart = levelTop * self.canvas.height // Top border
-                + (levelHeight * self.canvas.height - font.size) / 2 // Top padding
-                + font.size + labelPositionFix; // Font size
+                + (levelHeight * self.canvas.height - font.size * self.pixelAspectRatio) / 2 // Top padding
+                + font.size * self.pixelAspectRatio + labelPositionFix * self.pixelAspectRatio; // Font size
 
             var x = 0;
             switch (labelAlign) {
@@ -333,18 +333,18 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     var center = (leftBound + rightBound) / 2;
 
                     x = self.scaleManager.bound(
-                            coordinate + timelineConfig.labelPadding,
+                            coordinate + timelineConfig.labelPadding * self.pixelAspectRatio,
                             center - textWidth / 2,
-                            stopCoordinate - textWidth - timelineConfig.labelPadding
+                            stopCoordinate - textWidth - timelineConfig.labelPadding * self.pixelAspectRatio
                     );
 
                     break;
 
                 case 'left':
                     x = self.scaleManager.bound(
-                        timelineConfig.labelPadding,
-                            coordinate + timelineConfig.labelPadding,
-                            stopCoordinate - textWidth - timelineConfig.labelPadding
+                        timelineConfig.labelPadding * self.pixelAspectRatio,
+                        coordinate + timelineConfig.labelPadding * self.pixelAspectRatio,
+                        stopCoordinate - textWidth - timelineConfig.labelPadding * self.pixelAspectRatio
                     );
 
                     break;
@@ -386,7 +386,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     break;
                 case 'above':
                 default:
-                    context.clearRect(x, textStart - font.size, textWidth, font.size); // above
+                    context.clearRect(x, textStart - font.size * self.pixelAspectRatio, textWidth, font.size * self.pixelAspectRatio); // above
                     break;
             }
         }
