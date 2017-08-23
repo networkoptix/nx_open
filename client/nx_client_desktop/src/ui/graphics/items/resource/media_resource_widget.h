@@ -248,6 +248,8 @@ private slots:
     void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_eventRuleRemoved(const QnUuid& ruleId);
 
+    void clearEntropixEnchancedImage();
+
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();

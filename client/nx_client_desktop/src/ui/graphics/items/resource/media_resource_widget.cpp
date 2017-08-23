@@ -469,6 +469,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
+
+    connect(this, &QnMediaResourceWidget::positionChanged, this,
+        &QnMediaResourceWidget::clearEntropixEnchancedImage);
+    connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
+        &QnMediaResourceWidget::clearEntropixEnchancedImage);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -1226,6 +1231,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
                 this, &QnMediaResourceWidget::updateButtonsVisibility);
             connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
                 this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::clearEntropixEnchancedImage);
         }
 
         setChannelLayout(m_display->videoLayout());
@@ -1242,6 +1249,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
     const bool canRotate = accessController()->hasPermissions(item()->layout()->resource(),
         Qn::WritePermission);
     setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
+
+    clearEntropixEnchancedImage();
 
     emit displayChanged();
 }
@@ -1349,6 +1358,17 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     }
 
     Qn::RenderStatus result = Qn::NothingRendered;
+
+    if (!m_entropixEnchancedImage.isNull())
+    {
+        const PainterTransformScaleStripper scaleStripper(painter);
+        painter->drawImage(
+            scaleStripper.mapRect(paintRect),
+            m_entropixEnchancedImage,
+            m_entropixEnchancedImage.rect());
+        result = Qn::NewFrameRendered;
+    }
+    else
     {
         const PainterTransformScaleStripper scaleStripper(painter);
         result = paintVideoTexture(painter,
@@ -2624,6 +2644,11 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 
     m_triggersContainer->deleteItem(iter->overlayItemId);
     m_softwareTriggers.erase(iter);
+}
+
+void QnMediaResourceWidget::clearEntropixEnchancedImage()
+{
+    m_entropixEnchancedImage = QImage();
 };
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
