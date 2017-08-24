@@ -114,8 +114,9 @@ void LicenseWatcher::startUpdate()
                 return;
             }
 
-            executeInThread(objectGuard->thread(),
-                [this, objectGuard, response = m_httpClient->fetchMessageBodyBuffer()]() mutable
+            auto response = m_httpClient->fetchMessageBodyBuffer();
+            executeInThread(objectGuard->thread(), 
+                [this, objectGuard, response = std::move(response)]() mutable
                 {
                     if (objectGuard)
                         processResponse(std::move(response));
