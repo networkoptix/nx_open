@@ -25,9 +25,6 @@ public:
     virtual ~LicenseWatcher();
     void start();
 
-signals:
-    void gotResponse(QByteArray responseData);
-
 private:
     void startUpdate();
     void processResponse(QByteArray responseData);
