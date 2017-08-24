@@ -1711,9 +1711,13 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
         ? itemGeometry(zoomedItem)
         : fitInViewGeometry();
 
+    static const QSizeF viewportLowerSizeBound(
+        qnSettings->viewportLowerSizeBound(),
+        qnSettings->viewportLowerSizeBound());
+
     m_boundingInstrument->setPositionBounds(m_view, sizeRect);
     m_boundingInstrument->setSizeBounds(m_view,
-        qnGlobals->viewportLowerSizeBound(),
+        viewportLowerSizeBound,
         Qt::KeepAspectRatioByExpanding,
         sizeRect.size(),
         Qt::KeepAspectRatioByExpanding);

@@ -19,6 +19,8 @@
 
 #include <nx/utils/app_info.h>
 
+#include <ini.h>
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
 namespace nx {
@@ -1295,6 +1297,21 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::videowall, ExactlyOne)
             && ConditionWrapper(new AutoStartAllowedCondition())
             && !condition::isSafeMode());
+
+    factory(ConvertCameraToEntropix)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Convert to Entropix Camera"))
+        .conditionalText(
+            ContextMenu::tr("Convert to Normal Camera"),
+            condition::isEntropixCamera())
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::isTrue(ini().enableEntropixEnhancer)
+            && condition::hasFlags(Qn::live_cam, Any)
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
 
     factory(ServerAddCameraManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
