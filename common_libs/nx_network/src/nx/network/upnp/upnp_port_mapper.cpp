@@ -251,37 +251,37 @@ void PortMapper::updateExternalIp( Device& device )
     if (!device.failCounter.isOk())
         return;
 
-    m_upnpClient->externalIp(
-        device.url, [this, &device](HostAddress externalIp)
-    {
-        std::list<Guard> callbackGuards;
-
-        QnMutexLocker lock(&m_mutex);
-        NX_LOGX(lit("externalIp='%1' on device %2")
-                 .arg(externalIp.toString())
-                 .arg(device.url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
-
-        // All mappings with old IPs are not valid.
-        if (device.externalIp != externalIp && device.externalIp != HostAddress())
+    m_upnpClient->externalIp(device.url, 
+        [this, &device](HostAddress externalIp)
         {
-            for(auto& map : device.mapped)
+            std::list<Guard> callbackGuards;
+
+            QnMutexLocker lock(&m_mutex);
+            NX_LOGX(lit("externalIp='%1' on device %2")
+                .arg(externalIp.toString())
+                .arg(device.url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+
+            // All mappings with old IPs are not valid.
+            if (device.externalIp != externalIp && device.externalIp != HostAddress())
             {
-                const auto it = m_mapRequests.find(map.first);
-                if(it != m_mapRequests.end())
+                for (auto& map: device.mapped)
                 {
-                    callbackGuards.push_back(Guard(std::bind(
-                        it->second, SocketAddress(device.externalIp, 0))));
+                    const auto it = m_mapRequests.find(map.first);
+                    if (it != m_mapRequests.end())
+                    {
+                        callbackGuards.push_back(Guard(std::bind(
+                            it->second, SocketAddress(device.externalIp, 0))));
+                    }
                 }
             }
-        }
 
-        if (externalIp != HostAddress())
-            device.failCounter.success();
-        else
-            device.failCounter.failure();
+            if (externalIp != HostAddress())
+                device.failCounter.success();
+            else
+                device.failCounter.failure();
 
-        device.externalIp.swap(externalIp);
-    });
+            device.externalIp.swap(externalIp);
+        });
 }
 
 void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
