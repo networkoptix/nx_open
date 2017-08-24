@@ -37,6 +37,7 @@ public:
      * @return List of module information in JSON representation.
      */
     std::vector<std::string> getPeerInfoListByType(const std::string& peerTypeName) const;
+    std::vector<std::string> getPeerInfoList() const;
     /**
      * @return JSON representation of module information.
      */

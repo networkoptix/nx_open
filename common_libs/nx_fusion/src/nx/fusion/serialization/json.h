@@ -2,9 +2,11 @@
 
 #include <cassert>
 #include <typeinfo>
+#include <vector>
 
 #include <boost/optional.hpp>
 
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
@@ -152,6 +154,23 @@ template<class T>
 bool deserialize(QnJsonContext* ctx, const QJsonValue& value, T* outTarget)
 {
     return QnSerialization::deserialize(ctx, value, outTarget);
+}
+
+template<typename T>
+bool deserialize(QnJsonContext* ctx, const QJsonValue& val, std::vector<T>* out)
+{
+    if (!val.isArray())
+        return false;
+    const auto jsonArray = val.toArray();
+    out->reserve(jsonArray.size());
+    for (const auto& element: jsonArray)
+    {
+        out->push_back(T());
+        if (!deserialize(ctx, element, &out->back()))
+            return false;
+    }
+
+    return true;
 }
 
 template<class T>

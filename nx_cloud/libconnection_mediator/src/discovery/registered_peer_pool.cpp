@@ -48,7 +48,19 @@ void RegisteredPeerPool::addPeerConnection(
 std::vector<std::string> RegisteredPeerPool::getPeerInfoListByType(
     const std::string& /*peerTypeName*/) const
 {
+    // TODO
     return std::vector<std::string>();
+}
+
+std::vector<std::string> RegisteredPeerPool::getPeerInfoList() const
+{
+    QnMutexLocker locker(&m_mutex);
+
+    std::vector<std::string> peerInformation;
+    for (const auto& peerContext: m_peerIdToConnection)
+        peerInformation.push_back(peerContext.second->moduleInformationJson);
+
+    return peerInformation;
 }
 
 boost::optional<std::string> RegisteredPeerPool::getPeerInfo(

@@ -6,6 +6,26 @@ namespace nx {
 namespace cloud {
 namespace discovery {
 
+ModuleFinder::ModuleFinder(const QUrl& baseUrl):
+    m_baseUrl(baseUrl)
+{
+}
+
+void ModuleFinder::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    for (auto& request : m_runningRequests)
+        request->bindToAioThread(aioThread);
+}
+
+void ModuleFinder::stopWhileInAioThread()
+{
+    base_type::stopWhileInAioThread();
+    m_runningRequests.clear();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (BasicInstanceInformation),
     (json),

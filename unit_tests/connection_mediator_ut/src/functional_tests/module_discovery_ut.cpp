@@ -41,19 +41,19 @@ using DiscoveryClient = nx::cloud::discovery::ModuleRegistrar<InstanceInformatio
 
 } // namespace
 
-class ModuleDiscovery:
+class DiscoveryHttpApi:
     public MediatorRelayIntegrationTestSetup
 {
     using base_type = MediatorRelayIntegrationTestSetup;
 
 public:
-    ModuleDiscovery():
-        m_relayId(QnUuid::createUuid().toSimpleString().toStdString()),
-        m_relayUrl("http://nxvms.com/relay_api")
+    DiscoveryHttpApi():
+        m_moduleId(QnUuid::createUuid().toSimpleString().toStdString()),
+        m_moduleUrl("http://nxvms.com/relay_api")
     {
     }
 
-    ~ModuleDiscovery()
+    ~DiscoveryHttpApi()
     {
         if (m_moduleRegistrar)
             m_moduleRegistrar->pleaseStopSync();
@@ -64,21 +64,19 @@ protected:
     {
         base_type::SetUp();
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
-
-        m_moduleRegistrar = std::make_unique<DiscoveryClient>(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
-                .setEndpoint(httpEndpoint()).toUrl());
+        auto discoveryUrl = nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            .setEndpoint(httpEndpoint()).toUrl();
+        m_moduleRegistrar = std::make_unique<DiscoveryClient>(discoveryUrl, m_moduleId);
 
         InstanceInformation info;
-        info.id = m_relayId;
-        info.apiUrl = m_relayUrl;
+        info.id = m_moduleId;
+        info.apiUrl = m_moduleUrl;
         m_moduleRegistrar->setInstanceInformation(std::move(info));
     }
 
     void givenRegisteredModule()
     {
-        whenModuleRelay();
+        whenModulesRegistersItSelf();
         thenModuleIsConsideredOnline();
     }
 
@@ -99,7 +97,7 @@ protected:
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    void whenModuleRelay()
+    void whenModulesRegistersItSelf()
     {
         m_moduleRegistrar->start();
     }
@@ -119,7 +117,7 @@ protected:
     {
         const auto relayUrl = reportedTrafficRelayUrl();
         ASSERT_TRUE(static_cast<bool>(relayUrl));
-        ASSERT_EQ(m_relayUrl, QUrl(*relayUrl));
+        ASSERT_EQ(m_moduleUrl, QUrl(*relayUrl));
     }
 
     void thenNoModuleUrlHasBeenReported()
@@ -128,78 +126,78 @@ protected:
     }
 
 private:
-    std::string m_relayId;
-    QUrl m_relayUrl;
+    std::string m_moduleId;
+    QUrl m_moduleUrl;
     std::unique_ptr<DiscoveryClient> m_moduleRegistrar;
 
     nx::cloud::discovery::PeerStatus fetchPeerStatus()
     {
-        const auto url = nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName).setEndpoint(httpEndpoint())
-            .setPath(nx_http::rest::substituteParameters(
-                nx::cloud::discovery::http::kDiscoveredModulePath, {m_relayId.c_str()})
-            ).toUrl();
-
-        nx_http::FusionDataHttpClient<void, InstanceInformation> httpClient(
-            url, nx_http::AuthInfo());
-
-        nx::utils::promise<boost::optional<InstanceInformation>> done;
-        httpClient.execute(
+        nx::cloud::discovery::ModuleFinder moduleFinder(
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                .setEndpoint(httpEndpoint()).toUrl());
+        nx::utils::promise<
+            std::tuple<nx::cloud::discovery::ResultCode, std::vector<InstanceInformation>>
+        > done;
+        moduleFinder.fetchModules<InstanceInformation>(
             [&done](
-                SystemError::ErrorCode /*systemErrorCode*/,
-                const nx_http::Response* response,
-                InstanceInformation instanceInformation)
+                nx::cloud::discovery::ResultCode resultCode,
+                std::vector<InstanceInformation> instanceInformation)
             {
-                if (response && nx_http::StatusCode::isSuccessCode(response->statusLine.statusCode))
-                    done.set_value(std::move(instanceInformation));
-                else
-                    done.set_value(boost::none);
+                done.set_value(std::make_tuple(resultCode, std::move(instanceInformation)));
             });
         const auto result = done.get_future().get();
-        if (!result)
-            throw std::runtime_error("Error fetching peer status");
+        const auto resultCode = std::get<0>(result);
+        if (resultCode != nx::cloud::discovery::ResultCode::ok)
+        {
+            throw std::runtime_error(
+                "Error fetching peer status. " + 
+                QnLexical::serialized(resultCode).toStdString());
+        }
 
-        return result->status;
+        const auto instanceInformationVector = std::get<1>(result);
+        for (const auto& instanceInformation: instanceInformationVector)
+        {
+            if (instanceInformation.id == m_moduleId)
+                return nx::cloud::discovery::PeerStatus::online;
+        }
+
+        return nx::cloud::discovery::PeerStatus::offline;
     }
 };
 
-#if 0
-
-TEST_F(ModuleDiscovery, peer_is_considered_alive_just_after_registration)
+TEST_F(DiscoveryHttpApi, peer_is_considered_alive_just_after_registration)
 {
-    whenModuleRelay();
+    whenModulesRegistersItSelf();
     thenModuleIsConsideredOnline();
 }
 
-TEST_F(ModuleDiscovery, peer_removed_after_expiration_timeout)
+TEST_F(DiscoveryHttpApi, peer_removed_after_expiration_timeout)
 {
     givenRegisteredModule();
     whenModuleStops();
     thenModuleIsConsideredOffline();
 }
 
-TEST_F(ModuleDiscovery, no_relay_url_is_reported_if_no_relay_registered)
+TEST_F(DiscoveryHttpApi, no_relay_url_is_reported_if_no_relay_registered)
 {
     whenInvokeStunListen();
     thenNoModuleUrlHasBeenReported();
 }
 
-TEST_F(ModuleDiscovery, online_relay_is_selected)
+TEST_F(DiscoveryHttpApi, DISABLED_online_relay_is_selected)
 {
     givenRegisteredModule();
     whenInvokeStunListen();
     thenOnlineModuleUrlHasBeenReported();
 }
 
-TEST_F(ModuleDiscovery, offline_relay_is_no_longer_selected)
+TEST_F(DiscoveryHttpApi, offline_relay_is_no_longer_selected)
 {
     givenRegisteredModule();
     whenModuleGoesOffline();
     whenInvokeStunListen();
     thenNoModuleUrlHasBeenReported();
 }
-
-#endif
 
 } // namespace test
 } // namespace hpm

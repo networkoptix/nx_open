@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-static int s_cloudConnectTypeMask = (int)CloudConnectType::all;
+static int s_cloudConnectTypeMask = (int)CloudConnectType::all & ~(int)CloudConnectType::forwardedTcpPort;
 
 using namespace std::placeholders;
 

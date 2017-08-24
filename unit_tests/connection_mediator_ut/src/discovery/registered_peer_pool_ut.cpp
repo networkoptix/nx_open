@@ -5,6 +5,7 @@
 #include <nx/network/http/server/handler/http_server_handler_create_tunnel.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/sync_call.h>
@@ -17,7 +18,6 @@ namespace discovery {
 namespace test {
 
 static const char* const kPeerType = "test_peer";
-static const nx::Buffer kWebsocketProtocolName = "websocket";
 static const char* const kTestPath = "/create_websocket";
 
 struct PeerInformation:
@@ -55,11 +55,9 @@ protected:
             [this]()
             {
                 return std::make_unique<nx_http::server::handler::CreateTunnelHandler>(
-                    kWebsocketProtocolName,
+                    nx::network::websocket::kWebsocketProtocolName,
                     std::bind(&DiscoveryRegisteredPeerPool::onUpgradedConnectionAccepted, this, _1));
             });
-
-        //nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
 
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
@@ -67,7 +65,7 @@ protected:
     void givenConnectedPeer()
     {
         nx_http::HttpClient httpClient;
-        ASSERT_TRUE(httpClient.doUpgrade(getUrl(), kWebsocketProtocolName));
+        ASSERT_TRUE(httpClient.doUpgrade(getUrl(), nx::network::websocket::kWebsocketProtocolName));
         ASSERT_TRUE(nx_http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
             << httpClient.response()->statusLine.statusCode;
 
@@ -111,7 +109,6 @@ protected:
         PeerInformation peerInfo;
         peerInfo.id = m_peerId;
         peerInfo.apiUrl = "http://nxvms.com/test_peer/";
-        peerInfo.status = PeerStatus::online;
         m_expectedPeerInfo = QJson::serialized(peerInfo);
         sendPeerInfo(m_expectedPeerInfo);
     }
