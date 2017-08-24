@@ -32,6 +32,10 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
 TimelineActions.prototype.goToLive = function(){
     var self = this;
     var moveDate = self.scaleManager.screenCoordinateToDate(1);
+    if(self.scaleManager.watchLivePosition){
+        // we are already watching live position - no need for animation
+        return;
+    }
     self.animateScope.progress(self.scope, 'goingToLive' ).then(
         function(){
             var activeDate = timeManager.nowToDisplay();
