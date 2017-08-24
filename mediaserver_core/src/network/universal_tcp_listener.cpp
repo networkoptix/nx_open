@@ -16,15 +16,6 @@
 #include "universal_request_processor.h"
 
 
-//#define LISTEN_ON_UDT_SOCKET
-#ifdef LISTEN_ON_UDT_SOCKET
-static const int kCloudSocketIndex = 2;
-static const int kTotalListeningSockets = 3;
-#else
-static const int kCloudSocketIndex = 1;
-static const int kTotalListeningSockets = 2;
-#endif
-
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
     const CloudConnectionManager& cloudConnectionManager,
@@ -122,16 +113,20 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool needToAddIpV6Socket = localAddress.address == HostAddress::anyHost
         || (bool)localAddress.address.ipV6();
 
-    if (needToAddIpV4Socket
-        && !addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
+    if (needToAddIpV4Socket)
     {
-        return nullptr;
+        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
+            return nullptr;
+        ++m_totalListeningSockets;
+        ++m_cloudSocketIndex;
     }
 
-    if (needToAddIpV6Socket &&
-        !addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
+    if (needToAddIpV6Socket)
     {
-        return nullptr;
+        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
+            return nullptr;
+        ++m_totalListeningSockets;
+        ++m_cloudSocketIndex;
     }
 
     #ifdef LISTEN_ON_UDT_SOCKET
@@ -218,7 +213,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
     if (m_boundToCloud)
     {
-        NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);
+        NX_ASSERT(m_multipleServerSocket->count() == m_cloudSocketIndex);
 
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
         registrationOnMediatorRetryPolicy.maxRetryCount =
@@ -233,8 +228,8 @@ void QnUniversalTcpListener::updateCloudConnectState(
     }
     else
     {
-        NX_ASSERT(m_multipleServerSocket->count() == kTotalListeningSockets);
-        m_multipleServerSocket->removeSocket(kCloudSocketIndex);
+        NX_ASSERT(m_multipleServerSocket->count() == m_totalListeningSockets);
+        m_multipleServerSocket->removeSocket(m_cloudSocketIndex);
     }
 }
 
