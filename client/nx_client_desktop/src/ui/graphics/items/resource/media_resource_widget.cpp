@@ -689,11 +689,12 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (m_renderer && !m_renderer->sourceSize().isEmpty())
     {
         auto sourceSize = m_renderer->sourceSize();
-
-        const auto& sensor = camera->combinedSensorsDescription().mainSensor();
-        if (sensor.isValid())
-            sourceSize = QnGeometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
-
+        if (camera)
+        {
+            const auto& sensor = camera->combinedSensorsDescription().mainSensor();
+            if (sensor.isValid())
+                sourceSize = QnGeometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
+        }
         return QnGeometry::aspectRatio(sourceSize);
     }
 
