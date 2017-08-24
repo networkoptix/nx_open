@@ -82,18 +82,31 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_exportReader(nullptr),
     m_displayStarted(false)
 {
-    if (m_reader) {
+    if (m_reader)
+    {
         m_reader->addDataProcessor(&m_camdispay);
-        if (QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(m_reader.data())) {
-            connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,       &m_camdispay, &QnCamDisplay::onReaderPaused,        Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,      &m_camdispay, &QnCamDisplay::onReaderResumed,       Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::prevFrameOccured,   &m_camdispay, &QnCamDisplay::onPrevFrameOccured,    Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::nextFrameOccured,   &m_camdispay, &QnCamDisplay::onNextFrameOccured,    Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::slowSourceHint,     &m_camdispay, &QnCamDisplay::onSlowSourceHint,      Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::beforeJump,         &m_camdispay, &QnCamDisplay::onBeforeJump,          Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpOccured,        &m_camdispay, &QnCamDisplay::onJumpOccured,         Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpCanceled,       &m_camdispay, &QnCamDisplay::onJumpCanceled,        Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::skipFramesTo,       &m_camdispay, &QnCamDisplay::onSkippingFrames,      Qt::DirectConnection);
+
+        if (const auto archiveReader =
+            dynamic_cast<QnAbstractArchiveStreamReader*>(m_reader.data()))
+        {
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamAboutToBePaused,
+                &m_camdispay, &QnCamDisplay::onReaderPaused, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamAboutToBeResumed,
+                &m_camdispay, &QnCamDisplay::onReaderResumed, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::prevFrameOccured,
+                &m_camdispay, &QnCamDisplay::onPrevFrameOccured, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::nextFrameOccured,
+                &m_camdispay, &QnCamDisplay::onNextFrameOccured, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::slowSourceHint,
+                &m_camdispay, &QnCamDisplay::onSlowSourceHint, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::beforeJump,
+                &m_camdispay, &QnCamDisplay::onBeforeJump, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpOccured,
+                &m_camdispay, &QnCamDisplay::onJumpOccured, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpCanceled,
+                &m_camdispay, &QnCamDisplay::onJumpCanceled, Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::skipFramesTo,
+                &m_camdispay, &QnCamDisplay::onSkippingFrames, Qt::DirectConnection);
         }
     }
 
