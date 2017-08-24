@@ -298,7 +298,7 @@ TEST_F(RelayReverseConnection, provides_relay_settings_on_success)
 
 TEST_F(
     RelayReverseConnection,
-    does_not_receives_notifications_until_waitForOriginatorToStartUsingConnection_call)
+    does_not_receive_notification_until_waitForOriginatorToStartUsingConnection_call)
 {
     givenEstablishedConnection();
     whenRelayActivatesConnection();
