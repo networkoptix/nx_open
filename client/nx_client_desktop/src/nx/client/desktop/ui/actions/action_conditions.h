@@ -581,6 +581,9 @@ namespace condition {
 /** Visible always. */
 ConditionWrapper always();
 
+/** Visible when value is true. */
+ConditionWrapper isTrue(bool value);
+
 /** Visible when user is logged in (or at least logging in). */
 ConditionWrapper isLoggedIn();
 
@@ -608,7 +611,8 @@ ConditionWrapper tourIsRunning();
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();
 
-ConditionWrapper valueIsTrue(bool value);
+/** Check if the resource is Entropix camera. */
+ConditionWrapper isEntropixCamera();
 
 } // namespace condition
 

@@ -139,7 +139,7 @@ void EntropixImageEnhancer::Private::enhanceScreenshot(
         };
 
     auto makeImagePart =
-        [&makePart](const QByteArray& name, const QByteArray& fileName, const QByteArray& body)
+        [](const QByteArray& name, const QByteArray& fileName, const QByteArray& body)
         {
             QHttpPart part;
             part.setHeader(QNetworkRequest::ContentDispositionHeader,

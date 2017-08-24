@@ -1301,9 +1301,12 @@ void initialize(Manager* manager, Action* root)
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .dynamicText(new ConvertToEntropixTextFactory(manager))
+        .text(ContextMenu::tr("Convert to Entropix Camera"))
+        .conditionalText(
+            ContextMenu::tr("Convert to Normal Camera"),
+            condition::isEntropixCamera())
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::valueIsTrue(ini().enableEntropixEnhancer)
+        .condition(condition::isTrue(ini().enableEntropixEnhancer)
             && condition::hasFlags(Qn::live_cam, Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,

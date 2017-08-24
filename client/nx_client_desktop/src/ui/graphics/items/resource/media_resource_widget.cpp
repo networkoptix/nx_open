@@ -6,7 +6,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QStyleOptionProgressBar>
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
