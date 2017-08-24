@@ -184,6 +184,13 @@ angular.module('nxCommon')
                  */
 
                 function goToLive(force){
+                    if(!scope.positionProvider.playing){
+                        scope.playHandler(true);
+                        timeout(function(){
+                            goToLive(force);
+                        });
+                        return;
+                    }
                     timelineActions.goToLive();
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
@@ -197,10 +204,7 @@ angular.module('nxCommon')
                         pausedLive = scope.positionProvider.liveMode;
                         scope.playHandler(false);
                     }else if(pausedLive){
-                        scope.playHandler(true);
-                        timeout(function(){
-                            goToLive(true);
-                        });
+                        goToLive(true);
                     }else{
                         scope.playHandler(true);
                     }

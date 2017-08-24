@@ -45,7 +45,7 @@ function TimelineConfig(){
 
     var timelineConfig = {
         initialInterval: 1000 * 60 * 60 /* *24*365*/, // no records - show small interval
-        stickToLiveMs: 10 * 1000, // Value to stick viewpoert to Live - 10 seconds
+        stickToLiveMs: 5 * 1000, // Value to stick viewpoert to Live - 5 seconds
         maxMsPerPixel: 1000 * 60 * 60 * 24 * 365,   // one year per pixel - maximum view
         lastMinuteDuration: 1.5 * 60 * 1000, // 1.5 minutes
         minMsPerPixel: 10, // Minimum level for zooming:
