@@ -91,7 +91,8 @@ void TunnelConnectorStub::reportResult()
         case Behavior::reportSuccess:
         {
             auto connection = std::make_unique<TunnelConnectionStub>();
-            m_connectionQueue->push(connection.get());
+            if (m_connectionQueue)
+                m_connectionQueue->push(connection.get());
             nx::utils::swapAndCall(
                 m_completionHandler,
                 nx::hpm::api::NatTraversalResultCode::ok,
