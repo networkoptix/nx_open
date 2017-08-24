@@ -116,7 +116,10 @@ public:
             {
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
-                    return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
+                {
+                    const auto code = SystemError::getLastOSErrorCode();
+                    return m_streamSocket->post([this, code]() { onBytesRead(code, (size_t) -1); });
+                }
 
                 m_receiving = true;
                 m_readBuffer.resize(0);
