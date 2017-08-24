@@ -230,7 +230,6 @@ struct LineEditControls::Private
     QnWidgetAnchor* const anchor = nullptr;
     int spacing = kDefaultSpacing;
 
-    //QWidget* const contents;
     const QScopedPointer<QWidget> contents;
     const QMargins initialMargins; //< Initial contents margins of line edit.
     QList<QWidget*> controls;
