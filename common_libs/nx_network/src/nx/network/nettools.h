@@ -51,13 +51,26 @@ NX_NETWORK_API QString MACToString(const unsigned char *mac);
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of interfaces.rkjybhjdfybtr
+// returns list of interfaces.
 // Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
 QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
-QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
+QList<QHostAddress> NX_NETWORK_API allLocalIpV4Addresses();
+
+/** Filter mask for allLocalAddresses()*/
+enum AddressFilter
+{
+    ipV4 = 1,
+    ipV6 = 2,
+    noLocal = 4,
+    noLoopback = 8
+};
+/**
+ * returns list of all IP addresses of current machine. Filters result by filter param.
+ */
+QList<HostAddress> NX_NETWORK_API allLocalAddresses(int filter);
 
 //returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
 QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();

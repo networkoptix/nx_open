@@ -56,7 +56,7 @@ void AbstractListenAddressHelper::doReport(
     SocketAddress result = address;
     if (address.address == HostAddress::anyHost)
     {
-        auto firstAvailableAddress = allLocalAddresses()[0];
+        auto firstAvailableAddress = allLocalIpV4Addresses()[0];
         result = SocketAddress(firstAvailableAddress.toString(), address.port);
     }
 
@@ -84,7 +84,7 @@ bool AbstractListenAddressHelper::endpointReportedAsPublic(
     if (listenAddress.address != HostAddress::anyHost)
         return false;
 
-    for (const auto& availableQHostAddress : allLocalAddresses())
+    for (const auto& availableQHostAddress : allLocalIpV4Addresses())
     {
         HostAddress availableAddress(availableQHostAddress.toString());
         if (availableAddress == publicAddress)

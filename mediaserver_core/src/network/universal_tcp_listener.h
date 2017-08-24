@@ -46,6 +46,9 @@ private:
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
+
+    bool addServerSocketToMultipleSocket(const SocketAddress& localAddress,
+        nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion);
 };
 
 #endif  //__UNIVERSAL_TCP_LISTENER_H__

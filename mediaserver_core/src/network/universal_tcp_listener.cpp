@@ -86,25 +86,51 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
+bool QnUniversalTcpListener::addServerSocketToMultipleSocket(const SocketAddress& localAddress,
+    nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion)
+{
+    auto tcpServerSocket = SocketFactory::createStreamServerSocket(false,
+        nx::network::NatTraversalSupport::enabled, ipVersion);
+
+    if (!tcpServerSocket->setReuseAddrFlag(true) ||
+        !tcpServerSocket->bind(localAddress) ||
+        !tcpServerSocket->listen())
+    {
+        setLastError(SystemError::getLastOSErrorCode());
+        return false;
+    }
+
+    if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
+    {
+        setLastError(SystemError::getLastOSErrorCode());
+        return false;
+    }
+
+    return true;
+}
+
 AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto tcpServerSocket =  SocketFactory::createStreamServerSocket();
-    if (!tcpServerSocket->setReuseAddrFlag(true) ||
-        !tcpServerSocket->bind(localAddress) ||
-        !tcpServerSocket->listen())
+    auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
+    bool needToAddIpV4Socket = localAddress.address == HostAddress::anyHost
+        || (bool) localAddress.address.ipV4();
+
+    bool needToAddIpV6Socket = localAddress.address == HostAddress::anyHost
+        || (bool)localAddress.address.ipV6();
+
+    if (needToAddIpV4Socket
+        && !addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
     {
-        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
-    auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
+    if (needToAddIpV6Socket &&
+        !addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
     {
-        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 

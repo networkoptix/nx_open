@@ -37,7 +37,7 @@ public:
     void setCreateStreamSocketFunc(
         SocketFactory::CreateStreamSocketFuncType newFactoryFunc)
     {
-        auto oldFunc = 
+        auto oldFunc =
             SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
         if (!m_createStreamSocketFunc)
             m_createStreamSocketFunc = oldFunc;
@@ -62,7 +62,7 @@ public:
             });
 
         setCreateStreamServerSocketFunc(
-            [](bool /*sslRequired*/, NatTraversalSupport)
+            [](bool /*sslRequired*/, NatTraversalSupport, boost::optional<int> /*ipVersion*/)
                 -> std::unique_ptr<AbstractStreamServerSocket>
             {
                 return std::make_unique<UdtStreamServerSocket>(AF_INET);
@@ -144,7 +144,7 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
 
 static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
-{   
+{
     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
     EXPECT_TRUE(socket->setRendezvous(true));
     EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
@@ -262,7 +262,7 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
         });
 
     std::this_thread::sleep_for(kConnectDelay);
-    
+
     std::unique_ptr<ConnectionsGenerator> generator;
     clientSocket->connectAsync(
         serverSocket->getLocalAddress(),
