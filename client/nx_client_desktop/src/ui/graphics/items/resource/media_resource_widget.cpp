@@ -612,7 +612,7 @@ void QnMediaResourceWidget::createButtons()
         auto entropixEnhancementButton =
             createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
         entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-        entropixEnhancementButton->setToolTip(tr("Entropix Image Enhancement"));
+        entropixEnhancementButton->setToolTip(lit("Entropix Image Enhancement"));
         connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
             &QnMediaResourceWidget::at_entropixEnhancementButton_clicked);
         titleBar()->rightButtonsBar()->addButton(
