@@ -1129,6 +1129,12 @@ ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
     }
 };
 
+ScaleManager.prototype.clickedCoordinate = function(coordinate){
+    if(typeof(coordinate) != 'undefined'){
+        this.clickedCoordinateValue = coordinate;
+    }
+    return this.clickedCoordinateValue;
+};
 ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor date
     var position = this.screenCoordinateToDate(coordinate);
     this.setAnchorDateAndPoint(position, coordinate / this.viewportWidth);

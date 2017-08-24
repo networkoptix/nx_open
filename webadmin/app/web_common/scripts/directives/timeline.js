@@ -211,7 +211,7 @@ angular.module('nxCommon')
                 }
 
                 function timelineClick(mouseX){
-                    var date = timelineActions.setAnchorCoordinate(mouseX);
+                    var date = timelineActions.setClickedCoordinate(mouseX);
 
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){

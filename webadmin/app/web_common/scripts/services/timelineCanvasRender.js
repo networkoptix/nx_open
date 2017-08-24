@@ -908,8 +908,17 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         drawTimeMarker(context);
 
-        if(mouseOverEvents && !buttonsState.rightButton && ! buttonsState.leftButton) {
-            drawPointerMarker(context, mouseX, mouseY);
+        var clickedCoordinate =  self.scaleManager.clickedCoordinate();
+        if(!mouseOverEvents){ // Mouse left timeline - do not draw timemarker, but forget clickedCoordinate
+            self.scaleManager.clickedCoordinate(false);
+        }else{
+            if(!clickedCoordinate ||
+                Math.abs(mouseX - clickedCoordinate) > timelineConfig.hideTimeMarkerAfterClickedDistance){
+                if(!buttonsState.rightButton && !buttonsState.leftButton){ // Do not draw if any button is clicked
+                    drawPointerMarker(context, mouseX, mouseY);
+                }
+                self.scaleManager.clickedCoordinate(false); // forget clickedCoordinate
+            }
         }
     };
 

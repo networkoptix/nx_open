@@ -115,7 +115,9 @@ TimelineActions.prototype.updatePosition = function(){
     }
 };
 
-TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
+TimelineActions.prototype.setClickedCoordinate = function(mouseX){
+    this.scaleManager.clickedCoordinate(mouseX);
+
     var position = this.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
 
     this.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing

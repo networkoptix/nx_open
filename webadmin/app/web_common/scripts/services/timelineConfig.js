@@ -52,6 +52,7 @@ function TimelineConfig(){
         lastMinuteAnimationMs:100,
         minMarkWidth: 1, // Minimum width for visible mark
         smoothMoveLength: 3, //Minimum move of timeline which requires smooth moving
+        hideTimeMarkerAfterClickedDistance: 5, // distance around click we do not show timemarker under pointer
 
         zoomSpeed: 0.025, // Zoom speed for dblclick
         zoomAccuracyMs: 5000, // 5 seconds - accuracy for zoomout
