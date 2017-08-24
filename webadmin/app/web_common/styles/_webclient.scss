@@ -182,6 +182,10 @@ table.webclient-window>tbody>tr>td{
 
 .cameras-panel-wrapper{
   width: 320px;
+
+  @include transition-property(width);
+  @include transition-duration(.35s);
+  @include transition-timing-function(ease);
 }
 
 .cameras-panel{
