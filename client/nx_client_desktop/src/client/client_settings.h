@@ -132,9 +132,6 @@ public:
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
 
-        /** Viewport lower size boundary, in scene coordinates. */
-        VIEWPORT_LOWER_SIZE_BOUND,
-
         /** Full set of background options. */
         BACKGROUND_IMAGE,
 
@@ -226,7 +223,6 @@ private:
         // TODO: #GDM #3.1 replace with full set of export parameters in json
         //QN_DECLARE_RW_PROPERTY(Qt::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
-        QN_DECLARE_R_PROPERTY(qreal,                        viewportLowerSizeBound,                             VIEWPORT_LOWER_SIZE_BOUND,  500.0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
