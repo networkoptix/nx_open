@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QRectF>
 
 #include <core/resource/resource_fwd.h>
@@ -21,7 +22,7 @@ public:
     EntropixImageEnhancer(
         const QnVirtualCameraResourcePtr& camera,
         QObject* parent = nullptr);
-    ~EntropixImageEnhancer();
+    virtual ~EntropixImageEnhancer() override;
 
     void requestScreenshot(qint64 timestamp, const QRectF& zoomRect = QRectF());
     void cancelRequest();
