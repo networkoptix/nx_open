@@ -13,6 +13,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableEntropixEnhancer, "Enable Entropix image enhancement controls.");
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
+    NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
 };
 
 inline Ini& ini()

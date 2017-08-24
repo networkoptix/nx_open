@@ -170,8 +170,8 @@ void EntropixImageEnhancer::Private::enhanceScreenshot(
     m_reply = m_networkAccessManager->post(QNetworkRequest(url), multiPart);
     multiPart->setParent(m_reply);
 
-    connect(m_reply, &QNetworkReply::readyRead, this, &Private::at_replyReadyRead);
-    connect(m_reply, &QNetworkReply::finished, this, &Private::at_replyFinished);
+    connect(m_reply.data(), &QNetworkReply::readyRead, this, &Private::at_replyReadyRead);
+    connect(m_reply.data(), &QNetworkReply::finished, this, &Private::at_replyFinished);
 }
 
 void EntropixImageEnhancer::Private::at_imageLoaded(const QByteArray& imageData)

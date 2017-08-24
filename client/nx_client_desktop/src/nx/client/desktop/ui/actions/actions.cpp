@@ -1301,9 +1301,9 @@ void initialize(Manager* manager, Action* root)
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Convert to Entropix Camera"))
+        .text(lit("Convert to Entropix Camera"))
         .conditionalText(
-            ContextMenu::tr("Convert to Normal Camera"),
+            lit("Convert to Normal Camera"),
             condition::isEntropixCamera())
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::isTrue(ini().enableEntropixEnhancer)
