@@ -7,10 +7,10 @@
 # Default-Stop:
 # X-Start-Before:    hddbootflush
 # Short-Description: nx1 boot sequence
-# Description:       Provides the ability to boot up automatically depending on available 
+# Description:       Provides the ability to boot up automatically depending on available
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
-# VERSION: ${release.version}.${buildNumber}
+# VERSION: @release.version@.@buildNumber@
 
 run_watchdog() {
     while true
@@ -23,11 +23,11 @@ run_watchdog() {
 stop() {
     SERVICE_PID="`ps -eO command | grep nx1button | grep python | grep -v grep | awk {'print $1'}`"
 	WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep |  awk {'print $1'}`"
-    if [ "$SERVICE_PID" ]; then 
+    if [ "$SERVICE_PID" ]; then
         echo "Stopping Button Service... PID: " $SERVICE_PID
         kill -9 $SERVICE_PID
     fi
-    if [ "$WATCHDOG_PID" ]; then 
+    if [ "$WATCHDOG_PID" ]; then
         echo "Stopping Button Service Watchdog... PID: " $WATCHDOG_PID
         kill -9 $WATCHDOG_PID
     fi
@@ -41,7 +41,7 @@ start() {
     fi
     echo "Starting Button Service..."
     nohup python /root/tools/gpio/led/nx1button.py 2>&1&
-    
+
     if [[ $(ps -eO command | grep nx1button| grep -v grep | awk {'print $1'}) ]]; then
         echo "OK"
     fi
@@ -71,7 +71,7 @@ case "$1" in
     ;;
   stop)
     stop
-    ;;   
+    ;;
   *)
 	echo "Usage: nx1boot [start]" >&2
 	exit 3
