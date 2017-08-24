@@ -648,7 +648,10 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     // !!! Draw and position for timeMarker
     function drawTimeMarker(context){
-        if(!self.scaleManager.playedPosition || self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs){
+
+        if(!self.scaleManager.playedPosition ||
+            self.scaleManager.liveMode &&
+            self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs){
             return;
         }
 
