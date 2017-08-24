@@ -8,13 +8,17 @@
 #include <QtCore/QUrl>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/websocket/websocket.h>
+
+#include "discovery_http_api_path.h"
 
 namespace nx {
 namespace cloud {
@@ -188,7 +192,7 @@ private:
     {
         if (systemErrorCode == SystemError::noError)
         {
-            NX_ASSERT(bytesSent == m_sendBuffer.size());
+            NX_ASSERT(bytesSent == (std::size_t)m_sendBuffer.size());
             m_sendQueue.pop();
             if (!m_sendQueue.empty())
                 sendNext();
