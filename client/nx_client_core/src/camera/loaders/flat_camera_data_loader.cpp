@@ -19,15 +19,18 @@
 #include <nx/utils/datetime.h>
 
 namespace {
-    /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
-    QAtomicInt qn_fakeHandle(INT_MAX / 2);
 
-    /** Minimum time (in milliseconds) for overlapping time periods requests.  */
-    const int minOverlapDuration = 120*1000;
+/** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
+QAtomicInt qn_fakeHandle(INT_MAX / 2);
 
-    QString dt(qint64 time) {
-        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("MMM/dd/yyyy hh:mm:ss"));
-    }
+/** Minimum time (in milliseconds) for overlapping time periods requests.  */
+const int minOverlapDuration = 120 * 1000;
+
+QString dt(qint64 time)
+{
+    return QDateTime::fromMSecsSinceEpoch(time).toString(lit("MMM/dd/yyyy hh:mm:ss"));
+}
+
 }
 
 QnFlatCameraDataLoader::QnFlatCameraDataLoader(
@@ -193,11 +196,13 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
 
 void QnFlatCameraDataLoader::trace(const QString& message)
 {
-    if (m_dataType != Qn::RecordingContent)
-        return;
-
-    QString name = m_resource ? m_resource->getName() : lit("_invalid_camera_");
-    NX_VERBOSE(this, lm("Chunks: (%1) %2").arg(name).arg(message));
+    if (m_resource)
+    {
+        NX_VERBOSE(this, lm("Chunks %1: (%2) %3")
+            .arg(m_dataType == Qn::RecordingContent ? lit("rec") : lit("mot"))
+            .arg(m_resource->getName())
+            .arg(message));
+    }
 }
 
 QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():

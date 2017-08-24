@@ -1091,7 +1091,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*view*/,
     QnMediaResourceWidget* widget)
 {
-    NX_EXPECT(menu()->canTrigger(action::StartSmartSearchAction, widget));
     if (!menu()->canTrigger(action::StartSmartSearchAction, widget))
         return;
 

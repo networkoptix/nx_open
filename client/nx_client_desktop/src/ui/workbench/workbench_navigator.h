@@ -25,6 +25,8 @@
 #include <utils/threaded_chunks_merge_tool.h>
 #include <camera/thumbnails_loader.h>
 
+#include <nx/utils/disconnect_helper.h>
+
 class QAction;
 class QCompleter;
 
@@ -341,6 +343,9 @@ private:
 
     /** Timeline position animator. */
     VariantAnimator* m_positionAnimator;
+
+    QnDisconnectHelperPtr m_currentWidgetConnections;
+    QnDisconnectHelperPtr m_centralWidgetConnections;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

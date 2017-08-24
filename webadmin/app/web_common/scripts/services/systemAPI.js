@@ -129,7 +129,7 @@ angular.module('nxCommon')
 
             return promise;
         };
-        ServerConnection.prototype._setGetParams = function(url, data, auth){
+        ServerConnection.prototype._setGetParams = function(url, data, auth, absoluteUrl){
             if(auth){
                 data = data || {}
                 data.auth = auth;
@@ -138,7 +138,14 @@ angular.module('nxCommon')
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            return this.urlBase + url;
+            url = this.urlBase + url;
+            if(absoluteUrl){
+                var host = window.location.protocol + "//" +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+                url = host + url;
+            }
+            return url;
         };
         ServerConnection.prototype._get = function(url, data){
             return this._wrapRequest('GET', url, data);
@@ -310,7 +317,7 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet());
+            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
         ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
             var data = {

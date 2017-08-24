@@ -203,16 +203,24 @@ void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
         setData(format, data->data(format));
 
     auto ids = deserializeFromInternal(this->data(kInternalMimeType));
-    QSet<QnResourcePtr> resources;
+
+    m_resources.clear();
+
+    // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
     if (resourcePool)
-        resources.unite(resourcePool->getResources(ids).toSet());
+        m_resources = resourcePool->getResources(ids);
 
     if (data->hasUrls())
     {
-        resources.unite(QnFileProcessor::findOrCreateResourcesForFiles(data->urls(),
-            resourcePool).toSet());
+        auto urlResources = QnFileProcessor::findOrCreateResourcesForFiles(data->urls(),
+            resourcePool).toSet();
+
+        // Remove duplicates because resources can have both id and url.
+        for (const auto& resource: m_resources)
+            urlResources.remove(resource);
+
+        m_resources.append(urlResources.toList());
     }
-    m_resources = resources.toList();
 
     for (const auto resource: m_resources)
         ids.removeAll(resource->getId());

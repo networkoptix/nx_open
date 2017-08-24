@@ -1081,6 +1081,8 @@ void QnResourceTreeModel::updateSystemHasManyServers()
             updateNodeParent(node);
         }
     }
+
+    updateNodeParent(m_rootNodes[Qn::ServersNode]);
 }
 
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)

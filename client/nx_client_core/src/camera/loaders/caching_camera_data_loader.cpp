@@ -98,10 +98,8 @@ void QnCachingCameraDataLoader::initLoaders() {
             connect(loader, &QnAbstractCameraDataLoader::failed, this,
                 [this, dataType]()
                 {
-                    if (dataType == Qn::RecordingContent)
-                    {
-                        NX_VERBOSE(this, "Chunks: failed to load");
-                    }
+                    NX_VERBOSE(this, lm("Chunks %1: failed to load")
+                        .arg(dataType == Qn::RecordingContent ? lit("rec") : lit("mot")));
                     emit loadingFailed();
                 });
         }
@@ -269,9 +267,11 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
 
 void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodContent periodType)
 {
-    if (periodType != Qn::RecordingContent)
-        return;
-
-    QString name = m_resource ? m_resource->toResourcePtr()->getName() : lit("_invalid_camera_");
-    NX_VERBOSE(this, lm("Chunks: (cached) (%1) %2").arg(name).arg(message));
+    if (m_resource)
+    {
+        NX_VERBOSE(this, lm("Chunks (cached) %1: (%2) %3")
+            .arg(periodType == Qn::RecordingContent ? lit("rec") : lit("mot"))
+            .arg(m_resource->toResourcePtr()->getName())
+            .arg(message));
+    }
 }

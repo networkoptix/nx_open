@@ -596,6 +596,8 @@ enum IDType
      */
     CameraDiagnosticsAction,
 
+    ConvertCameraToEntropix,
+
     /**
      * Opens current layout settings dialog.
      */
