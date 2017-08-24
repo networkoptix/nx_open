@@ -34,13 +34,13 @@ TimelineActions.prototype.goToLive = function(){
     var moveDate = self.scaleManager.screenCoordinateToDate(1);
     self.animateScope.progress(self.scope, 'goingToLive' ).then(
         function(){
-            var activeDate = (new Date()).getTime();
+            var activeDate = timeManager.nowToDisplay();
             self.scaleManager.setAnchorDateAndPoint(activeDate,1);
             self.scaleManager.watchPlaying(activeDate, true);
         },
         function(){},
         function(val){
-            var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
+            var activeDate = moveDate + val * (timeManager.nowToDisplay() - moveDate);
             self.scaleManager.setAnchorDateAndPoint(activeDate,1);
         });
 };

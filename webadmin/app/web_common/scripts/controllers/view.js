@@ -242,7 +242,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             var salt = '';
             if(live){
                 salt = '&' + Math.random();
-                playingPosition = (new Date()).getTime();
+                playingPosition = timeManager.nowToDisplay();
             }else{
                 playingPosition = Math.round(playingPosition);
             }
