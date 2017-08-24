@@ -424,6 +424,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
     // !!! Draw events
     function drawOrCheckEvents(context, mouseX, mouseY){
+        mouseY *= self.pixelAspectRatio;
+        mouseX *= self.pixelAspectRatio;
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height; // Top border
 
         if(context) {
@@ -587,16 +589,18 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     // !!! Draw ScrollBar
     function drawOrCheckScrollBar(context, mouseX, mouseY, catchScrollBarSlider){
+        mouseY *= self.pixelAspectRatio;
+        mouseX *= self.pixelAspectRatio;
         var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
 
         var scrollSlider = self.scaleManager.scrollSlider();
         var startCoordinate = scrollSlider.start * self.pixelAspectRatio;
         var scrollBarSliderWidth = scrollSlider.width * self.pixelAspectRatio;
 
-        var mouseInScrollbarRow = mouseY * self.pixelAspectRatio >= top;
-        var mouseInScrollbarSlider = mouseX * self.pixelAspectRatio >= startCoordinate &&
-                                     mouseX * self.pixelAspectRatio <= startCoordinate + scrollBarSliderWidth &&
-                                     mouseY * self.pixelAspectRatio>= top;
+        var mouseInScrollbarRow = mouseY >= top;
+        var mouseInScrollbarSlider = mouseX >= startCoordinate &&
+                                     mouseX <= startCoordinate + scrollBarSliderWidth &&
+                                     mouseY >= top;
 
         if(context) {
             //1. DrawBG
@@ -745,6 +749,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
         mouseX *= self.pixelAspectRatio
+        mouseY *= self.pixelAspectRatio
         var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
         var canScrollRight = self.scaleManager.canScroll(false);
         var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth * self.pixelAspectRatio &&
@@ -886,8 +891,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
 
         var mouseOverEvents = false;
+
         if(!self.debugEventsMode) {
-            mouseOverEvents = drawOrCheckEvents(context,mouseX, mouseY);
+            mouseOverEvents = drawOrCheckEvents(context, mouseX, mouseY);
         }else{
             mouseOverEvents = drawOrCheckEvents(null, mouseX, mouseY);
             debugEvents(context);
@@ -931,7 +937,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         result.eventsRow = drawOrCheckEvents(null, mouseX, mouseY);
 
-        result.timeline = mouseY > 0 && mouseX > 0 && mouseX < canvas.width && mouseY < canvas.height;
+        result.timeline = mouseY > 0 && mouseX > 0 &&
+                          mouseX * self.pixelAspectRatio < canvas.width &&
+                          mouseY * self.pixelAspectRatio < canvas.height;
 
         return result;
     };
