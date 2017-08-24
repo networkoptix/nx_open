@@ -180,12 +180,8 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.cameras-panel-toggle{
+.cameras-panel-wrapper{
   width: 320px;
-
-  transition-timing-function: ease-in-out;
-  -webkit-transition-duration: 1s;
-  transition-duration: 1s;
 }
 
 .cameras-panel{
@@ -838,7 +834,7 @@ table.webclient-window>tbody>tr>td{
     display: inline-block !important;
   }
 
-  .cameras-panel-toggle{
+  .cameras-panel-wrapper{
     z-index: 10;
     position: absolute;
     width: 100% !important;
