@@ -199,6 +199,20 @@ function(get_dependencies)
     if(box STREQUAL "bpi")
         nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
         nx_rdep_add_package(opengl-es-mali)
+        nx_rdep_add_package(proxy-decoder-deb7)
+        nx_rdep_add_package(ldpreloadhook-1.0-deb7)
+        nx_rdep_add_package(libpixman-0.34.0-deb7)
+        nx_rdep_add_package(libcedrus-1.0-deb7)
+
+        nx_rdep_add_package(libstdc++-6.0.19)
+
+        nx_rdep_add_package(fontconfig-2.11.0)
+        nx_rdep_add_package(additional-fonts)
+        nx_rdep_add_package(libvdpau-1.0.4.1)
+
+        nx_rdep_add_package(read-edid-3.0.2)
+        nx_rdep_add_package(a10-display)
+        nx_rdep_add_package(uboot-2014.04-10733-gbb5691c-dirty-vanilla)
     endif()
 
     nx_rdep_add_package("any/certificates-${customization}" PATH_VARIABLE certificates_path)

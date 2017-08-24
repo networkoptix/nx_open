@@ -175,4 +175,8 @@ if(withTests)
     add_subdirectory(tests)
 endif()
 
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+    add_subdirectory(edge_firmware)
+endif()
+
 include(fix_qt_vars)
