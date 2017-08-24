@@ -190,9 +190,20 @@ angular.module('nxCommon')
                     }
                 }
 
+                var pausedLive = false;
                 function playPause(){
                     timelineActions.playPause();
-                    scope.playHandler(!scope.positionProvider.playing);
+                    if(scope.positionProvider.playing){
+                        pausedLive = scope.positionProvider.liveMode;
+                        scope.playHandler(false);
+                    }else if(pausedLive){
+                        scope.playHandler(true);
+                        timeout(function(){
+                            goToLive(true);
+                        });
+                    }else{
+                        scope.playHandler(true);
+                    }
                 }
 
                 function timelineClick(mouseX){

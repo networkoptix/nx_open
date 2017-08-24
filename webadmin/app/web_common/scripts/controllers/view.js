@@ -225,24 +225,26 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
-        function updateVideoSource(playing) {
+        function updateVideoSource(playingPosition) {
             if($scope.playerAPI) {
                 // Pause playing
                 $scope.playerAPI.pause();
             }
             updateAvailableResolutions();
-            var live = !playing;
+            var live = !playingPosition;
 
-            $scope.positionSelected = !!playing;
+            $scope.positionSelected = !!playingPosition;
             if(!$scope.positionProvider){
                 return;
             }
 
-            $scope.positionProvider.init(playing, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
+            var salt = '';
             if(live){
-                playing = (new Date()).getTime();
+                salt = '&' + Math.random();
+                playingPosition = (new Date()).getTime();
             }else{
-                playing = Math.round(playing);
+                playingPosition = Math.round(playingPosition);
             }
 
             if(!$scope.activeCamera){
@@ -262,8 +264,8 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
             $scope.activeVideoSource = _.filter([
-                { src: systemAPI.hlsUrl(cameraId, !live && playing, resolutionHls), type: mimeTypes.hls, transport:'hls'},
-                { src: systemAPI.webmUrl(cameraId, !live && playing, resolution), type: mimeTypes.webm, transport:'webm' }
+                { src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt, type: mimeTypes.hls, transport:'hls'},
+                { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' }
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
