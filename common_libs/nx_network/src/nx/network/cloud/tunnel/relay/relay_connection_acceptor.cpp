@@ -143,7 +143,9 @@ void ReverseConnection::relayNotificationReceived(
         m_httpPipeline->takeSocket(),
         openTunnelNotification.clientEndpoint());
     m_httpPipeline.reset();
-    nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
+
+    if (m_onConnectionActivated)
+        nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
 }
 
 } // namespace detail
