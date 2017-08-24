@@ -1048,6 +1048,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
 ScaleManager.prototype.stopWatching = function(){
     this.watchPlayingPosition = false;
+    this.watchLivePosition = false;
     this.wasForcedToStopWatchPlaying = true;
 };
 
@@ -1056,7 +1057,8 @@ ScaleManager.prototype.releaseWatching = function(){
 };
 
 ScaleManager.prototype.watchPlaying = function(date, liveMode){
-    this.watchPlayingPosition = true;
+    this.watchPlayingPosition = !liveMode;
+    this.watchLivePosition = liveMode;
     this.wasForcedToStopWatchPlaying = false;
 
     if(!date){
@@ -1100,6 +1102,14 @@ ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
 
     this.setEnd();
 
+    if(!this.wasForcedToStopWatchPlaying && this.watchLivePosition){
+        this.setAnchorDateAndPoint(this.end, 1);
+        return;
+    }
+    if(!this.wasForcedToStopWatchPlaying && !this.watchLivePosition){
+        this.checkWatchPlaying(this.end, true);
+        return;
+    }
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
         this.checkWatchPlaying(this.playedPosition, liveMode);
     }
