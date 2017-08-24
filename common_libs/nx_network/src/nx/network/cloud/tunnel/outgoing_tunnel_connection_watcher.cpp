@@ -76,9 +76,6 @@ void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
 void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
-    if (!m_tunnelConnection)
-        return post([this, handler = std::move(handler)](){ handler(m_statusCode); });
-
     using namespace std::placeholders;
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
