@@ -303,7 +303,7 @@ PageBase
             readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
 
             y: needOffset ? -header.height : 0
-            x: mainWindow.leftPadding ? -mainWindow.leftPadding : 0
+            x: -mainWindow.leftPadding
             width: mainWindow.width
             height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
 
@@ -317,10 +317,8 @@ PageBase
                     readonly property bool onlyCompactTitleIsVisible:
                         compact && title != "" && description == "" && buttonText == ""
 
-                    property bool leftSideNavigationBar: mainWindow.leftPadding > 0
-                    readonly property real navigationBarOffset: width - videoScreen.width
-                    rightPadding: 8 + (leftSideNavigationBar ? 0 : navigationBarOffset)
-                    leftPadding: 8 + (leftSideNavigationBar ? navigationBarOffset : 0)
+                    rightPadding: 8 + mainWindow.rightPadding
+                    leftPadding: 8 + mainWindow.leftPadding
                     compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
                 }
