@@ -47,7 +47,7 @@ files:
       - /webadmin/app/views/viewdebug.html
   -
     source: '/webadmin/app/web_common/commonLanguage.json'
-    translation: '/webadmin/translations/%locale_with_underscore%/commonLanguage.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/web_common/commonLanguage.json'
   -
     source: '/webadmin/app/web_common/views/**/*.*'
-    translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'
+    translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
