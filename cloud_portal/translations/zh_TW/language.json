@@ -83,24 +83,24 @@
       "description":"在系統中指定的自訂使用者角色"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"擁有者",
+      "description":"不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"瀏覽者",
+      "description":"可以瀏覽即時影像和回放錄影資料"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"即時影像瀏覽者",
+      "description":"只能瀏覽即時影像"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"進階瀏覽者",
+      "description":"可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"自訂",
+      "description":"使用 {{PRODUCT_NAME}} 用戶端應用程式以設置自訂權限"
     }
   },
   "errorCodes":{

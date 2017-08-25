@@ -29,7 +29,7 @@
     "restorePassword":"Parolayı sıfırla -",
     "restorePasswordSuccess":"Parola kaydedildi -",
     "restorePasswordCode":"Parolayı sıfırla -",
-    "view":"View cameras - ",
+    "view":"Kameraları görüntüle - ",
     "contentPage":"",
     "debug":"Hata ayıklama",
     "login":"Giriş yap -",
@@ -83,28 +83,28 @@
       "description":"Sisteminde belirtilen özel kullanıcı rolü"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Sahip",
+      "description":"Sistem'i buluttan paylaşma / bağlanma ve bağlantıyı kesme gibi sınırsız erişim"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"İzleyici",
+      "description":"Canlı video görüntüleyebilir ve arşive gözatabilir"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Canlı İzleme",
+      "description":"Sadece canlı vidyo izleyebilir"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Gelişmiş Görüntüleyici",
+      "description":"Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Özel Ayarlar",
+      "description":"Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
     }
   },
   "errorCodes":{
-    "ok":"ok",
+    "ok":"tamam",
     "cantSendActivationPrefix":"Onay e-posta gönderemezsiniz",
     "cantDisconnectSystemPrefix":"Sistem silinemiyor",
     "cantUnshareWithMeSystemPrefix":"Sistem silinemiyor",
@@ -137,7 +137,7 @@
     "cantEditAdmin":"Bu kullanıcının yönetici izinleri var",
     "cantOpenClient":"{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection":"{{systemName}} ile bağlantı kayboldu",
-    "thisSystem":"the system"
+    "thisSystem":"sistem"
   },
   "passwordRequirements":{
     "minLengthMessage":"Şifre en az 8 karakter içermelidir",
@@ -197,7 +197,7 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"Vista, 7, 8, 10, Sunucu 2003, Sunucu 2008, Sunucu 2012"
       },
       "mac":{
         "label":"Mac OS",
@@ -234,7 +234,7 @@
     "createAccount":"Hesap oluştur"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Tüm sistemler",
     "systems":"Sistemler"
   }
 }

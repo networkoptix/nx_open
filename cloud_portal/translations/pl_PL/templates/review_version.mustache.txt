@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+Jest dostępna nowa wersja {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Kliknij link, aby przejrzeć opis wersji {{ message.id }} dla {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Link do przeglądu: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+Na tej stronie możesz
+1) Przejrzeć najnowsze zmiany.
+2) Opublikować tę wersję i zaktualizować całą zawartość.
+3) Modyfikować kontekst, klikając przycisk edycji wpisu. Aby zobaczyć te zmiany, musisz stworzyć nową wersję.
