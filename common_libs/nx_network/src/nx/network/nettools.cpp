@@ -124,7 +124,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     return result;
 }
 
-QList<HostAddress> allLocalAddresses(int filter)
+QList<HostAddress> allLocalAddresses(AddressFilters filter)
 {
     QList<HostAddress> result;
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
@@ -133,7 +133,7 @@ QList<HostAddress> allLocalAddresses(int filter)
         if (!(iface.flags() & QNetworkInterface::IsUp))
             continue;
 
-        if ((iface.flags() & QNetworkInterface::IsLoopBack) && (filter & AddressFilter::noLoopback))
+        if ((iface.flags().testFlag(QNetworkInterface::IsLoopBack)) && (filter.testFlag(AddressFilter::noLoopback)))
             continue;
 
         for (const QNetworkAddressEntry& address: iface.addressEntries())
@@ -144,13 +144,13 @@ QList<HostAddress> allLocalAddresses(int filter)
             const bool isLocalIpV4 = isIpV4 && (address.ip() == QHostAddress::LocalHost);
             const bool isLocalHost = isLocalIpV6 || isLocalIpV4;
 
-            if (isLocalHost && (filter & AddressFilter::noLocal))
+            if (isLocalHost && (filter.testFlag(AddressFilter::noLocal)))
                 continue;
 
-            if (isIpV4 && (filter & AddressFilter::ipV4))
+            if (isIpV4 && (filter.testFlag(AddressFilter::ipV4)))
                 result << HostAddress(address.ip().toString());
 
-            if (isIpV6 && (filter & AddressFilter::ipV6))
+            if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
                 result << HostAddress(address.ip().toString());
         }
     }

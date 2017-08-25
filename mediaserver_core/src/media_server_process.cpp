@@ -1248,8 +1248,7 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    int addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal
-        | AddressFilter::noLoopback;
+    AddressFilters addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal | AddressFilter::noLoopback;
 
     QList<SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();

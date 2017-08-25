@@ -62,15 +62,17 @@ QList<QHostAddress> NX_NETWORK_API allLocalIpV4Addresses();
 /** Filter mask for allLocalAddresses()*/
 enum AddressFilter
 {
-    ipV4 = 1,
-    ipV6 = 2,
-    noLocal = 4,
-    noLoopback = 8
+    ipV4 = 1 << 0,
+    ipV6 = 1 << 1,
+    noLocal = 1 << 2,
+    noLoopback = 1 << 3
 };
+Q_DECLARE_FLAGS(AddressFilters, AddressFilter)
+Q_DECLARE_OPERATORS_FOR_FLAGS(AddressFilters)
 /**
  * returns list of all IP addresses of current machine. Filters result by filter param.
  */
-QList<HostAddress> NX_NETWORK_API allLocalAddresses(int filter);
+QList<HostAddress> NX_NETWORK_API allLocalAddresses(AddressFilters filter);
 
 //returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
 QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
