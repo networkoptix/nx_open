@@ -52,7 +52,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             'webm': 'video/webm',
             'flv': 'video/x-flv',
             'mp4': 'video/mp4',
-            'mjpeg':'video/x-motion-jpeg'
+            'mjpeg':'video/x-motion-jpeg',
+            'jpeg': 'image/jpeg'
         };
 
         $scope.activeFormat = 'Auto';
@@ -118,6 +119,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
 
         function formatSupported(type, nativeOnly){
+            if(type == 'preview'){
+                return true;
+            }
             return cameraSupports(type) && browserSupports(type, true, nativeOnly);
         }
 
@@ -265,7 +269,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
             $scope.activeVideoSource = _.filter([
                 { src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt, type: mimeTypes.hls, transport:'hls'},
-                { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' }
+                { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
+                { src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt, type: mimeTypes.jpeg, transport:'preview'}
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });

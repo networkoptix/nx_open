@@ -95,7 +95,6 @@ angular.module('nxCommon')
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
                 camera.preview = self.systemAPI.previewUrl(camera.id, false, null, Config.webclient.leftPanelPreviewHeight);
-                camera.fullPreview = self.systemAPI.previewUrl(camera.id, false, null, window.screen.availHeight);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';

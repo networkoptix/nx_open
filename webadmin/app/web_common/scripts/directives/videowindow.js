@@ -32,8 +32,7 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
-                playing: "=",
-                preview: "="
+                playing: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -43,7 +42,8 @@ angular.module('nxCommon')
                     'webm': 'video/webm',
                     'rtsp': 'application/x-rtsp',
                     'flv': 'video/x-flv',
-                    'mp4': 'video/mp4'
+                    'mp4': 'video/mp4',
+                    'jpeg': 'image/jpeg'
                 };
                 scope.Config = Config;
                 scope.debugMode = Config.allowDebugMode;
@@ -180,8 +180,6 @@ angular.module('nxCommon')
                     return false; // IE9 - No supported formats
                 }
 
-
-                //TODO: remove ID, generate it dynamically
 
                 function recyclePlayer(player){
                     if(scope.player != player || !player) {
@@ -370,6 +368,7 @@ angular.module('nxCommon')
                 function srcChanged(){
                     scope.loading = true; // source changed - start loading
                     scope.videoFlags.errorLoading = false;
+                    scope.preview = getFormatSrc('jpeg');
 
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
