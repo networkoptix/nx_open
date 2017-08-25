@@ -1409,7 +1409,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>שחזור נתיב הביקורת</translation>
     </message>
   </context>
   <context>

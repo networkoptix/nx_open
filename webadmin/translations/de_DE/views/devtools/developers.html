@@ -1,28 +1,13 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
-    <div>
+    <div ng-if="developersFeedbackForm">
         <h2>Entwickler Tools</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Bist du glücklich, Intergrationen zu entwickeln? Lass es uns wissen.
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Feedback hinterlassen</a></p>
     </div>
-    <div>
-        <h3>Camera Details Panel</h3>
-        <p>
-            Special panel for a webclient which displays additional information for cameras:
-        </p>
-        <ul>
-            <li>Kamera-ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
-        </ul>
-        <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
-        </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
-    </div>
+
     <div>
         <h3>Generic Events Generator</h3>
         <p>
@@ -33,9 +18,12 @@
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
-        <h3>Server-API</h3>
+        <h3>Server API</h3>
         <p>
-            Die Server-API stellt ein Standardset von API-Aurufen für 3rd-Party-Systeme bereit. Es gibt Entwicklern die Möglichkeit auf fast jede Systemfunktion im normalen Client zugreifen: Abfrage/Verwaltung von Systemressourcen (Server, Kameras, Benutzer, Berechtigungen), Live- oder aufgezeichnete Videos aus dem System ziehen, Ereignisse generieren, Regeln erstellen, PTZ-Kameras steuern und vieles mehr.
+            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
+            access almost every system feature available in the regular client: query/manage system resources (servers,
+            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
+            control PTZ cameras, and more.
         </p>
         <p>
             <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
@@ -45,6 +33,22 @@
             <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
         </p>
 
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
     </div>
     <div>
         <h3>Video Source Integration SDK</h3>
