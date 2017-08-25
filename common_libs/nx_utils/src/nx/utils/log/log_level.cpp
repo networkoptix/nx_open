@@ -82,6 +82,11 @@ QString toString(Level level)
     return lm("unknown(%1)").arg(static_cast<int>(level));
 }
 
+Tag::Tag(const std::type_info& info):
+    m_value(::toString(info))
+{
+}
+
 Tag::Tag(QString s):
     m_value(std::move(s))
 {

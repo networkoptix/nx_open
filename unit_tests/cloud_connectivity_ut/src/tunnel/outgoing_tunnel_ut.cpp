@@ -831,6 +831,8 @@ TEST_F(OutgoingTunnel, pool)
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class OutgoingTunnelCancellation:
     public OutgoingTunnel
 {

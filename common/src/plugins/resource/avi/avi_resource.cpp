@@ -54,6 +54,17 @@ QnAspectRatio QnAviResource::imageAspectRatio() const
     return m_imageAspectRatio;
 }
 
+bool QnAviResource::hasAviMetadata() const
+{
+    return m_aviMetadata.is_initialized();
+}
+
+const QnAviArchiveMetadata& QnAviResource::aviMetadata() const
+{
+    NX_EXPECT(m_aviMetadata.is_initialized());
+    return m_aviMetadata.get();
+}
+
 QString QnAviResource::toString() const
 {
     return getName();
@@ -144,6 +155,24 @@ QnMediaDewarpingParams QnAviResource::getDewarpingParams() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_aviMetadata ? m_aviMetadata->dewarpingParams : base_type::getDewarpingParams();
+}
+
+void QnAviResource::setDewarpingParams(const QnMediaDewarpingParams& params)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_aviMetadata)
+    {
+        if (m_aviMetadata->dewarpingParams == params)
+            return;
+
+        m_aviMetadata->dewarpingParams = params;
+        lock.unlock();
+        emit mediaDewarpingParamsChanged(toResourcePtr());
+    }
+    else
+    {
+        base_type::setDewarpingParams(params);
+    }
 }
 
 qreal QnAviResource::customAspectRatio() const

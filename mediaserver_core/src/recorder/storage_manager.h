@@ -289,7 +289,6 @@ private:
     nx::caminfo::Writer m_camInfoWriter;
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
-    bool m_lowSysStorageSpaceWarnShown;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

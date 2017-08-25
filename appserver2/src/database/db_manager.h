@@ -582,7 +582,6 @@ namespace detail
 
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
-        qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
     public:

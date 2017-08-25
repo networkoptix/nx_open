@@ -84,6 +84,7 @@
   }
 }
 
+.glyphicon-server-online,
 .glyphicon-server-active,
 .glyphicon-server-offline
 {
@@ -92,9 +93,15 @@
   height: 22px;
   width: 22px;
 }
-.glyphicon-server-active{
-  background-position: -1px -170px;
+
+.glyphicon-server-online{
+  background-position: -2px -170px;
 }
+
+.glyphicon-server-active{
+  background-position: -26px -170px;
+}
+
 .glyphicon-server-offline{
   background-position: -50px -170px
 }

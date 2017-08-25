@@ -6,7 +6,7 @@
         "unknown": "Unknown",
         "copyToClipboard": "Copy to clipboard",
         "copyDefaultText": "Copy",
-        "copyActiveText": "Link Copied"
+        "copyActiveText": "Copied to clipboard"
     },
     "systemOffline":"System Offline",
     "cameraStates":{

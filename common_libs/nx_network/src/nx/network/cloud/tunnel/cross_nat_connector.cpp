@@ -262,7 +262,6 @@ void CrossNatConnector::onConnectorFinished(
             std::move(m_connectionParameters),
             std::move(connection));
         tunnelWatcher->bindToAioThread(getAioThread());
-        tunnelWatcher->start();
         m_connection = std::move(tunnelWatcher);
     }
     holePunchingDone(resultCode, sysErrorCode);

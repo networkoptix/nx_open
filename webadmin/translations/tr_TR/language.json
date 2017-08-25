@@ -1,5 +1,5 @@
 {
-  "language_name":"Türk",
+  "language_name":"DİL ADI",
   "dialogs":{
     "okButton":"Tamam",
     "openLink":"Bu bağlantıyı ziyaret edin",
@@ -109,6 +109,6 @@
     "reserved":"Rezerve"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} web arayüzü"
   }
 }

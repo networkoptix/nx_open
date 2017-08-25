@@ -40,11 +40,7 @@ var Config = {
     visualLog: false,
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
-        video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//'flashls', // videowindow.js - force video player
         chunksOnTimeline: false, // timeline.js - draw debug events
-        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
-        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
     },
     helpLinks: [
         // Additional Links to show in help
@@ -125,7 +121,14 @@ var Config = {
         disableVolume: true,
         reloadInterval: 5*1000,
         leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
-        resetDisplayedTextTimer: 3 * 1000
+        resetDisplayedTextTimer: 3 * 1000,
+        hlsLoadingTimeout: 60 * 1000,
+            // One minute timeout for manifest:
+            // * 30 seconds for server to init camera
+            // * 20 seconds for chunks
+            // * 10 seconds extra
+        flashChromelessPath: "web_common/components/flashlsChromeless.swf",
+        flashChromelessDebugPath: "web_common/components/flashlsChromeless_debug.swf"
     },
     debugEvents: {
         events: [

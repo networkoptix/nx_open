@@ -108,7 +108,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 {
     const int reqID = generateRequestID();
     ApiResetBusinessRuleData params;
-    fromResourceListToApi(vms::event::Rule::getDefaultRules(), params.defaultRules);
+    // providing event rules set from the client side is rather incorrect way of reset.
 
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

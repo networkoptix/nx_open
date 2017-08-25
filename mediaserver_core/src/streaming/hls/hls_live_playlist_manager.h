@@ -25,9 +25,7 @@ namespace nx_hls
         - Updates playlist in real-time (by registering itself as an MediaStreamCache event receiver)
         - Blocks must-be-available chunks data from removal from MediaStreamCache
     */
-    class HLSLivePlaylistManager
-    :
-        public QnMediaStreamEventReceiver,
+    class HLSLivePlaylistManager:
         public AbstractPlaylistManager
     {
     public:
@@ -64,9 +62,11 @@ namespace nx_hls
         int m_blockID;
         const int m_removedChunksToKeepCount;
         mutable QElapsedTimer m_inactivityTimer;
+        nx::utils::SubscriptionId m_onKeyFrameSubscriptionId;
+        nx::utils::SubscriptionId m_onDiscontinueSubscriptionId;
 
-        virtual void onKeyFrame(quint64 currentPacketTimestampUSec) override;
-        virtual void onDiscontinue() override;
+        void onKeyFrame(quint64 currentPacketTimestampUSec);
+        void onDiscontinue();
     };
 
     //!Using std::shared_ptr for \a std::shared_ptr::unique()

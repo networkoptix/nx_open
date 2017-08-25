@@ -483,9 +483,14 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             }
             for (var i = 0; i < chunksToIterate; i++) {
                 var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
-                if (chunks[i].durationMs < 0) {
+                if (chunks[i].durationMs < 0 || endChunk > timeManager.nowToDisplay()) {
                     endChunk = timeManager.nowToDisplay();// current moment
                 }
+
+                if(chunks[i].startTimeMs > endChunk){
+                    continue; // Chunk is from future - do not add
+                }
+
                 var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
             }

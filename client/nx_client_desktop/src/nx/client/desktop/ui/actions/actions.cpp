@@ -19,6 +19,8 @@
 
 #include <nx/utils/app_info.h>
 
+#include <ini.h>
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
 namespace nx {
@@ -1296,6 +1298,21 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new AutoStartAllowedCondition())
             && !condition::isSafeMode());
 
+    factory(ConvertCameraToEntropix)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(lit("Convert to Entropix Camera"))
+        .conditionalText(
+            lit("Convert to Normal Camera"),
+            condition::isEntropixCamera())
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::isTrue(ini().enableEntropixEnhancer)
+            && condition::hasFlags(Qn::live_cam, Any)
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
+
     factory(ServerAddCameraManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
@@ -1684,7 +1701,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(PinCalendarAction)
-        .flags(NoTarget);
+        .flags(NoTarget)
+        .checkable();
 
     factory(MinimizeDayTimeViewAction)
         .text(ContextMenu::tr("Minimize")) //< To be displayed on button tooltip

@@ -1,14 +1,14 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          ${deb.customization.company.name}-mediaserver
+# Provides:          @deb.customization.company.name@-mediaserver
 # Required-Start:    networking
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: ${company.name} ${product.name} Media Server
+# Short-Description: @company.name@ @product.name@ Media Server
 ### END INIT INFO
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="@deb.customization.company.name@"
 
 INSTALL_DIR="/opt/$CUSTOMIZATION"
 LIBS_DIR="$INSTALL_DIR/lib"

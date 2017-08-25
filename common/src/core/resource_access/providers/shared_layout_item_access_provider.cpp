@@ -163,7 +163,7 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
 
     auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
         sharedResourcesManager()->sharedResources(subject));
-    for (auto layout : sharedLayouts)
+    for (auto layout: sharedLayouts)
         aggregator->addWatchedLayout(layout);
 
     base_type::handleSubjectAdded(subject);
@@ -191,7 +191,9 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     if (!subject.isValid())
         return;
 
-    auto aggregator = ensureAggregatorForSubject(subject);
+    auto aggregator = findAggregatorForSubject(subject);
+    if (!aggregator)
+        return;
 
     auto added = (newValues - oldValues);
     auto removed = (oldValues - newValues);
@@ -223,8 +225,25 @@ void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResour
         if (!shared.contains(layoutId))
             continue;
 
-        ensureAggregatorForSubject(subject)->addWatchedLayout(layout);
+        if (auto aggregator = findAggregatorForSubject(subject))
+            aggregator->addWatchedLayout(layout);
     }
+}
+
+QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::findAggregatorForSubject(
+    const QnResourceAccessSubject& subject)
+{
+    NX_EXPECT(mode() == Mode::cached);
+
+    auto id = subject.id();
+    {
+        QnMutexLocker lk(&m_mutex);
+        const auto existing = m_aggregatorsBySubject.constFind(id);
+        if (existing != m_aggregatorsBySubject.cend())
+            return *existing;
+    }
+
+    return QnLayoutItemAggregatorPtr();
 }
 
 QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForSubject(
@@ -234,7 +253,8 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForS
 
     auto id = subject.id();
 
-    auto updateAccessToResourceBySubject = [this, subject](const QnUuid& resourceId)
+    auto updateAccessToResourceBySubject =
+        [this, subject](const QnUuid& resourceId)
         {
             if (isUpdating())
                 return;

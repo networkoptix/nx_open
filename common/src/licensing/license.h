@@ -21,6 +21,7 @@
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_license_data.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -40,9 +41,10 @@ class QnLicense
 {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-    QnLicense();
+    QnLicense() = default;
     QnLicense(const QByteArray& licenseBlock);
-    virtual ~QnLicense();
+    QnLicense(const ec2::ApiDetailedLicenseData& value);
+    virtual ~QnLicense() = default;
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
 
@@ -78,6 +80,7 @@ public:
     bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
+    static QnLicensePtr createFromKey(const QByteArray& key);
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);

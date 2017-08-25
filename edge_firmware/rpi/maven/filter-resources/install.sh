@@ -10,11 +10,12 @@ exec 2<&- #< Close stderr fd.
 exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
 exec 2>&1 #< Redirect stderr to stdout.
 
+BOX="@box@"
 FAILURE_FLAG="/var/log/bpi-upgrade-failed.flag"
-CUSTOMIZATION="${deb.customization.company.name}"
+CUSTOMIZATION="@deb.customization.company.name@"
 INSTALL_PATH="opt/$CUSTOMIZATION"
 MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
-DISTRIB="${artifact.name.server}"
+DISTRIB="@artifact.name.server@"
 STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
 TAR_FILE="./$DISTRIB.tar.gz"
 
@@ -88,7 +89,7 @@ upgradeVms()
         dpkg -i cifs-utils/*.deb
     fi
 
-    if [[ "${box}" == "bpi" ]]; then
+    if [ "$BOX" = "bpi" ]; then
         # Avoid grabbing libstdc++ from mediaserver lib folder.
         export LD_LIBRARY_PATH=""
 
@@ -169,7 +170,7 @@ main()
 
     sync
 
-    if [ "${box}" = "bpi" ]; then
+    if [ "$BOX" = "bpi" ]; then
         reboot
         exit 0
     fi

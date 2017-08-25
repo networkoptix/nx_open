@@ -9,7 +9,7 @@ angular.module('nxCommon')
             return url.indexOf('//') >= 0 ? url : "//"+url;
         };
     })
-    .directive('cameraLinks', [function () {
+    .directive('cameraLinks', ['systemAPI', function (systemAPI) {
         return {
             restrict: 'E',
             scope: {
@@ -23,14 +23,17 @@ angular.module('nxCommon')
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
+                scope.debugMode = Config.allowDebugMode;
+                
                 var systemAPI = scope.system;
-                scope.position = 0;
-                scope.duration = 5*60;
-                scope.resolution = '640p';
-                scope.useAuth = false;
-                scope.useCredentials = false;
-                scope.useLogin = 'login';
-                scope.usePassword = 'password';
+                scope.linkSettings = {
+                    duration: 5*60,
+                    resolution: '640p',
+                    useAuth: false,
+                    useCredentials: false,
+                    useLogin: 'login',
+                    usePassword: 'password'
+                }
                 scope.L = L;
 
                 scope.streamName = function(stream){
@@ -51,23 +54,22 @@ angular.module('nxCommon')
                         'hls':'http://{{credentials}}{{host}}/hls/{{cameraId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
                         'rtsp':'rtsp://{{credentials}}{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}{{auth}}',
                         'transrtsp':'rtsp://{{credentials}}{{host}}/{{cameraId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
-                        'webm':'http://{{credentials}}{{host}}/media/{{cameraId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
-                        'mjpeg':'http://{{credentials}}{{host}}/media/{{cameraId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
+                        'webm':'http://{{credentials}}{{host}}/media/{{cameraId}}.webm?resolution={{resolution}}{{position}}{{auth}}',
+                        'mjpeg':'http://{{credentials}}{{host}}/media/{{cameraId}}.mpjpeg?resolution={{resolution}}{{position}}{{auth}}',
                         'download':'http://{{credentials}}{{host}}/hls/{{cameraId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
 
                     return linkTemplates[transport].
-                        replace("{{credentials}}", scope.useCredentials?(scope.useLogin + ':' + scope.usePassword + '@'):'').
-                        replace("{{host}}", window.location.host).
+                        replace("{{credentials}}", scope.linkSettings.useCredentials?(scope.linkSettings.useLogin + ':' + scope.linkSettings.usePassword + '@'):'').
+                        replace("{{host}}", systemAPI.apiHost()). // window.location.host
                         replace("{{cameraId}}", camera.id.replace('{','').replace('}','')).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (systemAPI.authGet())).
+                        replace("{{auth}}", !scope.linkSettings.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + Math.round(scope.position)).
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + Math.round(scope.position)).
-                        replace("{{duration}}", scope.duration).
-                        replace("{{resolution}}", scope.resolution);
+                        replace("{{duration}}", scope.linkSettings.duration).
+                        replace("{{resolution}}", scope.linkSettings.resolution);
                 };
 
                 scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'WEBM' : 'HLS'});

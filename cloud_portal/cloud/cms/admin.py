@@ -61,7 +61,7 @@ admin.site.register(Context, ContextAdmin)
 
 class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'name', 'description', 'translatable', 'type')
-    list_filter = ('context', 'translatable', 'language')
+    list_filter = ('context', 'translatable')
     search_fields = ('context__name', 'name', 'description', 'type')
 
 admin.site.register(DataStructure, DataStructureAdmin)
@@ -82,7 +82,7 @@ class DataRecordAdmin(CMSAdmin):
                     'data_structure', 'short_description', 'version')
     list_filter = ('data_structure', 'customization', 'language')
     search_fields = ('data_structure__name', 'customization__name',
-                     'short_description', 'value', 'language__code')
+                     'data_structure__short_description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
 

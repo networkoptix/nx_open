@@ -110,6 +110,7 @@ def run_options(request):
     vm_host = request.config.getoption('--vm-host')
     if vm_host:
         vm_ssh_host_config = SshHostConfig(
+            name='vm_host',
             host=vm_host,
             user=request.config.getoption('--vm-host-user'),
             key_file_path=request.config.getoption('--vm-host-key'))
