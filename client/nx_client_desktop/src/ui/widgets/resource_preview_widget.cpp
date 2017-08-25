@@ -23,7 +23,6 @@
 namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
-static const QSize kFrameSize(2, 2);
 
 /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
@@ -183,7 +182,7 @@ QSize QnResourcePreviewWidget::sizeHint() const
                 m_cachedSizeHint = minimumSize();
         }
 
-        const QSize maxSize = maximumSize() - kFrameSize;
+        const QSize maxSize = maximumSize();
 
         qreal oversizeCoefficient = qMax(
             static_cast<qreal>(m_cachedSizeHint.width()) / maxSize.width(),
@@ -191,8 +190,6 @@ QSize QnResourcePreviewWidget::sizeHint() const
 
         if (oversizeCoefficient > 1.0)
             m_cachedSizeHint /= oversizeCoefficient;
-
-        m_cachedSizeHint += kFrameSize;
     }
 
     return m_cachedSizeHint;
@@ -234,6 +231,9 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 
 void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
 {
-    m_preview->setPixmap(QPixmap::fromImage(image));
+    m_preview->setPixmap(QPixmap::fromImage(image.size().height() > maximumHeight()
+        ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
+        : image));
+
     invalidateGeometry();
 }
