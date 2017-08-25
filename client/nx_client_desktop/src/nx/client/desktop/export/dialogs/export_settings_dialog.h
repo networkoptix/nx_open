@@ -61,6 +61,8 @@ private:
     ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent = nullptr);
 
     void setupSettingsButtons();
+    void setMediaResource(const QnMediaResourcePtr& media);
+    void updateSettingsWidgets();
 
 private:
     class Private;

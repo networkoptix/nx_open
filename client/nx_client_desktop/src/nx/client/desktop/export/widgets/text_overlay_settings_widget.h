@@ -24,8 +24,8 @@ public:
     const ExportTextOverlaySettings& data() const;
     void setData(const ExportTextOverlaySettings& data);
 
-    int maximumWidth() const;
-    void setMaximumWidth(int value);
+    int maxOverlayWidth() const;
+    void setMaxOverlayWidth(int value);
 
 signals:
     void dataChanged(const ExportTextOverlaySettings& data);

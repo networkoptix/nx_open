@@ -13,6 +13,12 @@ namespace client {
 namespace desktop {
 namespace ui {
 
+namespace {
+
+static const QSize kPreviewSize(512, 288);
+
+} // namespace
+
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnTimePeriod& timePeriod,
@@ -20,7 +26,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     :
     ExportSettingsDialog(timePeriod, parent)
 {
-    d->setMediaResource(widget->resource());
+    setMediaResource(widget->resource());
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -31,17 +37,34 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, parent)
 {
     ui->layoutTab->setVisible(false);
-    d->setMediaResource(media);
+    setMediaResource(media);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent)
     :
     base_type(parent),
-    d(new Private()),
+    d(new Private(kPreviewSize)),
     ui(new Ui::ExportSettingsDialog)
 {
     ui->setupUi(this);
-    d->createOverlays(ui->cameraPreviewWidget);
+    ui->mediaPreviewLayout->setAlignment(Qt::AlignCenter);
+    ui->mediaPreviewLayout->setAlignment(Qt::AlignCenter);
+
+    ui->mediaPreviewWidget->setMaximumSize(kPreviewSize);
+    ui->layoutPreviewWidget->setMaximumSize(kPreviewSize);
+
+    ui->mediaFrame->setFixedSize(kPreviewSize
+        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
+    ui->layoutFrame->setFixedSize(kPreviewSize
+        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
+
+    ui->mediaExportSettingsWidget->setMaximumHeight(ui->mediaFrame->maximumHeight());
+    ui->layoutExportSettingsWidget->setMaximumHeight(ui->layoutFrame->maximumHeight());
+
+    autoResizePagesToContents(ui->tabWidget,
+        QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed), true);
+
+    d->createOverlays(ui->mediaPreviewWidget);
 
     setupSettingsButtons();
 
@@ -58,17 +81,16 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     d->setTimePeriod(timePeriod);
 
+    updateSettingsWidgets();
+
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
-    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
         d, &Private::setTimestampOverlaySettings);
 
-    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
     connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::dataChanged,
         d, &Private::setImageOverlaySettings);
 
-    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged,
         d, &Private::setTextOverlaySettings);
 
@@ -171,7 +193,7 @@ void ExportSettingsDialog::setupSettingsButtons()
                 return;
 
             const auto page = selected->property(kPagePropertyName).value<QWidget*>();
-            ui->stackedWidget->setCurrentWidget(page);
+            ui->mediaExportSettingsWidget->setCurrentWidget(page);
         });
 
     connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
@@ -207,6 +229,24 @@ const ExportMediaSettings& ExportSettingsDialog::exportMediaSettings() const
 const ExportLayoutSettings& ExportSettingsDialog::exportLayoutSettings() const
 {
     return d->exportLayoutSettings();
+}
+
+void ExportSettingsDialog::updateSettingsWidgets()
+{
+    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
+    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
+    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
+}
+
+void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
+{
+    d->setMediaResource(media);
+    ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
+
+    ui->imageSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
+    ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
+
+    updateSettingsWidgets();
 }
 
 } // namespace ui

@@ -2,6 +2,10 @@
 
 #include <QtCore/QFileInfo>
 
+#include <camera/camera_thumbnail_manager.h>
+#include <camera/single_thumbnail_loader.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -12,8 +16,9 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-ExportSettingsDialog::Private::Private(QObject* parent):
-    base_type(parent)
+ExportSettingsDialog::Private::Private(const QSize& previewSize, QObject* parent):
+    base_type(parent),
+    m_previewSize(previewSize)
 {
 }
 
@@ -35,6 +40,42 @@ void ExportSettingsDialog::Private::loadSettings()
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
 {
     m_exportMediaSettings.mediaResource = media;
+    m_mediaImageProvider.reset();
+    m_fullFrameSize = QSize();
+
+    const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    // TODO: FIXME: #vkutin #gdm Handle non-camera resources.
+
+    m_fullFrameSize = QnCameraThumbnailManager::sizeHintForCamera(camera, QSize());
+
+    const QPair<qreal, qreal> coefficients(
+        qreal(m_previewSize.width()) / m_fullFrameSize.width(),
+        qreal(m_previewSize.height()) / m_fullFrameSize.height());
+
+    const auto overlayScale = qMin(coefficients.first, coefficients.second);
+
+    for (size_t i = 0; i != overlayCount; ++i)
+        m_overlays[i]->setScale(overlayScale);
+
+    const auto thumbnailSizeLimit = coefficients.first >= coefficients.second
+        ? QSize(m_previewSize.width(), 0)
+        : QSize(0, m_previewSize.height());
+
+    m_mediaImageProvider.reset(new QnSingleThumbnailLoader(
+        camera,
+        -1, //< Live.
+        QnThumbnailRequestData::kDefaultRotation,
+        thumbnailSizeLimit));
+
+    m_mediaImageProvider->loadAsync();
+
+    // Set defaults that depend on frame size.
+    m_exportMediaSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
+    m_exportMediaSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
+    m_exportMediaSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
@@ -128,6 +169,7 @@ void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
 
             auto palette = overlay->palette();
             palette.setColor(QPalette::Text, data.foreground);
+            palette.setColor(QPalette::Window, Qt::transparent);
             overlay->setPalette(palette);
 
             updateTimestampText();
@@ -198,16 +240,14 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
     auto timestampOverlay = overlay(OverlayType::timestamp);
     timestampOverlay->setTextIndent(0);
 
-    auto timer = new QTimer(timestampOverlay);
-    QObject::connect(timer, &QTimer::timeout, [this]() { updateTimestampText(); });
-    timer->start(1000); //< Once a second.
-
     static constexpr qreal kShadowBlurRadius = 3.0;
     timestampOverlay->setShadow(Qt::black, QPointF(), kShadowBlurRadius);
 }
 
 void ExportSettingsDialog::Private::updateTimestampText()
 {
+    // TODO: FIXME: #vkutin Change to beginning of selection
+
     auto currentDayTime = qnSyncTime->currentDateTime();
     currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
 
@@ -223,6 +263,16 @@ ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
 const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type) const
 {
     return m_overlays[int(type)];
+}
+
+QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
+{
+    return m_mediaImageProvider.data();
+}
+
+QSize ExportSettingsDialog::Private::fullFrameSize() const
+{
+    return m_fullFrameSize;
 }
 
 } // namespace ui

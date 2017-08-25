@@ -16,7 +16,7 @@ namespace {
 static constexpr int kMinimumWidth = 60;
 
 static constexpr int kMinimumFontSize = 8;
-static constexpr int kMaximumFontSize = 48;
+static constexpr int kMaximumFontSize = 400;
 
 } // namespace
 
@@ -91,12 +91,12 @@ void TextOverlaySettingsWidget::setData(const ExportTextOverlaySettings& data)
     emit dataChanged(m_data);
 }
 
-int TextOverlaySettingsWidget::maximumWidth() const
+int TextOverlaySettingsWidget::maxOverlayWidth() const
 {
     return ui->widthSlider->maximum();
 }
 
-void TextOverlaySettingsWidget::setMaximumWidth(int value)
+void TextOverlaySettingsWidget::setMaxOverlayWidth(int value)
 {
     ui->widthSlider->setMaximum(value);
 }

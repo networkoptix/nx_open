@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1185</width>
-    <height>757</height>
+    <width>848</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
+   </property>
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -57,11 +60,8 @@
        <property name="spacing">
         <number>16</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QWidget" name="cameraPreviewWidget" native="true"/>
-       </item>
-       <item row="0" column="1">
-        <widget class="QStackedWidget" name="stackedWidget">
+       <item row="0" column="2">
+        <widget class="QStackedWidget" name="mediaExportSettingsWidget">
          <property name="minimumSize">
           <size>
            <width>280</width>
@@ -84,7 +84,41 @@
          <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
+       <item row="0" column="0" colspan="2">
+        <widget class="QFrame" name="mediaFrame">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QVBoxLayout" name="mediaPreviewLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QnResourcePreviewWidget" name="mediaPreviewWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
         <widget class="QWidget" name="buttonsWidget" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
@@ -196,10 +230,7 @@
        <property name="spacing">
         <number>16</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QWidget" name="layoutPreviewWidget" native="true"/>
-       </item>
-       <item row="0" column="1">
+       <item row="0" column="2">
         <widget class="QStackedWidget" name="layoutExportSettingsWidget">
          <property name="minimumSize">
           <size>
@@ -219,23 +250,57 @@
          <widget class="nx::client::desktop::ui::ExportLayoutSettingsWidget" name="exportLayoutSettingsPage"/>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
+       <item row="0" column="0" colspan="2">
+        <widget class="QFrame" name="layoutFrame">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QVBoxLayout" name="layoutPreviewLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="layoutPreviewWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
         <widget class="QWidget" name="layoutButtonsWidget" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="spacing">
            <number>4</number>
           </property>
           <property name="leftMargin">
-           <number>16</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>16</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>16</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>16</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="nx::client::desktop::ui::SelectableTextButton" name="layoutExportSettingsButton">
@@ -332,6 +397,12 @@
    <class>nx::client::desktop::FilenamePanel</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/common/widgets/filename_panel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnResourcePreviewWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/resource_preview_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

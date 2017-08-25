@@ -123,12 +123,12 @@ void ImageOverlaySettingsWidget::setData(const ExportImageOverlaySettings& data)
     emit dataChanged(m_data);
 }
 
-int ImageOverlaySettingsWidget::maximumWidth() const
+int ImageOverlaySettingsWidget::maxOverlayWidth() const
 {
     return ui->sizeSlider->maximum();
 }
 
-void ImageOverlaySettingsWidget::setMaximumWidth(int value)
+void ImageOverlaySettingsWidget::setMaxOverlayWidth(int value)
 {
     return ui->sizeSlider->setMaximum(value);
 }

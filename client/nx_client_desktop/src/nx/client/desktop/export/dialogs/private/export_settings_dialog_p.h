@@ -14,6 +14,7 @@
 #include <utils/common/connective.h>
 
 class QWidget;
+class QnImageProvider;
 
 namespace nx {
 namespace client {
@@ -39,7 +40,7 @@ public:
         overlayCount
     };
 
-    explicit Private(QObject* parent = nullptr);
+    explicit Private(const QSize& previewSize, QObject* parent = nullptr);
     virtual ~Private() override;
 
     void loadSettings();
@@ -67,6 +68,9 @@ public:
     ExportOverlayWidget* overlay(OverlayType type);
     const ExportOverlayWidget* overlay(OverlayType type) const;
 
+    QnImageProvider* mediaImageProvider() const;
+    QSize fullFrameSize() const;
+
 signals:
     void statusChanged(ErrorCode value);
 
@@ -77,6 +81,7 @@ private:
     void updateTimestampText();
 
 private:
+    const QSize m_previewSize;
     ExportSettingsDialog::Mode m_mode = Mode::Media;
     ErrorCode m_status = ErrorCode::ok;
     ExportMediaSettings m_exportMediaSettings;
@@ -84,6 +89,9 @@ private:
 
     static constexpr size_t overlayCount = size_t(OverlayType::overlayCount);
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
+
+    QScopedPointer<QnImageProvider> m_mediaImageProvider;
+    QSize m_fullFrameSize;
 };
 
 } // namespace ui

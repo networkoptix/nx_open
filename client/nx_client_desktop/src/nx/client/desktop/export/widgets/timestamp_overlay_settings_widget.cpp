@@ -13,7 +13,7 @@ namespace ui {
 namespace {
 
 static constexpr int kMinimumFontSize = 8;
-static constexpr int kMaximumFontSize = 48;
+static constexpr int kMaximumFontSize = 400;
 
 } // namespace
 
