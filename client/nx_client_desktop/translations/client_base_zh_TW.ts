@@ -1392,7 +1392,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>使用者行為記錄重播</translation>
     </message>
   </context>
   <context>

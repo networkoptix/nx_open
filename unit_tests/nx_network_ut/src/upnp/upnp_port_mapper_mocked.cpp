@@ -4,9 +4,8 @@
 namespace nx_upnp {
 namespace test {
 
-AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
-    : m_externalIp( externalIp )
-    , m_disabledPort( 80 )
+AsyncClientMock::AsyncClientMock():
+    m_disabledPort( 80 )
 {
     m_thread = nx::utils::thread(
         [this]()
@@ -26,7 +25,8 @@ void AsyncClientMock::externalIp(
         const QUrl& /*url*/,
         std::function< void( const HostAddress& ) > callback )
 {
-    m_tasks.push( [ this, callback ]{ callback( m_externalIp ); } );
+    QnMutexLocker lock( &m_mutex );
+    m_tasks.push( [ this, callback, ip = m_externalIp ]{ callback( ip ); } );
 }
 
 void AsyncClientMock::addMapping(
@@ -61,7 +61,7 @@ void AsyncClientMock::deleteMapping(
 void AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
         std::function< void( MappingInfo ) > callback )
-{
+{;
     QnMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
         return m_tasks.push( [ callback ]{ callback( MappingInfo() ); } );
@@ -101,6 +101,12 @@ void AsyncClientMock::getMapping(
         } );
 }
 
+void AsyncClientMock::changeExternalIp(const HostAddress ip)
+{
+    QnMutexLocker lock( &m_mutex );
+    m_externalIp = ip;
+}
+
 AsyncClientMock::Mappings AsyncClientMock::mappings() const
 {
     QnMutexLocker lock( &m_mutex );
@@ -127,11 +133,10 @@ bool AsyncClientMock::rmMapping( quint16 port, Protocol protocol )
 }
 
 PortMapperMocked::PortMapperMocked( const HostAddress& internalIp,
-                                    const HostAddress& externalIp,
                                     quint64 checkMappingsInterval )
     : PortMapper( true, checkMappingsInterval, lit( "UpnpPortMapperMocked" ), QString() )
 {
-    m_upnpClient.reset( new AsyncClientMock( externalIp ) );
+    m_upnpClient.reset( new AsyncClientMock );
 
     DeviceInfo::Service service;
     service.serviceType = AsyncClient::WAN_IP;

@@ -16,7 +16,7 @@ class AsyncClientMock
     public AsyncClient
 {
 public:
-    explicit AsyncClientMock( const HostAddress& externalIp );
+    AsyncClientMock();
     ~AsyncClientMock() override;
 
     virtual void externalIp(
@@ -46,16 +46,17 @@ public:
             std::pair< SocketAddress /*internal*/, QString /*description*/ >
         > Mappings;
 
+    void changeExternalIp(const HostAddress ip);
     Mappings mappings() const;
     size_t mappingsCount() const;
     bool mkMapping( const Mappings::value_type& value );
     bool rmMapping( quint16 port, Protocol protocol );
 
 private:
-    const HostAddress m_externalIp;
     const quint16 m_disabledPort;
 
     mutable QnMutex m_mutex;
+    HostAddress m_externalIp;
     Mappings m_mappings;
     nx::utils::thread m_thread;
     nx::utils::SyncQueue< std::function< void() > > m_tasks;
@@ -66,7 +67,7 @@ class PortMapperMocked
         public PortMapper
 {
 public:
-    PortMapperMocked( const HostAddress& internalIp, const HostAddress& externalIp,
+    PortMapperMocked( const HostAddress& internalIp,
                       quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL );
     AsyncClientMock& clientMock();
 };

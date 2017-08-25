@@ -295,6 +295,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
 
+    connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
+        this, &ActionHandler::at_convertCameraToEntropix_triggered);
+
     connect(action(action::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
         [this]
         {
@@ -945,6 +948,38 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
         {
             camera->setParentId(serverId);
         });
+}
+
+void ActionHandler::at_convertCameraToEntropix_triggered()
+{
+    using nx::vms::common::core::resource::SensorDescription;
+    using nx::vms::common::core::resource::CombinedSensorsDescription;
+
+    const auto& parameters = menu()->currentParameters(sender());
+    const auto& resources = parameters.resources();
+
+    for (const auto& resource: resources)
+    {
+        const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->hasCombinedSensors())
+        {
+            camera->setCombinedSensorsDescription(CombinedSensorsDescription());
+        }
+        else
+        {
+            camera->setCombinedSensorsDescription(
+                CombinedSensorsDescription{
+                    SensorDescription(
+                        QRectF(0, 0, 0.5, 1.0), SensorDescription::Type::blackAndWhite),
+                    SensorDescription(
+                        QRectF(0.5, 0, 0.5, 1.0))
+                });
+        }
+        camera->saveParamsAsync();
+    }
 }
 
 void ActionHandler::at_moveCameraAction_triggered() {

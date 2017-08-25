@@ -340,14 +340,16 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start,width);
-        if(nextLevel<RulerModel.levels.length-1) {
-            self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
-                                 timeManager.nowToServer(),
-                                 nextLevel + 1).then(function(){
-                                    archiveReadyDefer.resolve(true);
-                                 });
+        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start, width);
+
+        if(nextLevel < RulerModel.levels.length - 1) {
+            nextLevel ++;
         }
+        self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
+                             timeManager.nowToServer(),
+                             nextLevel).then(function(){
+                                archiveReadyDefer.resolve(true);
+                             });
     });
 
     //2. getCameraHistory
@@ -481,9 +483,14 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             }
             for (var i = 0; i < chunksToIterate; i++) {
                 var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
-                if (chunks[i].durationMs < 0) {
+                if (chunks[i].durationMs < 0 || endChunk > timeManager.nowToDisplay()) {
                     endChunk = timeManager.nowToDisplay();// current moment
                 }
+
+                if(chunks[i].startTimeMs > endChunk){
+                    continue; // Chunk is from future - do not add
+                }
+
                 var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
             }

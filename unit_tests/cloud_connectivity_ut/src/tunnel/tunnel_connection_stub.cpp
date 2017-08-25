@@ -12,6 +12,7 @@ TunnelConnectionStub::~TunnelConnectionStub()
 
 void TunnelConnectionStub::start()
 {
+    m_isStarted = true;
 }
 
 void TunnelConnectionStub::establishNewConnection(
@@ -25,6 +26,11 @@ void TunnelConnectionStub::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_onClosedHandler = std::move(handler);
+}
+
+bool TunnelConnectionStub::isStarted() const
+{
+    return m_isStarted;
 }
 
 void TunnelConnectionStub::stopWhileInAioThread()

@@ -5,13 +5,13 @@
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
             <tr><td>System</td><td><b>{{settings.systemName}}</b></td></tr>
             <tr><td>Użytkownik</td><td><b>{{user.name}}</b></td></tr>
-            <tr><td>Current Server</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
+            <tr><td>Bieżący serwer</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr><td>Version</td><td><b>{{settings.version}}</b></td></tr>
-            <tr><td>Platform</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
-            <tr><td>Architecture</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
+            <tr><td>Wersja</td><td><b>{{settings.version}}</b></td></tr>
+            <tr><td>Platforma</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
+            <tr><td>Architektura</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
             <tr ng-if="user.isAdmin" class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr ng-if="user.isAdmin"><td>All servers</td><td>
+            <tr ng-if="user.isAdmin"><td>Wszystkie serwery</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">
                     <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
                     <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank"><b>{{server.name}}</b> {{server.apiUrlFormatted}}</a>

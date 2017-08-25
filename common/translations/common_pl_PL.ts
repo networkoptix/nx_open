@@ -545,7 +545,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
+      <translation>Nie znaleziono serwera o zgodnym Id sprzętu</translation>
     </message>
   </context>
   <context>

@@ -36,6 +36,7 @@
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <nx/mediaserver/license_watcher.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
@@ -116,6 +117,7 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule(),
         m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
+    m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
@@ -196,4 +198,9 @@ QSettings* QnMediaServerModule::runTimeSettings() const
 nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
 {
     return m_unusedWallpapersWatcher;
+}
+
+nx::mediaserver::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
+{
+    return m_licenseWatcher;
 }

@@ -1,21 +1,21 @@
 {
   "language_name":"LANGUAGE_NAME",
   "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Visit this link",
-    "openLinkWithTitle":"To {{title}} visit this link"
+    "okButton":"OK",
+    "openLink":"Otwórz ten link",
+    "openLinkWithTitle":"Aby {{title}} otwórz ten link"
   },
   "setup":{
-    "createAccount":"create account",
-    "errorNoHDD":"This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-    "errorNoNetwork":"This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
+    "createAccount":"utwórz konto",
+    "errorNoHDD":"To urządzenie jest przeznaczone do działania z zainstalowanym dyskiem twardym. <br> Proszę wyłączyć urządzenie i zainstalować dysk twardy.",
+    "errorNoNetwork":"To urządzenie wymaga połączenia sieciowego. <br> Podłącz je do sieci lokalnej lub do Internetu"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Password must be at least 8 characters long",
-    "requiredMessage":"Only latin letters, numbers and keyboard symbols are allowed",
-    "weakMessage":"Password should contain different types of symbols",
-    "strongMessage":"Strong password!",
-    "commonMessage":"This password is in list of most popular passwords"
+    "minLengthMessage":"Hasło musi zawierać co najmniej 8 znaków",
+    "requiredMessage":"Dopuszczalne są tylko łacińskie litery, cyfry i symbole z klawiatury",
+    "weakMessage":"Hasło powinno zawierać różne rodzaje symboli",
+    "strongMessage":"Bezpieczne hasło!",
+    "commonMessage":"To hasło znajduje się na liście najpopularniejszych haseł"
   },
   "settings":{
     "tabs":{
@@ -23,92 +23,92 @@
       "system":"System",
       "device":"Urządzenie"
     },
-    "confirmRestart":"Restart server?",
-    "couldntCheckInternet":"Could not check cloud connection",
-    "confirmRestoreDefault":"Clear database and settings? This process will take some time and server will be restarted afterwards.",
-    "confirmRestoreDefaultTitle":"Restore factory defaults",
-    "unexpectedError":"Failed: unexpected error has happened",
+    "confirmRestart":"Uruchomić ponownie serwer?",
+    "couldntCheckInternet":"Nie można sprawdzić połączenia do chmury",
+    "confirmRestoreDefault":"Wyczyścić bazę danych i ustawienia? Proces ten zajmie trochę czasu, a po zakończeniu serwer zostanie ponownie uruchomiony.",
+    "confirmRestoreDefaultTitle":"Przywróć ustawienia fabryczne",
+    "unexpectedError":"Niepowodzenie: wystąpił nieoczekiwany błąd",
     "connnetionError":"Błąd połączenia",
-    "wrongPassword":"Wrong password.",
-    "error":"Error: ",
-    "restartNeeded":"Changes saved. Restart server to apply new settings?",
-    "settingsSaved":"Settings saved",
-    "confirmHardwareRestart":"Restart server operation system?",
-    "confirmRestoreSettings":"Restore all server settings? Archive will be saved, but network settings will be reset.",
-    "confirmRestoreSettingsNotNetwork":"Reset server configuration? Archive and network settings will be saved.",
-    "unavailable":"Unavailable",
-    "unsafePortConfirm":"It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
-    "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
+    "wrongPassword":"Nieprawidłowe hasło.",
+    "error":"Błąd:",
+    "restartNeeded":"Zmiany zostały zapisane. Uruchomić ponownie serwer używając nowych ustawień?",
+    "settingsSaved":"Ustawienia zostały zapisane",
+    "confirmHardwareRestart":"Uruchomić ponownie system operacyjny serwera?",
+    "confirmRestoreSettings":"Przywrócić wszystkie ustawienia serwera? Archiwum zostanie zachowane, ale ustawienia sieciowe zostaną zresetowane.",
+    "confirmRestoreSettingsNotNetwork":"Zresetować konfigurację serwera? Archiwum i ustawienia sieci zostaną zachowane.",
+    "unavailable":"Niedostępny",
+    "unsafePortConfirm":"Nie jest bezpiecznie używać numeru portu niższego od 1025. Serwer może być niedostępny. Kontynuować mimo to?",
+    "confirmDisconnectFromCloud":"Odłączyć system od {{CLOUD_NAME}}",
+    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Wszyscy użytkownicy chmury zostaną usunięci.</span><br><br>System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.",
     "confirmDisconnectFromCloudAction":"Rozłącz",
-    "disconnectedSuccess":"System was disconnected successfully",
-    "connectedSuccess":"System was connected successfully",
+    "disconnectedSuccess":"System został odłączony pomyślnie",
+    "connectedSuccess":"System został podłączony pomyślnie",
     "createLocalOwner":"",
-    "createLocalOwnerTitle":"Create local administrator",
-    "confirmChangePassword":"Change admin password",
-    "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
-    "confirmChangePasswordAction":"Save new password",
-    "nx1ControlHint":"Client application has been started. Use a keyboard/mouse or mobile application to control it."
+    "createLocalOwnerTitle":"Utwórz lokalnego administratora",
+    "confirmChangePassword":"Zmień hasło administratora",
+    "confirmChangePasswordTitle":"Zmienić hasło systemu? Wpłynie to na konto 'admin' i na hasło root na niektórych serwerach",
+    "confirmChangePasswordAction":"Zapisz nowe hasło",
+    "nx1ControlHint":"Aplikacja klienta została uruchomiona. Użyj klawiatury/myszy lub aplikacji mobilnej, aby nią sterować."
   },
   "info":{
     "tabs":{
-      "healthMonitoring":"Health monitoring",
-      "storage":"Storage",
-      "log":"Log"
+      "healthMonitoring":"Monitorowanie stanu technicznego",
+      "storage":"Archiwum",
+      "log":"Dziennik"
     }
   },
   "join":{
-    "systemIsUnreacheble":"System is unreachable or does not exist.",
-    "incorrectCurrentPassword":"Incorrect current password.",
-    "incorrectRemotePassword":"Login or password are incorrect.",
-    "incompatibleVersion":"System is unreachable, does not exist or has incompatible version.",
-    "wrongUrl":"Unable to connect to the specified server.",
-    "newSystemError":"Cannot merge systems. Remote system is not configured.",
-    "safeMode":"Cannot merge systems. Remote system is in safe mode.",
-    "configError":"Cannot merge systems. Maybe one of Systems is in safe mode.",
-    "cloudError":"Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
-    "cloudBothError":"Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
-    "cloudHostConflict":"Cannot merge systems, because servers are built with different cloud hosts",
-    "licenceError":"Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
-    "connectionFailed":"Connection failed: ",
+    "systemIsUnreacheble":"System jest nieosiągalny lub nie istnieje.",
+    "incorrectCurrentPassword":"Nieprawidłowe bieżące hasło",
+    "incorrectRemotePassword":"Nieprawidłowy login lub hasło.",
+    "incompatibleVersion":"System jest nieosiągalny, nie istnieje lub ma niezgodną wersję.",
+    "wrongUrl":"Nie można podłączyć się do serwera.",
+    "newSystemError":"Nie można złączyć systemów. Zdalny system nie jest skonfigurowany.",
+    "safeMode":"Nie można złączyć systemów. Zdalny system pracuje w trybie awaryjnym.",
+    "configError":"Nie można złączyć systemów. Być może jeden z nich pracuje w trybie awaryjnym.",
+    "cloudError":"Nie można złączyć systemów. Jeden z nich jest podłączony do chmury, z której trzeba go najpierw odłączyć.",
+    "cloudBothError":"Nie można złączyć systemów. Oba systemy są podłączone do chmury. Trzeba z niej odłączyć przynajmniej jeden z nich.",
+    "cloudHostConflict":"Nie można złączyć systemów, ponieważ serwery mają różne hosty w chmurze",
+    "licenceError":"Uwaga! Zamierzasz złączyć systemy na licencjach Starter. Tylko jedna taka licencja może być wykorzystywana w złączonym systemie, więc druga z licencji zostanie dezaktywowana. Złączyć mimo to?",
+    "connectionFailed":"Błąd połączenia: ",
     "unknownError":"Nieznany błąd",
-    "mergeFailed":"Merge failed: ",
-    "mergeSucceed":"Merge succeed.",
-    "newSystemDisplayName":"New system",
-    "incompatibleProtocol":"incompatible version",
+    "mergeFailed":"Błąd złączania: ",
+    "mergeSucceed":"Złączono pomyślnie.",
+    "newSystemDisplayName":"Nowy system",
+    "incompatibleProtocol":"niezgodna wersja",
     "incompatibleCloudHost":"konflikt w chmurze",
-    "incompatibleCloudState":"cloud connected"
+    "incompatibleCloudState":"chmura połączona"
   },
   "login":{
-    "incorrectPassword":"Login or password is incorrect"
+    "incorrectPassword":"Nieprawidłowy login lub hasło"
   },
   "navigaion":{
-    "cannotGetUser":"Server failure: cannot retrieve current user data"
+    "cannotGetUser":"Błąd serwera: nie można pobrać danych bieżącego użytkownika"
   },
   "offlineDialog":{
-    "serverOffline":"server is offline"
+    "serverOffline":"serwer jest odłączony"
   },
   "restartDialog":{
-    "serverStarting":"server is starting",
-    "serverRestarting":"server is restarting",
-    "serverOffline":"server is offline"
+    "serverStarting":"uruchamianie serwera",
+    "serverRestarting":"ponowne uruchamianie serwera",
+    "serverOffline":"serwer jest odłączony"
   },
   "fileUpload":{
-    "started":"Update successfully started. It will take several minutes",
-    "upToDate":"Update failed. The provided version is already installed.",
-    "invalidFile":"Update failed. Provided file is not a valid update archive.",
-    "incompatibleSystem":"Update failed. Provided file is targeted for another system.",
-    "extractionError":"Update failed. Insufficient space to extract archive, check available storage.",
-    "installationError":"Updating failed. Cannot execute installation script.",
-    "selectFiles":"Select files"
+    "started":"Aktualizacja została uruchomiona. To zajmie kilka minut",
+    "upToDate":"Aktualizacja nie powiodła się. Ta wersja jest już zainstalowana.",
+    "invalidFile":"Aktualizacja nie powiodła się. Ten plik nie jest poprawnym pakietem aktualizacyjnym.",
+    "incompatibleSystem":"Aktualizacja nie powiodła się. Ten plik jest przeznaczony dla innego systemu.",
+    "extractionError":"Aktualizacja nie powiodła się. Niewystarczająca przestrzeń do wyodrębnienia archiwum. Proszę sprawdzić dostępną przestrzeń dyskową.",
+    "installationError":"Aktualizowanie nie powiodło się. Nie można wykonać skryptu instalacji.",
+    "selectFiles":"Wybierz pliki"
   },
   "advanced":{
     "free":"Bezpłatna",
-    "total":"Total",
-    "occupied":"Occupied",
-    "reserved":"Reserved"
+    "total":"Razem",
+    "occupied":"Zajęte",
+    "reserved":"Zarezerwowane"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"Interfejs WWW {{PRODUCT_NAME}}"
   }
 }
