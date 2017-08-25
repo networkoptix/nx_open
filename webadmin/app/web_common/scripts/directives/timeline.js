@@ -205,6 +205,11 @@ angular.module('nxCommon')
                         scope.playHandler(false);
                     }else if(pausedLive){
                         goToLive(true);
+                        // This is an attempt to fix WEB-696: Play archive after pause on LIVE (didn't work out yet)
+                        // jumpToPosition(scope.positionProvider.playedPosition);
+                        // timeout(function(){
+                        //     scope.playHandler(true);
+                        // });
                     }else{
                         scope.playHandler(true);
                     }
@@ -212,7 +217,10 @@ angular.module('nxCommon')
 
                 function timelineClick(mouseX){
                     var date = timelineActions.setClickedCoordinate(mouseX);
+                    jumpToPosition(date);
+                }
 
+                function jumpToPosition(date){
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){
                         goToLive ();
