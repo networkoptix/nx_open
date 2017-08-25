@@ -58,7 +58,6 @@ cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domain
 cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     const std::string& /*domainName*/) const
 {
-    auto& firstRelay = m_relayTest->m_relays[0];
     auto redirectToEndpoint = "127.0.0.1:" + relayPort(0);
     return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
