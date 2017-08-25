@@ -2,19 +2,25 @@
 set -e
 shopt -s nullglob
 
-# TODO: #mshevchenko: REMOVE
-#echo "####### STUB: create_mediaserver_tar.sh called"
-#exit 0
+# ATTENTION: This script works with both maven and cmake builds.
 
-source create_mediaserver_tar.conf
+CONF_FILE="create_mediaserver_tar.conf"
+if [ -f "$CONF_FILE" ]; then
+    source "$CONF_FILE"
+fi
 
-LIB_BUILD_DIR="$BUILD_DIR/lib/$BUILD_CONFIGURATION"
-BIN_BUILD_DIR="$BUILD_DIR/bin/$BUILD_CONFIGURATION"
+if [ ! -z "$BUILD_CONFIGURATION" ]; then
+    LIB_AND_BIN_DIR_SUFFIX="/$BUILD_CONFIGURATION"
+else
+    LIB_AND_BIN_DIR_SUFFIX=""
+fi
+LIB_BUILD_DIR="$BUILD_DIR/lib$LIB_AND_BIN_DIR_SUFFIX"
+BIN_BUILD_DIR="$BUILD_DIR/bin$LIB_AND_BIN_DIR_SUFFIX"
 
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION" #< If not empty, will symlink to $INSTALL_PATH.
-    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service" #< If not empty, Qt .so files will be copied here.
+    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service" #< If not empty, Qt .so files go here.
 else
     INSTALL_PATH="opt/$CUSTOMIZATION"
 fi
@@ -226,7 +232,7 @@ copyConf()
     fi
 
     mkdir -p "$INSTALL_DIR/mediaserver/etc"
-    cp "$SRC_DIR/opt/networkoptix/mediaserver/etc/$MEDIASERVER_CONF_FILENAME" \
+    cp "$CUR_BUILD_DIR/opt/networkoptix/mediaserver/etc/$MEDIASERVER_CONF_FILENAME" \
         "$INSTALL_DIR/mediaserver/etc/"
 }
 
@@ -237,7 +243,7 @@ copyScripts()
 {
     if [ "$BOX" = "edge1" ]; then
         mkdir -p "$TAR_DIR/etc/init.d"
-        install -m 755 "$SRC_DIR/etc/init.d/S99networkoptix-mediaserver" \
+        install -m 755 "$CUR_BUILD_DIR/etc/init.d/S99networkoptix-mediaserver" \
             "$TAR_DIR/etc/init.d/S99$CUSTOMIZATION-mediaserver"
     else
         # TODO: Consider more general approach: copy all dirs and files, customizing filenames,
@@ -245,10 +251,10 @@ copyScripts()
         # to e.g. "sysroot" folder, or enumerated manually.
 
         echo "Copying scripts"
-        cp -r "$SRC_DIR/etc" "$TAR_DIR"
+        cp -r "$CUR_BUILD_DIR/etc" "$TAR_DIR"
         chmod -R 755 "$TAR_DIR/etc/init.d"
 
-        cp -r "$SRC_DIR/opt/networkoptix/"* "$INSTALL_DIR/"
+        cp -r "$CUR_BUILD_DIR/opt/networkoptix/"* "$INSTALL_DIR/"
         local SCRIPTS_DIR="$INSTALL_DIR/mediaserver/var/scripts"
         [ -d "$SCRIPTS_DIR" ] && chmod -R 755 "$SCRIPTS_DIR"
 
@@ -273,9 +279,7 @@ copyDebs()
 {
     local DEBS_DIR="$BUILD_DIR/deb"
     if [ -d "$DEBS_DIR" ]; then
-        # Dereference symlinks to allow the build system to create .deb symlinks instead of copying
-        # the .deb files.
-        cp -r -L "$DEBS_DIR" "$TAR_DIR/opt/"
+        cp -r "$DEBS_DIR" "$TAR_DIR/opt/"
     fi
 }
 
@@ -303,13 +307,14 @@ copyBpiLiteClient()
 
     # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
-        egldeviceintegrations
-        fonts
-        imageformats
-        mobile_client
-        platforms
-        qml
-        video
+        # TODO: #mike: cmake: Find and copy dirs to build/bin/:
+        fonts # roboto-fonts/bin/
+        egldeviceintegrations # $QT_DIR/plugins/
+        imageformats # $QT_DIR/plugins/
+        platforms # $QT_DIR/plugins/
+        qml # $QT_DIR/
+        # TODO: #mike: Compile nx_bpi_videonode_plugin into nx_client_core rather than as a .so.
+        video # Built common_libs/nx_bpi_videonode_plugin
     )
     local DIR
     for DIR in "${DIRS_TO_COPY[@]}"; do
@@ -329,18 +334,18 @@ copyBpiLiteClient()
 # [in] TAR_DIR
 copyBpiSpecificFiles()
 {
-    # Copying uboot.
-    cp -r "$BUILD_DIR/root" "$TAR_DIR/root/"
+    # Copy uboot.
+    cp -r "$BUILD_DIR/root" "$TAR_DIR/"
 
     # Copy additional binaries.
-    cp -r "$BUILD_DIR/usr" "$TAR_DIR/usr/"
+    cp -r "$BUILD_DIR/usr" "$TAR_DIR/"
 
-    cp -r "$SRC_DIR/root" "$TAR_DIR/"
-    mkdir -p "$TAR_DIR/root/tools/nx"
+    cp -r "$CUR_BUILD_DIR/root" "$TAR_DIR/"
 
     # Copy default server conf used on "factory reset".
-    cp "$SRC_DIR/opt/networkoptix/mediaserver/etc/mediaserver.conf.template" \
-        "$TAR_DIR/root/tools/nx/"
+    local TOOLS_DIR="$TAR_DIR/root/tools/nx"
+    mkdir -p "$TOOLS_DIR"
+    cp "$CUR_BUILD_DIR/opt/networkoptix/mediaserver/etc/mediaserver.conf.template" "$TOOLS_DIR/"
 }
 
 # [in] INSTALL_DIR
@@ -382,8 +387,8 @@ copyVox()
 # [in] LIB_INSTALL_DIR
 copyLibcIfNeeded()
 {
-    # TODO: Unconditionally copy from the compiler artifact. Decision on usage will be
-    # made in install.sh on the box.
+    # TODO: Consider unconditionally copying from the compiler artifact. Decision on usage will
+    # then be made in install.sh on the box.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
         cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
     fi
@@ -398,15 +403,15 @@ buildInstaller()
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    ( cd "$TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME" * )
+    ( cd "$TAR_DIR" && tar czf "$CUR_BUILD_DIR/$TAR_FILENAME" * )
 
     echo "Creating \"update\" .zip"
     local ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$SRC_DIR/$TAR_FILENAME" "$ZIP_DIR/"
-    cp -r "$SRC_DIR"/update.* "$ZIP_DIR/"
-    cp -r "$SRC_DIR"/install.sh "$ZIP_DIR/"
-    ( cd "$ZIP_DIR" && zip "$SRC_DIR/$ZIP_FILENAME" * )
+    cp -r "$CUR_BUILD_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$CUR_BUILD_DIR"/update.* "$ZIP_DIR/"
+    cp -r "$CUR_BUILD_DIR"/install.sh "$ZIP_DIR/"
+    ( cd "$ZIP_DIR" && zip "$CUR_BUILD_DIR/$ZIP_FILENAME" * )
 }
 
 # [in] WORK_DIR
@@ -435,7 +440,7 @@ buildDebugSymbolsArchive()
     if [ "$DEBUG_FILES_EXIST" == "0" ]; then
         echo "  No .debug files found"
     else
-        ( cd "$DEBUG_TAR_DIR" && tar czf "$SRC_DIR/$TAR_FILENAME-debug-symbols.tar.gz" * )
+        ( cd "$DEBUG_TAR_DIR" && tar czf "$CUR_BUILD_DIR/$TAR_FILENAME-debug-symbols.tar.gz" * )
     fi
 }
 

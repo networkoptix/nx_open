@@ -586,14 +586,26 @@ CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
 
 QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
+    using nx::vms::common::core::resource::SensorDescription;
+
     qreal customAr = customAspectRatio();
     if (!qFuzzyIsNull(customAr))
-        return QnAspectRatio::closestStandardRatio(customAr);
+        return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
 
     const auto stream = defaultStream();
     const QSize size = stream.getResolution();
-    if (!size.isEmpty())
-        return QnAspectRatio(size.width(), size.height());
+    if (size.isEmpty())
+        return QnAspectRatio();
 
-    return QnAspectRatio();
+    const auto& sensor = combinedSensorsDescription().mainSensor();
+    if (!sensor.isValid())
+        return QnAspectRatio(size);
+
+    const auto& sensorSize = sensor.geometry.size();
+
+    const QSize realSensorSize = QSize(
+        static_cast<int>(size.width() * sensorSize.width()),
+        static_cast<int>(size.height() * sensorSize.height()));
+
+    return QnAspectRatio(realSensorSize);
 }

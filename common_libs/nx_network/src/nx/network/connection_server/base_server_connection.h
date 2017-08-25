@@ -72,7 +72,6 @@ template<
     using self_type = BaseServerConnection<CustomConnectionType>;
 
 public:
-
     /**
      * @param connectionManager When connection is finished,
      * connectionManager->closeConnection(closeReason, this) is called.
@@ -104,7 +103,7 @@ public:
     }
 
     /**
-     * Start receiving data from connection
+     * Start receiving data from connection.
      */
     void startReadingConnection(
         boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
@@ -116,7 +115,13 @@ public:
             {
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
-                    return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
+                {
+                    return m_streamSocket->post(
+                        [this, code = SystemError::getLastOSErrorCode()]()
+                        {
+                            onBytesRead(code, (size_t) -1);
+                        });
+                }
 
                 m_receiving = true;
                 m_readBuffer.resize(0);
@@ -334,7 +339,6 @@ private:
         m_streamSocket->cancelIOSync(nx::network::aio::etTimedOut);
     }
 };
-
 
 /**
  * These two classes enable BaseServerConnection alternative usage without inheritance.

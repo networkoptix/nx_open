@@ -9,6 +9,9 @@
 #include <ui/common/widget_anchor.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 static const QMargins kDefaultMargins(6, 1, 6, 2);
@@ -38,6 +41,11 @@ struct LineEditControls::Private
 
         installEventHandler(contents, QEvent::LayoutRequest, contents,
             [this]() { updateLayout(); });
+    }
+
+    ~Private()
+    {
+        disconnectHelper.clear();
     }
 
     void setEmpty()
@@ -200,12 +208,18 @@ struct LineEditControls::Private
             controls << control;
 
             // Remove if deleted.
-            QObject::connect(control, &QWidget::destroyed,
-                [this](QObject* what) { removeControl(static_cast<QWidget*>(what), true); });
+            *disconnectHelper << QObject::connect(control, &QWidget::destroyed,
+                [this](QObject* what)
+                {
+                    removeControl(static_cast<QWidget*>(what), true);
+                });
 
             // Remove if reparented.
-            installEventHandler(control, QEvent::ParentChange, contents.data(),
-                [this](QObject* what) { removeControl(static_cast<QWidget*>(what), false); });
+            installEventHandler(control, QEvent::ParentChange, contents,
+                [this](QObject* what)
+                {
+                    removeControl(static_cast<QWidget*>(what), false);
+                });
         }
 
         if (oldCount != controls.size())
@@ -219,6 +233,7 @@ struct LineEditControls::Private
     const QScopedPointer<QWidget> contents;
     const QMargins initialMargins; //< Initial contents margins of line edit.
     QList<QWidget*> controls;
+    QnDisconnectHelperPtr disconnectHelper = QnDisconnectHelper::create();
 };
 
 // ------------------------------------------------------------------------------------------------

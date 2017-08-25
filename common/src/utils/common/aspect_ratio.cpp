@@ -14,14 +14,20 @@ namespace
 }
 
 QnAspectRatio::QnAspectRatio()
-    : m_width(0)
-    , m_height(0)
-{}
+{
+}
 
-QnAspectRatio::QnAspectRatio(int width, int height)
-    : m_width(width)
-    , m_height(height)
-{}
+QnAspectRatio::QnAspectRatio(int width, int height):
+    m_width(width),
+    m_height(height)
+{
+}
+
+QnAspectRatio::QnAspectRatio(const QSize& size):
+    m_width(size.width()),
+    m_height(size.height())
+{
+}
 
 bool QnAspectRatio::isValid() const
 {

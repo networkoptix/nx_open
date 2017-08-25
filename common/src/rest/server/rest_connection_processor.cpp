@@ -137,22 +137,22 @@ void QnRestConnectionProcessor::run()
 
         const auto requestContentType = nx_http::getHeaderValue(d->request.headers, "Content-Type");
         const auto method = d->request.requestLine.method.toUpper();
-        if (method == "GET")
+        if (method == nx_http::Method::get)
         {
             response = handler->executeGet(request);
         }
         else
-        if (method == "POST")
+        if (method == nx_http::Method::post)
         {
             response = handler->executePost(request, {requestContentType, d->requestBody});
         }
         else
-        if (method == "PUT")
+        if (method == nx_http::Method::put)
         {
             response = handler->executePut(request, {requestContentType, d->requestBody});
         }
         else
-        if (method == "DELETE")
+        if (method == nx_http::Method::delete_)
         {
             response = handler->executeDelete(request);
         }

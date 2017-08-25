@@ -61,13 +61,13 @@
   <String Id="InstallLicenseText">\"Kabul et ve yükle\" tıklayarak onaylamış olursunuz</String>
   <String Id="Options">Seçenekler</String>
   <String Id="SelectApps">Yüklenecek uygulamaları seçin:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">Windows Güvenlik Duvarı\'na bağlanılamıyor. ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Windows Güvenlik duvarını yapılandırma</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Windows Güvenlik duvarını yapılandırma</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Windows Güvenlik duvarı yapılandırması geri alınıyor</String>
+  <String Id="WixExecFirewallExceptionsInstall">Windows Güvenlik Duvarı yapılandırmasını yükle</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windows Güvenlik duvarı yapılandırması geri alınıyor</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Windows Güvenlik Duvarı yapılandırmasını kaldır</String>
+  <String Id="Product_ArchMismatch_x86">Bu paket 32-bit işletim sistemi için tasarlanmıştır. Kurulum şimdi kapatılıyor.</String>
+  <String Id="Product_ArchMismatch_x64">Bu paket 64-bit işletim sistemi için tasarlanmıştır. Kurulum şimdi kapatılıyor.</String>
 </WixLocalization>

@@ -47,9 +47,18 @@ void QnThreadedImageLoaderPrivate::setOutput(const QString &filename) {
     m_outputFilename = filename;
 }
 
-void QnThreadedImageLoaderPrivate::start() {
-    if (!m_inputFilename.isEmpty()) {
-        m_input.load(m_inputFilename);
+void QnThreadedImageLoaderPrivate::start()
+{
+    if (!m_inputFilename.isEmpty())
+    {
+        if (!m_input.load(m_inputFilename))
+        {
+            // Workaround for Qt Mac Os bug, when QImage::load sometimes can't
+            // load image from file directly.
+            QFile imageFile(m_inputFilename);
+            if (imageFile.open(QIODevice::ReadOnly))
+                m_input = QImage::fromData(imageFile.readAll());
+        }
     }
 
     QImage output = m_input;

@@ -1,28 +1,13 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
-    <div>
+    <div ng-if="developersFeedbackForm">
         <h2>开发者工具</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            你对于整合开发感到开心吗? 让我们知道.
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">留下您的反馈信息</a></p>
     </div>
-    <div>
-        <h3>Camera Details Panel</h3>
-        <p>
-            Special panel for a webclient which displays additional information for cameras:
-        </p>
-        <ul>
-            <li>摄像头 ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
-        </ul>
-        <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
-        </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
-    </div>
+
     <div>
         <h3>Generic Events Generator</h3>
         <p>
@@ -33,9 +18,12 @@
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
-        <h3>服务器 API</h3>
+        <h3>Server API</h3>
         <p>
-            伺服器 API 提供一套标准的 API 供第三方厂家呼叫. 让开发者几乎可取用所有在标准 Client 上能操作的系统功能: 调阅/管理系统资源 (伺服器, 摄像机, 使用者, 权限), 从系统中拉取实时流或录像资料, 生成事件, 建立规则, 操控 PTZ 摄像机以及更多.
+            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
+            access almost every system feature available in the regular client: query/manage system resources (servers,
+            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
+            control PTZ cameras, and more.
         </p>
         <p>
             <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
@@ -45,6 +33,22 @@
             <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
         </p>
 
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
     </div>
     <div>
         <h3>视频源集成 SDK</h3>

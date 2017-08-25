@@ -155,18 +155,18 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
     m_httpClient->doGet(kUrl.arg(endpoint.toString()));
 }
 
-inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
+static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
 {
-    size_t brasers = 0;
+    size_t bracerCount = 0;
     for (int index = 0; index < buffer->size(); ++index)
     {
         switch (buffer->at(index))
         {
-            case '{': ++brasers; break;
-            case '}': --brasers; break;
+            case '{': ++bracerCount; break;
+            case '}': --bracerCount; break;
         }
 
-        if (brasers == 0 && index != 0)
+        if (bracerCount == 0 && index != 0)
         {
             const auto object = buffer->left(index + 1);
             *buffer = buffer->mid(index + 1);

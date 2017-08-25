@@ -69,9 +69,34 @@
                 </property>
             </activation>
             <properties>
-                <!-- Uncomment to enable libc/libstdc++ upgrade -->
-                <!-- <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ldpreloadhook-1.0 libpixman-0.34.0 libump-3.0 libvdpau-sunxi-1.0 libcedrus-1.0 libvdpau-1.0.4.1 libc6-2.23 libstdc++-6.0.20 read-edid-3.0.2 a10-display fontconfig-2.11.0 curl-7.51.0</rdep.linux.packages> -->
-                <rdep.linux.packages>uboot-2014.04-10733-gbb5691c-dirty-vanilla ldpreloadhook-1.0-deb7 libpixman-0.34.0-deb7 libump-3.0 libvdpau-sunxi-1.0-deb7 libcedrus-1.0-deb7 libvdpau-1.0.4.1 libstdc++-6.0.19 read-edid-3.0.2 a10-display fontconfig-2.11.0 proxy-decoder-deb7 bpi/additional-fonts</rdep.linux.packages>
+                <!-- <rdep.linux.packages>
+                </rdep.linux.packages> -->
+                <rdep.linux.packages>
+                    uboot-2014.04-10733-gbb5691c-dirty-vanilla
+                    libvdpau-1.0.4.1
+                    read-edid-3.0.2
+                    a10-display
+                    fontconfig-2.11.0
+                    bpi/additional-fonts
+
+                    <!-- Uncomment to enable Debian 8 and libc/libstdc++ upgrade -->
+                <!--
+                    proxy-decoder
+                    ldpreloadhook-1.0
+                    libpixman-0.34.0
+                    libvdpau-sunxi-1.0
+                    libcedrus-1.0
+                    libstdc++-6.0.20
+                    libc6-2.23
+                    curl-7.51.0
+                -->
+                    proxy-decoder-deb7
+                    ldpreloadhook-1.0-deb7
+                    libpixman-0.34.0-deb7
+                    libvdpau-sunxi-1.0-deb7
+                    libcedrus-1.0-deb7
+                    libstdc++-6.0.19
+                 </rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
             <dependencies>

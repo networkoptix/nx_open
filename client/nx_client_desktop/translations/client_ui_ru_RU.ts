@@ -1614,7 +1614,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Циклическая прокрутка</translation>
     </message>
   </context>
   <context>

@@ -1,16 +1,16 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          ${deb.customization.company.name}-lite-client
+# Provides:          @deb.customization.company.name@-lite-client
 # Required-Start:    networking
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: ${company.name} ${product.name} Lite Client
+# Short-Description: @company.name@ @product.name@ Lite Client
 ### END INIT INFO
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="@deb.customization.company.name@"
 VTCONSOLE=$(fgconsole)
-SERVICE_NAME=lite-client
+SERVICE_NAME="lite-client"
 PREFIX="/opt/$CUSTOMIZATION/lite_client"
 BIN_NAME="mobile_client"
 BIN_PATH="$PREFIX/bin/$BIN_NAME"

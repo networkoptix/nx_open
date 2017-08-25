@@ -1398,7 +1398,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Audit napló visszajátszás</translation>
     </message>
   </context>
   <context>

@@ -40,7 +40,7 @@ QString DevicesNameTextFactory::text(const Parameters& parameters,
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
         m_stringSet,
-        resources.filtered<QnVirtualCameraResource>());
+                resources.filtered<QnVirtualCameraResource>());
 }
 
 } // namespace action

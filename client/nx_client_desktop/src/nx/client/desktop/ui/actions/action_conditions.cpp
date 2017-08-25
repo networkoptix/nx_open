@@ -1642,6 +1642,15 @@ ConditionWrapper always()
         });
 }
 
+ConditionWrapper isTrue(bool value)
+{
+    return new CustomBoolCondition(
+        [value](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        {
+            return value;
+        });
+}
+
 ConditionWrapper isLoggedIn()
 {
     return new CustomBoolCondition(
@@ -1732,8 +1741,26 @@ ConditionWrapper canSavePtzPosition()
         });
 }
 
-} // namespace condition
+ConditionWrapper isEntropixCamera()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            const auto& resouces = parameters.resources();
 
+            return std::all_of(resouces.begin(), resouces.end(),
+                [](const QnResourcePtr& resource)
+                {
+                    const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+                    if (!camera)
+                        return false;
+
+                    return camera->hasCombinedSensors();
+                });
+        });
+}
+
+} // namespace condition
 
 } // namespace action
 } // namespace ui
