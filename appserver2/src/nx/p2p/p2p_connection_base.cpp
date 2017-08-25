@@ -247,6 +247,7 @@ void ConnectionBase::onHttpClientDone()
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
     m_webSocket->setAliveTimeout(m_keepAliveTimeout);
+    m_webSocket->start();
 
     setState(State::Connected);
 }

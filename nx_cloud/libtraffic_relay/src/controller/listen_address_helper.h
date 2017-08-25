@@ -12,6 +12,12 @@ namespace cloud {
 namespace relay {
 namespace controller {
 
+/**
+ * Helper class for determining best suitable redirect endpoint to store in the Cassandra DB. If
+ * public address can be acquired and this address is among httpEndpoints addresses than
+ * corresponding http endpoint is reported via AbstractListenAddressHelperHandler. Otherwise first
+ * http endpoind is reported.
+ */
 class AbstractListenAddressHelper
 {
 public:
@@ -43,7 +49,6 @@ private:
     boost::optional<HostAddress> m_publicAddress;
 
     virtual boost::optional<HostAddress> publicAddress() const override;
-
 };
 
 } // namespace controller

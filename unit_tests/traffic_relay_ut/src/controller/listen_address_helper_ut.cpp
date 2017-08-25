@@ -53,23 +53,34 @@ protected:
 
     void whenPublicAddressFound()
     {
-
+        m_addressHelper.setPublicAddress(kPublicAddress);
     }
 
     void whenSomeEndpointsFoundWithPublicAddressAmongThem()
     {
+        m_endpoints.emplace_back(SocketAddress("10.3.0.7", 11));
+        m_endpoints.emplace_back(SocketAddress("127.0.0.1", 11));
+        m_endpoints.emplace_back(SocketAddress("1.1.1.1", 21));
 
+        m_addressHelper.findBestAddress(m_endpoints);
     }
 
     void thenListenEndpointAddressReportedShouldBeEqualToThePublicAddress()
     {
+        ASSERT_NE(
+            m_addressHelperHandler.endpoint().find(kPublicAddress.toString().toStdString()),
+            std::string::npos);
+    }
 
+    void thenFirstEndpointShouldBeReported()
+    {
+        ASSERT_EQ("10.3.0.7:11", m_addressHelperHandler.endpoint());
     }
 
 private:
     TestAbstractListenAddressHelperHandler m_addressHelperHandler;
     ListenAddressHelperStub m_addressHelper;
-    std::vector<HostAddress> m_endpoints;
+    std::vector<SocketAddress> m_endpoints;
 };
 
 
@@ -79,6 +90,12 @@ TEST_F(ListenAddressHelper, publicAddressFound_andIsInTheEndpoints)
     whenSomeEndpointsFoundWithPublicAddressAmongThem();
 
     thenListenEndpointAddressReportedShouldBeEqualToThePublicAddress();
+}
+
+TEST_F(ListenAddressHelper, publicAddressNotFound_andIsInTheEndpoints)
+{
+    whenSomeEndpointsFoundWithPublicAddressAmongThem();
+    thenFirstEndpointShouldBeReported();
 }
 
 } // namespace test

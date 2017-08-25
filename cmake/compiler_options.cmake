@@ -152,7 +152,7 @@ if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
 endif()
 
 if(MACOSX)
@@ -160,7 +160,6 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

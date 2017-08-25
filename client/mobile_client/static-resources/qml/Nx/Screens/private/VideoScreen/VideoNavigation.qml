@@ -13,7 +13,7 @@ Item
 
     property string resourceId
     property var videoScreenController
-    property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
+    property bool paused: true
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
@@ -23,6 +23,20 @@ Item
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
+
+    Connections
+    {
+        target: videoScreenController.mediaPlayer
+
+        onPlaybackStateChanged:
+        {
+            var state = videoScreenController.mediaPlayer.playbackState
+            if (state == MediaPlayer.Previewing)
+                return //< In case of previewing we do not change paused state.
+
+            videoNavigation.paused = state != MediaPlayer.Playing
+        }
+    }
 
     QtObject
     {
