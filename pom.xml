@@ -903,7 +903,6 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <festival.version>2.1x</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -935,7 +934,6 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
-                <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
@@ -974,7 +972,6 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
-                <festival.version>2.1x</festival.version>
                 <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
