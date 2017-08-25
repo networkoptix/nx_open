@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="@deb.customization.company.name@"
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 KILL_IF_HIGH_MEM_USAGE=1
@@ -44,7 +44,7 @@ start()
     fi
 
     checkSdCard
-    
+
     if ! touch "$STORAGE_PATH" >/dev/null 2>&1; then
         #echo "RO"
         mount -o rw,remount "$STORAGE_PATH"
@@ -61,7 +61,7 @@ start()
     set -x
     "$BIN_PATH" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
     { set +x; } 2>/dev/null
-    
+
     sleep 1
     # See if server instantly crashes.
     if [ $(pidof "$BIN_NAME") ]; then
