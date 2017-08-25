@@ -464,7 +464,7 @@
                 "BOSCH|VIDEO JET multi 4000",
                 "DW-CP16|Digital Watchdog*",
                 "*|EXVA-HD-216",
-                "*|WH-D5216A",,
+                "*|WH-D5216A",
                 "Dahua|DHI-HCVR*",
                 "Dahua|DHI-XVR*",
                 "Dahua|X21A2E",
@@ -484,7 +484,7 @@
                 "*|NTH-IPPTZ30XIR",
                 "Pravis*|HDR-1600",
                 "Customer|9534E2",
-                "*|NVR201-08LP"
+                "*|NVR201-08LP",
                 "UNIVIEW|NVR302-08E-P8"
             ],
             "analogEncoder": true
