@@ -43,6 +43,7 @@ struct ExportOverlayWidget::Private
     qreal scale = 1.0;
     QString text;
     QImage image;
+    QRectF unscaledRect;
 
     QPoint initialPos;
     bool dragging = false;
@@ -223,18 +224,18 @@ void ExportOverlayWidget::updateLayout()
         imageSize *= d->overlayWidth / imageSize.width();
     }
 
-    auto size = QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
-        .expandedTo(QApplication::globalStrut());
+    d->unscaledRect.setSize(QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
+        .expandedTo(QApplication::globalStrut()));
 
     if (d->shadow)
     {
-        const auto effectRect = d->shadow->boundingRectFor(QRectF(QPointF(), size));
+        const auto effectRect = d->shadow->boundingRectFor(d->unscaledRect);
         d->filterOffset = -effectRect.topLeft();
         d->shadowSource = QPixmap(); //< Invalidate cache.
-        size = effectRect.size();
+        d->unscaledRect.setSize(effectRect.size());
     }
 
-    const QRectF geometry(pos(), size * d->scale);
+    const QRectF geometry(pos(), d->unscaledRect.size() * d->scale);
     setGeometry(geometry.toAlignedRect());
     update();
 }
@@ -281,7 +282,8 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
         if (d->shadowSource.isNull())
         {
             const int devicePixelRatio = qApp->devicePixelRatio();
-            d->shadowSource = QPixmap(size() * devicePixelRatio);
+            const QSize size = d->unscaledRect.toAlignedRect().size();
+            d->shadowSource = QPixmap(size * devicePixelRatio);
             d->shadowSource.setDevicePixelRatio(devicePixelRatio);
             d->shadowSource.fill(Qt::transparent);
 
@@ -312,13 +314,13 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
 void ExportOverlayWidget::renderContent(QPainter& painter)
 {
     if (!d->image.isNull())
-        painter.drawImage(rect(), d->image);
+        painter.drawImage(d->unscaledRect, d->image);
 
     if (!d->text.isEmpty())
     {
         QAbstractTextDocumentLayout::PaintContext context;
         context.palette = palette();
-        context.clip = rect();
+        context.clip = d->unscaledRect;
         d->document->documentLayout()->draw(&painter, context);
     }
 }
@@ -395,6 +397,7 @@ bool ExportOverlayWidget::event(QEvent* event)
         case QEvent::FontChange:
         {
             d->document->setDefaultFont(font());
+            updateLayout();
             break;
         }
 
