@@ -39,13 +39,13 @@ public:
     }
 
     virtual cf::future<bool> addPeer(
-        const std::string& domainName,
-        const std::string& relayHost) override
+        const std::string& /*domainName*/,
+        const std::string& /*relayHost*/) override
     {
         return cf::make_ready_future(true);
     }
 
-    virtual cf::future<bool> removePeer(const std::string& domainName) override
+    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
     {
         return cf::make_ready_future(true);
     }
