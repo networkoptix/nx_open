@@ -319,16 +319,14 @@ angular.module('nxCommon')
                                                 scope.vgApi.load(getFormatSrc('hls'));
                                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                                     var video = event.srcElement || event.originalTarget;
-                                                    if(video.currentTime){ // When video is playing - disable loading
-                                                        scope.loading = false;
-                                                    }
+                                                    scope.loading = false;  // Video is ready - disable loading
                                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                                 });
                                             }
                                             scope.vgPlayerReady({$API:api});
                                       },  function (error) {
                                             $timeout(function(){
-                                                scope.loading = false;
+                                                scope.loading = false;  // Video error - disable loading
                                                 scope.videoFlags.errorLoading = true;
                                                 scope.jsHls = false;
                                             });
