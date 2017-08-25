@@ -298,6 +298,7 @@ void OutgoingTunnel::setTunnelConnection(
     m_connection = std::move(connection);
     m_connection->setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
+    m_connection->start();
     m_state = State::connected;
 
     NX_ASSERT(m_connection->getAioThread() == getAioThread());
