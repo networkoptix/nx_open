@@ -3,9 +3,9 @@ set -e #< Exit on any error.
 
 # ATTENTION: This script works with both maven and cmake builds.
 
-CONF_FILE="create_mediaserver_tar.conf"
-if [ -f "$CONF_FILE" ]; then
-    source "$CONF_FILE"
+: ${CONFIG="create_arm_installer.conf"} #< CONFIG can be overridden externally.
+if [ ! -z "$CONFIG" ]; then
+    source "$CONFIG"
 fi
 
 if [ ! -z "$BUILD_CONFIGURATION" ]; then
@@ -35,21 +35,26 @@ fi
 help()
 {
     echo "Options:"
-    echo "--no-client"
+    echo "--no-client: Do not pack Lite Client."
+    echo "-v, --verbose: Do not redirect output to a log file."
 }
 
 # [out] LITE_CLIENT
+# [out] VERBOSE
 parseArgs() # "$@"
 {
     LITE_CLIENT=1
+    VERBOSE=0
 
     local ARG
     for ARG in "$@"; do
         if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
             help
             exit 0
-        elif [ "$i" = "--no-client" ] ; then
+        elif [ "$ARG" = "--no-client" ] ; then
             LITE_CLIENT=0
+        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
+            VERBOSE=1
         fi
     done
 }
@@ -499,7 +504,8 @@ buildDebugSymbolsArchive()
 
 main()
 {
-    declare -i LITE_CLIENT
+    local -i LITE_CLIENT
+    local -i VERBOSE
     parseArgs "$@"
 
     local -r WORK_DIR=$(mktemp -d)
@@ -511,9 +517,13 @@ main()
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
 
     echo "Creating installer in $WORK_DIR (please delete it on failure)."
-    redirectOutput "$BUILD_DIR/create_arm_installer.log"
+
+    if [ $VERBOSE = 0 ]; then
+        redirectOutput "$BUILD_DIR/create_arm_installer.log"
+    fi
 
     mkdir -p "$INSTALL_DIR"
+
     echo "Creating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
