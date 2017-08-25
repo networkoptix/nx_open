@@ -6,6 +6,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
+#include <utils/common/event_processors.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 
 namespace nx {
@@ -210,6 +211,12 @@ void ExportSettingsDialog::setupSettingsButtons()
                     overlay->raise();
             }
         });
+
+    installEventHandler(ui->mediaFrame, QEvent::MouseButtonPress,
+        ui->cameraExportSettingsButton, &QPushButton::click);
+
+    installEventHandler(ui->mediaPreviewWidget, QEvent::MouseButtonPress,
+        ui->cameraExportSettingsButton, &QPushButton::click);
 }
 
 ExportSettingsDialog::~ExportSettingsDialog()
