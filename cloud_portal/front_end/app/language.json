@@ -7,7 +7,6 @@
     "cancelButton": "Cancel",
     "loginTitle": "Log in to {{PRODUCT_NAME}}",
     "loginButton":"Log in",
-    "logoutAuthorisedText": null,
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out"
@@ -30,12 +29,10 @@
     "restorePasswordSuccess": "Password saved -",
     "restorePasswordCode": "Reset password -",
     "view": "View cameras - ",
-    "contentPage": "",
     "debug": "Debug",
     "login": "Log in -",
     "download": "Download {{VMS_NAME}}",
     "downloadPlatform": "Download {{VMS_NAME}} for ",
-    "startPage": "",
     "pageNotFound": "Page not found"
   },
   "systemStatuses": {
@@ -184,7 +181,6 @@
   },
   "downloads": {
     "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "noClientDetectedMessage": null,
     "action": "Download {{VMS_NAME}}",
     "mobile": {
       "ios": {
