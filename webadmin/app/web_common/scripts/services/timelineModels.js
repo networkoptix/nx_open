@@ -320,23 +320,19 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras, mediaserver, $q, width) {
+function CameraRecordsProvider(cameras, mediaserver, width) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
-    this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
     var self = this;
     //1. request first detailization to get initial bounds
 
-    var archiveReadyDefer = $q.defer();
-    this.archiveReadyPromise = archiveReadyDefer.promise;
     this.lastRequested = timeManager.nowToServer(); // lastrequested is always servertime
-    this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
+    this.archiveReadyPromise = this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
         if(!self.chunksTree){
-            archiveReadyDefer.resolve(false);
-            return; //No chunks for this camera
+            return false; //No chunks for this camera
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
@@ -345,13 +341,12 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
         if(nextLevel < RulerModel.levels.length - 1) {
             nextLevel ++;
         }
-        self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
-                             timeManager.nowToServer(),
-                             nextLevel).then(function(){
-                                archiveReadyDefer.resolve(true);
-                             });
+        return self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
+                                    timeManager.nowToServer(),
+                                    nextLevel).then(function(){
+                                        return true;
+                                    });
     });
-
     //2. getCameraHistory
 }
 
@@ -454,7 +449,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     }
     this.level = level;
     if(this.currentRequest){
-        return;
+        return this.currentRequest;
     }
 
     var levelData = RulerModel.levels[level];
@@ -465,7 +460,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     //1. Request records for interval
     self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
 
-    this.ready = self.currentRequest.then(function (data) {
+    return self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
             var chunks = data.data.reply;
             //if(chunks.length == 0){} // No chunks for this camera
@@ -499,9 +494,6 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
             return self.chunksTree;
         });
-
-    //3. return promise
-    return this.ready;
 };
 /**
  * Request records for interval, add it to cache, update visibility splice
@@ -723,10 +715,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras, mediaserver, $q){
-
-    this.$q = $q;
-
+function ShortCache(cameras, mediaserver){
     this.mediaserver = mediaserver;
     this.cameras = cameras;
 
