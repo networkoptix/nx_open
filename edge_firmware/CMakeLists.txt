@@ -28,7 +28,7 @@ function(nx_configure_directory input output)
     endforeach()
 endfunction()
 
-if(deviceTarget STREQUAL "edge1")
+if(targetDevice STREQUAL "edge1")
     set(box_dir "isd")
 else()
     set(box_dir "rpi")

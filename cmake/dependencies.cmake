@@ -160,7 +160,7 @@ function(get_dependencies)
         nx_rdep_add_package(any/roboto-fonts)
     endif()
 
-    if(haveServer OR haveDesktopClient)
+    if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
         nx_rdep_add_package(festival)
         if(NOT "${festival-vox_version}" STREQUAL "system")
             nx_rdep_add_package(any/festival-vox)
