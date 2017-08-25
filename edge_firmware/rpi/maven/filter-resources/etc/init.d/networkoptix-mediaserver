@@ -26,7 +26,8 @@ SECONDS_TO_WAIT_BEFORE_KILL_9=120
 OBSOLETE_LIBS=(
     ffmpeg #< Was a dedicated ffmpeg for vdpau. Now one ffmpeg is used for vms and vdpau.
     libclient_core.so #< Renamed to libnx_client_core.so.
-    libnx_streaming.so #< Eliminated.
+    libnx_streaming.so #< Eliminated (went to libnx_media).
+    libnx_bpi_videonode_plugin.so #< Eliminated (went to libnx_client_core).
 )
 
 export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"

@@ -41,7 +41,6 @@
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
-        <nx_bpi_videonode_plugin.guid>{5e528d46-180a-4ea2-85b0-eeccef76ef79}</nx_bpi_videonode_plugin.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
@@ -943,7 +942,6 @@
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
-                <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
