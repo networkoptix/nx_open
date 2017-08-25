@@ -31,8 +31,8 @@ ConnectSessionManager::ConnectSessionManager(
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
-    m_trafficRelay(trafficRelay),
-    m_remoteRelayPeerPool(remoteRelayPeerPool)
+    m_remoteRelayPeerPool(remoteRelayPeerPool),
+    m_trafficRelay(trafficRelay)
 {
 }
 
