@@ -16,12 +16,15 @@ class Query;
 
 namespace cloud {
 namespace relay {
+
+namespace conf { class Settings; }
+
 namespace model {
 
 class RemoteRelayPeerPool: public AbstractRemoteRelayPeerPool
 {
 public:
-    RemoteRelayPeerPool(const char* cassandraHost);
+    RemoteRelayPeerPool(const conf::Settings& settings);
     ~RemoteRelayPeerPool();
 
     virtual cf::future<std::string> findRelayByDomain(

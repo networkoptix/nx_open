@@ -9,7 +9,9 @@
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
+#include <libtraffic_relay/src/controller/relay_public_ip_discovery.h>
 #include <libtraffic_relay/src/model/listening_peer_pool.h>
+#include <libtraffic_relay/src/model/model.h>
 
 namespace nx {
 namespace network {
@@ -32,6 +34,11 @@ boost::optional<hpm::api::SystemCredentials>
     return m_cloudSystemCredentials;
 }
 
+static std::string relayPort(int index)
+{
+    return std::to_string(20000 + index);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
@@ -52,9 +59,8 @@ cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     const std::string& /*domainName*/) const
 {
     auto& firstRelay = m_relayTest->m_relays[0];
-    auto relayPort = firstRelay->moduleInstance()->httpEndpoints()[0].port;
-    auto redirectToHost = "127.0.0.1:" + std::to_string(relayPort);
-    return cf::make_ready_future<std::string>(std::move(redirectToHost));
+    auto redirectToEndpoint = "127.0.0.1:" + relayPort(0);
+    return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
 
 BasicTestFixture::BasicTestFixture(
@@ -71,22 +77,21 @@ BasicTestFixture::BasicTestFixture(
 {
 }
 
-void BasicTestFixture::setUpConnectSessionManagerFactoryFunc()
+void BasicTestFixture::setUpPublicIpFactoryFunc()
 {
-    controller::ConnectSessionManagerFactory::setFactoryFunc(
-        [this](
-            const conf::Settings& settings,
-            model::ClientSessionPool* clientSessionPool,
-            model::ListeningPeerPool* listeningPeerPool,
-            controller::AbstractTrafficRelay* trafficRelay)
-    {
-        return std::make_unique<controller::ConnectSessionManager>(
-            settings,
-            clientSessionPool,
-            listeningPeerPool,
-            trafficRelay,
-            std::make_unique<MemoryRemoteRelayPeerPool>(this));
-    });
+    auto discoverFunc = []() {return HostAddress("127.0.0.1"); };
+    controller::PublicIpDiscoveryService::setDiscoverFunc(discoverFunc);
+}
+
+void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
+{
+    using namespace nx::cloud::relay::model;
+    auto createRemoteRelayPeerPoolFunc =
+        [this](const conf::Settings&)
+        {
+            return std::make_unique<MemoryRemoteRelayPeerPool>(this);
+        };
+    RemoteRelayPeerPoolFactory::setFactoryFunc(createRemoteRelayPeerPoolFunc);
 }
 
 BasicTestFixture::~BasicTestFixture()
@@ -113,7 +118,7 @@ void BasicTestFixture::startRelay(int index)
 {
     auto newRelay = std::make_unique<Relay>();
 
-    std::string endpointString = "0.0.0.0:0";
+    std::string endpointString = std::string("0.0.0.0:") + relayPort(index);
     newRelay->addArg("-http/listenOn", endpointString.c_str());
 
     std::string dataDirString = std::string("relay_") + std::to_string(index);
@@ -133,7 +138,8 @@ void BasicTestFixture::startRelay(int index)
 
 void BasicTestFixture::SetUp()
 {
-    setUpConnectSessionManagerFactoryFunc();
+    setUpPublicIpFactoryFunc();
+    setUpRemoteRelayPeerPoolFactoryFunc();
     startRelays();
     ASSERT_GE(m_relays.size(), 1U);
 
@@ -183,8 +189,7 @@ QUrl BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
-    auto relayPort = m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].port;
-    auto relayUrlString = lm("http://127.0.0.1:%1/").arg(relayPort).toQString();
+    auto relayUrlString = lm("http://127.0.0.1:%1/").arg(relayPort(relayNum)).toQString();
 
     return QUrl(relayUrlString);
 }

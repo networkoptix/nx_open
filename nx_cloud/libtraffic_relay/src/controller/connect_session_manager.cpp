@@ -25,14 +25,14 @@ ConnectSessionManager::ConnectSessionManager(
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
-    controller::AbstractTrafficRelay* trafficRelay,
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool)
+    model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
+    controller::AbstractTrafficRelay* trafficRelay)
     :
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
     m_trafficRelay(trafficRelay),
-    m_remoteRelayPool(std::move(remoteRelayPool))
+    m_remoteRelayPeerPool(remoteRelayPeerPool)
 {
 }
 
@@ -50,9 +50,6 @@ ConnectSessionManager::~ConnectSessionManager()
 
     for (auto& relaySession: relaySessions)
         relaySession.listeningPeerConnection->pleaseStopSync();
-
-    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
-        m_listeningPeerPool->peerConnectedSubscription().removeSubscription(subscriptionId);
 }
 
 void ConnectSessionManager::beginListening(
@@ -116,14 +113,14 @@ void ConnectSessionManager::createClientSession(
         return;
     }
 
-    m_remoteRelayPool->findRelayByDomain(request.targetPeerName)
+    m_remoteRelayPeerPool->findRelayByDomain(request.targetPeerName)
         .then(
             [completionHandler = std::move(completionHandler), response = std::move(response),
             request, this](
                 cf::future<std::string> findRelayFuture) mutable
             {
-                auto redirectHostString = findRelayFuture.get();
-                if (redirectHostString.empty())
+                auto redirectEndpointString = findRelayFuture.get();
+                if (redirectEndpointString.empty())
                 {
                     NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
                         .arg(request.desiredSessionId)
@@ -134,7 +131,7 @@ void ConnectSessionManager::createClientSession(
                 }
 
                 std::stringstream ss;
-                ss << "http://" << redirectHostString << "/relay/server/"
+                ss << "http://" << redirectEndpointString << "/relay/server/"
                     << request.targetPeerName << "/client_sessions/";
 
                 response.redirectUrl = ss.str();
@@ -304,78 +301,6 @@ void ConnectSessionManager::startRelaying(RelaySession relaySession)
         {std::move(listeningPeerChannel), relaySession.listeningPeerName});
 }
 
-void ConnectSessionManager::onBestEndpointDiscovered(std::string publicAddress)
-{
-    nx::utils::SubscriptionId subscriptionId;
-
-    subscribeForPeerConnected(&subscriptionId, std::move(publicAddress));
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-    }
-
-    subscribeForPeerDisconnected(&subscriptionId);
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_listeningPeerPoolSubscriptions.insert(subscriptionId);
-    }
-}
-
-void ConnectSessionManager::subscribeForPeerConnected(
-    nx::utils::SubscriptionId* subscriptionId,
-    std::string publicAddress)
-{
-    m_listeningPeerPool->peerConnectedSubscription().subscribe(
-        [this, publicAddress = std::move(publicAddress)](std::string peer)
-        {
-            m_remoteRelayPool->addPeer(peer, publicAddress)
-                .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
-                    {
-                        if (addPeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        subscriptionId);
-}
-
-void ConnectSessionManager::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId)
-{
-    m_listeningPeerPool->peerDisconnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_remoteRelayPool->removePeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> removePeerFuture)
-                    {
-                        if (removePeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        subscriptionId);
-}
-
-
 //-------------------------------------------------------------------------------------------------
 // ConnectSessionManagerFactory
 
@@ -385,20 +310,18 @@ std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::cre
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
     model::ListeningPeerPool* listeningPeerPool,
+    model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
     controller::AbstractTrafficRelay* trafficRelay)
 {
     if (customFactoryFunc)
         return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
 
-    auto cassandraHostCStr = settings.cassandraHost().toLatin1().constData();
-    auto remoteRelayPool = std::make_unique<model::RemoteRelayPeerPool>(cassandraHostCStr);
-
     return std::make_unique<ConnectSessionManager>(
         settings,
         clientSessionPool,
         listeningPeerPool,
-        trafficRelay,
-        std::move(remoteRelayPool));
+        remoteRelayPeerPool,
+        trafficRelay);
 }
 
 ConnectSessionManagerFactory::FactoryFunc
