@@ -37,7 +37,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;
-        $scope.liveOnly = true;
         $scope.activeCamera = null;
 
         $scope.activeResolution = 'Auto';
@@ -206,12 +205,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             if ($scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.id], systemAPI);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.id], systemAPI, 640);
-                $scope.liveOnly = true;
-                if($scope.canViewArchive) {
-                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
-                        $scope.liveOnly = !hasArchive;
-                    });
-                }
                 updateVideoSource(position);
                 $scope.switchPlaying(true);
             }

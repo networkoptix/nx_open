@@ -9,7 +9,6 @@ angular.module('nxCommon')
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
-                liveOnly: '=',
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',

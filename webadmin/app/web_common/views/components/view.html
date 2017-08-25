@@ -95,10 +95,9 @@
                             </videowindow>
                         </div>
 
-                        <div class="stick-to-bottom" ng-class="{invisible:liveOnly && !activeCamera}">
+                        <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
                             <timeline
                                     can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
-                                    live-only="liveOnly"
                                     records-provider="activeVideoRecords"
                                     position-handler="switchPosition"
                                     play-handler="switchPlaying" can-view-archive="canViewArchive"
