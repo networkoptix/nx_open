@@ -5,7 +5,7 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "https://www.hanwhasecurity.com/calculator/",
+    url: "https://www.hanwhasecurity.com/wavecalculator/",
     title: "System calculator",
     target: "new" // new|frame
 });
