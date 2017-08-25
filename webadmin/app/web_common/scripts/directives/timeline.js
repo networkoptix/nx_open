@@ -133,7 +133,7 @@ angular.module('nxCommon')
                         scope.scaleManager.checkZoom(scope.scaleManager.zoom());
                     });
                 }
-                function initTimeline(){
+                function initTimeline(hasArchive){
                     var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd();
@@ -472,15 +472,21 @@ angular.module('nxCommon')
                 if(scope.positionProvider) {
                     scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
                 }
+                function initRecordsProvider(){
+                    scope.recordsProvider.init().then(function(hasArchive){
+                        scope.emptyArchive = !hasArchive;
+                        scope.loading = false;
+                        if(hasArchive){
+                            initTimeline(); // There is archive - init timeline
+                        }else{ // No archive - wait and repeat attempt
+                            $timeout(initRecordsProvider, Config.webclient.updateArchiveStateTimeout);
+                        }
+                    });
+                }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.loading = true;
-                        scope.recordsProvider.init().then(function(hasArchive){
-                            scope.emptyArchive = !hasArchive;
-                            initTimeline();
-                            scope.loading = false;
-                        });
-
+                        initRecordsProvider();
                         timelineRender.setRecordsProvider(scope.recordsProvider);
                     }
                 });
@@ -494,7 +500,6 @@ angular.module('nxCommon')
                     the timeline's width should not change after that.
                 */
                 $timeout(updateTimelineWidth); // Adjust width.
-                initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing
                 animateScope.setDuration(timelineConfig.animationDuration);

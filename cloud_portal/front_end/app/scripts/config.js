@@ -209,7 +209,8 @@ var Config = {
             // * 20 seconds for chunks
             // * 10 seconds extra
         flashChromelessPath: "static/web_common/components/flashlsChromeless.swf",
-        flashChromelessDebugPath: "static/web_common/components/flashlsChromeless_debug.swf"
+        flashChromelessDebugPath: "static/web_common/components/flashlsChromeless_debug.swf",
+        updateArchiveStateTimeout: 60*1000 // If camera hs no archive - try to update it every minute
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
