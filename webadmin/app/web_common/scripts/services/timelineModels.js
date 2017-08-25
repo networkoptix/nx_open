@@ -321,22 +321,25 @@ var RulerModel = {
 
 //Provider for records from mediaserver
 function CameraRecordsProvider(cameras, mediaserver, width) {
-
     this.cameras = cameras;
+    this.width = width;
     this.mediaserver = mediaserver;
+}
+
+CameraRecordsProvider.prototype.init = function(){
     this.chunksTree = null;
     this.requestedCache = [];
     var self = this;
     //1. request first detailization to get initial bounds
 
     this.lastRequested = timeManager.nowToServer(); // lastrequested is always servertime
-    this.archiveReadyPromise = this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
+    return this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
         if(!self.chunksTree){
             return false; //No chunks for this camera
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start, width);
+        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start, self.width);
 
         if(nextLevel < RulerModel.levels.length - 1) {
             nextLevel ++;
@@ -347,9 +350,7 @@ function CameraRecordsProvider(cameras, mediaserver, width) {
                                         return true;
                                     });
     });
-    //2. getCameraHistory
-}
-
+};
 CameraRecordsProvider.prototype.cacheRequestedInterval = function (start, end, level){
     for(var i=0;i<level+1;i++){
         if(i >= this.requestedCache.length){

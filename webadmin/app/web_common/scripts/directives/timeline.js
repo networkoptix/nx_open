@@ -134,7 +134,6 @@ angular.module('nxCommon')
                     });
                 }
                 function initTimeline(){
-                    console.log("initTimeline");
                     var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd();
@@ -476,7 +475,7 @@ angular.module('nxCommon')
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.loading = true;
-                        scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
+                        scope.recordsProvider.init().then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
                             initTimeline();
                             scope.loading = false;
