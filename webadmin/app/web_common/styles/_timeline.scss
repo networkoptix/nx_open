@@ -229,37 +229,32 @@ ng-include{
   height: 100%;
   text-align: center;
   line-height: 100px;
+  color: black;
   background-color:$additional_light2;
-  border-left: 1px solid $light6 !important;
-  border-right: 1px solid $light4 !important;
+  border-left: 1px solid $light6;
+  border-right: 1px solid $light4;
 
   .webclient-button{
     margin: 40px auto;
   }
 
-  .active{
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
-  }
-
   &:hover{
-    background-color: $additional_light3 !important;
-    border-left: 1px solid $light6 !important;
-    border-right: 1px solid $light5 !important; 
+    background-color: $additional_light3;
+    border-left: 1px solid $light6;
+    border-right: 1px solid $light5; 
   }
 
   &.active:hover{
-    background-color: $light4 !important;
-    border-left: 1px solid $light7 !important;
-    border-right: 1px solid $light6 !important; 
+    background-color: $light4;
+    border-left: 1px solid $light7;
+    border-right: 1px solid $light6; 
   }
 
-  &:active,
+  &.active, &:active,
   &.active:active {
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
+    background-color: $light5;
+    border-left: 1px solid $light8;
+    border-right: 1px solid $light7; 
   }
 }
 
