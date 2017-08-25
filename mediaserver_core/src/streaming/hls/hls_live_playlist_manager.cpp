@@ -30,10 +30,10 @@ namespace nx_hls
     {
         using namespace std::placeholders;
 
-        m_mediaStreamCache->onKeyFrameSubscription().subscribe(
+        m_mediaStreamCache->keyFrameFoundSubscription().subscribe(
             std::bind(&HLSLivePlaylistManager::onKeyFrame, this, _1),
             &m_onKeyFrameSubscriptionId);
-        m_mediaStreamCache->onDiscontinueSubscription().subscribe(
+        m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription().subscribe(
             std::bind(&HLSLivePlaylistManager::onDiscontinue, this),
             &m_onDiscontinueSubscriptionId);
 
@@ -48,8 +48,8 @@ namespace nx_hls
             m_blockID = -1;
         }
 
-        m_mediaStreamCache->onDiscontinueSubscription().removeSubscription(m_onDiscontinueSubscriptionId);
-        m_mediaStreamCache->onKeyFrameSubscription().removeSubscription(m_onKeyFrameSubscriptionId);
+        m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription().removeSubscription(m_onDiscontinueSubscriptionId);
+        m_mediaStreamCache->keyFrameFoundSubscription().removeSubscription(m_onKeyFrameSubscriptionId);
     }
 
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
