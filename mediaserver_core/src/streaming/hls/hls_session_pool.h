@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 7 mar 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef HLS_SESSION_POOL_H
-#define HLS_SESSION_POOL_H
+#pragma once 
 
 #include <map>
 #include <set>
@@ -22,148 +17,153 @@
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 
+namespace nx_hls {
 
-namespace nx_hls
+class AbstractPlaylistManager;
+
+class HLSSession
 {
-    class AbstractPlaylistManager;
+public:
+    /**
+     * @param streamQuality If MEDIA_Quality_Auto, than both qualities (if available) can be streamed.
+     */
+    HLSSession(
+        const QString& id,
+        unsigned int targetDurationMS,
+        bool _isLive,
+        MediaQuality streamQuality,
+        const QnVideoCameraPtr& videoCamera,
+        const QnAuthSession& authSession);
+    ~HLSSession();
 
-    class HLSSession
-    {
-    public:
-        /*!
-            \param streamQuality If \a MEDIA_Quality_Auto, than both qualities (if available) can be streamed
-        */
-        HLSSession(
-            const QString& id,
-            unsigned int targetDurationMS,
-            bool _isLive,
-            MediaQuality streamQuality,
-            const QnVideoCameraPtr& videoCamera,
-            const QnAuthSession& authSession);
-        ~HLSSession();
+    const QString& id() const;
+    unsigned int targetDurationMS() const;
+    bool isLive() const;
+    MediaQuality streamQuality() const;
 
-        const QString& id() const;
-        unsigned int targetDurationMS() const;
-        bool isLive() const;
-        MediaQuality streamQuality() const;
+    void setPlaylistManager(MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value);
+    const AbstractPlaylistManagerPtr& playlistManager(MediaQuality streamQuality) const;
 
-        void setPlaylistManager( MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value );
-        const AbstractPlaylistManagerPtr& playlistManager( MediaQuality streamQuality ) const;
+    void saveChunkAlias(
+        MediaQuality streamQuality,
+        const QString& alias,
+        quint64 startTimestamp,
+        quint64 duration);
+    bool getChunkByAlias(
+        MediaQuality streamQuality,
+        const QString& alias,
+        quint64* const startTimestamp,
+        quint64* const duration) const;
 
-        void saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration );
-        bool getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const;
+    void setPlaylistAuthenticationQueryItem(const QPair<QString, QString>& authenticationQueryItem);
+    QPair<QString, QString> playlistAuthenticationQueryItem() const;
+    void setChunkAuthenticationQueryItem(const QPair<QString, QString>& authenticationQueryItem);
+    QPair<QString, QString> chunkAuthenticationQueryItem() const;
+    void updateAuditInfo(qint64 timeUsec);
 
-        void setPlaylistAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
-        QPair<QString, QString> playlistAuthenticationQueryItem() const;
-        void setChunkAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
-        QPair<QString, QString> chunkAuthenticationQueryItem() const;
-        void updateAuditInfo(qint64 timeUsec);
+private:
+    const QString m_id;
+    const unsigned int m_targetDurationMS;
+    const bool m_live;
+    const MediaQuality m_streamQuality;
+    const QnUuid m_cameraId;
+    QnResourcePool* m_resPool;
 
-    private:
-        const QString m_id;
-        const unsigned int m_targetDurationMS;
-        const bool m_live;
-        const MediaQuality m_streamQuality;
-        const QnUuid m_cameraId;
-        QnResourcePool* m_resPool;
+    std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
+    /** map<pair<quality, alias>, pair<start timestamp, duration>>. */
+    std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64>> m_chunksByAlias;
+    QPair<QString, QString> m_playlistAuthenticationQueryItem;
+    QPair<QString, QString> m_chunkAuthenticationQueryItem;
+    mutable QnMutex m_mutex;
+    AuditHandle m_auditHandle;
+    QnAuthSession m_authSession;
+};
 
-        std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
-        //!map<pair<quality, alias>, pair<start timestamp, duration> >
-        std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
-        QPair<QString, QString> m_playlistAuthenticationQueryItem;
-        QPair<QString, QString> m_chunkAuthenticationQueryItem;
-        mutable QnMutex m_mutex;
-        AuditHandle m_auditHandle;
-        QnAuthSession m_authSession;
-    };
-
-    /*!
-        - owns \a HLSSession objects
-        - removes session if noone uses it during specified timeout. Session cannot be removed while its id is locked
-
-        \note It is recommended to lock session id before performing any operations with session
-        \note Specifing session timeout and working with no id lock can result in undefined behavour
-        \note Class methods are thread-safe
-    */
-    class HLSSessionPool
+/**
+ * - Owns HLSSession objects.
+ * - Removes session if noone uses it during specified timeout. Session cannot be removed while its id is locked.
+ * NOTE: It is recommended to lock session id before performing any operations with session.
+ * NOTE: Specifing session timeout and working with no id lock can result in undefined behavour.
+ * NOTE: Class methods are thread-safe.
+ */
+class HLSSessionPool
     :
-        public nx::utils::TimerEventHandler
+    public nx::utils::TimerEventHandler
+{
+public:
+    /** Locks specified session id for ScopedSessionIDLock life time. */
+    class ScopedSessionIDLock
     {
     public:
-        //!Locks specified session id for \a ScopedSessionIDLock life time
-        class ScopedSessionIDLock
+        ScopedSessionIDLock(HLSSessionPool* const pool, const QString& id):
+            m_pool(pool),
+            m_id(id)
         {
-        public:
-            ScopedSessionIDLock( HLSSessionPool* const pool, const QString& id )
-            :
-                m_pool( pool ),
-                m_id( id )
-            {
-                m_pool->lockSessionID( m_id );
-            }
+            m_pool->lockSessionID(m_id);
+        }
 
-            ~ScopedSessionIDLock()
-            {
-                m_pool->unlockSessionID( m_id );
-            }
-
-        private:
-            HLSSessionPool* const m_pool;
-            const QString m_id;
-        };
-
-        HLSSessionPool();
-        virtual ~HLSSessionPool();
-
-        //!Add new session
-        /*!
-            \param session Object ownership is moved to \a HLSSessionPool instance
-            \param keepAliveTimeoutSec Session will be removed, if noone uses it for \a keepAliveTimeoutSec seconds. 0 is treated as no timeout
-            \return false, if session with id \a session->id() already exists. true, otherwise
-        */
-        bool add( HLSSession* session, unsigned int keepAliveTimeoutMS );
-        /*!
-            \return NULL, if session not found
-            \note Re-launches session deletion timer for \a keepAliveTimeoutSec
-        */
-        HLSSession* find( const QString& id ) const;
-        //!Removes session. Deallocates \a HLSSession object
-        void remove( const QString& id );
-
-        static HLSSessionPool* instance();
-        static QString generateUniqueID();
-
-    protected:
-        /*!
-            If \a id already locked, blocks till it unlocked
-        */
-        void lockSessionID( const QString& id );
-        void unlockSessionID( const QString& id );
+        ~ScopedSessionIDLock()
+        {
+            m_pool->unlockSessionID(m_id);
+        }
 
     private:
-        class HLSSessionContext
-        {
-        public:
-            HLSSession* session;
-            unsigned int keepAliveTimeoutMS;
-            quint64 removeTaskID;
-
-            HLSSessionContext();
-            HLSSessionContext(
-                HLSSession* const _session,
-                unsigned int _keepAliveTimeoutMS );
-        };
-
-        mutable QnMutex m_mutex;
-        QnWaitCondition m_cond;
-        std::set<QString> m_lockedIDs;
-        std::map<QString, HLSSessionContext> m_sessionByID;
-        std::map<quint64, QString> m_taskToSessionID;
-
-        //!Implementation of TimerEventHandler::onTimer
-        virtual void onTimer( const quint64& timerID );
-        void removeNonSafe( const QString& id );
+        HLSSessionPool* const m_pool;
+        const QString m_id;
     };
-}
 
-#endif  //HLS_SESSION_POOL_H
+    HLSSessionPool();
+    virtual ~HLSSessionPool();
+
+    /**
+     * Add new session.
+     * @param session Object ownership is moved to HLSSessionPool instance.
+     * @param keepAliveTimeoutSec Session will be removed,
+     * if noone uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
+     * @return false, if session with id session->id() already exists. true, otherwise.
+     */
+    bool add(HLSSession* session, unsigned int keepAliveTimeoutMS);
+    /**
+     * @return NULL, if session not found.
+     * NOTE: Re-launches session deletion timer for keepAliveTimeoutSec.
+     */
+    HLSSession* find(const QString& id) const;
+    /** Removes session. Deallocates HLSSession object. */
+    void remove(const QString& id);
+
+    static HLSSessionPool* instance();
+    static QString generateUniqueID();
+
+protected:
+    /**
+     * If id already locked, blocks till it unlocked.
+     */
+    void lockSessionID(const QString& id);
+    void unlockSessionID(const QString& id);
+
+private:
+    class HLSSessionContext
+    {
+    public:
+        HLSSession* session;
+        unsigned int keepAliveTimeoutMS;
+        quint64 removeTaskID;
+
+        HLSSessionContext();
+        HLSSessionContext(
+            HLSSession* const _session,
+            unsigned int _keepAliveTimeoutMS);
+    };
+
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    std::set<QString> m_lockedIDs;
+    std::map<QString, HLSSessionContext> m_sessionByID;
+    std::map<quint64, QString> m_taskToSessionID;
+
+    /** Implementation of TimerEventHandler::onTimer. */
+    virtual void onTimer(const quint64& timerID);
+    void removeNonSafe(const QString& id);
+};
+
+} // namespace nx_hls
