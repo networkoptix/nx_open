@@ -763,8 +763,8 @@ namespace nx_hls
                 {
                     requestIsAPartOfHlsSession = true;
                     hlsSession->updateAuditInfo(startTimestamp);
-                    if (aliasIter != requestParams.end())
-                        hlsSession->getChunkByAlias(streamQuality, aliasIter->second, &startTimestamp, &chunkDuration);
+                    if (params.alias)
+                        hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
                 }
             }
         }
