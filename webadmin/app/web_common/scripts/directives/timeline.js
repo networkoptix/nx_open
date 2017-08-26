@@ -133,7 +133,7 @@ angular.module('nxCommon')
                         scope.scaleManager.checkZoom(scope.scaleManager.zoom());
                     });
                 }
-                function initTimeline(hasArchive){
+                function initTimeline(){
                     var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd();
