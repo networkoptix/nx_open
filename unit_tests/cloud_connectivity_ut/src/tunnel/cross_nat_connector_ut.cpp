@@ -12,6 +12,8 @@
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
 #include "cross_nat_connector_test.h"
+#include "tunnel_connector_stub.h"
+#include "tunnel_connection_stub.h"
 
 namespace nx {
 namespace network {
@@ -22,15 +24,73 @@ class CrossNatConnector:
     public TunnelConnector
 {
 public:
-    CrossNatConnector()
+    ~CrossNatConnector()
     {
-        init();
+        if (m_connectorFactoryBak)
+            ConnectorFactory::instance().setCustomFunc(std::move(m_connectorFactoryBak));
+    }
+
+protected:
+    void givenEstablishedTunnelConnection()
+    {
+        whenEstablishConnection();
+        thenConnectionIsEstablished();
+    }
+
+    void whenEstablishConnection()
+    {
+        auto connectResult = doSimpleConnectTest(
+            std::chrono::milliseconds::zero(),
+            nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection,
+            mediator().stunEndpoint());
+        m_tunnelConnection = std::move(connectResult.connection);
+    }
+
+    void thenConnectionIsEstablished()
+    {
+        ASSERT_NE(nullptr, m_tunnelConnection.get());
+    }
+
+    void assertConnectionHasNotBeenStarted()
+    {
+        auto connectionStub = m_establishedTestConnections.pop();
+        ASSERT_FALSE(connectionStub->isStarted());
+    }
+
+    void enableConnectorStub()
+    {
+        using namespace std::placeholders;
+
+        m_connectorFactoryBak = ConnectorFactory::instance().setCustomFunc(
+            std::bind(&CrossNatConnector::connectorFactory, this, _1, _2, _3, _4));
     }
 
 private:
-    void init()
+    std::unique_ptr<nx::network::cloud::AbstractOutgoingTunnelConnection> m_tunnelConnection;
+    ConnectorFactory::Function m_connectorFactoryBak;
+    nx::utils::SyncQueue<TunnelConnectionStub*> m_establishedTestConnections;
+
+    virtual void SetUp() override
     {
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+    }
+
+    CloudConnectors connectorFactory(
+        const AddressEntry& targetAddress,
+        const nx::String& /*connectSessionId*/,
+        const hpm::api::ConnectResponse& /*response*/,
+        std::unique_ptr<UDPSocket> /*udpSocket*/)
+    {
+        TunnelConnectorContext connectorContext;
+        auto connector = std::make_unique<TunnelConnectorStub>(targetAddress);
+        connector->setBehavior(TunnelConnectorStub::Behavior::reportSuccess);
+        connector->setConnectionQueue(&m_establishedTestConnections);
+        connectorContext.connector = std::move(connector);
+
+        CloudConnectors cloudConnectors;
+        cloudConnectors.push_back(std::move(connectorContext));
+
+        return cloudConnectors;
     }
 };
 
@@ -67,6 +127,14 @@ TEST_F(CrossNatConnector, target_host_not_found)
 
     ASSERT_EQ(SystemError::hostNotFound, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
+}
+
+TEST_F(CrossNatConnector, provides_not_started_connections)
+{
+    enableConnectorStub();
+
+    givenEstablishedTunnelConnection();
+    assertConnectionHasNotBeenStarted();
 }
 
 //-------------------------------------------------------------------------------------------------

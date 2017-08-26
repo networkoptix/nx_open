@@ -1398,7 +1398,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Relecture piste de vérification</translation>
     </message>
   </context>
   <context>

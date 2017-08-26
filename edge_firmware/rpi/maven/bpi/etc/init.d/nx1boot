@@ -10,7 +10,7 @@
 # Description:       Provides the ability to boot up automatically depending on available
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
-# VERSION: ${release.version}.${buildNumber}
+# VERSION: @release.version@.@buildNumber@
 
 export NX1LOG=/var/log/nx1.log
 set -x
@@ -28,8 +28,8 @@ exec 2>&1
 
 echo `date` "++++++++++++++++++++++ Starting Boot Process ++++++++++++++++++++++++"
 
-export CUSTOMIZATION=${deb.customization.company.name}
-export DISTRIB=${artifact.name.server}.tar.gz
+export CUSTOMIZATION="@deb.customization.company.name@"
+export DISTRIB="@artifact.name.server@.tar.gz"
 
 export CHECKBOOTHDDPART=
 export CHECKDATAHDDPART=
@@ -213,7 +213,7 @@ system_restore () {
 
     if [ -f /restore ]; then
         stop_server
-        stop_lite_client        
+        stop_lite_client
         read_hdd_environment
         /etc/init.d/nx1led restore
         rm /etc/udev/rules.d/70-persistent-net.rules
@@ -380,7 +380,7 @@ upgrade_sd() {
 
     FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11) | awk '{print $3}'
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
-}    
+}
 
 default_sequence () {
     get_reset_button_presense

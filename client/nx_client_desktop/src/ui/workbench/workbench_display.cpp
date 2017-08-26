@@ -96,7 +96,10 @@
 
 #include <nx/utils/log/log.h>
 
+#include <ini.h>
+
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace client::desktop::ui;
 
 namespace {
@@ -146,6 +149,9 @@ const int splashPeriodMs = 500;
 
 /** How long splashes should be painted on items when notification appears.  */
 const int splashTotalLengthMs = 1000;
+
+/** Viewport lower size boundary, in scene coordinates. */
+static const QSizeF kViewportLowerSizeBound(500.0, 500.0);
 
 enum
 {
@@ -1711,9 +1717,13 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
         ? itemGeometry(zoomedItem)
         : fitInViewGeometry();
 
+    static const QSizeF viewportLowerSizeBound(ini().enableUnlimitedZoom
+        ? QSizeF(0.1, 0.1)
+        : kViewportLowerSizeBound);
+
     m_boundingInstrument->setPositionBounds(m_view, sizeRect);
     m_boundingInstrument->setSizeBounds(m_view,
-        qnGlobals->viewportLowerSizeBound(),
+        viewportLowerSizeBound,
         Qt::KeepAspectRatioByExpanding,
         sizeRect.size(),
         Qt::KeepAspectRatioByExpanding);

@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Licences Temps</translation>
     </message>
   </context>
   <context>
@@ -668,7 +668,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Licence Temps</translation>
     </message>
   </context>
   <context>
