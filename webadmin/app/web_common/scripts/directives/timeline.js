@@ -292,51 +292,49 @@ angular.module('nxCommon')
                 }
 
 
-                function canvasDragInit(event){
-                    updateMouseCoordinate(event);
-                }
-
                 var dragged = false;
-                function canvasDragStart(event){
-                    updateMouseCoordinate(event);
-                    dragged = false;
-                    /*if(mouseOverElements.leftButton){
-                     scope.startScroll(true);
-                     return;
-                     }
-
-                     if(mouseOverElements.rightButton){
-                     scope.startScroll(false);
-                     return;
-                     }*/
-
-                    if(mouseOverElements.scrollbarSlider){
-                        timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
-                    }
-                    if(mouseOverElements.timeline){
-                        timelineActions.timelineDragStart(mouseXOverTimeline)
-                    }
-                }
-                function canvasDrag(event){
-                    updateMouseCoordinate(event);
-                    dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
-                              timelineActions.timelineDrag (mouseXOverTimeline) || dragged;
-                              // dragged is true if it was actually dragged at least once during interaction
-                }
-
+                var dragStarted = 0;
+                var impetusInit = null;
                 var preventClick = false;
-                function canvasDragEnd(){
-                    updateMouseCoordinate(null);
-                    timelineActions.scrollbarSliderDragEnd();
-                    timelineActions.timelineDragEnd();
+                // Impetus is inertia drag library
+                new Impetus({
+                    source: $canvas.get(0),
+                    friction: timelineConfig.intertiaFriction,
+                    start:function(x, y, event){
+                        viewportMouseDown(event);
 
-                    if(dragged){
-                        preventClick = true;
-                        setTimeout(function(){
-                            preventClick = false;
-                        }, timelineConfig.animationDuration);
+                        updateMouseCoordinate(event);
+                        dragStarted = mouseXOverTimeline;
+                        impetusInit = x;
+
+                        dragged = false;
+                        if(mouseOverElements.scrollbarSlider){
+                            timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
+                        }
+                        if(mouseOverElements.timeline){
+                            timelineActions.timelineDragStart(mouseXOverTimeline)
+                        }
+                    },
+                    update: function(x, y) {
+                        var virtualMouseX = dragStarted + x - impetusInit;
+                        dragged = timelineActions.scrollbarSliderDrag(virtualMouseX) ||
+                                  timelineActions.timelineDrag (virtualMouseX) || dragged;
+                    },
+
+                    release:function(x,y){
+                        if(dragged){
+                            preventClick = true;
+                            setTimeout(function(){
+                                preventClick = false;
+                            }, timelineConfig.animationDuration);
+                        }
+                    },
+                    stop:function(x,y){
+                        updateMouseCoordinate(null);
+                        timelineActions.scrollbarSliderDragEnd();
+                        timelineActions.timelineDragEnd();
                     }
-                }
+                });
 
 
                 function viewportDblClick(event){
@@ -439,15 +437,6 @@ angular.module('nxCommon')
                 viewport.mousewheel(viewportMouseWheel);
 
 
-                $canvas.drag('draginit',viewportMouseDown); // draginit overrides mousedown
-                $canvas.drag('dragstart',canvasDragStart);
-                $canvas.drag('drag',canvasDrag);
-                $canvas.drag('dragend',canvasDragEnd);
-
-                $canvas.bind('touchstart', canvasDragStart);
-                $canvas.bind('touchmove', canvasDrag);
-                $canvas.bind('touchend', canvasDragEnd);
-                //$canvas.bind('touchcancel', canvasDragEnd);
                 // Actual browser events handling
 
                 /*

@@ -167,6 +167,7 @@ function TimelineConfig(){
         scrollSpeed: 1, // Relative to screen - one click on scrollbar
         scrollButtonSpeed: 0.25, // One click on scrollbutton 
         slowScrollSpeed: 0.25,
+        intertiaFriction: 0.92, // Friction for scrolling and drag and drop
 
 
         scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
