@@ -1318,10 +1318,6 @@ pour afficher plus de signets</translation>
       <translation>Exporter les enregistrements sélectionnés vers un fichier</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Relecture du journal de vérification</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Périphériques</translation>
     </message>
@@ -1399,6 +1395,10 @@ pour afficher plus de signets</translation>
         <numerusform>Cette ressource est retiré du système</numerusform>
         <numerusform>Ces ressources sont retirés du système</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Relecture piste de vérification</translation>
     </message>
   </context>
   <context>

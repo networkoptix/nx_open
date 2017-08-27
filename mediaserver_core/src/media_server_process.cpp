@@ -251,7 +251,8 @@
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
-#include "nx/mediaserver/unused_wallpapers_watcher.h"
+#include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <nx/mediaserver/license_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
@@ -275,6 +276,7 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
 
 using namespace nx;
 
@@ -3095,6 +3097,9 @@ void MediaServerProcess::run()
 
     qnBackupStorageMan->scheduleSync()->start();
     serverModule->unusedWallpapersWatcher()->start();
+    if (m_serviceMode)
+        serverModule->licenseWatcher()->start();
+
     emit started();
     exec();
 

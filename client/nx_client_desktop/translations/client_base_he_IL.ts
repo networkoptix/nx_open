@@ -1319,10 +1319,6 @@ to view more bookmarks</source>
       <translation>יצא את ההקלטות שנבחרו לקובץ</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>הפעלה מחדש של תיעוד (log) הביקורת</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>התקנים</translation>
     </message>
@@ -1410,6 +1406,10 @@ to view more bookmarks</source>
         <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
         <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>שחזור נתיב הביקורת</translation>
     </message>
   </context>
   <context>

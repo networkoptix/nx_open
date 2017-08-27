@@ -1318,10 +1318,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Kiválasztott felvételek exportálása fájlba</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Audit napló visszajátszás</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Eszközök</translation>
     </message>
@@ -1399,6 +1395,10 @@ több könyvjelző megjelenítéséhez</translation>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Audit napló visszajátszás</translation>
     </message>
   </context>
   <context>

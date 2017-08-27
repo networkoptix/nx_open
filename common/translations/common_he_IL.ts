@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>זמן</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>רישיונות זמניים</translation>
     </message>
   </context>
   <context>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>רישיון זמני</translation>
     </message>
   </context>
   <context>

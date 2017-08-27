@@ -187,9 +187,9 @@ public:
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     // AbstractStreamServerSocket -------------- interface
-    virtual bool listen(int queueLen = 128);
-    virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(AcceptCompletionHandler handler);
+    virtual bool listen(int queueLen = 128) override;
+    virtual AbstractStreamSocket* accept() override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
@@ -207,7 +207,11 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-    std::atomic<size_t> internetBytesTransfered{0};
+    #ifdef __arm__
+        std::atomic<uint32_t> internetBytesTransfered{0};
+    #else
+        std::atomic<uint64_t> internetBytesTransfered{0};
+    #endif
 
     static UdtStatistics global;
 };

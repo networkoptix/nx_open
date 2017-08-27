@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>Geselecteerde data exporteren naar een bestand</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Systeemrapportage herhalen</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Apparaten</translation>
     </message>
@@ -1398,6 +1394,10 @@ to view more bookmarks</source>
         <numerusform>Deze bron wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Audit trail afspelen</translation>
     </message>
   </context>
   <context>
@@ -1792,7 +1792,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige Server</translation>
+      <translation>Een willekeurige server</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2884,7 +2884,7 @@ to %1</source>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation>Gelukt</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Request timeout</source>
@@ -2896,7 +2896,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbind</translation>
+      <translation>Verbinden</translation>
     </message>
   </context>
   <context>
@@ -3366,7 +3366,7 @@ to %1</source>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Audit logboek</translation>
+      <translation>Audit Trail</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
@@ -3627,7 +3627,7 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Uitgesteld</translation>
+      <translation>Time-out</translation>
     </message>
   </context>
   <context>
@@ -3673,7 +3673,7 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Uitgesteld</translation>
+      <translation>Time-out</translation>
     </message>
     <message>
       <source>Import Selected</source>
@@ -3946,7 +3946,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4077,7 +4077,7 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Uiterlijk aanpassen</translation>
+      <translation>Personalisatie</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -4232,7 +4232,7 @@ to %1</source>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Bestand selecteren...</translation>
+      <translation>Selecteer bestand...</translation>
     </message>
     <message>
       <source>No image</source>
@@ -4331,7 +4331,7 @@ to %1</source>
     </message>
     <message>
       <source>New Server</source>
-      <translation>Nieuwe Server</translation>
+      <translation>Nieuwe server</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
@@ -4389,11 +4389,11 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Stel opnemen op &quot;Always&quot;</translation>
+      <translation>Stel opnemen in op &quot;Always&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>Secondary Stream inschakelen</translation>
+      <translation>Secondaire stream inschakelen</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -4958,7 +4958,7 @@ to %1</source>
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>%n van %1 geselecteerde rollen hebben geen toestemming voor %2</numerusform>
+        <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
         <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
       </translation>
     </message>
@@ -5148,7 +5148,7 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>Zoeken</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5186,7 +5186,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Zoeken</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5730,15 +5730,15 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>Systeem Handtekening</translation>
+      <translation>Systeem handtekening</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Ondersteuning Handtekening</translation>
+      <translation>Ondersteuning handtekening</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Vul hier een korte systeemomschrijving in.</translation>
+      <translation>Vul hier een korte systeembeschrijving in.</translation>
     </message>
   </context>
   <context>
@@ -5901,7 +5901,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Licentie activeren</translation>
+      <translation>Activeer licentie</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6275,7 +6275,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbind</translation>
+      <translation>Verbinden</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -6442,7 +6442,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dD MMMM jjjj uu: mm</translation>
+      <translation>dd MMMM jjjj uu:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
@@ -6840,7 +6840,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Email kan niet leeg zijn.</translation>
+      <translation>Email mag niet leeg zijn.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7118,227 +7118,227 @@ to %1</source>
     </message>
     <message>
       <source>Selected format not recommended</source>
-      <translation type="unfinished">Selected format not recommended</translation>
+      <translation>Geselecteerd formaat niet aanbevolen</translation>
     </message>
     <message>
       <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation type="unfinished">To avoid video downscaling, NOV or EXE formats are recommended for this camera.</translation>
+      <translation>Om de video-downscaling te voorkomen, worden *.nov of *.exe formaten aanbevolen voor deze camera.</translation>
     </message>
     <message>
       <source>Export with transcoding?</source>
-      <translation type="unfinished">Export with transcoding?</translation>
+      <translation>Exporteren met transcodering?</translation>
     </message>
     <message>
       <source>It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">It will increase CPU usage and may take significant time.</translation>
+      <translation>De CPU belasting zal toenemen en kan aanzienlijke tijd duren.</translation>
     </message>
     <message>
       <source>EXE format not recommended</source>
-      <translation type="unfinished">EXE format not recommended</translation>
+      <translation>*.exe formaat niet aanbevolen</translation>
     </message>
     <message>
       <source>Export to EXE anyway?</source>
-      <translation type="unfinished">Export to EXE anyway?</translation>
+      <translation>Toch exporteren naar *.exe?</translation>
     </message>
     <message>
       <source>Failed to export Multi-Video</source>
-      <translation type="unfinished">Failed to export Multi-Video</translation>
+      <translation>Multi-video exporteren mislukt</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+      <translation>Locale bestanden kunnen niet worden geëxporteerd als multi-video export</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+      <translation>Verwijder alle lokale bestanden uit de layout en probeer het opnieuw.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exporteer</translation>
     </message>
     <message>
       <source>You are about to export a lot of video</source>
-      <translation type="unfinished">You are about to export a lot of video</translation>
+      <translation>U staat op het punt om een ​​lange video te exporteren</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>Te korte periode geselecteerd</translation>
     </message>
     <message>
       <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation type="unfinished">For exporting as Rapid Review, video length should be at least 10 seconds.</translation>
+      <translation>Als u wilt exporteren als een rapid review, moet de videolengte minstens 10 seconden zijn.</translation>
     </message>
     <message>
       <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
+      <translation>Exporteren voltooid</translation>
     </message>
     <message>
       <source>Failed to export video</source>
-      <translation type="unfinished">Failed to export video</translation>
+      <translation>Exporteren van de video is mislukt</translation>
     </message>
     <message>
       <source>AVI format is not recommended</source>
-      <translation type="unfinished">AVI format is not recommended</translation>
+      <translation>AVI formaat wordt niet aanbevolen</translation>
     </message>
     <message>
       <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation type="unfinished">For exporting a non-continuous recording MKV or some other format is recommended.</translation>
+      <translation>Voor het exporteren van een niet-continue opname *.mkv of een ander formaat wordt aanbevolen.</translation>
     </message>
     <message>
       <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation type="unfinished">EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</translation>
+      <translation>*.exe bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Enter Password...</source>
-      <translation type="unfinished">Enter Password...</translation>
+      <translation>Voer wachtwoord in...</translation>
     </message>
     <message>
       <source>Administrator Password</source>
-      <translation type="unfinished">Administrator Password</translation>
+      <translation>Administrator wachtwoord</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Systemen zullen spoedig zijn samengevoegd</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
+      <translation>Servers van het andere systeem zullen verschijnen in de resource boom.</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation type="unfinished">Failed to merge Systems</translation>
+      <translation>Samenvoegen van systemen mislukt</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
-      <translation type="unfinished">Failed to update Server</translation>
+      <translation>Bijwerken van de Server mislukt</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation type="unfinished">Total amount of licenses will decrease</translation>
+      <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Wachtwoord mag niet leeg zijn.</translation>
     </message>
     <message>
       <source>Cloud Systems cannot be merged</source>
-      <translation type="unfinished">Cloud Systems cannot be merged</translation>
+      <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation type="unfinished">Connecting to the current System...</translation>
+      <translation>Verbinding maken met het huidige systeem...</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Het verschijnt in de resource tree wanneer de database synchronisatie is voltooid.</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
-      <translation type="unfinished">Server will be connected to System shortly</translation>
+      <translation>Server wordt spoedig op het systeem aangesloten</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
+        <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing System configuration not allowed in Safe Mode</source>
-      <translation type="unfinished">Changing System configuration not allowed in Safe Mode</translation>
+      <translation>Het wijzigen van systeemconfiguratie is niet toegestaan ​​in de veilige modus</translation>
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation type="unfinished">Failed to save changes</translation>
+      <translation>Het opslaan van de wijzigingen is niet gelukt</translation>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+      <translation>
+        <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
+        <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
       </translation>
     </message>
     <message>
       <source>Deleting objects not allowed in Safe Mode</source>
-      <translation type="unfinished">Deleting objects not allowed in Safe Mode</translation>
+      <translation>Objecten verwijderen is niet toegestaan ​​in de veilige modus</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>Kan %n items niet verwijderen:</numerusform>
+        <numerusform>Kan %n items niet verwijderen:</numerusform>
       </translation>
     </message>
     <message>
       <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-      <translation type="unfinished">System is in Safe Mode. It is not allowed to make any changes except license activation.</translation>
+      <translation>Systeem is in de veilige modus. Het is niet toegestaan ​​om wijzigingen aan te brengen behalve licentieactivering.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
       <source>System is in safe mode</source>
-      <translation type="unfinished">System is in safe mode</translation>
+      <translation>Systeem is in de veilige modus</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
+      <translation>Het scherm vastleggen van het subsysteem is nog niet geïnitialiseerd. Probeer het later nogmaals.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation type="unfinished">Recording in %1...</translation>
+      <translation>Opnemen in %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation type="unfinished">Recorded Video</translation>
+      <translation>Opgenomen video</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation type="unfinished">Save Recording As...</translation>
+      <translation>Opname opslaan als...</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved) (*.avi)</translation>
+      <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation type="unfinished">Failed to start recording</translation>
+      <translation>Kan de opname niet starten</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
       <source>PNG Image (*.png)</source>
-      <translation type="unfinished">PNG Image (*.png)</translation>
+      <translation>PNG Image (*.png)</translation>
     </message>
     <message>
       <source>JPEG Image (*.jpg)</source>
-      <translation type="unfinished">JPEG Image (*.jpg)</translation>
+      <translation>JPEG Image (*.jpg)</translation>
     </message>
     <message>
       <source>Save Screenshot As...</source>
-      <translation type="unfinished">Save Screenshot As...</translation>
+      <translation>Schermafbeelding opslaan als...</translation>
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation type="unfinished">Timestamp:</translation>
+      <translation>Tijdstempel:</translation>
     </message>
     <message>
       <source>Saving %1</source>
-      <translation type="unfinished">Saving %1</translation>
+      <translation>%1 opslaan</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation type="unfinished">Saving Screenshot...</translation>
+      <translation>Screenshot opslaan...</translation>
     </message>
     <message>
       <source>No Timestamp</source>
@@ -7557,7 +7557,7 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation>
-        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
+        <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
         <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>

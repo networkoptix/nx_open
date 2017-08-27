@@ -29,6 +29,7 @@
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
+using nx::vms::common::core::resource::CombinedSensorsDescription;
 
 namespace {
 
@@ -385,6 +386,24 @@ bool QnSecurityCamResource::isAnalogEncoder() const
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
+}
+
+CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
+{
+    const auto& value = getProperty(Qn::kCombinedSensorsDescriptionParamName);
+    return QJson::deserialized<CombinedSensorsDescription>(value.toLatin1());
+}
+
+void QnSecurityCamResource::setCombinedSensorsDescription(
+    const CombinedSensorsDescription& sensorsDescription)
+{
+    setProperty(Qn::kCombinedSensorsDescriptionParamName,
+        QString::fromLatin1(QJson::serialized(sensorsDescription)));
+}
+
+bool QnSecurityCamResource::hasCombinedSensors() const
+{
+    return !combinedSensorsDescription().isEmpty();
 }
 
 bool QnSecurityCamResource::isEdge() const

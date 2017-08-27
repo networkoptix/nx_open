@@ -20,6 +20,7 @@
 
 #include "core/dataconsumer/audio_data_transmitter.h"
 #include <core/resource/abstract_remote_archive_manager.h>
+#include <core/resource/combined_sensors_description.h>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -104,6 +105,10 @@ public:
     /** Returns true if it is a analog encoder (described in resource_data.json) */
     bool isAnalogEncoder() const;
 
+    nx::vms::common::core::resource::CombinedSensorsDescription combinedSensorsDescription() const;
+    void setCombinedSensorsDescription(
+        const nx::vms::common::core::resource::CombinedSensorsDescription& sensorsDescription);
+    bool hasCombinedSensors() const;
 
     /** Returns true if it is a edge camera */
     bool isEdge() const;

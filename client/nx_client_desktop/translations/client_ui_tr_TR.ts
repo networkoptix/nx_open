@@ -137,34 +137,6 @@
     </message>
   </context>
   <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Harici Depolama Ekle...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Versiyon:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>İşaretli</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>İşaretli değil</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Yüklü sürümleri al</translation>
-    </message>
-  </context>
-  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -437,7 +409,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>da/de</translation>
     </message>
   </context>
   <context>
@@ -461,6 +433,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Olay Günlükleri...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -583,11 +560,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>hakkında:boş</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Gelişmiş seçenekler kullanılamıyor</translation>
     </message>
@@ -717,7 +689,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Kameranın ayarlarını optimize etmek için Sistemi kapatın&quot;, Sistem Yönetimi'nde devre dışı bırakıldı.</translation>
     </message>
     <message>
       <location/>
@@ -732,12 +704,12 @@
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Yerel hazır ayarları devre dışı bırakın, bunun yerine sistem hazır ayarlarını kullanın</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Uyarı! Yerli kamera hazır ayarları mevcut olmayacaktır.</translation>
     </message>
   </context>
   <context>
@@ -1416,7 +1388,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Donanım Kimliği'ne kaydedildi:</translation>
     </message>
   </context>
   <context>
@@ -1642,7 +1614,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Showreel döngüsü</translation>
     </message>
   </context>
   <context>
@@ -1711,7 +1683,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Kullanıcıya oynat</translation>
     </message>
   </context>
   <context>
@@ -1729,7 +1701,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>İlerleme Bildirimi</translation>
     </message>
   </context>
   <context>
@@ -1904,7 +1876,7 @@
     <message>
       <location/>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
   </context>
   <context>
@@ -2241,7 +2213,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2279,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Kullnıcıya konuş</translation>
     </message>
   </context>
   <context>
@@ -2550,7 +2522,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2647,7 +2619,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Uygun</translation>
     </message>
     <message>
       <location/>
@@ -2863,8 +2835,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Özel tanımlı kullanıcı yetkilendirmesi yok. Oluşturmak için &quot;Yeni Rol&quot; butonuna tıklayın.</translation>
     </message>
     <message>
       <location/>

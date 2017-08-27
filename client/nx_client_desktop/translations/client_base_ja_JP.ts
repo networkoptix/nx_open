@@ -1316,10 +1316,6 @@ to view more bookmarks</source>
       <translation>ファイルにエクスポート</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>操作履歴ログ再表示</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>デバイス</translation>
     </message>
@@ -1392,6 +1388,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>これらのリソースはシステムから削除されます</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>

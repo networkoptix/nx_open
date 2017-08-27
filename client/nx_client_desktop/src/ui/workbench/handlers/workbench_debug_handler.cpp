@@ -132,6 +132,7 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
@@ -140,6 +141,7 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 

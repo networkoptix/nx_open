@@ -1,10 +1,11 @@
 <alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Are you developer?</b></p>
-    <p>We are looking for ways to improve developer tools we provide (API, SDK, etc). If you have developed any
-    integrations or you want to, please, complete this feedback form. It will take 3-5 minutes.<br>
-    Your feedback will help us to provide better products and solutions for your business.<br>
+    <p><b>Fejlesztő vagy?</b></p>
+    <p>Keressük a fejlesztői eszközök fejlesztésének módjait (API, SDK stb.). Ha fejlesztettél bármilyen
+        integrációt, vagy szeretnél, szívesen vesszük visszajelzésedet. Csak 3-5 percet vesz igénybe.<br>
+        Visszajelzésed segít a szoftverünk jobbá tételében és ezzel az üzleted fejlesztésében.<br>
     </p>
-    <p>Also, you have an opportunity to get our latest news and plans, participate in discussions and therefore influence our developer tools.</p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    <p>Ezzel együtt lehetőséged nyílik legfrissebb híreink, terveink és megismerésére és részt vehetsz vitafórumainkon
+        így befolyásolhatod a fejlesztői eszközeink javítását.</p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Várjuk visszajezését</a></p>
 </alert>

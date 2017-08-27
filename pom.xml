@@ -146,6 +146,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <paxton>false</paxton>
+        <addQtPdb>false</addQtPdb>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -253,7 +254,7 @@
         <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
         <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform>
         <!-- will be defined in each platform separately -->
-        <artifact.name.beta.suffix/>
+        <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
         <!-- will be defined in artifact-name-beta profile -->
         <artifact.name.cloud.suffix/>
         <!-- will be defined in artifact-name-cloud profile -->
@@ -277,6 +278,7 @@
         <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
         <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.qt_debug>${artifact.name.prefix}-qt_debug-${artifact.name.suffix}</artifact.name.qt_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
         <nxcloud.version>latest</nxcloud.version>
@@ -719,7 +721,6 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>
@@ -777,6 +778,10 @@
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
                 <qt.version>5.6.2-2</qt.version>
+                <festival.version>2.1</festival.version>
+                <openssl.version>1.0.2e-2</openssl.version>
+                <quazip.version>0.7.3</quazip.version>
+                <ffmpeg.version>3.1.1-2</ffmpeg.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -1093,6 +1098,7 @@
                 <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
+                <artifact.name.beta.suffix/>
             </properties>
         </profile>
 
@@ -1241,19 +1247,6 @@
         </profile>
 
         <!-- Artifact naming profiles -->
-
-        <profile>
-            <id>artifact-name-beta</id>
-            <activation>
-                <property>
-                    <name>beta</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
-            </properties>
-        </profile>
 
         <profile>
             <id>artifact-name-cloud</id>

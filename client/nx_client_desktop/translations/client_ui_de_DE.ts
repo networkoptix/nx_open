@@ -137,34 +137,6 @@
     </message>
   </context>
   <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Externen Speicher hinzufügen...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Version:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Überprüfen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Nicht überprüft</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Installierte Versionen anzeigen</translation>
-    </message>
-  </context>
-  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -462,6 +434,11 @@
       <source>Event Log...</source>
       <translation>Ereignisprotokoll...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +560,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Erweiterte Einstellungen sind nicht verfügbar</translation>
     </message>
@@ -1642,7 +1614,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Demoband-Zyklus</translation>
     </message>
   </context>
   <context>

@@ -137,34 +137,6 @@
     </message>
   </context>
   <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Külső tárhely hozzáadása...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Verzió:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Ellenőrzés</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Nem ellenőrzött</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>A telepített verzió beszerzése</translation>
-    </message>
-  </context>
-  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -462,6 +434,11 @@
       <source>Event Log...</source>
       <translation>Eseménynapló...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Teszt</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +560,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about: blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Haladó beállítások nem elérhetők</translation>
     </message>

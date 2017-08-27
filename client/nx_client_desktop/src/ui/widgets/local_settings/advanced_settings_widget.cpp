@@ -62,6 +62,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
             emit hasChangesChanged();
         });
 
+    connect(ui->disableBlurCheckbox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
     /* Live buffer lengths slider/spin logic: */
     connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
         [this](int value)
@@ -87,6 +90,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     qnSettings->setAudioDownmixed(isAudioDownmixed());
     qnSettings->setGLDoubleBuffer(isDoubleBufferingEnabled());
     qnSettings->setMaximumLiveBufferMSecs(maximumLiveBufferMs());
+    qnSettings->setGlBlurEnabled(isBlurEnabled());
 }
 
 void QnAdvancedSettingsWidget::loadDataToUi()
@@ -94,13 +98,15 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setAudioDownmixed(qnSettings->isAudioDownmixed());
     setDoubleBufferingEnabled(qnSettings->isGlDoubleBuffer());
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMSecs());
+    setBlurEnabled(qnSettings->isGlBlurEnabled());
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
 {
     return qnSettings->isAudioDownmixed() != isAudioDownmixed()
         || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
-        || qnSettings->maximumLiveBufferMSecs() != maximumLiveBufferMs();
+        || qnSettings->maximumLiveBufferMSecs() != maximumLiveBufferMs()
+        || qnSettings->isGlBlurEnabled() != isBlurEnabled();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const
@@ -166,6 +172,16 @@ bool QnAdvancedSettingsWidget::isDoubleBufferingEnabled() const
 void QnAdvancedSettingsWidget::setDoubleBufferingEnabled(bool value)
 {
     ui->doubleBufferCheckbox->setChecked(value);
+}
+
+bool QnAdvancedSettingsWidget::isBlurEnabled() const
+{
+    return !ui->disableBlurCheckbox->isChecked();
+}
+
+void QnAdvancedSettingsWidget::setBlurEnabled(bool value)
+{
+    ui->disableBlurCheckbox->setChecked(!value);
 }
 
 int QnAdvancedSettingsWidget::maximumLiveBufferMs() const

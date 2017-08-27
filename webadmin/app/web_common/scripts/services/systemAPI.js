@@ -73,6 +73,12 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
+        ServerConnection.prototype.apiHost = function(){
+            if(this.systemId){
+                return window.location.host + Config.gatewayUrl + '/' + this.systemId;
+            }
+            return window.location.host;
+        };
         ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
             var auth = method=='GET'? this.authGet() : this.authPost();
@@ -123,7 +129,7 @@ angular.module('nxCommon')
 
             return promise;
         };
-        ServerConnection.prototype._setGetParams = function(url, data, auth){
+        ServerConnection.prototype._setGetParams = function(url, data, auth, absoluteUrl){
             if(auth){
                 data = data || {}
                 data.auth = auth;
@@ -132,7 +138,14 @@ angular.module('nxCommon')
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            return this.urlBase + url;
+            url = this.urlBase + url;
+            if(absoluteUrl){
+                var host = window.location.protocol + "//" +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+                url = host + url;
+            }
+            return url;
         };
         ServerConnection.prototype._get = function(url, data){
             return this._wrapRequest('GET', url, data);
@@ -268,15 +281,12 @@ angular.module('nxCommon')
         /* End of Working with users */
 
         /* Cameras and Servers */
-        ServerConnection.prototype._cleanId = function(id) {
-            return id.replace('{','').replace('}','');
-        };
         ServerConnection.prototype.getCameras = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getCamerasEx',params);
         };
         ServerConnection.prototype.getMediaServers = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getMediaServersEx',params);
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
@@ -307,7 +317,7 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet());
+            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
         ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
             var data = {

@@ -1317,10 +1317,6 @@ to view more bookmarks</source>
       <translation>导出所选择录像至文件</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>研判日志回放</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>设备</translation>
     </message>
@@ -1393,6 +1389,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>资源已从系统中删除</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>研判日志回放</translation>
     </message>
   </context>
   <context>
@@ -5799,7 +5799,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>未经授权</translation>
+      <translation>未经身分检证</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>

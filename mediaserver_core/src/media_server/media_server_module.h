@@ -19,7 +19,8 @@ class QThread;
 namespace nx { 
 namespace mediaserver {
 
-class UnusedWallpapersWatcher; 
+class UnusedWallpapersWatcher;
+class LicenseWatcher;
 
 namespace metadata {
 
@@ -55,6 +56,7 @@ public:
     QSettings* runTimeSettings() const;
     MSSettings* settings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
+    nx::mediaserver::LicenseWatcher* licenseWatcher() const;
     PluginManager* pluginManager() const;
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
@@ -74,6 +76,7 @@ private:
     CommonPluginContainer m_pluginContainer;
     PluginManager* m_pluginManager = nullptr;
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
+    nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;

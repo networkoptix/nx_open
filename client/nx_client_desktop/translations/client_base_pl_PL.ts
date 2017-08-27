@@ -1318,10 +1318,6 @@ to view more bookmarks</source>
       <translation>Eksportuj zaznaczone rekordy do pliku</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Przegląd dziennika dostępu</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Urządzenia</translation>
     </message>
@@ -1404,6 +1400,10 @@ to view more bookmarks</source>
         <numerusform>These resources are removed from System</numerusform>
         <numerusform>These resources are removed from System</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Przegląd dziennika dostępu</translation>
     </message>
   </context>
   <context>
@@ -2274,10 +2274,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Znaleziono %n urządzeń</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Znaleziono %n urządzeń</numerusform>
+        <numerusform>Znaleziono %n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5314,8 +5314,8 @@ to %1</source>
       <source>%n Users</source>
       <translation type="unfinished">
         <numerusform>%n użytkowników</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n Użytkowników</numerusform>
+        <numerusform>%n Użytkowników</numerusform>
       </translation>
     </message>
   </context>
@@ -7713,10 +7713,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
       </translation>
     </message>
     <message numerus="yes">

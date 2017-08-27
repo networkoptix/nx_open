@@ -321,6 +321,8 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
     if (!widget)
         return;
     QPointer<const QnMediaResourceWidget> guard(widget);
+    QPointer<QnWorkbenchItem> itemGuard(widget->item());
+
     QnPtzControllerPtr controller = widget->ptzController();
 
     QVector3D position;
@@ -339,12 +341,15 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         QTimer::singleShot(10000, &loop, SLOT(quit()));
         loop.exec();
 
-        if (!guard)
+        if (!guard || !itemGuard)
             break;
 
         QVector3D cameraPosition;
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
+
+        if (!guard || !itemGuard)
+            break;
 
         menu()->trigger(action::TakeScreenshotAction, action::Parameters(widget)
             .withArgument(Qn::FileNameRole, lit("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
