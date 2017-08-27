@@ -106,3 +106,4 @@ bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+

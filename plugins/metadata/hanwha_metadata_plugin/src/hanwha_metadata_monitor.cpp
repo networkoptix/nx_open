@@ -29,10 +29,47 @@ HanwhaMetadataMonitor::HanwhaMetadataMonitor(const QUrl& url, const QAuthenticat
 
 HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
 {
-
+    stopMonitoring();
 }
 
 void HanwhaMetadataMonitor::startMonitoring()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_started)
+        return;
+
+    m_started = true;
+
+    initMonitorUnsafe();
+}
+
+void HanwhaMetadataMonitor::stopMonitoring()
+{
+    nx_http::AsyncHttpClientPtr httpClient;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_started = false;
+
+        httpClient.swap(m_httpClient);
+    }
+
+    if (httpClient)
+        httpClient->pleaseStopSync();
+}
+
+void HanwhaMetadataMonitor::setHandler(const Handler& handler)
+{
+    m_handler = handler;
+}
+
+QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
+{
+    return QUrl(kMonitorUrlTemplate
+        .arg(url.host())
+        .arg(url.port(kDefaultHttpPort)));
+}
+
+void HanwhaMetadataMonitor::initMonitorUnsafe()
 {
     auto httpClient = nx_http::AsyncHttpClient::create();
 
@@ -68,23 +105,6 @@ void HanwhaMetadataMonitor::startMonitoring()
     m_httpClient = httpClient;
 }
 
-void HanwhaMetadataMonitor::stopMonitoring()
-{
-    m_httpClient->pleaseStopSync();
-}
-
-void HanwhaMetadataMonitor::setHandler(const Handler& handler)
-{
-    m_handler = handler;
-}
-
-QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
-{
-    return QUrl(kMonitorUrlTemplate
-        .arg(url.host())
-        .arg(url.port(kDefaultHttpPort)));
-}
-
 void HanwhaMetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
     m_contentParser->setContentType(httpClient->contentType());
@@ -98,7 +118,11 @@ void HanwhaMetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr ht
 
 void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient)
 {
-    std::cout << "Hanwha monitor connection closed" << std::endl;
+    QnMutexLocker lock(&m_mutex);
+    if (!m_started)
+        return;
+
+    initMonitorUnsafe();
 }
 
 } // namespace plugins

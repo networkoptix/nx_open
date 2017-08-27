@@ -62,6 +62,13 @@ namespace Qn
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
 
+    static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
+    static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
+    static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
+    static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
+    static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
+    static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLenght");
+
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");

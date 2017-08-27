@@ -182,7 +182,7 @@ inline QString str(const nxpl::NX_GUID& guid)
 
 enum class HanwhaEventItemType
 {
-    // TODO: #dmihsin fill proper event item types
+    // TODO: #dmishin fill proper event item types
     ein,
     zwei,
     drei,

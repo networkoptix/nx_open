@@ -48,8 +48,6 @@ bool HanwhaBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     if (!m_handler)
         return false;
 
-    qDebug() << "BUFFER IS" << buffer;
-
     m_handler(parseMetadataState(buffer));
     return true;
 }

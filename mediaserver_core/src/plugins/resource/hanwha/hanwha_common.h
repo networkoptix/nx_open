@@ -1,0 +1,134 @@
+#pragma once
+
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
+enum class HanwhaMediaType
+{
+    undefined,
+    live,
+    search,
+    backup
+};
+
+enum class HanwhaStreamingMode
+{
+    undefined,
+    iframeOnly,
+    full
+};
+
+enum class HanwhaStreamingType
+{
+    undefined,
+    rtpUnicast,
+    rtpMulticast
+};
+
+enum class HanwhaTransportProtocol
+{
+    undefined,
+    tcp,
+    udp
+};
+
+enum class HanwhaClientType
+{
+    undefined,
+    pc,
+    mobile
+};
+
+//TODO: #dmishin consider using Fusion instead of custom methods.
+
+static const int kHanwhaInvalidProfile = -1;
+static const int kHanwhaInvalidGovLength = -1;
+static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
+
+static const QString kHanwhaTrue = lit("True");
+static const QString kHanwhaFalse = lit("False");
+
+static const QString kHanwhaMjpeg = lit("MJPEG");
+static const QString kHanwhaH264 = lit("H264");
+static const QString kHanwhaHevc = lit("H265");
+
+static const QString kHanwhaCbr = lit("CBR");
+static const QString kHanwhaVbr = lit("VBR");
+
+static const QString kHanwhaFrameRatePriority = lit("FrameRate");
+static const QString kHanwhaCompressionLevelPriority = lit("CompressionLevel");
+
+static const QString kHanwhaCabac = lit("CABAC");
+static const QString kHanwhaCavlc = lit("CAVLC");
+
+static const QString kHanwhaBaselineProfile = lit("Baseline");
+static const QString kHanwhaMainProfile = lit("Main");
+static const QString kHanwhaHighProfile = lit("High");
+
+static const QString kHanwhaLiveMediaType = lit("Live");
+static const QString kHanwhaSearchMediaType = lit("Search");
+static const QString kHanwhaBackupMediaType = lit("Backup");
+
+static const QString kHanwhaIframeOnlyMode = lit("IframeOnly");
+static const QString kHanwhaFullMode = lit("Full");
+
+static const QString kHanwhaRtpUnicast = lit("RTPUnicast");
+static const QString kHanwhaRtpMulticast = lit("RTPMulticast");
+
+static const QString kHanwhaTcp = lit("TCP");
+static const QString kHanwhaUdp = lit("UDP");
+
+static const QString kHanwhaPcClient = lit("PC");
+static const QString kHanwhaMobileClient = lit("Mobile");
+
+static const QString kHanwhaChannelPropertyTemplate = lit("Channel.%1");
+static const QString kHanwhaChannelProperty = lit("Channel");
+static const QString kHanwhaIsFixedProfileProperty = lit("IsFixedProfile");
+static const QString kHanwhaProfileNameProperty = lit("Name");
+static const QString kHanwhaProfileNumberProperty = lit("Profile");
+static const QString kHanwhaEncodingTypeProperty = lit("EncodingType");
+static const QString kHanwhaFrameRateProperty = lit("FrameRate");
+static const QString kHanwhaResolutionProperty = lit("Resolution");
+static const QString kHanwhaAudioInputEnableProperty = lit("AudioInputEnable");
+static const QString kHanwhaMediaTypeProperty = lit("MediaType");
+static const QString kHanwhaStreamingModeProperty("Mode");
+static const QString kHanwhaStreamingTypeProperty = lit("StreamType");
+static const QString kHanwhaTransportProtocolProperty = lit("TransportProtocol");
+static const QString kHanwhaRtspOverHttpProperty = lit("RTSPOverHTTP");
+static const QString kHanwhaUriProperty = lit("URI");
+
+static const QString kHanwhaNameAttribute = lit("name");
+static const QString kHanwhaValueAttribute = lit("value");
+static const QString kHanwhaChannelNumberAttribute = lit("number");
+
+static const QString kHanwhaAttributesNodeName = lit("attributes");
+static const QString kHanwhaGroupNodeName = lit("group");
+static const QString kHanwhaCategoryNodeName = lit("category");
+static const QString kHanwhaChannelNodeName = lit("channel");
+static const QString kHanwhaAttributeNodeName = lit("attribute");
+
+static const QString kHanwhaCgiNodeName = lit("cgi");
+static const QString kHanwhaSubmenuNodeName = lit("submenu");
+static const QString kHanwhaActionNodeName = lit("action");
+static const QString kHanwhaParameterNodeName = lit("parameter");
+static const QString kHanwhaDataTypeNodeName = lit("dataType");
+static const QString kHanwhaEnumNodeName = lit("enum");
+static const QString kHanwhaCsvNodeName = lit("csv");
+static const QString kHanwhaEnumEntryNodeName = lit("entry");
+static const QString kHanwhaIntegerNodeName = lit("int");
+static const QString kHanwhaBooleanNodeName = lit("bool");
+static const QString kHanwhaStringNodeName = lit("string");
+
+static const QString kHanwhaParameterIsRequestAttribute = lit("request");
+static const QString kHanwhaParameterIsResponseAttribute = lit("response");
+static const QString kHanwhaMinValueAttribute = lit("min");
+static const QString kHanwhaMaxValueAttribute = lit("max");
+static const QString kHanwhaTrueValueAttribute = lit("true");
+static const QString kHanwhaFalseValueAttribute = lit("false");
+static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
+static const QString kHanwhaFormatAttribute = lit("format");
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx

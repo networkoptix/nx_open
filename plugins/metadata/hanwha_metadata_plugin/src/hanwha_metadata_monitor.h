@@ -36,6 +36,7 @@ public:
 
 private:
     QUrl buildMonitoringUrl(const QUrl& url) const;
+    void initMonitorUnsafe();
 
 private:
     void at_responseReceived(nx_http::AsyncHttpClientPtr httpClient);
@@ -49,6 +50,7 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
     Handler m_handler;
+    bool m_started = false;
 };
 
 } // namespace plugins
