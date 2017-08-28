@@ -31,6 +31,11 @@ int navigationBarHeight() {
     return 0;
 }
 
+bool isLeftSideNavigationBar()
+{
+    return false;
+}
+
 bool isPhone() {
     return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 }
