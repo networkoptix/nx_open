@@ -1,0 +1,8 @@
+modules:
+    cloud_db:
+    connection_mediator:
+    vms_gateway:
+    cloud_portal:
+    nxcloud_host_agent:
+    balancer:
+        version: '3.1.0'
