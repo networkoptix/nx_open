@@ -1,6 +1,6 @@
 [basic]
-set(defaultSkin "dark_blue")
-set(parent.customization "default")
+set(defaultSkin "dark_orange")
+set(parent.customization "digitalwatchdog")
 
 # Components Namings
 set(display.product.name "WAVE")

@@ -1,28 +1,13 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
-    <div>
+    <div ng-if="developersFeedbackForm">
         <h2>Narzędzia programistyczne</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Czy jesteś zadowolony z mechanizmów umożliwiających integrację ? Daj nam znać.
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Wystaw opinię</a></p>
     </div>
-    <div>
-        <h3>Camera Details Panel</h3>
-        <p>
-            Special panel for a webclient which displays additional information for cameras:
-        </p>
-        <ul>
-            <li>ID kamery</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
-        </ul>
-        <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
-        </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
-    </div>
+
     <div>
         <h3>Generic Events Generator</h3>
         <p>
@@ -33,9 +18,9 @@
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
-        <h3>API serwera</h3>
+        <h3>Server API</h3>
         <p>
-            API serwera zawiera standardowy zestaw wywołań API dla systemów innych firm. It gives developers the ability to
+            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
             access almost every system feature available in the regular client: query/manage system resources (servers,
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
@@ -50,23 +35,33 @@
 
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Camera Details Panel</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Pakiet SDK do integrowania nowych źródeł wideo</h3>
+        <p>
+            Pakiet Video Source Integration SDK umożliwia zintegrowanie systemu z praktycznie każdym źródłem wideo generującym obraz na żywo lub do pliku (np. kamery IP, rejestratory itp.). SDK umożliwia tworzenie metod wykrywania, wyświetlania, analizowania i nagrywania wideo. Pozwala również na integrację detekcji ruchu oraz portów I/O wbudowanych w urządzeniach.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >pobierz SDK</a></p>
     </div>
 
     <div>
-        <h3>SDK archiwum</h3>
+        <h3>Pakiet SDK do integrowania pamięci masowych</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Pakiet Storage SDK umożliwia zintegrowanie nietypowych pamięci masowych. Umożliwia programistom odczyt lub zapis nagrań w dowolnych magazynach: lokalnych i zdalnych, nawet w chmurze. Utworzenie wtyczki pamięci masowej wymaga zaimplementowania standardowych funkcji, takich jak strumieniowanie I/O, "jeśli plik istnieje", "usuń plik", "lista plików w folderze" itp. To SDK zawiera również przykład użycia serwera FTP jako magazynu danych.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >pobierz SDK</a></p>
     </div>

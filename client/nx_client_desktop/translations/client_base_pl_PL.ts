@@ -1403,7 +1403,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Przegląd dziennika dostępu</translation>
     </message>
   </context>
   <context>

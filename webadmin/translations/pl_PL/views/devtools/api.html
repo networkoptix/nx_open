@@ -25,7 +25,7 @@
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
-                                        <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                        <span class="label label-danger" ng-if="function.proprietary">zastrzeżona</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
                                               ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
@@ -48,7 +48,7 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <span class="label label-danger" ng-if="function.proprietary">zastrzeżona</span>
                                             <a ng-click="setActiveFunction(group,function,$event)"
                                                ng-href="#/developers/api{{function.url}}">
                                                 <b ng-if="function.caption"
@@ -63,12 +63,12 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.caption || function.name}}
+                                    {{activeFunction.caption || activeFunction.name}}
                                     <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
                                 </h2>
-                                <span class="label label-danger" ng-if="activeFunction.proprietary">zastrzeżony</span>
+                                <span class="label label-danger" ng-if="activeFunction.proprietary">zastrzeżona</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
                                 <ng-include src="Config.viewsDir + 'devtools/api_form.html'"

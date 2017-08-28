@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>测试</translation>
     </message>
   </context>
   <context>
