@@ -127,6 +127,10 @@ function(get_dependencies)
         nx_rdep_add_package(opengl-es-mali)
     endif()
 
+    if(box MATCHES "bananapi|rpi")
+        nx_rdep_add_package(cifs-utils)
+    endif()
+
     if(haveTests)
         nx_rdep_add_package(gtest)
         nx_rdep_add_package(gmock)
