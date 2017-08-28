@@ -2,9 +2,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/common/util.h>
-#include <nx/utils/log/log.h>
-#include <nx/fusion/model_functions.h>
+#include <common/common_module.h>
 
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
@@ -30,28 +28,20 @@
 #include "transcoding/filters/rotate_image_filter.h"
 #include "transcoding/filters/crop_image_filter.h"
 #include "transcoding/filters/tiled_image_filter.h"
+#include "transcoding/filters/scale_image_filter.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"
-#include "transcoding/filters/scale_image_filter.h"
-#include <common/common_module.h>
+
+#include <utils/common/util.h>
+
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
-
-#if 0
-static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
-{
-    return QRectF(
-        l.left()   * r.width(),
-        l.top()    * r.height(),
-        l.width()  * r.width(),
-        l.height() * r.height()
-        );
-}
-#endif
 
 QString QnStreamRecorder::errorString(StreamRecorderError errCode)
 {
@@ -137,14 +127,15 @@ void QnStreamRecorder::updateSignatureAttr(size_t i)
 {
     QIODevice* file = m_recordingContextVector[i].storage->open(
         m_recordingContextVector[i].fileName,
-        QIODevice::ReadWrite
-    );
+        QIODevice::ReadWrite);
 
     if (!file)
         return;
-    QByteArray data = file->read(1024*16);
+
+    QByteArray data = file->read(1024 * 16);
     int pos = data.indexOf(QnSignHelper::getSignMagic());
-    if (pos == -1) {
+    if (pos == -1)
+    {
         delete file;
         return; // no signature found
     }
@@ -180,7 +171,7 @@ void QnStreamRecorder::close()
         if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
             qint64 fileDuration = m_startDateTime !=
-                qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
+                qint64(AV_NOPTS_VALUE) ? m_endDateTime / 1000 - m_startDateTime / 1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
             if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
                 fileFinished(
@@ -191,7 +182,8 @@ void QnStreamRecorder::close()
         }
     }
 
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
         if (m_motionFileList[i])
             m_motionFileList[i]->close();
     }
@@ -203,7 +195,8 @@ void QnStreamRecorder::close()
     m_firstTime = true;
     m_prevAudioFormat.reset();
 
-    if (m_recordingFinished) {
+    if (m_recordingFinished)
+    {
         // close may be called multiple times, so we have to reset flag m_recordingFinished
         m_recordingFinished = false;
         emit recordingFinished(m_lastError, QString());
@@ -280,7 +273,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         if (needSaveData(md))
             saveData(md);
     }
-    else {
+    else
+    {
         m_prebuffer.push(md);
         if (m_prebufferingUsec == 0)
         {
@@ -309,7 +303,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
                     m_prebuffer.pop(d);
                     if (needSaveData(d))
                         saveData(d);
-                    else if (md->dataType == QnAbstractMediaData::VIDEO) {
+                    else if (md->dataType == QnAbstractMediaData::VIDEO)
+                    {
                         markNeedKeyData();
                     }
                 }
@@ -318,15 +313,17 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         }
     }
 
-    if (m_waitEOF && m_dataQueue.size() == 0) {
+    if (m_waitEOF && m_dataQueue.size() == 0)
+    {
         close();
         m_waitEOF = false;
     }
 
     if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
     {
-        int progress = ((md->timestamp - m_startDateTime)*100ll) /(m_EofDateTime - m_startDateTime);
-        if (progress != m_lastProgress) {
+        int progress = ((md->timestamp - m_startDateTime) * 100ll) / (m_EofDateTime - m_startDateTime);
+        if (progress != m_lastProgress)
+        {
             emit recordingProgress(progress);
             m_lastProgress = progress;
         }
@@ -353,19 +350,23 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
 
-    if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
+    if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION * 2 * 1000ll && m_truncateInterval > 0)
+    {
         // if multifile recording allowed, recreate file if recording hole is detected
-        qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
+        qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime) / 1000 << "ms";
         close();
     }
-    else if (m_startDateTime != qint64(AV_NOPTS_VALUE)) {
-        if (md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
+    else if (m_startDateTime != qint64(AV_NOPTS_VALUE))
+    {
+        if (md->timestamp - m_startDateTime > m_truncateInterval * 3 && m_truncateInterval > 0)
+        {
             // if multifile recording allowed, recreate file if recording hole is detected
-            qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+            qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime) / 1000000 << "sec. Close file";
             close();
         }
-        else if (md->timestamp < m_startDateTime - 1000ll*1000) {
-            qDebug() << "Time translated into the past for " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+        else if (md->timestamp < m_startDateTime - 1000ll * 1000)
+        {
+            qDebug() << "Time translated into the past for " << (md->timestamp - m_startDateTime) / 1000000 << "sec. Close file";
             close();
         }
     }
@@ -390,7 +391,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
     if (m_firstTime)
     {
-        if (vd == 0 &&  mediaDev->hasVideo(md->dataProvider))
+        if (vd == 0 && mediaDev->hasVideo(md->dataProvider))
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(md))
         {
@@ -414,7 +415,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         m_gotKeyFrame[channel] = true;
     if ((md->flags & AV_PKT_FLAG_KEY) || !mediaDev->hasVideo(m_mediaProvider))
     {
-        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval+m_truncateIntervalEps))
+        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval + m_truncateIntervalEps))
         {
             m_endDateTime = md->timestamp;
             close();
@@ -437,7 +438,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     {
         QnAbstractMediaDataPtr result;
         bool inputDataDepleted = false;
-        do {
+        do
+        {
             m_audioTranscoder->transcodePacket(inputDataDepleted ? QnConstAbstractMediaDataPtr() : md, &result);
             if (result && result->dataSize() > 0)
                 writeData(result, streamIndex);
@@ -451,7 +453,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         if (result && result->dataSize() > 0)
             writeData(result, streamIndex);
     }
-    else {
+    else
+    {
         writeData(md, streamIndex);
     }
 
@@ -481,20 +484,20 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         QnFfmpegAvPacket avPkt;
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
-            avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
+            avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
         else
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
         if (video && video->pts != AV_NOPTS_VALUE)
-            avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
+            avPkt.pts = av_rescale_q(video->pts - m_startDateTime, srcRate, stream->time_base) + (avPkt.dts - dts);
         else
             avPkt.pts = avPkt.dts;
 
-        if(md->flags & AV_PKT_FLAG_KEY)
+        if (md->flags & AV_PKT_FLAG_KEY)
             avPkt.flags |= AV_PKT_FLAG_KEY;
         avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
         avPkt.size = static_cast<int>(md->dataSize());
-        avPkt.stream_index= streamIndex;
+        avPkt.stream_index = streamIndex;
 
         if (avPkt.pts < avPkt.dts)
         {
@@ -512,7 +515,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         m_recordingContextVector[i].totalWriteTimeNs +=
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 endWriteTime - startWriteTime
-            ).count();
+                ).count();
 
         if (m_recordingContextVector[i].formatCtx->pb->error == -1)
         {   // pb->error == -1 means that pb->write_data returned -1
@@ -534,7 +537,8 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         {
             NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
         }
-        else {
+        else
+        {
             m_packetWrited = true;
             if (m_needCalcSignature)
             {
@@ -556,7 +560,7 @@ void QnStreamRecorder::endOfRun()
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-    //NX_ASSERT(m_mediaProvider); //< Commented out since 
+    //NX_ASSERT(m_mediaProvider); //< Commented out since
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -572,7 +576,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         return false;
     }
 
-    m_currentTimeZone = currentTimeZone()/60;
+    m_currentTimeZone = currentTimeZone() / 60;
     QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
 
     // get recording context list
@@ -598,7 +602,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             url.toUtf8().constData()
         );
 
-        if (err < 0) {
+        if (err < 0)
+        {
             m_lastError = StreamRecorderErrorStruct(
                 StreamRecorderError::fileCreate,
                 m_recordingContextVector[i].storage
@@ -743,9 +748,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             }
         }
 
-        QnConstResourceAudioLayoutPtr audioLayout = m_forcedAudioLayout 
-                ? m_forcedAudioLayout.dynamicCast<const QnResourceAudioLayout>()
-                : mediaDev->getAudioLayout(m_mediaProvider);
+        QnConstResourceAudioLayoutPtr audioLayout = m_forcedAudioLayout
+            ? m_forcedAudioLayout.dynamicCast<const QnResourceAudioLayout>()
+            : mediaDev->getAudioLayout(m_mediaProvider);
 
         m_isAudioPresent = audioLayout->channelCount() > 0;
         for (int j = 0; j < audioLayout->channelCount(); ++j)
@@ -832,7 +837,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         if (!m_disableRegisterFile)
             fileStarted(
-                m_startDateTime/1000,
+                m_startDateTime / 1000,
                 m_currentTimeZone,
                 m_recordingContextVector[i].fileName,
                 m_mediaProvider
@@ -921,9 +926,8 @@ int QnStreamRecorder::getPrebufferingUsec() const
 }
 
 
-bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
+bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/)
 {
-    Q_UNUSED(media)
     return true;
 }
 
@@ -937,10 +941,9 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
     return true;
 }
 
-void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
+void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* /*provider*/)
 {
-    NX_ASSERT(!m_recordingContextVector.empty());  // if you are here check that you've called
-    Q_UNUSED(provider);                         // addRecordingContext() before.
+    NX_ASSERT(!m_recordingContextVector.empty(), "Make sure you've called addRecordingContext()");
 }
 
 QString QnStreamRecorder::fixedFileName() const
@@ -968,7 +971,8 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
 
     m_needCalcSignature = value;
 
-    if (value) {
+    if (value)
+    {
         m_mdctx.reset();
         m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
     }
@@ -979,12 +983,13 @@ QByteArray QnStreamRecorder::getSignature() const
     return m_mdctx.result();
 }
 
-bool QnStreamRecorder::addSignatureFrame() {
+bool QnStreamRecorder::addSignatureFrame()
+{
 #ifndef SIGN_FRAME_ENABLED
     QByteArray signText = QnSignHelper::getSignPattern(licensePool());
     if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
         signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
-    QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*) signText.data(), signText.size());
+    QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*)signText.data(), signText.size());
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
     QnSignHelper signHelper;
