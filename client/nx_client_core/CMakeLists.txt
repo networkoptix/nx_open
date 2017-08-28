@@ -20,8 +20,6 @@ target_link_libraries(nx_client_core PUBLIC
     debug ${Qt5MultimediaQuick_p_LIBRARY_DEBUG}
     optimized ${Qt5MultimediaQuick_p_LIBRARY_OPTIMIZED})
 
-set_target_properties(nx_client_core PROPERTIES PREFIX "")
-
 target_include_directories(nx_client_core
     PUBLIC
         ${Qt5Quick_PRIVATE_INCLUDE_DIRS}
