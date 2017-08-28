@@ -151,14 +151,14 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return m_sharedImpl->getNextPacket( timestamp, foundTimestamp );
 }
 
-nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& MediaStreamCache::onKeyFrameSubscription()
+nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& MediaStreamCache::keyFrameFoundSubscription()
 {
-    return m_sharedImpl->onKeyFrameSubscription();
+    return m_sharedImpl->keyFrameFoundSubscription();
 }
 
-nx::utils::Subscription<>& MediaStreamCache::onDiscontinueSubscription()
+nx::utils::Subscription<>& MediaStreamCache::streamTimeDiscontinuityFoundSubscription()
 {
-    return m_sharedImpl->onDiscontinueSubscription();
+    return m_sharedImpl->streamTimeDiscontinuityFoundSubscription();
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )

@@ -36,7 +36,7 @@ class Rule(object):
 
 
 # https://networkoptix.atlassian.net/browse/UT-46
-def test_events(server):
+def test_events_reset(server):
     rule_dict_list = server.rest_api.ec2.getEventRules.GET()
     log.info('Initially server has %d event rules:', len(rule_dict_list))
     initial_rule_list = {
