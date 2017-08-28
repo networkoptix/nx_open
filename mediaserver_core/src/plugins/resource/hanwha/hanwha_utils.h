@@ -4,6 +4,8 @@
 
 #include <QtCore/QSize>
 
+#include <boost/optional/optional.hpp>
+
 #include <common/common_globals.h>
 #include <utils/media/h264_common.h>
 #include <utils/media/hevc_common.h>
@@ -17,6 +19,14 @@ extern "C" {
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+QString channelParameter(int channelNumber, const QString& parameterName);
+
+boost::optional<bool> toBool(const boost::optional<QString>& str);
+
+boost::optional<int> toInt(const boost::optional<QString>& str);
+
+boost::optional<double> toDouble(const boost::optional<QString>& str);
 
 template<typename T>
 T fromHanwhaString(const QString& str)

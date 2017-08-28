@@ -22,10 +22,13 @@ public:
         ContinuousTiltCapability = 0x00000002,
         ContinuousZoomCapability = 0x00000004,
         ContinuousFocusCapability = 0x00000008,
+        ContinuousIrisCapability = 0x80000000,
 
         AbsolutePanCapability = 0x00000010,
         AbsoluteTiltCapability = 0x00000020,
         AbsoluteZoomCapability = 0x00000040,
+        AbsoluteFocusCapability = 0x10000000,
+        AbsoluteIrisCapability = 0x20000000,
 
         ViewportPtzCapability = 0x00000080,
 

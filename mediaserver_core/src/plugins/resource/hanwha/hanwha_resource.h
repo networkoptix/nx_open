@@ -2,6 +2,8 @@
 
 #if defined(ENABLE_HANWHA)
 
+#include <core/ptz/ptz_limits.h>
+
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
 
@@ -56,12 +58,15 @@ protected:
 private:
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
+    CameraDiagnostics::Result initPtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
 
     CameraDiagnostics::Result fetchStreamLimits(HanwhaStreamLimits* outStreamLimits);
     void sortResolutions(std::vector<QSize>* resolutions) const;
+
+    CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
 private:
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
@@ -77,6 +82,9 @@ private:
     int m_maxProfileCount = 0;
     HanwhaStreamLimits m_streamLimits;
     std::map<Qn::ConnectionRole, int> m_profileByRole;
+
+    Ptz::Capabilities m_ptzCapabilities;
+    QnPtzLimits m_ptzLimits;
 };
 
 } // namespace plugins

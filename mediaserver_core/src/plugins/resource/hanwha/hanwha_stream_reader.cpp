@@ -81,8 +81,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 HanwhaStreamReader::ProfileMap HanwhaStreamReader::parseProfiles(
     const HanwhaResponse& response) const
 {
-    NX_ASSERT(response.isSucccessful());
-    if (!response.isSucccessful())
+    NX_ASSERT(response.isSuccessful());
+    if (!response.isSuccessful())
         return ProfileMap();
 
     ProfileMap profiles;
@@ -198,7 +198,7 @@ CameraDiagnostics::Result HanwhaStreamReader::findProfile(
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto response = helper.view(lit("media/videoprofile"));
 
-    if (!response.isSucccessful())
+    if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/videoprofile/view"),
@@ -252,7 +252,7 @@ CameraDiagnostics::Result HanwhaStreamReader::createProfile(
                 m_hanwhaResource->streamCodec(getRole()))}
         });
 
-    if (!response.isSucccessful())
+    if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/videoprofile/add"),
@@ -284,7 +284,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
     const auto response = helper.update(lit("media/videoprofile"), profileParameters);
-    if (!response.isSucccessful())
+    if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/videoprofile/update"),
@@ -304,7 +304,7 @@ CameraDiagnostics::Result HanwhaStreamReader::removeProfile(int profileNumber)
             {kHanwhaProfileNameProperty, QString::number(profileNumber)}
         });
 
-    if (!response.isSucccessful())
+    if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/videoprofile/remove"),
@@ -335,7 +335,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
             {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
         });
 
-    if (!response.isSucccessful())
+    if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/streamuri/view"),

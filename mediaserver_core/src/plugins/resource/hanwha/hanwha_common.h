@@ -45,6 +45,7 @@ enum class HanwhaClientType
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
+static const int kHanwhaMaxPresetNumber = 1000;
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
@@ -97,6 +98,21 @@ static const QString kHanwhaStreamingTypeProperty = lit("StreamType");
 static const QString kHanwhaTransportProtocolProperty = lit("TransportProtocol");
 static const QString kHanwhaRtspOverHttpProperty = lit("RTSPOverHTTP");
 static const QString kHanwhaUriProperty = lit("URI");
+static const QString kHanwhaPanProperty = lit("Pan");
+static const QString kHanwhaTiltProperty = lit("Tilt");
+static const QString kHanwhaZoomProperty = lit("Zoom");
+static const QString kHanwhaFocusProperty = lit("Focus");
+static const QString kHanwhaNormalizedSpeedProperty = lit("NormalizedSpeed");
+static const QString kHanwhaPtzQueryProperty = lit("Query");
+static const QString kHanwhaPresetNumberProperty = lit("Preset");
+static const QString kHanwhaPresetNameProperty = lit("PresetName");
+static const QString kHanwhaHorizontalFlipProperty = lit("HorizontalFlipEnable");
+static const QString kHanwhaVerticalFlipProperty = lit("VerticalFlipEnable");
+static const QString kHanwhaRotationProperty = lit("Rotate");
+
+static const QString kHanwhaNearFocusMove = lit("Near");
+static const QString kHanwhaFarFocusMove = lit("Far");
+static const QString kHanwhaStopFocusMove = lit("Stop");
 
 static const QString kHanwhaNameAttribute = lit("name");
 static const QString kHanwhaValueAttribute = lit("value");

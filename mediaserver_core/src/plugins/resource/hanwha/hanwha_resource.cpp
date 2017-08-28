@@ -1,10 +1,11 @@
 #if defined(ENABLE_HANWHA)
 
 #include "hanwha_resource.h"
-#include "hanwha_stream_reader.h"
 #include "hanwha_utils.h"
-#include "hanwha_request_helper.h"
 #include "hanwha_common.h"
+#include "hanwha_request_helper.h"
+#include "hanwha_stream_reader.h"
+#include "hanwha_ptz_controller.h"
 
 #include <nx/utils/log/log.h>
 
@@ -66,6 +67,10 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
     if (!result)
         return result;
 
+    result = initPtz();
+    if (!result)
+        return result;
+
     result = initTwoWayAudio();
     if (!result)
         return result;
@@ -80,7 +85,14 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
 {
-    return nullptr;
+    if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
+        return nullptr;
+
+    auto controller = new HanwhaPtzController(toSharedPointer(this));
+    controller->setPtzCapabilities(m_ptzCapabilities);
+    controller->setPtzLimits(m_ptzLimits);
+
+    return controller;
 }
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
@@ -88,7 +100,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     HanwhaRequestHelper helper(toSharedPointer(this));
 
     const auto profiles = helper.view(lit("media/videoprofile"));
-    if (!profiles.isSucccessful())
+    if (!profiles.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("media/videoprofile/view"),
@@ -191,6 +203,37 @@ CameraDiagnostics::Result HanwhaResource::initIo()
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result HanwhaResource::initPtz()
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+
+    const auto attributes = helper.fetchAttributes(lit("attributes/PTZSupport"));
+    m_ptzCapabilities = Ptz::NoPtzCapabilities;
+
+    if (!attributes.isValid())
+    {
+        NX_WARNING(this, lit("Can not fetch PTZ capabilities."));
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
+    {
+        const auto& name = attributeToCheck.first;
+        const auto& capability = attributeToCheck.second;
+
+        const auto attr = attributes.attribute<bool>(name);
+        if (!attr.is_initialized())
+            continue;
+
+        if (!attr.get())
+            continue;
+
+        m_ptzCapabilities |= capability;
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
     return CameraDiagnostics::NoErrorResult();
@@ -200,8 +243,15 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
     HanwhaRequestHelper helper(toSharedPointer(this));
 
-    const auto parameters = helper.fetchAttributes(lit("Media"));
-    if (!parameters.isValid())
+    const auto attributes = helper.fetchAttributes(lit("Media"));
+    if (!attributes.isValid())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto maxAudioOutput = attributes.attribute<int>(lit("Media/Limit/MaxAudioOutput"));
+    if (!maxAudioOutput.is_initialized())
+        return CameraDiagnostics::NoErrorResult();
+
+    if (*maxAudioOutput - 1 < getChannel())
         return CameraDiagnostics::NoErrorResult();
 
     setCameraCapability(Qn::AudioTransmitCapability, true);
@@ -210,7 +260,7 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    setCameraCapability(Qn::RemoteArchiveCapability, true);
+    setCameraCapability(Qn::RemoteArchiveCapability, false);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -261,6 +311,12 @@ void HanwhaResource::sortResolutions(std::vector<QSize>* resolutions) const
         { 
             return f.width() * f.height() > s.width() * s.height();
         });
+}
+
+CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimits)
+{
+    // TODO: #dmishin implement;
+    return CameraDiagnostics::NoErrorResult();
 }
 
 AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const

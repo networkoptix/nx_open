@@ -3,10 +3,28 @@
 #if defined(ENABLE_HANWHA)
 
 #include <core/ptz/basic_ptz_controller.h>
+#include <core/resource/resource_fwd.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+static const std::map<QString, Ptz::Capability> kHanwhaPtzCapabilityAttributes =
+{
+    {lit("Absolute.Pan"), Ptz::Capability::AbsolutePanCapability},
+    {lit("Absolute.Tilt"), Ptz::Capability::AbsoluteTiltCapability},
+    {lit("Absolute.Zoom"), Ptz::Capability::AbsoluteZoomCapability},
+    {lit("Absolute.Focus"), Ptz::Capability::AbsoluteFocusCapability},
+    {lit("Absolute.Iris"), Ptz::Capability::AbsoluteIrisCapability},
+    {lit("Continuous.Pan"), Ptz::Capability::ContinuousPanCapability},
+    {lit("Continuous.Tilt"), Ptz::Capability::ContinuousTiltCapability},
+    {lit("Continuous.Zoom"), Ptz::Capability::ContinuousZoomCapability},
+    {lit("Continuous.Focus"), Ptz::Capability::ContinuousFocusCapability},
+    {lit("Continuous.Iris"), Ptz::Capability::ContinuousIrisCapability},
+    {lit("Preset"), Ptz::Capability::NativePresetsPtzCapability},
+    {lit("AreaZoom"), Ptz::Capability::ViewportPtzCapability},
+    {lit("Home"), Ptz::Capability::HomePtzCapability}
+};
 
 class HanwhaPtzController: public QnBasicPtzController
 {
@@ -14,8 +32,10 @@ class HanwhaPtzController: public QnBasicPtzController
         using base_type = QnAbstractPtzController;
 
 public:
-    HanwhaPtzController(const QnResourcePtr& resource);
+    HanwhaPtzController(const HanwhaResourcePtr& resource);
     virtual Ptz::Capabilities getCapabilities() const override;
+    void setPtzCapabilities(Ptz::Capabilities capabilities);
+    void setPtzLimits(const QnPtzLimits& limits);
 
     virtual bool continuousMove(const QVector3D& speed) override;
     virtual bool continuousFocus(qreal speed) override;
@@ -35,19 +55,23 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool createTour(const QnPtzTour& tour) override;
-    virtual bool removeTour(const QString& tourId) override;
-    virtual bool activateTour(const QString& tourId) override;
-    virtual bool getTours(QnPtzTourList* tours) const override;
+private:
+    QString channel() const;
+    QString freePresetNumber() const;
+    QVector3D toHanwhaSpeed(const QVector3D& speed) const;
+    QVector3D toHanwhaPosition(const QVector3D& position) const;
+    QString toHanwhaFocusCommand(qreal speed) const;
+    QString presetNumberFromId(const QString& presetId) const;
 
-    virtual bool getActiveObject(QnPtzObject* activeObject) const override;
-    virtual bool updateHomeObject(const QnPtzObject& homeObject) override;
-    virtual bool getHomeObject(QnPtzObject* homeObject) const override;
+private:
+    using PresetNumber = QString;
+    using PresetId = QString;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
-    virtual bool runAuxilaryCommand(
-        const QnPtzAuxilaryTrait& trait,
-        const QString& data) override;
+    HanwhaResourcePtr m_hanwhaResource;
+    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
+    QnPtzLimits m_ptzLimits;
+
+    mutable std::map<PresetId, PresetNumber> m_presetNumberById;
 };
 
 } // namespace plugins

@@ -4,6 +4,50 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+QString channelParameter(int channelNumber, const QString& parameterName)
+{
+    return lit("%1.%2.%3")
+        .arg(kHanwhaChannelProperty)
+        .arg(channelNumber)
+        .arg(parameterName);
+}
+
+boost::optional<bool> toBool(const boost::optional<QString>& str)
+{
+    if (!str.is_initialized())
+        return boost::none;
+
+    auto lowerCase = str->toLower();
+    if (lowerCase == kHanwhaTrue)
+        return true;
+    else if (lowerCase == kHanwhaFalse)
+        return false;
+
+    return boost::none;
+}
+
+boost::optional<int> toInt(const boost::optional<QString>& str)
+{
+    bool success = false;
+    int numericValue = str->toInt(&success);
+
+    if (!success)
+        return boost::none;
+
+    return numericValue;
+}
+
+boost::optional<double> toDouble(const boost::optional<QString>& str)
+{
+    bool success = false;
+    int numericValue = str->toDouble(&success);
+
+    if (!success)
+        return boost::none;
+
+    return numericValue;
+}
+
 template<>
 bool fromHanwhaString(const QString& str)
 {

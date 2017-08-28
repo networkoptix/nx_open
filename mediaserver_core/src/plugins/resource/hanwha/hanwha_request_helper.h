@@ -49,6 +49,10 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
+    HanwhaResponse control(
+        const QString& path,
+        const Parameters& parameters = Parameters());
+
 private:
     QUrl buildRequestUrl(
         const QString& cgi,

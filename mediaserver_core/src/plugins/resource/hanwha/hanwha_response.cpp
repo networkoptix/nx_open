@@ -1,4 +1,5 @@
 #include "hanwha_response.h"
+#include "hanwha_utils.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -24,7 +25,7 @@ HanwhaResponse::HanwhaResponse():
 {
 }
 
-bool HanwhaResponse::isSucccessful() const
+bool HanwhaResponse::isSuccessful() const
 {
     return m_errorCode == HanwhaError::kNoError;
 }
@@ -95,6 +96,39 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
             m_errorCode = HanwhaError::kNoError;
         }
     }
+}
+
+boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName) const
+{
+    auto itr = m_response.find(parameterName);
+    if (itr == m_response.cend())
+        return boost::none;
+
+    return itr->second;
+}
+
+template<>
+boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName) const
+{
+    return toBool(findParameter(parameterName));
+}
+
+template<>
+boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName) const
+{
+    return toInt(findParameter(parameterName));
+}
+
+template<>
+boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName) const
+{
+    return toDouble(findParameter(parameterName));
+}
+
+template<>
+boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName) const
+{
+    return findParameter(parameterName);
 }
 
 } // namespace plugins

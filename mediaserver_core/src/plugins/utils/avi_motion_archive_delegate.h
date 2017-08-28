@@ -20,7 +20,6 @@ public:
 private:
     QnMetaDataV1Ptr analyzeMotion(const QnAbstractMediaDataPtr& video);
     
-
 private:
     mutable QnMutex m_mutex;
     QnMotionEstimation m_motionEstimation;

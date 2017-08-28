@@ -92,6 +92,11 @@ HanwhaResponse HanwhaRequestHelper::remove(const QString& path, const Parameters
     return splitAndDoRequest(lit("remove"), path, parameters);
 }
 
+HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameters& parameters)
+{
+    return splitAndDoRequest(lit("control"), path, parameters);
+}
+
 QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
