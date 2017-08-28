@@ -13,7 +13,7 @@ CONFIG(debug, debug|release) {
   CONFIGURATION = release
 }
 
-CONFIG += unversioned_libname
+CONFIG += unversioned_libname unversioned_soname
 
 OUTPUT_PATH = $$clean_path("${libdir}")
 win*:!equals(LIBTYPE, "staticlib"): DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
