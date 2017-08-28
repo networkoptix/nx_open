@@ -1,6 +1,9 @@
 #include "avi_motion_archive_delegate.h"
 #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
+#error STUB motion
+***
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
