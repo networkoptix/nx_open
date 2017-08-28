@@ -4,6 +4,7 @@
 
 #include "data_source_cache.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "streaming_chunk_cache_key.h"
@@ -58,6 +59,10 @@ DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
         }
         else
         {
+            NX_VERBOSE(this, lm("Existing data provider (live %1, pos %2) does not fit (live %3, pos %4)")
+                .arg(it->first.live()).arg(it->second.first->mediaDataProvider->currentPos())
+                .arg(key.live()).arg(key.startTimestamp()));
+
             ++it;
         }
     }
