@@ -124,6 +124,7 @@ function(get_dependencies)
 
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
+        nx_rdep_add_package(opengl-es-mali)
     endif()
 
     if(haveTests)
@@ -198,7 +199,6 @@ function(get_dependencies)
 
     if(box STREQUAL "bpi")
         nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
-        nx_rdep_add_package(opengl-es-mali)
         nx_rdep_add_package(proxy-decoder-deb7)
         nx_rdep_add_package(ldpreloadhook-1.0-deb7)
         nx_rdep_add_package(libpixman-0.34.0-deb7)
