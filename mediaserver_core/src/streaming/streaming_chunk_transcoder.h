@@ -16,6 +16,7 @@
 #include "data_source_cache.h"
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
+#include "../camera/camera_pool.h"
 
 class StreamingChunkCacheKey;
 class StreamingChunkTranscoderThread;
@@ -98,6 +99,15 @@ private:
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
     DataSourceCache m_dataSourceCache;
     QnResourcePool* m_resPool{ nullptr };
+
+    DataSourceContextPtr prepareDataSourceContext(
+        QnSecurityCamResourcePtr cameraResource,
+        QnVideoCameraPtr camera,
+        const StreamingChunkCacheKey& transcodeParams);
+    AbstractOnDemandDataProviderPtr createMediaDataProvider(
+        QnSecurityCamResourcePtr cameraResource,
+        QnVideoCameraPtr camera,
+        const StreamingChunkCacheKey& transcodeParams);
 
     bool startTranscoding(
         int transcodingID,

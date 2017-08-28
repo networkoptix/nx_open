@@ -37,29 +37,40 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
     // Searching reader in cache.
     for (auto it = m_cachedDataProviders.begin(); it != m_cachedDataProviders.end(); )
     {
-        if (it->first.mediaStreamParamsEqualTo(key) &&
+        const bool isTranscoderSuitable = 
             it->first.live() == key.live() &&
-            it->second.first->mediaDataProvider->currentPos() == key.startTimestamp())
-        {
-            // Taking existing reader which is already at required position (from previous chunk).
-            DataSourceContextPtr item = it->second.first;
-            timerGuard = TimerManager::TimerGuard(
-                TimerManager::instance(),
-                it->second.second);
-            // timerGuard will remove timer after unlocking mutex.
-            m_timers.erase(timerGuard.get());
-            it = m_cachedDataProviders.erase(it);
-            return item;
-        }
-        else
+            it->first.mediaStreamParamsEqualTo(key);
+        const bool mediaDataProviderSuitable = 
+            it->first.live() == key.live() &&
+            it->second.first->mediaDataProvider->currentPos() == key.startTimestamp();
+
+        if (!isTranscoderSuitable)
         {
             NX_VERBOSE(this,
                 lm("Existing data provider (live %1, pos %2) does not fit (live %3, pos %4)")
                 .arg(it->first.live()).arg(it->second.first->mediaDataProvider->currentPos())
                 .arg(key.live()).arg(key.startTimestamp()));
-
             ++it;
+            continue;
         }
+
+        // Taking existing reader which is already at required position (from previous chunk).
+        DataSourceContextPtr item = it->second.first;
+        timerGuard = TimerManager::TimerGuard(
+            TimerManager::instance(),
+            it->second.second);
+        // timerGuard will remove timer after unlocking mutex.
+        m_timers.erase(timerGuard.get());
+        m_cachedDataProviders.erase(it);
+
+        if (!mediaDataProviderSuitable)
+        {
+            NX_VERBOSE(this, lm("Returning chunk transccoder only. resourceId %1, requested pos %2")
+                .arg(key.srcResourceUniqueID()).arg(key.startTimestamp()));
+            item->mediaDataProvider.reset();
+        }
+
+        return item;
     }
 
     return nullptr;
