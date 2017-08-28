@@ -7,12 +7,12 @@ set(tar_filename ${artifact.name.server}.tar.gz)
 set(zip_filename ${artifact.name.server_update}.zip)
 set(installer_output_list ${tar_filename} ${zip_filename})
 
-# Set variables which may depend on current project and are used by create_mediaserver_tar.conf.
+# Set variables which may depend on current project and are used by create_arm_installer.conf.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})
-set(build.configuration "") #< Used by create_mediaserver_tar.sh as suffix to lib and bin dirs.
+set(build.configuration "") #< Used by create_arm_installer.sh as suffix to lib and bin dirs.
 
 nx_configure_file(
-    maven/filter-resources/create_mediaserver_tar.conf
+    maven/filter-resources/create_arm_installer.conf
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY)
 
@@ -28,7 +28,7 @@ function(nx_configure_directory input output)
     endforeach()
 endfunction()
 
-if(deviceTarget STREQUAL "edge1")
+if(targetDevice STREQUAL "edge1")
     set(box_dir "isd")
 else()
     set(box_dir "rpi")
@@ -44,10 +44,12 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY)
 
+set(script ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/create_arm_installer.sh)
+
 add_custom_command(
     OUTPUT ${installer_output_list}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/create_mediaserver_tar.sh
-    DEPENDS ${depends}
+    COMMAND ${script}
+    DEPENDS ${script} ${depends}
     COMMENT "Creating ARM installer archives"
 )
 

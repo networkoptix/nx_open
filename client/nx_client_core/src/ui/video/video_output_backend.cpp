@@ -1,18 +1,20 @@
 #include "video_output_backend.h"
 
 #include <QtCore/QPointer>
-#include <QtCore/QMutex> // TODO: #dklychkov think about QnMutex replacement
+#include <QtCore/QMutex> //< TODO: #dklychkov: Think about QnMutex replacement.
 #include <QtGui/QOpenGLContext>
 #include <QtMultimedia/private/qmediapluginloader_p.h>
 #include <QtMultimedia/private/qsgvideonode_p.h>
 
 #include <nx/media/media_player.h>
+#include <utils/common/app_info.h>
 
 #include "video_output.h"
 #include "video_item_surface.h"
 #include "videonode_rgb.h"
 #include "videonode_texture.h"
 #include "videonode_yuv.h"
+#include "bpi_video_node.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QMediaPluginLoader,
     videoNodeFactoryLoader,
@@ -34,8 +36,9 @@ class QnVideoOutputBackendPrivate
     QSGVideoNodeFactory_YUV i420Factory;
     QSGVideoNodeFactory_RGB rgbFactory;
     QSGVideoNodeFactory_Texture textureFactory;
+    QnBpiSGVideoNodeFactory_YUV bpiFactory;
     QMutex frameMutex;
-    QRectF renderedRect;      // Destination pixel coordinates, clipped
+    QRectF renderedRect; // Destination pixel coordinates, clipped
     QRectF sourceTextureRect; // Source texture coordinates
 };
 
@@ -63,6 +66,8 @@ QnVideoOutputBackend::QnVideoOutputBackend(QnVideoOutput* videoOutput):
     d->videoNodeFactories.append(&d->i420Factory);
     d->videoNodeFactories.append(&d->rgbFactory);
     d->videoNodeFactories.append(&d->textureFactory);
+    if (QnAppInfo::isBpi())
+        d->videoNodeFactories.append(&d->bpiFactory);
 }
 
 QnVideoOutputBackend::~QnVideoOutputBackend()
