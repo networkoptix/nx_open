@@ -174,3 +174,10 @@ unset(_qml_debug)
 if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
+
+set(strip_binaries ON)
+if(targetDevice MATCHES "bpi|bananapi|rpi")
+    set(strip_binaries OFF)
+endif()
+
+option(stripBinaries "Strip the resulting binaries" ${strip_binaries})
