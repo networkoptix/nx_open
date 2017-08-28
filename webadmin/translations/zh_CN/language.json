@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"断开连接",
     "disconnectedSuccess":"系统已成功断开连接",
     "connectedSuccess":"系统已成功连接",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"创建本地管理员",
     "confirmChangePassword":"更改管理员密码",
     "confirmChangePasswordTitle":"更改系统密码吗？对于某些服务器会影响用户 '管理员' 和根用户密码",

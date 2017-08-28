@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times; </span> <span class="sr-only"> Đóng </span></button>
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
@@ -9,8 +9,7 @@
 
     <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
 
-    <alert type="info" ng-if="connecting">Connecting system to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
-        This may last about a minute.</alert>
+    <alert type="info" ng-if="connecting">Đang kết nối hệ thống... <span class="product-name">{{Config.cloud.productName}}</span>... <br>Điều này có thể kéo dài khoảng một phút.</alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
@@ -19,14 +18,12 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" required placeholder="Cloud Password" autocomplete="new-password">
+                   type="password" required placeholder="Mật khẩu Cloud" autocomplete="new-password">
         </div>
     </form>
 
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-
-    <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed">{{actionLabel}}</button>
+    <button class="btn btn-default" ng-click="cancel()"> Hủy </button> <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed"> {{actionLabel}} </button>
 </div>
