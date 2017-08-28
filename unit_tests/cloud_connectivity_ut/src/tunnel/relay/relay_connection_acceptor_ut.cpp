@@ -85,6 +85,8 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class RelayReverseConnection:
     public RelayTest
 {
@@ -122,14 +124,15 @@ protected:
         givenHappyRelayServer();
         whenConnectingToTheRelayServer();
         thenConnectionHasBeenEstablished();
-
-        whenWaitingForConnectionActivation();
     }
 
     void givenActivatedConnection()
     {
         givenEstablishedConnection();
+
+        whenWaitingForConnectionActivation();
         whenRelayActivatesConnection();
+
         thenConnectionIsActivated();
     }
 
@@ -208,6 +211,12 @@ protected:
         ASSERT_EQ(m_expectedSettings, m_connection->beginListeningResponse());
     }
 
+    void thenNotificationIsIgnored()
+    {
+        // Just making sure nothing happens (like process crash, for example).
+        std::this_thread::sleep_for(std::chrono::milliseconds(17));
+    }
+
 private:
     utils::SyncQueue<SystemError::ErrorCode> m_connectResult;
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
@@ -258,6 +267,7 @@ TEST_F(RelayReverseConnection, connection_is_activated)
 {
     givenEstablishedConnection();
 
+    whenWaitingForConnectionActivation();
     whenRelayActivatesConnection();
 
     thenConnectionIsActivated();
@@ -267,7 +277,10 @@ TEST_F(RelayReverseConnection, connection_is_activated)
 TEST_F(RelayReverseConnection, reports_error_on_subsequent_connection_to_relay_failure)
 {
     givenEstablishedConnection();
+
+    whenWaitingForConnectionActivation();
     whenRelayClosesConnection();
+
     thenConnectionActivationErrorIsReported();
 }
 
@@ -281,6 +294,27 @@ TEST_F(RelayReverseConnection, provides_relay_settings_on_success)
 {
     givenActivatedConnection();
     thenRelaySettingsAreAvailable();
+}
+
+TEST_F(
+    RelayReverseConnection,
+    does_not_receive_notification_until_waitForOriginatorToStartUsingConnection_call)
+{
+    givenEstablishedConnection();
+    whenRelayActivatesConnection();
+    thenNotificationIsIgnored();
+}
+
+TEST_F(
+    RelayReverseConnection,
+    notification_is_sent_prior_to_waitForOriginatorToStartUsingConnection_call)
+{
+    givenEstablishedConnection();
+    whenRelayActivatesConnection();
+    thenNotificationIsIgnored();
+
+    whenWaitingForConnectionActivation();
+    thenConnectionIsActivated();
 }
 
 //-------------------------------------------------------------------------------------------------

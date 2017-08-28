@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="@deb.customization.company.name@"
 BIN_NAME="mobile_client"
 BIN_PATH="/opt/$CUSTOMIZATION/lite_client/bin/$BIN_NAME"
 LIBS_PATH="/opt/$CUSTOMIZATION/lib"
@@ -33,7 +33,7 @@ cd "/opt/$CUSTOMIZATION/lite_client/bin"
 
 if [ -f "$LOG_OUTPUT_FLAG" ]; then
     REDIRECT_OUTPUT="$LOGS_PATH/mobile_client-out.log"
-    
+
     # Turn on NX_LOG for mobile_client via .ini-file, if it does not exist.
     if [ ! -f "$MOBILE_CLIENT_INI" ]; then
         echo "enableLog=true" >>"$MOBILE_CLIENT_INI"
@@ -51,4 +51,4 @@ LD_PRELOAD="$LIBS_PATH/ldpreloadhook.so" "$BIN_PATH" "$@" "$AUTO_LOGIN_MODE" >>$
 if ! pgrep mobile_client >/dev/null; then
     echo "Turning the screen blank because Lite Client is terminated"
     echo "1" >/sys/class/graphics/fb0/blank
-fi    
+fi
