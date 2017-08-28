@@ -53,8 +53,6 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include <redass/redass_controller.h>
-
 #include <recording/time_period.h>
 
 #include <nx_ec/data/api_videowall_data.h>
@@ -1077,9 +1075,9 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case QnVideoWallControlMessage::RadassModeChanged:
         {
-            Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
-            if (qnRedAssController)
-                qnRedAssController->setMode(resolutionMode);
+//             Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
+//             if (qnRedAssController)
+//                 qnRedAssController->setMode(resolutionMode);
             break;
         }
         default:
@@ -1173,9 +1171,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active)
     {
-        connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::AutoResolution); });
-        connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::LowResolution); });
-        connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::HighResolution); });
+//         connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::AutoResolution); });
+//         connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::LowResolution); });
+//         connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::HighResolution); });
 
         connect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         connect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1200,9 +1198,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     }
     else
     {
-        disconnect(action(action::RadassAutoAction), NULL, this, NULL);
-        disconnect(action(action::RadassLowAction), NULL, this, NULL);
-        disconnect(action(action::RadassHighAction), NULL, this, NULL);
+//         disconnect(action(action::RadassAutoAction), NULL, this, NULL);
+//         disconnect(action(action::RadassLowAction), NULL, this, NULL);
+//         disconnect(action(action::RadassHighAction), NULL, this, NULL);
 
         disconnect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1247,15 +1245,15 @@ void QnWorkbenchVideoWallHandler::updateMode()
     setControlMode(control);
 }
 
-void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resolutionMode)
-{
-    if (!m_controlMode.active)
-        return;
-
-    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
-    message[valueKey] = QString::number(resolutionMode);
-    sendMessage(message);
-}
+// void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resolutionMode)
+// {
+//     if (!m_controlMode.active)
+//         return;
+//
+//     QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
+//     message[valueKey] = QString::number(resolutionMode);
+//     sendMessage(message);
+// }
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 {

@@ -79,8 +79,6 @@
 
 #include <recording/time_period_list.h>
 
-#include <redass/redass_controller.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/about_dialog.h>
@@ -214,7 +212,6 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
@@ -326,9 +323,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
     connect(action(action::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
     connect(action(action::Rotate270Action), &QAction::triggered, this, [this] { rotateItems(270); });
-    connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::AutoResolution); });
-    connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::LowResolution); });
-    connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::HighResolution); });
     connect(action(action::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(action::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
     connect(action(action::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));
@@ -487,11 +481,6 @@ void ActionHandler::rotateItems(int degrees) {
     }
 }
 
-void ActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    if (qnRedAssController)
-        qnRedAssController->setMode(resolutionMode);
-}
-
 void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
 {
     // TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
@@ -634,12 +623,6 @@ void ActionHandler::at_workbench_cellSpacingChanged()
         action(action::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
         action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
-}
-
-void ActionHandler::at_workbench_currentLayoutChanged() {
-    action(action::RadassAutoAction)->setChecked(true);
-    if (qnRedAssController)
-        qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void ActionHandler::at_nextLayoutAction_triggered()

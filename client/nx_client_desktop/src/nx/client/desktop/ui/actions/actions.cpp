@@ -7,6 +7,7 @@
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
@@ -981,33 +982,16 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 
+    factory(RadassAction)
+        .flags(NoTarget | SingleTarget | MultiTarget | LayoutItemTarget);
+
     factory()
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Resolution..."))
+        .childFactory(new RadassActionFactory(manager))
         .condition(ConditionWrapper(new ChangeResolutionCondition())
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
-
-    factory.beginSubMenu();
-    {
-        factory.beginGroup();
-        factory(RadassAutoAction)
-            .flags(Scene | NoTarget)
-            .text(ContextMenu::tr("Auto"))
-            .checkable()
-            .checked();
-
-        factory(RadassLowAction)
-            .flags(Scene | NoTarget)
-            .text(ContextMenu::tr("Low"))
-            .checkable();
-
-        factory(RadassHighAction)
-            .flags(Scene | NoTarget)
-            .text(ContextMenu::tr("High"))
-            .checkable();
-        factory.endGroup();
-    } factory.endSubMenu();
 
     factory()
         .flags(Scene | SingleTarget)

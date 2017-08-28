@@ -1176,7 +1176,8 @@ ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters
     return (connected ? InvisibleAction : EnabledAction);
 }
 
-ActionVisibility ChangeResolutionCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
+    QnWorkbenchContext* context)
 {
     if (isVideoWallReviewMode(context))
         return InvisibleAction;
@@ -1191,7 +1192,24 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& /*parameters
     if (layout->isFile())
         return InvisibleAction;
 
-    return EnabledAction;
+    auto validItem = [](const QnLayoutItemIndex& index)
+        {
+            auto layout = index.layout();
+            if (!layout || !layout->resourcePool())
+                return false;
+
+            auto item = layout->getItems().value(index.uuid());
+            const auto resource = layout->resourcePool()->getResourceByDescriptor(item.resource);
+            if (!resource)
+                return false;
+
+            return resource->hasFlags(Qn::server_live_cam);
+        };
+
+    const auto items = parameters.layoutItems();
+    return std::all_of(items.cbegin(), items.cend(), validItem)
+        ? EnabledAction
+        : DisabledAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):

@@ -65,7 +65,9 @@
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
-#include <redass/redass_controller.h>
+#include <nx/client/desktop/radass/radass_controller.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
+#include <nx/client/desktop/radass/radass_cameras_watcher.h>
 
 #include <server/server_storage_manager.h>
 
@@ -325,7 +327,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnGlobals());
 
-    commonModule->store(new QnRedAssController());
+    m_radassController = commonModule->store(new RadassController());
+    commonModule->store(new RadassCamerasWatcher(m_radassController, commonModule->resourcePool()));
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -595,6 +598,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+nx::client::desktop::RadassController* QnClientModule::radassController() const
+{
+    return m_radassController;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

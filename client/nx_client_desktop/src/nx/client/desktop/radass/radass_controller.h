@@ -1,32 +1,33 @@
-#ifndef __QN_REDASS_CONTROLLER_H__
-#define __QN_REDASS_CONTROLLER_H__
+#pragma once
 
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 
+#include <nx/client/desktop/radass/radass_fwd.h>
+
 #include "nx/streaming/media_data_packet.h"
 #include "utils/common/synctime.h"
-
-#include <client/client_globals.h>
-
-#include <nx/utils/singleton.h>
 
 class QnCamDisplay;
 class QnArchiveStreamReader;
 
-class QnRedAssController: public QThread, public Singleton<QnRedAssController>
+namespace nx {
+namespace client {
+namespace desktop {
+
+class RadassController: public QThread
 {
     Q_OBJECT
 public:
-    QnRedAssController();
+    RadassController();
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
     int counsumerCount() const;
 
-    void setMode(Qn::ResolutionMode mode);
-    Qn::ResolutionMode getMode() const;
+    void setMode(RadassMode mode);
+    RadassMode getMode() const;
 
 public slots:
     /* Inform controller that not enough data or CPU for stream */
@@ -34,8 +35,10 @@ public slots:
 
     /* Inform controller that no more problem with stream */
     void streamBackToNormal(QnArchiveStreamReader* reader);
-private slots:
+
+private:
     void onTimer();
+
 private:
     QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
     bool isSmallItem(QnCamDisplay* display);
@@ -47,7 +50,7 @@ private:
     bool isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const;
 
     /** try LQ->HQ once more */
-    void addHQTry(); 
+    void addHQTry();
     bool isFFSpeed(QnCamDisplay* display) const;
     bool isFFSpeed(double speed) const;
     bool existstBufferingDisplay() const;
@@ -66,7 +69,7 @@ private:
         int smallSizeCnt;
     };
 
-    typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
+    typedef bool (RadassController::*SearchCondition)(QnCamDisplay*);
 
     mutable QnMutex m_mutex;
     typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
@@ -76,13 +79,13 @@ private:
     int m_hiQualityRetryCounter;
     int m_timerTicks;    // onTimer ticks count
     qint64 m_lastLqTime; // latest HQ->LQ switch time
-    Qn::ResolutionMode m_mode;
+    RadassMode m_mode;
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);
     void optimizeItemsQualityBySize();
 };
 
-#define qnRedAssController QnRedAssController::instance()
-
-#endif // __QN_REDASS_CONTROLLER_H__
+} // namespace desktop
+} // namespace client
+} // namespace nx
