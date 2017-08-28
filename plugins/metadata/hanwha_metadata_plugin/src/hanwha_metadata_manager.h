@@ -36,14 +36,7 @@ public:
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
-    void setUrl(const QString& url);
-
-    void setModel(const QString& model);
-
-    void setFirmware(const QString& firmware);
-
-    void setAuth(const QAuthenticator& auth);
-
+    void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
     void setCapabilitiesManifest(const QByteArray& manifest);
 
 private:

@@ -122,10 +122,7 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     auto manifest = buildDeviceManifest(*supportedEvents);
     auto manager = new HanwhaMetadataManager();
 
-    manager->setModel(resourceInfo.model);
-    manager->setFirmware(resourceInfo.firmware);
-    manager->setUrl(resourceInfo.url);
-    manager->setAuth(auth);
+    manager->setResourceInfo(resourceInfo);
     manager->setCapabilitiesManifest(manifest);
 
     return manager;

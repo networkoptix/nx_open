@@ -120,24 +120,13 @@ const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-void HanwhaMetadataManager::setUrl(const QString& url)
+void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
 {
-    m_url = url;
-}
-
-void HanwhaMetadataManager::setModel(const QString& model)
-{
-    m_model = model;
-}
-
-void HanwhaMetadataManager::setFirmware(const QString& firmware)
-{
-    m_firmware = firmware;
-}
-
-void HanwhaMetadataManager::setAuth(const QAuthenticator& auth)
-{
-    m_auth = auth;
+    m_url = resourceInfo.url;
+    m_model = resourceInfo.model;
+    m_firmware = resourceInfo.firmware;
+    m_auth.setUser(resourceInfo.login);
+    m_auth.setPassword(resourceInfo.password);
 }
 
 void HanwhaMetadataManager::setCapabilitiesManifest(const QByteArray& manifest)
