@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 CLOUD_USER_NAME = 'anikitin@networkoptix.com'
 CLOUD_USER_PASSWORD ='qweasd123'
 
-
 CLOUD_HOST_REGISTRY_URL = 'https://ireg.hdw.mx/api/v1/cloudhostfinder/'
 CLOUD_HOST_REGISTRY_TIMEOUT_SEC = 120
 

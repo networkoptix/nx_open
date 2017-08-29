@@ -23,6 +23,16 @@ namespace nx_hls
 {
     class HLSSession;
 
+    struct HlsRequestParams
+    {
+        MediaQuality streamQuality = MEDIA_Quality_High;
+        int channel = 0;
+        QString containerFormat = "mpeg2ts";
+        boost::optional<quint64> startTimestamp;
+        boost::optional<std::chrono::microseconds> duration;
+        boost::optional<QString> alias;
+    };
+
     /*!
         HLS request url has following format:\n
         - /hls/unique-resource-id.m3u?format-parameters  - for playlist
@@ -50,6 +60,7 @@ namespace nx_hls
             nx_http::Response* const response);
 
         static void setMinPlayListSizeToStartStreaming(size_t value);
+
     protected:
         virtual void run() override;
         const char* mimeTypeByExtension(const QString& extension) const;
@@ -134,6 +145,9 @@ namespace nx_hls
             const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality );
         void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
+
+        static HlsRequestParams readRequestParams(
+            const std::multimap<QString, QString>& requestParams);
     };
 }
 
