@@ -416,7 +416,7 @@
                 decelerating = true;
                 requestAnimFrame(stepDecelAnim);
             }else{
-                callStopCallback(); // If we do not run animation - predent it is finished
+                callStopCallback(); // If we do not run animation - pretend it is finished
             }
         }
 
