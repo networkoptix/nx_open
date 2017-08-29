@@ -18,6 +18,15 @@ namespace nx {
 namespace cloud {
 namespace discovery {
 
+struct DummyInstanceInformation:
+    public BasicInstanceInformation
+{
+    DummyInstanceInformation():
+        BasicInstanceInformation("dummy")
+    {
+    }
+};
+
 class RegisteredPeerPool
 {
 public:
@@ -48,6 +57,7 @@ private:
     {
         std::unique_ptr<nx::network::WebSocket> connection;
         std::string moduleInformationJson;
+        boost::optional<DummyInstanceInformation> info;
         nx::Buffer readBuffer;
     };
 
@@ -59,7 +69,9 @@ private:
         const std::string& peerId,
         SystemError::ErrorCode systemErrorCode,
         std::size_t bytesRead);
-    bool isPeerInfoValid(const std::string& peerId, const nx::Buffer& serializedInfo) const;
+    bool isPeerInfoValid(
+        const std::string& peerId,
+        const DummyInstanceInformation& serializedInfo) const;
 };
 
 } // namespace discovery

@@ -6,6 +6,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/websocket/websocket_handshake.h>
+#include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/sync_call.h>
@@ -34,15 +35,17 @@ class DiscoveryRegisteredPeerPool:
 {
 public:
     DiscoveryRegisteredPeerPool():
-        m_registeredPeerPool(m_configuration),
-        m_peerId(QnUuid::createUuid().toStdString())
+        m_registeredPeerPool(m_configuration)
     {
     }
 
     ~DiscoveryRegisteredPeerPool()
     {
-        if (m_peerConnection)
-            m_peerConnection->pleaseStopSync();
+        for (auto& peerContext: m_peers)
+        {
+            if (peerContext.connection)
+                peerContext.connection->pleaseStopSync();
+        }
     }
 
 protected:
@@ -64,6 +67,9 @@ protected:
 
     void givenConnectedPeer()
     {
+        PeerContext peerContext;
+
+        peerContext.id = QnUuid::createUuid().toStdString();
         nx_http::HttpClient httpClient;
         ASSERT_TRUE(httpClient.doUpgrade(getUrl(), nx::network::websocket::kWebsocketProtocolName));
         ASSERT_TRUE(nx_http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
@@ -73,8 +79,10 @@ protected:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
         auto peerConnection = std::make_unique<nx::network::WebSocket>(std::move(streamSocket));
         m_registeredPeerPool.addPeerConnection(
-            m_peerId,
+            peerContext.id,
             std::move(peerConnection));
+
+        m_peers.push_back(std::move(peerContext));
     }
 
     void givenReportedPeer()
@@ -85,32 +93,46 @@ protected:
 
     void givenMultipleOnlinePeersOfDifferentTypes()
     {
-        // TODO
+        const int peerCount = 7;
+        for (int i = 0; i < peerCount; ++i)
+        {
+            givenConnectedPeer();
+            m_peers.back().type = nx::utils::generateRandomName(7).toStdString();
+            whenPeerSendsInformation();
+        }
     }
 
     void whenRequestPeerWithRandomId()
     {
+        PeerContext peerContext;
+        peerContext.id = nx::utils::generateRandomName(7).toStdString();
+        m_peers.push_back(std::move(peerContext));
         whenRequestPeerInfo();
     }
 
     void whenRequestPeerInfo()
     {
-        m_foundPeer = m_registeredPeerPool.getPeerInfo(m_peerId);
+        auto foundPeer = m_registeredPeerPool.getPeerInfo(m_peers[0].id);
+        if (foundPeer)
+            m_foundPeers.push_back(std::move(*foundPeer));
     }
 
     void whenPeerConnectionIsBroken()
     {
-        m_peerConnection->pleaseStopSync();
-        m_peerConnection.reset();
+        m_peers[0].connection->pleaseStopSync();
+        m_peers[0].connection.reset();
     }
 
     void whenPeerSendsInformation()
     {
         PeerInformation peerInfo;
-        peerInfo.id = m_peerId;
+        peerInfo.id = m_peers.back().id;
         peerInfo.apiUrl = "http://nxvms.com/test_peer/";
-        m_expectedPeerInfo = QJson::serialized(peerInfo);
-        sendPeerInfo(m_expectedPeerInfo);
+        if (m_peers.back().type.empty())
+            m_peers.back().type = kPeerType;
+        peerInfo.type = m_peers.back().type;
+        m_peers.back().expectedPeerInfo = QJson::serialized(peerInfo);
+        sendPeerInfo(m_peers.back().expectedPeerInfo);
     }
 
     void whenPeerSendsInvalidInformation()
@@ -120,34 +142,37 @@ protected:
 
     void whenRequestPeersOfSpecificType()
     {
-        // TODO
+        m_selectedPeerType = nx::utils::random::choice(m_peers).type;
+        m_foundPeers = m_registeredPeerPool.getPeerInfoListByType(
+            m_selectedPeerType);
     }
 
     void whenRequestPeersOfUnknownType()
     {
-        // TODO
+        m_foundPeers = m_registeredPeerPool.getPeerInfoListByType(
+            nx::utils::generateRandomName(7).toStdString());
     }
 
     void thenPeerWasNotFound()
     {
-        ASSERT_FALSE(static_cast<bool>(m_foundPeer));
+        ASSERT_TRUE(m_foundPeers.empty());
     }
 
     void thenPeerIsFound()
     {
-        ASSERT_TRUE(static_cast<bool>(m_foundPeer));
+        ASSERT_FALSE(m_foundPeers.empty());
         // TODO Verifying peer information.
     }
 
     void thenPeerMovedToOnlineState()
     {
-        while (!m_registeredPeerPool.getPeerInfo(m_peerId))
+        while (!m_registeredPeerPool.getPeerInfo(m_peers[0].id))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     void thenPeerMovedToOfflineState()
     {
-        while (m_registeredPeerPool.getPeerInfo(m_peerId))
+        while (m_registeredPeerPool.getPeerInfo(m_peers[0].id))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
@@ -155,8 +180,8 @@ protected:
     {
         for (;;)
         {
-            auto info = m_registeredPeerPool.getPeerInfo(m_peerId);
-            if (info && *info == m_expectedPeerInfo.toStdString())
+            auto info = m_registeredPeerPool.getPeerInfo(m_peers[0].id);
+            if (info && *info == m_peers[0].expectedPeerInfo.toStdString())
                 break;
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -173,7 +198,7 @@ protected:
             std::tie(systemErrorCode, bytesRead) =
                 makeSyncCall<SystemError::ErrorCode, std::size_t>(std::bind(
                     &nx::network::WebSocket::readSomeAsync,
-                    m_peerConnection.get(),
+                    m_peers[0].connection.get(),
                     &readBuf,
                     std::placeholders::_1));
 
@@ -187,23 +212,52 @@ protected:
 
     void thenOnlyPeersOfThatTypeAreReported()
     {
-        // TODO
+        std::vector<BasicInstanceInformation> foundPeerParsedInfo;
+        for (const auto& peerJson: m_foundPeers)
+        {
+            BasicInstanceInformation peerInfo("invalid_type");
+            ASSERT_TRUE(QJson::deserialize(QByteArray(peerJson.c_str()), &peerInfo));
+            ASSERT_EQ(m_selectedPeerType, peerInfo.type);
+            foundPeerParsedInfo.push_back(std::move(peerInfo));
+        }
+
+        for (const auto& peerContext: m_peers)
+        {
+            if (peerContext.type != m_selectedPeerType)
+                continue;
+
+            auto peerIter = std::find_if(
+                foundPeerParsedInfo.begin(),
+                foundPeerParsedInfo.end(),
+                [id = peerContext.id](const BasicInstanceInformation& peerInfo)
+                {
+                    return peerInfo.id == id;
+                });
+            ASSERT_NE(foundPeerParsedInfo.end(), peerIter);
+        }
     }
 
     void thenEmptyListIsReturned()
     {
-        // TODO
+        ASSERT_TRUE(m_foundPeers.empty());
     }
 
 private:
+    struct PeerContext
+    {
+        std::string id;
+        std::unique_ptr<nx::network::WebSocket> connection;
+        nx::Buffer expectedPeerInfo;
+        std::string type;
+    };
+
     conf::Discovery m_configuration;
     discovery::RegisteredPeerPool m_registeredPeerPool;
-    std::string m_peerId;
-    boost::optional<std::string> m_foundPeer;
+    std::vector<std::string> m_foundPeers;
     TestHttpServer m_httpServer;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::WebSocket>> m_acceptedConnections;
-    std::unique_ptr<nx::network::WebSocket> m_peerConnection;
-    nx::Buffer m_expectedPeerInfo;
+    std::vector<PeerContext> m_peers;
+    std::string m_selectedPeerType;
 
     void onUpgradedConnectionAccepted(std::unique_ptr<AbstractStreamSocket> connection)
     {
@@ -222,10 +276,10 @@ private:
 
     void sendPeerInfo(const nx::Buffer& peerInfoJson)
     {
-        m_peerConnection = m_acceptedConnections.pop();
+        m_peers.back().connection = m_acceptedConnections.pop();
 
         nx::utils::promise<SystemError::ErrorCode> sent;
-        m_peerConnection->sendAsync(
+        m_peers.back().connection->sendAsync(
             peerInfoJson,
             [this, &sent](
                 SystemError::ErrorCode systemErrorCode,

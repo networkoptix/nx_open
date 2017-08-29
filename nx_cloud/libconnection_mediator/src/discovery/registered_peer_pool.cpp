@@ -46,10 +46,21 @@ void RegisteredPeerPool::addPeerConnection(
 }
 
 std::vector<std::string> RegisteredPeerPool::getPeerInfoListByType(
-    const std::string& /*peerTypeName*/) const
+    const std::string& peerTypeName) const
 {
-    // TODO
-    return std::vector<std::string>();
+    QnMutexLocker locker(&m_mutex);
+
+    std::vector<std::string> peersOfRequestedTypes;
+    for (const auto& peerContext: m_peerIdToConnection)
+    {
+        if (!peerContext.second->info)
+            continue;
+        if (peerContext.second->info->type != peerTypeName)
+            continue;
+        peersOfRequestedTypes.push_back(peerContext.second->moduleInformationJson);
+    }
+
+    return peersOfRequestedTypes;
 }
 
 std::vector<std::string> RegisteredPeerPool::getPeerInfoList() const
@@ -96,53 +107,36 @@ void RegisteredPeerPool::onBytesRead(
         m_peerIdToConnection.erase(peerIter);
         return;
     }
-
-    if (!isPeerInfoValid(peerId, peerIter->second->readBuffer))
-    {
-        NX_DEBUG(this, "Closing connection from %1 (peer id %2) after receiving invalid info");
-        m_peerIdToConnection.erase(peerIter);
-        return;
-    }
+    PeerContext& peerContext = *peerIter->second;
 
     if (systemErrorCode == SystemError::noError)
-        peerIter->second->moduleInformationJson = peerIter->second->readBuffer.toStdString();
-    peerIter->second->readBuffer.clear();
+    {
+        DummyInstanceInformation info;
+        if (!QJson::deserialize(peerContext.readBuffer, &info) ||
+            !isPeerInfoValid(peerId, info))
+        {
+            NX_DEBUG(this, "Closing connection from %1 (peer id %2) after receiving invalid info");
+            m_peerIdToConnection.erase(peerIter);
+            return;
+        }
 
-    peerIter->second->readBuffer.reserve(kReadBufferSize);
-    peerIter->second->connection->readSomeAsync(
-        &peerIter->second->readBuffer,
+        peerContext.info = std::move(info);
+        peerContext.moduleInformationJson = peerContext.readBuffer.toStdString();
+    }
+    peerContext.readBuffer.clear();
+
+    peerContext.readBuffer.reserve(kReadBufferSize);
+    peerContext.connection->readSomeAsync(
+        &peerContext.readBuffer,
         std::bind(&RegisteredPeerPool::onBytesRead, this, peerId, _1, _2));
 }
 
-namespace {
-
-struct DummyInstanceInformation:
-    public BasicInstanceInformation
-{
-    DummyInstanceInformation():
-        BasicInstanceInformation("dummy")
-    {
-    }
-};
-
-} // namespace
-
 bool RegisteredPeerPool::isPeerInfoValid(
     const std::string& peerId,
-    const nx::Buffer& serializedInfo) const
+    const DummyInstanceInformation& info) const
 {
-    bool isSucceeded = false;
-    const auto peerInfo = QJson::deserialized<DummyInstanceInformation>(
-        serializedInfo,
-        DummyInstanceInformation(),
-        &isSucceeded);
-    if (!isSucceeded)
-        return false;
-
-    if (peerInfo.id != peerId)
-        return false;
-
-    return true;
+    // TODO: #ak Add module type control.
+    return info.id == peerId;
 }
 
 } // namespace discovery
