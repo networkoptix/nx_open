@@ -1,4 +1,5 @@
 #include "hanwha_utils.h"
+#include "hanwha_common.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -46,6 +47,65 @@ boost::optional<double> toDouble(const boost::optional<QString>& str)
         return boost::none;
 
     return numericValue;
+}
+
+HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
+{
+    NX_ASSERT(response.isSuccessful());
+    if (!response.isSuccessful())
+        return HanwhaChannelProfiles();
+
+    HanwhaChannelProfiles profiles;
+    for (const auto& entry : response.response())
+    {
+        const auto split = entry.first.split(L'.');
+        const auto splitSize = split.size();
+
+        if (splitSize < 5)
+            continue;
+
+        if (split[0] != kHanwhaChannelProperty)
+            continue;
+
+        bool success = false;
+        const auto profileChannel = split[1].toInt(&success);
+        if (!success)
+            continue;
+
+        if (split[2] != kHanwhaProfileNumberProperty)
+            continue;
+
+        const auto profileNumber = split[3].toInt(&success);
+        if (!success)
+            continue;
+
+        profiles[profileChannel][profileNumber]
+            .setParameter(split.mid(4).join(L'.'), entry.second);
+
+        profiles[profileChannel][profileNumber].number = profileNumber;
+    }
+
+    return profiles;
+}
+
+QString nxProfileName(Qn::ConnectionRole role)
+{
+    switch (role)
+    {
+        case Qn::ConnectionRole::CR_LiveVideo:
+            return kPrimaryNxProfileName;
+        case Qn::ConnectionRole::CR_SecondaryLiveVideo:
+            return kSecondaryNxProfileName;
+        default:
+            NX_ASSERT(false, "Wrong role");
+            return QString();
+    }
+}
+
+bool isNxProfile(const QString& profileName)
+{
+    return profileName == kPrimaryNxProfileName
+        || profileName == kSecondaryNxProfileName;
 }
 
 template<>

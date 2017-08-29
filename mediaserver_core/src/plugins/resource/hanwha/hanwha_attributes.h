@@ -6,6 +6,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/network/http/http_types.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -14,8 +16,8 @@ class HanwhaAttributes
 {
     static const int kNoChannel = -1;
 public:
-    explicit HanwhaAttributes() = default;
-    HanwhaAttributes(const QString& attributesXml);
+    explicit HanwhaAttributes(nx_http::StatusCode::Value statusCode);
+    explicit HanwhaAttributes(const QString& attributesXml, nx_http::StatusCode::Value statusCode);
 
     template<typename T>
     boost::optional<T> attribute(
@@ -55,6 +57,8 @@ public:
 
     bool isValid() const;
 
+    nx_http::StatusCode::Value statusCode() const;
+
 private:
     boost::optional<QString> findAttribute(
         const QString& group,
@@ -80,6 +84,7 @@ private:
 
 private:
     bool m_isValid = false;
+    nx_http::StatusCode::Value m_statusCode;
 };
 
 template<>

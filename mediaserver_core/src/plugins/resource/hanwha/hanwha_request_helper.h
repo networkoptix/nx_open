@@ -62,7 +62,11 @@ private:
 
     QUrl buildAttributesUrl(const QString& attributesPath) const;
 
-    bool doRequestInternal(const QUrl& url, const QAuthenticator& auth, nx::Buffer* outBuffer);
+    bool doRequestInternal(
+        const QUrl& url,
+        const QAuthenticator& auth,
+        nx::Buffer* outBuffer,
+        nx_http::StatusCode::Value* outStatusCode);
 
     HanwhaResponse splitAndDoRequest(
         const QString& action,

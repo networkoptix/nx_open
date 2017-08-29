@@ -9,6 +9,10 @@
 #include <common/common_globals.h>
 #include <utils/media/h264_common.h>
 #include <utils/media/hevc_common.h>
+#include <utils/camera/camera_diagnostics.h>
+
+#include <plugins/resource/hanwha/hanwha_response.h>
+#include <plugins/resource/hanwha/hanwha_video_profile.h>
 
 extern "C" {
 
@@ -20,6 +24,30 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+using HanwhaProfileNumber = int;
+using HanwhaChannelNumber = int;
+using HanwhaProfileMap = std::map<HanwhaProfileNumber, HanwhaVideoProfile>;
+using HanwhaChannelProfiles = std::map<HanwhaChannelNumber, HanwhaProfileMap>;
+
+using HanwhaProfileParameterName = QString;
+using HanwhaProfileParameterValue = QString;
+using HanwhaProfileParameters = std::map<QString, QString>;
+
+template<typename T>
+CameraDiagnostics::Result error(
+    const T& response,
+    const CameraDiagnostics::Result& authorizedResult)
+{
+    auto statusCode = response.statusCode();
+    bool unauthorizedResponse = statusCode == nx_http::StatusCode::unauthorized
+        || statusCode == nx_http::StatusCode::notAllowed;
+
+    if (!unauthorizedResponse)
+        return authorizedResult;
+
+    return CameraDiagnostics::NotAuthorisedResult(authorizedResult.errorParams[0]);
+}
+
 QString channelParameter(int channelNumber, const QString& parameterName);
 
 boost::optional<bool> toBool(const boost::optional<QString>& str);
@@ -27,6 +55,12 @@ boost::optional<bool> toBool(const boost::optional<QString>& str);
 boost::optional<int> toInt(const boost::optional<QString>& str);
 
 boost::optional<double> toDouble(const boost::optional<QString>& str);
+
+HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
+
+QString nxProfileName(Qn::ConnectionRole role);
+
+bool isNxProfile(const QString& profileName);
 
 template<typename T>
 T fromHanwhaString(const QString& str)

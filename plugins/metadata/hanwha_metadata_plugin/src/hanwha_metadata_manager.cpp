@@ -57,44 +57,42 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
 {
-    QnMutexLocker lock(&m_mutex);
+    auto monitorHandler = [this](const HanwhaEventList& events)
+    {
+        using namespace std::chrono;
+
+        auto packet = new CommonEventMetadataPacket();
+
+        std::cout << "------------------------------------------------------------------------------" << std::endl;
+        for (const auto& hanwhaEvent : events)
+        {
+            auto event = new CommonDetectedEvent();
+            std::cout
+                << "Got event:"
+                << hanwhaEvent.caption.toStdString() << " "
+                << hanwhaEvent.description.toStdString() << std::endl;
+
+            event->setEventTypeId(hanwhaEvent.typeId);
+            event->setCaption(hanwhaEvent.caption.toStdString());
+            event->setDescription(hanwhaEvent.caption.toStdString());
+            event->setIsActive(hanwhaEvent.isActive);
+            event->setConfidence(1.0);
+
+            packet->setTimestampUsec(
+                duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
+
+            packet->setDurationUsec(-1);
+            packet->addEvent(event);
+        }
+        std::cout << std::endl << std::endl;
+        m_handler->handleMetadata(Error::noError, packet);
+    };
+
     m_handler = handler;
     m_monitor = std::make_unique<HanwhaMetadataMonitor>(m_url, m_auth);
-
-    auto monitorHandler = [this] (const HanwhaEventList& events)
-        {
-            using namespace std::chrono;
-
-            auto packet = new CommonEventMetadataPacket();
-            
-            std::cout << "------------------------------------------------------------------------------" << std::endl;
-            for (const auto& hanwhaEvent: events)
-            {
-                auto event = new CommonDetectedEvent();
-                std::cout 
-                    << "Got event:" 
-                    << hanwhaEvent.caption.toStdString() << " "
-                    << hanwhaEvent.description.toStdString() << std::endl;
-
-                event->setEventTypeId(hanwhaEvent.typeId);
-                event->setCaption(hanwhaEvent.caption.toStdString());
-                event->setDescription(hanwhaEvent.caption.toStdString());
-                event->setIsActive(hanwhaEvent.isActive);
-                event->setConfidence(1.0);
-
-                packet->setTimestampUsec(
-                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-
-                packet->setDurationUsec(-1);
-                packet->addEvent(event);
-            }
-            std::cout << std::endl << std::endl;
-            m_handler->handleMetadata(Error::noError, packet);
-        };
-
     m_monitor->setHandler(monitorHandler);
     m_monitor->startMonitoring();
-
+    
     return Error::noError;
 }
 

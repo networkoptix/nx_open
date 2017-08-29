@@ -14,15 +14,21 @@ const QString kUnknownErrorString = lit("unknown error");
 
 } // namespace
 
-HanwhaResponse::HanwhaResponse(const nx::Buffer& rawBuffer)
+
+HanwhaResponse::HanwhaResponse(nx_http::StatusCode::Value statusCode):
+    m_errorCode(HanwhaError::kUnknownError),
+    m_errorString(kUnknownErrorString),
+    m_statusCode(statusCode)
 {
-    parseBuffer(rawBuffer);
 }
 
-HanwhaResponse::HanwhaResponse():
-    m_errorCode(HanwhaError::kUnknownError),
-    m_errorString(kUnknownErrorString)
+HanwhaResponse::HanwhaResponse(
+    const nx::Buffer& rawBuffer,
+    nx_http::StatusCode::Value statusCode)
+    :
+    m_statusCode(statusCode)
 {
+    parseBuffer(rawBuffer);
 }
 
 bool HanwhaResponse::isSuccessful() const
@@ -43,6 +49,11 @@ QString HanwhaResponse::errorString() const
 std::map<QString, QString> HanwhaResponse::response() const
 {
     return m_response;
+}
+
+nx_http::StatusCode::Value HanwhaResponse::statusCode() const
+{
+    return m_statusCode;
 }
 
 void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)

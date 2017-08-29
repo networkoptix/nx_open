@@ -102,9 +102,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     const auto profiles = helper.view(lit("media/videoprofile"));
     if (!profiles.isSuccessful())
     {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("media/videoprofile/view"),
-            profiles.errorString());
+        return error(
+            profiles,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videoprofile/view"),
+                profiles.errorString()));
     }
 
     int fixedProfileCount = 0;
@@ -124,9 +126,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     const auto mediaAttributes = helper.fetchAttributes(lit("attributes/Media"));
     if (!mediaAttributes.isValid())
     {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("attributes/Media"),
-            lit("Invalid response"));
+        return error(
+            mediaAttributes,
+            CameraDiagnostics::RequestFailedResult(
+                lit("attributes/Media"),
+                lit("Invalid response")));
     }
 
     const auto maxProfileCount = mediaAttributes.attribute<int>(
@@ -149,7 +153,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int)hasDualStreaming);
     setProperty(Qn::MAX_FPS_PARAM_NAME, frameRates[frameRates.size() - 1]);
 
-    return CameraDiagnostics::NoErrorResult();
+    return createNxProfiles();
 }
 
 CameraDiagnostics::Result HanwhaResource::initIo()
@@ -264,6 +268,216 @@ CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result HanwhaResource::createNxProfiles()
+{
+    int nxPrimaryProfileNumber = kHanwhaInvalidProfile;
+    int nxSecondaryProfileNumber = kHanwhaInvalidProfile;
+    std::set<HanwhaProfileNumber> profilesToRemove;
+    int totalProfileNumber = 0;
+
+    m_profileByRole.clear();
+
+    auto result = findProfiles(
+        &nxPrimaryProfileNumber,
+        &nxSecondaryProfileNumber,
+        &totalProfileNumber,
+        &profilesToRemove);
+
+    if (!result)
+        return result;
+
+    if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
+    {
+        result = createNxProfile(
+            Qn::ConnectionRole::CR_LiveVideo,
+            &nxPrimaryProfileNumber,
+            totalProfileNumber,
+            &profilesToRemove);
+
+        if (!result)
+            return result;
+    }
+
+    if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
+    {
+        result = createNxProfile(
+            Qn::ConnectionRole::CR_SecondaryLiveVideo,
+            &nxSecondaryProfileNumber,
+            totalProfileNumber,
+            &profilesToRemove);
+
+        if (!result)
+            return result;
+    }
+
+    m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = nxPrimaryProfileNumber;
+    m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = nxSecondaryProfileNumber;
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::createNxProfile(
+    Qn::ConnectionRole role,
+    int* outNxProfile,
+    int totalProfileNumber,
+    std::set<int>* inOutProfilesToRemove)
+{
+    const int profileToRemove = chooseProfileToRemove(
+        totalProfileNumber,
+        *inOutProfilesToRemove);
+
+    if (profileToRemove != kHanwhaInvalidProfile)
+    { 
+        auto result = removeProfile(profileToRemove);
+        if (!result)
+            return result;
+
+        inOutProfilesToRemove->erase(profileToRemove);
+    }
+
+    return createProfile(outNxProfile, role);
+}
+
+int HanwhaResource::chooseProfileToRemove(
+    int totalProfileNumber,
+    const std::set<int>& profilesToRemove) const
+{
+    auto profile = kHanwhaInvalidProfile;
+    if (totalProfileNumber >= maxProfileCount())
+    {
+        if (profilesToRemove.empty())
+            return kHanwhaInvalidProfile;
+
+        profile = *profilesToRemove.cbegin();
+    }
+
+    return profile;
+}
+
+CameraDiagnostics::Result HanwhaResource::findProfiles(
+    int* outPrimaryProfileNumber,
+    int* outSecondaryProfileNumber,
+    int* totalProfileNumber,
+    std::set<int>* profilesToRemoveIfProfilesExhausted)
+{
+    bool isParametersValid = outPrimaryProfileNumber
+        && outSecondaryProfileNumber
+        && totalProfileNumber
+        && profilesToRemoveIfProfilesExhausted;
+
+    NX_ASSERT(isParametersValid);
+    if (!isParametersValid)
+    {
+        return CameraDiagnostics::CameraPluginErrorResult(
+            lit("Find profile: wrong output parameters provided"));
+    }
+
+    NX_ASSERT(profilesToRemoveIfProfilesExhausted);
+    if (!profilesToRemoveIfProfilesExhausted)
+    {
+        return CameraDiagnostics::CameraPluginErrorResult(
+            lit("Find profile: no profiles to remove provided"));
+    }
+
+    profilesToRemoveIfProfilesExhausted->clear();
+    *outPrimaryProfileNumber = kHanwhaInvalidProfile;
+    *outSecondaryProfileNumber = kHanwhaInvalidProfile;
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.view(lit("media/videoprofile"));
+
+    if (!response.isSuccessful())
+    {
+        return error(
+            response,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videoprofile/view"),
+                response.errorString()));
+    }
+
+    const auto profileByChannel = parseProfiles(response);
+    const auto currentChannelProfiles = profileByChannel.find(getChannel());
+    if (currentChannelProfiles == profileByChannel.cend())
+        return CameraDiagnostics::NoErrorResult();
+
+    *totalProfileNumber = currentChannelProfiles->second.size();
+    for (const auto& entry : currentChannelProfiles->second)
+    {
+        const auto& profile = entry.second;
+        
+        if (profile.name == kPrimaryNxProfileName)
+            *outPrimaryProfileNumber = profile.number;
+        else if (profile.name == kSecondaryNxProfileName)
+            *outSecondaryProfileNumber = profile.number;
+        else if (!profile.fixed)
+            profilesToRemoveIfProfilesExhausted->insert(profile.number);
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::removeProfile(int profileNumber)
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.remove(
+        lit("media/videoprofile"),
+        {
+            {kHanwhaChannelProperty, QString::number(getChannel())},
+            {kHanwhaProfileNumberProperty, QString::number(profileNumber)}
+        });
+
+    if (!response.isSuccessful())
+    {
+        return error(
+            response,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videoprofile/remove"),
+                response.errorString()));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::createProfile(
+    int* outProfileNumber,
+    Qn::ConnectionRole role)
+{
+    NX_ASSERT(outProfileNumber);
+    if (!outProfileNumber)
+    {
+        return CameraDiagnostics::CameraPluginErrorResult(
+            lit("Create profile: output profile number is null"));
+    }
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.add(
+        lit("media/videoprofile"),
+        {
+            {kHanwhaProfileNameProperty, nxProfileName(role)},
+            {kHanwhaEncodingTypeProperty, toHanwhaString(streamCodec(role))}
+        });
+
+    if (!response.isSuccessful())
+    {
+        return error(
+            response,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videoprofile/add"),
+                response.errorString()));
+    }
+
+    bool success = false;
+    *outProfileNumber = response.response()[kHanwhaProfileNumberProperty].toInt(&success);
+
+    if (!success)
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Invalid profile number string"));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* outStreamLimits)
 {
     NX_ASSERT(outStreamLimits);
@@ -278,9 +492,11 @@ CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* 
     const auto parameters = helper.fetchCgiParameters(lit("media/videoprofile"));
     if (!parameters.isValid())
     {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("media/videoprofile"),
-            lit("Request failed"));
+        return error(
+            parameters,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videoprofile"),
+                lit("Request failed")));
     }
 
     for (const auto& limitParameter: kHanwhaStreamLimitParameters)
@@ -385,12 +601,6 @@ int HanwhaResource::profileByRole(Qn::ConnectionRole role) const
         return itr->second;
 
     return kHanwhaInvalidProfile;
-}
-
-void HanwhaResource::setProfileForRole(Qn::ConnectionRole role, int profileNumber)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_profileByRole[role] = profileNumber;
 }
 
 AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole role) const

@@ -47,6 +47,9 @@ static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaMaxPresetNumber = 1000;
 
+const QString kPrimaryNxProfileName = lit("NxPrimary");
+const QString kSecondaryNxProfileName = lit("NxSecondary");
+
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
 

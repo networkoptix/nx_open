@@ -32,24 +32,26 @@ HanwhaRequestHelper::HanwhaRequestHelper(const QnSecurityCamResourcePtr& resourc
 HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesPath)
 {
     nx::Buffer buffer;
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
     qDebug() << "URL" << url;
-    if (!doRequestInternal(url, m_resource->getAuth(), &buffer))
-        return HanwhaAttributes();
+    if (!doRequestInternal(url, m_resource->getAuth(), &buffer, &statusCode))
+        return HanwhaAttributes(statusCode);
 
-    return HanwhaAttributes(buffer);
+    return HanwhaAttributes(buffer, statusCode);
 }
 
 HanwhaCgiParameters HanwhaRequestHelper::fetchCgiParameters(const QString& cgiParametersPath)
 {
     nx::Buffer buffer;
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(cgiParametersPath);
 
-    if (!doRequestInternal(url, m_resource->getAuth(), &buffer))
-        return HanwhaCgiParameters();
+    if (!doRequestInternal(url, m_resource->getAuth(), &buffer, &statusCode))
+        return HanwhaCgiParameters(statusCode);
 
-    return HanwhaCgiParameters(buffer);
+    return HanwhaCgiParameters(buffer, statusCode);
 }
 
 HanwhaResponse HanwhaRequestHelper::doRequest(
@@ -61,10 +63,11 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
     
-    if (!doRequestInternal(url, m_resource->getAuth(), &buffer))
-        return HanwhaResponse();
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    if (!doRequestInternal(url, m_resource->getAuth(), &buffer, &statusCode))
+        return HanwhaResponse(statusCode);
 
-    return HanwhaResponse(buffer);
+    return HanwhaResponse(buffer, statusCode);
 }
 
 HanwhaResponse HanwhaRequestHelper::view(const QString& path, const Parameters& parameters)
@@ -131,7 +134,8 @@ QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) cons
 bool HanwhaRequestHelper::doRequestInternal(
     const QUrl& url,
     const QAuthenticator& auth,
-    nx::Buffer* outBuffer)
+    nx::Buffer* outBuffer,
+    nx_http::StatusCode::Value* outStatusCode)
 {
     NX_ASSERT(outBuffer);
     if (!outBuffer)
@@ -151,6 +155,8 @@ bool HanwhaRequestHelper::doRequestInternal(
     while (!httpClient.eof())
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
+    *outStatusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
+
     return true;
 }
 
@@ -161,7 +167,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 {
     auto split = path.split(L'/');
     if (split.size() != 2)
-        return HanwhaResponse();
+        return HanwhaResponse(nx_http::StatusCode::undefined);
 
     return doRequest(split[0], split[1], action, parameters);
 }

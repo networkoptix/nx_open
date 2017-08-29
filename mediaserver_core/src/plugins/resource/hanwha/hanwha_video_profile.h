@@ -6,6 +6,9 @@
 
 #include <common/common_globals.h>
 
+#include <utils/media/h264_common.h>
+#include <utils/media/hevc_common.h>
+
 extern "C" {
 
 #include <libavcodec/avcodec.h>
@@ -30,16 +33,16 @@ struct HanwhaVideoProfile
     boost::optional<Qn::BitrateControl> bitrateControl;
     boost::optional<Qn::EncodingPriority> encodiingPriority;
 
-    boost::optional<int> govLength = -1;
-    boost::optional<int> maxGovLength = -1;
-    boost::optional<int> minGovLength = -1;
+    boost::optional<int> govLength;
+    boost::optional<int> maxGovLength;
+    boost::optional<int> minGovLength;
 
-    boost::optional<bool> dynamicGovEnabled = false;
-    boost::optional<int> dynamicGovLength = -1;
-    boost::optional<int> maxDynamicGovLength = -1;
+    boost::optional<bool> dynamicGovEnabled;
+    boost::optional<int> dynamicGovLength;
+    boost::optional<int> maxDynamicGovLength;
 
-    /*boost::optional<H264Profile> h264Profile;
-    boost::optional<HevcProfile> hevcProfile;*/
+    boost::optional<nx::media_utils::h264::Profile> h264Profile;
+    boost::optional<nx::media_utils::hevc::Profile> hevcProfile;
     boost::optional<Qn::EntropyCoding> entropyCoding;
     
     bool audioEnabled = false;

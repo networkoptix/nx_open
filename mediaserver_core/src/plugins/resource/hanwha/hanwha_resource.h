@@ -48,7 +48,16 @@ public:
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
     int profileByRole(Qn::ConnectionRole role) const;
-    void setProfileForRole(Qn::ConnectionRole role, int profileNumber);
+
+    CameraDiagnostics::Result findProfiles(
+        int* outPrimaryProfileNumber,
+        int* outSecondaryProfileNumber,
+        int* totalProfileNumber,
+        std::set<int>* profilesToRemoveIfProfilesExhausted);
+
+    CameraDiagnostics::Result removeProfile(int profileNumber);
+
+    CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -62,6 +71,17 @@ private:
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
+
+    CameraDiagnostics::Result createNxProfiles();
+    CameraDiagnostics::Result createNxProfile(
+        Qn::ConnectionRole role,
+        int* outNxProfile,
+        int totalProfileNumber,
+        std::set<int>* inOutProfilesToRemove);
+
+    int chooseProfileToRemove(
+        int totalProfileNumber,
+        const std::set<int>& inOutProfilesToRemove) const;
 
     CameraDiagnostics::Result fetchStreamLimits(HanwhaStreamLimits* outStreamLimits);
     void sortResolutions(std::vector<QSize>* resolutions) const;

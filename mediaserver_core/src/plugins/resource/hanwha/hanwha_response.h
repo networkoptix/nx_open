@@ -5,6 +5,7 @@
 #include <boost/optional/optional.hpp>
 
 #include <nx/network/buffer.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -21,13 +22,14 @@ static const int kUnknownError = 1;
 class HanwhaResponse
 {
 public:
-    explicit HanwhaResponse();
-    HanwhaResponse(const nx::Buffer& rawBuffer);
+    explicit HanwhaResponse(nx_http::StatusCode::Value statusCode);
+    explicit HanwhaResponse(const nx::Buffer& rawBuffer, nx_http::StatusCode::Value statusCode);
 
     bool isSuccessful() const;
     int errorCode() const;
     QString errorString() const;
     std::map<QString, QString> response() const;
+    nx_http::StatusCode::Value statusCode() const;
     
     template<typename T>
     boost::optional<T> parameter(const QString& parameterName) const
@@ -47,6 +49,7 @@ private:
     int m_errorCode = HanwhaError::kNoError;
     QString m_errorString;
     std::map<QString, QString> m_response;
+    nx_http::StatusCode::Value m_statusCode = nx_http::StatusCode::undefined;
 };
 
 template<>

@@ -7,6 +7,7 @@
 #include <QtCore/QXmlStreamReader>
 
 #include <nx/network/buffer.h>
+#include <nx/network/http/http_types.h>
 
 #include <plugins/resource/hanwha/hanwha_cgi_parameter.h>
 
@@ -17,8 +18,10 @@ namespace plugins {
 class HanwhaCgiParameters
 {
 public:
-    explicit HanwhaCgiParameters() = default;
-    HanwhaCgiParameters(const nx::Buffer& rawBuffer);
+    explicit HanwhaCgiParameters(nx_http::StatusCode::Value statusCode);
+    explicit HanwhaCgiParameters(
+        const nx::Buffer& rawBuffer,
+        nx_http::StatusCode::Value statusCode);
    
     boost::optional<HanwhaCgiParameter> parameter(
         const QString& submenu,
@@ -28,6 +31,8 @@ public:
     boost::optional<HanwhaCgiParameter> parameter(const QString& path) const;
 
     bool isValid() const;
+
+    nx_http::StatusCode::Value statusCode() const;
 
 private:
     bool parseXml(const nx::Buffer& rawBuffer);
@@ -55,6 +60,7 @@ private:
 
     bool m_isValid = false;
     SubmenuMap m_parameters;
+    nx_http::StatusCode::Value m_statusCode;
 };
 
 } // namespace plugins

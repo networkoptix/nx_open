@@ -1,17 +1,22 @@
 #include "hanwha_video_profile.h"
 #include "hanwha_utils.h"
 
-#define NX_HANWHA_FROM_STRING_TO_INT(integerTarget, stringParameter)\
-{\
-    bool success = false;\
-    auto tmp = (stringParameter).toInt(&success);\
-    if (success)\
-        (integerTarget) = tmp;\
-}  
-
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+namespace {
+
+template<typename T>
+void setInteger(T* target, const QString& stringParameter)
+{
+    bool success = false;
+    auto tmp = stringParameter.toInt(&success);
+    if (success)
+        *target = tmp;
+}
+
+} // namespace
 
 void HanwhaVideoProfile::setParameter(
     const QString& parameterName,
@@ -24,29 +29,29 @@ void HanwhaVideoProfile::setParameter(
     else if (parameterName == lit("Resolution"))
         resolution = fromHanwhaString<QSize>(parameterValue);
     else if (parameterName == lit("FrameRate"))
-        NX_HANWHA_FROM_STRING_TO_INT(frameRate, parameterValue)
+        setInteger(&frameRate, parameterValue);
     else if (parameterName == lit("CompressionLevel"))
-        NX_HANWHA_FROM_STRING_TO_INT(compressionLevel, parameterValue)
+        setInteger(&compressionLevel, parameterValue);
     else if (parameterName == lit("Bitrate"))
-        NX_HANWHA_FROM_STRING_TO_INT(bitrateKbps, parameterValue)
+        setInteger(&bitrateKbps, parameterValue);
     else if (parameterName.endsWith(lit("BitrateControlType")))
         bitrateControl = fromHanwhaString<Qn::BitrateControl>(parameterValue);
     else if (parameterName.endsWith("PriorityType"))
         encodiingPriority = fromHanwhaString<Qn::EncodingPriority>(parameterValue);
     else if (parameterName.endsWith("MaxDynamicGOVLength"))
-        NX_HANWHA_FROM_STRING_TO_INT(maxDynamicGovLength, parameterValue)
+        setInteger(&maxDynamicGovLength, parameterValue);
     else if (parameterName.endsWith("DynamicGOVLength"))
-        NX_HANWHA_FROM_STRING_TO_INT(dynamicGovLength, parameterValue)
+        setInteger(&dynamicGovLength, parameterValue);
     else if (parameterName.endsWith("MaxGOVLength"))
-        NX_HANWHA_FROM_STRING_TO_INT(maxGovLength, parameterValue)
+        setInteger(&maxGovLength, parameterValue);
     else if (parameterName.endsWith("MinGOVLength"))
-        NX_HANWHA_FROM_STRING_TO_INT(minGovLength, parameterValue)
+        setInteger(&minGovLength, parameterValue);
     else if (parameterName.endsWith("GOVLength"))
-        NX_HANWHA_FROM_STRING_TO_INT(govLength, parameterValue)
+        setInteger(&govLength, parameterValue);
     else if (parameterName == lit("H264.Profile"))
-        ; // TODO #dmishin implement
+        h264Profile = fromHanwhaString<nx::media_utils::h264::Profile>(parameterValue);
     else if (parameterName == lit("H265.Profile"))
-        ; // TODO #dmishin implement
+        hevcProfile = fromHanwhaString<nx::media_utils::hevc::Profile>(parameterValue);
     else if (parameterName.endsWith("EntropyCoding"))
         entropyCoding = fromHanwhaString<Qn::EntropyCoding>(parameterValue);
     else if (parameterName.endsWith("DynamicGOVEnable"))

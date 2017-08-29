@@ -7,6 +7,7 @@
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
 #include <plugins/resource/hanwha/hanwha_video_profile.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
+#include <plugins/resource/hanwha/hanwha_utils.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -14,13 +15,7 @@ namespace plugins {
 
 class HanwhaStreamReader: public QnRtpStreamReader
 {
-    using ProfileNumber = int;
-    using ProfileMap = std::map<ProfileNumber, HanwhaVideoProfile>;
-
-    using ProfileParameterName = QString;
-    using ProfileParameterValue = QString;
-    using ProfileParameters = std::map<QString, QString>;
-
+    
 public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
 
@@ -32,27 +27,13 @@ protected:
         const QnLiveStreamParams& params) override;
 
 private:
-    ProfileMap parseProfiles(const HanwhaResponse& response) const;
-
-    QString nxProfileName() const;
-
-    bool isNxProfile(const QString& profileName) const;
-
-    ProfileParameters makeProfileParameters(
+    HanwhaProfileParameters makeProfileParameters(
         int profileNumber,
         const QnLiveStreamParams& parameters) const;
-
-    CameraDiagnostics::Result findProfile(
-        int* outProfileNumber,
-        int* profileToRemoveIfProfilesExhausted);
-
-    CameraDiagnostics::Result createProfile(int* outProfileNumber);
 
     CameraDiagnostics::Result updateProfile(
         int profileNumber,
         const QnLiveStreamParams& parameters);
-
-    CameraDiagnostics::Result removeProfile(int profileNumber);
 
     CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
 

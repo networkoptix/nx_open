@@ -10,7 +10,16 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaAttributes::HanwhaAttributes(const QString& attributesXml)
+HanwhaAttributes::HanwhaAttributes(nx_http::StatusCode::Value statusCode):
+    m_statusCode(statusCode)
+{
+}
+
+HanwhaAttributes::HanwhaAttributes(
+    const QString& attributesXml,
+    nx_http::StatusCode::Value statusCode)
+    :
+    m_statusCode(statusCode)
 {
     m_isValid = parseXml(attributesXml);
 }
@@ -18,6 +27,11 @@ HanwhaAttributes::HanwhaAttributes(const QString& attributesXml)
 bool HanwhaAttributes::isValid() const
 {
     return m_isValid;
+}
+
+nx_http::StatusCode::Value HanwhaAttributes::statusCode() const
+{
+    return m_statusCode;
 }
 
 boost::optional<QString> HanwhaAttributes::findAttribute(

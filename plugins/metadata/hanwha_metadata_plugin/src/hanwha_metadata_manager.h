@@ -40,7 +40,6 @@ public:
     void setCapabilitiesManifest(const QByteArray& manifest);
 
 private:
-    mutable QnMutex m_mutex;
     QByteArray m_manifest;
 
     QUrl m_url;
