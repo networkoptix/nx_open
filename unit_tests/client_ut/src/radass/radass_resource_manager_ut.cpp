@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/layout_item_index.h>
 
 #include <nx/client/desktop/radass/radass_types.h>
 #include <nx/client/desktop/radass/radass_resource_manager.h>
@@ -17,6 +18,20 @@
 namespace nx {
 namespace client {
 namespace desktop {
+
+
+void PrintTo(const RadassMode& val, ::std::ostream* os)
+{
+    QString mode;
+    switch (val)
+    {
+        case RadassMode::Auto: mode = "auto"; break;
+        case RadassMode::High: mode = "high"; break;
+        case RadassMode::Low: mode = "low"; break;
+        case RadassMode::Custom: mode = "custom"; break;
+    }
+    *os << mode.toStdString();
+}
 
 class RadassResourceManagerTest: public testing::Test
 {
@@ -42,12 +57,12 @@ protected:
         m_staticCommon.reset();
     }
 
-    QnUuid addCamera()
+    QnLayoutItemIndex addCamera()
     {
         QnLayoutItemData item;
         item.uuid = QnUuid::createUuid();
         m_layout->addItem(item);
-        return item.uuid;
+        return QnLayoutItemIndex(m_layout, item.uuid);
     }
 
     QnCommonModule* commonModule() const { return m_module.data(); }
@@ -64,18 +79,120 @@ protected:
 
 TEST_F(RadassResourceManagerTest, initNull)
 {
-    ASSERT_EQ(manager()->mode(QnLayoutResourcePtr()), RadassMode::Auto);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(QnLayoutResourcePtr()));
 }
 
 TEST_F(RadassResourceManagerTest, initLayout)
 {
-    ASSERT_EQ(manager()->mode(layout()), RadassMode::Auto);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToEmptyLayout)
+{
+    manager()->setMode(layout(), RadassMode::High);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
 }
 
 TEST_F(RadassResourceManagerTest, setModeToLayout)
 {
+    addCamera();
     manager()->setMode(layout(), RadassMode::High);
-    ASSERT_EQ(manager()->mode(layout()), RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
+}
+
+TEST_F(RadassResourceManagerTest, ignoreCustomModeToLayout)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    manager()->setMode(layout(), RadassMode::Custom);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, ignoreCustomModeToItems)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    manager()->setMode(items, RadassMode::Custom);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToCamera)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToCameras)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera() << addCamera();
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToLayoutCheckCameras)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera() << addCamera();
+    manager()->setMode(layout(), RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, checkNewCamera)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToLayoutCheckNewCamera)
+{
+    manager()->setMode(layout(), RadassMode::High);
+
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToCamerasCheckLayout)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera() << addCamera();
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToCamerasDifferent)
+{
+    QnLayoutItemIndexList highItems;
+    highItems << addCamera();
+    manager()->setMode(highItems, RadassMode::High);
+
+    QnLayoutItemIndexList lowItems;
+    lowItems << addCamera();
+    manager()->setMode(lowItems, RadassMode::Low);
+
+    ASSERT_EQ(RadassMode::Custom, manager()->mode(layout()));
+
+    auto allItems = highItems;
+    allItems.append(lowItems);
+    ASSERT_EQ(RadassMode::Custom, manager()->mode(allItems));
+}
+
+TEST_F(RadassResourceManagerTest, addCameraToPresetLayout)
+{
+    addCamera();
+    manager()->setMode(layout(), RadassMode::High);
+
+    QnLayoutItemIndexList items;
+    items << addCamera();
+
+    ASSERT_EQ(RadassMode::Custom, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
 }
 
 

@@ -11,7 +11,8 @@ namespace client {
 namespace desktop {
 
 /**
- * Manages radass state for resources (layout items), saves it locally.
+ * Manages radass state for resources (layout items), saves it locally. Connection entries are
+ * saved by system id to make sure we will clean all non-existent layout items sometimes.
  */
 class RadassResourceManager: public QObject
 {

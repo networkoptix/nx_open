@@ -8,42 +8,28 @@
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/uuid.h>
 
-namespace {
-
-QnUuid id(const QnLayoutResourcePtr& layout)
-{
-    return layout->getId();
-}
-
-QnUuid id(const QnLayoutItemIndex& index)
-{
-    return index.uuid();
-}
-
-} // namespace
-
 namespace nx {
 namespace client {
 namespace desktop {
 
 struct RadassResourceManager::Private
 {
-    RadassMode mode(const QnUuid& key)
+    RadassMode mode(const QnLayoutItemIndex& index)
     {
-        return m_modes.value(key, RadassMode::Auto);
+        return m_modes.value(index.uuid(), RadassMode::Auto);
     }
 
-    void setMode(const QnUuid& key, RadassMode value)
+    void setMode(const QnLayoutItemIndex& index, RadassMode value)
     {
+        NX_ASSERT(value != RadassMode::Custom);
         if (value == RadassMode::Auto)
-            m_modes.remove(key);
+            m_modes.remove(index.uuid());
         else
-            m_modes[key] = value;
+            m_modes[index.uuid()] = value;
     }
 
 private:
-    //we need to store cameras only!!!!!11111111
-    //what's with items removed from layout? should we store layout id too? and system id?
+    // Mode by layout item uuid.
     QHash<QnUuid, RadassMode> m_modes;
 };
 
@@ -62,9 +48,11 @@ RadassMode RadassResourceManager::mode(const QnLayoutResourcePtr& layout) const
     if (!layout)
         return RadassMode::Auto;
 
-    // invalid!!! need calculate mode for separate items if it differs
+    QnLayoutItemIndexList items;
+    for (const auto item: layout->getItems())
+        items << QnLayoutItemIndex(layout, item.uuid);
 
-    return d->mode(id(layout));
+    return mode(items);
 }
 
 void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMode value)
@@ -72,22 +60,24 @@ void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMod
     if (!layout)
         return;
 
-    // need to clear all item's mode
+    // Custom mode is not to be set directly.
+    if (value == RadassMode::Custom)
+        return;
 
-    d->setMode(id(layout), value);
+    QnLayoutItemIndexList items;
+    for (const auto item: layout->getItems())
+        items << QnLayoutItemIndex(layout, item.uuid);
+
+    setMode(items, value);
 }
 
 RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
 {
-    NX_ASSERT(!items.empty());
-    if (items.empty())
-        return RadassMode::Auto;
-
     auto value = RadassMode::Auto;
     if (nx::utils::algorithm::same(items.cbegin(), items.cend(),
         [this](const QnLayoutItemIndex& index)
         {
-            return d->mode(id(index));
+            return d->mode(index);
         },
         &value))
     {
@@ -99,10 +89,12 @@ RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
 
 void RadassResourceManager::setMode(const QnLayoutItemIndexList& items, RadassMode value)
 {
-    //set mode for items must update their layout's mode (e.g to Custom)
+    // Custom mode is not to be set directly.
+    if (value == RadassMode::Custom)
+        return;
 
     for (const auto& item: items)
-        d->setMode(id(item), value);
+        d->setMode(item, value);
 }
 
 } // namespace desktop
