@@ -38,10 +38,47 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
+namespace {
+
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
-
 static const int STORE_QUEUE_SIZE = 50;
+
+bool updateInFile(QIODevice* file, const QByteArray& source, const QByteArray& target)
+{
+    NX_ASSERT(file);
+    NX_ASSERT(source.size() == target.size());
+
+    // 16Kb ought to be enough for anybody.
+    QByteArray data = file->read(1024 * 16);
+    int pos = data.indexOf(source);
+    if (pos < 0)
+        return false;
+
+    file->seek(pos);
+    file->write(target);
+    return true;
+}
+
+} // namespace
+
+
+struct QnStreamRecorder::StreamRecorderContext
+{
+    QString fileName;
+    AVFormatContext* formatCtx;
+    QnStorageResourcePtr storage;
+    qint64 totalWriteTimeNs;
+    QnAviArchiveMetadata metadata;
+
+    StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage):
+        fileName(fileName),
+        formatCtx(nullptr),
+        storage(storage),
+        totalWriteTimeNs(0)
+    {
+    }
+};
 
 QString QnStreamRecorder::errorString(StreamRecorderError errCode)
 {
@@ -120,28 +157,40 @@ QnStreamRecorder::~QnStreamRecorder()
     delete m_videoTranscoder;
 }
 
-/* It is impossible to write avi/mkv attribute in the end
-*  So, write magic on startup, then update it
-*/
-void QnStreamRecorder::updateSignatureAttr(size_t i)
+void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
 {
-    QIODevice* file = m_recordingContextVector[i].storage->open(
-        m_recordingContextVector[i].fileName,
-        QIODevice::ReadWrite);
-
+    NX_VERBOSE(this) "SignVideo: update signature at" << context->fileName;
+    QScopedPointer<QIODevice> file(context->storage->open(context->fileName, QIODevice::ReadWrite));
     if (!file)
-        return;
-
-    QByteArray data = file->read(1024 * 16);
-    int pos = data.indexOf(QnSignHelper::getSignMagic());
-    if (pos == -1)
     {
-        delete file;
-        return; // no signature found
+        NX_VERBOSE(this) "SignVideo: could not open the file";
+        return;
     }
-    file->seek(pos);
-    file->write(QnSignHelper::getSignFromDigest(getSignature()));
-    delete file;
+
+    // Placeholder start for actual signature. Really QnSignHelper::signSize() bytes written.
+    const auto placeholder = QnSignHelper::getSignMagic();
+
+    // Update old metadata.
+    if (updateInFile(file.data(), placeholder, QnSignHelper::getSignFromDigest(getSignature())))
+        NX_VERBOSE(this) "SignVideo: signature tag was updated";
+    else
+        NX_VERBOSE(this) "SignVideo: signature tag was not found";
+
+    // Update new metadata.
+    auto& metadata = context->metadata;
+    QByteArray signPattern = metadata.signature;
+
+    NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
+    signPattern.replace(QnSignHelper::getSignMagic(),
+        QnSignHelper::getSignFromDigest(getSignature()));
+
+    metadata.signature = QnSignHelper::makeSignature(signPattern);
+
+    //New metadata is stored as json, so signature is written base64 - encoded.
+    if (updateInFile(file.data(), signPattern.toBase64(), metadata.signature.toBase64()))
+        NX_VERBOSE(this) "SignVideo: metadata was updated";
+    else
+        NX_VERBOSE(this) "SignVideo: metadata was not found";
 }
 
 void QnStreamRecorder::close()
@@ -161,7 +210,7 @@ void QnStreamRecorder::close()
             QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
 #ifndef SIGN_FRAME_ENABLED
             if (m_needCalcSignature)
-                updateSignatureAttr(i);
+                updateSignatureAttr(&m_recordingContextVector[i]);
 #endif
             m_recordingContextVector[i].formatCtx->pb = 0;
             avformat_close_input(&m_recordingContextVector[i].formatCtx);
@@ -545,6 +594,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
                 if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
                     m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
                 AVCodecContext* srcCodec = m_recordingContextVector[i].formatCtx->streams[streamIndex]->codec;
+                NX_VERBOSE(this) "SignVideo: add video packet of size" << avPkt.size;
                 QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
                 //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
             }
@@ -591,12 +641,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
-        if (!m_recordingContextVector[i].fileName.endsWith(dFileExt, Qt::CaseInsensitive))
-            m_recordingContextVector[i].fileName += dFileExt;
-        QString url = m_recordingContextVector[i].fileName;
+        auto& context = m_recordingContextVector[i];
+
+        if (!context.fileName.endsWith(dFileExt, Qt::CaseInsensitive))
+            context.fileName += dFileExt;
+        QString url = context.fileName;
 
         int err = avformat_alloc_output_context2(
-            &m_recordingContextVector[i].formatCtx,
+            &context.formatCtx,
             outputCtx,
             0,
             url.toUtf8().constData()
@@ -606,10 +658,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         {
             m_lastError = StreamRecorderErrorStruct(
                 StreamRecorderError::fileCreate,
-                m_recordingContextVector[i].storage
+                context.storage
             );
             NX_LOG(lit("Can't create output file '%1' for video recording.")
-                .arg(m_recordingContextVector[i].fileName), cl_logERROR);
+                .arg(context.fileName), cl_logERROR);
 
             msleep(500); // avoid createFile flood
             return false;
@@ -623,29 +675,22 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
 
-        QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::custom;
-        if (fileExt == lit("avi"))
-            fileFormat = QnAviArchiveMetadata::Format::avi;
-        else if (fileExt == lit("mp4"))
-            fileFormat = QnAviArchiveMetadata::Format::mp4;
-
         // Always save with latest version.
-        QnAviArchiveMetadata metadata;
-        metadata.version = QnAviArchiveMetadata::kLatestVersion;
+        context.metadata.version = QnAviArchiveMetadata::kLatestVersion;
 
         if (!isTranscode)
         {
-            metadata.videoLayoutSize = layout->size();
-            metadata.videoLayoutChannels = layout->getChannels();
-            metadata.overridenAr = mediaDev->customAspectRatio();
+            context.metadata.videoLayoutSize = layout->size();
+            context.metadata.videoLayoutChannels = layout->getChannels();
+            context.metadata.overridenAr = mediaDev->customAspectRatio();
         }
 
         if (isUtcOffsetAllowed())
-            metadata.startTimeMs = mediaData->timestamp / 1000LL;
+            context.metadata.startTimeMs = mediaData->timestamp / 1000LL;
 
-        metadata.dewarpingParams = mediaDev->getDewarpingParams();
+        context.metadata.dewarpingParams = mediaDev->getDewarpingParams();
         if (isTranscode)
-            metadata.dewarpingParams.enabled = false;
+            context.metadata.dewarpingParams.enabled = false;
 
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature)
@@ -655,15 +700,18 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             // Add server time zone as one more column to sign pattern.
             if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
                 signPattern.append(QByteArray::number(m_serverTimeZoneMs));
-            while (signPattern.size() < QnSignHelper::getMaxSignSize())
-                signPattern.append(" ");
-            metadata.signature = signPattern.mid(0, QnSignHelper::getMaxSignSize());
+            context.metadata.signature = QnSignHelper::makeSignature(signPattern);
         }
 #endif
 
-        metadata.saveToFile(m_recordingContextVector[i].formatCtx, fileFormat);
+        auto fileFormat = QnAviArchiveMetadata::Format::custom;
+        if (fileExt == lit("avi"))
+            fileFormat = QnAviArchiveMetadata::Format::avi;
+        else if (fileExt == lit("mp4"))
+            fileFormat = QnAviArchiveMetadata::Format::mp4;
+        context.metadata.saveToFile(context.formatCtx, fileFormat);
 
-        m_recordingContextVector[i].formatCtx->start_time = mediaData->timestamp;
+        context.formatCtx->start_time = mediaData->timestamp;
 
         if (auto videoData = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData))
         {
@@ -671,7 +719,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             for (int j = 0; j < videoChannels; ++j)
             {
                 AVStream* videoStream = avformat_new_stream(
-                    m_recordingContextVector[i].formatCtx,
+                    context.formatCtx,
                     nullptr
                 );
 
@@ -679,7 +727,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     m_lastError = StreamRecorderErrorStruct(
                         StreamRecorderError::videoStreamAllocation,
-                        m_recordingContextVector[i].storage
+                        context.storage
                     );
                     NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                     return false;
@@ -756,7 +804,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         for (int j = 0; j < audioLayout->channelCount(); ++j)
         {
             AVStream* audioStream = avformat_new_stream(
-                m_recordingContextVector[i].formatCtx,
+                context.formatCtx,
                 nullptr
             );
 
@@ -764,7 +812,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             {
                 m_lastError = StreamRecorderErrorStruct(
                     StreamRecorderError::audioStreamAllocation,
-                    m_recordingContextVector[i].storage
+                    context.storage
                 );
                 NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
@@ -777,7 +825,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             {
                 m_lastError = StreamRecorderErrorStruct(
                     StreamRecorderError::invalidAudioCodec,
-                    m_recordingContextVector[i].storage
+                    context.storage
                 );
                 NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
                 return false;
@@ -805,30 +853,30 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 
         initIoContext(
-            m_recordingContextVector[i].storage,
-            m_recordingContextVector[i].fileName,
-            &m_recordingContextVector[i].formatCtx->pb);
+            context.storage,
+            context.fileName,
+            &context.formatCtx->pb);
 
-        if (m_recordingContextVector[i].formatCtx->pb == 0)
+        if (context.formatCtx->pb == 0)
         {
-            avformat_close_input(&m_recordingContextVector[i].formatCtx);
+            avformat_close_input(&context.formatCtx);
             m_lastError = StreamRecorderErrorStruct(StreamRecorderError::fileCreate,
-                m_recordingContextVector[i].storage);
+                context.storage);
             NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
             m_recordingFinished = true;
             msleep(500); // avoid createFile flood
             return false;
         }
 
-        int rez = avformat_write_header(m_recordingContextVector[i].formatCtx, 0);
+        int rez = avformat_write_header(context.formatCtx, 0);
         if (rez < 0)
         {
-            QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
-            m_recordingContextVector[i].formatCtx->pb = nullptr;
-            avformat_close_input(&m_recordingContextVector[i].formatCtx);
+            QnFfmpegHelper::closeFfmpegIOContext(context.formatCtx->pb);
+            context.formatCtx->pb = nullptr;
+            avformat_close_input(&context.formatCtx);
             m_lastError = StreamRecorderErrorStruct(
                 StreamRecorderError::incompatibleCodec,
-                m_recordingContextVector[i].storage
+                context.storage
             );
             NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
                 arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)), cl_logERROR);
@@ -839,7 +887,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             fileStarted(
                 m_startDateTime / 1000,
                 m_currentTimeZone,
-                m_recordingContextVector[i].fileName,
+                context.fileName,
                 m_mediaProvider
             );
 
@@ -975,6 +1023,7 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
     {
         m_mdctx.reset();
         m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
+        NX_VERBOSE(this) "SignVideo: init";
     }
 }
 
@@ -989,6 +1038,7 @@ bool QnStreamRecorder::addSignatureFrame()
     QByteArray signText = QnSignHelper::getSignPattern(licensePool());
     if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
         signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
+    NX_VERBOSE(this) "SignVideo: add signature";
     QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*)signText.data(), signText.size());
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
