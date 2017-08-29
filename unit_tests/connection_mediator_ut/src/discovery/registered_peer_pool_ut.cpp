@@ -99,6 +99,7 @@ protected:
             givenConnectedPeer();
             m_peers.back().type = nx::utils::generateRandomName(7).toStdString();
             whenPeerSendsInformation();
+            thenPeerMovedToOnlineState();
         }
     }
 

@@ -1,6 +1,7 @@
 #include "registered_peer_pool.h"
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
@@ -103,6 +104,8 @@ void RegisteredPeerPool::onBytesRead(
     if ((systemErrorCode == SystemError::noError && bytesRead == 0) ||
         nx::network::socketCannotRecoverFromError(systemErrorCode))
     {
+        NX_VERBOSE(this, lm("Connection from peer %1 has been closed with result code %2")
+            .arg(peerId).arg(SystemError::toString(systemErrorCode)));
         // Connection has been closed.
         m_peerIdToConnection.erase(peerIter);
         return;
@@ -115,7 +118,8 @@ void RegisteredPeerPool::onBytesRead(
         if (!QJson::deserialize(peerContext.readBuffer, &info) ||
             !isPeerInfoValid(peerId, info))
         {
-            NX_DEBUG(this, "Closing connection from %1 (peer id %2) after receiving invalid info");
+            NX_DEBUG(this, lm("Closing connection from peer %1 after receiving invalid info")
+                .arg(peerId));
             m_peerIdToConnection.erase(peerIter);
             return;
         }
