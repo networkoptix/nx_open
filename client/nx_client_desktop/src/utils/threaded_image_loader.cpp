@@ -53,7 +53,7 @@ void QnThreadedImageLoaderPrivate::start()
     {
         if (!m_input.load(m_inputFilename))
         {
-            // Workaround for Qt Mac Os bug, when QImage::load sometimes can't
+            // Workaround for Qt Mac OS bug, when QImage::load sometimes can't
             // load image from file directly.
             QFile imageFile(m_inputFilename);
             if (imageFile.open(QIODevice::ReadOnly))
