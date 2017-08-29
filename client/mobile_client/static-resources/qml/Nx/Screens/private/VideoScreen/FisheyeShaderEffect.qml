@@ -57,7 +57,7 @@ ShaderEffect
         hideSource: true
         visible: false
         textureSize: Qt.size(
-            parent.sourceSize.width / Screen.devicePixelRatio, 
+            parent.sourceSize.width / Screen.devicePixelRatio,
             parent.sourceSize.height / Screen.devicePixelRatio)
     }
 
