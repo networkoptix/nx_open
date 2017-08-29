@@ -95,7 +95,7 @@ public:
     std::chrono::seconds expirationPeriod;
     /**
      * if true, each request, authorized with these credentials, 
-     * increases credentials life time by prolongationPeriod.
+     * increases credentials lifetime by prolongationPeriod.
      */
     bool autoProlongationEnabled;
     std::chrono::seconds prolongationPeriod;
