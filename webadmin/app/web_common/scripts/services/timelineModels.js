@@ -1096,10 +1096,6 @@ ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
         this.setAnchorDateAndPoint(this.end, 1);
         return;
     }
-    if(!this.wasForcedToStopWatchPlaying && !this.watchLivePosition){
-        this.checkWatchPlaying(this.end, true);
-        return;
-    }
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
         this.checkWatchPlaying(this.playedPosition, liveMode);
     }
