@@ -2,12 +2,16 @@
 
 #include <QtWidgets/QAction>
 
+#include <client/client_module.h>
+
 #include <nx/client/desktop/radass/radass_types.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 #include <nx/client/desktop/radass/radass_resource_manager.h>
+#include <nx/client/desktop/radass/radass_cameras_watcher.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
@@ -17,15 +21,25 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct RadassActionHandler::Private
+{
+    QScopedPointer<RadassCamerasWatcher> camerasWatcher;
+    RadassController* controller = nullptr;
+    RadassResourceManager* manager = nullptr;
+};
+
 RadassActionHandler::RadassActionHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    d(new Private)
 {
-    context()->instance<RadassResourceManager>();
+    d->controller = qnClientModule->radassController();
+    d->camerasWatcher.reset(new RadassCamerasWatcher(d->controller, resourcePool()));
+    // Manager must be available from actions factory.
+    d->manager = context()->instance<RadassResourceManager>();
 
     connect(action(ui::action::RadassAction), &QAction::triggered, this,
         &RadassActionHandler::at_radassAction_triggered);
-
 }
 
 RadassActionHandler::~RadassActionHandler()

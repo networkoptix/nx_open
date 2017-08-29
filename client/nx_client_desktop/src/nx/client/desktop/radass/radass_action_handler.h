@@ -18,6 +18,10 @@ public:
 private:
     void at_radassAction_triggered();
 
+private:
+    struct Private;
+    QScopedPointer<Private> d;
+
 };
 
 } // namespace desktop
