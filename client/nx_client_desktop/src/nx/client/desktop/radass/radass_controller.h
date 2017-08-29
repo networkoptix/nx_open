@@ -58,28 +58,20 @@ private:
     // TODO: #Elric #enum
     enum FindMethod {Find_Biggest, Find_Least};
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
-    struct RedAssInfo
-    {
-        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0), smallSizeCnt(0) {}
-        qint64 lqTime;
-        float toLQSpeed;
-        LQReason lqReason;
-        qint64 initialTime;
-        qint64 awaitingLQTime;
-        int smallSizeCnt;
-    };
+    struct ConsumerInfo;
 
     typedef bool (RadassController::*SearchCondition)(QnCamDisplay*);
 
     mutable QnMutex m_mutex;
-    typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
-    ConsumersMap m_redAssInfo;
+    typedef QMap<QnCamDisplay*, ConsumerInfo> ConsumersMap;
+    ConsumersMap m_consumersInfo;
     QTimer m_timer;
-    QTime m_lastSwitchTimer; // latest HQ->LQ or LQ->HQ switch
+    QElapsedTimer m_lastSwitchTimer; //< Latest HQ->LQ or LQ->HQ switch
     int m_hiQualityRetryCounter;
     int m_timerTicks;    // onTimer ticks count
     qint64 m_lastLqTime; // latest HQ->LQ switch time
     RadassMode m_mode;
+
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);

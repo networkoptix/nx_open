@@ -8,15 +8,29 @@
 
 namespace {
 
-static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts
-static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ if visual size is small
+// Time to ignore recently added cameras.
+static constexpr int kRecentlyAddedIntervalMs = 1000;
 
+// Delay between quality switching attempts.
+static constexpr int kQualitySwitchIntervalMs = 1000 * 5;
 
-static const int TIMER_TICK_INTERVAL = 500; // at ms
-static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
-static const double FPS_EPS = 0.0001;
-static const double LQ_HQ_THRESHOLD = 1.34;
+// Some item stuck after HQ switching. Do not switch to HQ after this number of retries.
+static constexpr int kHighQualityRetryCounter = 1;
+
+// Put item to LQ if visual size is small.
+static const QSize kLowQualityScreenSize(320 / 1.4, 240 / 1.4);
+
+// Put item back to HQ if visual size increased to kLowQualityScreenSize * kLqToHqSizeThreshold.
+static constexpr double kLqToHqSizeThreshold = 1.34;
+
+// Try to balance every 500ms
+static constexpr int kTimerIntervalMs = 500;
+
+// Every 10 minutes try to raise quality. Value in counter ticks.
+static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000 / kTimerIntervalMs;
+
+// Ignore cameras which are on Fast Forward
+static constexpr double kSpeedValueEpsilon = 0.0001;
 
 } // namespace
 
@@ -24,12 +38,27 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct RadassController::ConsumerInfo
+{
+    qint64 lqTime = 0;
+    float toLQSpeed = 0.0;
+    LQReason lqReason = Reason_None ;
+    QElapsedTimer initialTime;
+    QElapsedTimer awaitingLQTime;
+    int smallSizeCnt = 0;
+
+    ConsumerInfo()
+    {
+        initialTime.start();
+    }
+};
+
 RadassController::RadassController():
     m_mutex(QnMutex::Recursive),
     m_mode(RadassMode::Auto)
 {
     QObject::connect(&m_timer, &QTimer::timeout, this, &RadassController::onTimer);
-    m_timer.start(TIMER_TICK_INTERVAL);
+    m_timer.start(kTimerIntervalMs);
     m_lastSwitchTimer.start();
     m_hiQualityRetryCounter = 0;
     m_timerTicks = 0;
@@ -38,7 +67,7 @@ RadassController::RadassController():
 
 QnCamDisplay* RadassController::getDisplayByReader(QnArchiveStreamReader* reader)
 {
-    for(QMap<QnCamDisplay*, RedAssInfo>::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
         if (display->getArchiveReader() == reader)
@@ -51,7 +80,8 @@ bool RadassController::isSupportedDisplay(QnCamDisplay* display) const
 {
     if (!display || !display->getArchiveReader())
         return false;
-    QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
+
+    auto cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
     return cam && cam->hasDualStreaming();
 }
 
@@ -61,7 +91,7 @@ QnCamDisplay* RadassController::findDisplay(FindMethod method, MediaQuality find
     if (displaySize)
         *displaySize = 0;
     QMultiMap<qint64, QnCamDisplay*> camDisplayByScreenSize;
-    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
         if (!isSupportedDisplay(display))
@@ -88,7 +118,8 @@ QnCamDisplay* RadassController::findDisplay(FindMethod method, MediaQuality find
         QnCamDisplay* display = itr.value();
         QnArchiveStreamReader* reader = display->getArchiveReader();
         bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh;
-        if (isReaderHQ == findHQ && (!cond || (this->*cond)(display))) {
+        if (isReaderHQ == findHQ && (!cond || (this->*cond)(display)))
+        {
             if (displaySize)
                 *displaySize = itr.key() >> 32;
             return display;
@@ -104,7 +135,7 @@ bool RadassController::isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamR
 
 void RadassController::onSlowStream(QnArchiveStreamReader* reader)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     if (m_mode != RadassMode::Auto)
         return;
@@ -112,13 +143,13 @@ void RadassController::onSlowStream(QnArchiveStreamReader* reader)
     QnCamDisplay* display = getDisplayByReader(reader);
     if (!isSupportedDisplay(display))
         return;
-    m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_lastLqTime = m_consumersInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
 
 
     double speed = display->getSpeed();
     if (isFFSpeed(speed))
     {
-        // for high speed mode change same item to LQ (do not try to find least item)
+        // For high speed mode change same item to LQ (do not try to find least item).
         gotoLowQuality(display, Reson_FF, speed);
         return;
     }
@@ -129,15 +160,17 @@ void RadassController::onSlowStream(QnArchiveStreamReader* reader)
     if (reader->getQuality() == MEDIA_Quality_Low)
         return; // reader already at LQ
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL) {
-        m_redAssInfo[display].awaitingLQTime = qnSyncTime->currentMSecsSinceEpoch();
-        return; // do not go to LQ if recently switch occurred
+    // Do not go to LQ if recently switch occurred.
+    if (!m_lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+    {
+        m_consumersInfo[display].awaitingLQTime.restart();
+        return;
     }
 
     // switch to LQ min item
     display = findDisplay(Find_Least, MEDIA_Quality_High);
-    if (display) {
-//        QnArchiveStreamReader* reader = display->getArchiveReader();
+    if (display)
+    {
         gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
         m_lastSwitchTimer.restart();
     }
@@ -145,7 +178,7 @@ void RadassController::onSlowStream(QnArchiveStreamReader* reader)
 
 bool RadassController::existstBufferingDisplay() const
 {
-    for (ConsumersMap::const_iterator itr = m_redAssInfo.constBegin(); itr != m_redAssInfo.constEnd(); ++itr)
+    for (auto itr = m_consumersInfo.constBegin(); itr != m_consumersInfo.constEnd(); ++itr)
     {
         const QnCamDisplay* display = itr.key();
         if (display->isBuffering())
@@ -156,7 +189,7 @@ bool RadassController::existstBufferingDisplay() const
 
 void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     if (m_mode != RadassMode::Auto)
         return;
@@ -168,41 +201,51 @@ void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (!isSupportedDisplay(display))
         return;
 
-    m_redAssInfo[display].awaitingLQTime = 0;
+    m_consumersInfo[display].awaitingLQTime.invalidate();
 
-    if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
+    if (qAbs(display->getSpeed()) < m_consumersInfo[display].toLQSpeed
+        || (m_consumersInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
         // If item leave high speed mode change same item to HQ (do not try to find biggest item)
         reader->setQuality(MEDIA_Quality_High, true);
         return;
     }
-    else if (isFFSpeed(display))
-        return; // do not return to HQ in FF mode because of retry counter is not increased for FF
 
-    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return; // Some item stuck after HQ switching. Do not switch to HQ any more
+    // Do not return to HQ in FF mode because of retry counter is not increased for FF.
+    if (isFFSpeed(display))
+        return;
 
+    // Some item stuck after HQ switching. Do not switch to HQ any more.
+    if (m_hiQualityRetryCounter >= kHighQualityRetryCounter)
+        return;
+
+    // Do not try HQ for small items.
     if (isSmallItem2(display))
-        return; // do not try HQ for small items
+        return;
 
-    if (m_redAssInfo[display].lqReason == Reason_Small)
+    // If item go to LQ because of small, return to HQ without delay.
+    if (m_consumersInfo[display].lqReason == Reason_Small)
     {
         reader->setQuality(MEDIA_Quality_High, true);
-        return; // if item go to LQ because of small, return to HQ without delay
+        return;
     }
 
-    //try one more LQ->HQ switch
+    // Try one more LQ->HQ switch.
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return; // recently LQ->HQ or HQ->LQ
-    if (m_lastLqTime + QUALITY_SWITCH_INTERVAL > qnSyncTime->currentMSecsSinceEpoch())
-        return; // recently slow report received (not all reports affect m_lastSwitchTimer)
+    // Recently LQ->HQ or HQ->LQ
+    if (!m_lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+        return;
+
+    // Recently slow report received (not all reports affect m_lastSwitchTimer)
+    if (m_lastLqTime + kQualitySwitchIntervalMs > qnSyncTime->currentMSecsSinceEpoch())
+        return;
 
     if (existstBufferingDisplay())
         return; // do not go to HQ if some display perform opening...
 
     display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &RadassController::isNotSmallItem2);
-    if (display) {
+    if (display)
+    {
         display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
     }
@@ -211,13 +254,13 @@ void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
 bool RadassController::isSmallItem(QnCamDisplay* display)
 {
     QSize sz = display->getMaxScreenSize();
-    return sz.height() <= TO_LOWQ_SCREEN_SIZE.height();
+    return sz.height() <= kLowQualityScreenSize.height();
 }
 
 bool RadassController::isSmallItem2(QnCamDisplay* display)
 {
     QSize sz = display->getMaxScreenSize();
-    return sz.height() <= TO_LOWQ_SCREEN_SIZE.height() * LQ_HQ_THRESHOLD;
+    return sz.height() <= kLowQualityScreenSize.height() * kLqToHqSizeThreshold;
 }
 
 bool RadassController::itemCanBeOptimized(QnCamDisplay* display)
@@ -238,16 +281,16 @@ bool RadassController::isFFSpeed(QnCamDisplay* display) const
 
 bool RadassController::isFFSpeed(double speed) const
 {
-    return speed > 1 + FPS_EPS || speed < 0;
+    return speed > 1 + kSpeedValueEpsilon || speed < 0;
 }
 
 void RadassController::onTimer()
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     if (m_mode != RadassMode::Auto)
     {
-        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
         {
             QnCamDisplay* display = itr.key();
             QnArchiveStreamReader* reader = display->getArchiveReader();
@@ -257,59 +300,70 @@ void RadassController::onTimer()
         return;
     }
 
-    if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
+    if (++m_timerTicks >= kAdditionalHQRetryCounter)
     {
         // sometimes allow addition LQ->HQ switch
         bool slowStreamExists = false;
-        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
         {
-            if (qnSyncTime->currentMSecsSinceEpoch() < itr.value().lqTime  + QUALITY_SWITCH_INTERVAL)
+            if (qnSyncTime->currentMSecsSinceEpoch() < itr.value().lqTime + kQualitySwitchIntervalMs)
                 slowStreamExists = true;
         }
-        if (!slowStreamExists) {
+        if (!slowStreamExists)
+        {
             addHQTry();
             m_timerTicks = 0;
         }
     }
 
-    //if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-    //    return;
-
-    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
     {
-        if (qnSyncTime->currentMSecsSinceEpoch() - itr.value().initialTime < 1000)
-            continue; // do not handle recently added items, some start animation can be in progress
+        auto& info = *itr;
+
+        // Do not handle recently added items, some start animation can be in progress.
+        if (!info.initialTime.hasExpired(kRecentlyAddedIntervalMs))
+            continue;
 
         QnCamDisplay* display = itr.key();
 
+        // Omit cameras without dual streaming, offline and non-authorized cameras.
         if (!isSupportedDisplay(display))
-            continue; // omit cameras without dual streaming, offline and non-authorized cameras
+            continue;
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
 
         if (isForcedHQDisplay(display, reader) && !isFFSpeed(display))
+        {
             reader->setQuality(MEDIA_Quality_High, true);
-        else if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
+        }
+        else if (info.awaitingLQTime.isValid()
+            && info.awaitingLQTime.hasExpired(kQualitySwitchIntervalMs))
+        {
             gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
-        else {
+        }
+        else
+        {
             if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display) && !reader->isMediaPaused())
             {
-                if (++itr.value().smallSizeCnt > 1) {
+                if (++info.smallSizeCnt > 1)
+                {
                     gotoLowQuality(display, Reason_Small);
                     addHQTry();
                 }
             }
-            else {
-                itr.value().smallSizeCnt = 0;
+            else
+            {
+                info.smallSizeCnt = 0;
             }
         }
         // switch LQ->HQ for LIVE here
-        if (display->isRealTimeSource() && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low &&   // LQ live stream
-            qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
-            display->queueSize() <= display->maxQueueSize()/2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
-            m_lastSwitchTimer.elapsed() >= QUALITY_SWITCH_INTERVAL && // no recently slow report by any camera
-            !isSmallItem2(display))  // is big enough item for HQ
+        if (display->isRealTimeSource()
+            && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low  // LQ live stream
+            && qnSyncTime->currentMSecsSinceEpoch() - m_consumersInfo[display].lqTime > kQualitySwitchIntervalMs  // no drop report several last seconds
+            && display->queueSize() <= display->maxQueueSize() / 2 // there are no a lot of packets in the queue (it is possible if CPU slow)
+            && !m_lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs) // no recently slow report by any camera
+            && !isSmallItem2(display))  // is big enough item for HQ
         {
             streamBackToNormal(display->getArchiveReader());
         }
@@ -322,10 +376,10 @@ void RadassController::optimizeItemsQualityBySize()
 {
     // rearrange items quality: put small items to LQ state, large to HQ
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
+    if (!m_lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
         return; // do not optimize quality if recently switch occurred
 
-    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
         if (display->getSpeed() > 1 || display->getSpeed() < 0)
@@ -336,10 +390,10 @@ void RadassController::optimizeItemsQualityBySize()
     int smallSize = 0;
     QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &RadassController::itemCanBeOptimized, &largeSize);
     QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &RadassController::itemCanBeOptimized, &smallSize);
-    if (largeDisplay && smallDisplay && largeSize >= smallSize*2)
+    if (largeDisplay && smallDisplay && largeSize >= smallSize * 2)
     {
         // swap items quality
-        gotoLowQuality(smallDisplay, m_redAssInfo[largeDisplay].lqReason);
+        gotoLowQuality(smallDisplay, m_consumersInfo[largeDisplay].lqReason);
         largeDisplay->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
     }
@@ -347,13 +401,13 @@ void RadassController::optimizeItemsQualityBySize()
 
 int RadassController::counsumerCount() const
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_redAssInfo.size();
+    QnMutexLocker lock(&m_mutex);
+    return m_consumersInfo.size();
 }
 
 void RadassController::registerConsumer(QnCamDisplay* display)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     QnArchiveStreamReader* reader = display->getArchiveReader();
     if (display->getArchiveReader())
     {
@@ -361,61 +415,63 @@ void RadassController::registerConsumer(QnCamDisplay* display)
         {
             switch (m_mode)
             {
-            case RadassMode::Auto:
-                if (!isForcedHQDisplay(display, reader))
-                {
-                    if (m_redAssInfo.size() >= 16) {
-                        gotoLowQuality(display, Reason_Network);
-                    }
-                    else {
-                        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+                case RadassMode::Auto:
+                    if (!isForcedHQDisplay(display, reader))
+                    {
+                        if (m_consumersInfo.size() >= 16)
                         {
-                            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-                                gotoLowQuality(display, itr.value().lqReason);
+                            gotoLowQuality(display, Reason_Network);
+                        }
+                        else
+                        {
+                            for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
+                            {
+                                if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                                    gotoLowQuality(display, itr.value().lqReason);
+                            }
                         }
                     }
-                }
-                break;
+                    break;
 
-            case RadassMode::High:
-                display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
-                break;
-            case RadassMode::Low:
-                display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
-                break;
-            default:
-                break;
+                case RadassMode::High:
+                    display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
+                    break;
+                case RadassMode::Low:
+                    display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
+                    break;
+                default:
+                    break;
             }
         }
-        m_redAssInfo.insert(display, RedAssInfo());
+        m_consumersInfo.insert(display, ConsumerInfo());
     }
 }
 
 void RadassController::gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed)
 {
-    LQReason oldReason = m_redAssInfo[display].lqReason;
+    LQReason oldReason = m_consumersInfo[display].lqReason;
     if ((oldReason == Reason_Network || oldReason == Reason_CPU) && (reason == Reason_Network || reason == Reason_CPU))
         m_hiQualityRetryCounter++; // item goes to LQ again because not enough resources
 
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
-    m_redAssInfo[display].lqReason = reason;
-    m_redAssInfo[display].toLQSpeed = speed != INT_MAX ? speed : display->getSpeed(); // get speed for FF reason as external varialbe to prevent race condition
-    m_redAssInfo[display].awaitingLQTime = 0;
+    m_consumersInfo[display].lqReason = reason;
+    m_consumersInfo[display].toLQSpeed = speed != INT_MAX ? speed : display->getSpeed(); // get speed for FF reason as external varialbe to prevent race condition
+    m_consumersInfo[display].awaitingLQTime.invalidate();
 }
 
 void RadassController::unregisterConsumer(QnCamDisplay* display)
 {
-    QnMutexLocker lock( &m_mutex );
-    if (!m_redAssInfo.contains(display))
+    QnMutexLocker lock(&m_mutex);
+    if (!m_consumersInfo.contains(display))
         return;
-    m_redAssInfo.remove(display);
+    m_consumersInfo.remove(display);
     addHQTry();
 }
 
 void RadassController::addHQTry()
 {
-    m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
-    m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
+    m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, kHighQualityRetryCounter);
+    m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter - 1);
 }
 
 void RadassController::setMode(RadassMode mode)
@@ -427,11 +483,13 @@ void RadassController::setMode(RadassMode mode)
 
     m_mode = mode;
 
-    if (m_mode == RadassMode::Auto) {
+    if (m_mode == RadassMode::Auto)
+    {
         m_hiQualityRetryCounter = 0; // allow LQ->HQ switching
     }
-    else {
-        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    else
+    {
+        for (auto itr = m_consumersInfo.begin(); itr != m_consumersInfo.end(); ++itr)
         {
             QnCamDisplay* display = itr.key();
 
