@@ -35,7 +35,8 @@ angular.module('cloudApp')
             return cloudApi.changePassword($scope.pass.newPassword,$scope.pass.password);
         },{
             errorCodes:{
-                notAuthorized: L.errorCodes.oldPasswordMistmatch
+                notAuthorized: L.errorCodes.oldPasswordMistmatch,
+                wrongOldPassword: L.errorCodes.oldPasswordMistmatch
             },
             successMessage:L.account.passwordChangedSuccess,
             errorPrefix:L.errorCodes.cantChangePasswordPrefix,
