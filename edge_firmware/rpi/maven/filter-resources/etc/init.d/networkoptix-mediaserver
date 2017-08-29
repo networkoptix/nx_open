@@ -14,6 +14,7 @@ INSTALL_DIR="/opt/$CUSTOMIZATION"
 LIBS_DIR="$INSTALL_DIR/lib"
 SERVICE_NAME="mediaserver"
 MEDIASERVER_DIR="$INSTALL_DIR/mediaserver"
+LITE_CLIENT_DIR="$INSTALL_DIR/lite_client"
 BIN_NAME="mediaserver"
 BIN_FILE="$MEDIASERVER_DIR/bin/$BIN_NAME"
 LOGS_DIR="$MEDIASERVER_DIR/var/log"
@@ -26,7 +27,11 @@ SECONDS_TO_WAIT_BEFORE_KILL_9=120
 OBSOLETE_LIBS=(
     ffmpeg #< Was a dedicated ffmpeg for vdpau. Now one ffmpeg is used for vms and vdpau.
     libclient_core.so #< Renamed to libnx_client_core.so.
-    libnx_streaming.so #< Eliminated.
+    libnx_streaming.so #< Eliminated (went to libnx_media).
+)
+OBSOLETE_FILES=(
+    # Eliminated (went to libnx_client_core).
+    "$LITE_CLIENT_DIR/bin/video/videonode/libnx_bpi_videonode_plugin.so"
 )
 
 export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"
@@ -173,6 +178,19 @@ initialize_if_needed()
             if [ -e "$LIB_PATH" ]; then
                 echo "Deleting obsolete $LIB_PATH"
                 rm -rf "$LIB_PATH"
+            fi
+        done
+
+        # Delete obsolete files and their parent dirs (if empty).
+        local FILE
+        for FILE in "${OBSOLETE_FILES[@]}"; do
+            if [ -e "$FILE" ]; then
+                echo "Deleting obsolete $FILE"
+                rm -rf "$FILE"
+                local DIR=$(dirname "$FILE")
+                while echo "    Deleting $DIR if empty" && rmdir "$DIR"; do
+                    DIR=$(dirname "$DIR")
+                done
             fi
         done
 

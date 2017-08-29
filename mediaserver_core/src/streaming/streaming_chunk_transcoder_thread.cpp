@@ -163,7 +163,7 @@ void StreamingChunkTranscoderThread::run()
             NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
                 arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            finishTranscoding(&lk, transcodeIter, false);
+            finishTranscoding(&lk, transcodeIter, true);
             continue;
         }
 
