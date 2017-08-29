@@ -113,6 +113,7 @@ function TimelineConfig(){
 
         scrollBarSpeed: 0.1, // By default - scroll by 10%
         scrollBarHeight: 14/100, // %
+        scrollBarTopPadding: 2/100,
         minScrollBarWidth: 40, // px
         scrollBarBgColor: [255,255,255],  //$light1
         scrollBarColor: [145,167,178],  //$light12

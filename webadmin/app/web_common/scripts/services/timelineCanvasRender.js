@@ -659,7 +659,16 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             return;
         }
 
-        drawMarker(context, self.scaleManager.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
+        drawMarker( context,
+                    self.scaleManager.playedPosition,
+                    timelineConfig.timeMarkerColor,
+                    timelineConfig.timeMarkerLineWidth,
+                    timelineConfig.timeMarkerTextColor);
+
+        drawScrollBarMark(  context,
+                            self.scaleManager.playedPosition,
+                            timelineConfig.timeMarkerColor,
+                            timelineConfig.timeMarkerLineWidth);
     }
 
     function drawPointerMarker(context, mouseX){
@@ -667,11 +676,15 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             return;
         }
 
-        drawMarker(context, self.scaleManager.screenCoordinateToDate(mouseX),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
+        drawMarker( context,
+                    self.scaleManager.screenCoordinateToDate(mouseX),
+                    timelineConfig.pointerMarkerColor,
+                    timelineConfig.timeMarkerPointerLineWidth,
+                    timelineConfig.pointerMarkerTextColor);
     }
 
-    function drawMarker(context, date, markerColor, textColor){
-        var coordinate =  self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
+    function drawMarker(context, date, markerColor, markWidth, textColor){
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
         if(coordinate < 0 || coordinate > self.canvas.width ) {
             return;
@@ -685,17 +698,17 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var offset = timelineConfig.markerPullDown * self.pixelAspectRatio;
 
         // Line
-
-        context.lineWidth = markerColor == timelineConfig.timeMarkerColor ? timelineConfig.timeMarkerLineWidth: timelineConfig.timeMarkerPointerLineWidth;
-        context.lineWidth *= self.pixelAspectRatio;
+        context.lineWidth = markWidth * self.pixelAspectRatio;
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height + 0.5;
+        var bottom = Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) -
+                     timelineConfig.scrollBarTopPadding * self.canvas.height;
 
         context.beginPath();
         context.moveTo(0.5 + coordinate, top);
-        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) - 2);
+        context.lineTo(0.5 + coordinate, bottom);
         context.stroke();
 
         var startCoord = coordinate - width/2;
@@ -736,8 +749,19 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     }
 
+    function drawScrollBarMark(context, date, markColor, markWidth){
+        context.lineWidth = markWidth * self.pixelAspectRatio;
+        context.strokeStyle = blurColor(markColor,1);
 
+        var bottom = Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) -
+                     timelineConfig.scrollBarTopPadding * self.canvas.height;
+        var scrollCooridnate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
 
+        context.beginPath();
+        context.moveTo(0.5 + scrollCooridnate, bottom);
+        context.lineTo(0.5 + scrollCooridnate, self.canvas.height);
+        context.stroke();
+    }
 
     var scrollLeftEnablingTimer = null;
     var ableToScrollLeft = false;
@@ -840,10 +864,12 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.beginPath();
         context.moveTo(left?rightCoordinate:leftCoordinate, topCoordinate - marginBottom + 2);
         context.lineTo(left?leftCoordinate:rightCoordinate, (topCoordinate + bottomCoordinate)/2 - marginBottom);
-        context.lineTo(left?rightCoordinate:leftCoordinate, bottomCoordinate - marginBottom - 2);
+        context.lineTo(left?rightCoordinate:leftCoordinate,
+                       bottomCoordinate - marginBottom - timelineConfig.scrollBarTopPadding * self.canvas.height);
         context.stroke();
 
     }
+
 
     function FpsCalculator(){
         var lastLoop = (new Date()).getMilliseconds();
