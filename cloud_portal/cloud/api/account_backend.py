@@ -5,8 +5,10 @@ from api.controllers.cloud_api import Account
 from django.contrib.auth.backends import ModelBackend
 from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
-
 from cloud import settings
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class AccountBackend(ModelBackend):
@@ -54,20 +56,28 @@ class AccountManager(db.models.Manager):
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
+
+        logger.debug('AccountManager._create_user called: ' + email)
         # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
 
         code = extra_fields.pop("code", None)
 
-        Account.register(email, password, first_name, last_name, code=code)
+        logger.debug('AccountManager._create_user calling /cdb/account/register: ' + email)
+        result = Account.register(email, password, first_name, last_name, code=code)
+        logger.debug('AccountManager._create_user calling /cdb/account/register result code: %s, result content: %s' %
+                     (result.status_code, result.text))
 
+        logger.debug('AccountManager._create_user saving user to cloud_portal: ' + email)
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
                           customization=settings.CUSTOMIZATION,
                           **extra_fields)
         user.save(using=self._db)
+
+        logger.debug('AccountManager._create_user completed: ' + email)
         return user
 
     def create_user(self, email, password, **extra_fields):
