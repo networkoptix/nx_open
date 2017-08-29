@@ -2,11 +2,9 @@
 
 #include <cassert>
 #include <typeinfo>
-#include <vector>
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
