@@ -46,6 +46,7 @@ public:
     void loadSettings();
 
     void setMediaResource(const QnMediaResourcePtr& media);
+    void setLayout(const QnLayoutResourcePtr& layout);
     void setTimePeriod(const QnTimePeriod& period);
     void setFilename(const QString& filename);
 
@@ -69,6 +70,7 @@ public:
     const ExportOverlayWidget* overlay(OverlayType type) const;
 
     QnImageProvider* mediaImageProvider() const;
+    QnImageProvider* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
 signals:
@@ -91,6 +93,7 @@ private:
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
 
     QScopedPointer<QnImageProvider> m_mediaImageProvider;
+    QScopedPointer<QnImageProvider> m_layoutImageProvider;
     QSize m_fullFrameSize;
 };
 

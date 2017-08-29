@@ -4,6 +4,7 @@
 
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
@@ -76,6 +77,18 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_exportMediaSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
     m_exportMediaSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
     m_exportMediaSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
+}
+
+void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
+{
+    m_layoutImageProvider.reset();
+    if (!layout)
+        return;
+
+    m_layoutImageProvider.reset(new LayoutThumbnailLoader(layout, m_previewSize/*, msecsSinceEpoch*/));
+    m_layoutImageProvider->loadAsync();
+
+    // TODO: #vkutin #GDM Further init.
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
@@ -268,6 +281,11 @@ const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType ty
 QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
 {
     return m_mediaImageProvider.data();
+}
+
+QnImageProvider* ExportSettingsDialog::Private::layoutImageProvider() const
+{
+    return m_layoutImageProvider.data();
 }
 
 QSize ExportSettingsDialog::Private::fullFrameSize() const

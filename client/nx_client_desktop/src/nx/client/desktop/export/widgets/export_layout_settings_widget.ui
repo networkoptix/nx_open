@@ -39,62 +39,9 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="spacing">
-         <number>2</number>
-        </property>
-        <item>
-         <widget class="QCheckBox" name="filtersCheckBox">
-          <property name="text">
-           <string>Apply Filters</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="filtersLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Rotation, Dewarping, Image Enhancement etc.</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="resolutionLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QCheckBox" name="readOnlyCheckBox">
         <property name="text">
-         <string>Resolution</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="resolutionComboBox"/>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="warningLabel">
-        <property name="text">
-         <string>Applying filters, changing resolution and adding overlays requires transcoding which will increase CPU usage and may take significant time.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
+         <string>Make read-only</string>
         </property>
        </widget>
       </item>

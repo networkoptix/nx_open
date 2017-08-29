@@ -6,6 +6,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 
@@ -28,6 +30,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, parent)
 {
     setMediaResource(widget->resource());
+
+    // TODO: #vkutin #GDM Put this layout part elsewhere.
+
+    const auto layout = widget->item()->layout()->resource();
+    d->setLayout(layout);
+    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
