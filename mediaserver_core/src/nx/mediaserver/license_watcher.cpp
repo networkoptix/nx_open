@@ -2,8 +2,9 @@
 
 #include <chrono>
 
-#include <common/common_module.h>
 #include "ec2_connection.h"
+
+#include <common/common_module.h>
 #include <llutil/hardware_id.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
@@ -13,6 +14,8 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
+#include <utils/common/delayed.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace mediaserver {
@@ -60,7 +63,6 @@ LicenseWatcher::LicenseWatcher(QnCommonModule* commonModule):
     base_type(commonModule)
 {
     connect(&m_timer, &QTimer::timeout, this, &LicenseWatcher::startUpdate);
-    connect(this, &LicenseWatcher::gotResponse, this, &LicenseWatcher::processResponse);
 }
 
 LicenseWatcher::~LicenseWatcher()
@@ -83,16 +85,27 @@ void LicenseWatcher::startUpdate()
     stopHttpClient();
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
 
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    m_httpClient->setProxyVia(
+    SocketAddress(HostAddress::localhost, QUrl(server->getUrl()).port()));
+    m_httpClient->setProxyUserName(server->getId().toString());
+    m_httpClient->setProxyUserPassword(server->getAuthKey());
+
     auto requestBody = QJson::serialized(data);
     m_httpClient->setRequestBody(
         std::make_unique<nx_http::BufferSource>(
             serializationFormatToHttpContentType(Qn::JsonFormat),
             std::move(requestBody)));
 
+    QPointer<QObject> objectGuard(this);
     m_httpClient->doPost(kLicenseServerUrl,
-        [this]()
+        [this, objectGuard]()
         {
-            const auto guard = makeScopeGuard([this](){ stopHttpClient(); });
+            NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");
+            const auto scopeGuard = makeScopeGuard([this](){ stopHttpClient(); });
 
             nx_http::AsyncClient::State state = m_httpClient->state();
             if (state == nx_http::AsyncClient::sFailed)
@@ -111,7 +124,13 @@ void LicenseWatcher::startUpdate()
                 return;
             }
 
-            emit gotResponse(m_httpClient->fetchMessageBodyBuffer());
+            auto response = m_httpClient->fetchMessageBodyBuffer();
+            executeInThread(objectGuard->thread(), 
+                [this, objectGuard, response = std::move(response)]() mutable
+                {
+                    if (objectGuard)
+                        processResponse(std::move(response));
+                });
         });
 }
 

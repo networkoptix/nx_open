@@ -41,6 +41,7 @@ private:
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_tunnelConnection;
     std::unique_ptr<aio::Timer> m_inactivityTimer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
+    SystemError::ErrorCode m_statusCode = SystemError::noError;
 
     void launchInactivityTimer();
     void closeTunnel(SystemError::ErrorCode reason);

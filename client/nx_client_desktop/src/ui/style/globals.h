@@ -48,8 +48,7 @@ public:
          * This basically is the width of a single video item in scene coordinates. */
         WORKBENCH_UNIT_SIZE,
 
-        /** Viewport lower size boundary, in scene coordinates. */
-        VIEWPORT_LOWER_SIZE_BOUND,
+
 
         DEFAULT_FRAME_WIDTH,
         SELECTED_FRAME_WIDTH,
@@ -131,7 +130,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   successTextColor,               SUCCESS_TEXT_COLOR,                     QColor(64, 255, 64))
 
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /**< Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
-        QN_DECLARE_R_PROPERTY(QSizeF,   viewportLowerSizeBound,         VIEWPORT_LOWER_SIZE_BOUND,              QSizeF(500.0, 500.0))
 
         QN_DECLARE_R_PROPERTY(float,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       16.0f / 9.0f)
         QN_DECLARE_R_PROPERTY(qreal,    defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            0.05)

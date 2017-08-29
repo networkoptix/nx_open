@@ -34,6 +34,9 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class EntropixImageEnhancer;
+
 namespace ui {
 namespace graphics {
 
@@ -190,6 +193,7 @@ protected:
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
+    void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
@@ -236,11 +240,16 @@ private slots:
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
+    void at_entropixEnhancementButton_clicked();
+    void at_entropixImageLoaded(const QImage& image);
+
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
     void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_eventRuleRemoved(const QnUuid& ruleId);
+
+    void clearEntropixEnhancedImage();
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -387,6 +396,10 @@ private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+
+    QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
+    QImage m_entropixEnhancedImage;
+    int m_entropixProgress = -1;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

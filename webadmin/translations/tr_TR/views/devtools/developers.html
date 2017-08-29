@@ -1,28 +1,13 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
-    <div>
-        <h2>Developer Tools</h2>
+    <div ng-if="developersFeedbackForm">
+        <h2>Geliştirici Araçları</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Entegrasyonları geliştirme konusunda mutlu musunuz? Bize Bildirin.
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Geri bildirim bırak</a></p>
     </div>
-    <div>
-        <h3>Camera Details Panel</h3>
-        <p>
-            Special panel for a webclient which displays additional information for cameras:
-        </p>
-        <ul>
-            <li>Kamera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
-        </ul>
-        <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
-        </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
-    </div>
+
     <div>
         <h3>Generic Events Generator</h3>
         <p>
@@ -33,7 +18,7 @@
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
     <div>
-        <h3>Sunucu API</h3>
+        <h3>Server API</h3>
         <p>
             Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
             access almost every system feature available in the regular client: query/manage system resources (servers,
@@ -48,6 +33,22 @@
             <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
         </p>
 
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
+            settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
     </div>
     <div>
         <h3>Vidyo Kaynak Entegrasyonu SDK</h3>

@@ -73,7 +73,12 @@ void ReverseConnection::connectToOriginator(
 void ReverseConnection::waitForOriginatorToStartUsingConnection(
     ReverseConnectionCompletionHandler handler)
 {
-    m_onConnectionActivated = std::move(handler);
+    post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            m_onConnectionActivated = std::move(handler);
+            m_httpPipeline->startReadingConnection();
+        });
 }
 
 api::BeginListeningResponse ReverseConnection::beginListeningResponse() const
@@ -120,7 +125,6 @@ void ReverseConnection::onConnectDone(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(
             std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
-        m_httpPipeline->startReadingConnection();
         m_beginListeningResponse = response;
     }
 
@@ -143,6 +147,7 @@ void ReverseConnection::relayNotificationReceived(
         m_httpPipeline->takeSocket(),
         openTunnelNotification.clientEndpoint());
     m_httpPipeline.reset();
+
     nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
 }
 

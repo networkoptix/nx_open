@@ -1392,7 +1392,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>研判日志回放</translation>
     </message>
   </context>
   <context>
@@ -5799,7 +5799,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>未经授权</translation>
+      <translation>未经身分检证</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>

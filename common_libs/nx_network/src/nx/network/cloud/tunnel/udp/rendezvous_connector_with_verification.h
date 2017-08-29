@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 14, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include "rendezvous_connector.h"
@@ -10,13 +5,14 @@
 #include "nx/network/stun/async_client.h"
 #include "nx/network/stun/message.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 namespace udp {
 
-/** Extends \a RendezvousConnector functionality by adding connection id verification. */
+/**
+ * Extends RendezvousConnector functionality by adding connection id verification.
+ */
 class RendezvousConnectorWithVerification:
     public RendezvousConnector,
     public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
@@ -35,8 +31,8 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
-        @param completionHandler Success is returned only if remote side is aware of connection id
-    */
+     * @param completionHandler Success is returned only if remote side is aware of connection id.
+     */
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler) override;

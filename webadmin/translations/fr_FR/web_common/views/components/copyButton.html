@@ -1,0 +1,3 @@
+<a ng-if="clipboardSupported" class="copy-button" clipboard href=""
+   title="{{hoverText}}" text="copyData" supported="clipboardSupported"
+   on-copied="copySuccess()" on-error="copyError(err)">{{displayedText}}</a>
