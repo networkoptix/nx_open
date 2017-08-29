@@ -415,6 +415,8 @@
             if (Math.abs(decVelX) > 1 || Math.abs(decVelY) > 1 || !diff.inBounds) {
                 decelerating = true;
                 requestAnimFrame(stepDecelAnim);
+            }else{
+                callStopCallback(); // If we do not run animation - predent it is finished
             }
         }
 
