@@ -167,7 +167,7 @@ protected:
 
     void thenPeerMovedToOnlineState()
     {
-        while (!m_registeredPeerPool.getPeerInfo(m_peers[0].id))
+        while (!m_registeredPeerPool.getPeerInfo(m_peers.back().id))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
