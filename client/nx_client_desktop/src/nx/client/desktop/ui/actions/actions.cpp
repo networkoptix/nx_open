@@ -1316,7 +1316,7 @@ void initialize(Manager* manager, Action* root)
             lit("Convert to Normal Camera"),
             condition::isEntropixCamera())
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::isTrue(ini().enableEntropixEnhancer)
+        .condition(condition::isTrue(nx::client::desktop::ini().enableEntropixEnhancer)
             && condition::hasFlags(Qn::live_cam, Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,

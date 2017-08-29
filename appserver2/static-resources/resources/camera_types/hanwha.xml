@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<resources>
+    <oem name = "Hanwha Techwin">
+    <resource name="Hanwha_Common" id="EFC01393-CDAC-46E4-BB60-7AC4D8513E7F" type="Camera"/>
+    </oem>
+</resources>

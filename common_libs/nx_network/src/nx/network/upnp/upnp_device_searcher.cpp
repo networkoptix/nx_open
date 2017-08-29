@@ -446,7 +446,8 @@ void DeviceSearcher::startFetchDeviceXml(
             //item present in cache, no need to request xml
             info.xmlDevInfo = cacheItem->xmlDevInfo;
             info.devInfo = cacheItem->devInfo;
-            m_discoveredDevices.emplace( remoteHost, std::move(info) );
+            m_discoveredDevices.emplace( remoteHost, info);
+            processPacket(std::move(info));
             return;
         }
 
@@ -523,13 +524,17 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     return &it->second;
 }
 
-void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
+void DeviceSearcher::updateItemInCache(DiscoveredDeviceInfo info)
 {
     UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[info.uuid];
     cacheItem.devInfo = info.devInfo;
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
+    processPacket(info);
+}
 
+void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
+{
     nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()

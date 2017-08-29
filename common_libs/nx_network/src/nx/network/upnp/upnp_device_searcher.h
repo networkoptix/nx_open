@@ -188,6 +188,8 @@ private:
     */
     void updateItemInCache( DiscoveredDeviceInfo devInfo );
 
+    void processPacket(DiscoveredDeviceInfo info);
+
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };

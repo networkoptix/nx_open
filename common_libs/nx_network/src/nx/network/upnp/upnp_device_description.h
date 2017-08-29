@@ -17,6 +17,7 @@ struct NX_NETWORK_API DeviceInfo
     QString manufacturer;
     QString modelName;
     QString serialNumber;
+    QString udn;
     QString presentationUrl;
 
     struct Service
