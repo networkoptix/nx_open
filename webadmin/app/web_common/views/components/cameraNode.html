@@ -5,7 +5,8 @@
         </div>
         <span ng-if="camera.status == 'Offline' || camera.status == 'Unauthorized'"
              ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
-        <span ng-if="camera.errorLoading" class='camera-preview-failed'></span>
+        <span ng-if="camera.errorLoading && !(camera.status == 'Offline' || camera.status == 'Unauthorized')"
+              class='camera-preview-failed'></span>
         <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
                 ng-src="{{camera.preview}}" error-loading='camera.errorLoading' preview-image>
     </div>
