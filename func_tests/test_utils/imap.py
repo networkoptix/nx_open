@@ -15,6 +15,7 @@ ACTIVATION_EMAIL_SUBJECT = 'Confirm your account'
 class IMAPConnection(object):
 
     def __init__(self, host, email, password):
+        assert email and password, repr((email, password))
         log.debug('\tIMAP: connecting to %r', host)
         self._conn = imaplib.IMAP4_SSL(host)
         self._call('login', email, password)

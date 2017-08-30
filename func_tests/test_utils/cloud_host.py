@@ -13,7 +13,6 @@ CLOUD_HOST_REGISTRY_TIMEOUT_SEC = 120
 IMAP_HOST = 'imap.gmail.com'
 AUTOTEST_EMAIL_ALIAS = 'autotest@networkoptix.com'
 AUTOTEST_LOGIN_EMAIL = 'service@networkoptix.com'
-AUTOTEST_EMAIL_PASSWORD = 'kbnUk06boqBkwU'
 CLOUD_ACCOUNT_PASSWORD = 'qweasd123'
 
 # timeout when waiting for activation email to appear in IMAP inbox
@@ -112,20 +111,21 @@ def resolve_cloud_host_from_registry(cloud_group, customization):
     log.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
     return cloud_host
 
-def create_cloud_host(cloud_group, customization, host):
+def create_cloud_host(cloud_group, customization, host, autotest_email_password):
     cloud_email = make_test_email(cloud_group, customization)
     cloud_host = CloudHost(cloud_group, customization, host, cloud_email, CLOUD_ACCOUNT_PASSWORD)
-    ensure_email_exists(cloud_group, customization, cloud_host, cloud_email)
+    ensure_email_exists(cloud_group, customization, cloud_host, cloud_email, autotest_email_password)
     return cloud_host
 
-def ensure_email_exists(cloud_group, customization, cloud_host, cloud_email):
+def ensure_email_exists(cloud_group, customization, cloud_host, cloud_email, autotest_email_password):
     log.info('Checking cloud account %r', cloud_email)
     try:
         user_info = cloud_host.get_user_info()
     except HttpError as x:
         result_code = x.json.get('resultCode')
         assert result_code in ['notAuthorized', 'accountNotActivated'], repr(result_code)
-        with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, AUTOTEST_EMAIL_PASSWORD) as imap_connection:
+        assert autotest_email_password, '--autotest-email-password must be provided to activate %r' % cloud_email
+        with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, autotest_email_password) as imap_connection:
             imap_connection.delete_old_activation_messages(cloud_email)
             if result_code == 'notAuthorized':
                 log.info('Account %r is missing, creating new one', cloud_email)
