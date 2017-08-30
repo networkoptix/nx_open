@@ -904,6 +904,23 @@ protected:
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
+    void whenRestartedCloudDb()
+    {
+        ASSERT_TRUE(restart());
+    }
+
+    void whenRequestAccountInfo()
+    {
+        api::AccountData accountData;
+        m_prevResultCode = getAccount(m_account.email, m_account.password, &accountData);
+    }
+
+    void whenRequestSystemList()
+    {
+        std::vector<api::SystemDataEx> systems;
+        m_prevResultCode = getSystems(m_account.email, m_account.password, &systems);
+    }
+
     void assertRegistrationTimestampIsCorrect()
     {
         using namespace std::chrono;
@@ -930,9 +947,10 @@ protected:
             nx::utils::floor<milliseconds>(m_activationTimeRange.second));
     }
 
-    void whenRestartedCloudDb()
+    void thenResultCodeIs(api::ResultCode expectedResultCode)
     {
-        ASSERT_TRUE(restart());
+        ASSERT_TRUE(m_prevResultCode);
+        ASSERT_EQ(expectedResultCode, *m_prevResultCode);
     }
 
     const AccountWithPassword& account() const
@@ -949,6 +967,7 @@ private:
     api::AccountConfirmationCode m_activationCode;
     TimeRange m_registrationTimeRange;
     TimeRange m_activationTimeRange;
+    boost::optional<api::ResultCode> m_prevResultCode;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -976,6 +995,17 @@ TEST_F(AccountNewTest, account_timestamps)
 
     assertRegistrationTimestampIsCorrect();
     assertActivationTimestampIsCorrect();
+}
+
+TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_account)
+{
+    givenNotActivatedAccount();
+
+    whenRequestAccountInfo();
+    thenResultCodeIs(api::ResultCode::accountNotActivated);
+
+    whenRequestSystemList();
+    thenResultCodeIs(api::ResultCode::accountNotActivated);
 }
 
 //-------------------------------------------------------------------------------------------------
