@@ -82,9 +82,7 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    if (m_lastError == SystemError::noError)
-        m_lastError = ecode;
-
+    m_lastError = ecode;
     if (m_lastError != SystemError::noError || bytesRead == 0)
     {
         NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
@@ -193,7 +191,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != SystemError::noError)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
@@ -214,7 +212,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != SystemError::noError)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
@@ -282,7 +280,6 @@ void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSe
             writeData.handler(ecode, writeData.buffer.writeSize);
         if (watcher.objectDestroyed())
             return;
-        restartTimers();
     }
     if (!queueEmpty)
         m_socket->sendAsync(

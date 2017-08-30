@@ -7,6 +7,7 @@
 
 #include <nx/fusion/serialization_format.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>

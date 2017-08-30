@@ -5,185 +5,185 @@
   "dialogs":{
     "okButton":"Oké",
     "cancelButton":"Annuleren",
-    "loginTitle":"Log in to {{PRODUCT_NAME}}",
+    "loginTitle":"Log in op {{PRODUCT_NAME}}",
     "loginButton":"Log in",
     "logoutAuthorisedText":"",
-    "logoutAuthorisedTitle":"You are already logged in",
-    "logoutAuthorisedContinueButton":"Continue",
+    "logoutAuthorisedTitle":"U bent reeds ingelogd",
+    "logoutAuthorisedContinueButton":"Doorgaan",
     "logoutAuthorisedLogoutButton":"Log uit"
   },
   "pageTitles":{
     "template":"{{title}} {{PRODUCT_NAME}}",
     "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Welcome to",
-    "register":"Create account in",
-    "changePassword":"Change password -",
-    "account":"Account settings -",
-    "systems":"Systems -",
-    "system":"System -",
-    "systemShare":"Share System -",
-    "activate":"Activate account -",
-    "activateSent":"Activate account -",
-    "activateSuccess":"Account activated -",
-    "activateCode":"Activate account -",
-    "restorePassword":"Reset password -",
-    "restorePasswordSuccess":"Password saved -",
-    "restorePasswordCode":"Reset password -",
-    "view":"View cameras - ",
+    "registerSuccess":"Welkom bij",
+    "register":"Maak een account aan in",
+    "changePassword":"Wachtwoord wijzigen -",
+    "account":"Account instellingen -",
+    "systems":"Systemen -",
+    "system":"Systeem -",
+    "systemShare":"Deel Systeem -",
+    "activate":"Activeer account -",
+    "activateSent":"Activeer account -",
+    "activateSuccess":"Account geactiveerd -",
+    "activateCode":"Activeer account -",
+    "restorePassword":"Reset wachtwoord -",
+    "restorePasswordSuccess":"Wachtwoord opgeslagen -",
+    "restorePasswordCode":"Reset wachtwoord -",
+    "view":"Bekijk camera's - ",
     "contentPage":"",
     "debug":"Debug",
     "login":"Log in -",
     "download":"Download {{VMS_NAME}}",
-    "downloadPlatform":"Download {{VMS_NAME}} for ",
+    "downloadPlatform":"Download {{VMS_NAME}} voor ",
     "startPage":"",
     "pageNotFound":"Pagina niet gevonden"
   },
   "systemStatuses":{
-    "notActivated":"not activated",
-    "activated":"activated",
+    "notActivated":"niet geactiveerd",
+    "activated":"geactiveerd",
     "online":"online",
     "offline":"offline",
-    "unavailable":"unavailable"
+    "unavailable":"niet beschikbaar"
   },
   "accessRoles":{
     "disabled":{
       "label":"Uitgeschakeld",
-      "description":"User is disabled and cannot log in to System"
+      "description":"Gebruiker is uitgeschakeld en kan niet aanmelden in het systeem"
     },
     "Owner":{
       "label":"Eigenaar",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "description":"Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "Viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Kijker",
+      "description":"Kan live video bekijken en doorzoeken in het archief"
     },
     "Live Viewer":{
       "label":"Live Viewer",
-      "description":"Can only view live video"
+      "description":"Kan alleen live video bekijken"
     },
     "Advanced Viewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Geavanceerde kijker",
+      "description":"Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator":{
       "label":"Administrator",
-      "description":"Unrestricted access including the ability to share"
+      "description":"Onbeperkt toegang inclusief de mogelijkheid om te delen"
     },
     "Custom":{
       "label":"Aangepast",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "description":"Gebruik de {{PRODUCT_NAME}} Client-applicatie om aangepaste toestemmingen op te stellen"
     },
     "cloudAdmin":{
       "label":"Administrator",
-      "description":"Can configure System and share it"
+      "description":"Kan systeem configureren en delen"
     },
     "customRole":{
-      "label":"Custom role",
-      "description":"Custom user role specified in System"
+      "label":"Aangepaste rollen",
+      "description":"Aangepaste gebruikersrol die is opgegeven in systeem"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Eigenaar",
+      "description":"Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Kijker",
+      "description":"Kan live video bekijken en zoeken in het archief"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Live kijker",
+      "description":"Kan alleen live video bekijken"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Geavanceerde kijker",
+      "description":"Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Aangepast",
+      "description":"Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
     }
   },
   "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix":"Cannot delete System",
-    "cantUnshareWithMeSystemPrefix":"Cannot delete System",
-    "cantSharePrefix":"Cannot share System",
-    "cantGetUsersListPrefix":"Users list is unavailable",
-    "cantGetSystemsListPrefix":"System list is unavailable",
-    "cantRegisterPrefix":"Error occurred",
-    "cantGetSystemInfoPrefix":"System info is unavailable",
-    "cantChangeAccountPrefix":"Cannot save changes",
-    "cantChangePasswordPrefix":"Cannot save password",
-    "cantActivatePrefix":"Cannot activate your account",
-    "cantSendConfirmationPrefix":"Cannot send confirmation Email",
-    "cloudInvalidResponse":"Cloud DB returned an unexpected response",
-    "notAuthorized":"Incorrect Email or password",
-    "wrongParameters":"Some parameters on the form are incorrect",
-    "wrongCode":"Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore":"Confirmation code is already used or incorrect",
-    "forbidden":"You do not have permissions to perform this action",
-    "accountNotActivated":"This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked":"This account is blocked",
-    "notFound":"Not found",
-    "alreadyExists":"This account already exists",
-    "unknownError":"Unexpected error occured",
-    "accountAlreadyActivated":"This account is already activated",
-    "emailNotFound":"Account does not exist",
-    "EmailAlreadyExists":"This Email is already registered",
-    "oldPasswordMistmatch":"Current password is incorrect",
-    "passwordMismatch":"Wrong password",
-    "cantEditYourself":"Changing own permissions is not allowed",
-    "cantEditAdmin":"This user has administrator permissions",
-    "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection":"Connection to {{systemName}} lost",
-    "thisSystem":"the system"
+    "ok":"oke",
+    "cantSendActivationPrefix":"Kan geen bevestigingsmail versturen",
+    "cantDisconnectSystemPrefix":"Kan het systeem niet verwijderen",
+    "cantUnshareWithMeSystemPrefix":"Kan het systeem niet verwijderen",
+    "cantSharePrefix":"Kan het systeem niet delen",
+    "cantGetUsersListPrefix":"Gebruikerslijst is niet beschikbaar",
+    "cantGetSystemsListPrefix":"Systeemlijst is niet beschikbaar",
+    "cantRegisterPrefix":"Fout opgetreden",
+    "cantGetSystemInfoPrefix":"Systeeminformatie is niet beschikbaar",
+    "cantChangeAccountPrefix":"Kan geen wijzigingen opslaan",
+    "cantChangePasswordPrefix":"Kan geen wachtwoord opslaan",
+    "cantActivatePrefix":"Kan uw account niet activeren",
+    "cantSendConfirmationPrefix":"Kan geen bevestigingsmail versturen",
+    "cloudInvalidResponse":"Cloud DB heeft een onverwacht antwoord teruggezonden",
+    "notAuthorized":"Onjuiste e-mail of wachtwoord",
+    "wrongParameters":"Sommige parameters op het formulier zijn onjuist",
+    "wrongCode":"Account is al geactiveerd of de bevestigingscode is onjuist",
+    "wrongCodeRestore":"Bevestigingscode is al gebruikt of niet correct",
+    "forbidden":"U hebt geen rechten om deze actie uit te voeren",
+    "accountNotActivated":"Dit account is nog niet geactiveerd. <a href=\"/activate\">Stuur de activeringslink opnieuw</a>",
+    "accountBlocked":"Dit account is geblokkeerd",
+    "notFound":"Niet gevonden",
+    "alreadyExists":"Deze account bestaat al",
+    "unknownError":"Er is een onverwachte fout opgetreden",
+    "accountAlreadyActivated":"Deze account is al geactiveerd",
+    "emailNotFound":"Dit account bestaat niet",
+    "EmailAlreadyExists":"Dit e-mailadres is al geregistreerd",
+    "oldPasswordMistmatch":"Dit wachtwoord is onjuist",
+    "passwordMismatch":"Wachtwoord onjuist",
+    "cantEditYourself":"Het wijzigen van eigen machtigingen is niet toegestaan",
+    "cantEditAdmin":"Deze gebruiker heeft beheerdersrechten",
+    "cantOpenClient":"{{VMS_NAME}} applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
+    "lostConnection":"Verbinding met {{systemName}} verloren",
+    "thisSystem":"het systeem"
   },
   "passwordRequirements":{
     "minLengthMessage":"Het wachtwoord moet minstens 8 karakters bevatten",
-    "requiredMessage":"Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage":"Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "requiredMessage":"Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
+    "weakMessage":"Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage":"Sterk wachtwoord!",
     "commonMessage":"Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld"
   },
   "sharing":{
-    "confirmOwner":"If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle":"Share",
-    "shareConfirmButton":"Share",
-    "editShareTitle":"Edit Permissions",
+    "confirmOwner":"Als u de eigenaar van het systeem wijzigt, trekt u het eigendom in van het uw account voor dit systeem. Deze actie is onomkeerbaar. Weet je het zeker?",
+    "shareTitle":"Delen",
+    "shareConfirmButton":"Delen",
+    "editShareTitle":"Wijzig machtigingen",
     "editShareConfirmButton":"Opslaan",
-    "permissionsSaved":"New permissions saved"
+    "permissionsSaved":"Nieuwe machtigingen opgeslagen"
   },
   "system":{
     "yourSystem":"Uw systeem",
     "mySystemSearch":"IMeMyMine",
-    "unavailable":"System is unreachable",
-    "offline":"System is offline",
+    "unavailable":"Systeem is onbereikbaar",
+    "offline":"Systeem is offline",
     "openClient":"Open in {{VMS_NAME}}",
     "confirmRenameTitle":"Systeemnaam",
     "confirmRenameAction":"Opslaan",
-    "successRename":"System name saved",
-    "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
+    "successRename":"Systeemnaam opgeslagen",
+    "confirmDisconnectTitle":"Verbinding verbreken met systeem {{PRODUCT_NAME}}?",
     "confirmDisconnectAction":"Verbinding verbreken",
-    "confirmUnshareFromMe":"You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle":"Disconnect System?",
+    "confirmUnshareFromMe":"U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
+    "confirmUnshareFromMeTitle":"Systeem loskoppelen?",
     "confirmUnshareFromMeAction":"Verbinding verbreken",
-    "confirmUnshare":"This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle":"Delete user?",
+    "confirmUnshare":"Deze gebruiker heeft geen toegang tot het systeem. Weet je het zeker?",
+    "confirmUnshareTitle":"Gebruiker verwijderen?",
     "confirmUnshareAction":"Verwijder",
-    "successDisconnected":"System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDisconnected":"Systeem is succesvol afgesloten van {{PRODUCT_NAME}}",
+    "successDeleted":"Systeem {{systemName}} is succesvol verwijderd van uw account",
+    "permissionsRemoved":"Toestemmingen zijn verwijderd voor {{email}}"
   },
   "account":{
-    "accountSavedSuccess":"Your account is successfully saved",
-    "passwordChangedSuccess":"Your account is successfully saved",
+    "accountSavedSuccess":"Uw account is succesvol opgeslagen",
+    "passwordChangedSuccess":"Uw account is succesvol opgeslagen",
     "changePassword":"Wijzig wachtwoord",
-    "newPasswordLabel":"New password",
+    "newPasswordLabel":"Nieuw wachtwoord",
     "saveChanges":"Opslaan"
   },
   "downloads":{
-    "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
+    "noClientDetectedTitle":"Installeer {{VMS_NAME}} om uw systeem te bekijken",
     "noClientDetectedMessage":"",
     "action":"Download {{VMS_NAME}}",
     "mobile":{
@@ -197,7 +197,7 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
@@ -217,24 +217,24 @@
       "mac":"X"
     },
     "appTypes":{
-      "client":"Client only",
-      "server":"Server only",
-      "bundle":"Client and Server",
-      "servertool":"Configuration tool"
+      "client":"Alleen client",
+      "server":"Alleen server",
+      "bundle":"Client en Server",
+      "servertool":"Configuratie tool"
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
+    "sendConfirm":"Bevestigen",
+    "resetPassword":"Reset wachtwoord",
     "setNewPassword":"Wachtwoord opslaan",
-    "setNewPasswordLabel":"New password"
+    "setNewPasswordLabel":"Nieuw wachtwoord"
   },
   "regActions":{
     "passwordLabel":"Wachtwoord",
     "createAccount":"Account aanmaken"
   },
   "header":{
-    "allSystems":"All Systems",
-    "systems":"Systems"
+    "allSystems":"Alle systemen",
+    "systems":"Systemen"
   }
 }

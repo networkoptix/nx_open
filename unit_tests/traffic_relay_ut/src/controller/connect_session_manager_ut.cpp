@@ -29,6 +29,28 @@ namespace test {
 
 namespace {
 
+class RemoteRelayPeerPoolStub: public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+{
+public:
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& /*domainName*/) const override
+    {
+        return cf::make_ready_future(std::string());
+    }
+
+    virtual cf::future<bool> addPeer(
+        const std::string& /*domainName*/,
+        const std::string& /*relayHost*/) override
+    {
+        return cf::make_ready_future(true);
+    }
+
+    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
+    {
+        return cf::make_ready_future(true);
+    }
+};
+
 class TrafficRelayStub:
     public controller::AbstractTrafficRelay
 {
@@ -268,13 +290,6 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
-        return customConnectSessionManager(
-            std::make_unique<model::RemoteRelayPeerPool>("127.0.0.1"));
-    }
-
-    controller::ConnectSessionManager& customConnectSessionManager(
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPeerPool)
-    {
         if (!m_connectSessionManager)
         {
             m_settingsLoader.load();
@@ -284,8 +299,8 @@ protected:
                     m_settingsLoader.settings(),
                     &clientSessionPool(),
                     &listeningPeerPool(),
-                    &m_trafficRelayStub,
-                    std::move(remoteRelayPeerPool));
+                    &m_remoteRelayPeerPoolStub,
+                    &m_trafficRelayStub);
         }
 
         return *m_connectSessionManager;
@@ -366,6 +381,7 @@ private:
     std::unique_ptr<model::ClientSessionPool> m_clientSessionPool;
     std::unique_ptr<model::ListeningPeerPool> m_listeningPeerPool;
     TrafficRelayStub m_trafficRelayStub;
+    RemoteRelayPeerPoolStub m_remoteRelayPeerPoolStub;
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;

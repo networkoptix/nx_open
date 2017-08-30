@@ -1248,11 +1248,13 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    QList<SocketAddress> serverAddresses;
+    AddressFilters addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal | AddressFilter::noLoopback;
 
+    QList<SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
-    for (const auto& host: allLocalAddresses())
-        serverAddresses << SocketAddress(host.toString(), port);
+
+    for (const auto& host: allLocalAddresses(addressMask))
+        serverAddresses << SocketAddress(host, port);
 
     for (const auto& host : m_forwardedAddresses )
         serverAddresses << SocketAddress(host.first, host.second);

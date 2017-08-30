@@ -6,6 +6,8 @@ namespace nx {
 namespace network {
 namespace websocket {
 
+const nx::Buffer kWebsocketProtocolName = "websocket";
+
 namespace {
 
 static const nx::Buffer kUpgrade = "Upgrade";
@@ -16,7 +18,6 @@ static const nx::Buffer kVersion = "Sec-WebSocket-Version";
 static const nx::Buffer kProtocol = "Sec-WebSocket-Protocol";
 static const nx::Buffer kAccept = "Sec-WebSocket-Accept";
 
-static const nx::Buffer kWebsocket = "websocket";
 static const nx::Buffer kVersionNum = "13";
 static const nx::Buffer kMagic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
@@ -38,7 +39,7 @@ static Error validateHeaders(const nx_http::HttpHeaders& headers)
 {
     nx_http::HttpHeaders::const_iterator headersIt;
 
-    if (((headersIt = headers.find(kUpgrade)) == headers.cend() || headersIt->second != kWebsocket)
+    if (((headersIt = headers.find(kUpgrade)) == headers.cend() || headersIt->second != kWebsocketProtocolName)
         || ((headersIt = headers.find(kConnection)) == headers.cend() || headersIt->second != kUpgrade))
     {
         return Error::handshakeError;
@@ -125,7 +126,7 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
 
     response->statusLine.statusCode = nx_http::StatusCode::switchingProtocols;
     response->headers.emplace(kConnection, kUpgrade);
-    response->headers.emplace(kUpgrade, kWebsocket);
+    response->headers.emplace(kUpgrade, kWebsocketProtocolName);
     response->headers.emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
 
     auto websocketProtocolIt = request.headers.find(kProtocol);
@@ -135,13 +136,20 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
     return Error::noError;
 }
 
-void addClientHeaders(nx_http::Request* request, const nx::Buffer& protocolName)
+void addClientHeaders(nx_http::HttpHeaders* headers, const nx::Buffer& protocolName)
 {
-    request->headers.emplace(kUpgrade, kWebsocket);
-    request->headers.emplace(kConnection, kUpgrade);
-    request->headers.emplace(kKey, makeClientKey());
-    request->headers.emplace(kVersion, kVersionNum);
-    request->headers.emplace(kProtocol, protocolName);
+    headers->emplace(kUpgrade, kWebsocketProtocolName);
+    headers->emplace(kConnection, kUpgrade);
+    headers->emplace(kKey, makeClientKey());
+    headers->emplace(kVersion, kVersionNum);
+    headers->emplace(kProtocol, protocolName);
+}
+
+void addClientHeaders(nx_http::AsyncClient* request, const nx::Buffer& protocolName)
+{
+    nx_http::HttpHeaders headers;
+    addClientHeaders(&headers, protocolName);
+    request->setAdditionalHeaders(std::move(headers));
 }
 
 Error validateResponse(const nx_http::Request& request, const nx_http::Response& response)

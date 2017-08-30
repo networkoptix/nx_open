@@ -6,7 +6,7 @@
                        name="password" type="text" required autofocus>
                 <p class="help-block" >
                     <span ng-if="renameForm.systemName.$touched && renameForm.systemName.$error.required">
-                        System name is required
+                        Nazwa systemu jest wymagana
                     </span>
                 </p>
             </div>
@@ -17,7 +17,7 @@
                             action-type="'primary'"
                             button-text="$root.L.system.confirmRenameAction"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Anuluj</button>
         </div>
     </form>
 </div>

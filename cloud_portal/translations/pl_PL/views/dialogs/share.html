@@ -2,8 +2,8 @@
     <form name="shareForm" novalidate>
         <div class="modal-body">
             <div class="form-group" validate-field>
-                <label ng-if="!isNewShare" for="lockedEmail">User</label>
-                <label ng-if="isNewShare" for="email">Email</label>
+                <label ng-if="!isNewShare" for="lockedEmail">Użytkownika</label>
+                <label ng-if="isNewShare" for="email">E-mail</label>
 
                 <input ng-hide="!isNewShare" type="email" class="form-control" ng-model="user.email" id="email" name="email"
                        validate-email maxlength="255"
@@ -13,7 +13,7 @@
                        class="form-control" ng-value="formatUserName()" readonly>
             </div>
             <div class="form-group">
-                <label for="role">Permissions</label>
+                <label for="role">Uprawnienia</label>
 
                 <select class="form-control" name="role" id="role" ng-model="user.role"
                         ng-options="option as option.name for option in accessRoles"></select>
@@ -28,7 +28,7 @@
                             form="shareForm"
                             button-text="buttonText"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Anuluj</button>
         </div>
     </form>
 </div>
