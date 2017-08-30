@@ -17,7 +17,6 @@
 #include <nx/streaming/config.h>
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/avi_archive_metadata.h>
 #include <nx/streaming/archive_stream_reader.h>
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
@@ -63,22 +62,14 @@ bool updateInFile(QIODevice* file, const QByteArray& source, const QByteArray& t
 } // namespace
 
 
-struct QnStreamRecorder::StreamRecorderContext
+QnStreamRecorder::StreamRecorderContext::StreamRecorderContext(
+    const QString& fileName,
+    const QnStorageResourcePtr& storage)
+    :
+    fileName(fileName),
+    storage(storage)
 {
-    QString fileName;
-    AVFormatContext* formatCtx;
-    QnStorageResourcePtr storage;
-    qint64 totalWriteTimeNs;
-    QnAviArchiveMetadata metadata;
-
-    StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage):
-        fileName(fileName),
-        formatCtx(nullptr),
-        storage(storage),
-        totalWriteTimeNs(0)
-    {
-    }
-};
+}
 
 QString QnStreamRecorder::errorString(StreamRecorderError errCode)
 {
