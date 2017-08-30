@@ -3,7 +3,7 @@ import time
 import pprint
 import pytest
 import pytz
-from test_utils.server_rest_api import ServerRestApiError
+from test_utils.server_rest_api import HttpError, ServerRestApiError
 
 
 log = logging.getLogger(__name__)
@@ -62,7 +62,14 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud
     check_user_exists(two, is_cloud=True)
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
 def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(server_factory, cloud_host, http_schema):
     one = server_factory('one', setup=False, leave_initial_cloud_host=True, http_schema=http_schema)
-    one.setup_cloud_system(cloud_host)
+    try:
+        one.setup_cloud_system(cloud_host)
+    except HttpError as x:
+        if x.reason == 'Could not connect to cloud: notAuthorized':
+            pytest.fail('Server is incompatible with this cloud host/customization')
+        else:
+            raise
     check_user_exists(one, is_cloud=True)

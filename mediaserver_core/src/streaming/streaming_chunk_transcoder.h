@@ -65,7 +65,7 @@ public:
      * Requested data (transcodeParams.startTimestamp()) may be in future. 
      *   In this case transcoding will start as soon as source data is available.
      * @param chunk Transcoded stream is passed to chunk->appendData.
-     * @return false, if transcoding could not be started by any reason. true, otherwise.
+     * @return False, if transcoding could not be started by any reason. True, otherwise.
      * NOTE: chunk->openForModification is called in this method, not at actual transcoding start.
      * NOTE: Transcoding can start only at GOP boundary (usually, that means with keyframe).
     */
