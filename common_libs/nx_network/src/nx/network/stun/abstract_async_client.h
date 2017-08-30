@@ -53,7 +53,7 @@ public:
      *
      * @param method Indication method of interest. 
      *    Use kEveryIndicationMethod constant to install handler
-     *    that will received every unhandled indication.
+     *    that will receive every unhandled indication.
      * @param handler Will be called for each indication message.
      * @param client Can be used to cancel subscription.
      * @return true on success, false if this method is already monitored.
