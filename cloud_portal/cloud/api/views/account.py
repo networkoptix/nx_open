@@ -13,12 +13,16 @@ from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, api_success, ErrorCodes, require_params
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def register(request):
     from .utils import detect_language_by_request
+    logger.debug('/api/account/register called')
     lang = detect_language_by_request(request)
     data = request.data
     data['language'] = lang
@@ -26,7 +30,9 @@ def register(request):
     serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
         raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
+    logger.debug('/api/account/register calling serializer.save')
     serializer.save()
+    logger.debug('/api/account/register completed')
     return api_success()
 
 
