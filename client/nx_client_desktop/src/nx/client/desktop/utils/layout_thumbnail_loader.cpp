@@ -8,11 +8,28 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/geometry.h>
+#include <ui/common/palette.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
+#include <ui/widgets/common/autoscaled_plain_text.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+namespace {
+
+static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+
+static QRectF boundedRect(const QSizeF& sourceSize, const QRectF& boundingRect)
+{
+    const auto alignedRect = QnGeometry::aligned(sourceSize, boundingRect);
+    return QnGeometry::scaled(alignedRect, boundingRect.size(),
+        alignedRect.center(), Qt::KeepAspectRatio);
+}
+
+} // namespace
 
 struct LayoutThumbnailLoader::Private
 {
@@ -21,7 +38,10 @@ struct LayoutThumbnailLoader::Private
     QSize maximumSize;
     qint64 msecSinceEpoch;
     QnThumbnailRequestData::ThumbnailFormat format;
+    QColor itemBackgroundColor = Qt::darkGray;
+    QColor fontColor = Qt::lightGray;
 
+    // Methods.
     Private(const QnLayoutResourcePtr& layout,
         const QSize& maximumSize,
         qint64 msecSinceEpoch,
@@ -30,8 +50,46 @@ struct LayoutThumbnailLoader::Private
         layout(layout),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
-        format(format)
+        format(format),
+        noDataWidget(new QnAutoscaledPlainText())
     {
+        noDataWidget->setText(tr("NO DATA"));
+        noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
+        noDataWidget->setAlignment(Qt::AlignCenter);
+        noDataWidget->setContentsMargins(kMinIndicationMargins);
+        setPaletteColor(noDataWidget.data(), QPalette::Window, itemBackgroundColor);
+        setPaletteColor(noDataWidget.data(), QPalette::WindowText, fontColor);
+    }
+
+    void updateTileStatus(Qn::ThumbnailStatus status, const QRectF& tileRect)
+    {
+        switch (status)
+        {
+            case Qn::ThumbnailStatus::Loading:
+                break;
+
+            case Qn::ThumbnailStatus::Loaded:
+                --data.numLoading;
+                break;
+
+            case Qn::ThumbnailStatus::Refreshing:
+            case Qn::ThumbnailStatus::Invalid:
+            case Qn::ThumbnailStatus::NoData:
+            {
+                // Paint into pixmap:
+                QPixmap pixmap(tileRect.size().toSize() * data.image.devicePixelRatio());
+                pixmap.setDevicePixelRatio(data.image.devicePixelRatio());
+                pixmap.fill(Qt::transparent);
+                noDataWidget->setGeometry(tileRect.toRect());
+                noDataWidget->render(&pixmap);
+
+                // Paint pixmap into main image:
+                QPainter painter(&data.image);
+                paintPixmapSharp(&painter, pixmap, tileRect.topLeft());
+                --data.numLoading;
+                break;
+            }
+        }
     }
 
     // Intermediate/output data.
@@ -44,6 +102,7 @@ struct LayoutThumbnailLoader::Private
     };
 
     Data data;
+    QScopedPointer<QnAutoscaledPlainText> noDataWidget;
 };
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(
@@ -80,6 +139,26 @@ QSize LayoutThumbnailLoader::sizeHint() const
 Qn::ThumbnailStatus LayoutThumbnailLoader::status() const
 {
     return d->data.status;
+}
+
+QColor LayoutThumbnailLoader::itemBackgroundColor() const
+{
+    return d->itemBackgroundColor;
+}
+
+void LayoutThumbnailLoader::setItemBackgroundColor(const QColor& value)
+{
+    d->itemBackgroundColor = value;
+}
+
+QColor LayoutThumbnailLoader::fontColor() const
+{
+    return d->fontColor;
+}
+
+void LayoutThumbnailLoader::setFontColor(const QColor& value)
+{
+    d->fontColor = value;
 }
 
 void LayoutThumbnailLoader::doLoadAsync()
@@ -155,25 +234,24 @@ void LayoutThumbnailLoader::doLoadAsync()
             continue;
 
         // Cell bounds.
-        const qreal x = (cellRect.left() - bounding.left() + spacing * 0.5) * xscale;
-        const qreal y = (cellRect.top() - bounding.top() + spacing * 0.5) * yscale;
-        const qreal w = (cellRect.width() - spacing) * xscale;
-        const qreal h = (cellRect.height() - spacing) * yscale;
+        const QRectF scaledCellRect(
+            (cellRect.left() - bounding.left() + spacing * 0.5) * xscale,
+            (cellRect.top() - bounding.top() + spacing * 0.5) * yscale,
+            (cellRect.width() - spacing) * xscale,
+            (cellRect.height() - spacing) * yscale);
 
         QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
             camera,
             d->msecSinceEpoch,
             data.rotation,
-            QSize(w, 0),
+            QSize(0, scaledCellRect.height()),
             d->format));
 
         connect(loader.data(), &QnImageProvider::statusChanged,
-            [this](Qn::ThumbnailStatus status)
+            [this, loader, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                if (status == Qn::ThumbnailStatus::Loading)
-                    return;
-
-                if (--d->data.numLoading > 0)
+                d->updateTileStatus(status, boundedRect(loader->sizeHint(), scaledCellRect));
+                if (d->data.numLoading > 0)
                     return;
 
                 d->data.status = Qn::ThumbnailStatus::Loaded;
@@ -181,17 +259,13 @@ void LayoutThumbnailLoader::doLoadAsync()
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged,
-            [this, rect = QRectF(x, y, w, h)](const QImage& image)
+            [this, loader, scaledCellRect](const QImage& tile)
             {
-                if (image.isNull())
+                if (tile.isNull())
                     return;
 
-                const auto imageRect = QnGeometry::aligned(image.size(), rect);
-                const auto fitRect = QnGeometry::scaled(imageRect, rect.size(),
-                    imageRect.center(), Qt::KeepAspectRatio);
-
                 QPainter painter(&d->data.image);
-                painter.drawImage(fitRect, image);
+                painter.drawImage(boundedRect(loader->sizeHint(), scaledCellRect), tile);
                 painter.end();
 
                 emit imageChanged(d->data.image);
@@ -201,6 +275,9 @@ void LayoutThumbnailLoader::doLoadAsync()
         ++d->data.numLoading;
 
         loader->loadAsync();
+
+        d->data.status = Qn::ThumbnailStatus::Loading;
+        emit statusChanged(d->data.status);
     }
 }
 

@@ -14,11 +14,14 @@
 #include <utils/common/connective.h>
 
 class QWidget;
-class QnImageProvider;
+class QnSingleThumbnailLoader;
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class LayoutThumbnailLoader;
+
 namespace ui {
 
 class ExportSettingsDialog::Private: public Connective<QObject>
@@ -69,8 +72,8 @@ public:
     ExportOverlayWidget* overlay(OverlayType type);
     const ExportOverlayWidget* overlay(OverlayType type) const;
 
-    QnImageProvider* mediaImageProvider() const;
-    QnImageProvider* layoutImageProvider() const;
+    QnSingleThumbnailLoader* mediaImageProvider() const;
+    LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
 signals:
@@ -92,8 +95,8 @@ private:
     static constexpr size_t overlayCount = size_t(OverlayType::overlayCount);
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
 
-    QScopedPointer<QnImageProvider> m_mediaImageProvider;
-    QScopedPointer<QnImageProvider> m_layoutImageProvider;
+    QScopedPointer<QnSingleThumbnailLoader> m_mediaImageProvider;
+    QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
     QSize m_fullFrameSize;
 };
 

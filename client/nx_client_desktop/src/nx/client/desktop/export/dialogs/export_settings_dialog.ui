@@ -60,52 +60,19 @@
        <property name="spacing">
         <number>16</number>
        </property>
-       <item row="0" column="2">
-        <widget class="QStackedWidget" name="mediaExportSettingsWidget">
-         <property name="minimumSize">
-          <size>
-           <width>280</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>280</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="nx::client::desktop::ui::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
-         <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
-         <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
-         <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
-         <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="2">
         <widget class="QFrame" name="mediaFrame">
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
-         <layout class="QVBoxLayout" name="mediaPreviewLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="1">
            <widget class="QnResourcePreviewWidget" name="mediaPreviewWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -114,6 +81,58 @@
              </sizepolicy>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -208,6 +227,30 @@
          </layout>
         </widget>
        </item>
+       <item row="0" column="2">
+        <widget class="QStackedWidget" name="mediaExportSettingsWidget">
+         <property name="minimumSize">
+          <size>
+           <width>280</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>280</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="nx::client::desktop::ui::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
+         <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
+         <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
+         <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
+         <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="layoutTab">
@@ -252,26 +295,43 @@
        </item>
        <item row="0" column="0" colspan="2">
         <widget class="QFrame" name="layoutFrame">
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
-         <layout class="QVBoxLayout" name="layoutPreviewLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="1">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>228</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1">
            <widget class="QnResourcePreviewWidget" name="layoutPreviewWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -280,6 +340,32 @@
              </sizepolicy>
             </property>
            </widget>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>228</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

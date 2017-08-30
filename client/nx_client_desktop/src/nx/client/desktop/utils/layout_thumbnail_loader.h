@@ -34,6 +34,12 @@ public:
 
     QnLayoutResourcePtr layout() const;
 
+    QColor itemBackgroundColor() const;
+    void setItemBackgroundColor(const QColor& value);
+
+    QColor fontColor() const;
+    void setFontColor(const QColor& value);
+
 protected:
     virtual void doLoadAsync() override;
 

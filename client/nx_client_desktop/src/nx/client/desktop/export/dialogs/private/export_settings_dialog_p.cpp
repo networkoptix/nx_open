@@ -67,7 +67,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 
     m_mediaImageProvider.reset(new QnSingleThumbnailLoader(
         camera,
-        -1, //< Live.
+        m_exportMediaSettings.timePeriod.startTimeMs,
         QnThumbnailRequestData::kDefaultRotation,
         thumbnailSizeLimit));
 
@@ -85,7 +85,9 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
     if (!layout)
         return;
 
-    m_layoutImageProvider.reset(new LayoutThumbnailLoader(layout, m_previewSize/*, msecsSinceEpoch*/));
+    m_layoutImageProvider.reset(new LayoutThumbnailLoader(
+        layout, m_previewSize, m_exportLayoutSettings.period.startTimeMs));
+
     m_layoutImageProvider->loadAsync();
 
     // TODO: #vkutin #GDM Further init.
@@ -278,12 +280,12 @@ const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType ty
     return m_overlays[int(type)];
 }
 
-QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
+QnSingleThumbnailLoader* ExportSettingsDialog::Private::mediaImageProvider() const
 {
     return m_mediaImageProvider.data();
 }
 
-QnImageProvider* ExportSettingsDialog::Private::layoutImageProvider() const
+LayoutThumbnailLoader* ExportSettingsDialog::Private::layoutImageProvider() const
 {
     return m_layoutImageProvider.data();
 }

@@ -2,14 +2,18 @@
 #include "private/export_settings_dialog_p.h"
 #include "ui_export_settings_dialog.h"
 
+#include <camera/single_thumbnail_loader.h>
+#include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/busy_indicator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
+#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 
 namespace nx {
 namespace client {
@@ -19,6 +23,8 @@ namespace ui {
 namespace {
 
 static const QSize kPreviewSize(512, 288);
+static constexpr int kBusyIndicatorDotRadius = 8;
+static constexpr int kNoDataDefaultFontSize = 18;
 
 } // namespace
 
@@ -36,6 +42,10 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto layout = widget->item()->layout()->resource();
     d->setLayout(layout);
     ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
+
+    const auto palette = ui->layoutPreviewWidget->palette();
+    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
+    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -49,18 +59,31 @@ ExportSettingsDialog::ExportSettingsDialog(
     setMediaResource(media);
 }
 
-ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent)
-    :
+ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent):
     base_type(parent),
     d(new Private(kPreviewSize)),
     ui(new Ui::ExportSettingsDialog)
 {
     ui->setupUi(this);
-    ui->mediaPreviewLayout->setAlignment(Qt::AlignCenter);
-    ui->mediaPreviewLayout->setAlignment(Qt::AlignCenter);
 
     ui->mediaPreviewWidget->setMaximumSize(kPreviewSize);
     ui->layoutPreviewWidget->setMaximumSize(kPreviewSize);
+
+    auto font = ui->mediaPreviewWidget->font();
+    font.setPixelSize(kNoDataDefaultFontSize);
+    ui->mediaPreviewWidget->setFont(font);
+
+    ui->mediaFrame->ensurePolished();
+    ui->layoutFrame->ensurePolished();
+    const auto background = qApp->palette().color(QPalette::Shadow);
+    setPaletteColor(ui->mediaFrame, QPalette::Window, background);
+    setPaletteColor(ui->layoutFrame, QPalette::Window, background);
+
+    ui->mediaPreviewWidget->setBorderRole(QPalette::NoRole);
+    ui->mediaPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
+    ui->mediaPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
+    ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
+    ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 
     ui->mediaFrame->setFixedSize(kPreviewSize
         + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
