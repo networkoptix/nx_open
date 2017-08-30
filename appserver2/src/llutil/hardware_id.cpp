@@ -42,7 +42,7 @@ namespace LLUtil {
 
         // Workaround issue when in 2.6 hardwareid sometimes calculated without mac address
         if (version >= 4)
-            macs << "";
+            macs << kEmptyMac;
 
         for (QString mac : macs)
         {
