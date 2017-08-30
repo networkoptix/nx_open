@@ -55,7 +55,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%5",
                 "eventName": {
-                    "value": "Appearing",
+                    "value": "Appearing/Disappearing",
                     "localization": {
                     }
                 }
@@ -63,7 +63,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%6",
                 "eventName": {
-                    "value": "Disappearing",
+                    "value": "Intrusion",
                     "localization": {
                     }
                 }
@@ -111,13 +111,37 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%12",
                 "eventName": {
-                    "value": "Sound classification",
+                    "value": "Scream sound",
                     "localization": {
                     }
                 }
             },
             {
                 "eventTypeId": "%13",
+                "eventName": {
+                    "value": "Gunshot sound",
+                    "localization": {
+                    }
+                }
+            },
+            {
+                "eventTypeId": "%14",
+                "eventName": {
+                    "value": "Explosion sound",
+                    "localization": {
+                    }
+                }
+            },
+            {
+                "eventTypeId": "%15",
+                "eventName": {
+                    "value": "Glass break sound",
+                    "localization": {
+                    }
+                }
+            },
+            {
+                "eventTypeId": "%16",
                 "eventName": {
                     "value": "Loitering",
                     "localization": {
@@ -151,7 +175,7 @@ static const nxpl::NX_GUID kHanwhaExitingEventId =
 static const nxpl::NX_GUID kHanwhaAppearingEventId =
     {{0xA4, 0x52, 0xE4, 0x9A, 0xD1, 0xD8, 0x44, 0xEA, 0x84, 0xDA, 0xF5, 0x81, 0x41, 0x4E, 0x81, 0x53}};
 
-static const nxpl::NX_GUID kHanwhaDisappearingEventId =
+static const nxpl::NX_GUID kHanwhaIntrusionEventId =
     {{0x42, 0xD4, 0x99, 0x4A, 0xA2, 0x67, 0x4C, 0x39, 0x98, 0xAA, 0xCB, 0xC4, 0xD4, 0x1C, 0xA4, 0x2B}};
 
 static const nxpl::NX_GUID kHanwhaAudioDetectionEventId =
@@ -169,11 +193,20 @@ static const nxpl::NX_GUID kHanwhaDryContactInputEventId =
 static const nxpl::NX_GUID kHanwhaMotionDetectionEventId =
     {{0xF1, 0xF7, 0x23, 0xBB, 0x20, 0xC8, 0x45, 0x3A, 0xAF, 0xCE, 0x86, 0xF3, 0x18, 0xCB, 0xF0, 0x97}};
 
-static const nxpl::NX_GUID kHanwhaSoundClassificationEventId =
-    {{0x29, 0x28, 0x48, 0x45, 0xE4, 0x69, 0x48, 0x21, 0xA2, 0x21, 0x18, 0x51, 0x46, 0xF4, 0x0E, 0xAE}};
-
 static const nxpl::NX_GUID kHanwhaLoiteringEventId =
     {{0x1B, 0x54, 0x1C, 0xB7, 0xE3, 0x77, 0x48, 0x18, 0x88, 0x01, 0x32, 0x32, 0x81, 0x53, 0x0E, 0x7B}};
+
+static const nxpl::NX_GUID kHanwhaSoundScreamEventId =
+    {{0x79, 0xF0, 0x3C, 0xE5, 0xAF, 0xD1, 0x49, 0x42, 0x90, 0x5C, 0x46, 0xA9, 0x81, 0x94, 0x24, 0x22}};
+
+static const nxpl::NX_GUID kHanwhaSoundGunShotEventId =
+    {{0x02, 0x56, 0x7E, 0x19, 0x33, 0xAC, 0x44, 0x0B, 0x86, 0x47, 0x16, 0xD9, 0x5E, 0xF6, 0xB2, 0x95}};
+
+static const nxpl::NX_GUID kHanwhaSoundExplosionEventId =
+    {{0xBD, 0x27, 0x5A, 0x24, 0xF7, 0x58, 0x4F, 0xD5, 0x92, 0x39, 0xFB, 0xE8, 0x7B, 0x13, 0x31, 0xCE}};
+
+static const nxpl::NX_GUID kHanwhaSoundGlassBreakEventId =
+    {{0xBA, 0x9D, 0xFE, 0x3C, 0x55, 0xE6, 0x42, 0x98, 0xBC, 0x8E, 0xCA, 0xA9, 0x47, 0xCB, 0x94, 0x40}};
 
 inline QString str(const nxpl::NX_GUID& guid)
 {

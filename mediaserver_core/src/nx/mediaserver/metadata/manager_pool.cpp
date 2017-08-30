@@ -242,14 +242,21 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
     if (!pluginManifest || error != Error::noError)
         boost::none;
 
+    bool overwritten = false;
     auto existingManifests = server->analyticsDrivers();
-    for (const auto& existingManifest : existingManifests)
+    for (auto& existingManifest : existingManifests)
     {
         if (existingManifest.driverId == pluginManifest->driverId)
-            return pluginManifest;
+        {
+            existingManifest = *pluginManifest;
+            overwritten = true;
+            break;
+        }
     }
 
-    existingManifests.push_back(*pluginManifest);
+    if (!overwritten)
+        existingManifests.push_back(*pluginManifest);
+
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
 

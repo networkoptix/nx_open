@@ -18,20 +18,6 @@ using namespace nx::sdk::metadata;
 
 HanwhaMetadataManager::HanwhaMetadataManager()
 {
-    m_manifest = QString(kPluginManifestTemplate)
-        .arg(str(kHanwhaFaceDetectionEventId))
-        .arg(str(kHanwhaVirtualLineEventId))
-        .arg(str(kHanwhaEnteringEventId))
-        .arg(str(kHanwhaExitingEventId))
-        .arg(str(kHanwhaAppearingEventId))
-        .arg(str(kHanwhaDisappearingEventId))
-        .arg(str(kHanwhaAudioDetectionEventId))
-        .arg(str(kHanwhaTamperingEventId))
-        .arg(str(kHanwhaDefocusingEventId))
-        .arg(str(kHanwhaDryContactInputEventId))
-        .arg(str(kHanwhaMotionDetectionEventId))
-        .arg(str(kHanwhaSoundClassificationEventId))
-        .arg(str(kHanwhaLoiteringEventId)).toUtf8();
 }
 
 HanwhaMetadataManager::~HanwhaMetadataManager()
@@ -57,6 +43,8 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
 {
+    decltype(m_monitor) monitor;
+
     auto monitorHandler = [this](const HanwhaEventList& events)
     {
         using namespace std::chrono;
@@ -93,6 +81,7 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
     m_monitor->setHandler(monitorHandler);
     m_monitor->startMonitoring();
     
+
     return Error::noError;
 }
 

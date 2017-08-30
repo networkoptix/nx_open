@@ -10,6 +10,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 
 
 namespace nx {
@@ -47,6 +48,9 @@ private:
     boost::optional<std::vector<nxpl::NX_GUID>> fetchSupportedEvents(
         const QUrl& url,
         const QAuthenticator& auth);
+
+    boost::optional<std::vector<nxpl::NX_GUID>> eventsFromParameters(
+        const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters);
 
     QUrl buildAttributesUrl(const QUrl& resourceUrl) const;
     QByteArray buildDeviceManifest(const std::vector<nxpl::NX_GUID>& supportedEvents) const;

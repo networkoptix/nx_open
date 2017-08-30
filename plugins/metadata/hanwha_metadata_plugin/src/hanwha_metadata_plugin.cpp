@@ -8,6 +8,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/network/http/http_client.h>
+#include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 
 namespace nx {
 namespace mediaserver {
@@ -19,8 +20,11 @@ const char* kPluginName = "Hanwha metadata plugin";
 const QString kSamsungTechwinVendor = lit("samsung techwin");
 const QString kHanwhaTechwinVendor = lit("hanwha techwin");
 
+const QString kVideoAnalytics = lit("VideoAnalytics");
+const QString kAudioAnalytics = lit("AudioAnalytics");
+
 const std::chrono::milliseconds kAttributesTimeout(4000);
-const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/eventstatus");
+const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
 
 } // namespace
 
@@ -35,13 +39,16 @@ HanwhaMetadataPlugin::HanwhaMetadataPlugin()
         .arg(str(kHanwhaEnteringEventId))
         .arg(str(kHanwhaExitingEventId))
         .arg(str(kHanwhaAppearingEventId))
-        .arg(str(kHanwhaDisappearingEventId))
+        .arg(str(kHanwhaIntrusionEventId))
         .arg(str(kHanwhaAudioDetectionEventId))
         .arg(str(kHanwhaTamperingEventId))
         .arg(str(kHanwhaDefocusingEventId))
         .arg(str(kHanwhaDryContactInputEventId))
         .arg(str(kHanwhaMotionDetectionEventId))
-        .arg(str(kHanwhaSoundClassificationEventId))
+        .arg(str(kHanwhaSoundScreamEventId))
+        .arg(str(kHanwhaSoundGunShotEventId))
+        .arg(str(kHanwhaSoundExplosionEventId))
+        .arg(str(kHanwhaSoundGlassBreakEventId))
         .arg(str(kHanwhaLoiteringEventId)).toUtf8();
 }
 
@@ -146,6 +153,8 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::fetchSupported
     const QUrl& url,
     const QAuthenticator& auth)
 {
+    using namespace nx::mediaserver_core::plugins;
+
     nx_http::HttpClient httpClient;
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
@@ -160,21 +169,10 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::fetchSupported
     while (!httpClient.eof())
         buffer.append(httpClient.fetchMessageBodyBuffer());
 
-    HanwhaAttributesParser parser;
-    if (!parser.parseCgi(QString::fromUtf8(buffer)))
-        return boost::none;
+    auto statusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
+    HanwhaCgiParameters parameters(buffer, statusCode);
 
-    auto supportedEvents = parser.supportedEvents();
-    std::vector<nxpl::NX_GUID> result;
-
-    for (const auto& eventName: supportedEvents)
-    {
-        auto guid = HanwhaStringHelper::fromStringToEventType(eventName);
-        if (guid)
-            result.push_back(*guid);
-    }
-
-    return result;
+    return eventsFromParameters(parameters);
 }
 
 QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
@@ -200,6 +198,101 @@ QByteArray HanwhaMetadataPlugin::buildDeviceManifest(
     }
 
     return manifest.arg(supportedEventsStr).toUtf8();
+}
+
+boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromParameters(
+    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters)
+{
+    if (!parameters.isValid())
+        return boost::none;
+
+    auto supportedEventsParameter = parameters.parameter(
+        "eventstatus/eventstatus/monitor/Channel.#.EventType");
+
+    if (!supportedEventsParameter.is_initialized())
+        return boost::none;
+
+    std::vector<nxpl::NX_GUID> result;
+
+    auto supportedEvents = supportedEventsParameter->possibleValues();
+    for (const auto& eventName : supportedEvents)
+    {
+        bool gotValidParameter = false;
+
+        auto guid = HanwhaStringHelper::fromStringToEventType(eventName);
+        if (guid)
+            result.push_back(*guid);
+
+        if (eventName == kVideoAnalytics)
+        {
+            auto supportedAreaAnalyticsParameter = parameters.parameter(
+                "eventsources/videoanalysis/set/DefinedArea.#.Mode");
+
+            gotValidParameter = supportedAreaAnalyticsParameter.is_initialized()
+                && supportedAreaAnalyticsParameter->isValid();
+
+            if (gotValidParameter)
+            {
+                auto supportedAreaAnalytics = 
+                    supportedAreaAnalyticsParameter->possibleValues();
+
+                for (const auto& videoAnalytics: supportedAreaAnalytics)
+                {
+                    guid = HanwhaStringHelper::fromStringToEventType(
+                        lit("%1.%2")
+                            .arg(kVideoAnalytics)
+                            .arg(videoAnalytics));
+
+                    if (guid)
+                        result.push_back(*guid);
+                }
+            }
+
+            auto supportedLineAnalyticsParameter = parameters.parameter(
+                "eventsources/videoanalysis/set/Line.#.Mode");
+
+            gotValidParameter = supportedLineAnalyticsParameter.is_initialized()
+                && supportedLineAnalyticsParameter->isValid();
+
+            if (gotValidParameter)
+            {
+                guid = HanwhaStringHelper::fromStringToEventType(
+                    lit("%1.%2")
+                    .arg(kVideoAnalytics)
+                    .arg(lit("Passing")));
+
+                if (guid)
+                    result.push_back(*guid);
+            }
+            
+        }
+
+        if (eventName == kAudioAnalytics)
+        {
+            auto supportedAudioTypesParameter = parameters.parameter(
+                "eventsources/audioanalysis/set/SoundType");
+
+            gotValidParameter = supportedAudioTypesParameter.is_initialized()
+                && supportedAudioTypesParameter->isValid();
+
+            if (gotValidParameter)
+            {
+                auto supportedAudioTypes = supportedAudioTypesParameter->possibleValues();
+                for (const auto& audioAnalytics : supportedAudioTypes)
+                {
+                    guid = HanwhaStringHelper::fromStringToEventType(
+                        lit("%1.%2")
+                            .arg(kAudioAnalytics)
+                            .arg(audioAnalytics));
+
+                    if (guid)
+                        result.push_back(*guid);
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 } // namespace plugins

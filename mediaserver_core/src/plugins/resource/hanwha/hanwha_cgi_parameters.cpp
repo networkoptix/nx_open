@@ -22,12 +22,17 @@ HanwhaCgiParameters::HanwhaCgiParameters(
 }
 
 boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
+    const QString& cgi,
     const QString& submenu,
     const QString& action,
     const QString& parameter) const
 {
-    auto submenuItr = m_parameters.find(submenu);
-    if (submenuItr == m_parameters.cend())
+    auto cgiItr = m_parameters.find(cgi);
+    if (cgiItr == m_parameters.cend())
+        return boost::none;
+
+    auto submenuItr = cgiItr->second.find(submenu);
+    if (submenuItr == cgiItr->second.cend())
         return boost::none;
 
     auto actionItr = submenuItr->second.find(action);
@@ -44,10 +49,13 @@ boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
 boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString& path) const
 {
     auto split = path.split("/");
-    if (split.size() != 3)
+    if (split.size() != 4)
+    {
+        NX_ASSERT(false);
         return boost::none;
+    }
 
-    return parameter(split[0], split[1], split[2]);
+    return parameter(split[0], split[1], split[2], split[3]);
 }
 
 bool HanwhaCgiParameters::isValid() const
@@ -67,26 +75,25 @@ bool HanwhaCgiParameters::parseXml(const nx::Buffer& rawBuffer)
     if (!reader.readNextStartElement())
         return false;
 
-    auto name  = reader.name();
-    if (name == kHanwhaCgiNodeName)
+    if (reader.name() == kHanwhaCgisNodeName)
         reader.readNextStartElement();
 
-    if (reader.name() != kHanwhaSubmenuNodeName)
+    if (reader.name() != kHanwhaCgiNodeName)
         return false;
 
-    return parseSubmenus(reader);
+    return parseCgis(reader);
 }
 
-bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader)
+bool HanwhaCgiParameters::parseCgis(QXmlStreamReader& reader)
 {
-    while (reader.name() == kHanwhaSubmenuNodeName)
+    while (reader.name() == kHanwhaCgiNodeName)
     {
-        auto submenuName = reader.attributes().value(kHanwhaNameAttribute).toString();
+        auto cgiName = reader.attributes().value(kHanwhaNameAttribute).toString();
 
         if (!reader.readNextStartElement())
             return false;
 
-        if (!parseActions(reader, submenuName))
+        if (!parseSubmenus(reader, cgiName))
             return false;
 
         reader.readNextStartElement();
@@ -95,7 +102,28 @@ bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader)
     return true;
 }
 
-bool HanwhaCgiParameters::parseActions(QXmlStreamReader& reader, const QString& submenu)
+bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString& cgi)
+{
+    while (reader.name() == kHanwhaSubmenuNodeName)
+    {
+        auto submenuName = reader.attributes().value(kHanwhaNameAttribute).toString();
+
+        if (!reader.readNextStartElement())
+            return false;
+
+        if (!parseActions(reader, cgi, submenuName))
+            return false;
+
+        reader.readNextStartElement();
+    }
+
+    return true;
+}
+
+bool HanwhaCgiParameters::parseActions(
+    QXmlStreamReader& reader,
+    const QString& cgi,
+    const QString& submenu)
 {
     while (reader.name() == kHanwhaActionNodeName)
     {
@@ -111,7 +139,7 @@ bool HanwhaCgiParameters::parseActions(QXmlStreamReader& reader, const QString& 
 
         if (reader.name() == kHanwhaParameterNodeName)
         {
-            if (!parseParameters(reader, submenu, actionName))
+            if (!parseParameters(reader, cgi, submenu, actionName))
                 return false;
         }
         reader.readNextStartElement();
@@ -122,6 +150,7 @@ bool HanwhaCgiParameters::parseActions(QXmlStreamReader& reader, const QString& 
 
 bool HanwhaCgiParameters::parseParameters(
     QXmlStreamReader& reader,
+    const QString& cgi,
     const QString& submenu,
     const QString& action)
 {
@@ -139,18 +168,24 @@ bool HanwhaCgiParameters::parseParameters(
             .toString()
             .toLower() == kHanwhaTrue.toLower();
 
-
-        if (!reader.readNextStartElement())
-            return false;
-
         HanwhaCgiParameter parameter;
         parameter.setName(parameterName);
         parameter.setIsRequestParameter(isRequestParameter);
         parameter.setIsResponseParameter(isResponseParameter);
 
-        if (!parseDataType(reader, submenu, action, parameter))
-            return false;
+        reader.readNext();
+        if (reader.isEndElement())
+        {
+            reader.readNextStartElement();
+            continue;
+        }
 
+        if (reader.name() == kHanwhaDataTypeNodeName)
+        {
+            if (!parseDataType(reader, cgi, submenu, action, parameter))
+                return false;
+        }
+        
         reader.readNextStartElement();
     }
 
@@ -159,6 +194,7 @@ bool HanwhaCgiParameters::parseParameters(
 
 bool HanwhaCgiParameters::parseDataType(
     QXmlStreamReader& reader,
+    const QString& cgi,
     const QString& submenu,
     const QString& action,
     HanwhaCgiParameter& parameter)
@@ -185,7 +221,7 @@ bool HanwhaCgiParameters::parseDataType(
 
         parameter.setPossibleValues(possibleValues);
         parameter.setType(HanwhaCgiParameterType::enumeration);
-        m_parameters[submenu][action][parameter.name()] = parameter;
+        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
     }
     else if (reader.name() == kHanwhaIntegerNodeName)
     {
@@ -201,7 +237,7 @@ bool HanwhaCgiParameters::parseDataType(
         if (success)
             parameter.setMax(max);
 
-        m_parameters[submenu][action][parameter.name()] = parameter;
+        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
     }
@@ -215,7 +251,7 @@ bool HanwhaCgiParameters::parseDataType(
         parameter.setFalseValue(falseValue);
         parameter.setTrueValue(trueValue);
         
-        m_parameters[submenu][action][parameter.name()] = parameter;
+        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
     }
@@ -230,7 +266,7 @@ bool HanwhaCgiParameters::parseDataType(
         parameter.setFormatInfo(formatInfo);
         parameter.setFormatString(format);
 
-        m_parameters[submenu][action][parameter.name()] = parameter;
+        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
     }

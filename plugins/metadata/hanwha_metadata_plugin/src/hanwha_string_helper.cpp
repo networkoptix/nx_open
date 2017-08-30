@@ -21,56 +21,75 @@ static const std::unordered_map<nxpl::NX_GUID, QString> kCaptionTemplates = {
     {kHanwhaEnteringEventId, lit("Entering the area")},
     {kHanwhaExitingEventId, lit("Exiting the area")},
     {kHanwhaAppearingEventId, lit("Appearing in the area")},
-    {kHanwhaDisappearingEventId, lit("Disappearing from the area")},
+    {kHanwhaIntrusionEventId, lit("Intrusion in the area")},
     {kHanwhaAudioDetectionEventId, lit("Audio detection")},
     {kHanwhaTamperingEventId, lit("Tampering detection")},
     {kHanwhaDefocusingEventId, lit("Defocusing detection")},
     {kHanwhaDryContactInputEventId, lit("Dry contact input")},
     {kHanwhaMotionDetectionEventId, lit("Motion detection")},
-    {kHanwhaSoundClassificationEventId, lit("Sound classification")},
+    {kHanwhaSoundScreamEventId, lit("Scream")},
+    {kHanwhaSoundGunShotEventId, lit("Gun shot")},
+    {kHanwhaSoundExplosionEventId, lit("Explosion")},
+    {kHanwhaSoundGlassBreakEventId, lit("Glass break")},
     {kHanwhaLoiteringEventId, lit("Loitering detecetion")}
 };
 
 static const std::unordered_map<nxpl::NX_GUID, QString> kDescriptionTemplates = {
-    {kHanwhaFaceDetectionEventId, lit("Face detected")},
+    {kHanwhaFaceDetectionEventId, lit("Face %1")},
     {kHanwhaVirtualLineEventId, lit("Virtual line #%1 was crossed")},
     {kHanwhaEnteringEventId, lit("Object has entered%1")},
     {kHanwhaExitingEventId, lit("Object has exited%1")},
-    {kHanwhaAppearingEventId, lit("Object has appeared%1")},
-    {kHanwhaDisappearingEventId, lit("Object has disappeared%1")},
+    {kHanwhaAppearingEventId, lit("Object %1")},
+    {kHanwhaIntrusionEventId, lit("Intrusion %1")},
     {kHanwhaAudioDetectionEventId, lit("The audio volume level is %1 the threshold")},
     {kHanwhaTamperingEventId, lit("Tampering %1")},
     {kHanwhaDefocusingEventId, lit("Defocusing %1")},
     {kHanwhaDryContactInputEventId, lit("Dry contact input has been %1")},
     {kHanwhaMotionDetectionEventId, lit("Motion %1%2")},
-    {kHanwhaSoundClassificationEventId, lit("Sound of type %1 has been detected")},
+    {kHanwhaSoundScreamEventId, lit("Scream %1")},
+    {kHanwhaSoundGunShotEventId, lit("Gun shot %1")},
+    {kHanwhaSoundExplosionEventId, lit("Explosion %1")},
+    {kHanwhaSoundGlassBreakEventId, lit("Glass break %1")},
     {kHanwhaLoiteringEventId, lit("Loitering %1%2")}
 };
 
 static const std::unordered_map<nxpl::NX_GUID, QString> kPositiveStateTemplates = {
-    {kHanwhaAudioDetectionEventId, lit("below")},
+    {kHanwhaAudioDetectionEventId, lit("above")},
     {kHanwhaTamperingEventId, lit("has been detected")},
     {kHanwhaDefocusingEventId, lit("has been detected")},
+    {kHanwhaAppearingEventId, lit("appeared")},
     {kHanwhaDryContactInputEventId, lit("activated")},
+    {kHanwhaIntrusionEventId, lit("has been detected")},
     {kHanwhaMotionDetectionEventId, lit("has been detected")},
-    {kHanwhaLoiteringEventId, lit("has been detected")}
+    {kHanwhaLoiteringEventId, lit("has been detected")},
+    {kHanwhaSoundScreamEventId, lit("has been detected")},
+    {kHanwhaSoundGunShotEventId, lit("has been detected")},
+    {kHanwhaSoundExplosionEventId, lit("has been detected")},
+    {kHanwhaSoundGlassBreakEventId, lit("has been detected")},
+    {kHanwhaFaceDetectionEventId, lit("has been detected")}
 };
 
 static const std::unordered_map<nxpl::NX_GUID, QString> kNegativeStateTemplates = {
-    {kHanwhaAudioDetectionEventId, lit("above")},
+    {kHanwhaAudioDetectionEventId, lit("below")},
     {kHanwhaTamperingEventId, lit("has ended")},
     {kHanwhaDefocusingEventId, lit("has ended")},
+    {kHanwhaAppearingEventId, lit("disappeared")},
     {kHanwhaDryContactInputEventId, lit("deactivated")},
+    {kHanwhaIntrusionEventId, lit("has ended")},
     {kHanwhaMotionDetectionEventId, lit("has ended")},
-    {kHanwhaLoiteringEventId, lit("has ended")}
+    {kHanwhaLoiteringEventId, lit("has ended")},
+    {kHanwhaSoundScreamEventId, lit("has ended")},
+    {kHanwhaSoundGunShotEventId, lit("sound has ended")},
+    {kHanwhaSoundExplosionEventId, lit("sound has ended")},
+    {kHanwhaSoundGlassBreakEventId, lit("sound has ended")},
+    {kHanwhaFaceDetectionEventId, lit("is not detected")}
 };
 
 static const std::unordered_map<nxpl::NX_GUID, QString> kRegionTemplates = {
     {kHanwhaVirtualLineEventId, lit("#%1")},
     {kHanwhaEnteringEventId, lit(" the region #%1")},
-    {kHanwhaExitingEventId, lit(" th region #%1")},
+    {kHanwhaExitingEventId, lit(" the region #%1")},
     {kHanwhaAppearingEventId, lit(" in the region #%1")},
-    {kHanwhaDisappearingEventId, lit(" from the region #%1")},
     {kHanwhaMotionDetectionEventId, lit(" in the region #%1")},
     {kHanwhaLoiteringEventId, lit(" in the region #%1")}
 };
@@ -83,29 +102,43 @@ static const std::unordered_map<HanwhaEventItemType, QString> kEventItemTypeStri
 };
 
 static const std::unordered_map<nxpl::NX_GUID, TemplateFlags> kDescriptionTemplateFlags = {
-    {kHanwhaFaceDetectionEventId, TemplateFlags()},
+    {kHanwhaFaceDetectionEventId, TemplateFlag::stateDependent},
     {kHanwhaVirtualLineEventId, TemplateFlag::regionDependent},
     {kHanwhaEnteringEventId, TemplateFlag::regionDependent},
     {kHanwhaExitingEventId, TemplateFlag::regionDependent},
-    {kHanwhaAppearingEventId, TemplateFlag::regionDependent},
-    {kHanwhaDisappearingEventId, TemplateFlag::regionDependent},
+    {kHanwhaAppearingEventId, TemplateFlag::stateDependent},
+    {kHanwhaIntrusionEventId, TemplateFlag::stateDependent},
     {kHanwhaAudioDetectionEventId, TemplateFlag::stateDependent},
     {kHanwhaTamperingEventId, TemplateFlag::stateDependent},
     {kHanwhaDefocusingEventId, TemplateFlag::stateDependent},
     {kHanwhaDryContactInputEventId, TemplateFlag::stateDependent},
     {kHanwhaMotionDetectionEventId, TemplateFlag::stateDependent | TemplateFlag::regionDependent},
-    {kHanwhaSoundClassificationEventId, TemplateFlag::itemDependent},
+    {kHanwhaSoundScreamEventId, TemplateFlag::stateDependent},
+    {kHanwhaSoundGunShotEventId, TemplateFlag::stateDependent},
+    {kHanwhaSoundExplosionEventId, TemplateFlag::stateDependent},
+    {kHanwhaSoundGlassBreakEventId, TemplateFlag::stateDependent},
     {kHanwhaLoiteringEventId, TemplateFlag::stateDependent | TemplateFlag::regionDependent}
 };
 
 static const std::unordered_map<QString, nxpl::NX_GUID> kEventNameToEventType = {
     {lit("MotionDetection"), kHanwhaMotionDetectionEventId},
     {lit("Tampering"), kHanwhaTamperingEventId},
-    {lit("DefocusDetection"), kHanwhaDefocusingEventId}
+    {lit("DefocusDetection"), kHanwhaDefocusingEventId},
+    {lit("FaceDetection"), kHanwhaFaceDetectionEventId},
+    {lit("AudioDetection"), kHanwhaAudioDetectionEventId},
+    {lit("VideoAnalytics.Passing"), kHanwhaVirtualLineEventId},
+    {lit("VideoAnalytics.Intrusion"), kHanwhaIntrusionEventId},
+    {lit("VideoAnalytics.Loitering"), kHanwhaLoiteringEventId},
+    {lit("VideoAnalytics.Exiting"), kHanwhaExitingEventId},
+    {lit("VideoAnalytics.Entering"), kHanwhaEnteringEventId},
+    {lit("VideoAnalytics.AppearDisappear"), kHanwhaAppearingEventId},
+    {lit("AudioAnalytics.Scream"), kHanwhaSoundScreamEventId},
+    {lit("AudioAnalytics.Gunshot"), kHanwhaSoundGunShotEventId},
+    {lit("AudioAnalytics.Explosion"), kHanwhaSoundExplosionEventId},
+    {lit("AudioAnalytics.GlassBreak"), kHanwhaSoundGlassBreakEventId},
 };
 
 } // namespace 
-
 
 QString HanwhaStringHelper::buildCaption(
     const nxpl::NX_GUID& eventType,

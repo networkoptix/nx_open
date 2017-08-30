@@ -24,6 +24,7 @@ public:
         nx_http::StatusCode::Value statusCode);
    
     boost::optional<HanwhaCgiParameter> parameter(
+        const QString& cgi,
         const QString& submenu,
         const QString& action,
         const QString& parameter) const;
@@ -37,14 +38,21 @@ public:
 private:
     bool parseXml(const nx::Buffer& rawBuffer);
 
-    bool parseSubmenus(QXmlStreamReader& reader);
-    
-    bool parseActions(QXmlStreamReader& reader, const QString& submenu);
+    bool parseCgis(QXmlStreamReader& reader);
 
-    bool parseParameters(QXmlStreamReader& reader, const QString& submenu, const QString& action);
+    bool parseSubmenus(QXmlStreamReader& reader, const QString& cgi);
+    
+    bool parseActions(QXmlStreamReader& reader, const QString& cgi, const QString& submenu);
+
+    bool parseParameters(
+        QXmlStreamReader& reader,
+        const QString& cgi,
+        const QString& submenu,
+        const QString& action);
 
     bool parseDataType(
         QXmlStreamReader& reader,
+        const QString& cgi,
         const QString& submenu,
         const QString& action,
         HanwhaCgiParameter& parameter);
@@ -53,13 +61,15 @@ private:
     using ParameterName = QString;
     using ActionName = QString;
     using SubmenuName = QString;
+    using CgiName = QString;
 
     using ParameterMap = std::map<ParameterName, HanwhaCgiParameter>;
     using ActionMap = std::map<ActionName, ParameterMap>;
     using SubmenuMap = std::map<SubmenuName, ActionMap>;
+    using CgiMap = std::map<CgiName, SubmenuMap>;
 
     bool m_isValid = false;
-    SubmenuMap m_parameters;
+    CgiMap m_parameters;
     nx_http::StatusCode::Value m_statusCode;
 };
 

@@ -43,19 +43,24 @@ std::vector<QString> HanwhaAttributesParser::supportedEvents() const
 
 bool HanwhaAttributesParser::readCgi(QXmlStreamReader& reader)
 {
-    if (!reader.readNextStartElement() || reader.name() != "cgi")
+    if (!reader.readNextStartElement())
         return false;
 
+    if (reader.name() == "cgis" && !reader.readNextStartElement())
+        return false;
+
+    if (reader.name() != "cgi")
+        return false;
+    
     while (reader.readNextStartElement())
     {
-        if (reader.name() == "submenu" && reader.attributes().value("name") == "eventstatus")
+        if (reader.name() == "submenu" && (reader.attributes().value("name") == "eventstatus"))
             return true;
         else
             reader.skipCurrentElement();
     }
 
     return false;
-
 }
 
 bool HanwhaAttributesParser::readSubMenu(QXmlStreamReader& reader)

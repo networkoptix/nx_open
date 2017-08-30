@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/literal.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {

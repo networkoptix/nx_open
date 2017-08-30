@@ -11,17 +11,21 @@ namespace plugins {
 namespace {
 
 static const QString kHanwhaFaceDetectionString = lit("facedetection");
-static const QString kHanwhaVirtualLineString = lit("virtualline");
-static const QString kHanwhaEnteringString = lit("enter");
-static const QString kHanwhaExitingString = lit("exit");
-static const QString kHanwhaAppearingString = lit("appear");
-static const QString kHanwhaDisappearingString = lit("disappear");
+static const QString kHanwhaVirtualLineString = lit("videoanalytics.passing");
+static const QString kHanwhaEnteringString = lit("videoanalytics.entering");
+static const QString kHanwhaExitingString = lit("videoanalytics.exiting");
+static const QString kHanwhaAppearingString = lit("videoanalytics.appearing");
+static const QString kHanwhaIntrusionString = lit("videoanalytics.intrusion");
 static const QString kHanwhaAudioDetectionString = lit("audiodetection");
 static const QString kHanwhaTamperingString = lit("tampering");
 static const QString kHanwhaDefocusString = lit("defocusdetection");
-static const QString kHanwhaDryContactString = lit("drycontact");
+static const QString kHanwhaFogDetectionString = lit("fogdetection");
+static const QString kHanwhaDryContactString = lit("alarminput");
 static const QString kHanwhaMotionDetectionString = lit("motiondetection");
-static const QString kHanwhaSoundClassificationString = lit("sound");
+static const QString kHanwhaSoundScreamString = lit("audioanalytics.scream");
+static const QString kHanwhaSoundGunShotString = lit("audioanalytics.gunshot");
+static const QString kHanwhaSoundExplosionString = lit("audioanalytics.explosion");
+static const QString kHanwhaSoundGlassBreakString = lit("audioanalytics.glassbreak");
 static const QString kHanwhaLoiteringString = lit("loitering");
 
 static const QString kChannelField = lit("channel");
@@ -60,6 +64,7 @@ std::vector<HanwhaEvent> HanwhaBytestreamFilter::parseMetadataState(
 
     for (const auto& entry: split)
     {
+        qDebug() << "ENTRY" << entry;
         auto trimmed = entry.trimmed();
         auto nameAndValue = trimmed.split(L'=');
 
@@ -110,8 +115,8 @@ boost::optional<nxpl::NX_GUID> HanwhaBytestreamFilter::eventTypeId(const QString
         return kHanwhaExitingEventId;
     else if (eventSource.contains(kHanwhaAppearingString))
         return kHanwhaAppearingEventId;
-    else if (eventSource.contains(kHanwhaDisappearingString))
-        return kHanwhaDisappearingEventId;
+    else if (eventSource.contains(kHanwhaIntrusionString))
+        return kHanwhaIntrusionEventId;
     else if (eventSource.contains(kHanwhaAudioDetectionString))
         return kHanwhaAudioDetectionEventId;
     else if (eventSource.contains(kHanwhaTamperingString))
@@ -122,8 +127,14 @@ boost::optional<nxpl::NX_GUID> HanwhaBytestreamFilter::eventTypeId(const QString
         return kHanwhaDryContactInputEventId;
     else if (eventSource.contains(kHanwhaMotionDetectionString) && !eventSource.contains("regionid"))
         return kHanwhaMotionDetectionEventId;
-    else if (eventSource.contains(kHanwhaSoundClassificationString))
-        return kHanwhaSoundClassificationEventId;
+    else if (eventSource.contains(kHanwhaSoundScreamString))
+        return kHanwhaSoundScreamEventId;
+    else if (eventSource.contains(kHanwhaSoundGunShotString))
+        return kHanwhaSoundGunShotEventId;
+    else if (eventSource.contains(kHanwhaSoundExplosionString))
+        return kHanwhaSoundExplosionEventId;
+    else if (eventSource.contains(kHanwhaSoundGlassBreakString))
+        return kHanwhaSoundGlassBreakEventId;
     else if (eventSource.contains(kHanwhaLoiteringString))
         return kHanwhaLoiteringEventId;
 

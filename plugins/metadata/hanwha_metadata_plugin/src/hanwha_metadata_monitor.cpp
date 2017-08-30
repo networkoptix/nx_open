@@ -12,7 +12,7 @@ namespace plugins {
 
 namespace {
     const QString kMonitorUrlTemplate(
-        "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitor");
+        "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
     const int kDefaultHttpPort = 80;
 

@@ -128,6 +128,7 @@ static const QString kHanwhaChannelNodeName = lit("channel");
 static const QString kHanwhaAttributeNodeName = lit("attribute");
 
 static const QString kHanwhaCgiNodeName = lit("cgi");
+static const QString kHanwhaCgisNodeName = lit("cgis");
 static const QString kHanwhaSubmenuNodeName = lit("submenu");
 static const QString kHanwhaActionNodeName = lit("action");
 static const QString kHanwhaParameterNodeName = lit("parameter");
