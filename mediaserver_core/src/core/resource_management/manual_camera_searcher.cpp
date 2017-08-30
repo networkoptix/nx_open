@@ -102,17 +102,24 @@ QnSearchTask::QnSearchTask(
     const QString& addr,
     int port,
     const QAuthenticator& auth,
-    bool breakOnGotResult):
-
+    bool breakOnGotResult)
+:
     m_auth(auth),
     m_breakIfGotResult(breakOnGotResult),
     m_blocking(false),
     m_interruptTaskProcesing(false)
 {
-    if(QUrl(addr).scheme().isEmpty())
+    if (QUrl(addr).scheme().isEmpty())
         m_url.setHost(addr);
     else
         m_url.setUrl(addr);
+
+    if (!m_url.userInfo().isEmpty())
+    {
+        m_auth.setUser(m_url.userName());
+        m_auth.setPassword(m_url.password());
+        m_url.setUserInfo(QString());
+    }
 
     if (port)
         m_url.setPort(port);
