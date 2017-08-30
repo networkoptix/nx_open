@@ -373,8 +373,11 @@ void ListeningPeerPool::doPeriodicTasks()
 {
     const auto currentTime = nx::utils::monotonicTime();
 
-    handleTimedoutTakeConnectionRequests(currentTime);
-    processExpirationTimers(currentTime);
+    {
+        QnMutexLocker lock(&m_mutex);
+        handleTimedoutTakeConnectionRequests(lock, currentTime);
+        processExpirationTimers(lock, currentTime);
+    }
     raiseScheduledEvents();
 
     m_periodicTasksTimer.cancelSync();
@@ -384,17 +387,20 @@ void ListeningPeerPool::doPeriodicTasks()
 }
 
 void ListeningPeerPool::handleTimedoutTakeConnectionRequests(
+    const QnMutexLockerBase& lock,
     std::chrono::steady_clock::time_point currentTime)
 {
-    std::vector<TakeIdleConnectionHandler> timedoutRequestHandlers;
-    {
-        QnMutexLocker lock(&m_mutex);
-        timedoutRequestHandlers = 
-            findTimedoutTakeConnectionRequestHandlers(lock, currentTime);
-    }
+    auto timedoutRequestHandlers = 
+        findTimedoutTakeConnectionRequestHandlers(lock, currentTime);
 
     for (auto& handler: timedoutRequestHandlers)
-        handler(api::ResultCode::timedOut, nullptr);
+    {
+        scheduleEvent(
+            [handler = std::move(handler)]()
+            {
+                handler(api::ResultCode::timedOut, nullptr);
+            });
+    }
 }
 
 std::vector<TakeIdleConnectionHandler> 
