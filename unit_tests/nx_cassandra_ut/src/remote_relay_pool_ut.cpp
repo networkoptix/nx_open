@@ -4,6 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <model/remote_relay_peer_pool.h>
+#include <model/../settings.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/cf/wrappers.h>
@@ -23,7 +24,7 @@ public:
     using RemoteRelayPeerPool::RemoteRelayPeerPool;
     cassandra::AsyncConnection* getConnection()
     {
-        return RemoteRelayPeerPool::getConnection();
+        return nx::cloud::relay::model::RemoteRelayPeerPool::getConnection();
     }
 };
 
@@ -65,7 +66,14 @@ protected:
 
     void whenRelayPoolObjectHasBeenCreated()
     {
-        m_relayPool.reset(new TestRelayPool(options()->host.c_str()));
+        std::vector<const char*> argv;
+        argv.push_back("cassandra/host");
+        argv.push_back(options()->host.c_str());
+
+        conf::Settings settings;
+        settings.load(argv.size(), argv.data());
+
+        m_relayPool.reset(new TestRelayPool(settings));
     }
 
     void whenFivePeersHaveBeenAdded()

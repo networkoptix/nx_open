@@ -1,11 +1,11 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        Konto zostało utworzone. <br>Potwierdzenie wysłano na adres e-mail <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        Account is successfully created.
+        Konto zostało pomyślnie utworzone.
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
@@ -17,25 +17,25 @@
         <!-- /end of special hack -->
 
         <div class="form-group" validate-field>
-            <label for="firstName" class="col-sm-4 control-label">First name</label>
+            <label for="firstName" class="col-sm-4 control-label">Imię</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
                        required
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Imię jest wymagane.</span>
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="lastName"  class="col-sm-4 control-label">Last name</label>
+            <label for="lastName"  class="col-sm-4 control-label">Nazwisko</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
                        required
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Nazwisko jest wymagane.</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,18 +49,18 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail jest wymagany.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Proszę wprowadzić prawidłowy adres e-mail.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ten adres został już zarejestrowany w {{PRODUCT_NAME}}.</span>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" >
             <div class="col-sm-offset-4 col-sm-8">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to email newsletters</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subskrybuj biuletyny e-mail</label>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">By clicking "Create Account", you agree<br> to <a href="/content/eula" target="_blank">Terms and Conditions</a></small>
+                <small class="conditions-note">Klikając "Utwórz konto", zgadzasz się <br> na te <a href="/content/eula" target="_blank">warunki</a></small>
             </div>
         </div>
     </form>

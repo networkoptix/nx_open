@@ -50,7 +50,7 @@ using RelayPtrList = std::vector<RelayPtr>;
 
 class BasicTestFixture;
 
-class MemoryRemoteRelayPeerPool : public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+class MemoryRemoteRelayPeerPool: public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
 {
 public:
     MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest) :
@@ -153,7 +153,8 @@ private:
 
     virtual void peerAdded(const std::string& /*serverName*/, const std::string& /*relay*/) {}
     virtual void peerRemoved(const std::string& /*serverName*/) {}
-    void setUpConnectSessionManagerFactoryFunc();
+    void setUpRemoteRelayPeerPoolFactoryFunc();
+    void setUpPublicIpFactoryFunc();
 };
 
 } // namespace test

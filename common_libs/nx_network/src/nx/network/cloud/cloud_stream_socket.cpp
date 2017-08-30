@@ -54,7 +54,7 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
     // TODO: #ak just ignoring for now. 
-    // Usually, we do not care about exact port on tcp client socket.
+    // Usually, we do not care about the exact port on tcp client socket.
     static_cast<void>(localAddress);
     return true;
 }

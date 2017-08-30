@@ -4,10 +4,9 @@
         <h2>Twój system</h2>
         <p></p>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <button class="btn btn-default" ng-click="disconnect()">Odłącz od <span class="product-name">{{PRODUCT_NAME}}</span></button>
     </div>
 </div>
 
@@ -18,13 +17,12 @@
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            Your permissions:
-            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+            Twoje uprawnienia: <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+        <button class="btn btn-default" ng-click="delete()">Odłącz od mojego konta</button>
     </div>
 </div>

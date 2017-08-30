@@ -83,24 +83,24 @@
       "description":"Rôle d’usager personnalisé spécifié dans le système"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Propriétaire",
+      "description":"Accès illimité, y compris la possibilité de partager et de connecter/déconnecter le système de nuage"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Visualisateur",
+      "description":"Peut afficher la vidéo en direct et parcourir les archives"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Visualiseur en direct",
+      "description":"Peut seulement voir vidéo en direct"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Visualisateur avancé",
+      "description":"Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Personnalisé",
+      "description":"Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
     }
   },
   "errorCodes":{

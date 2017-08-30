@@ -83,24 +83,24 @@
       "description":"在系统中指定的自定义用户角色"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"所有者",
+      "description":"不受限制地的访问包括共享和从云连接或断开系统的能力"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"浏览者",
+      "description":"可以查看实时视频和浏览存档"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"实时浏览者",
+      "description":"只能查看实时视频"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"高级浏览者",
+      "description":"可以查看实时视频，浏览存档，配置摄像头，控制云台等"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"自定义",
+      "description":"使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
     }
   },
   "errorCodes":{
