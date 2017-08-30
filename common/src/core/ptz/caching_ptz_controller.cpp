@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr& baseController):
     base_type(baseController),
@@ -130,7 +130,7 @@ bool QnCachingPtzController::getFlip(Qt::Orientations* flip) const
 
 bool QnCachingPtzController::createPreset(const QnPtzPreset& preset)
 {
-    return base_type::createPreset(preset); 
+    return base_type::createPreset(preset);
 }
 
 bool QnCachingPtzController::updatePreset(const QnPtzPreset& preset)
@@ -163,17 +163,17 @@ bool QnCachingPtzController::getPresets(QnPtzPresetList* presets) const
 
 bool QnCachingPtzController::createTour(const QnPtzTour& tour)
 {
-    return base_type::createTour(tour); 
+    return base_type::createTour(tour);
 }
 
 bool QnCachingPtzController::removeTour(const QString& tourId)
 {
-    return base_type::removeTour(tourId); 
+    return base_type::removeTour(tourId);
 }
 
 bool QnCachingPtzController::activateTour(const QString& tourId)
 {
-    return base_type::activateTour(tourId); 
+    return base_type::activateTour(tourId);
 }
 
 bool QnCachingPtzController::getTours(QnPtzTourList* tours) const
@@ -204,7 +204,7 @@ bool QnCachingPtzController::getActiveObject(QnPtzObject* activeObject) const
 
 bool QnCachingPtzController::updateHomeObject(const QnPtzObject& homeObject)
 {
-    return base_type::updateHomeObject(homeObject); 
+    return base_type::updateHomeObject(homeObject);
 }
 
 bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
@@ -237,7 +237,7 @@ bool QnCachingPtzController::runAuxilaryCommand(
     const QnPtzAuxilaryTrait& trait,
     const QString& data)
 {
-    return base_type::runAuxilaryCommand(trait, data); 
+    return base_type::runAuxilaryCommand(trait, data);
 }
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
@@ -262,7 +262,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::CreatePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == preset.id; });
                 if (idx < 0) {
                     m_data.presets.append(preset);
                     changedFields |= Qn::PresetsPtzField;
@@ -275,7 +276,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::UpdatePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == preset.id; });
                 if (idx >= 0 && m_data.presets[idx] != preset) {
                     m_data.presets[idx] = preset;
                     changedFields |= Qn::PresetsPtzField;
@@ -285,7 +287,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::RemovePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QString presetId = data.value<QString>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == presetId; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == presetId; });
                 if (idx >= 0) {
                     m_data.presets.removeAt(idx);
                     changedFields |= Qn::PresetsPtzField;
@@ -295,7 +298,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::CreateTourPtzCommand:
             if (m_data.fields & Qn::ToursPtzField) {
                 QnPtzTour tour = data.value<QnPtzTour>();
-                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tour.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.tours,
+                    [&](const QnPtzTour &old) { return old.id == tour.id; });
                 if (idx < 0) {
                     m_data.tours.append(tour);
                     changedFields |= Qn::ToursPtzField;
@@ -308,7 +312,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::RemoveTourPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QString tourId = data.value<QString>();
-                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tourId; });
+                int idx = nx::utils::algorithm::index_of(m_data.tours,
+                    [&](const QnPtzTour &old) { return old.id == tourId; });
                 if (idx >= 0) {
                     m_data.tours.removeAt(idx);
                     changedFields |= Qn::ToursPtzField;
@@ -402,6 +407,6 @@ Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(const QnPtzData &dat
     if (fields & Qn::ActiveObjectPtzField)   changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField,    &QnPtzData::activeObject,   data.activeObject);
     if (fields & Qn::HomeObjectPtzField)     changedFields |= updateCacheLocked(Qn::HomeObjectPtzField,      &QnPtzData::homeObject,     data.homeObject);
     if (fields & Qn::AuxilaryTraitsPtzField) changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField,  &QnPtzData::auxilaryTraits, data.auxilaryTraits);
-    
+
     return changedFields;
 }

@@ -5,7 +5,7 @@
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 #include <network/system_description.h>
 #include <client_core/client_core_settings.h>
 
@@ -349,7 +349,7 @@ bool QnSystemHostsModel::lessThan(
     const auto getIndexOfConnection =
         [recentUrls](const QUrl& url) -> int
         {
-            return qnIndexOf(recentUrls,
+            return nx::utils::algorithm::index_of(recentUrls,
                 [url, recentUrls](const QUrl& recentUrl)
                 {
                     return ((recentUrl.host() == url.host())
