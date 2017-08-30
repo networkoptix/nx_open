@@ -151,6 +151,7 @@ private:
 
     void doPeriodicTasks();
     void handleTimedoutTakeConnectionRequests(
+        const QnMutexLockerBase& lock,
         std::chrono::steady_clock::time_point currentTime);
     std::vector<TakeIdleConnectionHandler> findTimedoutTakeConnectionRequestHandlers(
         const QnMutexLockerBase& lock,
