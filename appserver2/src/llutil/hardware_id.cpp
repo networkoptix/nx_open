@@ -39,6 +39,11 @@ namespace LLUtil {
         std::array<bool, 2> guidCompatibilities = { false, true };
 
         QStringList macs = version >= 4 ? getMacAddressList(hardwareInfo.nics) : QStringList("");
+
+        // Workaround issue when in 2.6 hardwareid sometimes calculated without mac address
+        if (version >= 4)
+            macs << "";
+
         for (QString mac : macs)
         {
             QStringList hardwareIds;
