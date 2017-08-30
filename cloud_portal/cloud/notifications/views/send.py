@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
-from notifications import api
+from notifications import api, models
 from django.core.exceptions import ValidationError
 
 
@@ -12,6 +12,16 @@ def send_notification(request):
     try:
         validation_error = False
         error_data = {}
+
+        external_id = None
+        if 'id' in request.data:  # external service generated an id for this message to track it
+            external_id = request.data['id']
+            msg = api.find_message(external_id)
+            if msg:
+                # there is already a message with this id - do not send the message, respond with status
+                serializer = models.MessageStatusSerializer(msg, many=False)
+                return api_success(serializer.data)
+
         if 'user_email' not in request.data or not request.data['user_email']:
             validation_error = True
             error_data['user_email'] = ['This field is required.']
@@ -31,10 +41,15 @@ def send_notification(request):
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
-        api.send(request.data['user_email'], request.data['type'], request.data['message'], request.data['customization'])
+        api.send(request.data['user_email'],
+                 request.data['type'],
+                 request.data['message'],
+                 request.data['customization'],
+                 external_id)
     except ValidationError as error:
         raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error.detail)
     return api_success()
+
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
