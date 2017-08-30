@@ -38,8 +38,6 @@ struct LayoutThumbnailLoader::Private
     QSize maximumSize;
     qint64 msecSinceEpoch;
     QnThumbnailRequestData::ThumbnailFormat format;
-    QColor itemBackgroundColor = Qt::darkGray;
-    QColor fontColor = Qt::lightGray;
 
     // Methods.
     Private(const QnLayoutResourcePtr& layout,
@@ -57,8 +55,6 @@ struct LayoutThumbnailLoader::Private
         noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
         noDataWidget->setAlignment(Qt::AlignCenter);
         noDataWidget->setContentsMargins(kMinIndicationMargins);
-        setPaletteColor(noDataWidget.data(), QPalette::Window, itemBackgroundColor);
-        setPaletteColor(noDataWidget.data(), QPalette::WindowText, fontColor);
     }
 
     void updateTileStatus(Qn::ThumbnailStatus status, const QRectF& tileRect)
@@ -143,22 +139,22 @@ Qn::ThumbnailStatus LayoutThumbnailLoader::status() const
 
 QColor LayoutThumbnailLoader::itemBackgroundColor() const
 {
-    return d->itemBackgroundColor;
+    return d->noDataWidget->palette().color(QPalette::Window);
 }
 
 void LayoutThumbnailLoader::setItemBackgroundColor(const QColor& value)
 {
-    d->itemBackgroundColor = value;
+    setPaletteColor(d->noDataWidget.data(), QPalette::Window, value);
 }
 
 QColor LayoutThumbnailLoader::fontColor() const
 {
-    return d->fontColor;
+    return d->noDataWidget->palette().color(QPalette::WindowText);
 }
 
 void LayoutThumbnailLoader::setFontColor(const QColor& value)
 {
-    d->fontColor = value;
+    setPaletteColor(d->noDataWidget.data(), QPalette::WindowText, value);
 }
 
 void LayoutThumbnailLoader::doLoadAsync()
@@ -250,6 +246,8 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::statusChanged,
             [this, loader, scaledCellRect](Qn::ThumbnailStatus status)
             {
+                // TODO: #vkutin Use correct item rotation!
+
                 d->updateTileStatus(status, boundedRect(loader->sizeHint(), scaledCellRect));
                 if (d->data.numLoading > 0)
                     return;
@@ -263,6 +261,8 @@ void LayoutThumbnailLoader::doLoadAsync()
             {
                 if (tile.isNull())
                     return;
+
+                // TODO: #vkutin Use correct item rotation!
 
                 QPainter painter(&d->data.image);
                 painter.drawImage(boundedRect(loader->sizeHint(), scaledCellRect), tile);
