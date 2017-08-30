@@ -306,6 +306,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
     addAction(action(action::ShowFpsAction));
+    addAction(action(action::OpenNewSceneAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);

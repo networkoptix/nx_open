@@ -60,6 +60,8 @@
 
 #include <nx_ec/dummy_handler.h>
 
+#include <client_core/client_core_module.h>
+
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
@@ -176,6 +178,8 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+
+#include <nx/client/desktop/ui/main_window.h>
 
 namespace {
 
@@ -348,6 +352,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(action::BeforeExitAction), &QAction::triggered, this, &ActionHandler::at_beforeExitAction_triggered);
+
+    connect(action(action::OpenNewSceneAction), &QAction::triggered, this, &ActionHandler::at_openNewScene_triggered);
 
     /* Run handlers that update state. */
     at_scheduleWatcher_scheduleEnabledChanged();
@@ -980,6 +986,18 @@ void ActionHandler::at_convertCameraToEntropix_triggered()
         }
         camera->saveParamsAsync();
     }
+}
+
+void ActionHandler::at_openNewScene_triggered()
+{
+    if (!m_mainWindow)
+    {
+        m_mainWindow = new experimental::MainWindow(qnClientCoreModule->mainQmlEngine());
+        m_mainWindow->resize(mainWindow()->size());
+    }
+
+    m_mainWindow->show();
+    m_mainWindow->raise();
 }
 
 void ActionHandler::at_moveCameraAction_triggered() {

@@ -66,4 +66,6 @@ struct QnStartupParameters
     QString enforceMediatorEndpoint;
 
     QStringList files; //< File paths passed to the client.
+
+    QString qmlRoot;
 };

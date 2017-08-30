@@ -163,7 +163,8 @@ namespace
 }
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_startupParameters(startupParams)
 {
     ini().reload();
 
@@ -595,6 +596,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+QnStartupParameters QnClientModule::startupParameters() const
+{
+    return m_startupParameters;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

@@ -26,6 +26,9 @@ public:
 
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+
+    QnStartupParameters startupParameters() const;
+
 private:
     void initApplication();
     void initThread();
@@ -39,6 +42,7 @@ private:
     void initLocalInfo(const QnStartupParameters& startupParams);
 
 private:
+    QnStartupParameters m_startupParameters;
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;

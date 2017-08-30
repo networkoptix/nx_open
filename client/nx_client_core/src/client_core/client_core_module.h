@@ -5,6 +5,8 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <nx/utils/singleton.h>
 
+class QQmlEngine;
+
 class QnCommonModule;
 class QnPtzControllerPool;
 class QnLayoutTourStateManager;
@@ -22,9 +24,12 @@ public:
     QnPtzControllerPool* ptzControllerPool() const;
     QnLayoutTourStateManager* layoutTourStateManager() const;
 
+    QQmlEngine* mainQmlEngine();
+
 private:
     QnCommonModule* m_commonModule;
     std::unique_ptr<ec2::AbstractECConnectionFactory> m_connectionFactory;
+    QQmlEngine* m_qmlEngine = nullptr;
 };
 
 #define qnClientCoreModule QnClientCoreModule::instance()
