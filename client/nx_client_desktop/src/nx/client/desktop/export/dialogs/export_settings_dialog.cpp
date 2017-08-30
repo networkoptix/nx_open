@@ -115,6 +115,13 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     updateSettingsWidgets();
 
+    // TODO: #GDM bound to tab change
+    QStringList filters{
+        lit("Matroska (*.mkv)"),
+        lit("MP4 (*.mp4)"),
+        lit("AVI (*.avi)")
+    };
+    ui->filenamePanel->setAllowedExtensions(filters);
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,

@@ -19,11 +19,22 @@ public:
     explicit FilenamePanel(QWidget *parent = 0);
     virtual ~FilenamePanel() override;
 
+    QStringList allowedExtesions() const;
+    void setAllowedExtensions(const QStringList& extensions);
+
+    QString filename() const;
+    void setFilename(const QString& value);
+
 signals:
     bool filenameChanged(const QString& filename);
 
 private:
+    void updateExtension();
+
+private:
+    struct Private;
     QScopedPointer<Ui::FilenamePanel> ui;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop
