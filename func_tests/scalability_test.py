@@ -10,6 +10,7 @@ import requests
 import datetime
 import traceback
 import json
+from requests.exceptions import ReadTimeout
 from functools import wraps
 import test_utils.utils as utils
 from test_utils.utils import GrowingSleep
@@ -157,10 +158,14 @@ def create_test_data(config, servers):
 def get_response(server, method, api_object, api_method):
     try:
         return server.rest_api.get_api_fn(method, api_object, api_method)()
-    except Exception, x:
-        log.error("%r call '%s/%s' error: %s" % (server, api_object, api_method, str(x)))
-        return None
-
+    except ReadTimeout as x:
+        log.error('ReadTimeout when waiting for %s call %s/%s; seems server is deadlocked, will make core dump: %s',
+                  server, api_object, api_method, x)
+        server.make_core_dump()
+        raise
+    except Exception as x:
+        log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
+        raise
 
 def clean_transaction_log(json):
     # We have to filter 'setResourceStatus' transactions due to VMS-5969
