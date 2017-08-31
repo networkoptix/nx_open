@@ -16,7 +16,6 @@ namespace
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
 
-
 QnRaiiGuardPtr createSignalGuard(
     QnUserResource* resource,
     void (QnUserResource::*targetSignal)(const QnResourcePtr&))
