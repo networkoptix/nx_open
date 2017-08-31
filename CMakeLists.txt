@@ -23,7 +23,7 @@ include(build_utils/cmake/find_python.cmake)
 include(build_utils/cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice AND NOT targetDevice STREQUAL "ios")
+if(targetDevice AND NOT targetDevice STREQUAL "none" AND NOT targetDevice STREQUAL "ios")
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
     include(cmake/sync_toolchain.cmake)
 endif()
