@@ -41,8 +41,8 @@ AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader
     m_dualsensor = avRes->isDualSensor();
     m_model = avRes->getModel();
     m_tftp_client = 0;
-
     m_motionData = 0;
+    m_channelCount = avRes->getVideoLayout()->channelCount();
 }
 
 AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreader()
@@ -133,7 +133,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     if (needMetaData())
     {
-        m_motionData = 4;
+        m_motionData = m_channelCount;
     }
 
 
@@ -151,7 +151,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     {
         QnMutexLocker mutex(&m_mutex);
 
-        h264 = isH264();;
+        h264 = isH264();
 
         if (h264) // cam is not jpeg only
         {
@@ -376,7 +376,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
     QnMutexLocker mtx(&m_mutex);
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
         if (m_gotKeyFrame[i] < 2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
             return true;
 
