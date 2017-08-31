@@ -639,8 +639,7 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
         return; //< password is not changed
 
     userResource->setRealm(nx::network::AppInfo::realm());
-    userResource->setPassword(password);
-    userResource->generateHash();
+    userResource->setPasswordAndGenerateHash(password);
 
     ec2::ApiUserData userData;
     fromResourceToApi(userResource, userData);

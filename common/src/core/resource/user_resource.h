@@ -36,21 +36,21 @@ public:
     void setHash(const QByteArray& hash);
 
     QString getPassword() const;
-    void setPassword(const QString& password);
+    void setPasswordAndGenerateHash(const QString& password);
+    void resetPassword();
 
-    void generateHash();
     QString decodeLDAPPassword() const;
 
     bool checkLocalUserPassword(const QString &password);
 
     QByteArray getDigest() const;
-    void setDigest(const QByteArray& digest, bool isValidated = false);
+    void setDigest(const QByteArray& digest);
 
     QByteArray getCryptSha512Hash() const;
     void setCryptSha512Hash(const QByteArray& hash);
 
     QString getRealm() const;
-    void setRealm( const QString& realm );
+    void setRealm(const QString& realm);
 
     // Do not use this method directly.
     // Use resourceAccessManager()::globalPermissions(user) instead
@@ -97,6 +97,7 @@ public:
      * For regular users it is random value, for cloud users it's md5 hash from email address.
      */
     void fillId();
+
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);
@@ -112,6 +113,26 @@ signals:
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
+
+private:
+    void updateHash();
+
+    template<typename T>
+    bool setMemberChecked(
+        T QnUserResource::* member,
+        T value,
+        std::function<void ()> middlestep = std::function<void ()>())
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (this->*member == value)
+            return false;
+
+        if (middlestep)
+            middlestep();
+
+        this->*member = value;
+        return true;
+    }
 
 private:
     QnUserType m_userType;
