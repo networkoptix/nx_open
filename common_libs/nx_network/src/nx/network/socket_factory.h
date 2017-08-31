@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <boost/optional/optional.hpp>
 
 #include "abstract_socket.h"
 #include "socket_common.h"
@@ -26,13 +27,14 @@ public:
         nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamSocketFuncType;
     typedef std::function<std::unique_ptr<AbstractStreamServerSocket>(
         bool /*sslRequired*/,
-        nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
+        nx::network::NatTraversalSupport /*natTraversalRequired*/,
+        boost::optional<int> /*ipVersion*/)> CreateStreamServerSocketFuncType;
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
     static std::unique_ptr< nx::network::UDPSocket > createUdpSocket();
 
     /**
-     * @param sslRequired If true than it is guaranteed that returned object 
+     * @param sslRequired If true than it is guaranteed that returned object
      * can be safely cast to AbstractEncryptedStreamSocket.
      */
     static std::unique_ptr< AbstractStreamSocket > createStreamSocket(
@@ -41,7 +43,8 @@ public:
 
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
-        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled);
+        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled,
+        boost::optional<int> ipVersion = boost::none);
 
     static QString toString(SocketType type);
     static SocketType stringToSocketType(QString type);
@@ -94,5 +97,6 @@ private:
         nx::network::NatTraversalSupport nttType, SocketType forcedSocketType);
 
     static std::unique_ptr<AbstractStreamServerSocket> defaultStreamServerSocketFactoryFunc(
-        nx::network::NatTraversalSupport nttType, SocketType socketType);
+        nx::network::NatTraversalSupport nttType, SocketType socketType,
+        boost::optional<int> _ipVersion);
 };

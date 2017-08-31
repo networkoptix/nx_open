@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1322,7 @@
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Zoekbasis</translation>
     </message>
     <message>
       <location/>
@@ -1858,7 +1858,7 @@
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Schakel de tegel-interface in</translation>
     </message>
   </context>
   <context>
@@ -1940,7 +1940,7 @@
     <message>
       <location/>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Naam wijzigen...</translation>
     </message>
     <message>
       <location/>
@@ -1961,7 +1961,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Voeg URL toe</translation>
     </message>
     <message>
       <location/>
@@ -2292,7 +2292,7 @@
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation type="unfinished">Global Email Settings...</translation>
+      <translation>Algemene e-mailinstellingen...</translation>
     </message>
   </context>
   <context>
@@ -2300,7 +2300,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
@@ -2338,12 +2338,12 @@
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Forceer het openen van een alarmlayout</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Toon ook de broncamera</translation>
     </message>
   </context>
   <context>
@@ -2356,22 +2356,22 @@
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation type="unfinished">Display text for:</translation>
+      <translation>Toon tekst voor:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Gebruik aangepaste tekst:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation type="unfinished">Rule will work only for prolonged events</translation>
+      <translation>Regel werkt alleen voor langdurige evenementen</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Toon ook op broncamera</translation>
     </message>
   </context>
   <context>
@@ -2379,17 +2379,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Watermerkcontrole</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Gecontroleerd bestand:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Controle resultaat:</translation>
     </message>
   </context>
   <context>
@@ -2407,7 +2407,7 @@
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
@@ -2442,12 +2442,12 @@
     <message>
       <location/>
       <source>Motion is not available for this camera.</source>
-      <translation type="unfinished">Motion is not available for this camera.</translation>
+      <translation>Bewegingsdetectie is niet beschikbaar voor deze camera.</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Bewegingsdetectie</translation>
     </message>
     <message>
       <location/>
@@ -2457,7 +2457,7 @@
     <message>
       <location/>
       <source>I/O ports</source>
-      <translation type="unfinished">I/O ports</translation>
+      <translation>I/O poorten</translation>
     </message>
     <message>
       <location/>
@@ -2482,7 +2482,7 @@
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Audio</translation>
     </message>
     <message>
       <location/>
@@ -2507,12 +2507,12 @@
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>Mac adres</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Gevoeligheid</translation>
     </message>
     <message>
       <location/>
@@ -2522,7 +2522,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>Text label</translation>
     </message>
   </context>
   <context>
@@ -2530,7 +2530,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation type="unfinished">Unsecure Connection</translation>
+      <translation>Niet-beveiligde verbinding</translation>
     </message>
     <message>
       <location/>
@@ -2540,17 +2540,17 @@
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation type="unfinished">Secure connection using TLS.</translation>
+      <translation>Beveiligde verbinding via TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation type="unfinished">Secure connection using SSL.</translation>
+      <translation>Beveiligde verbinding via SSL.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Poort:</translation>
     </message>
   </context>
   <context>
@@ -2558,12 +2558,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation type="unfinished">Outgoing Email Settings</translation>
+      <translation>Uitgaande e-mailinstellingen</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation type="unfinished">Advanced settings...</translation>
+      <translation>Geavanceerde instellingen...</translation>
     </message>
     <message>
       <location/>
@@ -2576,12 +2576,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Server:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Poort:</translation>
     </message>
     <message>
       <location/>
@@ -2591,12 +2591,12 @@
     <message>
       <location/>
       <source>Security:</source>
-      <translation type="unfinished">Security:</translation>
+      <translation>Beveiliging:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation type="unfinished">Progress:</translation>
+      <translation>Voortgang:</translation>
     </message>
     <message>
       <location/>

@@ -37,28 +37,18 @@ WebSocket::~WebSocket()
 {
 }
 
+void WebSocket::start()
+{
+    m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
+    m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
+}
+
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    nx::utils::promise<void> p;
-    auto f = p.get_future();
-
-    dispatch([this, aioThread, p = std::move(p)]() mutable
-    {
-        AbstractAsyncChannel::bindToAioThread(aioThread);
-        m_socket->bindToAioThread(aioThread);
-
-        m_pingTimer->cancelSync();
-        m_pingTimer->bindToAioThread(aioThread);
-        m_pingTimer->start(pingTimeout(), [this]() { handlePingTimer(); });
-
-        m_aliveTimer->cancelSync();
-        m_aliveTimer->bindToAioThread(aioThread);
-        m_aliveTimer->start(m_aliveTimeout, [this]() { handleAliveTimer(); });
-
-        p.set_value();
-    });
-
-    f.wait();
+    AbstractAsyncChannel::bindToAioThread(aioThread);
+    m_socket->bindToAioThread(aioThread);
+    m_pingTimer->bindToAioThread(aioThread);
+    m_aliveTimer->bindToAioThread(aioThread);
 }
 
 std::chrono::milliseconds WebSocket::pingTimeout() const
@@ -92,9 +82,7 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    if (m_lastError == SystemError::noError)
-        m_lastError = ecode;
-
+    m_lastError = ecode;
     if (m_lastError != SystemError::noError || bytesRead == 0)
     {
         NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
@@ -203,7 +191,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != SystemError::noError)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
@@ -224,7 +212,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != SystemError::noError)
+            if (socketCannotRecoverFromError(m_lastError))
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
                 handler(m_lastError, 0);
@@ -263,12 +251,7 @@ void WebSocket::handleAliveTimer()
 
 void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 {
-    post(
-        [this, timeout]()
-        {
-            m_aliveTimeout = timeout;
-            restartTimers();
-        });
+    m_aliveTimeout = timeout;
 }
 
 void WebSocket::sendCloseAsync()
@@ -283,6 +266,12 @@ void WebSocket::sendCloseAsync()
 
 void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
 {
+    if (m_writeQueue.empty())
+    {
+        NX_VERBOSE(this, "write queue is empty");
+        return; // might be the case on object destruction
+    }
+
     auto writeData = m_writeQueue.pop();
     bool queueEmpty = m_writeQueue.empty();
     {
@@ -291,7 +280,6 @@ void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSe
             writeData.handler(ecode, writeData.buffer.writeSize);
         if (watcher.objectDestroyed())
             return;
-        restartTimers();
     }
     if (!queueEmpty)
         m_socket->sendAsync(

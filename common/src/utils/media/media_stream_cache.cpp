@@ -151,14 +151,14 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return m_sharedImpl->getNextPacket( timestamp, foundTimestamp );
 }
 
-void MediaStreamCache::addEventReceiver( QnMediaStreamEventReceiver* eventReceiver  )
+nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& MediaStreamCache::keyFrameFoundSubscription()
 {
-    m_sharedImpl->addEventReceiver( eventReceiver );
+    return m_sharedImpl->keyFrameFoundSubscription();
 }
 
-void MediaStreamCache::removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
+nx::utils::Subscription<>& MediaStreamCache::streamTimeDiscontinuityFoundSubscription()
 {
-    return m_sharedImpl->removeEventReceiver( eventReceiver );
+    return m_sharedImpl->streamTimeDiscontinuityFoundSubscription();
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )

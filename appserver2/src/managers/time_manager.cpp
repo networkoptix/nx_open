@@ -410,9 +410,9 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
         }
         else
         {
-            m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
-                std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
-                std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
+            //m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
+            //    std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
+            //    std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
         }
     }
 }
@@ -935,7 +935,12 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( qui
     if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
         return;
 
-    emit primaryTimeServerSelectionRequired();
+    NX_LOGX(lm("User input required. Used sync time 0x%1, local time 0x%2")
+        .arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16)
+        .arg(m_localTimePriorityKey.toUInt64(), 0, 16),
+        cl_logDEBUG2);
+
+    //emit primaryTimeServerSelectionRequired();
 }
 
 

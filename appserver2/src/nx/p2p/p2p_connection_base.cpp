@@ -247,6 +247,7 @@ void ConnectionBase::onHttpClientDone()
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
     m_webSocket->setAliveTimeout(m_keepAliveTimeout);
+    m_webSocket->start();
 
     setState(State::Connected);
 }
@@ -254,7 +255,7 @@ void ConnectionBase::onHttpClientDone()
 void ConnectionBase::startConnection()
 {
     nx_http::Request request;
-    nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
+    nx::network::websocket::addClientHeaders(&request.headers, kP2pProtoName);
     request.headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(m_localPeer).toBase64());
     request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_localPeer.instanceId.toByteArray());
 

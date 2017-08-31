@@ -5,7 +5,6 @@
 #include "view/view.h"
 #include "settings.h"
 #include "libtraffic_relay_app_info.h"
-#include "controller/listen_address_helper.h"
 
 namespace nx {
 namespace cloud {
@@ -39,12 +38,14 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     m_model = &model;
 
     Controller controller(settings, &model);
+    if (!controller.discoverPublicAddress())
+    {
+        NX_ERROR(this, "Failed to discover public address. Terminating.");
+        return -1;
+    }
 
     View view(settings, model, &controller);
     m_view = &view;
-
-    controller::ListenAddressHelper addressHelper(&controller.connectSessionManager());
-    addressHelper.findBestAddress(view.httpEndpoints());
 
     // TODO: #ak: process rights reduction should be done here.
 

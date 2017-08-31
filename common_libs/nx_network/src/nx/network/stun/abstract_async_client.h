@@ -43,9 +43,8 @@ public:
      * Asynchronously opens connection to the server.
      *
      * @param url stun::/hostname:port/
-     * @param handler Is called when 1st connection attempt has passed regadless of it's success.
-     * NOTE: shall be called only once (to provide address) reconnect will
-     *      happen automatically.
+     * @param handler Called when 1st connection attempt has passed regardless of its success.
+     * NOTE: Shall be called only once (to provide address). Reconnect will happen automatically.
      */
     virtual void connect(const QUrl& url, ConnectHandler handler = nullptr) = 0;
 
@@ -53,10 +52,11 @@ public:
      * Subscribes for certain indications.
      *
      * @param method Indication method of interest. 
-     *    Use kEveryIndicationMethod constant to install handler that will received all unhandled indications.
+     *    Use kEveryIndicationMethod constant to install handler
+     *    that will receive every unhandled indication.
      * @param handler Will be called for each indication message.
      * @param client Can be used to cancel subscription.
-     * @return true on success, false if this methed is already monitored.
+     * @return true on success, false if this method is already monitored.
      */
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = 0) = 0;
@@ -70,16 +70,16 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler, void* client = 0) = 0;
 
-    /** Sends message asynchronously
+    /**
+     * Sends message asynchronously.
      *
-     * @param requestHandler Triggered after response has been received or error
-     *     has occured. Message attribute is valid only if first attribute value
-     *     is SystemError::noError.
+     * @param requestHandler Triggered after response has been received or error has occured. 
+     *     Resulting Message object is valid only if error code is SystemError::noError.
      * @param client Can be used to cancel subscription.
      * @return false, if could not start asynchronous operation.
      *
      * NOTE: It is valid to call this method independent of openConnection
-     *      (connection will be opened automaticaly).
+     *      (connection will be opened automatically).
      */
     virtual void sendRequest(
         Message request, RequestHandler handler, void* client = 0) = 0;
@@ -92,28 +92,28 @@ public:
         std::chrono::milliseconds period, TimerHandler handler, void* client) = 0;
 
     /**
-     * @return local address if client is connected to the server.
+     * @return local address if the client is connected to the server.
      */
     virtual SocketAddress localAddress() const = 0;
 
     /**
-     * @return server address if client knows one.
+     * @return server address if the client knows one.
      */
     virtual SocketAddress remoteAddress() const = 0;
 
     /**
-     * Closes connection, also engage reconnect.
+     * Closes connection, also engages reconnect.
      */
     virtual void closeConnection(SystemError::ErrorCode errorCode) = 0;
 
     /**
-     * Cancels all handlers, passed with @param client.
+     * Cancels all handlers, passed with client.
      */
     virtual void cancelHandlers(
         void* client, utils::MoveOnlyFunc<void()> handler) = 0;
 
     /**
-     * Configures connection keep alive options.
+     * Configures connection keep-alive options.
      */
     virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;
 };

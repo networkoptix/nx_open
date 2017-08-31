@@ -1,1 +1,1 @@
-crowdin download -b mobile --config crowdin-mobile.yaml 
+crowdin download -b mobile --config crowdin-mobile.yaml

@@ -8,7 +8,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/service.h>
 #include <nx/utils/std/future.h>
-
 #include <nx/utils/thread/stoppable.h>
 
 namespace nx_http {
@@ -38,8 +37,8 @@ class MediatorProcess:
 public:
     MediatorProcess(int argc, char **argv);
 
-    const std::vector<SocketAddress>& httpEndpoints() const;
-    const std::vector<SocketAddress>& stunEndpoints() const;
+    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<SocketAddress> stunEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;
 
 protected:

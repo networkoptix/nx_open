@@ -251,7 +251,8 @@
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
-#include "nx/mediaserver/unused_wallpapers_watcher.h"
+#include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <nx/mediaserver/license_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
@@ -275,6 +276,7 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
 
 using namespace nx;
 
@@ -1246,11 +1248,13 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    QList<SocketAddress> serverAddresses;
+    AddressFilters addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal | AddressFilter::noLoopback;
 
+    QList<SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
-    for (const auto& host: allLocalAddresses())
-        serverAddresses << SocketAddress(host.toString(), port);
+
+    for (const auto& host: allLocalAddresses(addressMask))
+        serverAddresses << SocketAddress(host, port);
 
     for (const auto& host : m_forwardedAddresses )
         serverAddresses << SocketAddress(host.first, host.second);
@@ -2657,22 +2661,13 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-
-    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-        [this](qint64 newTime)
-        {
-            QnSyncTime::instance()->updateTime(newTime);
-
-            using namespace ec2;
-            QnTransaction<ApiPeerSyncTimeData> tran(
-                ApiCommand::broadcastPeerSyncTime,
-                commonModule()->moduleGUID());
-            tran.params.syncTimeMs = newTime;
-            if (auto connection = commonModule()->ec2Connection())
-                connection->messageBus()->sendTransaction(tran);
-        }
-        );
-
+    
+    connect(
+        ec2Connection->getTimeNotificationManager().get(), 
+        &ec2::AbstractTimeNotificationManager::timeChanged,
+        this, 
+        &MediaServerProcess::at_timeChanged, 
+        Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     CommonPluginContainer pluginContainer;
@@ -3083,6 +3078,9 @@ void MediaServerProcess::run()
 
     qnBackupStorageMan->scheduleSync()->start();
     serverModule->unusedWallpapersWatcher()->start();
+    if (m_serviceMode)
+        serverModule->licenseWatcher()->start();
+
     emit started();
     exec();
 
@@ -3206,6 +3204,19 @@ void MediaServerProcess::at_appStarted()
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
 };
+
+void MediaServerProcess::at_timeChanged(qint64 newTime)
+{
+    QnSyncTime::instance()->updateTime(newTime);
+
+    using namespace ec2;
+    QnTransaction<ApiPeerSyncTimeData> tran(
+        ApiCommand::broadcastPeerSyncTime,
+        commonModule()->moduleGUID());
+    tran.params.syncTimeMs = newTime;
+    if (auto connection = commonModule()->ec2Connection())
+        connection->messageBus()->sendTransaction(tran);
+}
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {

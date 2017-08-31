@@ -2,17 +2,14 @@
 
 function JsHlsAPI(){
     var events, stats, fmp4Data,
-    hideError, //Hiding errors mostlikey caused by proxy in local env
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
     //levelCapping = -1,
-    defaultAudioCodec = undefined,
     dumpfMP4 = false,
     autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
         var jshlsApi = this;
-        hls.config.manifestLoadingTimeOut = 30*1000; // 30 seconds to wait for manifest
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
@@ -227,9 +224,6 @@ function JsHlsAPI(){
             stats.fragAvgDecryptTime = this.totalDecryptTime / stats.fragDecrypted;
         });
         hls.on(Hls.Events.ERROR, function(event,data) {
-            if(hideError){
-                return;
-            }
             console.warn(data);
 
             switch(data.details) {
@@ -289,6 +283,10 @@ function JsHlsAPI(){
                 case Hls.ErrorDetails.BUFFER_APPENDING_ERROR:
                     console.log("Buffer Appending Error");
                     break;
+                /*case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
+                    console.log("Buffer Stalled Error");
+                    console.log(jshlsApi.hls.streamController._bufferedFrags);
+                    //jshlsApi.hls.handleMediaError();*/
                 default:
                     break;
             }
@@ -349,10 +347,9 @@ function JsHlsAPI(){
         });
     };
 
-    this.init = function(element, jshlsHideError, jshlsDebugMode, readyHandler, errorHandler){
+    this.init = function(element, loadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
         
-        hideError = jshlsHideError;
         debugMode = jshlsDebugMode;
         if(Hls.isSupported()) {
             if(this.hls) {
@@ -364,7 +361,13 @@ function JsHlsAPI(){
         recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
         fmp4Data = { 'audio': [], 'video': [] };
 
-        this.hls = new Hls({debug:debugMode, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+        this.hls = new Hls({
+            debug: debugMode,
+            enableWorker: enableWorker,
+            manifestLoadingTimeOut: loadingTimeOut,
+            levelLoadingTimeOut: loadingTimeOut, // used by playlist-loader
+            fragLoadingTimeOut: loadingTimeOut
+        });
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
@@ -459,12 +462,6 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    if(this.video){
-        this.video.src="";
-        //This unbinds all of the event listeners for the video player
-        var cloneVideo = this.video.cloneNode(true);
-        this.video.parentNode.replaceChild(cloneVideo, this.video);
-    }
     this.hls.destroy();
 };
 

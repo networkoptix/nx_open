@@ -120,9 +120,6 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
-QnLicense::QnLicense()
-{
-}
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
@@ -130,8 +127,21 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
     loadLicenseBlock(licenseBlock);
 }
 
-QnLicense::~QnLicense()
-{
+QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
+{ 
+    QList<QByteArray> params;
+    params << QByteArray("NAME=").append(value.name);
+    params << QByteArray("SERIAL=").append(value.key);
+    params << QByteArray("HWID=").append(value.hardwareId);
+    params << QByteArray("COUNT=").append(QByteArray::number(value.cameraCount));
+    params << QByteArray("CLASS=").append(value.licenseType);
+    params << QByteArray("VERSION=").append(value.version);
+    params << QByteArray("BRAND=").append(value.brand);
+    params << QByteArray("EXPIRATION=").append(value.expiration);
+    params << QByteArray("SIGNATURE2=").append(value.signature);
+
+    auto licenseBlock = params.join('\n');
+    loadLicenseBlock(licenseBlock);
 }
 
 bool QnLicense::isInfoMode() const
@@ -166,6 +176,13 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
         return QnLicensePtr();
 
     return QnLicensePtr(new QnLicense(licenseBlock));
+}
+
+QnLicensePtr QnLicense::createFromKey(const QByteArray& key)
+{
+    QnLicense* result = new QnLicense();
+    result->m_key = key;
+    return QnLicensePtr(result);
 }
 
 QString QnLicense::displayName() const {

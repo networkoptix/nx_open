@@ -257,6 +257,19 @@ void AsyncClient::doUpgrade(
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    doUpgrade(
+        url,
+        nx_http::Method::options,
+        protocolToUpgradeTo,
+        std::move(completionHandler));
+}
+
+void AsyncClient::doUpgrade(
+    const QUrl& url,
+    nx_http::Method::ValueType method,
+    const StringType& protocolToUpgradeTo,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
     m_onDone = std::move(completionHandler);
 
     NX_ASSERT(url.isValid());
@@ -264,9 +277,12 @@ void AsyncClient::doUpgrade(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    m_additionalHeaders.emplace("Connection", "Upgrade");
-    m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    composeRequest(nx_http::Method::options);
+    if (m_additionalHeaders.count("Connection") == 0)
+        m_additionalHeaders.emplace("Connection", "Upgrade");
+    if (m_additionalHeaders.count("Upgrade") == 0)
+        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
+    m_additionalHeaders.emplace("Content-Length", "0");
+    composeRequest(method);
     initiateHttpMessageDelivery();
 }
 
@@ -298,10 +314,8 @@ bool AsyncClient::hasRequestSuccesed() const
         return false;
 
     if (auto resp = response())
-    {
-        auto status = resp->statusLine.statusCode;
-        return status >= 200 && status < 300; // SUCCESS codes 2XX
-    }
+        return StatusCode::isSuccessCode(resp->statusLine.statusCode);
+
     return false;
 }
 

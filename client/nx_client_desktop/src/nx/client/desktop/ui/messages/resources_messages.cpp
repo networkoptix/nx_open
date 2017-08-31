@@ -62,7 +62,7 @@ bool showCompositeDialog(
         messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
 
     messageBox.setInformativeText(extras);
-    messageBox.setCheckBoxEnabled();
+    messageBox.setCheckBoxEnabled(!showOnceFlag.isEmpty());
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);

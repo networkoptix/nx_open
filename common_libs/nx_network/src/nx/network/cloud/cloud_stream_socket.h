@@ -21,7 +21,7 @@ namespace cloud {
 
 /**
  * Socket that is able to use hole punching (tcp or udp) and mediator to establish connection.
- * Method to use to connect to remote peer is selected depending on route to the peer
+ * Method to use to connect to a remote peer is selected depending on the route to the peer.
  * If connection to peer requires using udp hole punching, then this socket uses UDT.
  * NOTE: Actual socket is instantiated only when address is known 
  *   (AbstractCommunicatingSocket::connect or AbstractCommunicatingSocket::connectAsync)

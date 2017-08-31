@@ -7,12 +7,9 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/subscription.h>
 #include <nx/utils/thread/cf/async_queued_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
-
-#include "abstract_listen_address_helper_handler.h"
 
 namespace nx {
 namespace cloud {
@@ -30,7 +27,7 @@ namespace controller {
 
 class AbstractTrafficRelay;
 
-class AbstractConnectSessionManager: public AbstractListenAddressHelperHandler
+class AbstractConnectSessionManager
 {
 public:
     //---------------------------------------------------------------------------------------------
@@ -70,8 +67,8 @@ public:
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
-        controller::AbstractTrafficRelay* trafficRelay,
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool> remoteRelayPool);
+        model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
+        controller::AbstractTrafficRelay* trafficRelay);
     ~ConnectSessionManager();
 
     virtual void beginListening(
@@ -85,6 +82,7 @@ public:
     virtual void connectToPeer(
         const api::ConnectToPeerRequest& request,
         ConnectToPeerHandler completionHandler) override;
+
 
 private:
     struct RelaySession
@@ -100,13 +98,12 @@ private:
     const conf::Settings& m_settings;
     model::ClientSessionPool* m_clientSessionPool;
     model::ListeningPeerPool* m_listeningPeerPool;
+    model::AbstractRemoteRelayPeerPool* m_remoteRelayPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
     utils::Counter m_apiCallCounter;
     std::list<RelaySession> m_relaySessions;
     QnMutex m_mutex;
     bool m_terminated = false;
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPool;
-    std::set<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
     void saveServerConnection(
         const std::string& peerName,
@@ -130,13 +127,6 @@ private:
         std::size_t bytesSent,
         std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
-
-    virtual void onBestEndpointDiscovered(std::string publicAddress) override;
-
-    void subscribeForPeerConnected(
-        nx::utils::SubscriptionId* subscriptionId,
-        std::string publicAddress);
-    void subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId);
 };
 
 class ConnectSessionManagerFactory
@@ -153,6 +143,7 @@ public:
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
         model::ListeningPeerPool* listeningPeerPool,
+        model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
         controller::AbstractTrafficRelay* trafficRelay);
     /**
      * @return Previous factory func.

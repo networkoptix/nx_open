@@ -38,8 +38,8 @@ private:
 
     void updateAccessToLayout(const QnLayoutResourcePtr& layout);
 
-    QnLayoutItemAggregatorPtr ensureAggregatorForSubject(
-        const QnResourceAccessSubject& subject);
+    QnLayoutItemAggregatorPtr findAggregatorForSubject(const QnResourceAccessSubject& subject);
+    QnLayoutItemAggregatorPtr ensureAggregatorForSubject(const QnResourceAccessSubject& subject);
 
 private:
     QHash<QnUuid, QnLayoutItemAggregatorPtr> m_aggregatorsBySubject;

@@ -4,6 +4,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/casssandra/async_cassandra_connection.h>
+#include "../settings.h"
+
 
 namespace nx {
 namespace cloud {
@@ -37,8 +39,9 @@ bool getQueryResultValue(const cassandra::QueryResult& queryResult, const char* 
 } // namespace
 
 
-RemoteRelayPeerPool::RemoteRelayPeerPool(const char* cassandraHost):
-    m_cassConnection(new nx::cassandra::AsyncConnection(cassandraHost))
+RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
+    m_cassConnection(
+        new nx::cassandra::AsyncConnection(settings.cassandraHost().toLatin1().constData()))
 {
     prepareDbStructure();
 }

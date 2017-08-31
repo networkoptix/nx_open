@@ -162,7 +162,7 @@ angular.module('cloudApp', [
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {
-            title: L.pageTitles.contentPage,
+            title: "" /*L.pageTitles.contentPage*/,
             templateUrl: Config.viewsDir + 'static.html',
             controller: 'StaticCtrl'
         })
@@ -193,7 +193,7 @@ angular.module('cloudApp', [
             controller: 'DownloadCtrl'
         })
         .when('/', {
-            title: L.pageTitles.startPage,
+            title: "" /*L.pageTitles.startPage*/,
             templateUrl: Config.viewsDir + 'startPage.html',
             controller: 'StartPageCtrl'
         })
