@@ -981,6 +981,11 @@ QSize QnPlOnvifResource::getPrimaryResolution() const
     return m_primaryResolution;
 }
 
+void QnPlOnvifResource::setPrimaryResolution(const QSize& value)
+{
+    m_primaryResolution = value;
+}
+
 QSize QnPlOnvifResource::getSecondaryResolution() const
 {
     QnMutexLocker lock( &m_mutex );
