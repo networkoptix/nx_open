@@ -180,16 +180,6 @@ angular.module('nxCommon')
                     return false; // IE9 - No supported formats
                 }
 
-
-                function recyclePlayer(player){
-                    if(scope.player != player || !player) {
-                        scope.vgPlayerReady({$API: null});
-                        scope.player = player;
-                        return false;
-                    }
-                    return true;
-                }
-
                 // TODO: Create common interface for each player, html5 compatible or something
                 // TODO: move supported info to config
                 // TODO: Support new players
@@ -365,6 +355,23 @@ angular.module('nxCommon')
                     }
                 }
 
+                function resetPlayer(player){
+                    if(scope.vgApi){
+                        scope.vgApi.kill();
+                    }
+                    if(videoPlayers && 0){
+                        videoPlayers.pop();
+                    }
+
+                    scope.player = player || null;
+                    scope.vgPlayerReady({$API: null});
+                    //return;
+                    //Turn off all players to reset ng-class for rotation
+                    scope.native = false;
+                    scope.flashls = false;
+                    scope.jsHls = false;
+                }
+
                 function srcChanged(){
                     scope.loading = true; // source changed - start loading
                     scope.videoFlags.errorLoading = false;
@@ -372,22 +379,11 @@ angular.module('nxCommon')
 
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
-                        //Turn off all players to reset ng-class for rotation
-                        scope.native = false;
-                        scope.flashls = false;
-                        scope.jsHls = false;
+                        resetPlayer(format);
+
                         if(!format){
                             scope.loading = false; // no supported format - no loading
-                            recyclePlayer(null); //There is no player so it should be set to null
                             return;
-                        }
-
-                        recyclePlayer(format);
-                        if(scope.vgApi){
-                            scope.vgApi.kill();
-                        }
-                        if(videoPlayers){
-                            videoPlayers.pop();
                         }
 
                         $timeout(initNewPlayer);
@@ -398,16 +394,11 @@ angular.module('nxCommon')
                 scope.$watch("vgSrc",srcChanged, true);
 
                 scope.$on('$destroy',function(){
-                    recyclePlayer(null);
-                    scope.vgApi.kill();
+                    resetPlayer();
 
                     if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
-                    }
-
-                    if(videoPlayers.length > 0){
-                        videoPlayers.pop();
                     }
                 });
 
