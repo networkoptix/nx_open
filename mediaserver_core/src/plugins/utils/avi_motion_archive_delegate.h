@@ -1,4 +1,5 @@
 #pragma once
+#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <motion/motion_estimation.h>
@@ -7,7 +8,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-class AviMotionArchiveDelegate : public QnAviArchiveDelegate
+class AviMotionArchiveDelegate: public QnAviArchiveDelegate
 {
     using base_type = QnAviArchiveDelegate;
 
@@ -19,7 +20,7 @@ public:
 
 private:
     QnMetaDataV1Ptr analyzeMotion(const QnAbstractMediaDataPtr& video);
-    
+
 private:
     mutable QnMutex m_mutex;
     QnMotionEstimation m_motionEstimation;
@@ -29,3 +30,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)
