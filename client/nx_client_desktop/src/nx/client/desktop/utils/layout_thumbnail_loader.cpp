@@ -319,6 +319,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
         {
+            // Non-camera resources are drawn as "NO DATA".
             const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
             d->updateTileStatus(Qn::ThumbnailStatus::NoData, scaledCellAr, scaledCellRect, 0);
             continue;
