@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
+#include <QtQml/QQmlEngine>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -107,6 +108,7 @@
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
+static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
@@ -417,6 +419,17 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     if (mac_isSandboxed())
         qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
 #endif
+
+    auto qmlRoot = startupParams.qmlRoot.isEmpty() ? kQmlRoot : startupParams.qmlRoot;
+    if (!qmlRoot.endsWith(L'/'))
+        qmlRoot.append(L'/');
+    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+
+    m_clientCoreModule->mainQmlEngine()->setBaseUrl(
+        qmlRoot.startsWith(lit("qrc:"))
+            ? QUrl(qmlRoot)
+            : QUrl::fromLocalFile(qmlRoot));
+    m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 }
 
 void QnClientModule::initLog(const QnStartupParameters& startupParams)

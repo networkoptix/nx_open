@@ -1,18 +1,16 @@
 #include "main_window.h"
 
+#include <QtCore/QFileInfo>
+#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlError>
 
 #include <nx/utils/log/log.h>
-
-#include <client/client_module.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 namespace experimental {
-
-static const QString kQmlSource = QStringLiteral("qrc:///qml/main.qml");
 
 class MainWindow::Private: public QObject
 {
@@ -33,11 +31,7 @@ MainWindow::MainWindow(QQmlEngine* engine, QWindow* parent):
     base_type(engine, parent),
     d(new Private(this))
 {
-    const auto qmlRoot = qnClientModule->startupParameters().qmlRoot;
-    const auto sourceUrl = qmlRoot.isEmpty() ? kQmlSource : qmlRoot;
-
-    NX_DEBUG(this, lm("Loading from %1").arg(sourceUrl));
-    setSource(sourceUrl);
+    setSource(QStringLiteral("main.qml"));
 
     if (status() == Error)
     {
