@@ -12,8 +12,6 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/media_data_packet.h>
 
-#include <utils/common/synctime.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -120,11 +118,11 @@ struct ConsumerInfo
 
     QnCamDisplay* display;
 
-    qint64 lqTime = 0;
     float toLQSpeed = 0.0;
     LqReason lqReason = LqReason::None;
     QElapsedTimer initialTime;
-    QElapsedTimer awaitingLQTime;
+    QElapsedTimer awaitingLqTime;
+    QElapsedTimer lqTime;
     int smallSizeCnt = 0;
 
     // Custom mode means unsupported consumer.
@@ -151,10 +149,10 @@ namespace desktop {
 struct RadassController::Private
 {
     mutable QnMutex mutex;
-    QElapsedTimer lastSwitchTimer; //< Latest HQ->LQ or LQ->HQ switch
+    QElapsedTimer lastSwitchTimer; //< Latest HQ->LQ or LQ->HQ switch.
     int hiQualityRetryCounter = 0;
-    int timerTicks = 0;    // onTimer ticks count
-    qint64 lastLqTime = 0; // latest HQ->LQ switch time
+    int timerTicks = 0;    //< onTimer ticks count
+    QElapsedTimer lastLqTime; //< Latest HQ->LQ switch time.
 
     std::vector<ConsumerInfo> consumers;
     using Consumer = decltype(consumers)::iterator;
@@ -240,6 +238,7 @@ struct RadassController::Private
             auto consumer = itr.value();
             auto display = consumer->display;
             QnArchiveStreamReader* reader = display->getArchiveReader();
+            //TODO: #GDM MEDIA_Quality_ForceHigh is for temporary export reader only! It must not be registered here.
             bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High
                 || reader->getQuality() == MEDIA_Quality_ForceHigh;
 
@@ -267,7 +266,7 @@ struct RadassController::Private
         consumer->lqReason = reason;
         // Get speed for FF reason as external variable to prevent race condition.
         consumer->toLQSpeed = speed != INT_MAX ? speed : consumer->display->getSpeed();
-        consumer->awaitingLQTime.invalidate();
+        consumer->awaitingLqTime.invalidate();
     }
 
     void gotoHighQuality(Consumer consumer)
@@ -304,7 +303,8 @@ void RadassController::onSlowStream(QnArchiveStreamReader* reader)
     if (consumer->mode != RadassMode::Auto)
         return;
 
-    d->lastLqTime = consumer->lqTime = qnSyncTime->currentMSecsSinceEpoch();
+    d->lastLqTime.restart();
+    consumer->lqTime.restart();
 
     QnCamDisplay* display = consumer->display;
     if (isFFSpeed(display))
@@ -323,7 +323,7 @@ void RadassController::onSlowStream(QnArchiveStreamReader* reader)
     // Do not go to LQ if recently switch occurred.
     if (!d->lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
     {
-        consumer->awaitingLQTime.restart();
+        consumer->awaitingLqTime.restart();
         return;
     }
 
@@ -341,6 +341,7 @@ void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
     QnMutexLocker lock(&d->mutex);
 
+    //TODO: #GDM MEDIA_Quality_ForceHigh is for temporary export reader only! It must not be registered here.
     if (reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh)
         return; // reader already at HQ
 
@@ -352,7 +353,7 @@ void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (consumer->mode != RadassMode::Auto)
         return;
 
-    consumer->awaitingLQTime.invalidate();
+    consumer->awaitingLqTime.invalidate();
 
     QnCamDisplay* display = consumer->display;
     if (qAbs(display->getSpeed()) < consumer->toLQSpeed
@@ -388,12 +389,13 @@ void RadassController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (!d->lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
         return;
 
-    // Recently slow report received (not all reports affect d->lastSwitchTimer)
-    if (d->lastLqTime + kQualitySwitchIntervalMs > qnSyncTime->currentMSecsSinceEpoch())
+    // Recently slow report received (not all reports affect d->lastSwitchTimer).
+    if (d->lastLqTime.isValid() && !d->lastLqTime.hasExpired(kQualitySwitchIntervalMs))
         return;
 
+    // Do not go to HQ if some display perform opening.
     if (d->existsBufferingDisplay())
-        return; // do not go to HQ if some display perform opening...
+        return;
 
     auto maxConsumer = d->findDisplay(FindMethod::Biggest, MEDIA_Quality_Low, isBigItem);
     if (d->isValid(maxConsumer))
@@ -422,14 +424,9 @@ void RadassController::onTimer()
 
     if (++d->timerTicks >= kAdditionalHQRetryCounter)
     {
-        // sometimes allow addition LQ->HQ switch
-        bool slowStreamExists = false;
-        for (auto info: d->consumers)
-        {
-            if (qnSyncTime->currentMSecsSinceEpoch() < info.lqTime + kQualitySwitchIntervalMs)
-                slowStreamExists = true;
-        }
-        if (!slowStreamExists)
+        // Sometimes allow addition LQ->HQ switch.
+        // Check if there were no slow stream reports lately.
+        if (d->lastLqTime.hasExpired(kQualitySwitchIntervalMs))
         {
             addHQTry();
             d->timerTicks = 0;
@@ -455,8 +452,8 @@ void RadassController::onTimer()
         {
             d->gotoHighQuality(consumer);
         }
-        else if (consumer->awaitingLQTime.isValid()
-            && consumer->awaitingLQTime.hasExpired(kQualitySwitchIntervalMs))
+        else if (consumer->awaitingLqTime.isValid()
+            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
         {
             d->gotoLowQuality(consumer, slowLqReason(display));
         }
@@ -484,7 +481,7 @@ void RadassController::onTimer()
             // LQ live stream.
             && reader->getQuality() == MEDIA_Quality_Low
             // No drop report several last seconds.
-            && qnSyncTime->currentMSecsSinceEpoch() - consumer->lqTime > kQualitySwitchIntervalMs
+            && consumer->lqTime.hasExpired(kQualitySwitchIntervalMs)
             // There are no a lot of packets in the queue (it is possible if CPU slow).
             && display->queueSize() <= display->maxQueueSize() / 2
             // No recently slow report by any camera.
