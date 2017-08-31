@@ -115,24 +115,15 @@ protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 private:
-    void updateHash();
+    using MiddlestepFunction = std::function<void ()>;
 
     template<typename T>
     bool setMemberChecked(
         T QnUserResource::* member,
         T value,
-        std::function<void ()> middlestep = std::function<void ()>())
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (this->*member == value)
-            return false;
+        MiddlestepFunction middlestep = MiddlestepFunction());
 
-        if (middlestep)
-            middlestep();
-
-        this->*member = value;
-        return true;
-    }
+    void updateHash();
 
 private:
     QnUserType m_userType;

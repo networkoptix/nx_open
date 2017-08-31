@@ -64,6 +64,23 @@ QnUserResource::QnUserResource(const QnUserResource& right):
 {
 }
 
+template<typename T>
+bool QnUserResource::setMemberChecked(
+    T QnUserResource::* member,
+    T value,
+    MiddlestepFunction middlestep)
+{
+    QnMutexLocker locker(&m_mutex);
+    if (this->*member == value)
+        return false;
+
+    if (middlestep)
+        middlestep();
+
+    this->*member = value;
+    return true;
+}
+
 Qn::UserRole QnUserResource::userRole() const
 {
     if (isOwner())
@@ -116,8 +133,9 @@ QString QnUserResource::getPassword() const
 
 void QnUserResource::setPasswordAndGenerateHash(const QString& password)
 {
-    const auto updateHashGuard = QnRaiiGuard::createDestructible([this]() { updateHash(); });
-    if (setMemberChecked(&QnUserResource::m_password, password))
+    const bool emitChangedSignal = setMemberChecked(&QnUserResource::m_password, password);
+    updateHash();
+    if (emitChangedSignal)
         emit passwordChanged(::toSharedPointer(this));
 }
 
