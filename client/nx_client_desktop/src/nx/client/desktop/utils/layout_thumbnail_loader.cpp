@@ -22,11 +22,10 @@ namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
 
-static QRectF boundedRect(const QSizeF& sourceSize, const QRectF& boundingRect)
+// TODO: #vkutin #common Put into utility class/namespace. Get rid of duplicates.
+static inline bool isOdd(int value)
 {
-    const auto alignedRect = QnGeometry::aligned(sourceSize, boundingRect);
-    return QnGeometry::scaled(alignedRect, boundingRect.size(),
-        alignedRect.center(), Qt::KeepAspectRatio);
+    return (value & 1) != 0;
 }
 
 } // namespace
@@ -34,17 +33,20 @@ static QRectF boundedRect(const QSizeF& sourceSize, const QRectF& boundingRect)
 struct LayoutThumbnailLoader::Private
 {
     // Input data.
+    LayoutThumbnailLoader* const q;
     QnLayoutResourcePtr layout;
     QSize maximumSize;
     qint64 msecSinceEpoch;
     QnThumbnailRequestData::ThumbnailFormat format;
 
     // Methods.
-    Private(const QnLayoutResourcePtr& layout,
+    Private(LayoutThumbnailLoader* q,
+        const QnLayoutResourcePtr& layout,
         const QSize& maximumSize,
         qint64 msecSinceEpoch,
         QnThumbnailRequestData::ThumbnailFormat format)
         :
+        q(q),
         layout(layout),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
@@ -57,7 +59,8 @@ struct LayoutThumbnailLoader::Private
         noDataWidget->setContentsMargins(kMinIndicationMargins);
     }
 
-    void updateTileStatus(Qn::ThumbnailStatus status, const QRectF& tileRect)
+    void updateTileStatus(Qn::ThumbnailStatus status, qreal aspectRatio,
+        const QRectF& cellRect, qreal rotation)
     {
         switch (status)
         {
@@ -72,20 +75,95 @@ struct LayoutThumbnailLoader::Private
             case Qn::ThumbnailStatus::Invalid:
             case Qn::ThumbnailStatus::NoData:
             {
-                // Paint into pixmap:
-                QPixmap pixmap(tileRect.size().toSize() * data.image.devicePixelRatio());
-                pixmap.setDevicePixelRatio(data.image.devicePixelRatio());
-                pixmap.fill(Qt::transparent);
-                noDataWidget->setGeometry(tileRect.toRect());
-                noDataWidget->render(&pixmap);
+                rotation = qMod(rotation, 180.0);
 
-                // Paint pixmap into main image:
-                QPainter painter(&data.image);
-                paintPixmapSharp(&painter, pixmap, tileRect.topLeft());
+                if (qFuzzyIsNull(rotation))
+                {
+                    const auto targetRect = QnGeometry::expanded(aspectRatio,
+                        cellRect, Qt::KeepAspectRatio);
+
+                    QPainter painter(&data.image);
+                    paintPixmapSharp(&painter, noDataPixmap(targetRect.size().toSize()),
+                        targetRect.topLeft());
+                }
+                else
+                {
+                    if (rotation < 0.0)
+                        rotation += 180.0;
+
+                    // 0 = up, 1 = left, 2 = down.
+                    const auto direction = qRound(rotation / 90.0);
+
+                    rotation -= direction * 90.0;
+                    if (isOdd(direction))
+                        aspectRatio = 1.0 / aspectRatio;
+
+                    const auto cellCenter = cellRect.center();
+                    const auto targetRect = QnGeometry::encloseRotatedGeometry(
+                        cellRect, aspectRatio, rotation);
+
+                    QPainter painter(&data.image);
+                    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+                    painter.translate(cellRect.center());
+                    painter.rotate(rotation);
+                    painter.translate(-cellRect.center());
+                    paintPixmapSharp(&painter, noDataPixmap(targetRect.size().toSize()),
+                        targetRect.topLeft());
+                }
+
+                emit q->imageChanged(data.image);
+
                 --data.numLoading;
                 break;
             }
         }
+
+        if (data.numLoading > 0)
+            return;
+
+        data.status = Qn::ThumbnailStatus::Loaded;
+        emit q->statusChanged(data.status);
+    }
+
+    void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect, qreal rotation)
+    {
+        if (tile.isNull())
+            return;
+
+        if (qFuzzyIsNull(rotation))
+        {
+            const auto targetRect = QnGeometry::expanded(aspectRatio,
+                cellRect, Qt::KeepAspectRatio);
+
+            QPainter painter(&data.image);
+            painter.setRenderHints(QPainter::SmoothPixmapTransform);
+            painter.drawImage(targetRect, tile);
+        }
+        else
+        {
+            const auto cellCenter = cellRect.center();
+            const auto targetRect = QnGeometry::encloseRotatedGeometry(
+                cellRect, aspectRatio, rotation);
+
+            QPainter painter(&data.image);
+            painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+            painter.translate(cellRect.center());
+            painter.rotate(rotation);
+            painter.translate(-cellRect.center());
+            painter.drawImage(targetRect, tile);
+        }
+
+        emit q->imageChanged(data.image);
+    }
+
+    QPixmap noDataPixmap(const QSize& size) const
+    {
+        QPixmap pixmap(size * data.image.devicePixelRatio());
+        pixmap.setDevicePixelRatio(data.image.devicePixelRatio());
+        pixmap.fill(Qt::transparent);
+        noDataWidget->resize(size);
+        noDataWidget->render(&pixmap);
+        return pixmap;
     }
 
     // Intermediate/output data.
@@ -109,7 +187,7 @@ LayoutThumbnailLoader::LayoutThumbnailLoader(
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(layout, maximumSize, msecSinceEpoch, format))
+    d(new Private(this, layout, maximumSize, msecSinceEpoch, format))
 {
 }
 
@@ -211,10 +289,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         QImage::Format_ARGB32_Premultiplied);
 
     d->data.image.fill(Qt::transparent);
+    d->data.status = Qn::ThumbnailStatus::Loading;
 
     emit sizeHintChanged(d->data.image.size());
+    emit statusChanged(d->data.status);
 
-    for (const auto& data: d->layout->getItems())
+    for (const auto& data : d->layout->getItems())
     {
         const QRectF cellRect = data.combinedGeometry;
         if (!cellRect.isValid())
@@ -224,11 +304,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        // TODO: #vkutin Do we want to draw placeholders for non-camera resources?
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            continue;
-
         // Cell bounds.
         const QRectF scaledCellRect(
             (cellRect.left() - bounding.left() + spacing * 0.5) * xscale,
@@ -236,49 +311,45 @@ void LayoutThumbnailLoader::doLoadAsync()
             (cellRect.width() - spacing) * xscale,
             (cellRect.height() - spacing) * yscale);
 
+        const auto rotation = data.rotation;
+        const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
+
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+        {
+            d->updateTileStatus(Qn::ThumbnailStatus::NoData, scaledCellAr, scaledCellRect, 0);
+            continue;
+        }
+
         QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
-            camera,
-            d->msecSinceEpoch,
-            data.rotation,
-            QSize(0, scaledCellRect.height()),
-            d->format));
+            camera, d->msecSinceEpoch, 0, QSize(0, scaledCellRect.height()), d->format));
 
         connect(loader.data(), &QnImageProvider::statusChanged,
-            [this, loader, scaledCellRect](Qn::ThumbnailStatus status)
+            [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                // TODO: #vkutin Use correct item rotation!
-
-                d->updateTileStatus(status, boundedRect(loader->sizeHint(), scaledCellRect));
-                if (d->data.numLoading > 0)
-                    return;
-
-                d->data.status = Qn::ThumbnailStatus::Loaded;
-                emit statusChanged(d->data.status);
+                d->updateTileStatus(status, QnGeometry::aspectRatio(loader->sizeHint()),
+                    scaledCellRect, rotation);
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged,
-            [this, loader, scaledCellRect](const QImage& tile)
+            [this, loader, rotation, scaledCellRect](const QImage& tile)
             {
-                if (tile.isNull())
-                    return;
-
-                // TODO: #vkutin Use correct item rotation!
-
-                QPainter painter(&d->data.image);
-                painter.drawImage(boundedRect(loader->sizeHint(), scaledCellRect), tile);
-                painter.end();
-
-                emit imageChanged(d->data.image);
+                d->drawTile(tile, QnGeometry::aspectRatio(loader->sizeHint()),
+                    scaledCellRect, rotation);
             });
 
         d->data.loaders.push_back(loader);
         ++d->data.numLoading;
 
         loader->loadAsync();
-
-        d->data.status = Qn::ThumbnailStatus::Loading;
-        emit statusChanged(d->data.status);
     }
+
+    if (d->data.numLoading)
+        return;
+
+    // If there's nothing to load.
+    d->data.status = Qn::ThumbnailStatus::Loaded;
+    emit statusChanged(d->data.status);
 }
 
 } // namespace desktop
