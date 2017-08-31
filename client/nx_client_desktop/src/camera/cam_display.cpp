@@ -463,7 +463,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (!m_forceMtDecoding)
     {
         bool canSwitchToMT = isFullScreen()
-            || qnClientModule->radassController()->counsumerCount() == 1;
+            || qnClientModule->radassController()->consumerCount() == 1;
 
         bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
         if (canSwitchToMT && shouldSwitchToMT)
