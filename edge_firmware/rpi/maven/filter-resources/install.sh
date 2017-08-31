@@ -1,23 +1,38 @@
 #!/bin/bash
-set -x #< Log each command.
-set -u #< Prohibit undefined variables.
 set -e #< Exit on any error.
+set -u #< Prohibit undefined variables.
+
+configure()
+{
+    BOX="@box@"
+    FAILURE_FLAG="/var/log/vms-upgrade-failed.flag"
+    CUSTOMIZATION="@deb.customization.company.name@"
+    INSTALL_PATH="opt/$CUSTOMIZATION"
+    MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
+    DISTRIB="@artifact.name.server@"
+    STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
+    TAR_FILE="./$DISTRIB.tar.gz"
+}
+
+checkRunningUnderRoot()
+{
+    if [ "$(id -u)" != "0" ]; then
+        echo "ERROR: $0 should be run under root"
+        exit 1
+    fi
+}
 
 # Redirect all output of this script to the log file.
-LOG_FILE="/var/log/bpi-upgrade.log"
-exec 1<&- #< Close stdout fd.
-exec 2<&- #< Close stderr fd.
-exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
-exec 2>&1 #< Redirect stderr to stdout.
+redirectOutput() # log_file
+{
+    LOG_FILE="$1"
+    echo "$0: All further output goes to $LOG_FILE"
 
-BOX="@box@"
-FAILURE_FLAG="/var/log/bpi-upgrade-failed.flag"
-CUSTOMIZATION="@deb.customization.company.name@"
-INSTALL_PATH="opt/$CUSTOMIZATION"
-MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
-DISTRIB="@artifact.name.server@"
-STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
-TAR_FILE="./$DISTRIB.tar.gz"
+    exec 1<&- #< Close stdout fd.
+    exec 2<&- #< Close stderr fd.
+    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
+    exec 2>&1 #< Redirect stderr to stdout.
+}
 
 # Call the specified command after mounting dev, setting MNT to the mount point.
 # ATTENTION: The command is called without "exit-on-error".
@@ -120,12 +135,12 @@ getPidWhichUsesPort() # port
     netstat -tpln |grep ":$PORT\s" |head -n 1 |awk '{print $NF}' |grep -o '[0-9]\+'
 }
 
-# Output nothing if the specified pid does not belong to a mediaserver; otherwise, output the pid.
+# Output nothing if pid does not belong to a mediaserver or is empty; otherwise, output the pid.
 checkMediaserverPid() # pid
 {
     local PID="$1"
 
-    if [ ! -z $(ps "$PID" |grep "/$MEDIASERVER_PATH") ]; then
+    if [ ! -z "$PID" ] && [ ! -z $(ps "$PID" |grep "/$MEDIASERVER_PATH") ]; then
         echo "$PID"
     fi
 }
@@ -142,29 +157,36 @@ restartMediaserver()
 
         local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$MEDIASERVER_PORT")
         local MEDIASERVER_PID=$(checkMediaserverPid "$PID_WHICH_USES_PORT")
+
         if [ ! -z "$MEDIASERVER_PID" ]; then
             echo "Upgraded mediaserver is up and running with pid $MEDIASERVER_PID at port $MEDIASERVER_PORT"
             break
         fi
 
-        echo "Another process (pid $PID_WHICH_USES_PORT) uses port $MEDIASERVER_PORT:" \
-            "killing it and restarting $CUSTOMIZATION-mediaserver"
+        if [ ! -z "$PID_WHICH_USES_PORT" ]; then
+            echo "Another process (pid $PID_WHICH_USES_PORT) uses port $MEDIASERVER_PORT:" \
+                "killing it and restarting $CUSTOMIZATION-mediaserver"
 
-        # Just in case - the mediaserver should not be running by now.
-        "$STARTUP_SCRIPT" stop || true
+            # Just in case - the mediaserver should not be running by now.
+            "$STARTUP_SCRIPT" stop || true
 
-        kill -9 "$PID_WHICH_USES_PORT" || true
+            kill -9 "$PID_WHICH_USES_PORT" || true
+        fi
     done
 }
 
 main()
 {
+    redirectOutput "/var/log/vms-upgrade.log"
+    set -x #< Log each command.
+    checkRunningUnderRoot
+    configure
     rm -rf "$FAILURE_FLAG" || true
 
-    echo "Starting VMS upgrade..."
-
+    echo "Stopping mediaserver..."
     "$STARTUP_SCRIPT" stop || true # If not stopped, try upgrading as is.
 
+    echo "Starting VMS upgrade..."
     upgradeVms
     echo "VMS upgrade succeeded"
 
