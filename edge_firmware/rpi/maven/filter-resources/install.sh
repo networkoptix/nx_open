@@ -98,9 +98,8 @@ upgradeVms()
     rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin"/core* || true
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
-
-    CIFSUTILS=$(dpkg --get-selections | grep -v deinstall | grep cifs-utils | awk '{print $1}')
-    if [ -z "$CIFSUTILS" ]; then
+    local CIFS_UTILS=$(dpkg --get-selections |grep -v deinstall |grep cifs-utils |awk '{print $1}')
+    if [ -z "$CIFS_UTILS" ]; then
         dpkg -i cifs-utils/*.deb
     fi
 
@@ -140,7 +139,7 @@ checkMediaserverPid() # pid
 {
     local PID="$1"
 
-    if [ ! -z "$PID" ] && [ ! -z $(ps "$PID" |grep "/$MEDIASERVER_PATH") ]; then
+    if [ ! -z "$PID" ] && [ ! -z "$(ps "$PID" |grep "/$MEDIASERVER_PATH")" ]; then
         echo "$PID"
     fi
 }
