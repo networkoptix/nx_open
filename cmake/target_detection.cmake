@@ -49,7 +49,7 @@ function(detect_target)
         elseif(targetDevice STREQUAL "edge1")
             set(detected_target "isd_s2")
         else()
-            set(detected_target "")
+            set(detected_target ${targetDevice})
         endif()
 
         if(targetDevice MATCHES "android")
