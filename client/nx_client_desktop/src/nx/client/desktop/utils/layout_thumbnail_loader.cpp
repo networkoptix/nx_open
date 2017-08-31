@@ -125,10 +125,15 @@ struct LayoutThumbnailLoader::Private
         emit q->statusChanged(data.status);
     }
 
-    void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect, qreal rotation)
+    void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect,
+        qreal rotation, const QRectF& zoomRect)
     {
         if (tile.isNull())
             return;
+
+        const auto sourceRect = zoomRect.isNull()
+            ? tile.rect()
+            : QnGeometry::subRect(tile.rect(), zoomRect).toRect();
 
         if (qFuzzyIsNull(rotation))
         {
@@ -137,7 +142,7 @@ struct LayoutThumbnailLoader::Private
 
             QPainter painter(&data.image);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
-            painter.drawImage(targetRect, tile);
+            painter.drawImage(targetRect, tile, sourceRect);
         }
         else
         {
@@ -150,7 +155,7 @@ struct LayoutThumbnailLoader::Private
             painter.translate(cellRect.center());
             painter.rotate(rotation);
             painter.translate(-cellRect.center());
-            painter.drawImage(targetRect, tile);
+            painter.drawImage(targetRect, tile, sourceRect);
         }
 
         emit q->imageChanged(data.image);
@@ -311,18 +316,23 @@ void LayoutThumbnailLoader::doLoadAsync()
             (cellRect.width() - spacing) * xscale,
             (cellRect.height() - spacing) * yscale);
 
-        const auto rotation = data.rotation;
-        const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
-
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
         {
+            const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
             d->updateTileStatus(Qn::ThumbnailStatus::NoData, scaledCellAr, scaledCellRect, 0);
             continue;
         }
 
+        const auto rotation = data.rotation;
+        const auto zoomRect = data.zoomRect;
+
+        QSize thumbnailSize(0, scaledCellRect.height());
+        if (!zoomRect.isEmpty())
+            thumbnailSize /= zoomRect.height();
+
         QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
-            camera, d->msecSinceEpoch, 0, QSize(0, scaledCellRect.height()), d->format));
+            camera, d->msecSinceEpoch, 0, thumbnailSize, d->format));
 
         connect(loader.data(), &QnImageProvider::statusChanged,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
@@ -332,10 +342,10 @@ void LayoutThumbnailLoader::doLoadAsync()
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged,
-            [this, loader, rotation, scaledCellRect](const QImage& tile)
+            [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
             {
                 d->drawTile(tile, QnGeometry::aspectRatio(loader->sizeHint()),
-                    scaledCellRect, rotation);
+                    scaledCellRect, rotation, zoomRect);
             });
 
         d->data.loaders.push_back(loader);
