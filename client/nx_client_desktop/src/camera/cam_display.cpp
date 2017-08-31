@@ -1984,6 +1984,11 @@ void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio)
         m_display[i]->setOverridenAspectRatio(aspectRatio);
 }
 
+QnMediaResourcePtr QnCamDisplay::resource() const
+{
+    return m_resource;
+}
+
 qint64 QnCamDisplay::initialLiveBufferMkSecs()
 {
     return qMin(qnSettings->initialLiveBufferMSecs() * 1000ll, maximumLiveBufferMkSecs());

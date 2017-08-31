@@ -29,6 +29,9 @@ public:
     RadassMode mode(const QnLayoutItemIndexList& items) const;
     void setMode(const QnLayoutItemIndexList& items, RadassMode value);
 
+signals:
+    void modeChanged(const QnLayoutItemIndex& item, RadassMode value);
+
 private:
     struct Private;
     QScopedPointer<Private> d;

@@ -1199,11 +1199,12 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
                 return false;
 
             auto item = layout->getItems().value(index.uuid());
-            const auto resource = layout->resourcePool()->getResourceByDescriptor(item.resource);
-            if (!resource)
+            if (!item.zoomRect.isNull())
                 return false;
 
-            return resource->hasFlags(Qn::server_live_cam);
+            const auto camera = layout->resourcePool()->getResourceByDescriptor(item.resource)
+                .dynamicCast<QnVirtualCameraResource>();
+            return camera && camera->hasDualStreaming();
         };
 
     const auto items = parameters.layoutItems();

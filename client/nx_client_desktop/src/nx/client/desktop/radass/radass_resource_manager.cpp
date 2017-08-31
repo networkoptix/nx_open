@@ -94,7 +94,12 @@ void RadassResourceManager::setMode(const QnLayoutItemIndexList& items, RadassMo
         return;
 
     for (const auto& item: items)
+    {
+        auto oldMode = d->mode(item);
         d->setMode(item, value);
+        if (oldMode != value)
+            emit modeChanged(item, value);
+    }
 }
 
 } // namespace desktop

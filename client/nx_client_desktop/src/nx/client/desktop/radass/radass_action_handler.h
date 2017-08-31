@@ -1,6 +1,10 @@
 #pragma once
 
+#include <nx/client/desktop/radass/radass_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
+
+class QnLayoutItemIndex;
 
 namespace nx {
 namespace client {
@@ -17,6 +21,8 @@ public:
 
 private:
     void at_radassAction_triggered();
+    void handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode);
+    void handleCurrentLayoutChanged();
 
 private:
     struct Private;

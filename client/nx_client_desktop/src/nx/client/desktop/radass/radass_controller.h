@@ -19,8 +19,8 @@ public:
     void unregisterConsumer(QnCamDisplay* display);
     int consumerCount() const;
 
-//     void setMode(RadassMode mode);
-//     RadassMode getMode() const;
+    RadassMode mode(QnCamDisplay* display) const;
+    void setMode(QnCamDisplay* display, RadassMode mode);
 
 public slots:
     /** Inform controller that not enough data or CPU for stream */
@@ -31,10 +31,6 @@ public slots:
 
 private:
     void onTimer();
-
-private:
-    /** try LQ->HQ once more */
-    void addHQTry();
 
 private:
     struct Private;

@@ -1196,8 +1196,11 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
                 }
             }
+
+            // Zoom windows must not be controlled by radass.
+            if (!mediaWidget->isZoomWindow())
+                qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
         }
-        qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
