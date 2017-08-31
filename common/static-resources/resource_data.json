@@ -642,7 +642,8 @@
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
                 "H264|N51820L",
                 "onvif|v047-1",
-                "iPIXA|*"
+                "iPIXA|*",
+                "Rhodium|RBU-PZ-4461-EB"
             ],
             "onvifPtzPresetsEnabled": true
         },
