@@ -174,11 +174,13 @@ void QnDirectSystemsFinder::updateServerInternal(
     if (!serverIsInKnownSystem)
         return;
 
-    updatePrimaryAddress(module);
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(module);
     if (!changes.testFlag(QnServerField::CloudId))
+    {
+        updatePrimaryAddress(module);
         return;
+    }
 
     NX_LOGX(lm("Update server %1").arg(module.id), cl_logDEBUG2);
 
