@@ -174,6 +174,7 @@ void QnDirectSystemsFinder::updateServerInternal(
     if (!serverIsInKnownSystem)
         return;
 
+    updatePrimaryAddress(module);
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(module);
     if (!changes.testFlag(QnServerField::CloudId))
