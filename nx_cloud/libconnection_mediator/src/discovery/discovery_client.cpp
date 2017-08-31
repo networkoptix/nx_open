@@ -6,6 +6,15 @@ namespace nx {
 namespace cloud {
 namespace discovery {
 
+bool operator==(const BasicInstanceInformation& left, const BasicInstanceInformation& right)
+{
+    return left.type == right.type
+        && left.id == right.id
+        && left.apiUrl == right.apiUrl;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 ModuleFinder::ModuleFinder(const QUrl& baseUrl):
     m_baseUrl(baseUrl)
 {
