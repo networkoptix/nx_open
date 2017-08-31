@@ -71,9 +71,9 @@ bool StreamingChunk::tryRead(
     const quint64 dataOffsetAtTheEndOfTheBuffer =
         m_dataOffsetAtTheFrontOfTheBuffer + m_data.size();
 
-    if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer)  //< Whole data has been read.
-        return m_modificationState != State::opened;    //< If chunk not opened, signalling end-of-data.
-                                                        //< Else, expecting more data to arrive to chunk.
+    if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer) //< Whole data has been read.
+        return m_modificationState != State::opened; //< If chunk not opened, signalling end-of-data.
+                                                     //< Else, expecting more data to arrive to chunk.
 
     Q_ASSERT(ctx->m_currentOffset >= m_dataOffsetAtTheFrontOfTheBuffer);
     const quint64 bytesToCopy = std::min<quint64>(
@@ -201,9 +201,9 @@ bool StreamingChunk::waitForChunkReadyOrInternalBufferFilled()
     for (;;)
     {
         if (m_modificationState >= State::closed)
-            return true;    //< Whole chunk has been generated.
+            return true; //< Whole chunk has been generated.
         if ((std::size_t)m_data.size() >= m_maxInternalBufferSize)
-            return false;   //< No space in internal buffer.
+            return false; //< No space in internal buffer.
         m_cond.wait(lk.mutex());
     }
 }
@@ -227,7 +227,7 @@ bool StreamingChunkInputStream::tryRead(
     nx::Buffer* const dataBuffer,
     std::size_t maxBytesToRead)
 {
-    if ((!m_range) ||     //< No range specified.
+    if ((!m_range) || //< No range specified.
         ((m_range.get().rangeSpec.start == 0)
             && (m_range.get().rangeLength() == m_chunk->sizeInBytes()))) //< Full entity requested.
     {

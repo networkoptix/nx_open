@@ -525,7 +525,9 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
         const QnSecurityCamResource* camRes = dynamic_cast<const QnSecurityCamResource*>(res.data());
         bool isNoRec = scheduleTask.getRecordingType() == Qn::RT_Never;
         bool usedInRecordAction = camRes && camRes->isRecordingEventAttached();
-        int prebuffer = usedInRecordAction && isNoRec ? 1 : 0; // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
+
+        // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
+        int prebuffer = usedInRecordAction && isNoRec && !camRes->isIOModule() ? 1 : 0;
         setPrebufferingUsec(prebuffer);
     }
     else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.getRecordingType())) {

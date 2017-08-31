@@ -8,16 +8,16 @@
 
 namespace test {
 
+static const int kMaxChunkBufferSize = 16 * 1024;
+
 class StreamingChunkInputStream:
     public ::testing::Test
 {
-    static const std::size_t kMaxChunkBufferSize = 16*1024;
-
 protected:
     void givenChunkInputStream()
     {
         givenChunk();
-        
+
         m_chunkInputStream = std::make_unique<::StreamingChunkInputStream>(m_chunk.get());
     }
 

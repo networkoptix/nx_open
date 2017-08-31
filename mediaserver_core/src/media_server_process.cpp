@@ -2676,22 +2676,13 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-
-    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-        [this](qint64 newTime)
-        {
-            QnSyncTime::instance()->updateTime(newTime);
-
-            using namespace ec2;
-            QnTransaction<ApiPeerSyncTimeData> tran(
-                ApiCommand::broadcastPeerSyncTime,
-                commonModule()->moduleGUID());
-            tran.params.syncTimeMs = newTime;
-            if (auto connection = commonModule()->ec2Connection())
-                connection->messageBus()->sendTransaction(tran);
-        }
-        );
-
+    
+    connect(
+        ec2Connection->getTimeNotificationManager().get(), 
+        &ec2::AbstractTimeNotificationManager::timeChanged,
+        this, 
+        &MediaServerProcess::at_timeChanged, 
+        Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     CommonPluginContainer pluginContainer;
@@ -3228,6 +3219,19 @@ void MediaServerProcess::at_appStarted()
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
 };
+
+void MediaServerProcess::at_timeChanged(qint64 newTime)
+{
+    QnSyncTime::instance()->updateTime(newTime);
+
+    using namespace ec2;
+    QnTransaction<ApiPeerSyncTimeData> tran(
+        ApiCommand::broadcastPeerSyncTime,
+        commonModule()->moduleGUID());
+    tran.params.syncTimeMs = newTime;
+    if (auto connection = commonModule()->ec2Connection())
+        connection->messageBus()->sendTransaction(tran);
+}
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
