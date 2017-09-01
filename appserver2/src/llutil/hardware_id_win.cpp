@@ -436,10 +436,9 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
                 hardwareIdMap[mac] = hardwareId + mac;
             }
         }
-    } else
-    {
-        hardwareIdMap[kEmptyMac] = hardwareId;
     }
+
+    hardwareIdMap[kEmptyMac] = hardwareId;
 }
 
 } // namespace {}

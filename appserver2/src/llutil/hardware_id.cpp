@@ -39,6 +39,11 @@ namespace LLUtil {
         std::array<bool, 2> guidCompatibilities = { false, true };
 
         QStringList macs = version >= 4 ? getMacAddressList(hardwareInfo.nics) : QStringList("");
+
+        // Workaround issue when in 2.6 hardwareid sometimes calculated without mac address
+        if (version >= 4)
+            macs << kEmptyMac;
+
         for (QString mac : macs)
         {
             QStringList hardwareIds;
@@ -136,7 +141,7 @@ namespace LLUtil {
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                NX_LOG(QnLog::HWID_LOG, "No network cards detected. HardwareID can't be calculated.", cl_logERROR);
+                NX_LOG(QnLog::HWID_LOG, "No network cards detected.", cl_logERROR);
             }
 
             g_storedMac = saveMac(macs, settings);
