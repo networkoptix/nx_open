@@ -677,8 +677,6 @@ void ActionHandler::at_openInLayoutAction_triggered()
             })
         : QnRaiiGuardPtr();
 
-    QCursor::setPos(QPoint(0, 0));
-
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
