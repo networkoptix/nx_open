@@ -33,7 +33,7 @@ QString getCacheDirectory()
     return directory.absoluteFilePath(kCacheDirectoryName);
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace client {

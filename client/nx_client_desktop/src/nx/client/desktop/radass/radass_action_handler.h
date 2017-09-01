@@ -23,6 +23,7 @@ private:
     void at_radassAction_triggered();
     void handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode);
     void handleCurrentLayoutChanged();
+    void handleLocalSystemIdChanged();
 
 private:
     struct Private;

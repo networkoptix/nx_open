@@ -1,6 +1,11 @@
 #include "radass_action_handler.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
+
 #include <QtWidgets/QAction>
+
+#include <api/global_settings.h>
 
 #include <client/client_module.h>
 
@@ -24,6 +29,18 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+namespace {
+
+static const QString kCacheDirectoryName = lit("radass");
+
+QString getCacheDirectory()
+{
+    auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    return directory.absoluteFilePath(kCacheDirectoryName);
+}
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -44,6 +61,7 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     d->camerasWatcher.reset(new RadassCamerasWatcher(d->controller, resourcePool()));
     // Manager must be available from actions factory.
     d->manager = context()->instance<RadassResourceManager>();
+    d->manager->setCacheDirectory(getCacheDirectory());
 
     connect(action(ui::action::RadassAction), &QAction::triggered, this,
         &RadassActionHandler::at_radassAction_triggered);
@@ -53,6 +71,11 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &RadassActionHandler::handleCurrentLayoutChanged);
+
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
+        &RadassActionHandler::handleLocalSystemIdChanged);
+
+    handleLocalSystemIdChanged();
 }
 
 RadassActionHandler::~RadassActionHandler()
@@ -74,6 +97,9 @@ void RadassActionHandler::at_radassAction_triggered()
         d->manager->setMode(workbench()->currentLayout()->resource(), mode);
     else
         d->manager->setMode(layoutItems, mode);
+
+    if (!globalSettings()->localSystemId().isNull())
+        d->manager->saveData(globalSettings()->localSystemId(), resourcePool());
 }
 
 void RadassActionHandler::handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode)
@@ -106,7 +132,7 @@ void RadassActionHandler::handleCurrentLayoutChanged()
     {
         QnLayoutItemIndex index(layout, item->uuid());
         if (!isRadassSupported(index))
-            continue;;
+            continue;
 
         auto widget = display()->widget(index.uuid());
         if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
@@ -115,6 +141,12 @@ void RadassActionHandler::handleCurrentLayoutChanged()
             d->controller->setMode(camDisplay, d->manager->mode(QnLayoutItemIndexList() << index));
         }
     }
+}
+
+void RadassActionHandler::handleLocalSystemIdChanged()
+{
+    d->manager->switchLocalSystemId(globalSettings()->localSystemId());
+    handleCurrentLayoutChanged();
 }
 
 } // namespace desktop
