@@ -63,7 +63,7 @@ bool isSupportedDisplay(QnCamDisplay* display)
         return false;
 
     auto cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
-    return cam && cam->hasDualStreaming();
+    return cam && cam->hasDualStreaming2();
 }
 
 bool isSmallItem(QnCamDisplay* display)
