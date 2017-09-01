@@ -119,6 +119,7 @@ private slots:
     void at_saveVideowallMatrixAction_triggered();
     void at_loadVideowallMatrixAction_triggered();
     void at_deleteVideowallMatrixAction_triggered();
+    void at_radassAction_triggered();
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);

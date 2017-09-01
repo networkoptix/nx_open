@@ -60,6 +60,7 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/radass/radass_types.h>
 #include <ui/dialogs/layout_name_dialog.h> // TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
@@ -109,6 +110,7 @@
 //#define RECEIVER_DEBUG
 
 using nx::client::desktop::utils::UnityLauncherWorkaround;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -126,6 +128,7 @@ PARAM_KEY(speed)
 PARAM_KEY(geometry)
 PARAM_KEY(zoomRect)
 PARAM_KEY(checkedButtons)
+PARAM_KEY(items)
 
 #if defined(SENDER_DEBUG) || defined(RECEIVER_DEBUG)
 static QByteArray debugRole(int role)
@@ -1075,9 +1078,20 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case QnVideoWallControlMessage::RadassModeChanged:
         {
-//             Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
-//             if (qnRedAssController)
-//                 qnRedAssController->setMode(resolutionMode);
+            int mode = message[valueKey].toInt();
+            const auto items = QJson::deserialized<std::vector<QnUuid>>(message[itemsKey].toUtf8());
+
+            const auto layout = workbench()->currentLayout()->resource();
+            if (!layout)
+                return;
+
+            QnLayoutItemIndexList layoutItems;
+            for (const auto& id: items)
+                layoutItems.push_back(QnLayoutItemIndex(layout, id));
+
+            ui::action::Parameters parameters(layoutItems);
+            parameters.setArgument(Qn::ResolutionModeRole, mode);
+            menu()->trigger(ui::action::RadassAction, parameters);
             break;
         }
         default:
@@ -1171,9 +1185,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active)
     {
-//         connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::AutoResolution); });
-//         connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::LowResolution); });
-//         connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::HighResolution); });
+        connect(action(action::RadassAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_radassAction_triggered);
 
         connect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         connect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1198,9 +1211,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     }
     else
     {
-//         disconnect(action(action::RadassAutoAction), NULL, this, NULL);
-//         disconnect(action(action::RadassLowAction), NULL, this, NULL);
-//         disconnect(action(action::RadassHighAction), NULL, this, NULL);
+        action(action::RadassAction)->disconnect(this);
 
         disconnect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1244,16 +1255,6 @@ void QnWorkbenchVideoWallHandler::updateMode()
     }
     setControlMode(control);
 }
-
-// void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resolutionMode)
-// {
-//     if (!m_controlMode.active)
-//         return;
-//
-//     QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
-//     message[valueKey] = QString::number(resolutionMode);
-//     sendMessage(message);
-// }
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 {
@@ -2165,6 +2166,25 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     }
 
     saveVideowalls(videoWalls);
+}
+
+void QnWorkbenchVideoWallHandler::at_radassAction_triggered()
+{
+    if (!m_controlMode.active)
+        return;
+
+    const auto parameters = menu()->currentParameters(sender());
+
+    const auto mode = parameters.argument(Qn::ResolutionModeRole).toInt();
+
+    std::vector<QnUuid> items;
+    for (const auto& item: parameters.layoutItems())
+        items.push_back(item.uuid());
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
+    message[valueKey] = QString::number(mode);
+    message[itemsKey] = QString::fromUtf8(QJson::serialized(items));
+    sendMessage(message);
 }
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource)
