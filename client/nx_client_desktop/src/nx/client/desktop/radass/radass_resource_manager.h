@@ -6,6 +6,8 @@
 
 #include <nx/client/desktop/radass/radass_fwd.h>
 
+#include <nx/utils/uuid.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -28,6 +30,15 @@ public:
 
     RadassMode mode(const QnLayoutItemIndexList& items) const;
     void setMode(const QnLayoutItemIndexList& items, RadassMode value);
+
+    QString cacheDirectory() const;
+    void setCacheDirectory(const QString& value);
+
+    /** Load stored settings for the given system, drop other. */
+    void switchLocalSystemId(const QnUuid& localSystemId);
+
+    /** Save items for the local system, cleanup non-existing. */
+    void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool);
 
 signals:
     void modeChanged(const QnLayoutItemIndex& item, RadassMode value);

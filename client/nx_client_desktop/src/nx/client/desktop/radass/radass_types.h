@@ -4,6 +4,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+// Please note: enum is numeric-serialized, reordering is forbidden.
 enum class RadassMode
 {
     Auto,

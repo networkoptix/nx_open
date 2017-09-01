@@ -1,10 +1,16 @@
 #include "radass_resource_manager.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/layout_item_index.h>
 
 #include <nx/client/desktop/radass/radass_types.h>
 #include <nx/client/desktop/radass/radass_support.h>
+
+#include <nx/fusion/model_functions.h>
 
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/uuid.h>
@@ -12,6 +18,8 @@
 namespace nx {
 namespace client {
 namespace desktop {
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RadassMode)
 
 struct RadassResourceManager::Private
 {
@@ -28,6 +36,50 @@ struct RadassResourceManager::Private
         else
             m_modes[index.uuid()] = value;
     }
+
+    void loadFromFile(const QString& filename)
+    {
+        m_modes.clear();
+
+        QDir dir(cacheDirectory);
+        if (!dir.exists())
+            return;
+
+        QFile data(dir.absoluteFilePath(filename));
+        if (!data.open(QIODevice::ReadOnly))
+            return;
+
+        m_modes = QnUbjson::deserialized<QHash<QnUuid, RadassMode>>(data.readAll());
+        data.close();
+    }
+
+    void filter(QnResourcePool* resourcePool)
+    {
+        QSet<QnUuid> existingItems;
+        for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
+            existingItems.unite(layout->getItems().keys().toSet());
+
+        QSet<QnUuid> storedItems = m_modes.keys().toSet();
+
+        QSet<QnUuid> removedItems = storedItems - existingItems;
+        for (const auto& item: removedItems)
+            m_modes.remove(item);
+    }
+
+    void saveToFile(const QString& filename)
+    {
+        QDir dir(cacheDirectory);
+        dir.mkpath(cacheDirectory);
+
+        QFile data(dir.absoluteFilePath(filename));
+        if (!data.open(QIODevice::WriteOnly))
+            return;
+
+        data.write(QnUbjson::serialized(m_modes));
+        data.close();
+    }
+
+    QString cacheDirectory;
 
 private:
     // Mode by layout item uuid.
@@ -111,6 +163,27 @@ void RadassResourceManager::setMode(const QnLayoutItemIndexList& items, RadassMo
         if (oldMode != value)
             emit modeChanged(item, value);
     }
+}
+
+QString RadassResourceManager::cacheDirectory() const
+{
+    return d->cacheDirectory;
+}
+
+void RadassResourceManager::setCacheDirectory(const QString& value)
+{
+    d->cacheDirectory = value;
+}
+
+void RadassResourceManager::switchLocalSystemId(const QnUuid& localSystemId)
+{
+    d->loadFromFile(localSystemId.toString());
+}
+
+void RadassResourceManager::saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool)
+{
+    d->filter(resourcePool);
+    d->saveToFile(localSystemId.toString());
 }
 
 } // namespace desktop

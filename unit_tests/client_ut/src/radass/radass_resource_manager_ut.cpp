@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
+
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
@@ -17,10 +20,24 @@
 #include <nx/client/desktop/radass/radass_types.h>
 #include <nx/client/desktop/radass/radass_resource_manager.h>
 
+namespace {
+
+static const QString kCacheDirectoryName("radass_manager_cache");
+
+static const QnUuid kSystemId1("{A85E63C4-D2F2-4CF4-BA6C-C7480ADCDD7F}");
+static const QnUuid kSystemId2("{B647474A-8354-4E7F-B98E-D5718B695F55}");
+
+QString getCacheDirectory()
+{
+    auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+    return directory.absoluteFilePath(kCacheDirectoryName);
+}
+
+}
+
 namespace nx {
 namespace client {
 namespace desktop {
-
 
 void PrintTo(const RadassMode& val, ::std::ostream* os)
 {
@@ -42,9 +59,12 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
+        QDir(getCacheDirectory()).removeRecursively();
+
         m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnCommonModule(false, core::access::Mode::direct));
         m_manager.reset(new RadassResourceManager());
+        m_manager->setCacheDirectory(getCacheDirectory());
         m_layout.reset(new QnLayoutResource());
         m_layout->setId(QnUuid::createUuid());
         resourcePool()->addResource(m_layout);
@@ -57,6 +77,8 @@ protected:
         m_manager.reset();
         m_module.reset();
         m_staticCommon.reset();
+
+        QDir(getCacheDirectory()).removeRecursively();
     }
 
     QnLayoutItemIndex addCamera(bool hasDualStreaming = true)
@@ -273,6 +295,56 @@ TEST_F(RadassResourceManagerTest, addUnsupportedCameraToPresetLayout)
     addZoomWindow();
     ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
 }
+
+TEST_F(RadassResourceManagerTest, checkCacheDirectory)
+{
+    ASSERT_EQ(getCacheDirectory(), manager()->cacheDirectory());
+}
+
+TEST_F(RadassResourceManagerTest, switchLocalId)
+{
+    addCamera();
+    manager()->setMode(layout(), RadassMode::High);
+    manager()->switchLocalSystemId(kSystemId1);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+}
+
+TEST_F(RadassResourceManagerTest, saveAndLoadPersistentData)
+{
+    manager()->switchLocalSystemId(kSystemId1);
+    addCamera();
+    manager()->setMode(layout(), RadassMode::High);
+    manager()->saveData(kSystemId1, resourcePool());
+    manager()->switchLocalSystemId(kSystemId2);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+    manager()->switchLocalSystemId(kSystemId1);
+    ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
+}
+
+TEST_F(RadassResourceManagerTest, cleanupNonExistentDataIfRemoveLayout)
+{
+    manager()->switchLocalSystemId(kSystemId1);
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    manager()->setMode(items, RadassMode::High);
+    resourcePool()->removeResource(layout());
+    manager()->saveData(kSystemId1, resourcePool());
+
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, cleanupNonExistentDataIfRemoveItem)
+{
+    manager()->switchLocalSystemId(kSystemId1);
+    QnLayoutItemIndexList items;
+    items << addCamera();
+    manager()->setMode(items, RadassMode::High);
+    layout()->removeItem(items.first().uuid());
+    manager()->saveData(kSystemId1, resourcePool());
+
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
 
 } // namespace desktop
 } // namespace client
