@@ -79,6 +79,8 @@ public:
         boost::optional<std::chrono::seconds> disconnectedPeerTimeout = boost::none);
     ~BasicTestFixture();
 
+    SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
+
 protected:
     virtual void SetUp() override;
 
