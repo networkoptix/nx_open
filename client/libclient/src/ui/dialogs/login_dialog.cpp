@@ -722,6 +722,9 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
+    using namespace nx::client::core::helpers;
+
+    removeCredentials(connection.localId, connection.url.userName());
     connections.removeOne(connection.name);
     qnSettings->setCustomConnections(connections);
     qnSettings->save();
