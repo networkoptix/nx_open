@@ -39,7 +39,8 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
     {
         const bool isTranscoderSuitable = 
             it->first.live() == key.live() &&
-            it->first.mediaStreamParamsEqualTo(key);
+            it->first.mediaStreamParamsEqualTo(key) &&
+            it->first.streamingSessionId() == key.streamingSessionId();
         const bool mediaDataProviderSuitable = 
             it->first.live() == key.live() &&
             it->second.first->mediaDataProvider->currentPos() == key.startTimestamp();

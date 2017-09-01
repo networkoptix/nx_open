@@ -42,6 +42,7 @@ protected:
     CLSimpleTFTPClient* m_tftp_client;
 
     int m_motionData;
+    int m_channelCount;
 };
 
 #endif
