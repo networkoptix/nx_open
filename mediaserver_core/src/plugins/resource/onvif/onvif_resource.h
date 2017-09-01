@@ -314,9 +314,9 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-private:
     void setMaxFps(int f);
-
+    void setPrimaryResolution(const QSize& value);
+private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);

@@ -100,6 +100,7 @@ copyBuildLibs()
         libnx_fusion
         libnx_kit
         libnx_network
+        libnx_speech_synthesizer
         libnx_utils
 
         # ffmpeg

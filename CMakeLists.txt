@@ -18,12 +18,16 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
+if(targetDevice STREQUAL "none")
+    set(targetDevice "")
+endif()
+
 # Early loading rdep to download a toolchain if needed.
 include(build_utils/cmake/find_python.cmake)
 include(build_utils/cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice AND NOT targetDevice STREQUAL "none" AND NOT targetDevice STREQUAL "ios")
+if(targetDevice AND NOT targetDevice STREQUAL "ios")
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
     include(cmake/sync_toolchain.cmake)
 endif()
