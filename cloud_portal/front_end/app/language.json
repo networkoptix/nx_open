@@ -220,7 +220,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm": "Send",
+    "sendConfirm": "Resend activation link",
     "resetPassword": "Reset Password",
     "setNewPassword": "Save password",
     "setNewPasswordLabel": "New password"

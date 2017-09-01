@@ -27,5 +27,7 @@ angular.module('cloudApp')
             setTimeout(function(){
                 document.location.reload();
             });
+        },function(){
+            $location.path('/activate');
         });
     }]);
