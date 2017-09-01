@@ -185,7 +185,7 @@ angular.module('nxCommon')
                 function goToLive(force){
                     if(!scope.positionProvider.playing){
                         scope.playHandler(true);
-                        timeout(function(){
+                        $timeout(function(){
                             goToLive(force);
                         });
                         return;
