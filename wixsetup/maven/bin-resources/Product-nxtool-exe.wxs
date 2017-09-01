@@ -8,21 +8,21 @@
             Name="$(var.productName) Server Tool"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="nxtool.ico"
+                        IconSourceFile="$(var.CustomizationDir)/icons/windows/favicon.ico"
             UpgradeCode="$(var.nxtoolBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="License.html" /> 
-            <Payload SourceFile="installer_bg.png" /> 
-            <Payload SourceFile="logo-102x102.png" />
-            <Payload SourceFile="logo-64x64.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
                 SuppressRepair="yes"
-                LicenseUrl="License.html" 
+                LicenseUrl="License.html"
                 ShowFilesInUse="yes"
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
         </BootstrapperApplicationRef>
