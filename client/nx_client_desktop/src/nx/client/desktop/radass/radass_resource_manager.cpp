@@ -4,6 +4,7 @@
 #include <core/resource/layout_item_index.h>
 
 #include <nx/client/desktop/radass/radass_types.h>
+#include <nx/client/desktop/radass/radass_support.h>
 
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/uuid.h>
@@ -73,8 +74,15 @@ void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMod
 
 RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
 {
+    QnLayoutItemIndexList validItems;
+    for (const auto& item: items)
+    {
+        if (isRadassSupported(item))
+            validItems.push_back(item);
+    }
+
     auto value = RadassMode::Auto;
-    if (nx::utils::algorithm::same(items.cbegin(), items.cend(),
+    if (nx::utils::algorithm::same(validItems.cbegin(), validItems.cend(),
         [this](const QnLayoutItemIndex& index)
         {
             return d->mode(index);
@@ -95,6 +103,9 @@ void RadassResourceManager::setMode(const QnLayoutItemIndexList& items, RadassMo
 
     for (const auto& item: items)
     {
+        if (!isRadassSupported(item))
+            continue;
+
         auto oldMode = d->mode(item);
         d->setMode(item, value);
         if (oldMode != value)

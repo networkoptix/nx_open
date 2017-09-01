@@ -5,6 +5,8 @@
 
 #include <client_core/client_core_module.h>
 
+#include <test_support/resource/camera_resource_stub.h>
+
 #include <nx/core/access/access_types.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -57,12 +59,23 @@ protected:
         m_staticCommon.reset();
     }
 
-    QnLayoutItemIndex addCamera()
+    QnLayoutItemIndex addCamera(bool hasDualStreaming = true)
     {
+        auto camera = new CameraResourceStub();
+        resourcePool()->addResource(QnResourcePtr(camera));
+        camera->setHasDualStreaming(hasDualStreaming);
+
         QnLayoutItemData item;
         item.uuid = QnUuid::createUuid();
+        item.resource.id = camera->getId();
+
         m_layout->addItem(item);
         return QnLayoutItemIndex(m_layout, item.uuid);
+    }
+
+    QnLayoutItemIndex addUnsupportedCamera()
+    {
+        return addCamera(false);
     }
 
     QnCommonModule* commonModule() const { return m_module.data(); }
@@ -126,6 +139,14 @@ TEST_F(RadassResourceManagerTest, setModeToCamera)
     ASSERT_EQ(RadassMode::High, manager()->mode(items));
 }
 
+TEST_F(RadassResourceManagerTest, setModeToUnsupportedCamera)
+{
+    QnLayoutItemIndexList items;
+    items << addUnsupportedCamera();
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
 TEST_F(RadassResourceManagerTest, setModeToCameras)
 {
     QnLayoutItemIndexList items;
@@ -134,12 +155,37 @@ TEST_F(RadassResourceManagerTest, setModeToCameras)
     ASSERT_EQ(RadassMode::High, manager()->mode(items));
 }
 
+TEST_F(RadassResourceManagerTest, setModeToMixedCameras)
+{
+    QnLayoutItemIndexList items;
+    items << addCamera() << addCamera();
+
+    auto mixedItems = items;
+    mixedItems << addUnsupportedCamera();
+
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::High, manager()->mode(mixedItems));
+
+    manager()->setMode(items, RadassMode::Low);
+    ASSERT_EQ(RadassMode::Low, manager()->mode(mixedItems));
+}
+
 TEST_F(RadassResourceManagerTest, setModeToLayoutCheckCameras)
 {
     QnLayoutItemIndexList items;
     items << addCamera() << addCamera();
     manager()->setMode(layout(), RadassMode::High);
     ASSERT_EQ(RadassMode::High, manager()->mode(items));
+}
+
+TEST_F(RadassResourceManagerTest, setModeToLayoutWithUnsupportedCamerasOnly)
+{
+    QnLayoutItemIndexList items;
+    items << addUnsupportedCamera() << addUnsupportedCamera();
+    manager()->setMode(layout(), RadassMode::High);
+
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
 }
 
 TEST_F(RadassResourceManagerTest, checkNewCamera)
@@ -195,6 +241,13 @@ TEST_F(RadassResourceManagerTest, addCameraToPresetLayout)
     ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
 }
 
+TEST_F(RadassResourceManagerTest, addUnsupportedCameraToPresetLayout)
+{
+    addCamera();
+    manager()->setMode(layout(), RadassMode::High);
+    addUnsupportedCamera();
+    ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
+}
 
 } // namespace desktop
 } // namespace client

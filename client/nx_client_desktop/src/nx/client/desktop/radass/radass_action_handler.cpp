@@ -80,8 +80,6 @@ void RadassActionHandler::at_radassAction_triggered()
     if (mode == RadassMode::Custom)
         return;
 
-    const auto manager = context()->instance<RadassResourceManager>();
-
     // If empty, means apply to the current layout.
     auto layoutItems = parameters.layoutItems();
     if (layoutItems.empty())
@@ -101,7 +99,7 @@ void RadassActionHandler::at_radassAction_triggered()
             validItems.push_back(item);
     }
 
-    manager->setMode(validItems, mode);
+    d->manager->setMode(validItems, mode);
 }
 
 void RadassActionHandler::handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode)
