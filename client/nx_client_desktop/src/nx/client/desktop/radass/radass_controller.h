@@ -35,12 +35,6 @@ private:
 private:
     struct Private;
     QScopedPointer<Private> d;
-
-private:
-    /**
-     * Rearrange items quality: put small items to LQ state, large to HQ.
-     */
-    void optimizeItemsQualityBySize();
 };
 
 } // namespace desktop

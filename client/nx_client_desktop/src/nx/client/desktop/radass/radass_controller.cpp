@@ -480,6 +480,47 @@ struct RadassController::Private
         hiQualityRetryCounter = qMax(0, hiQualityRetryCounter - 1);
     }
 
+    // Rearrange items quality: put small items to LQ state, large to HQ.
+    void optimizeItemsQualityBySize()
+    {
+        // Do not optimize quality if recently switch occurred.
+        if (!lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
+            return;
+
+        // Do not rearrange items if any item is in FF/REW mode right now.
+        if (std::any_of(consumers.cbegin(), consumers.cend(),
+            [](const ConsumerInfo& consumer) { return isFFSpeed(consumer.display); }))
+        {
+            return;
+        }
+
+        // Find the biggest camera with auto control and low quality.
+        int largeSize = 0;
+        auto largeConsumer = findConsumer(FindMethod::Biggest,
+            MEDIA_Quality_Low,
+            itemQualityCanBeRaised,
+            &largeSize);
+        if (!isValid(largeConsumer))
+            return;
+
+        // Find the smallest camera with auto control and hi quality.
+        int smallSize = 0;
+        auto smallConsumer = findConsumer(FindMethod::Smallest,
+            MEDIA_Quality_High,
+            itemQualityCanBeLowered,
+            &smallSize);
+        if (!isValid(smallConsumer))
+            return;
+
+        if (largeSize >= smallSize * 2)
+        {
+            // swap items quality
+            gotoLowQuality(smallConsumer, largeConsumer->lqReason);
+            gotoHighQuality(largeConsumer);
+            lastSwitchTimer.restart();
+        }
+    }
+
 };
 
 RadassController::RadassController():
@@ -552,47 +593,7 @@ void RadassController::onTimer()
         }
     }
 
-    optimizeItemsQualityBySize();
-}
-
-void RadassController::optimizeItemsQualityBySize()
-{
-    // Do not optimize quality if recently switch occurred.
-    if (!d->lastSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
-        return;
-
-    // Do not rearrange items if any item is in FF/REW mode right now.
-    if (std::any_of(d->consumers.cbegin(), d->consumers.cend(),
-        [](const ConsumerInfo& consumer) { return isFFSpeed(consumer.display); }))
-    {
-        return;
-    }
-
-    // Find the biggest camera with auto control and low quality.
-    int largeSize = 0;
-    auto largeConsumer = d->findConsumer(FindMethod::Biggest,
-        MEDIA_Quality_Low,
-        itemQualityCanBeRaised,
-        &largeSize);
-    if (!d->isValid(largeConsumer))
-        return;
-
-    // Find the smallest camera with auto control and hi quality.
-    int smallSize = 0;
-    auto smallConsumer = d->findConsumer(FindMethod::Smallest,
-        MEDIA_Quality_High,
-        itemQualityCanBeLowered,
-        &smallSize);
-    if (!d->isValid(smallConsumer))
-        return;
-
-    if (largeSize >= smallSize * 2)
-    {
-        // swap items quality
-        d->gotoLowQuality(smallConsumer, largeConsumer->lqReason);
-        d->gotoHighQuality(largeConsumer);
-        d->lastSwitchTimer.restart();
-    }
+    d->optimizeItemsQualityBySize();
 }
 
 int RadassController::consumerCount() const
