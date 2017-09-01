@@ -359,17 +359,24 @@ angular.module('nxCommon')
                     if(scope.vgApi){
                         scope.vgApi.kill();
                     }
-                    if(videoPlayers && 0){
+                    if(videoPlayers){
                         videoPlayers.pop();
                     }
 
                     scope.player = player || null;
                     scope.vgPlayerReady({$API: null});
-                    //return;
+
                     //Turn off all players to reset ng-class for rotation
                     scope.native = false;
                     scope.flashls = false;
                     scope.jsHls = false;
+                }
+
+                function cleanExcessPlayers(){
+                    while(videoPlayers.length > 0){
+                        var player = videoPlayers.pop();
+                        player.kill();
+                    }
                 }
 
                 function srcChanged(){
@@ -385,9 +392,13 @@ angular.module('nxCommon')
                             scope.loading = false; // no supported format - no loading
                             return;
                         }
-
-                        $timeout(initNewPlayer);
+                        $timeout(initNewPlayer());
                         $timeout(updateWidth);
+                    }
+
+                    if(videoPlayers.length > 0){
+                        $log.error('Problem with deallocating video players');
+                        cleanExcessPlayers();
                     }
                 }
 
@@ -396,9 +407,10 @@ angular.module('nxCommon')
                 scope.$on('$destroy',function(){
                     resetPlayer();
 
-                    if(videoPlayers.length > 1){
+                    if(videoPlayers.length > 0){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
+                        cleanExcessPlayers();
                     }
                 });
 
