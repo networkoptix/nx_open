@@ -24,19 +24,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
-namespace {
-
-bool isValidWidget(QnMediaResourceWidget* widget)
-{
-    if (!widget || widget->isZoomWindow())
-        return false;
-
-    const auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-    return camera && camera->hasDualStreaming();
-}
-
-}
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -84,23 +71,9 @@ void RadassActionHandler::at_radassAction_triggered()
     // If empty, means apply to the current layout.
     auto layoutItems = parameters.layoutItems();
     if (layoutItems.empty())
-    {
-        const auto layout = workbench()->currentLayout()->resource();
-        QnLayoutItemIndexList items;
-        for (const auto item: layout->getItems())
-            items << QnLayoutItemIndex(layout, item.uuid);
-    }
-
-    QnLayoutItemIndexList validItems;
-    for (const auto item: layoutItems)
-    {
-        auto widget = display()->widget(item.uuid());
-        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (isValidWidget(mediaWidget))
-            validItems.push_back(item);
-    }
-
-    d->manager->setMode(validItems, mode);
+        d->manager->setMode(workbench()->currentLayout()->resource(), mode);
+    else
+        d->manager->setMode(layoutItems, mode);
 }
 
 void RadassActionHandler::handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode)
@@ -113,10 +86,10 @@ void RadassActionHandler::handleItemModeChanged(const QnLayoutItemIndex& item, R
     if (item.layout() != workbench()->currentLayout()->resource())
         return;
 
+    NX_ASSERT(isRadassSupported(item));
+
     auto widget = display()->widget(item.uuid());
-    auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-    NX_ASSERT(isValidWidget(mediaWidget));
-    if (isValidWidget(mediaWidget))
+    if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
     {
         auto camDisplay = mediaWidget->display()->camDisplay();
         d->controller->setMode(camDisplay, mode);
@@ -132,10 +105,11 @@ void RadassActionHandler::handleCurrentLayoutChanged()
     for (const auto& item: workbench()->currentLayout()->items())
     {
         QnLayoutItemIndex index(layout, item->uuid());
+        if (!isRadassSupported(index))
+            continue;;
 
         auto widget = display()->widget(index.uuid());
-        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (isValidWidget(mediaWidget))
+        if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
         {
             auto camDisplay = mediaWidget->display()->camDisplay();
             d->controller->setMode(camDisplay, d->manager->mode(QnLayoutItemIndexList() << index));

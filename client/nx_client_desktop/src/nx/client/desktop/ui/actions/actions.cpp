@@ -983,10 +983,7 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode());
 
     factory(RadassAction)
-        .flags(NoTarget | SingleTarget | MultiTarget | LayoutItemTarget);
-
-    factory()
-        .flags(Scene | NoTarget)
+        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Resolution..."))
         .childFactory(new RadassActionFactory(manager))
         .condition(ConditionWrapper(new ChangeResolutionCondition())

@@ -38,6 +38,7 @@
 #include <recording/time_period.h>
 
 #include <nx/client/desktop/condition/generic_condition.h>
+#include <nx/client/desktop/radass/radass_support.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
@@ -1144,38 +1145,16 @@ ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters
 ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     QnWorkbenchContext* context)
 {
-    if (isVideoWallReviewMode(context))
-        return InvisibleAction;
-
-    if (!context->user())
-        return InvisibleAction;
-
     QnLayoutResourcePtr layout = context->workbench()->currentLayout()->resource();
     if (!layout)
         return InvisibleAction;
 
-    if (layout->isFile())
-        return InvisibleAction;
+    auto layoutItems = parameters.layoutItems();
+    const bool supported = layoutItems.empty()
+        ? isRadassSupported(layout, MatchMode::Any)
+        : isRadassSupported(layoutItems, MatchMode::Any);
 
-    auto validItem = [](const QnLayoutItemIndex& index)
-        {
-            auto layout = index.layout();
-            if (!layout || !layout->resourcePool())
-                return false;
-
-            auto item = layout->getItems().value(index.uuid());
-            if (!item.zoomRect.isNull())
-                return false;
-
-            const auto camera = layout->resourcePool()->getResourceByDescriptor(item.resource)
-                .dynamicCast<QnVirtualCameraResource>();
-            return camera && camera->hasDualStreaming();
-        };
-
-    const auto items = parameters.layoutItems();
-    return std::all_of(items.cbegin(), items.cend(), validItem)
-        ? EnabledAction
-        : DisabledAction;
+    return supported ? EnabledAction : DisabledAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
