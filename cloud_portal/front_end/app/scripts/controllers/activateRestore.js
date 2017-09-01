@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage',
-        '$sessionStorage', 'account', '$location', 'urlProtocol',
+        '$sessionStorage', 'account', '$location', 'urlProtocol', 'dialogs',
         function ($scope, cloudApi, $routeParams, process, $localStorage,
-                  $sessionStorage, account, $location, urlProtocol) {
+                  $sessionStorage, account, $location, urlProtocol, dialogs) {
 
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
@@ -121,9 +121,7 @@ angular.module('cloudApp')
                 errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
                 setContext('reactivatingSuccess');
-                $location.path('/activate/send', false); // Change url, do not reload
-                $scope.reactivating = false;
-                $scope.reactivatingSuccess = true;
+                dialogs.notify(L.account.activationLinkSent, 'success');
             });
 
             if($scope.data.activateCode){

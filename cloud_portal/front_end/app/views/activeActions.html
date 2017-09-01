@@ -17,12 +17,6 @@
             <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
         </h1>
     </div>
-
-    <div ng-if="reactivatingSuccess">
-        <h1 class="process-success">
-            Confirmation message is sent to Email <br>{{data.email}}
-        </h1>
-    </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
