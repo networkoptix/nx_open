@@ -110,8 +110,9 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool needToAddIpV4Socket = localAddress.address == HostAddress::anyHost
         || (bool) localAddress.address.ipV4();
 
-    bool needToAddIpV6Socket = localAddress.address == HostAddress::anyHost
-        || (bool)localAddress.address.ipV6();
+    bool needToAddIpV6Socket = false;
+    // localAddress.address == HostAddress::anyHost
+    //     || (bool)localAddress.address.ipV6();
 
     if (needToAddIpV4Socket)
     {

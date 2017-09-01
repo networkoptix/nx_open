@@ -17,7 +17,9 @@ class NX_NETWORK_API AcceptConnectionHandler:
 
 public:
     using ConnectionCreatedHandler = 
-        nx::utils::MoveOnlyFunc<void(std::unique_ptr<WebSocket>, std::vector<nx_http::StringType>)>;
+        nx::utils::MoveOnlyFunc<void(
+            std::unique_ptr<WebSocket>,
+            std::vector<nx_http::StringType> /*REST request parameters*/)>;
 
     AcceptConnectionHandler(ConnectionCreatedHandler onConnectionCreated);
 };
