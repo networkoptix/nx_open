@@ -61,6 +61,9 @@ def pytest_addoption(parser):
     parser.addoption('--customization', default=DEFAULT_CUSTOMIZATION,
                      help='Customization; will be used for requesting cloud host from ireg.hdw.mx;'
                           ' default is %r' % DEFAULT_CUSTOMIZATION)
+    parser.addoption('--autotest-email-password',
+                     help='Password for accessing service account via IMAP protocol. '
+                          'Used for activation cloud accounts for different cloud groups and customizations.')
     parser.addoption('--work-dir', default=DEFAULT_WORK_DIR, type=expand_path,
                      help='working directory for tests: all generated files will be placed there')
     parser.addoption('--bin-dir', type=expand_path,
@@ -128,6 +131,7 @@ def run_options(request):
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
+        autotest_email_password=request.config.getoption('--autotest-email-password'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         mediaserver_dist_path=mediaserver_dist_path,
@@ -267,7 +271,8 @@ def lightweight_servers_factory(run_options, artifact_factory, physical_installa
 # CloudHost instance    
 @pytest.fixture
 def cloud_host(run_options, cloud_host_host):
-    cloud_host = create_cloud_host(run_options.cloud_group, run_options.customization, cloud_host_host)
+    cloud_host = create_cloud_host(
+        run_options.cloud_group, run_options.customization, cloud_host_host, run_options.autotest_email_password)
     cloud_host.check_is_ready_for_tests()
     return cloud_host
 

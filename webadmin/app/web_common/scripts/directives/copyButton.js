@@ -12,8 +12,8 @@ angular.module('nxCommon')
         	link: function(scope){
                 
                 scope.hoverText = scope.hoverText || L.common.cameraLinks.copyToClipboard;
-                scope.defaultText = scope.defaultText || L.common.cameraLinks.copyDefaultText;
-                scope.activeText = scope.activeText || L.common.cameraLinks.copyActiveText;
+                scope.defaultText = scope.defaultText ||  ('(' + L.common.cameraLinks.copyDefaultText + ')');
+                scope.activeText = scope.activeText ||  ('(' + L.common.cameraLinks.copyActiveText + ')');
                 scope.clipboardSupported = true; // presume
                 
                 scope.displayedText = scope.defaultText;

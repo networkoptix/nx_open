@@ -48,7 +48,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     }
 
     auto channelCapabilities = optionalChannelCapabilities.get();
-    auto resolution = chooseResolution(channelCapabilities);
+    auto resolution = chooseResolution(channelCapabilities, m_hikvisionResource->getPrimaryResolution());
     auto codec = chooseCodec(channelCapabilities);
     auto fps = chooseFps(channelCapabilities, liveStreamParameters.fps);
 
@@ -89,14 +89,14 @@ QUrl HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path)
 }
 
 QSize HikvisionHevcStreamReader::chooseResolution(
-    const ChannelCapabilities& channelCapabilities) const
+    const ChannelCapabilities& channelCapabilities,
+    const QSize& primaryResolution) const
 {
     auto& resolutions = channelCapabilities.resolutions;
     NX_ASSERT(!resolutions.empty(), lit("Resolution list is empty."));
     if (resolutions.empty())
         return QSize();
 
-    auto primaryResolution = resolutions[resolutions.size() - 1];
     if (getRole() == Qn::ConnectionRole::CR_LiveVideo)
         return primaryResolution;
 
@@ -109,7 +109,7 @@ QSize HikvisionHevcStreamReader::chooseResolution(
         maxArea,
         QList<QSize>::fromVector(QVector<QSize>::fromStdVector(resolutions)));
 
-    if (secondaryResolution == QSize())
+    if (secondaryResolution.isEmpty())
     {
         secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
             SECONDARY_STREAM_DEFAULT_RESOLUTION,

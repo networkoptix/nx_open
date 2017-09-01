@@ -160,7 +160,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'default': {
+        '': {  # default settings for all django loggers
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
@@ -181,6 +181,21 @@ LOGGING = {
             'handlers': ['console', 'mail_admins']
         },
         'notifications.tasks': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
+        'api.account_backend': {  # explicitly mention all modules with loogers
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
+        'api.controller.cloud_api': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
+        'api.views.account': {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']

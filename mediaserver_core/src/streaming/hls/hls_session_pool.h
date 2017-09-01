@@ -25,7 +25,7 @@ class HLSSession
 {
 public:
     /**
-     * @param streamQuality If MEDIA_Quality_Auto, than both qualities (if available) can be streamed.
+     * @param streamQuality If MEDIA_Quality_Auto then both qualities (if available) can be streamed.
      */
     HLSSession(
         const QString& id,
@@ -81,17 +81,16 @@ private:
 
 /**
  * - Owns HLSSession objects.
- * - Removes session if noone uses it during specified timeout. Session cannot be removed while its id is locked.
+ * - Removes session if no one uses it during specified timeout. Session cannot be removed while its id is locked.
  * NOTE: It is recommended to lock session id before performing any operations with session.
  * NOTE: Specifing session timeout and working with no id lock can result in undefined behavour.
  * NOTE: Class methods are thread-safe.
  */
-class HLSSessionPool
-    :
+class HLSSessionPool:
     public nx::utils::TimerEventHandler
 {
 public:
-    /** Locks specified session id for ScopedSessionIDLock life time. */
+    /** Locks specified session id for ScopedSessionIDLock lifetime. */
     class ScopedSessionIDLock
     {
     public:
@@ -119,12 +118,12 @@ public:
      * Add new session.
      * @param session Object ownership is moved to HLSSessionPool instance.
      * @param keepAliveTimeoutSec Session will be removed,
-     * if noone uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
-     * @return false, if session with id session->id() already exists. true, otherwise.
+     * if no one uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
+     * @return False, if session with id session->id() already exists. true, otherwise.
      */
     bool add(HLSSession* session, unsigned int keepAliveTimeoutMS);
     /**
-     * @return NULL, if session not found.
+     * @return Null, if session not found.
      * NOTE: Re-launches session deletion timer for keepAliveTimeoutSec.
      */
     HLSSession* find(const QString& id) const;
@@ -136,7 +135,7 @@ public:
 
 protected:
     /**
-     * If id already locked, blocks till it unlocked.
+     * If id is already locked, blocks untill it is unlocked.
      */
     void lockSessionID(const QString& id);
     void unlockSessionID(const QString& id);

@@ -17,7 +17,10 @@
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_transcoder_thread.h"
 
-/** Maximum time (in micros) by which requested chunk start time may be in future. */
+/**
+ * Maximum time offset (in micros) requested chunk can be ahead of current live position.
+ * Such chunk will be prepared as soon as live position reaches chunk start time.
+ */
 static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30 * 1000 * 1000;
 static const int TRANSCODE_THREAD_COUNT = 1;
 static const int USEC_IN_MSEC = 1000;
@@ -94,7 +97,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
     auto camera = qnCameraPool->getVideoCamera(cameraResource);
     NX_ASSERT(camera);
 
-    // if region is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE: scheduling task.
+    // If requested stream time range is in the future for not futher than MAX_CHUNK_TIMESTAMP_ADVANCE
+    // then scheduling transcoding task.
 
     const int newTranscodingId = m_transcodeIDSeq.fetchAndAddAcquire(1);
 
@@ -120,7 +124,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
             transcodeParams.startTimestamp() > cacheEndTimestamp &&
             transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS)
         {
-            // Chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS, scheduling transcoding on data availability.
+            // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
+            // Scheduling transcoding on data availability.
             std::pair<std::map<int, TranscodeContext>::iterator, bool> p = 
                 m_scheduledTranscodings.emplace(newTranscodingId, TranscodeContext());
             NX_ASSERT(p.second);
@@ -131,8 +136,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
             p.first->second.chunk = chunk;
 
             if (scheduleTranscoding(
-                    newTranscodingId,
-                    (transcodeParams.startTimestamp() - cacheEndTimestamp) / USEC_IN_MSEC + 1))
+                   newTranscodingId,
+                   (transcodeParams.startTimestamp() - cacheEndTimestamp) / USEC_IN_MSEC + 1))
             {
                 return true;
             }
@@ -227,16 +232,17 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvide
             new LiveMediaCacheReader(
                 camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp));
 
-        if ((transcodeParams.startTimestamp() < cacheEndTimestamp &&     //< Requested data is in live cache (at least, partially).
+        if ((transcodeParams.startTimestamp() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
             transcodeParams.endTimestamp() > cacheStartTimestamp) ||
-            (transcodeParams.startTimestamp() > cacheEndTimestamp &&     //< Chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
+            (transcodeParams.startTimestamp() > cacheEndTimestamp && //< Chunk is in the future not futher
+                                                                     //< than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
                 transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
-            !transcodeParams.alias().isEmpty())    //< Has alias, startTimestamp may be invalid.
+            !transcodeParams.alias().isEmpty()) //< Has alias, startTimestamp may be invalid.
         {
         }
         else
         {
-            // No data. e.g., request is too far away in future.
+            // No data. e.g., request is too far away in the future.
             return nullptr;
         }
     }
@@ -427,8 +433,8 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         else
         {
             NX_ASSERT(false);
-            videoResolution = QSize(1280, 720);  //< TODO/hls: #ak get resolution of resource video stream. 
-                                                 // This resolution is ignored when TM_DirectStreamCopy is used.
+            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream. 
+                                                //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }
     if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::QualityNormal, videoResolution) != 0)
@@ -491,7 +497,7 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
     // We want to remove all cache elements having id resourceIDStr.
     // That's why we need to generate next id value.
     // We can be sure that unicode char will not overflow because nextResourceIDStr
-    //   contains only ascii symbols (guid).
+    // contains only ascii symbols (guid).
     nextResourceIDStr[nextResourceIDStr.size() - 1] =
         QChar(nextResourceIDStr[nextResourceIDStr.size() - 1].unicode() + 1);
 
