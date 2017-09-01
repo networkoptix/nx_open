@@ -163,6 +163,13 @@
            </widget>
           </item>
           <item>
+           <widget class="nx::client::desktop::ui::SelectableTextButton" name="bookmarkButton">
+            <property name="text">
+             <string notr="true">&lt;Bookmark Info&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QWidget" name="overlayButtonsWidget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <property name="spacing">
@@ -245,6 +252,7 @@
           <number>0</number>
          </property>
          <widget class="nx::client::desktop::ui::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
+         <widget class="nx::client::desktop::ui::BookmarkOverlaySettingsWidget" name="bookmarkSettingsPage"/>
          <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
          <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
          <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
@@ -489,6 +497,12 @@
    <class>QnResourcePreviewWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/resource_preview_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::BookmarkOverlaySettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

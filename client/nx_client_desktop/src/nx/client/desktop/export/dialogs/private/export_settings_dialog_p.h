@@ -10,6 +10,10 @@
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
 #include <nx/client/desktop/export/widgets/export_overlay_widget.h>
+#include <nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.h>
+#include <nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.h>
+#include <nx/client/desktop/export/widgets/image_overlay_settings_widget.h>
+#include <nx/client/desktop/export/widgets/text_overlay_settings_widget.h>
 
 #include <utils/common/connective.h>
 
@@ -40,6 +44,7 @@ public:
         timestamp,
         image,
         text,
+        bookmark,
         overlayCount
     };
 
@@ -58,14 +63,8 @@ public:
 
     ExportSettingsDialog::Mode mode();
 
-    const ExportMediaSettings& exportMediaSettings() const;
-    const ExportLayoutSettings& exportLayoutSettings() const;
-
-    void setExportMediaSettings(const ExportMediaSettings& settings);
-
-    void setTimestampOverlaySettings(const ExportTimestampOverlaySettings& settings);
-    void setImageOverlaySettings(const ExportImageOverlaySettings& settings);
-    void setTextOverlaySettings(const ExportTextOverlaySettings& settings);
+    ExportMediaSettings exportMediaSettings() const;
+    ExportLayoutSettings exportLayoutSettings() const;
 
     void createOverlays(QWidget* overlayContainer);
 
@@ -75,6 +74,18 @@ public:
     QnSingleThumbnailLoader* mediaImageProvider() const;
     LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
+
+    const TimestampOverlaySettingsWidget::Data& timestampOverlaySettings() const;
+    void setTimestampOverlaySettings(const TimestampOverlaySettingsWidget::Data& settings);
+
+    const ImageOverlaySettingsWidget::Data& imageOverlaySettings() const;
+    void setImageOverlaySettings(const ImageOverlaySettingsWidget::Data& settings);
+
+    const TextOverlaySettingsWidget::Data& textOverlaySettings() const;
+    void setTextOverlaySettings(const TextOverlaySettingsWidget::Data& settings);
+
+    const BookmarkOverlaySettingsWidget::Data& bookmarkOverlaySettings() const;
+    void setBookmarkOverlaySettings(const BookmarkOverlaySettingsWidget::Data& settings);
 
 signals:
     void statusChanged(ErrorCode value);
@@ -91,6 +102,11 @@ private:
     ErrorCode m_status = ErrorCode::ok;
     ExportMediaSettings m_exportMediaSettings;
     ExportLayoutSettings m_exportLayoutSettings;
+
+    TimestampOverlaySettingsWidget::Data m_timestampSettings;
+    BookmarkOverlaySettingsWidget::Data m_bookmarkSettings;
+    ImageOverlaySettingsWidget::Data m_imageSettings;
+    TextOverlaySettingsWidget::Data m_textSettings;
 
     static constexpr size_t overlayCount = size_t(OverlayType::overlayCount);
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};

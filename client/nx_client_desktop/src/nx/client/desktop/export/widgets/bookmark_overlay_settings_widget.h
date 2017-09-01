@@ -5,26 +5,33 @@
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 
-namespace Ui { class TimestampOverlaySettingsWidget; }
+namespace Ui { class BookmarkOverlaySettingsWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 
-class TimestampOverlaySettingsWidget: public QWidget
+class BookmarkOverlaySettingsWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    TimestampOverlaySettingsWidget(QWidget* parent = nullptr);
-    virtual ~TimestampOverlaySettingsWidget() override;
+    BookmarkOverlaySettingsWidget(QWidget* parent = nullptr);
+    virtual ~BookmarkOverlaySettingsWidget() override;
 
-    using Data = ExportTimestampOverlaySettings;
+    struct Data: public ExportTextOverlaySettings
+    {
+        bool includeDescription = true;
+        Data();
+    };
 
     const Data& data() const;
     void setData(const Data& data);
+
+    int maxOverlayWidth() const;
+    void setMaxOverlayWidth(int value);
 
 signals:
     void dataChanged(const Data& data);
@@ -34,7 +41,7 @@ private:
     void updateControls();
 
 private:
-    QScopedPointer<Ui::TimestampOverlaySettingsWidget> ui;
+    QScopedPointer<Ui::BookmarkOverlaySettingsWidget> ui;
     Data m_data;
 };
 

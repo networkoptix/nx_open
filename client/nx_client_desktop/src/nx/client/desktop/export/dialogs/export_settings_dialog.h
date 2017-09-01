@@ -54,8 +54,8 @@ public:
 
     Mode mode() const;
 
-    const ExportMediaSettings& exportMediaSettings() const;
-    const ExportLayoutSettings& exportLayoutSettings() const;
+    ExportMediaSettings exportMediaSettings() const;
+    ExportLayoutSettings exportLayoutSettings() const;
 
 private:
     ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent = nullptr);

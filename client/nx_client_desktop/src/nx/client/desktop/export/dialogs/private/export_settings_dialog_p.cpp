@@ -7,7 +7,7 @@
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
-#include <ui/style/skin.h>
+#include <ui/common/palette.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/assert.h>
@@ -29,12 +29,6 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
-    m_exportMediaSettings.imageOverlay.image =
-        qnSkin->pixmap(lit("welcome_page/logo.png")).toImage();
-
-    m_exportMediaSettings.imageOverlay.overlayWidth =
-        m_exportMediaSettings.imageOverlay.image.width();
-
     updateOverlays();
 }
 
@@ -74,9 +68,9 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider->loadAsync();
 
     // Set defaults that depend on frame size.
-    m_exportMediaSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
-    m_exportMediaSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
-    m_exportMediaSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
+    m_timestampSettings.fontSize = m_fullFrameSize.height() / 20;
+    m_textSettings.fontSize = m_bookmarkSettings.fontSize = m_fullFrameSize.height() / 30;
+    m_textSettings.overlayWidth = m_bookmarkSettings.overlayWidth = m_fullFrameSize.width() / 4;
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
@@ -127,41 +121,115 @@ ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode()
     return m_mode;
 }
 
-const ExportMediaSettings& ExportSettingsDialog::Private::exportMediaSettings() const
+ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
 {
-    return m_exportMediaSettings;
+    ExportMediaSettings result = m_exportMediaSettings;
+
+    const auto calculateOverlayPosition =
+        [](const QWidget* widget, ExportOverlaySettings& settings)
+        {
+            // TODO: #vkutin Calculate alignment depending on position in widget's parent.
+            settings.position = widget->pos();
+            settings.alignment = Qt::AlignLeft | Qt::AlignCenter;
+        };
+
+    // TODO: #vkutin Honor z-order.
+
+    result.overlays.reserve(overlayCount);
+
+    if (!overlay(OverlayType::timestamp)->isHidden())
+    {
+        QSharedPointer<ExportTimestampOverlaySettings> settings(
+            new ExportTimestampOverlaySettings(m_timestampSettings));
+
+        calculateOverlayPosition(overlay(OverlayType::timestamp), *settings);
+        result.overlays << settings;
+    }
+
+    if (!overlay(OverlayType::bookmark)->isHidden())
+    {
+        QSharedPointer<ExportTextOverlaySettings> settings(
+            new ExportTextOverlaySettings(m_bookmarkSettings));
+
+        calculateOverlayPosition(overlay(OverlayType::bookmark), *settings);
+        result.overlays << settings;
+    }
+
+    if (!overlay(OverlayType::image)->isHidden())
+    {
+        QSharedPointer<ExportImageOverlaySettings> settings(
+            new ExportImageOverlaySettings(m_imageSettings));
+
+        calculateOverlayPosition(overlay(OverlayType::image), *settings);
+        result.overlays << settings;
+    }
+
+    if (!overlay(OverlayType::text)->isHidden())
+    {
+        QSharedPointer<ExportTextOverlaySettings> settings(
+            new ExportTextOverlaySettings(m_textSettings));
+
+        calculateOverlayPosition(overlay(OverlayType::text), *settings);
+        result.overlays << settings;
+    }
+
+    return result;
 }
 
-const ExportLayoutSettings& ExportSettingsDialog::Private::exportLayoutSettings() const
+ExportLayoutSettings ExportSettingsDialog::Private::exportLayoutSettings() const
 {
     return m_exportLayoutSettings;
 }
 
-void ExportSettingsDialog::Private::setExportMediaSettings(const ExportMediaSettings& settings)
+const TimestampOverlaySettingsWidget::Data&
+    ExportSettingsDialog::Private::timestampOverlaySettings() const
 {
-    m_exportMediaSettings = settings;
-    updateOverlays();
+    return m_timestampSettings;
 }
 
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
-    const ExportTimestampOverlaySettings& settings)
+    const TimestampOverlaySettingsWidget::Data& settings)
 {
-    m_exportMediaSettings.timestampOverlay = settings;
+    m_timestampSettings = settings;
     updateOverlay(OverlayType::timestamp);
 }
 
-void ExportSettingsDialog::Private::setImageOverlaySettings(
-    const ExportImageOverlaySettings& settings)
+const ImageOverlaySettingsWidget::Data& ExportSettingsDialog::Private::imageOverlaySettings() const
 {
-    m_exportMediaSettings.imageOverlay = settings;
+    return m_imageSettings;
+}
+
+void ExportSettingsDialog::Private::setImageOverlaySettings(
+    const ImageOverlaySettingsWidget::Data& settings)
+{
+    m_imageSettings = settings;
     updateOverlay(OverlayType::image);
 }
 
-void ExportSettingsDialog::Private::setTextOverlaySettings(
-    const ExportTextOverlaySettings& settings)
+const TextOverlaySettingsWidget::Data& ExportSettingsDialog::Private::textOverlaySettings() const
 {
-    m_exportMediaSettings.textOverlay = settings;
+    return m_textSettings;
+}
+
+void ExportSettingsDialog::Private::setTextOverlaySettings(
+    const TextOverlaySettingsWidget::Data& settings)
+{
+    m_textSettings = settings;
     updateOverlay(OverlayType::text);
+}
+
+const BookmarkOverlaySettingsWidget::Data&
+    ExportSettingsDialog::Private::bookmarkOverlaySettings() const
+{
+    return m_bookmarkSettings;
+}
+
+void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
+    const BookmarkOverlaySettingsWidget::Data& settings)
+{
+    m_bookmarkSettings = settings;
+    // TODO: #vkutin Generate text from bookmark information and passed settings
+    updateOverlay(OverlayType::bookmark);
 }
 
 void ExportSettingsDialog::Private::updateOverlays()
@@ -177,7 +245,7 @@ void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
     {
         case OverlayType::timestamp:
         {
-            const auto& data = m_exportMediaSettings.timestampOverlay;
+            const auto& data = m_timestampSettings;
             auto font = overlay->font();
             font.setPixelSize(data.fontSize);
             overlay->setFont(font);
@@ -193,21 +261,20 @@ void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
 
         case OverlayType::image:
         {
-            const auto& data = m_exportMediaSettings.imageOverlay;
+            const auto& data = m_imageSettings;
             overlay->setImage(data.image);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setOpacity(data.opacity);
-
-            auto palette = overlay->palette();
-            palette.setColor(QPalette::Window, data.background);
-            overlay->setPalette(palette);
             break;
         }
 
         case OverlayType::text:
+        case OverlayType::bookmark:
         {
-            const auto& data = m_exportMediaSettings.textOverlay;
-            overlay->setText(data.text);
+            const auto& data = type == OverlayType::text
+                ? static_cast<const ExportTextOverlaySettings&>(m_textSettings)
+                : m_bookmarkSettings;
+
             overlay->setTextIndent(data.indent);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setRoundingRadius(data.roundingRadius);
@@ -252,6 +319,8 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
         m_overlays[index]->setHidden(true);
     }
 
+    setPaletteColor(overlay(OverlayType::image), QPalette::Window, Qt::transparent);
+
     auto timestampOverlay = overlay(OverlayType::timestamp);
     timestampOverlay->setTextIndent(0);
 
@@ -267,7 +336,7 @@ void ExportSettingsDialog::Private::updateTimestampText()
     currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
 
     overlay(OverlayType::timestamp)->setText(currentDayTime.toString(
-        m_exportMediaSettings.timestampOverlay.format));
+        m_timestampSettings.format));
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)

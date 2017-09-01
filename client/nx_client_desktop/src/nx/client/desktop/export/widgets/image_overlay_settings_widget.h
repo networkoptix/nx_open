@@ -21,14 +21,20 @@ public:
     ImageOverlaySettingsWidget(QWidget* parent = nullptr);
     virtual ~ImageOverlaySettingsWidget() override;
 
-    const ExportImageOverlaySettings& data() const;
-    void setData(const ExportImageOverlaySettings& data);
+    struct Data: public ExportImageOverlaySettings
+    {
+        QString name;
+        Data();
+    };
+
+    const Data& data() const;
+    void setData(const Data& data);
 
     int maxOverlayWidth() const;
     void setMaxOverlayWidth(int value);
 
 signals:
-    void dataChanged(const ExportImageOverlaySettings& data);
+    void dataChanged(const Data& data);
     void deleteClicked();
 
 private:
@@ -37,7 +43,7 @@ private:
 
 private:
     QScopedPointer<Ui::ImageOverlaySettingsWidget> ui;
-    ExportImageOverlaySettings m_data;
+    Data m_data;
     QString m_lastImageDir;
 };
 

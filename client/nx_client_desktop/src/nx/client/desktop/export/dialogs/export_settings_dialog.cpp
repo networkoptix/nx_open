@@ -133,6 +133,9 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged,
         d, &Private::setTextOverlaySettings);
 
+    connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::dataChanged,
+        d, &Private::setBookmarkOverlaySettings);
+
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
         ui->timestampButton, &SelectableTextButton::deactivate);
 
@@ -141,6 +144,9 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::deleteClicked,
         ui->textButton, &SelectableTextButton::deactivate);
+
+    connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::deleteClicked,
+        ui->bookmarkButton, &SelectableTextButton::deactivate);
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -217,8 +223,24 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->speedButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->rapidReviewSettingsPage));
 
+    ui->bookmarkButton->setDeactivatable(true);
+    ui->bookmarkButton->setDeactivatedText(tr("Add Bookmark Info"));
+    ui->bookmarkButton->setDeactivationToolTip(tr("Delete Bookmark Info"));
+    ui->bookmarkButton->setText(tr("Bookmark Info"));
+    ui->bookmarkButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/bookmark.png")));
+    ui->bookmarkButton->setIcon(qnSkin->icon(
+        lit("buttons/bookmark_hovered.png"),
+        lit("buttons/bookmark_selected.png")));
+    ui->bookmarkButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->bookmarkSettingsPage));
+    ui->bookmarkButton->setProperty(kOverlayPropertyName,
+        qVariantFromValue(d->overlay(Private::OverlayType::bookmark)));
+    connect(d->overlay(Private::OverlayType::bookmark), &ExportOverlayWidget::pressed,
+        ui->bookmarkButton, &SelectableTextButton::click);
+
     auto group = new SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
+    group->add(ui->bookmarkButton);
     group->add(ui->timestampButton);
     group->add(ui->imageButton);
     group->add(ui->textButton);
@@ -266,21 +288,22 @@ ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
     return d->mode();
 }
 
-const ExportMediaSettings& ExportSettingsDialog::exportMediaSettings() const
+ExportMediaSettings ExportSettingsDialog::exportMediaSettings() const
 {
     return d->exportMediaSettings();
 }
 
-const ExportLayoutSettings& ExportSettingsDialog::exportLayoutSettings() const
+ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 {
     return d->exportLayoutSettings();
 }
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
-    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
-    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
-    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
+    ui->timestampSettingsPage->setData(d->timestampOverlaySettings());
+    ui->bookmarkSettingsPage->setData(d->bookmarkOverlaySettings());
+    ui->imageSettingsPage->setData(d->imageOverlaySettings());
+    ui->textSettingsPage->setData(d->textOverlaySettings());
 }
 
 void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
@@ -288,6 +311,7 @@ void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
     d->setMediaResource(media);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
+    ui->bookmarkSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
     ui->imageSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
     ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
 

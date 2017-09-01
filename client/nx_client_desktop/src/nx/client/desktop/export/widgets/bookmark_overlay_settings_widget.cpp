@@ -1,5 +1,5 @@
-#include "text_overlay_settings_widget.h"
-#include "ui_text_overlay_settings_widget.h"
+#include "bookmark_overlay_settings_widget.h"
+#include "ui_bookmark_overlay_settings_widget.h"
 
 #include <ui/common/aligner.h>
 #include <ui/style/helper.h>
@@ -20,9 +20,15 @@ static constexpr int kMaximumFontSize = 400;
 
 } // namespace
 
-TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
+BookmarkOverlaySettingsWidget::Data::Data()
+{
+    foreground = Qt::white;
+    background = QColor(0x2E, 0x69, 0x96, 0xB3);
+}
+
+BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::TextOverlaySettingsWidget())
+    ui(new Ui::BookmarkOverlaySettingsWidget())
 {
     ui->setupUi(this);
 
@@ -41,10 +47,10 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
     ui->fontSizeSpinBox->setRange(kMinimumFontSize, kMaximumFontSize);
     updateControls();
 
-    connect(ui->plainTextEdit, &QPlainTextEdit::textChanged,
+    connect(ui->descriptionCheckBox, &QCheckBox::stateChanged,
         [this]()
         {
-            m_data.text = ui->plainTextEdit->toPlainText();
+            //m_data.includeDescription = ui->descriptionComboBox->isChecked();
             emit dataChanged(m_data);
         });
 
@@ -65,38 +71,37 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
     ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
 
     connect(ui->deleteButton, &QPushButton::clicked,
-        this, &TextOverlaySettingsWidget::deleteClicked);
+        this, &BookmarkOverlaySettingsWidget::deleteClicked);
 }
 
-TextOverlaySettingsWidget::~TextOverlaySettingsWidget()
+BookmarkOverlaySettingsWidget::~BookmarkOverlaySettingsWidget()
 {
 }
 
-void TextOverlaySettingsWidget::updateControls()
+void BookmarkOverlaySettingsWidget::updateControls()
 {
-    ui->plainTextEdit->setPlainText(m_data.text);
     ui->fontSizeSpinBox->setValue(m_data.fontSize);
     ui->widthSlider->setValue(m_data.overlayWidth);
 }
 
-const TextOverlaySettingsWidget::Data& TextOverlaySettingsWidget::data() const
+const BookmarkOverlaySettingsWidget::Data& BookmarkOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void TextOverlaySettingsWidget::setData(const Data& data)
+void BookmarkOverlaySettingsWidget::setData(const Data& data)
 {
     m_data = data;
     updateControls();
     emit dataChanged(m_data);
 }
 
-int TextOverlaySettingsWidget::maxOverlayWidth() const
+int BookmarkOverlaySettingsWidget::maxOverlayWidth() const
 {
     return ui->widthSlider->maximum();
 }
 
-void TextOverlaySettingsWidget::setMaxOverlayWidth(int value)
+void BookmarkOverlaySettingsWidget::setMaxOverlayWidth(int value)
 {
     ui->widthSlider->setMaximum(value);
 }

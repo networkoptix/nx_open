@@ -21,14 +21,16 @@ public:
     TextOverlaySettingsWidget(QWidget* parent = nullptr);
     virtual ~TextOverlaySettingsWidget() override;
 
-    const ExportTextOverlaySettings& data() const;
-    void setData(const ExportTextOverlaySettings& data);
+    using Data = ExportTextOverlaySettings;
+
+    const Data& data() const;
+    void setData(const Data& data);
 
     int maxOverlayWidth() const;
     void setMaxOverlayWidth(int value);
 
 signals:
-    void dataChanged(const ExportTextOverlaySettings& data);
+    void dataChanged(const Data& data);
     void deleteClicked();
 
 private:
@@ -36,7 +38,7 @@ private:
 
 private:
     QScopedPointer<Ui::TextOverlaySettingsWidget> ui;
-    ExportTextOverlaySettings m_data;
+    Data m_data;
 };
 
 } // namespace ui
