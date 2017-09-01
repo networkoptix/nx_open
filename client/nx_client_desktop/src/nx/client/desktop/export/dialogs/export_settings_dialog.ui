@@ -427,6 +427,30 @@
     <widget class="nx::client::desktop::FilenamePanel" name="filenamePanel" native="true"/>
    </item>
    <item>
+    <widget class="QStackedWidget" name="alertsStackedWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <widget class="QWidget" name="mediaAlertsPage">
+      <layout class="QVBoxLayout" name="mediaAlertsLayout">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutAlertsPage">
+      <layout class="QVBoxLayout" name="layoutAlertsLayout">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

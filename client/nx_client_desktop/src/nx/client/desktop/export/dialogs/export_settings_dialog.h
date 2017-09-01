@@ -64,6 +64,9 @@ private:
     void setMediaResource(const QnMediaResourcePtr& media);
     void updateSettingsWidgets();
 
+    void addSingleCameraAlert(const QString& text);
+    void addMultiVideoAlert(const QString& text);
+
 private:
     class Private;
     QScopedPointer<Private> d;

@@ -9,6 +9,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/busy_indicator.h>
+#include <ui/widgets/common/alert_bar.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
@@ -25,6 +26,17 @@ namespace {
 static const QSize kPreviewSize(512, 288);
 static constexpr int kBusyIndicatorDotRadius = 8;
 static constexpr int kNoDataDefaultFontSize = 18;
+
+void addAlert(QLayout* layout, const QString& text)
+{
+    NX_EXPECT(!text.isEmpty());
+    if (text.isEmpty())
+        return;
+
+    auto alert = new QnAlertBar();
+    alert->setText(text);
+    layout->addWidget(alert);
+}
 
 } // namespace
 
@@ -95,6 +107,11 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     autoResizePagesToContents(ui->tabWidget,
         QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed), true);
+    autoResizePagesToContents(ui->alertsStackedWidget,
+        QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed), true);
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        ui->alertsStackedWidget, &QStackedWidget::setCurrentIndex);
 
     d->createOverlays(ui->mediaPreviewWidget);
 
@@ -105,9 +122,9 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(d, &Private::statusChanged, this,
         [this, exportButton](Private::ErrorCode value)
-    {
-        exportButton->setEnabled(Private::isExportAllowed(value));
-    });
+        {
+            exportButton->setEnabled(Private::isExportAllowed(value));
+        });
 
     d->loadSettings();
 
@@ -124,8 +141,8 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     QStringList filters{
         lit("Matroska (*.mkv)"),
         lit("MP4 (*.mp4)"),
-        lit("AVI (*.avi)")
-    };
+        lit("AVI (*.avi)") };
+
     ui->filenamePanel->setAllowedExtensions(filters);
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
@@ -338,6 +355,16 @@ void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
     ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
 
     updateSettingsWidgets();
+}
+
+void ExportSettingsDialog::addSingleCameraAlert(const QString& text)
+{
+    addAlert(ui->mediaAlertsLayout, text);
+}
+
+void ExportSettingsDialog::addMultiVideoAlert(const QString& text)
+{
+    addAlert(ui->layoutAlertsLayout, text);
 }
 
 } // namespace ui
