@@ -59,7 +59,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     setMediaResource(media);
 }
 
-ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent):
+ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent) :
     base_type(parent),
     d(new Private(kPreviewSize)),
     ui(new Ui::ExportSettingsDialog)
@@ -105,13 +105,18 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(d, &Private::statusChanged, this,
         [this, exportButton](Private::ErrorCode value)
-        {
-            exportButton->setEnabled(Private::isExportAllowed(value));
-        });
+    {
+        exportButton->setEnabled(Private::isExportAllowed(value));
+    });
 
     d->loadSettings();
 
     d->setTimePeriod(timePeriod);
+
+    if (timePeriod.durationMs < RapidReviewSettingsWidget::minimalSourcePeriodLength())
+        ui->speedButton->setHidden(true);
+    else
+        ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
 
     updateSettingsWidgets();
 
@@ -136,6 +141,20 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::dataChanged,
         d, &Private::setBookmarkOverlaySettings);
 
+    const auto updateRapidReviewData =
+        [this](int absoluteSpeed, qint64 frameStepMs)
+        {
+            d->setRapidReviewFrameStep(frameStepMs);
+            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
+                arg(QChar(L'\x2013'))); //< N-dash
+        };
+
+    connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::speedChanged,
+        this, updateRapidReviewData);
+
+    updateRapidReviewData(ui->rapidReviewSettingsPage->speed(),
+        ui->rapidReviewSettingsPage->frameStepMs());
+
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
         ui->timestampButton, &SelectableTextButton::deactivate);
 
@@ -147,6 +166,9 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::deleteClicked,
         ui->bookmarkButton, &SelectableTextButton::deactivate);
+
+    connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::deleteClicked,
+        ui->speedButton, &SelectableTextButton::deactivate);
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -215,7 +237,7 @@ void ExportSettingsDialog::setupSettingsButtons()
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
-    ui->speedButton->setText(tr("Speed"));
+    ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
     ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/rapid_review.png")));
     ui->speedButton->setIcon(qnSkin->icon(
         lit("buttons/rapid_review_hovered.png"),

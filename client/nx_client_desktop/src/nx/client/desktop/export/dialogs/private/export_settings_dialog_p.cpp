@@ -99,6 +99,11 @@ void ExportSettingsDialog::Private::setFilename(const QString& filename)
     m_exportLayoutSettings.filename = filename;
 }
 
+void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
+{
+    m_exportMediaSettings.timelapseFrameStepMs = frameStepMs;
+}
+
 ExportSettingsDialog::Private::ErrorCode ExportSettingsDialog::Private::status() const
 {
     return m_status;

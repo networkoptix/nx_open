@@ -57,6 +57,7 @@ public:
     void setLayout(const QnLayoutResourcePtr& layout);
     void setTimePeriod(const QnTimePeriod& period);
     void setFilename(const QString& filename);
+    void setRapidReviewFrameStep(qint64 frameStepMs);
 
     ErrorCode status() const;
     static bool isExportAllowed(ErrorCode code);
