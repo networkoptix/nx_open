@@ -62,7 +62,7 @@ private:
     static bool s_needVerification;
 
     void performEndpointVerification(
-        const std::list<SocketAddress>& endpoints,
+        std::list<SocketAddress> endpoints,
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
     void removeInvalidEmptyAddresses(std::list<SocketAddress>* endpoints);

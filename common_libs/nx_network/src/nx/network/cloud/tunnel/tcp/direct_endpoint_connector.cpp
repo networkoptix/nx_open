@@ -80,12 +80,12 @@ void DirectEndpointConnector::stopWhileInAioThread()
 bool DirectEndpointConnector::s_needVerification(true);
 
 void DirectEndpointConnector::performEndpointVerification(
-    const std::list<SocketAddress>& endpoints,
+    std::list<SocketAddress> endpoints,
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
     post(
-        [this, endpoints = endpoints, timeout, handler = std::move(handler)]() mutable
+        [this, endpoints = std::move(endpoints), timeout, handler = std::move(handler)]() mutable
         {
             removeInvalidEmptyAddresses(&endpoints);
 
