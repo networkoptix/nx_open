@@ -141,7 +141,7 @@ namespace LLUtil {
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                NX_LOG(QnLog::HWID_LOG, "No network cards detected. HardwareID can't be calculated.", cl_logERROR);
+                NX_LOG(QnLog::HWID_LOG, "No network cards detected.", cl_logERROR);
             }
 
             g_storedMac = saveMac(macs, settings);
