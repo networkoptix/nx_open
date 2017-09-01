@@ -111,7 +111,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%12",
                 "eventName": {
-                    "value": "Scream sound",
+                    "value": "Sound - Scream",
                     "localization": {
                     }
                 }
@@ -119,7 +119,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%13",
                 "eventName": {
-                    "value": "Gunshot sound",
+                    "value": "Sound - Gunshot",
                     "localization": {
                     }
                 }
@@ -127,7 +127,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%14",
                 "eventName": {
-                    "value": "Explosion sound",
+                    "value": "Sound - Explosion",
                     "localization": {
                     }
                 }
@@ -135,7 +135,7 @@ static const char* kPluginManifestTemplate = R"manifest(
             {
                 "eventTypeId": "%15",
                 "eventName": {
-                    "value": "Glass break sound",
+                    "value": "Sound - Glass break",
                     "localization": {
                     }
                 }
@@ -170,7 +170,7 @@ static const nxpl::NX_GUID kHanwhaEnteringEventId =
     {{0x6F, 0x60, 0x24, 0x03, 0xCC, 0xA4, 0x4F, 0x85, 0x87, 0x77, 0xF3, 0x40, 0xE8, 0x23, 0x9A, 0x23}};
 
 static const nxpl::NX_GUID kHanwhaExitingEventId =
-    {{0x6F, 0x60, 0x24, 0x03, 0xCC, 0xA4, 0x4F, 0x85, 0x87, 0x77, 0xF3, 0x40, 0xE8, 0x23, 0x9A, 0x23}};
+    {{0x2C, 0x21, 0x87, 0x43, 0x60, 0x4C, 0x47, 0x5D, 0xAE, 0xD9, 0xA8, 0x48, 0xF4, 0x0F, 0x13, 0xF9}};
 
 static const nxpl::NX_GUID kHanwhaAppearingEventId =
     {{0xA4, 0x52, 0xE4, 0x9A, 0xD1, 0xD8, 0x44, 0xEA, 0x84, 0xDA, 0xF5, 0x81, 0x41, 0x4E, 0x81, 0x53}};
