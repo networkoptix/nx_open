@@ -124,6 +124,19 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     return result;
 }
 
+namespace {
+
+/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
+static QString fixIpv6AddressString(const QString& ipv6Str)
+{
+    int unexpectedSuffixPos = ipv6Str.indexOf('%');
+    if (unexpectedSuffixPos == -1)
+        return ipv6Str;
+    return ipv6Str.mid(0, unexpectedSuffixPos);
+}
+
+} // namespace
+
 QList<HostAddress> allLocalAddresses(AddressFilters filter)
 {
     QList<HostAddress> result;
@@ -151,7 +164,7 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
                 result << HostAddress(address.ip().toString());
 
             if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
-                result << HostAddress(address.ip().toString());
+                result << HostAddress(fixIpv6AddressString(address.ip().toString()));
         }
     }
 
