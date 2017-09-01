@@ -42,8 +42,8 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_startTimestamp( startTimestamp ),
     m_duration( duration ),
     m_streamQuality( streamQuality ),
-    m_isLive( false )
-    //,m_auxiliaryParams( auxiliaryParams )
+    m_isLive( false ),
+    m_auxiliaryParams( auxiliaryParams )
 {
     NX_ASSERT( !containerFormat.isEmpty() );
 
@@ -140,6 +140,14 @@ const QString& StreamingChunkCacheKey::audioCodec() const
 bool StreamingChunkCacheKey::live() const
 {
     return m_isLive;
+}
+
+QString StreamingChunkCacheKey::streamingSessionId() const
+{
+    auto it = m_auxiliaryParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
+    if (it != m_auxiliaryParams.end())
+        return it->second;
+    return QString();
 }
 
 bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheKey& right) const
