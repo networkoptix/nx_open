@@ -8,7 +8,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-bool isRadassSupported(const QnVirtualCameraResourcePtr& camera);
 bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match);
 ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout);
 bool isRadassSupported(const QnLayoutItemIndex& item);

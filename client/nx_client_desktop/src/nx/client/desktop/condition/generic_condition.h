@@ -31,33 +31,6 @@ public:
         }
         NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(match)));
         return false;
-//
-//         int count = 0;
-//         for (const Item& item: sequence)
-//         {
-//             bool matches = checkOne(item);
-//
-//             if (matches && match == MatchMode::Any)
-//                 return true;
-//
-//             if (!matches && match == MatchMode::All)
-//                 return false;
-//
-//             if (matches)
-//                 count++;
-//         }
-//
-//         if (match == MatchMode::Any)
-//             return false;
-//
-//         if (match == MatchMode::All)
-//             return true;
-//
-//         if (match == MatchMode::ExactlyOne)
-//             return count == 1;
-//
-//         NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(match)));
-//         return false;
     }
 
     template<class Item, class ItemSequence>
@@ -65,18 +38,11 @@ public:
         std::function<bool(const Item& item)> checkOne)
     {
         int count = boost::count_if(sequence, checkOne);
-        int total = sequence.size();
-//         for (const Item& item: sequence)
-//         {
-//             ++total;
-//             if (checkOne(item))
-//                 count++;
-//         }
 
         if (count == 0)
             return ConditionResult::None;
 
-        if (count == total)
+        if (count == sequence.size())
             return ConditionResult::All;
 
         return ConditionResult::Partial;

@@ -8,14 +8,23 @@
 
 #include <nx/client/desktop/condition/generic_condition.h>
 
+namespace {
+
+bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemData& item)
+{
+    if (!item.zoomRect.isNull())
+        return false;
+
+    const auto camera = resourcePool->getResourceByDescriptor(item.resource)
+        .dynamicCast<QnVirtualCameraResource>();
+    return camera && camera->hasDualStreaming2();
+}
+
+}
+
 namespace nx {
 namespace client {
 namespace desktop {
-
-bool isRadassSupported(const QnVirtualCameraResourcePtr& camera)
-{
-    return camera && camera->hasDualStreaming2();
-}
 
 bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
 {
@@ -25,9 +34,7 @@ bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
     return GenericCondition::check<QnLayoutItemData>(layout->getItems(), match,
         [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
         {
-            const auto camera = resourcePool->getResourceByDescriptor(item.resource)
-                .dynamicCast<QnVirtualCameraResource>();
-            return camera && isRadassSupported(camera);
+            return isRadassSupportedInternal(resourcePool, item);
         });
 }
 
@@ -39,9 +46,7 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
     return GenericCondition::check<QnLayoutItemData>(layout->getItems(),
         [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
         {
-            const auto camera = resourcePool->getResourceByDescriptor(item.resource)
-                .dynamicCast<QnVirtualCameraResource>();
-            return camera && isRadassSupported(camera);
+            return isRadassSupportedInternal(resourcePool, item);
         });
 }
 
@@ -51,13 +56,7 @@ bool isRadassSupported(const QnLayoutItemIndex& item)
         return false;
 
     const auto layoutItem = item.layout()->getItem(item.uuid());
-    if (layoutItem.uuid.isNull())
-        return false;
-
-    const auto camera = item.layout()->resourcePool()->getResourceByDescriptor(layoutItem.resource)
-        .dynamicCast<QnVirtualCameraResource>();
-
-    return camera && isRadassSupported(camera);
+    return isRadassSupportedInternal(item.layout()->resourcePool(), layoutItem);
 }
 
 bool isRadassSupported(const QnLayoutItemIndexList& items, MatchMode match)

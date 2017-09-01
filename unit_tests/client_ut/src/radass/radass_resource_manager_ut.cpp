@@ -78,6 +78,21 @@ protected:
         return addCamera(false);
     }
 
+    QnLayoutItemIndex addZoomWindow()
+    {
+        auto camera = new CameraResourceStub();
+        resourcePool()->addResource(QnResourcePtr(camera));
+        camera->setHasDualStreaming(true);
+
+        QnLayoutItemData item;
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = camera->getId();
+        item.zoomRect = QRectF(0.1, 0.1, 0.5, 0.5);
+
+        m_layout->addItem(item);
+        return QnLayoutItemIndex(m_layout, item.uuid);
+    }
+
     QnCommonModule* commonModule() const { return m_module.data(); }
     QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
     RadassResourceManager* manager() const { return m_manager.data(); }
@@ -147,6 +162,14 @@ TEST_F(RadassResourceManagerTest, setModeToUnsupportedCamera)
     ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
 }
 
+TEST_F(RadassResourceManagerTest, setModeToFisheyeItem)
+{
+    QnLayoutItemIndexList items;
+    items << addZoomWindow();
+    manager()->setMode(items, RadassMode::High);
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
+}
+
 TEST_F(RadassResourceManagerTest, setModeToCameras)
 {
     QnLayoutItemIndexList items;
@@ -162,6 +185,7 @@ TEST_F(RadassResourceManagerTest, setModeToMixedCameras)
 
     auto mixedItems = items;
     mixedItems << addUnsupportedCamera();
+    mixedItems << addZoomWindow();
 
     manager()->setMode(items, RadassMode::High);
     ASSERT_EQ(RadassMode::High, manager()->mode(mixedItems));
@@ -181,7 +205,7 @@ TEST_F(RadassResourceManagerTest, setModeToLayoutCheckCameras)
 TEST_F(RadassResourceManagerTest, setModeToLayoutWithUnsupportedCamerasOnly)
 {
     QnLayoutItemIndexList items;
-    items << addUnsupportedCamera() << addUnsupportedCamera();
+    items << addUnsupportedCamera() << addZoomWindow();
     manager()->setMode(layout(), RadassMode::High);
 
     ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
@@ -246,6 +270,7 @@ TEST_F(RadassResourceManagerTest, addUnsupportedCameraToPresetLayout)
     addCamera();
     manager()->setMode(layout(), RadassMode::High);
     addUnsupportedCamera();
+    addZoomWindow();
     ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
 }
 
