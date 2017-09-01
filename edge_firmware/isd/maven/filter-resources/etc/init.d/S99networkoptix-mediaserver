@@ -51,7 +51,7 @@ start()
     fi
 
     if [ -f "$LOG_OUTPUT_FLAG" ]; then
-        mkdir -p $(dirname "$OUTPUT_LOG")
+        mkdir -p "$(dirname "$OUTPUT_LOG")"
         REDIRECT_OUTPUT="$OUTPUT_LOG"
     else
         REDIRECT_OUTPUT="/dev/null"
@@ -64,7 +64,7 @@ start()
 
     sleep 1
     # See if server instantly crashes.
-    if [ $(pidof "$BIN_NAME") ]; then
+    if [ "$(pidof "$BIN_NAME")" ]; then
         echo "OK"
     else
         echo "FAILED"
@@ -77,13 +77,14 @@ startquiet()
     start
 }
 
-stop()
+stop() # [signal]
 {
+    SIGNAL="$1" #< Can be empty.
+
     echo "Stopping $BIN_NAME..."
-    /usr/bin/killall "$1" "$BIN_NAME" >/dev/null
+    /usr/bin/killall $SIGNAL "$BIN_NAME" >/dev/null
     local i=0
-    while [ $(pidof "$BIN_NAME") ]
-    do
+    while [ "$(pidof "$BIN_NAME")" ]; do
         /bin/sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
@@ -94,9 +95,14 @@ stop()
     echo "DONE"
 }
 
+printWatchdogPid()
+{
+    pgrep -f -- "-c $0"
+}
+
 start_watchdog()
 {
-    WATCHDOG_PID=$(pgrep -f -- "-c $0")
+    WATCHDOG_PID=$(printWatchdogPid)
     if [ ! -z "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is already running with pid $WATCHDOG_PID"
         return 0
@@ -108,7 +114,7 @@ start_watchdog()
 
 stop_watchdog()
 {
-    WATCHDOG_PID=$(pgrep -f -- "-c $0")
+    WATCHDOG_PID=$(printWatchdogPid)
     if [ -z "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is not running"
         return 0
@@ -211,7 +217,7 @@ case "$1" in
         fi
         ;;
     server_status)
-        if [ $(pidof "$BIN_NAME") ]; then
+        if [ "$(pidof "$BIN_NAME")" ]; then
             echo "1"
         fi
         ;;
@@ -219,7 +225,7 @@ case "$1" in
         stop_watchdog
         stop
         echo "Waiting for mediaserver process to end..."
-        while [ $(pidof "$BIN_NAME") ]; do
+        while [ "$(pidof "$BIN_NAME")" ]; do
             /bin/sleep 1
         done
         start && start_watchdog
