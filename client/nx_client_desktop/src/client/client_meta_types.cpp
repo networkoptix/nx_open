@@ -1,5 +1,7 @@
 #include "client_meta_types.h"
 
+#include <QtQml/QtQml>
+
 #include <common/common_meta_types.h>
 
 #include <client/client_globals.h>
@@ -27,6 +29,8 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
 #include <api/server_rest_connection.h>
+
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -150,6 +154,13 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
+    registerQmlTypes();
+
     qn_clientMetaTypes_initialized = true;
+}
+
+void QnClientMetaTypes::registerQmlTypes()
+{
+    qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
 }
 

@@ -16,9 +16,13 @@
  *
  * Also initializes metatypes from common and client_core module.
  */
-class QnClientMetaTypes {
+class QnClientMetaTypes
+{
 public:
     static void initialize();
+
+private:
+    static void registerQmlTypes();
 };
 
 Q_DECLARE_METATYPE(Qt::KeyboardModifiers)
