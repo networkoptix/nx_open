@@ -85,10 +85,14 @@ void DirectEndpointConnector::performEndpointVerification(
     ConnectCompletionHandler handler)
 {
     post(
-        [this, endpoints, timeout, handler = std::move(handler)]() mutable
+        [this, endpoints = endpoints, timeout, handler = std::move(handler)]() mutable
         {
+            removeInvalidEmptyAddresses(&endpoints);
+
             if (endpoints.empty())
             {
+                NX_WARNING(this, lm("Cloud connect session %1, target %2. Cannot verify empty address list")
+                    .args(m_connectSessionId, m_targetHostAddress.toString()));
                 handler(
                     nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
                     SystemError::connectionReset,
@@ -100,6 +104,24 @@ void DirectEndpointConnector::performEndpointVerification(
 
             launchVerificators(endpoints, timeout);
         });
+}
+
+void DirectEndpointConnector::removeInvalidEmptyAddresses(
+    std::list<SocketAddress>* endpoints)
+{
+    for (auto it = endpoints->begin(); it != endpoints->end();)
+    {
+        if (it->address.toString().isEmpty())
+        {
+            NX_WARNING(this, lm("Cloud connect session %1, target %2. Received empty address")
+                .args(m_connectSessionId, m_targetHostAddress.toString()));
+            it = endpoints->erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void DirectEndpointConnector::launchVerificators(
