@@ -336,7 +336,9 @@ void HttpServerConnection::someMsgBodyRead(
         {
             // The only way to signal about the end of message body is to close a connection 
             // if Content-Length is not specified.
-            return closeConnection(SystemError::noError);
+            // Connection will be closed after sending this response if noone takes socket 
+            // for any reason (like establishing some tunnel, etc...).
+            m_isPersistent = false;
         }
 
         // Done with message body.
