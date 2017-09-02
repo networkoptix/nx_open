@@ -66,8 +66,8 @@ class AccountManager(db.models.Manager):
 
         logger.debug('AccountManager._create_user calling /cdb/account/register: ' + email)
         result = Account.register(email, password, first_name, last_name, code=code)
-        logger.debug('AccountManager._create_user calling /cdb/account/register result code: %s, result content: %s' %
-                     (result.status_code, result.text))
+        logger.debug('AccountManager._create_user calling /cdb/account/register result code: %s' %
+                     (result['code']))
 
         logger.debug('AccountManager._create_user saving user to cloud_portal: ' + email)
         user = self.model(email=email,
