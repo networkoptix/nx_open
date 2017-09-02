@@ -2,36 +2,21 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/http/http_client.h>
-#include <nx/network/http/server/handler/http_server_handler_create_tunnel.h>
-#include <nx/network/http/test_http_server.h>
-#include <nx/network/url/url_builder.h>
-#include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/random.h>
-#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/sync_call.h>
 
 #include <discovery/registered_peer_pool.h>
+
+#include "discovery_test_setup.h"
 
 namespace nx {
 namespace cloud {
 namespace discovery {
 namespace test {
 
-static const char* const kPeerType = "test_peer";
-static const char* const kTestPath = "/create_websocket";
-
-struct PeerInformation:
-    BasicInstanceInformation
-{
-    PeerInformation():
-        BasicInstanceInformation(kPeerType)
-    {
-    }
-};
-
 class DiscoveryRegisteredPeerPool:
-    public ::testing::Test
+    public DiscoveryTestSetup
 {
 public:
     DiscoveryRegisteredPeerPool():
@@ -49,22 +34,6 @@ public:
     }
 
 protected:
-    virtual void SetUp() override
-    {
-        using namespace std::placeholders;
-
-        m_httpServer.registerRequestProcessor<nx_http::server::handler::CreateTunnelHandler>(
-            kTestPath,
-            [this]()
-            {
-                return std::make_unique<nx_http::server::handler::CreateTunnelHandler>(
-                    nx::network::websocket::kWebsocketProtocolName,
-                    std::bind(&DiscoveryRegisteredPeerPool::onUpgradedConnectionAccepted, this, _1));
-            });
-
-        ASSERT_TRUE(m_httpServer.bindAndListen());
-    }
-
     void givenConnectedPeer()
     {
         PeerContext peerContext;
@@ -130,8 +99,9 @@ protected:
         peerInfo.id = m_peers.back().id;
         peerInfo.apiUrl = "http://nxvms.com/test_peer/";
         if (m_peers.back().type.empty())
-            m_peers.back().type = kPeerType;
-        peerInfo.type = m_peers.back().type;
+            m_peers.back().type = peerInfo.type; //< Using default type.
+        else
+            peerInfo.type = m_peers.back().type;
         m_peers.back().expectedPeerInfo = QJson::serialized(peerInfo);
         sendPeerInfo(m_peers.back().expectedPeerInfo);
     }
@@ -255,25 +225,8 @@ private:
     conf::Discovery m_configuration;
     discovery::RegisteredPeerPool m_registeredPeerPool;
     std::vector<std::string> m_foundPeers;
-    TestHttpServer m_httpServer;
-    nx::utils::SyncQueue<std::unique_ptr<nx::network::WebSocket>> m_acceptedConnections;
     std::vector<PeerContext> m_peers;
     std::string m_selectedPeerType;
-
-    void onUpgradedConnectionAccepted(std::unique_ptr<AbstractStreamSocket> connection)
-    {
-        auto webSocket = std::make_unique<nx::network::WebSocket>(
-            std::move(connection));
-        m_acceptedConnections.push(std::move(webSocket));
-    }
-
-    QUrl getUrl() const
-    {
-        return nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName)
-            .setEndpoint(m_httpServer.serverAddress())
-            .setPath(kTestPath);
-    }
 
     void sendPeerInfo(const nx::Buffer& peerInfoJson)
     {

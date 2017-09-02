@@ -34,11 +34,6 @@ boost::optional<hpm::api::SystemCredentials>
     return m_cloudSystemCredentials;
 }
 
-static std::string relayPort(int index)
-{
-    return std::to_string(20000 + index);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
@@ -58,7 +53,7 @@ cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domain
 cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     const std::string& /*domainName*/) const
 {
-    auto redirectToEndpoint = "127.0.0.1:" + relayPort(0);
+    auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
     return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
 
@@ -107,6 +102,11 @@ BasicTestFixture::~BasicTestFixture()
     m_httpServer.reset();
 }
 
+SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+{
+    return m_relays[index]->moduleInstance()->httpEndpoints()[0];
+}
+
 void BasicTestFixture::startRelays()
 {
     for (int i = 0; i < m_relayCount; ++i)
@@ -117,7 +117,7 @@ void BasicTestFixture::startRelay(int index)
 {
     auto newRelay = std::make_unique<Relay>();
 
-    std::string endpointString = std::string("0.0.0.0:") + relayPort(index);
+    std::string endpointString = "127.0.0.1:0";
     newRelay->addArg("-http/listenOn", endpointString.c_str());
 
     std::string dataDirString = std::string("relay_") + std::to_string(index);
@@ -188,7 +188,8 @@ QUrl BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
-    auto relayUrlString = lm("http://127.0.0.1:%1/").arg(relayPort(relayNum)).toQString();
+    auto relayUrlString = lm("http://%1/")
+        .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
 
     return QUrl(relayUrlString);
 }
