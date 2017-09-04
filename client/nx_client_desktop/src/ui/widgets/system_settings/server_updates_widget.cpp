@@ -809,7 +809,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, &dialog));
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     const auto result = dialog.exec();

@@ -16,6 +16,14 @@ namespace {
 static const int kMaximumRows = 10;
 static const int kRecommendedWidth = 284;
 
+static const QnResourceListView::Options kDefaultOptions =
+    []
+    {
+        QnResourceListView::Options result;
+        result.set(QnResourceListView::SortAsInTree);
+        return result;
+    }();
+
 }
 
 QnResourceListView::QnResourceListView(QWidget* parent):
@@ -24,10 +32,7 @@ QnResourceListView::QnResourceListView(QWidget* parent):
 {
     m_model->setReadOnly(true);
 
-    auto sortedModel = new QnResourceListSortedModel(this);
-    sortedModel->setSourceModel(m_model);
-
-    setModel(sortedModel);
+    setModel(m_model);
     setRootIsDecorated(false);
     setUniformRowHeights(true);
     setHeaderHidden(true);
@@ -46,18 +51,19 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     }
 }
 
-QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):
+QnResourceListView::QnResourceListView(const QnResourceList& resources,
+    Options options,
+    QWidget* parent)
+    :
     QnResourceListView(parent)
 {
+    setOptions(options);
     setResources(resources);
 }
 
-QnResourceListView::QnResourceListView(const QnResourceList& resources, bool ignoreStatus,
-    QWidget* parent)
-    :
-    QnResourceListView(resources, parent)
+QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):
+    QnResourceListView(resources, kDefaultOptions, parent)
 {
-    setSimplified(ignoreStatus);
 }
 
 QnResourceList QnResourceListView::resources() const
@@ -71,14 +77,40 @@ void QnResourceListView::setResources(const QnResourceList& resources)
     model()->sort(QnResourceListModel::NameColumn);
 }
 
-bool QnResourceListView::isSimplified() const
+QnResourceListView::Options QnResourceListView::options() const
 {
-    return m_model->isSimplified();
+    return m_options;
 }
 
-void QnResourceListView::setSimplified(bool value)
+void QnResourceListView::setOptions(Options value)
 {
-    m_model->setSimplified(value);
+    if (m_options == value)
+        return;
+
+    m_options = value;
+
+    QnResourceListModel::Options modelOptions;
+    if (value.test(Option::HideStatus))
+        modelOptions.set(QnResourceListModel::HideStatus);
+    if (value.test(Option::ServerAsHealthMonitor))
+        modelOptions.set(QnResourceListModel::ServerAsHealthMonitor);
+    m_model->setOptions(modelOptions);
+
+    if (value.test(Option::SortAsInTree))
+    {
+        NX_EXPECT(!value.test(Option::SortByName), "Only one sorting may be actual");
+        resetSortModel(new QnResourceListSortedModel(this));
+    }
+    else if (value.test(Option::SortByName))
+    {
+        auto model = new QSortFilterProxyModel(this);
+        model->setSortCaseSensitivity(Qt::CaseInsensitive);
+        resetSortModel(model);
+    }
+    else if (m_sortModel)
+    {
+        resetSortModel(nullptr);
+    }
 }
 
 bool QnResourceListView::isSelectionEnabled() const
@@ -104,4 +136,21 @@ QnResourcePtr QnResourceListView::selectedResource() const
 QSize QnResourceListView::sizeHint() const
 {
     return QSize(kRecommendedWidth, style::Metrics::kViewRowHeight * std::min(kMaximumRows, resources().size()));
+}
+
+void QnResourceListView::resetSortModel(QSortFilterProxyModel* model)
+{
+    setModel(nullptr);
+    delete m_sortModel;
+    m_sortModel = model;
+    if (m_sortModel)
+    {
+        m_sortModel->setSourceModel(m_model);
+        m_sortModel->sort(QnResourceListModel::NameColumn);
+        setModel(m_sortModel);
+    }
+    else
+    {
+        setModel(m_model);
+    }
 }

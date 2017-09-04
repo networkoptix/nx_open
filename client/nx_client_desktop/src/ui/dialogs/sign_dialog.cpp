@@ -22,11 +22,15 @@
 class QnSignDialogGlWidget: public QnGLWidget
 {
 public:
-    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0):
+    QnSignDialogGlWidget(
+        const QGLFormat& format,
+        QWidget* parent = nullptr,
+        QGLWidget* shareWidget = nullptr,
+        Qt::WindowFlags windowFlags = 0)
+        :
         QnGLWidget(format, parent, shareWidget, windowFlags)
     {
-        m_renderer = 0;
-        connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+        connect(&m_timer, &QTimer::timeout, this, [this]{ update(); });
         m_timer.start(16);
         m_textureWidth = 1920;
         m_textureHeight = 1080;
@@ -39,7 +43,7 @@ public:
         resizeEvent(0);
     }
 
-    virtual void resizeEvent(QResizeEvent *) override
+    virtual void resizeEvent(QResizeEvent* /*event*/) override
     {
         m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
         if (m_renderer)
@@ -47,24 +51,23 @@ public:
         update();
     }
 
-    void setRenderer(QnResourceWidgetRenderer *renderer)
+    void setRenderer(QnResourceWidgetRenderer* renderer)
     {
         m_renderer = renderer;
     }
 
-    
-    virtual void paintEvent(QPaintEvent *) override
+    virtual void paintEvent(QPaintEvent* /*event*/) override
     {
         QPainter painter(this);
-        QnGlNativePainting::begin(QGLContext::currentContext(),&painter);
+        QnGlNativePainting::begin(QGLContext::currentContext(), &painter);
         if (m_renderer)
             m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         QnGlNativePainting::end(&painter);
     }
-    
+
 private:
     QRect m_videoRect;
-    QnResourceWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer* m_renderer = nullptr;
     QTimer m_timer;
     double m_textureWidth;
     double m_textureHeight;
@@ -72,16 +75,9 @@ private:
 
 // ------------------------------------
 
-SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
+SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     base_type(parent),
-    ui(new Ui::SignDialog),
-    m_camDispay(NULL),
-    m_reader(NULL),
-    m_renderer(NULL),
-    m_glWindow(NULL),
-    m_srcVideoInfo(0),
-    m_layout(0),
-    m_requestHandle(-1)
+    ui(new Ui::SignDialog)
 {
     ui->setupUi(this);
 
@@ -89,32 +85,42 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
     m_layout = new QVBoxLayout(ui->videoSpacer);
     m_layout->setSpacing(0);
-    m_layout->setContentsMargins(0,0,0,0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
 
-    m_glWindow = QnGlWidgetFactory::create<QnSignDialogGlWidget>();
-    m_layout->addWidget(m_glWindow);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_glWindow );
-    
+    m_glWindow.reset(QnGlWidgetFactory::create<QnSignDialogGlWidget>());
+    m_layout->addWidget(m_glWindow.data());
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
+        m_glWindow.data());
+
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader = static_cast<QnAbstractArchiveStreamReader*> (m_resource->createDataProvider(Qn::CR_Default));
+    m_reader.reset(static_cast<QnAbstractArchiveStreamReader*> (
+        m_resource->createDataProvider(Qn::CR_Default)));
     m_reader->setCycleMode(false);
-    m_camDispay = new QnSignDialogDisplay(m_resource);
 
-    connect(m_camDispay, SIGNAL(gotSignature(QByteArray, QByteArray)), ui->signInfoLabel, SLOT(at_gotSignature(QByteArray, QByteArray)));
-    connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), ui->signInfoLabel, SLOT(at_calcSignInProgress(QByteArray, int)));
-    connect(m_camDispay, SIGNAL(gotSignatureDescription(QString, QString, QString)), ui->signInfoLabel, SLOT(at_gotSignatureDescription(QString, QString, QString)));
-    connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), this, SLOT(at_calcSignInProgress(QByteArray, int)));
-    connect(m_camDispay, SIGNAL(gotSignature(QByteArray, QByteArray)), this, SLOT(at_gotSignature(QByteArray, QByteArray)));
+    m_camDispay.reset(new QnSignDialogDisplay(m_resource));
 
-    connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
+    connect(m_camDispay, &QnSignDialogDisplay::gotSignature, ui->signInfoLabel,
+        &QnSignInfo::at_gotSignature);
+    connect(m_camDispay, &QnSignDialogDisplay::calcSignInProgress, ui->signInfoLabel,
+        &QnSignInfo::at_calcSignInProgress);
+    connect(m_camDispay, &QnSignDialogDisplay::gotSignatureDescription, ui->signInfoLabel,
+        &QnSignInfo::at_gotSignatureDescription);
+
+    connect(m_camDispay, &QnSignDialogDisplay::calcSignInProgress, this,
+        &SignDialog::at_calcSignInProgress);
+    connect(m_camDispay, &QnSignDialogDisplay::gotSignature, this,
+        &SignDialog::at_gotSignature);
+
+    connect(m_camDispay, &QnSignDialogDisplay::gotImageSize, this,
+        &SignDialog::at_gotImageSize);
 
     m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
     m_glWindow->setRenderer(m_renderer);
     m_camDispay->addVideoRenderer(1, m_renderer, true);
-    m_reader->addDataProcessor(m_camDispay);
-    m_reader->setSpeed(1024*1024);
+    m_reader->addDataProcessor(m_camDispay.data());
+    m_reader->setSpeed(1024 * 1024);
     m_reader->start();
     m_camDispay->start();
 }
@@ -130,13 +136,13 @@ SignDialog::~SignDialog()
     m_reader->stop();
     m_camDispay->stop();
     m_camDispay->clearUnprocessedData();
-    
-    delete m_camDispay;
-    delete m_reader;
-    delete m_glWindow;
 }
 
-QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight)
+QRect SignDialog::calcVideoRect(
+    double windowWidth,
+    double windowHeight,
+    double textureWidth,
+    double textureHeight)
 {
     QRect videoRect;
     double newTextureWidth = static_cast<uint>(textureWidth);
@@ -153,17 +159,20 @@ QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double 
         videoRect.setLeft((windowWidth - scaledWidth) / 2);
         videoRect.setWidth(scaledWidth + 0.5);
     }
-    else {
+    else
+    {
         // black bars at the top and bottom
         videoRect.setLeft(0);
         videoRect.setWidth(windowWidth);
-        if (newTextureWidth < windowWidth) {
+        if (newTextureWidth < windowWidth)
+        {
             double scale = windowWidth / newTextureWidth;
             double scaledHeight = textureHeight * scale;
             videoRect.setTop((windowHeight - scaledHeight) / 2);
             videoRect.setHeight(scaledHeight + 0.5);
         }
-        else {
+        else
+        {
             double newTextureHeight = windowWidth / textureAspect + 0.5;
             videoRect.setTop((windowHeight - newTextureHeight) / 2);
             videoRect.setHeight(newTextureHeight);
@@ -172,28 +181,28 @@ QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double 
     return videoRect;
 }
 
-void SignDialog::changeEvent(QEvent *event)
+void SignDialog::changeEvent(QEvent* event)
 {
     QDialog::changeEvent(event);
 
-    switch (event->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    switch (event->type())
+    {
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
-void SignDialog::at_calcSignInProgress(QByteArray sign, int progress)
+void SignDialog::at_calcSignInProgress(QByteArray /*sign*/, int progress)
 {
-    Q_UNUSED(sign)
     ui->progressBar->setValue(progress);
 }
 
 void SignDialog::at_gotImageSize(int width, int height)
 {
-    if (m_glWindow) 
+    if (m_glWindow)
         m_glWindow->setImageSize(width, height);
     ui->signInfoLabel->setImageSize(width, height);
 }
@@ -204,6 +213,8 @@ void SignDialog::at_gotSignature(QByteArray calculatedSign, QByteArray signFromF
     m_layout->addWidget(m_srcVideoInfo);
     m_glWindow->hide();
     m_srcVideoInfo->setDrawDetailTextMode(true);
-    m_srcVideoInfo->at_gotSignature(signFromFrame, calculatedSign); // it is correct. set parameters vise versa here
+
+    // It is correct. Set parameters vise versa here.
+    m_srcVideoInfo->at_gotSignature(signFromFrame, calculatedSign);
 #endif
 }

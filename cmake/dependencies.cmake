@@ -83,7 +83,6 @@ function(detect_package_versions)
     set(gmock_version ${_gmock_version} CACHE STRING "")
     set(directx_version ${_directx_version} CACHE STRING "")
     set(server-external_version "" CACHE STRING "")
-
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 
@@ -146,6 +145,9 @@ function(get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
+        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
+        set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
+        nx_rdep_add_package("vmaxproxy-2.1")
     endif()
 
     if(box STREQUAL "edge1")

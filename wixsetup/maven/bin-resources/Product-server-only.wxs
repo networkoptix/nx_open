@@ -2,17 +2,18 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="${display.product.name} Server" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Server Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+    <?include BuildVars.wxi ?>
+    <Product Id="*" Name="$(var.productName) Server" Language="1033" Version="$(var.releaseVersionFull)" Manufacturer="$(var.companyName)" UpgradeCode="$(var.serverUpgradeCode)">
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="$(var.companyName) $(var.productName) Server Installer" Manufacturer="$(var.companyName)" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
-        
-        <?define ProductName="${display.product.name}"?>
+
+        <?define ProductName="$(var.productName)"?>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
 
-        <Property Id="REINSTALLMODE" Value="dmus"/> 
+        <Property Id="REINSTALLMODE" Value="dmus"/>
 
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
@@ -40,14 +41,14 @@
         <SetProperty Id="INSTALL_SERVER" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &ServerFeature = 3 OR !ServerFeature = 3 ]]>
         </SetProperty>
-        
+
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
 
         <!-- Logo -->
-        <Icon Id="icon_menu.exe" SourceFile="favicon.ico"/>
-        <Icon Id="icon_desktop.exe" SourceFile="favicon.ico"/>
+        <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
 
         <!-- Disable restart manager as it causes installer to ask to stop services instead of doing this automatically -->
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
@@ -56,7 +57,7 @@
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${product.title}" />
+        <Property Id="WelcomeDlg_Title" Value="$(var.ProductTitle)" />
 
         <Property Id="BUSYPORT" Secure="yes"/>
 
@@ -80,11 +81,11 @@
         <!-- <Property Id="SYSTEM_NAME" Value="[SYSTEM_NAME]" Secure="yes">
             <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
         </Property> -->
-        
+
         <!-- Demo only!!! -->
         <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
-        </Property>        
+        </Property>
         <!-- <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property> -->
@@ -94,12 +95,12 @@
         </Property>
 
         <Property Id="STATISTICS_REPORT_ALLOWED" Value="1" Secure="yes"/>
-   
+
         <Property Id="SERVER_LOGIN" Value="admin"/>
-        
+
         <?if NOT $(var.VmsUpgrading) ?>
-            <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
-            <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
+        <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
+        <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
         <?endif?>
 
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
@@ -109,7 +110,7 @@
 
         <SetProperty Action="SetStatisticsReportAllowed1" Id="ALLOW_CAMERA_CHANGES" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
         <SetProperty Action="SetAllowCameraOptimization1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="AppSearch">$(var.VmsInstalling)</SetProperty>
-    
+
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
@@ -129,22 +130,22 @@
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
-        
-        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" 
-            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\$(var.companyName)\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
-        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" 
-            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\vms_storedfiles"/>
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\$(var.companyName)\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)\vms_storedfiles"/>
         <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
-        
+
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[$(var.customization)TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -154,17 +155,17 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate"
-                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name};Software\[Manufacturer]\version;"/>
+                      Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName);Software\[Manufacturer]\version;"/>
 
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
-                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}"/>
+                      Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="$(var.customization)TrayToolDir" ExeCommand="[$(var.customization)TrayToolDir]traytool.exe"/>
 
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
+        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
 
-        <MajorUpgrade 
+        <MajorUpgrade
             AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
             MigrateFeatures="yes" />
@@ -191,25 +192,30 @@
             <Custom Action="GenerateSystemName" After="DetectIfSystemIsStandalone">$(var.VmsUpgrading) AND NOT SYSTEM_NAME AND STANDALONE_SYSTEM="yes"</Custom>
 
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
+            </Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
+            </Custom>
             <Custom Action="CopyHostedFiles_Cmd" After="InstallFiles">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
+            </Custom>
             <Custom Action="CopyHostedFiles" After="CopyHostedFiles_Cmd">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
+            </Custom>
 
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
-            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">NOT $(var.VmsInstalling)</Custom>                                 
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseTrayToolAction" Before="CloseTrayToolAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
 
             <Custom Action="CloseTrayToolAction2_Cmd" Before="CloseTrayToolAction2">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseTrayToolAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
-            <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]>
+            </Custom>
 
             <Custom Action="BackupDatabaseFile_Cmd" After="StopServices">1</Custom>
             <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">1</Custom>
@@ -240,17 +246,17 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${customization}BgDir" Name="$(var.ProductName) Backgrounds"/>
+                <Directory Id="$(var.customization)BgDir" Name="$(var.ProductName) Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="${company.name}">
+                <Directory Id="NetworkOptix" Name="$(var.companyName)">
                     <Directory Id="INSTALLDIR" Name="$(var.ProductName)"/>
                 </Directory>
             </Directory>
 
             <Directory Id="ProgramMenuFolder" Name="Programs">
-                <Directory Id="ProgramMenuDir" Name="${company.name}">
+                <Directory Id="ProgramMenuDir" Name="$(var.companyName)">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
                         <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
@@ -259,7 +265,7 @@
             </Directory>
 
             <Directory Id="DesktopFolder" Name="Desktop"/>
-            <Directory Id="StartupFolder" Name="Startup"/>            
+            <Directory Id="StartupFolder" Name="Startup"/>
         </Directory>
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -279,7 +285,7 @@
         <UI>
             <!-- These dialog references are needed for CloseApplication above to work correctly -->
             <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />      
+            <DialogRef Id="MsiRMFilesInUse" />
 
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
@@ -301,20 +307,26 @@
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
             <!-- WelcomeDlg -->
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]></Publish>          
-            
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">
+                <![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]>
+            </Publish>
+
             <!-- Demo only!!! -->
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> 
-            
-            <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">
+                <![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]>
+            </Publish>
+
+            <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">
+                <![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]>
+            </Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSSERVERINSTALLED = "1"</Publish>
 
             <!-- LicenseAgreementDlg -->
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            
+
             <!-- Demo only!!! -->
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">LicenseAccepted = "1"</Publish>
-            
+
             <!-- Demo only!!! <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">LicenseAccepted = "1"</Publish> -->
 
             <!-- UpgradeDlg -->
@@ -324,10 +336,10 @@
             <!-- Demo only!!! -->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
-            
+
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="ALLOW_CAMERA_CHANGES" Value="{}">ALLOW_CAMERA_CHANGES = "0"</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">1</Publish>
-            
+
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
 

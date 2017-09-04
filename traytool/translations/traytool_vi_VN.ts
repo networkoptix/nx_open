@@ -59,11 +59,11 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Máy chủ đã bị dừng</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Máy chủ đã được bắt đầu</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
@@ -71,47 +71,47 @@
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Hiển thị nhật ký máy chủ</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Bắt đầu Máy chủ</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Dừng máy chủ</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Trang Web Máy chủ</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>đã dừng</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>bắt đầu</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>đang dừng</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>đã bắt đầu</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>tiếp tục</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>đã tạm dừng</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>đang tạm dừng</translation>
     </message>
   </context>
 </TS>

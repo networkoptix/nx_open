@@ -647,8 +647,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 userResource->getRealm() != nx::network::AppInfo::realm() ||
                 !userResource->isEnabled())
             {
-                userResource->setPassword(defaultAdminPassword);
-                userResource->generateHash();
+                userResource->setPasswordAndGenerateHash(defaultAdminPassword);
                 userResource->setEnabled(true);
                 updateUserResource = true;
             }

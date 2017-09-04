@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"切断",
     "disconnectedSuccess":"システムが正常に切断されました",
     "connectedSuccess":"システムが正常に接続されています",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"ローカルの管理者を登録",
     "confirmChangePassword":"adminパスワードの変更",
     "confirmChangePasswordTitle":"システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",

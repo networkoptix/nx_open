@@ -63,6 +63,16 @@ function(nx_configure_file input output)
     configure_file(${input} ${output} ${ARGN})
 endfunction()
 
+function(nx_configure_directory input output)
+    file(GLOB_RECURSE files RELATIVE ${input} ${input}/*)
+    foreach(file ${files})
+        set(src_template_path ${input}/${file})
+        if(NOT IS_DIRECTORY ${src_template_path})
+            nx_configure_file(${input}/${file} ${output}/${file})
+        endif()
+    endforeach()
+endfunction()
+
 function(nx_copy_package_for_configuration package_dir config)
     cmake_parse_arguments(COPY "SKIP_BIN;SKIP_LIB" "" "" ${ARGN})
     if(config)
@@ -126,4 +136,13 @@ function(nx_copy_current_package)
         PATTERN ".rdpack" EXCLUDE
         PATTERN "*.cmake" EXCLUDE
     )
+endfunction()
+
+# TODO Extend nx_copy function
+function(nx_copy_bin_resources input output)
+  file(GLOB files RELATIVE ${input} ${input}/*)
+  foreach(file ${files})
+    message("copying ${file}")
+    nx_copy("${input}/${file}" DESTINATION "${output}")
+  endforeach(file)
 endfunction()

@@ -1,5 +1,7 @@
 #include "resources_messages.h"
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <common/common_module.h>
 
 #include <client_core/client_core_module.h>
@@ -38,6 +40,16 @@ static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayou
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
 
+static const QnResourceListView::Options kSimpleOptions =
+    []
+    {
+        QnResourceListView::Options result;
+        result.set(QnResourceListView::HideStatus);
+        result.set(QnResourceListView::ServerAsHealthMonitor);
+        result.set(QnResourceListView::SortAsInTree);
+        return result;
+    }();
+
 
 bool showCompositeDialog(
     QWidget* parent,
@@ -59,7 +71,7 @@ bool showCompositeDialog(
     messageBox.setText(text);
 
     if (useResources)
-        messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+        messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
 
     messageBox.setInformativeText(extras);
     messageBox.setCheckBoxEnabled(!showOnceFlag.isEmpty());
@@ -164,7 +176,7 @@ bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layou
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Delete %n shared layouts?", "", layouts.size()));
-    messageBox.addCustomWidget(new QnResourceListView(layouts, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(layouts, kSimpleOptions, &messageBox));
     messageBox.setInformativeText(
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
@@ -196,7 +208,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -216,7 +228,7 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
     messageBox.setText(tr("Remove %n items from showreel?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -306,7 +318,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, false, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();
