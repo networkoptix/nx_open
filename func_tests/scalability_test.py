@@ -10,6 +10,7 @@ import requests
 import datetime
 import traceback
 import json
+from requests.exceptions import ReadTimeout
 from functools import wraps
 import test_utils.utils as utils
 from test_utils.utils import GrowingSleep
@@ -26,6 +27,8 @@ log = logging.getLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
+CHECK_METHOD_TIMEOUT = datetime.timedelta(minutes=2)
+CHECK_METHOD_RETRY_COUNT = 5
 
 
 @pytest.fixture
@@ -155,12 +158,17 @@ def create_test_data(config, servers):
 # merge  ============================================================================================
 
 def get_response(server, method, api_object, api_method):
-    try:
-        return server.rest_api.get_api_fn(method, api_object, api_method)()
-    except Exception, x:
-        log.error("%r call '%s/%s' error: %s" % (server, api_object, api_method, str(x)))
-        return None
-
+    for i in range(CHECK_METHOD_RETRY_COUNT):
+        try:
+            return server.rest_api.get_api_fn(method, api_object, api_method)(timeout=CHECK_METHOD_TIMEOUT)
+        except ReadTimeout as x:
+            log.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
+        except Exception as x:
+            log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
+    log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
+              CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
+    server.make_core_dump()
+    raise  # reraise last exception
 
 def clean_transaction_log(json):
     # We have to filter 'setResourceStatus' transactions due to VMS-5969

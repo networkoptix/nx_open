@@ -355,7 +355,7 @@ angular.module('webadminApp')
                         });
                         if(!localAdmin){
                             // Request for login and password
-                            dialogs.createUser(L.settings.createLocalOwner, L.settings.createLocalOwnerTitle).then(function(data){
+                            dialogs.createUser( null /*L.settings.createLocalOwner*/, L.settings.createLocalOwnerTitle).then(function(data){
                                 doDisconnect(data.login,data.password);
                             })
                         }else{

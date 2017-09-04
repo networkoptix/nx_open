@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtGui/QImageReader>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -51,14 +52,10 @@ void QnThreadedImageLoaderPrivate::start()
 {
     if (!m_inputFilename.isEmpty())
     {
-        if (!m_input.load(m_inputFilename))
-        {
-            // Workaround for Qt Mac Os bug, when QImage::load sometimes can't
-            // load image from file directly.
-            QFile imageFile(m_inputFilename);
-            if (imageFile.open(QIODevice::ReadOnly))
-                m_input = QImage::fromData(imageFile.readAll());
-        }
+        // TODO: #ynikitenkov Store image file in layout with correct extension
+        QImageReader reader(m_inputFilename);
+        reader.setDecideFormatFromContent(true);
+        reader.read(&m_input);
     }
 
     QImage output = m_input;

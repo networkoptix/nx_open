@@ -44,15 +44,10 @@
         "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedSuccess": "System was disconnected successfully",
         "connectedSuccess": "System was connected successfully",
-
-        "createLocalOwner":null,
         "createLocalOwnerTitle":"Create local administrator",
-
-
         "confirmChangePassword": "Change admin password",
         "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
-
         "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
     },

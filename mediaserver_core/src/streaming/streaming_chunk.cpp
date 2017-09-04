@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 18 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "streaming_chunk.h"
 
 #include <atomic>
@@ -10,7 +6,7 @@
 #include <nx/utils/random.h>
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
-    m_currentOffset( 0 ),
+    m_currentOffset(0),
     m_chunk(chunk)
 {
     m_chunk->m_readers.insert(this);
@@ -25,14 +21,10 @@ StreamingChunk::StreamingChunk(
     const StreamingChunkCacheKey& params,
     std::size_t maxInternalBufferSize)
     :
-    m_params( params ),
-    m_modificationState( State::init ),
+    m_params(params),
+    m_modificationState(State::init),
     m_maxInternalBufferSize(maxInternalBufferSize),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
-{
-}
-
-StreamingChunk::~StreamingChunk()
 {
 }
 
@@ -43,24 +35,23 @@ const StreamingChunkCacheKey& StreamingChunk::params() const
 
 QString StreamingChunk::mimeType() const
 {
-    if( m_params.containerFormat() == "mpegts" )
+    if (m_params.containerFormat() == "mpegts")
         return QLatin1String("video/mp2t");
-    else if( m_params.containerFormat() == "mp4" )
+    else if (m_params.containerFormat() == "mp4")
         return QLatin1String("video/mp4");
-    else if( m_params.containerFormat() == "webm" )
+    else if (m_params.containerFormat() == "webm")
         return QLatin1String("video/webm");
-    else if( m_params.containerFormat() == "flv" )
+    else if (m_params.containerFormat() == "flv")
         return QLatin1String("video/x-flv");
     else
         return QLatin1String("application/octet-stream");
 
-    //TODO #ak should find some common place for containerFormat -> MIME_type match
+    // TODO: #ak should find some common place for containerFormat -> MIME_type match.
 }
 
-//!Returns whole chunk data
 nx::Buffer StreamingChunk::data() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_data;
 }
 
@@ -80,9 +71,9 @@ bool StreamingChunk::tryRead(
     const quint64 dataOffsetAtTheEndOfTheBuffer =
         m_dataOffsetAtTheFrontOfTheBuffer + m_data.size();
 
-    if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer)  //all data has been read
-        return m_modificationState != State::opened;    //if chunk not opened, signalling end-of-data.
-                                                        //Else, expecting more data to arrive to chunk
+    if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer) //< Whole data has been read.
+        return m_modificationState != State::opened; //< If chunk not opened, signalling end-of-data.
+                                                     //< Else, expecting more data to arrive to chunk.
 
     Q_ASSERT(ctx->m_currentOffset >= m_dataOffsetAtTheFrontOfTheBuffer);
     const quint64 bytesToCopy = std::min<quint64>(
@@ -97,8 +88,8 @@ bool StreamingChunk::tryRead(
     if (m_data.size() < m_maxInternalBufferSize)
         return true;
 
-    //cleaning up space in m_data
-    //  checking that there is no read context that reads data we want to clean
+    // Cleaning up space in m_data.
+    // Checking that there is no read context that reads data we want to clean.
     const auto readerWithMinOffsetIter = std::min_element(
         m_readers.begin(),
         m_readers.end(),
@@ -128,28 +119,27 @@ void StreamingChunk::waitUntilDataAfterOffsetAvailable(
         if (m_dataOffsetAtTheFrontOfTheBuffer + m_data.size() > ctx.m_currentOffset)
             return;
         if (m_modificationState != State::opened)
-            return; //chunk is done, no data will arrive
+            return; //< Chunk is done, no data will arrive.
         m_cond.wait(lk.mutex());
     }
 }
 
 #ifdef DUMP_CHUNK_TO_FILE
 static std::atomic<int> fileNumber = 1;
-static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(nx::utils::random::number()) );
+static QString filePathBase(lit("c:\\tmp\\chunks\\%1_%2.ts").arg(nx::utils::random::number()));
 #endif
 
-//!Only one thread is allowed to modify chunk data at a time
 bool StreamingChunk::openForModification()
 {
-    QnMutexLocker lk( &m_mutex );
-    if( m_modificationState == State::opened )
+    QnMutexLocker lk(&m_mutex);
+    if (m_modificationState == State::opened)
         return false;
     m_modificationState = State::opened;
 
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.open(
-        filePathBase.arg( fileNumber++, 2, 10, QChar(L'0') ).toStdString(),
-        std::ios_base::binary | std::ios_base::out );
+        filePathBase.arg(fileNumber++, 2, 10, QChar(L'0')).toStdString(),
+        std::ios_base::binary | std::ios_base::out);
 #endif
 
     return true;
@@ -161,29 +151,29 @@ bool StreamingChunk::wantMoreData() const
     return (std::size_t)m_data.size() < m_maxInternalBufferSize;
 }
 
-void StreamingChunk::appendData( const nx::Buffer& data )
+void StreamingChunk::appendData(const nx::Buffer& data)
 {
-    static const size_t BUF_INCREASE_STEP = 128*1024;
+    static const size_t BUF_INCREASE_STEP = 128 * 1024;
 
     {
-        QnMutexLocker lk( &m_mutex );
-        NX_ASSERT( m_modificationState == State::opened );
-        if( m_data.capacity() < m_data.size() + data.size() )
-            m_data.reserve( m_data.size() + data.size() + BUF_INCREASE_STEP );
-        m_data.append( data );
+        QnMutexLocker lk(&m_mutex);
+        NX_ASSERT(m_modificationState == State::opened);
+        if (m_data.capacity() < m_data.size() + data.size())
+            m_data.reserve(m_data.size() + data.size() + BUF_INCREASE_STEP);
+        m_data.append(data);
         m_cond.wakeAll();
     }
 
 #ifdef DUMP_CHUNK_TO_FILE
-    m_dumpFile.write( data.constData(), data.size() );
+    m_dumpFile.write(data.constData(), data.size());
 #endif
 }
 
-void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
+void StreamingChunk::doneModification(StreamingChunk::ResultCode /*result*/)
 {
     {
-        QnMutexLocker lk( &m_mutex );
-        NX_ASSERT( m_modificationState == State::opened );
+        QnMutexLocker lk(&m_mutex);
+        NX_ASSERT(m_modificationState == State::opened);
         m_modificationState = State::closed;
         m_cond.wakeAll();
     }
@@ -195,26 +185,25 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 
 bool StreamingChunk::isClosed() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_modificationState != State::opened;
 }
 
 size_t StreamingChunk::sizeInBytes() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_data.size();
 }
 
 bool StreamingChunk::waitForChunkReadyOrInternalBufferFilled()
 {
-    QnMutexLocker lk( &m_mutex );
-    //waiting while chunk is modified
+    QnMutexLocker lk(&m_mutex);
     for (;;)
     {
         if (m_modificationState >= State::closed)
-            return true;    //whole chunk has been generated
+            return true; //< Whole chunk has been generated.
         if ((std::size_t)m_data.size() >= m_maxInternalBufferSize)
-            return false;   //no space in internal buffer
+            return false; //< No space in internal buffer.
         m_cond.wait(lk.mutex());
     }
 }
@@ -226,9 +215,7 @@ void StreamingChunk::disableInternalBufferLimit()
         std::numeric_limits<decltype(m_maxInternalBufferSize)>::max();
 }
 
-//////////////////////////////////////////////
-//   StreamingChunkInputStream
-//////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 
 StreamingChunkInputStream::StreamingChunkInputStream(StreamingChunk* chunk):
     m_chunk(chunk),
@@ -240,15 +227,15 @@ bool StreamingChunkInputStream::tryRead(
     nx::Buffer* const dataBuffer,
     std::size_t maxBytesToRead)
 {
-    if ((!m_range) ||     //no range specified
+    if ((!m_range) || //< No range specified.
         ((m_range.get().rangeSpec.start == 0)
-            && (m_range.get().rangeLength() == m_chunk->sizeInBytes()))) //full entity requested
+            && (m_range.get().rangeLength() == m_chunk->sizeInBytes()))) //< Full entity requested.
     {
         return m_chunk->tryRead(&m_readCtx, dataBuffer, maxBytesToRead);
     }
 
-    NX_ASSERT( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
-    //supporting byte range only on closed chunk
+    NX_ASSERT(m_chunk->isClosed() && m_chunk->sizeInBytes() > 0);
+    // Supporting byte range only on closed chunk.
     if (!(m_chunk->isClosed() && m_chunk->sizeInBytes() > 0))
         return false;
 

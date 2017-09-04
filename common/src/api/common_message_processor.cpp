@@ -731,11 +731,11 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
-    qnCamera->setCommonModule(commonModule());
 
     NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
     {
+        qnCamera->setCommonModule(commonModule());
         fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,

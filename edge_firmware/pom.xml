@@ -59,7 +59,7 @@
                         <configuration>
                             <target>
                                 <chmod file="${project.build.directory}/*.sh" perm="755"/>
-                                <exec dir="${project.build.directory}" executable="${project.build.directory}/create_mediaserver_tar.sh" failonerror="true" failifexecutionfails="true" />
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/create_arm_installer.sh" failonerror="true" failifexecutionfails="true" />
                             </target>
                         </configuration>
                     </execution>

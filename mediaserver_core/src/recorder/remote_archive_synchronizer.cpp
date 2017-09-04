@@ -535,10 +535,14 @@ bool SynchronizationTask::convertAndWriteBuffer(
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(m_commonModule));
     storage->registerResourceData(temporaryFilePath, ioDevice);
 
-    using namespace  nx::mediaserver_core::plugins;
-    std::shared_ptr<QnAviArchiveDelegate> reader(needMotion
-        ? new AviMotionArchiveDelegate()
-        : new QnAviArchiveDelegate());
+    using namespace nx::mediaserver_core::plugins;
+    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+        auto archiveDelegate =
+            needMotion ? new AviMotionArchiveDelegate() : new QnAviArchiveDelegate();
+    #else
+        auto archiveDelegate = new QnAviArchiveDelegate();
+    #endif
+    std::shared_ptr<QnAviArchiveDelegate> reader(archiveDelegate);
 
     reader->setStorage(storage);
     if (!reader->open(storageResource))

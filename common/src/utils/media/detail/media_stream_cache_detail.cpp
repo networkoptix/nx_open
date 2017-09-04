@@ -273,12 +273,12 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return it->packet;
 }
 
-nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& MediaStreamCache::onKeyFrameSubscription()
+nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& MediaStreamCache::keyFrameFoundSubscription()
 {
     return m_onKeyFrame;
 }
 
-nx::utils::Subscription<>& MediaStreamCache::onDiscontinueSubscription()
+nx::utils::Subscription<>& MediaStreamCache::streamTimeDiscontinuityFoundSubscription()
 {
     return m_onDiscontinue;
 }

@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Trennen",
     "disconnectedSuccess":"Das System wurde erfolgreich getrennt",
     "connectedSuccess":"Das System wurde erfolgreich verbunden",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Lokalen Administrator erstellen",
     "confirmChangePassword":"Admin-Passwort ändern",
     "confirmChangePasswordTitle":"Systempasswort ändern? Es wird sich auf den Benutzer \"admin\" und das Root-Passwort für einige Server auswirken",

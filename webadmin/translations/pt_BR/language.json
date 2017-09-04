@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Disconnect",
     "disconnectedSuccess":"System was disconnected successfully",
     "connectedSuccess":"System was connected successfully",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Create local administrator",
     "confirmChangePassword":"Change admin password",
     "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",

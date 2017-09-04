@@ -15,11 +15,12 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/delayed.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace mediaserver {
 
-static const QUrl kLicenseServerUrl("http://nxlicensed.hdw.mx/nxlicensed/api/v1/validate/");
+static const QUrl kLicenseServerUrl("http://licensing.networkoptix.com/nxlicensed/api/v1/validate/");
 static const std::chrono::milliseconds kCheckInterval = std::chrono::hours(24);
 
 struct ServerInfo
@@ -83,6 +84,15 @@ void LicenseWatcher::startUpdate()
 
     stopHttpClient();
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
+
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    if (!server)
+        return;
+
+    m_httpClient->setProxyVia(
+    SocketAddress(HostAddress::localhost, QUrl(server->getUrl()).port()));
+    m_httpClient->setProxyUserName(server->getId().toString());
+    m_httpClient->setProxyUserPassword(server->getAuthKey());
 
     auto requestBody = QJson::serialized(data);
     m_httpClient->setRequestBody(

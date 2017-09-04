@@ -2518,11 +2518,6 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
 
-    QString dataLocation = getDataDirectory();
-    QDir stateDirectory;
-    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
     auto remoteArchiveSynchronizer =
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
@@ -2676,22 +2671,13 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-
-    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-        [this](qint64 newTime)
-        {
-            QnSyncTime::instance()->updateTime(newTime);
-
-            using namespace ec2;
-            QnTransaction<ApiPeerSyncTimeData> tran(
-                ApiCommand::broadcastPeerSyncTime,
-                commonModule()->moduleGUID());
-            tran.params.syncTimeMs = newTime;
-            if (auto connection = commonModule()->ec2Connection())
-                connection->messageBus()->sendTransaction(tran);
-        }
-        );
-
+    
+    connect(
+        ec2Connection->getTimeNotificationManager().get(), 
+        &ec2::AbstractTimeNotificationManager::timeChanged,
+        this, 
+        &MediaServerProcess::at_timeChanged, 
+        Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     CommonPluginContainer pluginContainer;
@@ -3227,7 +3213,25 @@ void MediaServerProcess::at_appStarted()
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
+
+    QString dataLocation = getDataDirectory();
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 };
+
+void MediaServerProcess::at_timeChanged(qint64 newTime)
+{
+    QnSyncTime::instance()->updateTime(newTime);
+
+    using namespace ec2;
+    QnTransaction<ApiPeerSyncTimeData> tran(
+        ApiCommand::broadcastPeerSyncTime,
+        commonModule()->moduleGUID());
+    tran.params.syncTimeMs = newTime;
+    if (auto connection = commonModule()->ec2Connection())
+        connection->messageBus()->sendTransaction(tran);
+}
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
@@ -3256,8 +3260,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
         user->setName(login);
-        user->setPassword(password);
-        user->generateHash();
+        user->setPasswordAndGenerateHash(password);
 
         ec2::ApiUserData userData;
         fromResourceToApi(user, userData);

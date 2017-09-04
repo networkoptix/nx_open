@@ -291,5 +291,7 @@
                 <param name = "MaxFPS" default_value = "50"/>
             </params>
         </resource>        
+        <resource name = "AXISP7210" public = "AXISP7210Group1">
+        </resource>        
     </oem>
 </resources>

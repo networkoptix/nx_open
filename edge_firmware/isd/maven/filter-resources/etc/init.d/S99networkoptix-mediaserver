@@ -3,7 +3,7 @@
 CUSTOMIZATION="@deb.customization.company.name@"
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
-KILL_IF_HIGH_MEM_USAGE=1
+KILL_MEDIASERVER_IF_HIGH_MEM_USAGE=1
 
 SERVICE_NAME="mediaserver"
 MEDIASERVER_DIR="/opt/$CUSTOMIZATION/mediaserver"
@@ -12,8 +12,14 @@ BIN_PATH="$MEDIASERVER_DIR/bin/$BIN_NAME"
 STORAGE_PATH="/sdcard"
 HTTP_LOG_LEVEL="none"
 LOGS_PATH="/sdcard/mserver.data/log"
-LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
-OUTPUT_LOG="$LOGS_PATH/mediaserver-out.log"
+
+# Touch .flag file to capture all mediaserver output to a file.
+MEDIASERVER_OUT_FLAG="$LOGS_PATH/mediaserver-out.flag"
+MEDIASERVER_OUT_LOG="$LOGS_PATH/mediaserver-out.log"
+
+# Touch .flag file to capture all output of this script to a file.
+OUT_FLAG="$LOGS_PATH/$(basename "$0")-out.flag"
+OUT_LOG="$LOGS_PATH/$(basename "$0")-out.log"
 
 export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"
 export SASL_PATH="$MEDIASERVER_DIR/lib/sasl2"
@@ -26,11 +32,39 @@ RUN_ARGS="\
 --msg-log-level=$HTTP_LOG_LEVEL \
 "
 
+#--------------------------------------------------------------------------------------------------
+
+# Redirect all output of this script to the log file.
+redirectOutput() # log_file
+{
+    LOG_FILE="$1"
+
+    # If the old log file exists, rename it to first available "filename_#.log", stopping at 9.
+    OLD_LOG_FILE_MESSAGE=""
+    if [ -f "$LOG_FILE" ]; then
+        for i in $(seq 1 9); do
+            OLD_LOG_FILE="${LOG_FILE%.*}_$i.log" #< Remove the extension and add the new suffix.
+            if [ ! -f "$OLD_LOG_FILE" ]; then # Unused filename found.
+                break
+            fi
+        done
+        mv "$LOG_FILE" "$OLD_LOG_FILE"
+        OLD_LOG_FILE_MESSAGE=" (old log file renamed to $(basename "$OLD_LOG_FILE"))"
+    fi
+
+    echo "$0: See the log in $LOG_FILE$OLD_LOG_FILE_MESSAGE"
+
+    exec 1<&- #< Close stdout fd.
+    exec 2<&- #< Close stderr fd.
+    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
+    exec 2>&1 #< Redirect stderr to stdout.
+}
+
 checkSdCard()
 {
     # Make sure that STORAGE_PATH dir exists and is in /proc/mounts.
     if ! grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1 || [ ! -d "$STORAGE_PATH" ]; then
-        echo "SD card not inserted"
+        echo "ERROR: SD card is not inserted."
         return 1
     fi
 }
@@ -50,21 +84,26 @@ start()
         mount -o rw,remount "$STORAGE_PATH"
     fi
 
-    if [ -f "$LOG_OUTPUT_FLAG" ]; then
-        mkdir -p $(dirname "$OUTPUT_LOG")
-        REDIRECT_OUTPUT="$OUTPUT_LOG"
+    # Workaround for /usr/local/apps being mounted a few dozen seconds after the kernel boots.
+    while [ ! -f "$BIN_PATH" ]; do
+        sleep 5
+    done
+
+    if [ -f "$MEDIASERVER_OUT_FLAG" ]; then
+        mkdir -p "$(dirname "$MEDIASERVER_OUT_LOG")"
+        REDIRECT_OUTPUT="$MEDIASERVER_OUT_LOG"
     else
         REDIRECT_OUTPUT="/dev/null"
     fi
 
     echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
-    set -x
+    set -x #< Log the next command.
     "$BIN_PATH" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
     { set +x; } 2>/dev/null
 
-    sleep 1
-    # See if server instantly crashes.
-    if [ $(pidof "$BIN_NAME") ]; then
+    sleep 3
+    # See if mediaserver instantly crashes.
+    if [ ! -z "$(pidof "$BIN_NAME")" ]; then
         echo "OK"
     else
         echo "FAILED"
@@ -77,38 +116,44 @@ startquiet()
     start
 }
 
-stop()
+stop() # [signal]
 {
+    SIGNAL="$1" #< Can be empty.
+
     echo "Stopping $BIN_NAME..."
-    /usr/bin/killall "$1" "$BIN_NAME" >/dev/null
+    killall $SIGNAL "$BIN_NAME" >/dev/null
     local i=0
-    while [ $(pidof "$BIN_NAME") ]
-    do
+    while [ ! -z "$(pidof "$BIN_NAME")" ]; do
         /bin/sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
-            echo -n "sending 9 signal...    "
-            /usr/bin/killall -9 "$BIN_NAME" >/dev/null 2>&1
+            echo "$SERVICE_NAME not stopped after $i seconds; doing killall -9"
+            killall -9 "$BIN_NAME" >/dev/null 2>&1
         fi
     done
-    echo "DONE"
+    echo "Done"
+}
+
+printWatchdogPid()
+{
+    pgrep -f -- "$0 run_watchdog"
 }
 
 start_watchdog()
 {
-    WATCHDOG_PID=$(pgrep -f -- "-c $0")
+    WATCHDOG_PID=$(printWatchdogPid)
     if [ ! -z "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
 
-    /bin/sh -c "$0 run_watchdog" >/dev/null 2>&1 &
+    "$0" "run_watchdog" >/dev/null 2>&1 &
     echo "$SERVICE_NAME watchdog has been started"
 }
 
 stop_watchdog()
 {
-    WATCHDOG_PID=$(pgrep -f -- "-c $0")
+    WATCHDOG_PID=$(printWatchdogPid)
     if [ -z "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is not running"
         return 0
@@ -117,10 +162,16 @@ stop_watchdog()
     echo "Stopping $CUSTOMIZATION-mediaserver watchdog..."
     kill "$WATCHDOG_PID"
     sleep 1
-    echo "OK"
+    WATCHDOG_PID=$(printWatchdogPid)
+    if [ ! -z "$WATCHDOG_PID" ]; then
+        echo "$CUSTOMIZATION-mediaserver watchdog still not killed; doing kill -9"
+        kill -9 "$WATCHDOG_PID"
+        sleep 1
+    fi
+    echo "Done"
 }
 
-kill_ms_if_high_mem_usage()
+kill_mediaserver_if_high_mem_usage()
 {
     MSERVER_PID=$(pidof "$BIN_NAME")
     if [ -z "$MSERVER_PID" ]; then
@@ -139,8 +190,8 @@ run_watchdog()
 {
     while true; do
         start
-        if [ ! -z "$KILL_IF_HIGH_MEM_USAGE" ]; then
-            kill_ms_if_high_mem_usage
+        if [ ! -z "$KILL_MEDIASERVER_IF_HIGH_MEM_USAGE" ]; then
+            kill_mediaserver_if_high_mem_usage
         fi
         sleep 20
     done
@@ -151,7 +202,7 @@ help()
     cat <<EOF
 Usage: $0 <command>
 Supported commands:
-start # Start mediaserver and watchdog, enabling output to $OUTPUT_LOG if $LOG_OUTPUT_FLAG exists.
+start # Start mediaserver and watchdog, enabling output to $MEDIASERVER_OUT_LOG if $MEDIASERVER_OUT_FLAG exists.
 startquiet # Start mediaserver.
 start_console # Run mediaserver in foreground without output redirection.
 start_gdb # Run mediaserver under gdb.
@@ -168,6 +219,20 @@ EOF
 
 #--------------------------------------------------------------------------------------------------
 # main
+
+if [ -f "$OUT_FLAG" ]; then
+    redirectOutput "$OUT_LOG"
+
+    echo "Script [$0] started with pid $$ (parent pid $PPID), with $# args:"
+    echo "{"
+    for ARG in "$@"; do
+        echo "    [$ARG]"
+    done
+    echo "}"
+    echo ""
+
+    set -x #< Log each command.
+fi
 
 echo "$STORAGE_PATH/cores/core.%p" >/proc/sys/kernel/core_pattern
 if [ ! -e "$STORAGE_PATH/cores" ]; then
@@ -211,17 +276,13 @@ case "$1" in
         fi
         ;;
     server_status)
-        if [ $(pidof "$BIN_NAME") ]; then
+        if [ ! -z "$(pidof "$BIN_NAME")" ]; then
             echo "1"
         fi
         ;;
     restart|reload|force-reload)
-        stop_watchdog
-        stop
-        echo "Waiting for mediaserver process to end..."
-        while [ $(pidof "$BIN_NAME") ]; do
-            /bin/sleep 1
-        done
+        stop_watchdog || true
+        stop || true
         start && start_watchdog
         ;;
     start_watchdog)

@@ -349,7 +349,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     {
         if (!cameraGuid.isNull())
         {
-            // TODO: destination device is a camera. Remove proxy headers here as well.
+            cleanupProxyInfo(&d->request);
             if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
         }
@@ -421,6 +421,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::HttpHeader( "Via", via.toString() ) );
     }
 
+    d->request.requestLine.url = dstUrl.path();
     auto hostIter = d->request.headers.find("Host");
     if (hostIter != d->request.headers.end())
         hostIter->second = SocketAddress(

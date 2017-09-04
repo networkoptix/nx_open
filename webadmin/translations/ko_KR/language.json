@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"연결 끊기",
     "disconnectedSuccess":"시스템을 성공적으로 끊어졌습니다.",
     "connectedSuccess":"시스템은 성공적으로 연결 됨",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"로컬 관리자를 만듦",
     "confirmChangePassword":"관리자 암호 변경",
     "confirmChangePasswordTitle":"시스템 비밀 번호를 변경하시나요? Admin 사용자와 Root 계정에 영향을 줄 수있어요",

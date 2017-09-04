@@ -539,7 +539,7 @@ void QnUserSettingsDialog::applyChanges()
     }
 
     /* We may fill password field to change current user password. */
-    m_user->setPassword(QString());
+    m_user->resetPassword();
 
     /* New User was created, clear dialog. */
     if (m_model->mode() == QnUserSettingsModel::NewUser)
