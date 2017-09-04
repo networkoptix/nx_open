@@ -176,7 +176,11 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi")
+if(targetDevice MATCHES "bpi|bananapi|rpi"
+    OR targetDevice STREQUAL "linux-x64"
+    OR targetDevice STREQUAL "linux-x86"
+    OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
+)
     set(strip_binaries OFF)
 endif()
 
