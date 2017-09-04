@@ -270,8 +270,6 @@ int QnSessionManager::sendAsyncRequest(
     else
         requestInfo.handle = httpPool->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));
 
-    qDebug() << "REQUEST URL" << requestUrl;
-
     QnMutexLocker lk(&m_mutex);
     m_requestInProgress.emplace(requestInfo.handle, requestInfo);
 
