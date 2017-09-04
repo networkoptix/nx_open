@@ -117,6 +117,8 @@ public:
         return m_display[0]->getRawDataSize();
     }
 
+    QnMediaResourcePtr resource() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);

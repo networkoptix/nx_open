@@ -15,7 +15,10 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider *dataProvider = 0) const override;
 
     virtual Qn::ResourceFlags flags() const override;
-    
+
+signals:
+    void dataDropped(QnArchiveStreamReader* reader);
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 };
