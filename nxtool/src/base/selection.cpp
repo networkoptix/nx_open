@@ -140,7 +140,7 @@ namespace
     
         static const auto &eq = [](qint64 first, qint64 second) -> bool
         {
-            return (std::abs(first - second) < kEps);
+            return (llabs(first - second) < kEps);
         };
     
         const qint64 utcTimeMs = getSelectionValue<qint64>(
@@ -392,7 +392,7 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
 
     /// Check differences in password/system name settings
     if (!emitDateTimeChanged
-        && ((std::abs(m_snapshot->dateTime.toMSecsSinceEpoch() - otherSnapshot.dateTime.toMSecsSinceEpoch()) > kEps)
+        && ((llabs(m_snapshot->dateTime.toMSecsSinceEpoch() - otherSnapshot.dateTime.toMSecsSinceEpoch()) > kEps)
             || (timeZonesAreDifferent(m_snapshot->timeZonesModel, otherSnapshot.timeZonesModel))
             || safeModeChanged))
     {
