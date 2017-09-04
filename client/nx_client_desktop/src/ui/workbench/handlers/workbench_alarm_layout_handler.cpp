@@ -126,7 +126,10 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
 QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler()
 {}
 
-void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCameraResourceList &cameras, bool switchToLayout ) {
+void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout(
+    const QnVirtualCameraResourceList& cameras,
+    bool switchToLayout)
+{
     if (cameras.isEmpty())
         return;
 
@@ -140,18 +143,21 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     const auto syncDisabled = QnStreamSynchronizationState();
     if (workbench()->currentLayout() == layout)
     {
-        QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
         streamSynchronizer->setState(syncDisabled);
     }
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
+    layout->setData(Qn::LayoutSyncStateRole,
+        QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
 
     // Sort items to guarantee the same item placement for the same set of cameras.
     QnVirtualCameraResourceList sortedCameras = cameras;
-    std::sort(sortedCameras.begin(), sortedCameras.end(), [](const QnVirtualCameraResourcePtr &camera1, const QnVirtualCameraResourcePtr &camera2) {
-        return camera1->getId() < camera2->getId();
-    });
+    std::sort(sortedCameras.begin(), sortedCameras.end(),
+        [](const QnVirtualCameraResourcePtr& camera1, const QnVirtualCameraResourcePtr& camera2)
+        {
+            return camera1->getId() < camera2->getId();
+        });
 
-    for (const QnVirtualCameraResourcePtr &camera: sortedCameras)
+    for (const auto& camera: sortedCameras)
     {
         auto existingItems = layout->items(camera);
 
