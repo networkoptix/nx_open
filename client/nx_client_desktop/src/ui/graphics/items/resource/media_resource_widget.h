@@ -279,6 +279,8 @@ private:
 
     void initSoftwareTriggers();
 
+    void updateTriggersAvailability();
+
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 
