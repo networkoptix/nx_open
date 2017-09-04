@@ -1095,6 +1095,10 @@ bool QnResource::init()
         QnMutexLocker lk(&m_mutex);
         m_prevInitializationResult = initResult;
     }
+
+    if (initResult.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+        setStatus(Qn::Unauthorized);
+
     m_initializationAttemptCount.fetchAndAddOrdered(1);
 
     bool changed = m_initialized;

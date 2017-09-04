@@ -2,6 +2,8 @@
 
 #include <plugins/resource/hanwha/hanwha_common.h>
 
+#include <set>
+
 #include <QtCore/QSize>
 
 #include <boost/optional/optional.hpp>
@@ -47,6 +49,23 @@ CameraDiagnostics::Result error(
 
     return CameraDiagnostics::NotAuthorisedResult(authorizedResult.errorParams[0]);
 }
+
+template<typename ContainerOfQString>
+QString join(ContainerOfQString container, QString delimiter)
+{
+    QString result;
+    for (auto itr = container.cbegin(); itr != container.cend(); ++itr)
+    {
+        if (itr != container.cbegin())
+            result += delimiter;
+
+        result += *itr;
+    }
+
+    return result;
+}
+
+std::set<QString> fromHanwhaInternalRange(const std::set<QString>& internalRange);
 
 QString channelParameter(int channelNumber, const QString& parameterName);
 

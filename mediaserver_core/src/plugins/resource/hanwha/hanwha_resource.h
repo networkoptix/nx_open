@@ -6,6 +6,8 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
+#include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
+#include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 
 extern "C" {
 
@@ -88,7 +90,6 @@ private:
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
-private:
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
     int defaultGovLengthForStream(Qn::ConnectionRole role) const;
@@ -97,7 +98,17 @@ private:
         const QSize& primaryResolution,
         const std::vector<QSize>& resolutionList) const;
 
+    QnCameraAdvancedParams filterParameters(const QnCameraAdvancedParams& allParameters) const;
+
+    bool fillRanges(
+        QnCameraAdvancedParams* inOutParameters,
+        const HanwhaCgiParameters& cgiParameters) const;
+
+    boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
+
 private:
+    using AdvancedParameterId = QString;
+
     mutable QnMutex m_mutex;
     int m_maxProfileCount = 0;
     HanwhaStreamLimits m_streamLimits;
@@ -105,6 +116,8 @@ private:
 
     Ptz::Capabilities m_ptzCapabilities;
     QnPtzLimits m_ptzLimits;
+
+    std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 };
 
 } // namespace plugins

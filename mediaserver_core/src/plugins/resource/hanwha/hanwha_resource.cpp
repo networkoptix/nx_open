@@ -7,11 +7,21 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
 
+#include <utils/xml/camera_advanced_param_reader.h>
+#include <core/resource/camera_advanced_param.h>
+
 #include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+namespace {
+
+const QString kAdvancedParametersTemplateFile =
+    lit("c:\\develop\\nx_vms\\common\\static-resources\\camera_advanced_params\\hanwha.xml");
+
+} // namespace
 
 HanwhaResource::HanwhaResource()
 {
@@ -30,14 +40,95 @@ QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
 {
-    return false;
+    const QSet<QString> ids = {id};
+    QnCameraAdvancedParamValueList params;
+    bool result = getParamsPhysical(ids, params);
+
+    if (!result)
+        return false;
+
+    if (params.isEmpty())
+        return false;
+
+    if (params[0].id != id)
+        return false;
+
+    value = params[0].value;
+    return true;
 }
 
 bool HanwhaResource::getParamsPhysical(
     const QSet<QString> &idList,
     QnCameraAdvancedParamValueList& result)
 {
-    return false;
+    using ParameterList = std::vector<QString>;
+    using SubmenuMap = std::map<QString, ParameterList>;
+    using CgiMap = std::map<QString, SubmenuMap>;
+
+    CgiMap requests;
+    std::map<QString, QString> parameterNameToId;
+
+    for (const auto& id: idList)
+    {
+        const auto parameter = m_advancedParameters.getParameterById(id);
+        if (parameter.dataType == QnCameraAdvancedParameter::DataType::Button)
+            continue;
+
+        const auto info = advancedParameterInfo(id);
+        if (!info || !info->isValid())
+            continue;
+        
+        const auto cgi = info->cgi();
+        const auto submenu = info->submenu();
+        const auto parmeterName = info->parameterName();
+
+        requests[cgi][submenu].push_back(parmeterName);
+        parameterNameToId[parmeterName] = id;
+    }
+
+    for (const auto& cgiEntry: requests)
+    {
+        const auto cgi = cgiEntry.first;
+        const auto submenuMap = cgiEntry.second;
+
+        for (const auto& submenuEntry: submenuMap)
+        {
+            auto submenu = submenuEntry.first;
+            HanwhaRequestHelper helper(toSharedPointer(this));
+            auto response = helper.view(
+                lit("%1/%2").arg(cgi).arg(submenu),
+                {{kHanwhaChannelProperty, QString::number(getChannel())}});
+
+            if (!response.isSuccessful())
+                continue;
+
+            for (const auto& parameterName: requests[cgi][submenu])
+            {
+                QString parameterString;
+                auto parameterId = parameterNameToId[parameterName];
+                auto info = advancedParameterInfo(parameterId);
+                if (!info)
+                    continue;
+
+                if (!info->isChannelIndependent())
+                    parameterString += kHanwhaChannelPropertyTemplate.arg(getChannel());
+
+                auto profile = profileByRole(info->profileDependency());
+                if (profile != kHanwhaInvalidProfile)
+                    parameterString += lit(".Profile.%1").arg(profile);
+
+                parameterString += lit(".%1").arg(parameterName);
+
+                auto value = response.parameter<QString>(parameterString);
+                if (!value)
+                    continue;
+
+                result.push_back(QnCameraAdvancedParamValue(parameterId, *value));
+            }
+        }
+    }
+
+    return true;
 }
 
 bool HanwhaResource::setParamPhysical(const QString &id, const QString& value)
@@ -166,7 +257,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     QnIOPortDataList ioPorts;
 
-    const auto alarmInputs = parameters.parameter(lit("eventstatus/check/AlarmInput"));
+    const auto alarmInputs = parameters.parameter(lit("eventstatus/eventstatus/check/AlarmInput"));
     if (alarmInputs && alarmInputs->isValid())
     {
         const auto inputs = alarmInputs->possibleValues();
@@ -184,7 +275,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         }
     }
 
-    const auto alarmOutputs = parameters.parameter(lit("eventstatus/check/AlarmOutput"));
+    const auto alarmOutputs = parameters.parameter(lit("eventstatus/eventstatus/check/AlarmOutput"));
     if (alarmOutputs && alarmOutputs->isValid())
     {
         const auto outputs = alarmOutputs->possibleValues();
@@ -240,6 +331,40 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
+    QnCameraAdvancedParams parameters;
+    QFile advancedParametersFile(kAdvancedParametersTemplateFile);
+
+    bool result = QnCameraAdvacedParamsXmlParser::readXml(&advancedParametersFile, parameters);
+    NX_ASSERT(result, lm("Error while parsing xml: %1").arg(kAdvancedParametersTemplateFile));
+    if (!result)
+        return CameraDiagnostics::NoErrorResult();
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto cgiParameters = helper.fetchCgiParameters(lit("cgis"));
+
+    for (const auto& id: parameters.allParameterIds())
+    {
+        const auto parameter = parameters.getParameterById(id);
+        HanwhaAdavancedParameterInfo info(parameter);
+
+        if(!info.isValid())
+            continue;
+
+        m_advancedParameterInfos.emplace(id, info);
+    }
+    
+    bool success = fillRanges(&parameters, cgiParameters);
+    if (!success)
+        return CameraDiagnostics::NoErrorResult();
+
+    parameters = filterParameters(parameters);
+    
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_advancedParameters = parameters;
+    }
+
+    QnCameraAdvancedParamsReader::setParamsToResource(toSharedPointer(this), parameters);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -489,7 +614,7 @@ CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* 
 
     HanwhaRequestHelper helper(toSharedPointer(this));
 
-    const auto parameters = helper.fetchCgiParameters(lit("media/videoprofile"));
+    const auto parameters = helper.fetchCgiParameters(lit("media"));
     if (!parameters.isValid())
     {
         return error(
@@ -502,7 +627,7 @@ CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* 
     for (const auto& limitParameter: kHanwhaStreamLimitParameters)
     {
         const auto parameter = parameters.parameter(
-            lit("videoprofile/add_update/%1").arg(limitParameter));
+            lit("media/videoprofile/add_update/%1").arg(limitParameter));
 
         if (!parameter.is_initialized())
             continue;
@@ -688,6 +813,79 @@ QSize HanwhaResource::bestSecondaryResolution(
         lit("Can not find secondary resolution of appropriate size, using the smallest one"));
 
     return resolutionList[resolutionList.size() -1];
+}
+
+QnCameraAdvancedParams HanwhaResource::filterParameters(
+    const QnCameraAdvancedParams& allParameters) const
+{
+    QSet<QString> supportedIds;
+    for (const auto& id: allParameters.allParameterIds())
+    {
+        const auto& parameter = allParameters.getParameterById(id);
+
+        bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
+            || parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration;
+
+        if (needToCheck && parameter.range.isEmpty())
+            continue;
+        
+        supportedIds.insert(id);
+    }
+
+    return allParameters.filtered(supportedIds);
+}
+
+bool HanwhaResource::fillRanges(
+    QnCameraAdvancedParams* inOutParameters,
+    const HanwhaCgiParameters& cgiParameters) const
+{
+    for (const auto& id : inOutParameters->allParameterIds())
+    {
+        auto parameter = inOutParameters->getParameterById(id);
+        auto info = advancedParameterInfo(id);
+        if (!info)
+            continue;
+
+        const bool needToFixRange =
+            (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration
+            || parameter.dataType == QnCameraAdvancedParameter::DataType::Number)
+                && parameter.range.isEmpty();
+
+        if (!needToFixRange)
+            continue;
+ 
+        auto range = cgiParameters.parameter(info->rangeParameter());
+        if (!range || !range->isValid())
+            continue;
+
+        const auto rangeType = range->type();
+        if (rangeType == HanwhaCgiParameterType::enumeration)
+        {
+            const auto possibleValues = range->possibleValues();
+            parameter.range = join(fromHanwhaInternalRange(possibleValues), lit(","));
+            parameter.internalRange = join(possibleValues, lit(","));
+            inOutParameters->updateParameter(parameter);
+        }
+        else if (rangeType == HanwhaCgiParameterType::integer)
+        {
+            parameter.range = lit("%1,%2")
+                .arg(range->min())
+                .arg(range->max());
+            inOutParameters->updateParameter(parameter);
+        }
+    }
+
+    return true;
+}
+
+boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterInfo(
+    const QString& id) const
+{
+    auto itr = m_advancedParameterInfos.find(id);
+    if (itr == m_advancedParameterInfos.cend())
+        return boost::none;
+
+    return itr->second;
 }
 
 } // namespace plugins

@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<plugin
+	name="Hanwha"
+	version="1" 
+	unique_id="49BB72CF-36DE-4CA0-918B-0028C98AEF95">
+	<parameters>
+		<group name="Video Source">
+            <param id="image/flip/VerticalFlipEnable"
+					name="Flip mode"
+					dataType="Bool"/>
+            <param id="image/flip/HorizontalFlipEnable"
+					name="Mirror mode"
+					dataType="Bool"/>
+            <param id="image/flip/Rotate"
+					name="HallwayView"
+					dataType="Enumeration"
+					range="0 degrees, 90 degrees, 270 degrees"
+                    internalRange="0,90,270"/>
+		</group>
+        <group name="Audio Input">
+            <param id="media/audioinput/Source"
+                    name="Source"
+                    dataType="Enumeration"
+                    range=""
+                    aux="support=Media/Limit/MaxAudioInput"/>
+            <param id="media/audioinput/EncodingType"
+                    name="Codec"
+                    dataType="Enumeration"
+                    range="G.711,G.726"
+                    internalRange="G711,G726"
+                    aux="support=Media/Limit/MaxAudioInput"/>
+            <param id="media/audioinput/Bitrate"
+                    name="Bitrate"
+                    dataType="Enumeration"
+                    range="16K,24K,32K,40K,64K"
+                    internalRange="16000,24000,32000,40000,64000"
+                    aux="support=Media/Limit/MaxAudioInput">
+                    <dependencies>
+                        <dependencies-ranges>
+                            <conditional-range id="g711Range" range="64K">
+                                <condition
+                                    watch="media/audioinput/EncodingType"
+                                    condition="value=G.711"/>
+                            </conditional-range>
+                            <conditional-range id="g726Range" range="16K,24K,32K,40K,64K">
+                                <condition
+                                    watch="media/audioinput/EncodingType"
+                                    condition="value=G.726"/>
+                            </conditional-range>
+                        </dependencies-ranges>
+                    </dependencies>
+            </param>
+            <param id="media/audioinput/Gain"
+                    name="Gain"
+                    dataType="Number"
+                    range="1,10"
+                    aux="support=Media/Limit/MaxAudioInput"/>
+        </group>
+        <group name="Streaming">
+            <group name="Primary Stream">
+                <param id="PRIMARY%media/videoprofile/Resolution"
+                        name="Resolution"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/Resolution;profile=primary"/>
+                <param id="PRIMARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary"/>
+                <param id="PRIMARY%media/videoprofile/GOVLength"
+                        name="GOV Length"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/GOVLength;profile=primary"/>
+            </group>
+            <group name="Secondary Stream">
+                <param id="SECONDARY%media/videoprofile/Resolution"
+                        name="Resolution"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary"/>
+                <param id="SECONDARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary"/>
+                <param id="SECONDARY%media/videoprofile/GOVLength"
+                        name="GOV Length"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/GOVLength;profile=secondary"/>
+            </group>
+            <group name="WiseStream">
+                <param id="media/wisestream/Mode"
+                        name="Mode"
+                        dataType="Enumeration"
+                        range="Off,Low,Medium,High"
+                        aux="support=Media/Support/WiseStream"/>
+            </group>
+        </group>
+        <group name="Image">
+            <group name="SSDR">
+                <param id="image/ssdr/Enable"
+                        name="SSDR Enabled"
+                        dataType="Bool"
+                        range=""
+                        readCmd=""/>
+                <param id="image/ssdr/Level"
+                        name="Level"
+                        dataType="Bool"
+                        range=""
+                        readCmd=""/>
+                <param id="image/ssdr/DynamicRange"
+                        name="D-Range"
+                        dataType="Enumeration"
+                        range=""
+                        readCmd=""/>
+            </group>
+            <group name="White Balance">
+                <param id="image/whitebalance/WhiteBalanceMode"
+                        name="Mode"
+                        dataType="Enumeration"
+                        range=""/>
+                <param id="image/whitebalance/WhiteBalanceModeManualRedLevel"
+                        name="Red Gain"
+                        dataType="Number"/>
+                <param id="image/whitebalance/WhiteBalanceModeManualBlueLevel"
+                        name="Blue Gain"
+                        dataType="Number"
+                        range=""/>
+            </group>
+            <group name="Back Light">
+                <param id="image/camera/CompensationMode"
+                        name="Mode"
+                        dataType="Enumeration"
+                        range="BLC,WDR"/>
+                <param id="image/camera/WDRLevel"
+                        name="WDR Level"
+                        dataType="Enumeration"
+                        range="Low,Middle,High"/>
+                <param id="image/camera/BLCLevel"
+                        name="BLC Level"
+                        dataType="Enumeration"
+                        range="Low,Middle,High"/>
+                <param id="image/camera/BLCAreaTop"
+                        name="Top"
+                        dataType="Number"/>
+                <param id="image/camera/BLCAreaBottom"
+                        name="Bottom"
+                        dataType="Number"/>
+                <param id="image/camera/BLCAreaLeft"
+                        name="Left"
+                        dataType="Number"/>
+                <param id="image/camera/BLCAreaRight"
+                        name="Right"
+                        dataType="Number"/>
+            </group>
+            <group name="Exposure">
+                <param id="image/imageenhancements/Brightness"
+                        name="Brightness"
+                        dataType="Enumeration"
+                        range="Low,Middle,High"/>
+                <param id="image/camera/AutoShortShutterSpeed"
+                        name="Minimum Shutter"
+                        dataType="Enumeration"
+                        range="Low,Middle,High"/>
+                <param id="image/camera/AutoLongShutterSpeed"
+                        name="Maximum Shutter"
+                        dataType="Enumeration"
+                        range="Low,Middle,High"/>
+                <param id="image/camera/AFLKMode"
+                        name="Anti Flicker"
+                        dataType="Enumeration"
+                        range="Off,60Hz,70Hz"/>
+                <param id="image/camera/SSNRMode"
+                        name="SSNR Enabled"
+                        dataType="Bool"/>
+                <param id="image/camera/SSNRLevel"
+                        name="SSNR Level"
+                        dataType="Number"/>
+                <param id="image/camera/AGCMode"
+                        name="AGC"
+                        dataType="Enumeration"
+                        range="Off,Low,Middle,High"/>
+            </group>
+            <group name="Day/Night">
+                <param id="image/camera/DayNightMode"
+                        name="Mode"
+                        dataType="Enumeration"
+                        range="Color,B/W,Auto,External"
+                        internalRange="Color,BW,Auto,ExternalBW"/>
+                <!--<param id="root.ImageSource.I0.Sensor.ColorLevel"
+                        name="Dwell Time"
+                        dataType="Enumeration"/>-->
+                <param id="image/camera/DayNightSwitchingMode"
+                        name="Duration"
+                        dataType="Enumeration"
+                        range="Very fast,Fast,Normal,Slow,Very slow"/>
+                <param id="image/camera/DayNightAlarmIn"
+                        name="Alarm Input"
+                        dataType="Enumeration"
+                        range="Open:Color/Close:BW,Open:BW/Close:Color"
+                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"/>
+            </group>
+            <group name="Special">
+                <param id="image/imageenhancements/SharpnessEnable"
+                        name="Sharpness"
+                        dataType="Bool"/>
+                <param id="image/imageenhancements/SharpnessLevel"
+                        name="Sharpness Level"
+                        dataType="Number"/>
+                <param id="image/imageenhacements/Gamma"
+                        name="Gamma"
+                        dataType="Number"/>
+                <param id="image/imageenhacements/Saturation"
+                        name="ColorLevel"
+                        dataType="Number"/>
+                <param id="image/imageenhacements/LDCEnable" 
+                        name="LDC"
+                        dataType="Bool"/>
+                <param id="image/imageenhacements/LDCLevel"
+                        name="LDC Level"
+                        dataType="Number"/>
+            </group>
+            <group name="IR">
+                <param id="image/irled/Mode"
+                        name="Mode"
+                        dataType="Enumeration"
+                        range="Off,Auto"/>
+            </group>
+        </group>
+        <group name="Maintenance">
+            <param id="system/factoryreset/ExcludeSettings=Network"
+                        name="Soft Reset"
+                        dataType="Button"/>
+            <param id="system/factoryreset/ExludeSettings=None"
+                        name="Hard Reset"
+                        dataType="Button"/>
+            <param id="system/power/Type=Restart"
+                        name="Reboot"
+                        dataType="Button"/>
+        </group>
+	</parameters>
+</plugin>

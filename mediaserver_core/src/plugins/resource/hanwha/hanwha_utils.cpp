@@ -5,6 +5,11 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+std::set<QString> fromHanwhaInternalRange(const std::set<QString>& internalRange)
+{
+    return internalRange; //< TODO: #dmishin implement
+}
+
 QString channelParameter(int channelNumber, const QString& parameterName)
 {
     return lit("%1.%2.%3")
