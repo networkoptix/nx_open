@@ -59,7 +59,7 @@
         </bal:Condition>
 
         <bal:Condition Message="!(loc.Product_ProductIsTooOld)">
-            <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3" ]]>
+            <![CDATA[ (NOT (ServerInstalled = 5)) OR InstalledServerVersion >= "2.3" ]]>
         </bal:Condition>
     </Fragment>
 
