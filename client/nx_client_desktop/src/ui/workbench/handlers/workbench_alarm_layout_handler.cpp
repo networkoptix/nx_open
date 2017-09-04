@@ -225,6 +225,8 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
     auto workbenchAlarmLayout = QnWorkbenchLayout::instance(m_alarmLayout);
     if (!workbenchAlarmLayout)
     {
+        // If user have closed alarm layout, all cameras must be removed.
+        m_alarmLayout->setItems(QnLayoutItemDataMap());
         workbenchAlarmLayout = qnWorkbenchLayoutsFactory->create(m_alarmLayout, workbench());
         workbench()->addLayout(workbenchAlarmLayout);
     }
