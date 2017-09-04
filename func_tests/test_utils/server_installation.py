@@ -12,7 +12,8 @@ MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
 MEDIASERVER_VAR_PATH = 'var'
 MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
-MEDIASERVER_CLOUDHOST_PATH = 'lib/libnx_network.so'
+# path to .so file containing cloud host in it. Different for different server versions
+MEDIASERVER_CLOUDHOST_LIB_PATH_LIST = ['lib/libnx_network.so', 'lib/libcommon.so']
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
@@ -65,14 +66,20 @@ class ServerInstallation(object):
             return None
 
     def patch_binary_set_cloud_host(self, new_host):
-        path_to_patch = os.path.join(self.dir, MEDIASERVER_CLOUDHOST_PATH)
         if self._current_cloud_host and new_host == self._current_cloud_host:
-            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.host, new_host)
+            log.debug('Server binary at %s already has %r in it', self.host, new_host)
             return
-        data = self.host.read_file(path_to_patch)
-        idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
-        assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r (size: %d)'
-                           % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data)))
+        for lib_path in MEDIASERVER_CLOUDHOST_LIB_PATH_LIST:
+            path_to_patch = os.path.join(self.dir, lib_path)
+            data = self.host.read_file(path_to_patch)
+            idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
+            if idx != -1:
+                break  # found required file
+            else:
+                log.warning('Cloud host tag %r is missing from mediaserver binary file %r (size: %d)',
+                            MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data))
+        assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary files %r'
+                           % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_LIB_PATH_LIST))
         eidx = data.find('\0', idx)
         assert eidx != -1
         old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
