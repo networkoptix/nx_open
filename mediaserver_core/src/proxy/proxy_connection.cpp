@@ -421,7 +421,6 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::HttpHeader( "Via", via.toString() ) );
     }
 
-    d->request.requestLine.url = dstUrl.path();
     auto hostIter = d->request.headers.find("Host");
     if (hostIter != d->request.headers.end())
         hostIter->second = SocketAddress(
