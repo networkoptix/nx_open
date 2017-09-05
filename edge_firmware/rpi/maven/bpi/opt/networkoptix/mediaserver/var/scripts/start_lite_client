@@ -24,6 +24,13 @@ export LESS_TERMCAP_se=
 
 killall gpm
 
+# Close all open file descriptors so lite client does not inherit any.
+for fd in $(\ls /proc/self/fd); do
+    if [ $fd -gt 2 ]; then
+        eval "exec $fd>&-"
+    fi
+done
+
 # Failed to determine EDID on some TVs, so commenting this section
 #if ! (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') 2>/dev/null; then
 #    AUTO_LOGIN_MODE="--auto-login=disabled"
