@@ -75,6 +75,10 @@ boost::optional<int> toInt(const boost::optional<QString>& str);
 
 boost::optional<double> toDouble(const boost::optional<QString>& str);
 
+boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
+
+boost::optional<QSize> toQSize(const boost::optional<QString>& str);
+
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
 
 QString nxProfileName(Qn::ConnectionRole role);

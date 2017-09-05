@@ -18,19 +18,44 @@ namespace plugins {
 
 namespace {
 
-const QString kAdvancedParametersTemplateFile =
-    lit("c:\\develop\\nx_vms\\common\\static-resources\\camera_advanced_params\\hanwha.xml");
+const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
+
+struct UpdateInfo
+{
+    QString cgi;
+    QString submenu;
+    QString action;
+    int profile;
+    bool channelIndependent;
+
+    UpdateInfo& operator=(const UpdateInfo& info) = default;
+};
+
+bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
+{
+    if (lhs.cgi < rhs.cgi)
+        return true;
+
+    if (lhs.submenu < rhs.submenu)
+        return true;
+
+    if (lhs.action < rhs.action)
+        return true;
+
+    if (lhs.profile < rhs.profile)
+        return true;
+
+    if (lhs.channelIndependent && !rhs.channelIndependent)
+        return true;
+
+    return false;
+}
 
 } // namespace
 
-HanwhaResource::HanwhaResource()
-{
-
-}
-
 HanwhaResource::~HanwhaResource()
 {
-
+    // TODO: #dmishin don't forget about it.
 }
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
@@ -40,9 +65,8 @@ QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
 {
-    const QSet<QString> ids = {id};
     QnCameraAdvancedParamValueList params;
-    bool result = getParamsPhysical(ids, params);
+    bool result = getParamsPhysical({id}, params);
 
     if (!result)
         return false;
@@ -66,7 +90,7 @@ bool HanwhaResource::getParamsPhysical(
     using CgiMap = std::map<QString, SubmenuMap>;
 
     CgiMap requests;
-    std::map<QString, QString> parameterNameToId;
+    std::multimap<QString, QString> parameterNameToId;
 
     for (const auto& id: idList)
     {
@@ -80,10 +104,10 @@ bool HanwhaResource::getParamsPhysical(
         
         const auto cgi = info->cgi();
         const auto submenu = info->submenu();
-        const auto parmeterName = info->parameterName();
+        const auto parameterName = info->parameterName();
 
-        requests[cgi][submenu].push_back(parmeterName);
-        parameterNameToId[parmeterName] = id;
+        requests[cgi][submenu].push_back(parameterName);
+        parameterNameToId.emplace(parameterName, id);
     }
 
     for (const auto& cgiEntry: requests)
@@ -104,26 +128,37 @@ bool HanwhaResource::getParamsPhysical(
 
             for (const auto& parameterName: requests[cgi][submenu])
             {
-                QString parameterString;
-                auto parameterId = parameterNameToId[parameterName];
-                auto info = advancedParameterInfo(parameterId);
-                if (!info)
-                    continue;
+                const auto idRange = parameterNameToId.equal_range(parameterName);
+                for (auto itr = idRange.first; itr != idRange.second; ++itr)
+                {
+                    QString parameterString;
+                    const auto parameterId = itr->second;
+                    const auto parameter = m_advancedParameters.getParameterById(parameterId);
+                    const auto info = advancedParameterInfo(parameterId);
+                    if (!info)
+                        continue;
 
-                if (!info->isChannelIndependent())
-                    parameterString += kHanwhaChannelPropertyTemplate.arg(getChannel());
+                    if (!info->isChannelIndependent())
+                        parameterString += kHanwhaChannelPropertyTemplate.arg(getChannel());
 
-                auto profile = profileByRole(info->profileDependency());
-                if (profile != kHanwhaInvalidProfile)
-                    parameterString += lit(".Profile.%1").arg(profile);
+                    auto profile = profileByRole(info->profileDependency());
+                    if (profile != kHanwhaInvalidProfile)
+                        parameterString += lit(".Profile.%1").arg(profile);
 
-                parameterString += lit(".%1").arg(parameterName);
+                    parameterString += lit(".%1").arg(parameterName);
+                    auto value = response.parameter<QString>(parameterString);
 
-                auto value = response.parameter<QString>(parameterString);
-                if (!value)
-                    continue;
+                    if (!value)
+                        value = tryToGetSpecificParameterDefault(parameterString, response);
 
-                result.push_back(QnCameraAdvancedParamValue(parameterId, *value));
+                    if (!value)
+                        continue;
+
+                    result.push_back(
+                        QnCameraAdvancedParamValue(
+                            parameterId,
+                            fromHanwhaAdvancedParameterValue(parameter, *info, *value)));
+                }
             }
         }
     }
@@ -133,13 +168,80 @@ bool HanwhaResource::getParamsPhysical(
 
 bool HanwhaResource::setParamPhysical(const QString &id, const QString& value)
 {
-    return false;
+    QnCameraAdvancedParamValueList result;
+    return setParamsPhysical(
+        {QnCameraAdvancedParamValue(id, value)},
+        result);
 }
 
 bool HanwhaResource::setParamsPhysical(
     const QnCameraAdvancedParamValueList &values,
     QnCameraAdvancedParamValueList &result)
 {
+    using ParameterMap = std::map<QString, QString>;
+    using SubmenuMap = std::map<QString, ParameterMap>;
+    using CgiMap = std::map<QString, SubmenuMap>;
+
+    std::map<UpdateInfo, ParameterMap> requests;
+    for (const auto& value: values)
+    {
+        UpdateInfo updateInfo;
+        const auto info = advancedParameterInfo(value.id);
+        if (!info)
+            continue;
+
+        const auto parameter = m_advancedParameters.getParameterById(value.id);
+        const auto resourceProperty = info->resourceProperty();
+        
+        if (!resourceProperty.isEmpty())
+            setProperty(resourceProperty, value.value);
+
+        updateInfo.cgi = info->cgi();
+        updateInfo.submenu = info->submenu();
+        updateInfo.action = info->updateAction();
+        updateInfo.channelIndependent = info->isChannelIndependent();
+        updateInfo.profile = profileByRole(info->profileDependency());
+
+        requests[updateInfo][info->parameterName()] = toHanwhaAdvancedParameterValue(
+            parameter,
+            *info,
+            value.value);
+    }
+
+    saveParams();
+
+    bool failed = false;
+    for (const auto& request: requests)
+    {
+        const auto requestCommon = request.first;
+        auto requestParameters = request.second;
+
+        if (!requestCommon.channelIndependent)
+            requestParameters[kHanwhaChannelProperty] = QString::number(getChannel());
+
+        if (requestCommon.profile != kHanwhaInvalidProfile)
+        {
+            requestParameters[kHanwhaProfileNumberProperty] 
+                = QString::number(requestCommon.profile);
+        }
+
+        HanwhaRequestHelper helper(toSharedPointer(this));
+        const auto response = helper.doRequest(
+            requestCommon.cgi,
+            requestCommon.submenu,
+            requestCommon.action,
+            requestParameters);
+
+        if (!response.isSuccessful())
+        {
+            failed = true;
+            continue;
+        }
+    }
+
+    if (!failed)
+        result = values;
+
     return false;
 }
 
@@ -235,21 +337,30 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     m_maxProfileCount = *maxProfileCount;
     const bool hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
-    const auto result = fetchStreamLimits(&m_streamLimits);
-    const auto& frameRates = m_streamLimits.frameRates;
+    auto result = fetchStreamLimits(&m_streamLimits);
+    
+    if (!result)
+        return result;
+
+    result = fetchCodecInfo(&m_codecInfo);
 
     if (!result)
         return result;
 
-    const bool hasAudio = mediaAttributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
+    auto primaryStreamLimits = m_codecInfo.limits(
+        getChannel(),
+        streamCodec(Qn::ConnectionRole::CR_LiveVideo),
+        lit("General"),
+        streamResolution(Qn::ConnectionRole::CR_LiveVideo));
 
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int)hasDualStreaming);
+    if (!primaryStreamLimits)
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Can not fetch primary stream limits."));
+    }
 
-    // todo: some cameras reports fps > 30 but it doesn't work.
-    int maxFps = std::min(30, frameRates[frameRates.size() - 1]);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, maxFps);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
+    setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
 
     return createNxProfiles();
 }
@@ -651,6 +762,32 @@ CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* 
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCodecInfo)
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(
+        lit("media/videocodecinfo"),
+        {{lit("ViewMode"), lit("All")}});
+
+    if (!response.isSuccessful())
+    {
+        return error(
+            response,
+            CameraDiagnostics::RequestFailedResult(
+                lit("media/videocodecinfo"),
+                lit("Request failed")));
+    }
+
+    *outCodecInfo = HanwhaCodecInfo(response);
+    if (!outCodecInfo->isValid())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Video codec info is invalid"));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 void HanwhaResource::sortResolutions(std::vector<QSize>* resolutions) const
 {
     std::sort(
@@ -672,10 +809,10 @@ AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
 {
     QString codecString;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
-        ? Qn::kPrimaryStreamGovLengthParamName
-        : Qn::kSecondaryStreamGovLengthParamName;
+        ? Qn::kPrimaryStreamCodecParamName
+        : Qn::kSecondaryStreamCodecParamName;
 
-    codecString = getProperty(Qn::kPrimaryStreamResolutionParamName);
+    codecString = getProperty(propertyName);
     if (codecString.isEmpty())
         return defaultCodecForStream(role);
 
@@ -687,9 +824,9 @@ QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
     QString resolutionString;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
         ? Qn::kPrimaryStreamResolutionParamName
-        : Qn::kSecondaryStreamCodecParamName;
+        : Qn::kSecondaryStreamResolutionParamName;
 
-    resolutionString = getProperty(Qn::kPrimaryStreamResolutionParamName);
+    resolutionString = getProperty(propertyName);
     if (resolutionString.isEmpty())
         return defaultResolutionForStream(role);
 
@@ -703,7 +840,7 @@ int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
         ? Qn::kPrimaryStreamGovLengthParamName
         : Qn::kSecondaryStreamGovLengthParamName;
 
-    govLengthString = getProperty(Qn::kPrimaryStreamResolutionParamName);
+    govLengthString = getProperty(propertyName);
     if (govLengthString.isEmpty())
         return defaultGovLengthForStream(role);
 
@@ -918,6 +1055,187 @@ void HanwhaResource::updateToChannel(int value)
     suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
         setName(getName() + suffix);
+}
+
+boost::optional<QString> HanwhaResource::tryToGetSpecificParameterDefault(
+    const QString& parameterString,
+    const HanwhaResponse& response) const
+{
+    const auto split = parameterString.split(L'.');
+    if (split.size() < 5)
+        return boost::none;
+
+    auto codec = fromHanwhaString<AVCodecID>(split[4]);
+
+    if (parameterString.endsWith(lit(".PriorityType")))
+        return lit("CompressionLevel");
+
+    if (parameterString.endsWith(lit(".EntropyCoding")))
+        return lit("CABAC");
+
+    if (parameterString.endsWith(lit(".BitrateControlType")))
+        return lit("CBR");
+
+    if (parameterString.endsWith(lit(".Profile")))
+    {
+        if (codec == AV_CODEC_ID_H264)
+            return lit("High");
+
+        if (codec == AV_CODEC_ID_HEVC)
+            return lit("Main");
+
+        return boost::none;
+    }
+
+    if (parameterString.endsWith(lit(".GOVLength")))
+    {
+        auto defaultGovLength = calculateDefaultGovLength(parameterString, response);
+        if (!defaultGovLength.is_initialized())
+            return boost::none;
+
+        return QString::number(*defaultGovLength);
+    }
+
+    if (parameterString.endsWith(lit(".Bitrate")))
+    {
+        auto defaultBitrate = calculateDefaultBitrate(parameterString, response);
+        if (!defaultBitrate.is_initialized())
+            return boost::none;
+
+        return QString::number(*defaultBitrate);
+    }
+
+    return boost::none;
+}
+
+boost::optional<int> HanwhaResource::calculateDefaultBitrate(
+    const QString& parameterString,
+    const HanwhaResponse& response) const
+{
+    int channel = kHanwhaInvalidChannel;
+    int profile = kHanwhaInvalidProfile;
+    AVCodecID codec = AV_CODEC_ID_NONE;
+
+    std::tie(channel, profile, codec) = channelProfileCodec(parameterString);
+
+    if (channel == kHanwhaInvalidChannel || profile == kHanwhaInvalidProfile)
+        return boost::none;
+
+    const auto resolution = response.parameter<QSize>(
+        lit("Channel.%1.Profile.%2.Resolution")
+            .arg(channel)
+            .arg(profile));
+
+    if (!resolution.is_initialized())
+        return boost::none;
+
+    auto limits = m_codecInfo.limits(
+        getChannel(),
+        codec,
+        lit("General"),
+        *resolution);
+
+    if (!limits)
+        return boost::none;
+
+    return limits->defaultCbrBitrate;
+}
+
+boost::optional<int> HanwhaResource::calculateDefaultGovLength(
+    const QString& parameterString,
+    const HanwhaResponse& response) const
+{
+    int channel = kHanwhaInvalidChannel;
+    int profile = kHanwhaInvalidProfile;
+    
+    std::tie(channel, profile, std::ignore) = channelProfileCodec(parameterString);
+
+    if (channel == kHanwhaInvalidChannel || profile == kHanwhaInvalidProfile)
+        return boost::none;
+
+    const auto fps = response.parameter<int>(
+        lit("Channel.%1.Profile.%2.FrameRate")
+            .arg(channel)
+            .arg(profile));
+
+    if (!fps)
+        return boost::none;
+
+    return *fps * 2;
+}
+
+std::tuple<int, int, AVCodecID> HanwhaResource::channelProfileCodec(const QString& parameterString) const
+{
+    const std::tuple<int, int, AVCodecID> invalidResult = {
+        kHanwhaInvalidChannel,
+        kHanwhaInvalidProfile,
+        AV_CODEC_ID_NONE};
+
+    const auto split = parameterString.split(L'.');
+    if (split.size() < 6)
+        return invalidResult;
+
+    if (split[0] != kHanwhaChannelProperty && split[2] != kHanwhaProfileNumberProperty)
+        return invalidResult;
+
+    bool success = false;
+    const auto channel = split[1].toInt(&success);
+
+    if (!success)
+        return invalidResult;
+
+    const auto profile = split[3].toInt(&success);
+    if (!success)
+        return invalidResult;
+
+    const auto codec = fromHanwhaString<AVCodecID>(split[4]);
+
+    return {channel, profile, codec};
+}
+
+QString HanwhaResource::toHanwhaAdvancedParameterValue(
+    const QnCameraAdvancedParameter& parameter,
+    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const QString& str) const
+{
+    const auto parameterType = parameter.dataType;
+
+    if (parameterType == QnCameraAdvancedParameter::DataType::Bool)
+    {
+        if (str == lit("true") || str == lit("1"))
+            return kHanwhaTrue;
+
+        return kHanwhaFalse;
+    }
+    else if (parameterType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        if(!parameter.internalRange.isEmpty())
+            return parameter.toInternalRange(str);
+    }
+
+    return str;
+}
+
+QString HanwhaResource::fromHanwhaAdvancedParameterValue(
+    const QnCameraAdvancedParameter& parameter,
+    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const QString& str) const
+{
+    const auto parameterType = parameter.dataType;
+    if (parameterType == QnCameraAdvancedParameter::DataType::Bool)
+    {
+        if (str == kHanwhaTrue)
+            return lit("true");
+
+        return lit("false");
+    }
+    else if (parameterType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        if (!parameter.internalRange.isEmpty())
+            return parameter.fromInternalRange(str);
+    }
+
+    return str;
 }
 
 } // namespace plugins

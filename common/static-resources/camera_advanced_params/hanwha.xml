@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <plugin
-	name="Hanwha"
-	version="1" 
-	unique_id="49BB72CF-36DE-4CA0-918B-0028C98AEF95">
-	<parameters>
-		<group name="Video Source">
+    name="Hanwha"
+    version="1" 
+    unique_id="49BB72CF-36DE-4CA0-918B-0028C98AEF95">
+    <parameters>
+        <group name="Video Source">
             <param id="image/flip/VerticalFlipEnable"
-					name="Flip mode"
-					dataType="Bool"/>
+                    name="Flip mode"
+                    dataType="Bool"/>
             <param id="image/flip/HorizontalFlipEnable"
-					name="Mirror mode"
-					dataType="Bool"/>
+                    name="Mirror mode"
+                    dataType="Bool"/>
             <param id="image/flip/Rotate"
-					name="HallwayView"
-					dataType="Enumeration"
-					range="0 degrees, 90 degrees, 270 degrees"
+                    name="HallwayView"
+                    dataType="Enumeration"
+                    range="0 degrees, 90 degrees, 270 degrees"
                     internalRange="0,90,270"/>
-		</group>
+        </group>
         <group name="Audio Input">
             <param id="media/audioinput/Source"
                     name="Source"
@@ -32,23 +32,22 @@
             <param id="media/audioinput/Bitrate"
                     name="Bitrate"
                     dataType="Enumeration"
-                    range="16K,24K,32K,40K,64K"
-                    internalRange="16000,24000,32000,40000,64000"
+                    range="16000,24000,32000,40000,64000"
                     aux="support=Media/Limit/MaxAudioInput">
-                    <dependencies>
-                        <dependencies-ranges>
-                            <conditional-range id="g711Range" range="64K">
-                                <condition
-                                    watch="media/audioinput/EncodingType"
-                                    condition="value=G.711"/>
-                            </conditional-range>
-                            <conditional-range id="g726Range" range="16K,24K,32K,40K,64K">
-                                <condition
-                                    watch="media/audioinput/EncodingType"
-                                    condition="value=G.726"/>
-                            </conditional-range>
-                        </dependencies-ranges>
-                    </dependencies>
+                <dependencies>
+                    <dependencies-ranges>
+                        <conditional-range id="g711Range" range="64000">
+                            <condition
+                                watch="media/audioinput/EncodingType"
+                                condition="value=G.711"/>
+                        </conditional-range>
+                        <conditional-range id="g726Range" range="16000,24000,32000,40000,64000">
+                            <condition
+                                watch="media/audioinput/EncodingType"
+                                condition="value=G.726"/>
+                        </conditional-range>
+                    </dependencies-ranges>
+                </dependencies>
             </param>
             <param id="media/audioinput/Gain"
                     name="Gain"
@@ -56,40 +55,384 @@
                     range="1,10"
                     aux="support=Media/Limit/MaxAudioInput"/>
         </group>
+        
         <group name="Streaming">
             <group name="Primary Stream">
+            
+                <param id="PRIMARY%media/videoprofile/EncodingType"
+                        name="Codec"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/EncodingType;profile=primary;resourceProperty=primaryStreamCodec">
+                </param>
+                
                 <param id="PRIMARY%media/videoprofile/Resolution"
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=primary"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution"/>
+                        
+                <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
+                        name="Bitrate Control Type"
+                        dataType="Enumeration"
+                        range="CBR,VBR"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H265.BitrateControlType"
+                        name="Bitrate Control Type"
+                        dataType="Enumeration"
+                        range="CBR,VBR"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H264.PriorityType"
+                        name="Encoding Priority"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=primary">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/H264.BitrateControlType"
+                                    condition="value=CBR"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H265.PriorityType"
+                        name="Encoding Priority"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=primary">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/H265.BitrateControlType"
+                                    condition="value=CBR"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
                 <param id="PRIMARY%media/videoprofile/Bitrate"
                         name="Bitrate"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary"/>
-                <param id="PRIMARY%media/videoprofile/GOVLength"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate"/>
+                        
+                <param id="PRIMARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/GOVLength;profile=primary"/>
+                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H265.GOVLength"
+                        name="GOV Length"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H265.Profile"
+                        name="Profile"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H264.Profile"
+                        name="Profile"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H264.EntropyCoding"
+                        name="Entropy coding"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/H265.EntropyCoding"
+                        name="Entropy coding"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=primary;default=CABAC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="PRIMARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
+            
             <group name="Secondary Stream">
+                <param id="SECONDARY%media/videoprofile/EncodingType"
+                        name="Codec"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/EncodingType;profile=secondary;resourceProperty=secondaryStreamCodec">
+                </param>
+                
                 <param id="SECONDARY%media/videoprofile/Resolution"
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution"/>
+                        
+                <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
+                        name="Bitrate Control Type"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H265.BitrateControlType"
+                        name="Bitrate Control Type"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H264.PriorityType"
+                        name="Encoding Priority"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=secondary">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/H264.BitrateControlType"
+                                    condition="value=CBR"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H265.PriorityType"
+                        name="Encoding Priority"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=secondary">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/H265.BitrateControlType"
+                                    condition="value=CBR"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
                 <param id="SECONDARY%media/videoprofile/Bitrate"
                         name="Bitrate"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary"/>
-                <param id="SECONDARY%media/videoprofile/GOVLength"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate"/>
+                        
+                <param id="SECONDARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/GOVLength;profile=secondary"/>
+                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H265.GOVLength"
+                        name="GOV Length"
+                        dataType="Number"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H265.Profile"
+                        name="Profile"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H264.Profile"
+                        name="Profile"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H264.EntropyCoding"
+                        name="Entropy coding"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H264"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/H265.EntropyCoding"
+                        name="Entropy coding"
+                        dataType="Enumeration"
+                        writeCmd="update"
+                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=secondary;">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="SECONDARY%media/videoprofile/EncodingType"
+                                    condition="value=H265"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
             </group>
             <group name="WiseStream">
                 <param id="media/wisestream/Mode"
@@ -138,23 +481,83 @@
                 <param id="image/camera/WDRLevel"
                         name="WDR Level"
                         dataType="Enumeration"
-                        range="Low,Middle,High"/>
+                        range="Low,Middle,High">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=WDR"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/BLCLevel"
                         name="BLC Level"
                         dataType="Enumeration"
-                        range="Low,Middle,High"/>
+                        range="Low,Middle,High">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/BLCAreaTop"
                         name="Top"
-                        dataType="Number"/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/BLCAreaBottom"
                         name="Bottom"
-                        dataType="Number"/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/BLCAreaLeft"
                         name="Left"
-                        dataType="Number"/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/BLCAreaRight"
                         name="Right"
-                        dataType="Number"/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="Exposure">
                 <param id="image/imageenhancements/Brightness"
@@ -163,22 +566,30 @@
                         range="Low,Middle,High"/>
                 <param id="image/camera/AutoShortShutterSpeed"
                         name="Minimum Shutter"
-                        dataType="Enumeration"
-                        range="Low,Middle,High"/>
+                        dataType="Enumeration"/>
                 <param id="image/camera/AutoLongShutterSpeed"
                         name="Maximum Shutter"
-                        dataType="Enumeration"
-                        range="Low,Middle,High"/>
+                        dataType="Enumeration"/>
                 <param id="image/camera/AFLKMode"
                         name="Anti Flicker"
                         dataType="Enumeration"
                         range="Off,60Hz,70Hz"/>
                 <param id="image/camera/SSNRMode"
-                        name="SSNR Enabled"
-                        dataType="Bool"/>
+                        name="SSNR Mode"
+                        dataType="Enumeration"/>
                 <param id="image/camera/SSNRLevel"
                         name="SSNR Level"
-                        dataType="Number"/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/SSNRMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/AGCMode"
                         name="AGC"
                         dataType="Enumeration"
@@ -201,7 +612,17 @@
                         name="Alarm Input"
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
-                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"/>
+                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/DayNightMode"
+                                    condition="value=External"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="Special">
                 <param id="image/imageenhancements/SharpnessEnable"
@@ -241,5 +662,5 @@
                         name="Reboot"
                         dataType="Button"/>
         </group>
-	</parameters>
+    </parameters>
 </plugin>

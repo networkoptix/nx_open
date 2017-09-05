@@ -11,6 +11,8 @@ static const QString kSupportAux = lit("support");
 static const QString kRangeAux = lit("range");
 static const QString kProfileAux = lit("profile");
 static const QString kNoChannelAux = lit("noChannel");
+static const QString kCodecAux = lit("codec");
+static const QString kResourceProperty = lit("resourceProperty");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -91,6 +93,16 @@ bool HanwhaAdavancedParameterInfo::isChannelIndependent() const
     return m_channelIndependent;
 }
 
+bool HanwhaAdavancedParameterInfo::isCodecDependent() const
+{
+    return m_isCodecDependent;
+}
+
+QString HanwhaAdavancedParameterInfo::resourceProperty() const
+{
+    return m_resourceProperty;
+}
+
 QString HanwhaAdavancedParameterInfo::cgi() const
 {
     return m_cgi;
@@ -156,6 +168,10 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             m_channelIndependent = fromString<bool>(auxValue);
         else if (auxName == kProfileAux)
             m_profile = fromString<Qn::ConnectionRole>(auxValue);
+        else if (auxName == kCodecAux)
+            m_isCodecDependent = fromString<bool>(auxValue);
+        else if (auxName == kResourceProperty)
+            m_resourceProperty = auxValue;
     }
 }
 

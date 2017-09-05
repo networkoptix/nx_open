@@ -8,6 +8,7 @@
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
+#include <plugins/resource/hanwha/hanwha_codec_limits.h>
 
 extern "C" {
 
@@ -24,7 +25,7 @@ class HanwhaResource: public QnPlOnvifResource
     using base_type = QnPlOnvifResource;
 
 public:
-    HanwhaResource();
+    HanwhaResource() = default;
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -87,6 +88,9 @@ private:
         const std::set<int>& inOutProfilesToRemove) const;
 
     CameraDiagnostics::Result fetchStreamLimits(HanwhaStreamLimits* outStreamLimits);
+
+    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+
     void sortResolutions(std::vector<QSize>* resolutions) const;
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
@@ -107,12 +111,37 @@ private:
 
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
+    boost::optional<QString> tryToGetSpecificParameterDefault(
+        const QString& parameterString,
+        const HanwhaResponse& response) const;
+
+    boost::optional<int> calculateDefaultBitrate(
+        const QString& parmeterString,
+        const HanwhaResponse& response) const;
+
+    boost::optional<int> calculateDefaultGovLength(
+        const QString& parameterString,
+        const HanwhaResponse& response) const;
+
+    std::tuple<int, int, AVCodecID> channelProfileCodec(const QString& parameterString) const;
+    
+    QString toHanwhaAdvancedParameterValue(
+        const QnCameraAdvancedParameter& parameter,
+        const HanwhaAdavancedParameterInfo& parameterInfo,
+        const QString& str) const;
+
+    QString fromHanwhaAdvancedParameterValue(
+        const QnCameraAdvancedParameter& parameter,
+        const HanwhaAdavancedParameterInfo& parameterInfo,
+        const QString& str) const;
+
 private:
     using AdvancedParameterId = QString;
 
     mutable QnMutex m_mutex;
     int m_maxProfileCount = 0;
     HanwhaStreamLimits m_streamLimits;
+    HanwhaCodecInfo m_codecInfo;
     std::map<Qn::ConnectionRole, int> m_profileByRole;
 
     Ptz::Capabilities m_ptzCapabilities;

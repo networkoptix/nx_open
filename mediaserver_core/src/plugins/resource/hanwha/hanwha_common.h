@@ -44,6 +44,9 @@ enum class HanwhaClientType
 
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
+static const int kHanwhaInvalidFps = -1;
+static const int kHanwhaInvalidBitrate = -1;
+static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaMaxPresetNumber = 1000;
 
@@ -112,6 +115,15 @@ static const QString kHanwhaPresetNameProperty = lit("PresetName");
 static const QString kHanwhaHorizontalFlipProperty = lit("HorizontalFlipEnable");
 static const QString kHanwhaVerticalFlipProperty = lit("VerticalFlipEnable");
 static const QString kHanwhaRotationProperty = lit("Rotate");
+
+static const QString kHanwhaMaxFpsProperty = lit("MaxFPS");
+static const QString kHanwhaDefaultFpsProperty = lit("DefaultFPS");
+static const QString kHanwhaMaxCbrBitrateProperty = lit("MaxCBRTargetBitrate");
+static const QString kHanwhaMinCbrBitrateProperty = lit("MinCBRTargetBitrate");
+static const QString kHanwhaDefaultCbrBitrateProperty = lit("DefaultCBRTargetBitrate");
+static const QString kHanwhaMaxVbrBitrateProperty = lit("MaxVBRTargetBitrate");
+static const QString kHanwhaMinVbrBitrateProperty = lit("MinVBRTargetBitrate");
+static const QString kHanwhaDefaultVbrBitrateProperty = lit("DefaultVBRTargetBitrate");
 
 static const QString kHanwhaNearFocusMove = lit("Near");
 static const QString kHanwhaFarFocusMove = lit("Far");

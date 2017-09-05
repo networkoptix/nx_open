@@ -7,10 +7,10 @@ namespace plugins {
 
 namespace {
 
-const QString kErrorStart = lit("ng");
-const QByteArray kErrorCodePrefix("error code:");
-const QByteArray kErrorDetailsPrefix("error details:");
-const QString kUnknownErrorString = lit("unknown error");
+const QString kErrorStart = lit("NG");
+const QByteArray kErrorCodePrefix("Error Code:");
+const QByteArray kErrorDetailsPrefix("Error Details:");
+const QString kUnknownErrorString = lit("Unknown error");
 
 } // namespace
 
@@ -24,9 +24,11 @@ HanwhaResponse::HanwhaResponse(nx_http::StatusCode::Value statusCode):
 
 HanwhaResponse::HanwhaResponse(
     const nx::Buffer& rawBuffer,
-    nx_http::StatusCode::Value statusCode)
+    nx_http::StatusCode::Value statusCode,
+    const QString& groupBy)
     :
-    m_statusCode(statusCode)
+    m_statusCode(statusCode),
+    m_groupBy(groupBy)
 {
     parseBuffer(rawBuffer);
 }
@@ -58,17 +60,62 @@ nx_http::StatusCode::Value HanwhaResponse::statusCode() const
 
 void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
 {
+    const auto groupBy = m_groupBy.toUtf8();
     auto lines = rawBuffer.split(L'\n');
     bool isError = false;
     bool gotErrorDetails = false;
-
+    QString currentGroupPrefix;
+    
     for (const auto& line: lines)
     {
-        auto trimmed = line.trimmed().toLower();
+        const auto trimmed = line.trimmed();
+        if (trimmed.isEmpty())
+            continue;
+
         if (trimmed == kErrorStart)
         {
             isError = true;
             continue;
+        }
+        else if (!m_groupBy.isEmpty())
+        {
+            const auto split = trimmed.split('.');
+            const auto splitSize = split.size();
+
+            if (split.isEmpty())
+                continue;
+
+            for (auto i = 0; i < splitSize; ++i)
+            {
+                const auto part = split[i];
+                const bool lastValue = i == splitSize - 1;
+
+                if (part == groupBy && !lastValue)
+                {
+                    currentGroupPrefix = lit("%1.%2.")
+                        .arg(QString::fromUtf8(groupBy))
+                        .arg(QString::fromUtf8(split[i + 1]));
+
+                    continue;
+                }
+
+                if (i == splitSize - 1)
+                {
+                    auto nameAndValue = part.split(L'=');
+
+                    if (nameAndValue.size() != 2)
+                        continue;
+
+                    if (nameAndValue[0] == groupBy)
+                    {
+                        currentGroupPrefix = lit("%1.%2.")
+                            .arg(QString::fromUtf8(groupBy))
+                            .arg(QString::fromUtf8(nameAndValue[1]));
+                    }
+
+                    continue;
+                }
+            }
         }
 
         if (isError)
@@ -103,7 +150,7 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
             if (split.size() != 2)
                 continue;
 
-            m_response[split[0].trimmed()] = split[1].trimmed();
+            m_response[currentGroupPrefix + split[0].trimmed()] = split[1].trimmed();
             m_errorCode = HanwhaError::kNoError;
         }
     }
@@ -134,6 +181,18 @@ template<>
 boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName) const
 {
     return toDouble(findParameter(parameterName));
+}
+
+template<>
+boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName) const
+{
+    return toCodecId(findParameter(parameterName));
+}
+
+template<>
+boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName) const
+{
+    return toQSize(findParameter(parameterName));
 }
 
 template<>

@@ -58,7 +58,8 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    const HanwhaRequestHelper::Parameters& parameters)
+    const HanwhaRequestHelper::Parameters& parameters,
+    const QString& groupBy)
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
@@ -67,12 +68,15 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     if (!doRequestInternal(url, m_resource->getAuth(), &buffer, &statusCode))
         return HanwhaResponse(statusCode);
 
-    return HanwhaResponse(buffer, statusCode);
+    return HanwhaResponse(buffer, statusCode, groupBy);
 }
 
-HanwhaResponse HanwhaRequestHelper::view(const QString& path, const Parameters& parameters)
+HanwhaResponse HanwhaRequestHelper::view(
+    const QString& path,
+    const Parameters& parameters,
+    const QString& groupBy)
 {
-    return splitAndDoRequest(lit("view"), path, parameters);
+    return splitAndDoRequest(lit("view"), path, parameters, groupBy);
 }
 
 HanwhaResponse HanwhaRequestHelper::set(const QString& path, const Parameters& parameters)
@@ -163,13 +167,14 @@ bool HanwhaRequestHelper::doRequestInternal(
 HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     const QString& action,
     const QString& path,
-    const Parameters& parameters)
+    const Parameters& parameters,
+    const QString& groupBy)
 {
     auto split = path.split(L'/');
     if (split.size() != 2)
         return HanwhaResponse(nx_http::StatusCode::undefined);
 
-    return doRequest(split[0], split[1], action, parameters);
+    return doRequest(split[0], split[1], action, parameters, groupBy);
 }
 
 } // namespace plugins

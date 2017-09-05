@@ -28,11 +28,13 @@ public:
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        const Parameters& parameters = Parameters());
+        const Parameters& parameters = Parameters(),
+        const QString& groupBy = QString());
 
     HanwhaResponse view(
         const QString& path,
-        const Parameters& parameters = Parameters());
+        const Parameters& parameters = Parameters(),
+        const QString& groupBy = QString());
 
     HanwhaResponse set(
         const QString& path,
@@ -72,7 +74,8 @@ private:
     HanwhaResponse splitAndDoRequest(
         const QString& action,
         const QString& path,
-        const Parameters& parameters);
+        const Parameters& parameters,
+        const QString& groupBy = QString());
 
 private:
     const QnSecurityCamResourcePtr m_resource;

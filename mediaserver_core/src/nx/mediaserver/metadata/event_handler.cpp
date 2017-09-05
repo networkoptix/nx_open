@@ -43,10 +43,6 @@ void EventHandler::handleMetadata(
             ? nx::vms::event::EventState::active
             : nx::vms::event::EventState::inactive;
 
-        nxpl::NX_GUID kMd = {{0xF1, 0xF7, 0x23, 0xBB, 0x20, 0xC8, 0x45, 0x3A, 0xAF, 0xCE, 0x86, 0xF3, 0x18, 0xCB, 0xF0, 0x97}};
-        if (eventData->eventTypeId() == kMd)
-            qDebug() << "HANDLING MOTION DETECTION!" << eventData->isActive();
-
         qnEventRuleConnector->at_analyticsSdkEvent(
             m_resource,
             m_pluginId,

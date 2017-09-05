@@ -34,6 +34,9 @@ boost::optional<bool> toBool(const boost::optional<QString>& str)
 
 boost::optional<int> toInt(const boost::optional<QString>& str)
 {
+    if (!str.is_initialized())
+        return boost::none;
+
     bool success = false;
     int numericValue = str->toInt(&success);
 
@@ -45,6 +48,9 @@ boost::optional<int> toInt(const boost::optional<QString>& str)
 
 boost::optional<double> toDouble(const boost::optional<QString>& str)
 {
+    if (!str.is_initialized())
+        return boost::none;
+
     bool success = false;
     int numericValue = str->toDouble(&success);
 
@@ -52,6 +58,22 @@ boost::optional<double> toDouble(const boost::optional<QString>& str)
         return boost::none;
 
     return numericValue;
+}
+
+boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str)
+{
+    if (!str.is_initialized())
+        return boost::none;
+    
+    return fromHanwhaString<AVCodecID>(*str);
+}
+
+boost::optional<QSize> toQSize(const boost::optional<QString>& str)
+{
+    if (!str.is_initialized())
+        return boost::none;
+
+    return fromHanwhaString<QSize>(*str);
 }
 
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
