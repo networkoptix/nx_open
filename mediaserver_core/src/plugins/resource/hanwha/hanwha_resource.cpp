@@ -359,6 +359,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             lit("Can not fetch primary stream limits."));
     }
 
+    const bool hasAudio = mediaAttributes.attribute<int>(
+        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
     setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
 
