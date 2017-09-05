@@ -324,7 +324,7 @@ void QnLoginDialog::accept()
                         (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
 
                     QUrl lastUrl = url;
-                    if (!storePassword)
+                    if (!storePassword || !autoLogin)
                         lastUrl.setPassword(QString());
                     qnSettings->setLastLocalConnectionUrl(lastUrl);
                     qnSettings->save();
