@@ -498,9 +498,9 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (item()->layout()->isSearchLayout())
         return;
 
-    static const auto kUpdateTriggeresInterval = 1000;
+    static const auto kUpdateTriggersInterval = 1000;
     const auto updateTriggersAvailabilityTimer = new QTimer(this);
-    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggeresInterval);
+    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
     connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
         this, &QnMediaResourceWidget::updateTriggersAvailability);
     updateTriggersAvailabilityTimer->start();
@@ -519,35 +519,43 @@ void QnMediaResourceWidget::initSoftwareTriggers()
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+{
+    if (!rule)
+        return;
+
+    const auto triggerIt = m_softwareTriggers.find(rule->id());
+    if (triggerIt == m_softwareTriggers.end())
+        return;
+
+    const auto button = qobject_cast<QnSoftwareTriggerButton*>(
+        m_triggersContainer->item(triggerIt.value().overlayItemId));
+
+    if (!button)
+        return;
+
+    const bool ruleEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
+    if (button->isEnabled() == ruleEnabled)
+        return;
+
+    if (ruleEnabled)
+    {
+        button->setEnabled(true);
+        return;
+    }
+
+    const bool longPressed = triggerIt.value().info.prolonged &&
+        button->state() == QnSoftwareTriggerButton::State::Waiting;
+    if (longPressed)
+        button->setState(QnSoftwareTriggerButton::State::Failure);
+
+    button->setEnabled(false);
+}
+
 void QnMediaResourceWidget::updateTriggersAvailability()
 {
-    for (auto it = m_softwareTriggers.begin(); it != m_softwareTriggers.end(); ++it)
-    {
-        const auto button = qobject_cast<QnSoftwareTriggerButton*>(
-            m_triggersContainer->item(it.value().overlayItemId));
-        if (!button)
-            continue;
-
-        const auto ruleId = it.key();
-        const auto rule = commonModule()->eventRuleManager()->rule(ruleId);
-        const bool ruleEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
-
-        if (button->isEnabled() == ruleEnabled)
-            continue;
-
-        if (ruleEnabled)
-        {
-            button->setEnabled(true);
-            continue;
-        }
-
-        const bool longPressed = it.value().info.prolonged &&
-            button->state() == QnSoftwareTriggerButton::State::Waiting;
-        if (longPressed)
-            button->setState(QnSoftwareTriggerButton::State::Failure);
-
-        button->setEnabled(false);
-    }
+    for (auto ruleId: m_softwareTriggers.keys())
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2741,6 +2749,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);
     }
+
+    updateTriggerAvailability(rule);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(
