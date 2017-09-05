@@ -3056,7 +3056,8 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
      * in eighths (1/8s) of a degree. */
     const qreal degrees = event->delta() / 8.0;
 
-    if (event->modifiers().testFlag(Qt::ControlModifier))
+    if (event->modifiers().testFlag(Qt::ControlModifier)
+        || event->modifiers().testFlag(Qt::ShiftModifier))
     {
         /* Kinetic drag: */
         m_kineticScrollHandler->kineticProcessor()->shift(degrees / kWheelDegreesFor1PixelScroll);
