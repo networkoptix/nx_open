@@ -204,7 +204,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -224,7 +224,7 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from showreel?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -312,7 +312,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     }
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(text);
     messageBox.setInformativeText(extras);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
