@@ -78,7 +78,7 @@ class ServerInstallation(object):
             else:
                 log.warning('Cloud host tag %r is missing from shared library %r (size: %d)',
                             MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data))
-        assert start_idx != -1, ('Cloud host tag %r is missing from mediaserver binary files %r'
+        assert start_idx != -1, ('Cloud host tag %r is missing from shared libraries %r'
                            % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_LIB_PATH_LIST))
         end_idx = data.find('\0', start_idx)
         assert end_idx != -1
