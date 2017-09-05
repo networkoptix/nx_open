@@ -25,7 +25,11 @@ public:
 
     bool operator < (const VersionHolder &other) const;
 
+    bool operator <= (const VersionHolder &other) const;
+
     bool operator > (const VersionHolder &other) const;
+
+    bool operator >= (const VersionHolder &other) const;
 
     bool operator == (const VersionHolder &other) const;
 

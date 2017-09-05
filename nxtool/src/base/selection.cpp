@@ -292,6 +292,20 @@ namespace
         
         return aggregatedSafeMode;
     }
+
+    bool calcIsNewSystem(const api::ServerInfoPtrContainer &servers)
+    {
+        if (servers.empty())
+            return false;
+
+        const bool aggregatedIsNewSystem = getSelectionValue<bool>(servers, false, true
+            , std::equal_to<bool>(), [](const api::ServerInfo &info) -> int
+        {
+            return info.baseInfo().flags.testFlag(api::Constants::IsNewSystemFlag);
+        });
+
+        return aggregatedIsNewSystem;
+    }
 }
 
 ///
@@ -318,6 +332,7 @@ struct rtu::Selection::Snapshot
     TimeZonesModelPtr timeZonesModel;
     
     bool safeMode;
+    bool isNewSystem;
 
     api::Constants::SystemCommands sysCommands;
 
@@ -346,6 +361,7 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , timeZonesModel(new TimeZonesModel(model->selectedServers(), rtu::helpers::qml_objects_parent()))
 
     , safeMode(calcSafeMode(model->selectedServers()))
+    , isNewSystem(calcIsNewSystem(model->selectedServers()))
 
     , sysCommands(calcFlags<api::Constants::SystemCommands>(
         model->selectedServers(), api::Constants::SystemCommand::AllCommands
@@ -436,6 +452,12 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
 
     m_snapshot->sysCommands = otherSnapshot.sysCommands;
 
+    if (m_snapshot->isNewSystem != otherSnapshot.isNewSystem)
+    {
+        m_snapshot->isNewSystem = otherSnapshot.isNewSystem;
+        emit isNewSystemChanged();
+    }
+
     if (emitDateTimeChanged)
         emit dateTimeSettingsChanged();
 
@@ -500,6 +522,11 @@ QObject *rtu::Selection::timeZonesModel()
 bool rtu::Selection::safeMode() const
 {
     return m_snapshot->safeMode;
+}
+
+bool rtu::Selection::isNewSystem() const
+{
+    return m_snapshot->isNewSystem;
 }
 
 bool rtu::Selection::editableInterfaces() const
