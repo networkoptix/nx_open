@@ -631,9 +631,10 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     {
         const auto lastUsed = QnConnectionData(info.systemName, url, localId);
         qnSettings->setLastUsedConnection(lastUsed);
-        qnSettings->setAutoLogin(autoLogin);
-        qnSettings->save();
     }
+
+    qnSettings->setAutoLogin(autoLogin);
+    qnSettings->save();
 
     if (cloudConnection)
     {
