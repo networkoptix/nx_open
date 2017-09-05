@@ -49,7 +49,7 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
 
             const QTransform translation = rotation
                 * QTransform::fromTranslate(m_originalTransform.dx(), m_originalTransform.dy())
-                * rotation.transposed();
+                * rotation.transposed(); //< For rotation matrix transposition === inversion.
 
             painter->setTransform(rotation);
             m_transform = QTransform::fromScale(sx, sy) * translation;
