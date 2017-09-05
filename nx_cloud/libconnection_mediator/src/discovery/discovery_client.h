@@ -161,12 +161,13 @@ private:
 
     void onWebSocketConnectFinished()
     {
-        if (!m_webSocketConnector->hasRequestSuccesed())
+        if (!m_webSocketConnector->hasRequestSucceeded())
         {
             NX_DEBUG(this, lm("Failed to establish websocket connection to %1. "
                 "system result code %2, http result code %3")
-                .arg(m_baseUrl).arg(m_webSocketConnector->lastSysErrorCode())
-                /*.arg(nx_http::StatusCode::toString(m_webSocketConnector->httpStatusCode()))*/);
+                .args(
+                    m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
+                    nx_http::StatusCode::toString(m_webSocketConnector->httpStatusCode())));
 
             // TODO Reconnecting.
             return;
