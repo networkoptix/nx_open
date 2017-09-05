@@ -690,13 +690,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 );
             break;
 
-        case QnSystemHealth::NoPrimaryTimeServer:
-            item->addActionButton(
-                qnSkin->icon("events/settings.png"),
-                action::SelectTimeServerAction,
-                actionParams);
-            break;
-
         case QnSystemHealth::SystemIsReadOnly:
             break;
 

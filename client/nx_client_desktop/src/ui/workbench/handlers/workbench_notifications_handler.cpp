@@ -93,18 +93,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
-    connect(messageProcessor, &QnCommonMessageProcessor::timeServerSelectionRequired, this,
-        [this]
-        {
-            setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
-        });
-
-    connect(action(action::SelectTimeServerAction), &QAction::triggered, this,
-        [this]
-        {
-            setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, false);
-        });
-
     connect(action(action::HideCloudPromoAction), &QAction::triggered, this,
         [this]
         {
@@ -282,7 +270,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::ArchiveFastScanFinished:
-        case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::CloudPromo:
             return true;
@@ -359,7 +346,6 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     {
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesAreFull:
-        case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
