@@ -1553,11 +1553,6 @@ void MediaServerProcess::loadResourcesFromECS(
             messageProcessor->on_licenseChanged(license);
     }
 
-    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
-        m_mediaServer->setPanicMode(Qn::PM_None);
-        m_mediaServer->saveParams();
-    }
-
     // Start receiving local notifications
     auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     processor->startReceivingLocalNotifications(ec2Connection);
@@ -1575,6 +1570,9 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) 
+        server->setPanicMode(Qn::PM_None);
 
     QFile hddList(Qn::HDD_LIST_FILE);
     if (hddList.open(QFile::ReadOnly))

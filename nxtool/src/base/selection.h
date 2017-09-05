@@ -32,6 +32,7 @@ namespace rtu
         Q_PROPERTY(QObject *timeZonesModel READ timeZonesModel NOTIFY changed)
 
         Q_PROPERTY(bool safeMode READ safeMode NOTIFY changed)
+        Q_PROPERTY(bool isNewSystem READ isNewSystem NOTIFY isNewSystemChanged)
 
         /// We can't change something on actions page now. Thus, we could update extraFlags value immediately 
         Q_PROPERTY(int SystemCommands READ SystemCommands NOTIFY actionsSettingsChanged)    
@@ -83,6 +84,8 @@ namespace rtu
 
         bool safeMode() const;
 
+        bool isNewSystem() const;
+
     signals:
         void changed(); /// fake signal
 
@@ -93,6 +96,8 @@ namespace rtu
         void dateTimeSettingsChanged();
 
         void actionsSettingsChanged();
+
+        void isNewSystemChanged();
 
     private:
         struct Snapshot;

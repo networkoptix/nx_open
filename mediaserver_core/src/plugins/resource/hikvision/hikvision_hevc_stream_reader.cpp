@@ -32,6 +32,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
 
     auto role = getRole();
     auto streamingUrl = buildHikvisionStreamUrl(channelProperties.rtspPortNumber);
+    m_hikvisionResource->updateSourceUrl(streamingUrl.toString(), getRole());
     if (!isCameraControlRequired)
     {
         m_rtpReader.setRole(role);

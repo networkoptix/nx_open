@@ -60,16 +60,16 @@ private:
     }
 
     void provideEmptyMessageBody(
-        nx_http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
 
         nx_http::RequestResult result(nx_http::StatusCode::ok);
-        result.connectionEvents.onResponseHasBeenSent = 
+        result.connectionEvents.onResponseHasBeenSent =
             std::bind(&HttpServerConnection::onResponseSent, this, _1);
         result.dataSource = std::make_unique<EmptyMessageBodySource>(
             "text/plain",
