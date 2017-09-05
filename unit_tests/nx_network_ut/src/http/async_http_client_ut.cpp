@@ -131,7 +131,7 @@ protected:
         client->doGet(url,
             [&promise](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 EXPECT_TRUE(ptr->hasRequestSucceeded());
                  promise.set_value();
             });
 
@@ -150,7 +150,7 @@ protected:
         client->doGet(url,
             [&promise, &expectedResult](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 EXPECT_TRUE(ptr->hasRequestSucceeded());
                  EXPECT_EQ(expectedResult, ptr->fetchMessageBodyBuffer());
                  promise.set_value();
             });

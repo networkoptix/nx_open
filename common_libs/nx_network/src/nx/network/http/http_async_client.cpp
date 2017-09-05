@@ -308,7 +308,7 @@ StringType AsyncClient::contentType() const
     return contentTypeIter->second;
 }
 
-bool AsyncClient::hasRequestSuccesed() const
+bool AsyncClient::hasRequestSucceeded() const
 {
     if (state() == State::sFailed)
         return false;
