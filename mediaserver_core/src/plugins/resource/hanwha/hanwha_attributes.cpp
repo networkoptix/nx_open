@@ -29,6 +29,11 @@ bool HanwhaAttributes::isValid() const
     return m_isValid;
 }
 
+int HanwhaAttributes::channelCount() const
+{
+    return m_attributes.size();
+}
+
 nx_http::StatusCode::Value HanwhaAttributes::statusCode() const
 {
     return m_statusCode;

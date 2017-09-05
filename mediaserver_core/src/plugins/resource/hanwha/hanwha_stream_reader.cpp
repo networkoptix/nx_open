@@ -69,15 +69,17 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
         || codec == AVCodecID::AV_CODEC_ID_HEVC)
             && govLength != kHanwhaInvalidGovLength;
 
-    HanwhaProfileParameters result = {
+    HanwhaProfileParameters result = 
+    {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
         {kHanwhaEncodingTypeProperty, toHanwhaString(codec)},
         {kHanwhaFrameRateProperty, QString::number(
             m_hanwhaResource->closestFrameRate(role, frameRate))},
-        {kHanwhaResolutionProperty, toHanwhaString(resolution)},
-        {kHanwhaAudioInputEnableProperty, toHanwhaString(m_hanwhaResource->isAudioEnabled())}
+        {kHanwhaResolutionProperty, toHanwhaString(resolution)}
     };
+    if (m_hanwhaResource->isAudioSupported())
+        result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(m_hanwhaResource->isAudioEnabled()));
 
     if (govLengthParameterIsNeeded)
         result.emplace(govLengthParameterName, QString::number(govLength));

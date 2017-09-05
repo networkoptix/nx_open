@@ -189,7 +189,7 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 }
 
 int QnSecurityCamResource::getMaxFps() const {
-    QString value = getProperty(lit("MaxFPS"));
+    QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 

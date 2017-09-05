@@ -241,8 +241,15 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!result)
         return result;
 
+    const bool hasAudio = mediaAttributes.attribute<int>(
+        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
+
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int)hasDualStreaming);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, frameRates[frameRates.size() - 1]);
+
+    // todo: some cameras reports fps > 30 but it doesn't work.
+    int maxFps = std::min(30, frameRates[frameRates.size() - 1]);
+    setProperty(Qn::MAX_FPS_PARAM_NAME, maxFps);
 
     return createNxProfiles();
 }
@@ -579,7 +586,8 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
         lit("media/videoprofile"),
         {
             {kHanwhaProfileNameProperty, nxProfileName(role)},
-            {kHanwhaEncodingTypeProperty, toHanwhaString(streamCodec(role))}
+            {kHanwhaEncodingTypeProperty, toHanwhaString(streamCodec(role))},
+            {kHanwhaChannelProperty, QString::number(getChannel())}
         });
 
     if (!response.isSuccessful())
@@ -886,6 +894,30 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
         return boost::none;
 
     return itr->second;
+}
+
+void HanwhaResource::updateToChannel(int value)
+{
+    QUrl url(getUrl());
+    QUrlQuery query(url.query());
+    query.removeQueryItem("channel");
+    if (value > 0)
+        query.addQueryItem("channel", QString::number(value + 1));
+    url.setQuery(query);
+    setUrl(url.toString());
+
+    QString physicalId = getPhysicalId().split('_')[0];
+    setGroupName(getModel());
+    setGroupId(physicalId);
+
+    QString suffix = lit("_channel=%1").arg(value + 1);
+    if (value > 0)
+        physicalId += suffix;
+    setPhysicalId(physicalId);
+
+    suffix = lit("-channel %1").arg(value + 1);
+    if (value > 0 && !getName().endsWith(suffix))
+        setName(getName() + suffix);
 }
 
 } // namespace plugins

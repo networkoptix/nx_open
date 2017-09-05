@@ -61,6 +61,7 @@ public:
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
+    void updateToChannel(int value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 

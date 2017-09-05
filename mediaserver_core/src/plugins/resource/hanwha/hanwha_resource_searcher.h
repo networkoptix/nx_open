@@ -49,11 +49,15 @@ private:
         QnResourceList& result );
 
     bool isHanwhaCamera(const QString& vendorName, const QString& model) const;
+    int getChannels(const HanwhaResourcePtr& resource);
 
+    template<typename T>
+    void addMultichannelResources(QList<T>& result);
 private:
-	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadFoundMacAddresses;
-	mutable QnMutex m_mutex;
+    QnResourceList m_foundUpnpResources;
+    std::set<QString> m_alreadFoundMacAddresses;
+    mutable QnMutex m_mutex;
+    QMap<QString, int> m_channelsByCamera;
 };
 
 } // namespace plugins

@@ -15,8 +15,9 @@ namespace plugins {
 
 class HanwhaRequestHelper
 {
-    using Parameters = std::map<QString, QString>;
 public:
+    using Parameters = std::map<QString, QString>;
+
     HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);

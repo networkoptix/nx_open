@@ -10,6 +10,7 @@
 
 #include "hanwha_resource_searcher.h"
 #include "hanwha_resource.h"
+#include "hanwha_request_helper.h"
 
 namespace
 {
@@ -55,10 +56,50 @@ QString HanwhaResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     const QUrl& url,
-    const QAuthenticator& authOriginal,
+    const QAuthenticator& auth,
     bool isSearchAction)
 {
-    return QList<QnResourcePtr>();
+    if (!url.scheme().isEmpty() && isSearchAction)
+        return QList<QnResourcePtr>();
+
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), kHanwhaCameraName);
+    if (rt.isNull())
+        return QList<QnResourcePtr>();
+
+    QnResourceList result;
+    HanwhaResourcePtr resource(new HanwhaResource());
+    QUrl urlCopy(url);
+    urlCopy.setScheme("http");
+    QString urlStr = urlCopy.toString();
+
+    resource->setUrl(urlCopy.toString());
+    resource->setDefaultAuth(auth);
+
+    HanwhaRequestHelper helper(resource);
+    HanwhaResponse systemInfo = helper.view("system/deviceinfo");
+    if (!systemInfo.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    auto macAddr = systemInfo.parameter<QString>("ConnectedMACAddress");
+    auto model = systemInfo.parameter<QString>("Model");
+    if (!macAddr || !model)
+        return QList<QnResourcePtr>();
+    auto firmware = systemInfo.parameter<QString>("FirmwareVersion");
+    
+    resource->setMAC(QnMacAddress(*macAddr));
+    resource->setModel(*model);
+    resource->setName(*model);
+    if (firmware)
+        resource->setFirmware(*firmware);
+    resource->setTypeId(rt);
+    resource->setVendor(kHanwhaManufacturerName);
+    result << resource;
+    const int channel = resource->getChannel();
+    if (isSearchAction)
+        addMultichannelResources(result);
+    else if (channel > 0 || getChannels(resource) > 1)
+        resource->updateToChannel(channel);
+    return result;
 }
 
 QnResourceList HanwhaResourceSearcher::findResources(void)
@@ -143,6 +184,63 @@ void HanwhaResourceSearcher::createResource(
         resource->setDefaultAuth(auth);
 
     result << resource;
+    addMultichannelResources(result);
+}
+
+int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
+{
+    auto result = m_channelsByCamera.value(resource->getUniqueId());
+    if (result > 0)
+        return result;
+    
+    HanwhaRequestHelper helper(resource);
+    const HanwhaResponse sources = helper.view(lit("media/videosource"));
+    if (!sources.isSuccessful())
+        return 0;
+    const auto params = sources.response();
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+    {
+        auto paramName = itr->first;
+        if (paramName.endsWith("VideoSourceToken"))
+            ++result;
+    }
+    m_channelsByCamera.insert(resource->getUniqueId(), result);
+    return result;
+}
+
+template <typename T>
+void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
+{
+    HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
+
+    const auto channels = getChannels(firstResource);
+    if (channels > 1)
+    {
+        firstResource->updateToChannel(0);
+        for (int i = 1; i < channels; ++i)
+        {
+            HanwhaResourcePtr resource(new HanwhaResource());
+
+            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), kHanwhaCameraName);
+            if (rt.isNull())
+                return;
+
+            resource->setTypeId(rt);
+            resource->setVendor(kHanwhaManufacturerName);
+            resource->setName(firstResource->getName());
+            resource->setModel(firstResource->getName());
+            resource->setMAC(firstResource->getMAC());
+
+            auto auth = firstResource->getAuth();
+            if (!auth.isNull())
+                resource->setDefaultAuth(auth);
+
+            resource->setUrl(firstResource->getUrl());
+            resource->updateToChannel(i);
+
+            result.push_back(resource);
+        }
+    }
 }
 
 } // namespace plugins
