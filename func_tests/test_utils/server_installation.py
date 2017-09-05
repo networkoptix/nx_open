@@ -72,17 +72,17 @@ class ServerInstallation(object):
         for lib_path in MEDIASERVER_CLOUDHOST_LIB_PATH_LIST:
             path_to_patch = os.path.join(self.dir, lib_path)
             data = self.host.read_file(path_to_patch)
-            idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
-            if idx != -1:
+            start_idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
+            if start_idx != -1:
                 break  # found required file
             else:
-                log.warning('Cloud host tag %r is missing from mediaserver binary file %r (size: %d)',
+                log.warning('Cloud host tag %r is missing from shared library %r (size: %d)',
                             MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data))
-        assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary files %r'
+        assert start_idx != -1, ('Cloud host tag %r is missing from mediaserver binary files %r'
                            % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_LIB_PATH_LIST))
-        eidx = data.find('\0', idx)
-        assert eidx != -1
-        old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
+        end_idx = data.find('\0', start_idx)
+        assert end_idx != -1
+        old_host = data[start_idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : end_idx]
         if self._current_cloud_host:
             assert old_host == self._current_cloud_host, repr((old_host, self._current_cloud_host))
         if new_host == old_host:
@@ -90,7 +90,7 @@ class ServerInstallation(object):
             self._current_cloud_host = new_host
             return
         old_str_len =  len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
-        old_padding = data[eidx : eidx + MEDIASERVER_CLOUDHOST_SIZE - old_str_len]
+        old_padding = data[end_idx : end_idx + MEDIASERVER_CLOUDHOST_SIZE - old_str_len]
         assert old_padding == '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len), (
             'Cloud host padding error: %d padding characters are expected, but got only %d' % (
             MEDIASERVER_CLOUDHOST_SIZE - old_str_len, old_padding.rfind('\0') + 1))
@@ -99,7 +99,7 @@ class ServerInstallation(object):
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
         padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))
         assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
-        new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
+        new_data = data[:start_idx] + padded_str + data[start_idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
         self.host.write_file(path_to_patch, new_data)
         self._current_cloud_host = new_host
