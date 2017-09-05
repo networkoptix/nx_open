@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e #< Exit on any error.
+set -u #< Prohibit undefined variables.
 
 # ATTENTION: This script works with both maven and cmake builds.
 
