@@ -83,8 +83,8 @@ copyToDataPartition()
     fi
 }
 
-# Install a deb package, unless it is missing from /opt/deb, or the proper version is installed.
-installDeb() # package [version]
+# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+installDebs() # package [version]
 {
     local -r PACKAGE="$1"; shift
     local VERSION=""
@@ -113,7 +113,7 @@ upgradeVms()
 
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
-    installDeb cifs-utils
+    installDebs cifs-utils
 
     if [ "$BOX" = "bpi" ]; then
         # Avoid grabbing libstdc++ from mediaserver lib folder.
@@ -123,11 +123,11 @@ upgradeVms()
 
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
-        installDeb libvdpau 0.4.1
-        installDeb fontconfig 2.11
-        installDeb fonts-takao-mincho
-        installDeb fonts-baekmuk
-        installDeb fonts-arphic-ukai
+        installDebs libvdpau 0.4.1
+        installDebs fontconfig 2.11
+        installDebs fonts-takao-mincho
+        installDebs fonts-baekmuk
+        installDebs fonts-arphic-ukai
 
         touch "/dev/cedar_dev"
         chmod 777 "/dev/disp"
