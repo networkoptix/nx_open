@@ -88,7 +88,7 @@ installDeb() # package [version]
 {
     local -r PACKAGE="$1"; shift
     local VERSION=""
-    if [ $# != 0 ]; then
+    if [ $# -ge 2 ]; then
         VERSION="$2"
     fi
 
