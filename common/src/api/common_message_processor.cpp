@@ -164,7 +164,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(storedFileManager, &ec2::AbstractStoredFileNotificationManager::removed,            this, &QnCommonMessageProcessor::fileRemoved, Qt::DirectConnection);
 
     auto timeManager = connection->getTimeNotificationManager();
-    connect(timeManager, &ec2::AbstractTimeNotificationManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
 
     auto discoveryManager = connection->getDiscoveryNotificationManager();
