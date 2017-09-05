@@ -40,8 +40,9 @@ public:
         NoFlags                             = 0x00
         , AllowChangeDateTimeFlag           = 0x01
         , AllowIfConfigFlag                 = 0x02
-        , IsFactoryFlag                     = 0x04
-        , HasHdd                            = 0x08
+        , IsFactoryFlag                     = 0x04 //< Old systems (version < 3.0) factory tag
+        , IsNewSystemFlag                   = 0x08 | IsFactoryFlag
+        , HasHdd                            = 0x10
 
         , AllFlags                          = 0xFF
     };

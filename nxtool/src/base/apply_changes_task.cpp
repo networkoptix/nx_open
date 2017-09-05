@@ -345,7 +345,7 @@ private:
 
     void addIpChangeRequests();
 
-    void addPasswordChangeRequests();
+    void addPasswordChangeRequests(bool forceNewLocalSystemId);
 
     bool addSummaryItem(const ServerInfoCacheItem &item
         , const QString &description
@@ -439,7 +439,10 @@ void rtu::ApplyChangesTask::Impl::apply(const ApplyChangesTaskPtr &owner)
     addActions();
     addDateTimeChangeRequests();
     addSystemNameChangeRequests();
-    addPasswordChangeRequests();
+
+    const bool forceChangeLocalSystemId =
+        m_changeset->systemName() && m_changeset->password();
+    addPasswordChangeRequests(forceChangeLocalSystemId);
     addPortChangeRequests();
     addIpChangeRequests();
 
@@ -1323,7 +1326,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
     }
 }
 
-void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
+void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests(bool forceNewLocalSystemId)
 {
     if (!m_changeset->password())
         return;
@@ -1331,17 +1334,18 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
     const QString &newPassword = *m_changeset->password();
     const ThisWeakPtr weak = shared_from_this();
 
+    const QUuid newLocalSystemId = forceNewLocalSystemId ? QUuid::createUuid() : QUuid();
     for (auto &item: m_serversCache)
     {
         enum { kPasswordChangesetSize = 1 };
         const auto initRuntimeId = item.first->runtimeId;
-        const auto request = [weak, initRuntimeId, &item, newPassword]()
+        const auto request = [weak, initRuntimeId, &item, newPassword, newLocalSystemId]()
         {
             if (weak.expired())
                 return;
 
-            const auto finalCallback = [weak, initRuntimeId, &item, newPassword ](const api::Client::ResultCode errorCode
-                , api::Client::AffectedEntities affected, bool needRestart)
+            const auto finalCallback = [weak, initRuntimeId, &item, newPassword, newLocalSystemId]
+                (const api::Client::ResultCode errorCode, api::Client::AffectedEntities affected, bool needRestart)
             {
                 static const QString kPasswordDescription = "password";
 
@@ -1363,7 +1367,7 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
                 shared->onChangesetApplied(waitForRestart ? 0 : kPasswordChangesetSize);
             };
 
-            const auto &callback = [weak, &item, newPassword, finalCallback]
+            const auto &callback = [weak, &item, newPassword, finalCallback, newLocalSystemId]
                 (const api::Client::ResultCode errorCode, api::Client::AffectedEntities affected, bool needRestart)
             {
                 if (weak.expired())
@@ -1376,12 +1380,14 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
                 else
                 {
                     const auto shared = weak.lock();
-                    api::Client::sendSetPasswordRequest(item.first, item.second.password, newPassword, true, finalCallback);
+                    api::Client::sendSetPasswordAndLocalIdRequest(item.first, item.second.password,
+                        newPassword, newLocalSystemId, true, finalCallback);
                 }
             };
 
             const auto shared = weak.lock();
-            api::Client::sendSetPasswordRequest(item.first, item.second.password, newPassword, false, callback);
+            api::Client::sendSetPasswordAndLocalIdRequest(item.first, item.second.password,
+                newPassword, newLocalSystemId, false, callback);
         };
 
         m_totalChangesCount += kPasswordChangesetSize;
