@@ -32,13 +32,20 @@
             Variable="InstalledClientVersion" />
 
         <util:ProductSearch
+            Id="ServerMsiSearch2"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="state"
+            Variable="ServerInstalled" />
+
+        <util:ProductSearch
             Id="ServerMsiVersion2"
             UpgradeCode="$(var.serverUpgradeCode)"
             Result="version"
             Variable="InstalledServerVersion" />
 
         <bal:Condition Message="Update to this version is not allowed. You should first upgrade to version 2.6">
-            <![CDATA[ (InstalledClientVersion = "0.0.0.0" OR InstalledClientVersion >= "2.3") AND (InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3")]]>
+            <![CDATA[ ((NOT (ClientInstalled = 5)) OR InstalledClientVersion >= "2.3") AND ((NOT (ServerInstalled = 5)) OR InstalledServerVersion >= "2.3")]]>
         </bal:Condition>
+
     </Fragment>
 </Wix>
