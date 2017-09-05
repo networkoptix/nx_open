@@ -75,6 +75,7 @@ TEMPLATES = [
         'DIRS': (
             '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
             '/app/app/static/{}/templates'.format(CUSTOMIZATION),
+            '/app/app/templates'
         ),
         'APP_DIRS': True,
         'OPTIONS': {
