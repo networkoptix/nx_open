@@ -167,7 +167,10 @@ private:
                 "system result code %2, http result code %3")
                 .args(
                     m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
-                    nx_http::StatusCode::toString(m_webSocketConnector->httpStatusCode())));
+                    m_webSocketConnector->response()
+                        ? nx_http::StatusCode::toString(
+                            m_webSocketConnector->response()->statusLine.statusCode)
+                        : nx::String("none")));
 
             // TODO Reconnecting.
             return;
