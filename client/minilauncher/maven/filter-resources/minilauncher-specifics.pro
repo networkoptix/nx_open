@@ -22,7 +22,7 @@ DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
 OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 CONFIG += x64
 RC_FILE = ${project.build.directory}/hdwitness.rc
-ICON = ${customization.dir}/icons/favicon.ico
+ICON = ${customization.dir}/icons/all/favicon.ico
 LIBS += shlwapi.lib
 QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /wd4290 /wd4661 /wd4100 /we4717
 # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.

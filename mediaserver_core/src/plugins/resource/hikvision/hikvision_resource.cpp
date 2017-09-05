@@ -86,6 +86,19 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             m_hevcSupported = hikvision::codecSupported(
                 AV_CODEC_ID_HEVC,
                 channelCapabilities);
+            if (m_hevcSupported && role == Qn::ConnectionRole::CR_LiveVideo)
+            {
+                setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
+                if (!channelCapabilities.resolutions.empty())
+                {
+                    const auto primaryResolution = channelCapabilities.resolutions.front();
+                    setPrimaryResolution(primaryResolution);
+                    if (qFuzzyIsNull(customAspectRatio()))
+                        setCustomAspectRatio(primaryResolution.width() / (qreal)primaryResolution.height());
+                }
+                if (!channelCapabilities.fps.empty())
+                    setMaxFps(channelCapabilities.fps[0] / 100);
+            }
         }
     }
 

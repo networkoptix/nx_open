@@ -29,7 +29,8 @@ private:
     QUrl hikvisionRequestUrlFromPath(const QString& path) const;
 
     QSize chooseResolution(
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        const QSize& primaryResolution) const;
 
     QString chooseCodec(
         const hikvision::ChannelCapabilities& channelCapabilities) const;

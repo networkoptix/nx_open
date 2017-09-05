@@ -1,4 +1,4 @@
-if(targetDevice AND NOT targetDevice STREQUAL "none")
+if(targetDevice)
     if(targetDevice MATCHES "bpi|bananapi")
         nx_rdep_sync_package(bpi/gcc-4.8.3)
     elseif(targetDevice STREQUAL "rpi")

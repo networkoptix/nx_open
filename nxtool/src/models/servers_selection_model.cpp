@@ -1007,7 +1007,7 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(
     ExtraServerInfo &extra = getExtraInfo(searchInfo);
 
     enum { kMaxMsecDiff = 5000 };
-    const auto timeDiffMs = std::abs(utcDateTimeMs - (extra.utcDateTimeMs + (timestampMs - extra.timestampMs)));
+    const auto timeDiffMs = llabs(utcDateTimeMs - (extra.utcDateTimeMs + (timestampMs - extra.timestampMs)));
     const bool diffTime = (timeDiffMs > kMaxMsecDiff);
     const bool diffTimeZone = (extra.timeZoneId != timeZoneId);
 

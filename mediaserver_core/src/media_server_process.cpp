@@ -1553,11 +1553,6 @@ void MediaServerProcess::loadResourcesFromECS(
             messageProcessor->on_licenseChanged(license);
     }
 
-    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
-        m_mediaServer->setPanicMode(Qn::PM_None);
-        m_mediaServer->saveParams();
-    }
-
     // Start receiving local notifications
     auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     processor->startReceivingLocalNotifications(ec2Connection);
@@ -1575,6 +1570,9 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) 
+        server->setPanicMode(Qn::PM_None);
 
     QFile hddList(Qn::HDD_LIST_FILE);
     if (hddList.open(QFile::ReadOnly))
@@ -2518,11 +2516,6 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
 
-    QString dataLocation = getDataDirectory();
-    QDir stateDirectory;
-    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
     auto remoteArchiveSynchronizer =
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
 
@@ -3213,6 +3206,11 @@ void MediaServerProcess::at_appStarted()
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
+
+    QString dataLocation = getDataDirectory();
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 };
 
 void MediaServerProcess::at_timeChanged(qint64 newTime)
@@ -3255,8 +3253,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
         user->setName(login);
-        user->setPassword(password);
-        user->generateHash();
+        user->setPasswordAndGenerateHash(password);
 
         ec2::ApiUserData userData;
         fromResourceToApi(user, userData);

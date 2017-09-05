@@ -1,17 +1,17 @@
 <div class="panel panel-default system-info">
     <div class="panel-body">
-        <h4 class="panel-title">Info</h4>
+        <h4 class="panel-title">Thông tin</h4>
         <table class="small table-fixed">
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr><td>System</td><td><b>{{settings.systemName}}</b></td></tr>
-            <tr><td>người sử dụng</td><td><b>{{user.name}}</b></td></tr>
-            <tr><td>Current Server</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
+            <tr><td>Hệ thống</td><td><b>{{settings.systemName}}</b></td></tr>
+            <tr><td>Người dùng</td><td><b>{{user.name}}</b></td></tr>
+            <tr><td>Máy chủ hiện tại</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr><td>Version</td><td><b>{{settings.version}}</b></td></tr>
-            <tr><td>Platform</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
-            <tr><td>Architecture</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
+            <tr><td>Phiên bản</td><td><b>{{settings.version}}</b></td></tr>
+            <tr><td>Nền tảng</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
+            <tr><td>Kiến trúc</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
             <tr ng-if="user.isAdmin" class="table-spacer"><td>&nbsp;</td><td></td></tr>
-            <tr ng-if="user.isAdmin"><td>All servers</td><td>
+            <tr ng-if="user.isAdmin"><td>Tất cả các máy chủ</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">
                     <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
                     <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank"><b>{{server.name}}</b> {{server.apiUrlFormatted}}</a>

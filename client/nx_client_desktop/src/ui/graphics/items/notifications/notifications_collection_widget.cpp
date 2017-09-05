@@ -263,7 +263,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
 
     NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
-        return
+        return;
 
     widget->setCloseButtonAvailable(false);
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);

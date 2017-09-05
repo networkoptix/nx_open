@@ -11,13 +11,7 @@
 #include <utils/common/checked_cast.h>
 
 QnResourceListModel::QnResourceListModel(QObject *parent) :
-    base_type(parent),
-    m_readOnly(false),
-    m_hasCheckboxes(false),
-    m_userCheckable(true),
-    m_simplified(false),
-    m_resources(),
-    m_checkedResources()
+    base_type(parent)
 {
 }
 
@@ -59,18 +53,18 @@ void QnResourceListModel::setUserCheckable(bool value)
     m_userCheckable = value;
 }
 
-bool QnResourceListModel::isSimplified() const
+QnResourceListModel::Options QnResourceListModel::options() const
 {
-    return m_simplified;
+    return m_options;
 }
 
-void QnResourceListModel::setSimplified(bool value)
+void QnResourceListModel::setOptions(Options value)
 {
-    if (m_simplified == value)
+    if (m_options == value)
         return;
 
     ScopedReset resetModel(this);
-    m_simplified = value;
+    m_options = value;
 }
 
 const QnResourceList &QnResourceListModel::resources() const
@@ -224,7 +218,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
         case Qn::ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
-            return m_simplified
+            return m_options.test(Option::ServerAsHealthMonitor)
                 ? qVariantFromValue(Qn::LayoutItemNode)
                 : qVariantFromValue(Qn::ResourceNode);
 
@@ -288,15 +282,17 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
-    if (!m_simplified)
-        return qnResIconCache->icon(resource);
-
-    if (resource->hasFlags(Qn::server))
+    if (resource->hasFlags(Qn::server) && m_options.test(Option::ServerAsHealthMonitor))
         return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
 
-    QnResourceIconCache::Key key = qnResIconCache->key(resource);
-    key &= ~QnResourceIconCache::StatusMask;
-    key |= QnResourceIconCache::Online;
-    return qnResIconCache->icon(key);
+    if (m_options.test(Option::HideStatus))
+    {
+        QnResourceIconCache::Key key = qnResIconCache->key(resource);
+        key &= ~QnResourceIconCache::StatusMask;
+        key |= QnResourceIconCache::Online;
+        return qnResIconCache->icon(key);
+    }
+
+    return qnResIconCache->icon(resource);
 }
 
