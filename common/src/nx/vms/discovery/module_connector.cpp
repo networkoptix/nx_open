@@ -138,7 +138,7 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
             NX_ASSERT(m_httpClient, client);
             const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
             m_httpClient.reset();
-            if (!client->hasRequestSuccesed())
+            if (!client->hasRequestSucceeded())
                 return nx::utils::swapAndCall(m_handler, boost::none, lit("HTTP request has failed"));
 
             m_buffer = client->fetchMessageBodyBuffer();

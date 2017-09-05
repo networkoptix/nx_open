@@ -140,7 +140,7 @@ public:
     /**
      * Checks state as well as response return HTTP code (expect 2XX).
      */
-    bool hasRequestSuccesed() const;
+    bool hasRequestSucceeded() const;
 
     /**
      * Returns current message body buffer, clearing it.
