@@ -328,7 +328,7 @@ void QnLoginDialog::accept()
                     qnSettings->save();
 
                     const bool storePasswordForTile =
-                        (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
+                        haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
 
                     action::Parameters params;
                     params.setArgument(Qn::UrlRole, url);
