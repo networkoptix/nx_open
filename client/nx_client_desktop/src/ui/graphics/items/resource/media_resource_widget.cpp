@@ -498,6 +498,13 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (item()->layout()->isSearchLayout())
         return;
 
+    static const auto kUpdateTriggersInterval = 1000;
+    const auto updateTriggersAvailabilityTimer = new QTimer(this);
+    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
+    connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
+        this, &QnMediaResourceWidget::updateTriggersAvailability);
+    updateTriggersAvailabilityTimer->start();
+
     resetTriggers();
 
     auto eventRuleManager = commonModule()->eventRuleManager();
@@ -510,6 +517,45 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
+}
+
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+{
+    if (!rule)
+        return;
+
+    const auto triggerIt = m_softwareTriggers.find(rule->id());
+    if (triggerIt == m_softwareTriggers.end())
+        return;
+
+    const auto button = qobject_cast<QnSoftwareTriggerButton*>(
+        m_triggersContainer->item(triggerIt.value().overlayItemId));
+
+    if (!button)
+        return;
+
+    const bool ruleEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
+    if (button->isEnabled() == ruleEnabled)
+        return;
+
+    if (ruleEnabled)
+    {
+        button->setEnabled(true);
+        return;
+    }
+
+    const bool longPressed = triggerIt.value().info.prolonged &&
+        button->state() == QnSoftwareTriggerButton::State::Waiting;
+    if (longPressed)
+        button->setState(QnSoftwareTriggerButton::State::Failure);
+
+    button->setEnabled(false);
+}
+
+void QnMediaResourceWidget::updateTriggersAvailability()
+{
+    for (auto ruleId: m_softwareTriggers.keys())
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2665,6 +2711,8 @@ void QnMediaResourceWidget::resetTriggers()
     /* Create new relevant triggers: */
     for (const auto& rule: commonModule()->eventRuleManager()->rules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+
+    updateTriggersAvailability();
 }
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
@@ -2701,6 +2749,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);
     }
+
+    updateTriggerAvailability(rule);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(

@@ -132,10 +132,8 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
 
-                QnResourceListView::Options options;
-                options.set(QnResourceListView::SortByName);
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
-                    options,
+                    QnResourceListView::SortByNameOption,
                     messageBox));
                 messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();

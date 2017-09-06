@@ -13,16 +13,8 @@
 
 namespace {
 
-static const int kMaximumRows = 10;
-static const int kRecommendedWidth = 284;
-
-static const QnResourceListView::Options kDefaultOptions =
-    []
-    {
-        QnResourceListView::Options result;
-        result.set(QnResourceListView::SortAsInTree);
-        return result;
-    }();
+static constexpr int kMaximumRows = 10;
+static constexpr int kRecommendedWidth = 284;
 
 }
 
@@ -62,7 +54,7 @@ QnResourceListView::QnResourceListView(const QnResourceList& resources,
 }
 
 QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):
-    QnResourceListView(resources, kDefaultOptions, parent)
+    QnResourceListView(resources, SortAsInTreeOption, parent)
 {
 }
 
@@ -90,18 +82,18 @@ void QnResourceListView::setOptions(Options value)
     m_options = value;
 
     QnResourceListModel::Options modelOptions;
-    if (value.test(Option::HideStatus))
-        modelOptions.set(QnResourceListModel::HideStatus);
-    if (value.test(Option::ServerAsHealthMonitor))
-        modelOptions.set(QnResourceListModel::ServerAsHealthMonitor);
+    if (value.testFlag(HideStatusOption))
+        modelOptions |= QnResourceListModel::HideStatusOption;
+    if (value.testFlag(ServerAsHealthMonitorOption))
+        modelOptions |= QnResourceListModel::ServerAsHealthMonitorOption;
     m_model->setOptions(modelOptions);
 
-    if (value.test(Option::SortAsInTree))
+    if (value.testFlag(SortAsInTreeOption))
     {
-        NX_EXPECT(!value.test(Option::SortByName), "Only one sorting may be actual");
+        NX_EXPECT(!value.testFlag(SortByNameOption), "Only one sorting may be actual");
         resetSortModel(new QnResourceListSortedModel(this));
     }
-    else if (value.test(Option::SortByName))
+    else if (value.testFlag(SortByNameOption))
     {
         auto model = new QSortFilterProxyModel(this);
         model->setSortCaseSensitivity(Qt::CaseInsensitive);

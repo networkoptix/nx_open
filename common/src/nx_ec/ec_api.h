@@ -541,13 +541,8 @@ namespace ec2
         Q_OBJECT
     public:
         virtual ~AbstractTimeNotificationManager() {}
+
     signals:
-        //!Emitted when there is ambiguity while choosing primary time server automatically
-        /*!
-            User SHOULD call \a AbstractTimeManager::forcePrimaryTimeServer to set primary time server manually.
-            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-        */
-        void timeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
     };

@@ -26,14 +26,12 @@ public:
     // TODO: #GDM really these options must be present in delegate, not in model.
     enum Option
     {
-        HideStatus,
-        ServerAsHealthMonitor,
-
-        Count
+        HideStatusOption,
+        ServerAsHealthMonitorOption
     };
-    using Options = std::bitset<(int)Option::Count>;
+    Q_DECLARE_FLAGS(Options, Option)
 
-    QnResourceListModel(QObject *parent = NULL);
+    explicit QnResourceListModel(QObject *parent = nullptr);
     virtual ~QnResourceListModel();
 
     const QnResourceList &resources() const;
@@ -79,3 +77,5 @@ private:
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceListModel::Options)

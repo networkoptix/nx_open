@@ -218,7 +218,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
         case Qn::ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
-            return m_options.test(Option::ServerAsHealthMonitor)
+            return m_options.testFlag(ServerAsHealthMonitorOption)
                 ? qVariantFromValue(Qn::LayoutItemNode)
                 : qVariantFromValue(Qn::ResourceNode);
 
@@ -282,10 +282,10 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
-    if (resource->hasFlags(Qn::server) && m_options.test(Option::ServerAsHealthMonitor))
+    if (resource->hasFlags(Qn::server) && m_options.testFlag(ServerAsHealthMonitorOption))
         return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
 
-    if (m_options.test(Option::HideStatus))
+    if (m_options.testFlag(HideStatusOption))
     {
         QnResourceIconCache::Key key = qnResIconCache->key(resource);
         key &= ~QnResourceIconCache::StatusMask;
