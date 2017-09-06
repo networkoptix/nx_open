@@ -115,7 +115,7 @@ bool MultipleAddressConnector::establishDirectConnection(const SocketAddress& en
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying direct connection to %1").str(endpoint), cl_logDEBUG2);
+    NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -176,7 +176,7 @@ void MultipleAddressConnector::establishCloudConnection(const AddressEntry& dnsE
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying cloud connection to %1").str(dnsEntry.host), cl_logDEBUG2);
+   NX_LOGX(lm("Trying cloud connection to %1").arg(dnsEntry.host), cl_logDEBUG2);
 
     auto cloudConnector = std::make_unique<CloudAddressConnector>(
         dnsEntry,
