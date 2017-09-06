@@ -74,6 +74,51 @@ static qint64 usecToMsec(qint64 posUsec)
     return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
 }
 
+using QualityInfo = nx::media::media_player_quality_chooser::Result;
+using QualityInfoList = QList<QualityInfo>;
+QList<int> sortOutEqualQualities(QualityInfoList qualities)
+{
+    QList<int> result;
+    if (qualities.isEmpty())
+        return result;
+
+    // Removes standard qualities from list which will be sorted.
+    const auto newEnd = std::remove_if(qualities.begin(), qualities.end(),
+        [](const QualityInfo& value)
+        {
+            return value.quality < Player::CustomVideoQuality;
+        });
+
+    // Adds standard qualities to result.
+    for (auto it = newEnd; it != qualities.end(); ++it)
+        result.append(it->quality);
+
+    qualities.erase(newEnd, qualities.end());
+
+    std::sort(qualities.begin(), qualities.end(),
+        [](const QualityInfo& left, const QualityInfo& right) -> bool
+        {
+            return left.quality > right.quality;
+        });
+
+    for (int i = 0; i < qualities.size() - 1;)
+    {
+        // Removes neighbor equal values.
+        if (qualities[i].frameSize == qualities[i + 1].frameSize)
+        {
+            qualities.removeAt(i);
+            continue; //< Check next equal values.
+        }
+
+        ++i;
+    }
+
+    for (const auto qualityInfo: qualities)
+        result.append(qualityInfo.quality);
+
+    return result;
+}
+
 } // namespace
 
 class PlayerPrivate: public QObject
@@ -1117,7 +1162,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     const auto& maximumResolution = highQuality.frameSize;
 
     bool customResolutionAvailable = false;
-    QList<int> customQualities;
+    QualityInfoList customQualities;
 
     for (auto videoQuality: videoQualities)
     {
@@ -1136,14 +1181,15 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
 
             default:
             {
-                const auto& resultQuality = getQuality(videoQuality);
+                auto resultQuality = getQuality(videoQuality);
                 if (resultQuality.quality != UnknownVideoQuality
                     && resultQuality.frameSize.height() <= maximumResolution.height())
                 {
-                    customQualities.append(videoQuality);
-
                     if (resultQuality.quality == CustomVideoQuality)
                         customResolutionAvailable = true;
+
+                    resultQuality.quality = static_cast<Player::VideoQuality>(videoQuality);
+                    customQualities.append(resultQuality);
                 }
             }
         }
@@ -1152,7 +1198,10 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     d->log(lit("availableVideoQualities() END"));
 
     if (customResolutionAvailable)
-        return result + customQualities;
+    {
+        const auto uniqueCustomQualities = sortOutEqualQualities(customQualities);
+        return result + uniqueCustomQualities;
+    }
 
     return result;
 }
