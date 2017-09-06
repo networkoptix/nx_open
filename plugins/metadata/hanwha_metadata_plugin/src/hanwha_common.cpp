@@ -22,7 +22,7 @@ QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEv
 
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        if (eventDescriptor.internalName == internalEventName)
+        if (internalEventName.contains(eventDescriptor.internalName))
         {
             m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
             return eventDescriptor.eventTypeId;

@@ -44,7 +44,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    const Hanwha::DriverManifest& manifest() const;
+    const Hanwha::DriverManifest& driverManifest() const;
 
 private:
     boost::optional<std::vector<QnUuid>> fetchSupportedEvents(
@@ -59,7 +59,7 @@ private:
 
 private:
     QByteArray m_manifest;
-    Hanwha::DriverManifest m_parsedManifest;
+    Hanwha::DriverManifest m_driverManifest;
 };
 
 } // namespace plugins

@@ -75,11 +75,6 @@ static const char* kDeviceManifestTemplate = R"manifest(
     }
     )manifest";
 
-inline QString str(const nxpl::NX_GUID& guid)
-{
-    return QString::fromStdString(nxpt::NxGuidHelper::toStdString(guid));
-}
-
 struct HanwhaEvent
 {
     nxpl::NX_GUID typeId;

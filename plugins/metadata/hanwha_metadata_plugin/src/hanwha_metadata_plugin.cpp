@@ -38,7 +38,7 @@ HanwhaMetadataPlugin::HanwhaMetadataPlugin()
     QFile f(":manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-    m_parsedManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
+    m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
 }
 
 void* HanwhaMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -119,7 +119,8 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     auto manager = new HanwhaMetadataManager();
 
     manager->setResourceInfo(resourceInfo);
-    manager->setCapabilitiesManifest(manifest);
+    manager->setDeviceManifest(manifest);
+    manager->setDriverManifest(driverManifest());
 
     return manager;
 }
@@ -208,7 +209,7 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     {
         bool gotValidParameter = false;
 
-        auto guid = m_parsedManifest.eventTypeByInternalName(eventName);
+        auto guid = m_driverManifest.eventTypeByInternalName(eventName);
         if (!guid.isNull())
             result.push_back(guid);
 
@@ -227,7 +228,7 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 
                 for (const auto& videoAnalytics: supportedAreaAnalytics)
                 {
-                    guid = m_parsedManifest.eventTypeByInternalName(
+                    guid = m_driverManifest.eventTypeByInternalName(
                         lit("%1.%2")
                             .arg(kVideoAnalytics)
                             .arg(videoAnalytics));
@@ -245,7 +246,7 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 
             if (gotValidParameter)
             {
-                guid = m_parsedManifest.eventTypeByInternalName(
+                guid = m_driverManifest.eventTypeByInternalName(
                     lit("%1.%2")
                     .arg(kVideoAnalytics)
                     .arg(lit("Passing")));
@@ -269,7 +270,7 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
                 auto supportedAudioTypes = supportedAudioTypesParameter->possibleValues();
                 for (const auto& audioAnalytics : supportedAudioTypes)
                 {
-                    guid = m_parsedManifest.eventTypeByInternalName(
+                    guid = m_driverManifest.eventTypeByInternalName(
                         lit("%1.%2")
                             .arg(kAudioAnalytics)
                             .arg(audioAnalytics));
@@ -284,9 +285,9 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     return result;
 }
 
-const Hanwha::DriverManifest& HanwhaMetadataPlugin::manifest() const
+const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
 {
-    return m_parsedManifest;
+    return m_driverManifest;
 }
 
 } // namespace plugins
