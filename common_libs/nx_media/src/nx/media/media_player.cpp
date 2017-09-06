@@ -1183,6 +1183,18 @@ QSize Player::currentResolution() const
     return d->currentResolution;
 }
 
+Player::TranscodingSupportStatus Player::transcodingStatus() const
+{
+    Q_D(const Player);
+
+    const auto& camera = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return TranscodingDisabled;
+
+    return media_player_quality_chooser::transcodingSupportStatus(
+        camera, d->positionMs, d->liveMode);
+}
+
 QRect Player::videoGeometry() const
 {
     Q_D(const Player);
