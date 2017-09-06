@@ -49,7 +49,7 @@ function TimelineConfig(){
         maxMsPerPixel: 1000 * 60 * 60 * 24 * 365,   // one year per pixel - maximum view
         lastMinuteDuration: 1.5 * 60 * 1000, // 1.5 minutes
         minMsPerPixel: 10, // Minimum level for zooming:
-        lastMinuteAnimationMs:100,
+        lastMinuteAnimationMs:30,
         minMarkWidth: 1, // Minimum width for visible mark
         smoothMoveLength: 3, //Minimum move of timeline which requires smooth moving
         hideTimeMarkerAfterClickedDistance: 5, // distance around click we do not show timemarker under pointer
