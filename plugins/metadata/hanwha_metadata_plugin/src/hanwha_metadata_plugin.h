@@ -11,7 +11,7 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
-
+#include "hanwha_common.h"
 
 namespace nx {
 namespace mediaserver {
@@ -44,19 +44,22 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
+    const Hanwha::DriverManifest& manifest() const;
+
 private:
-    boost::optional<std::vector<nxpl::NX_GUID>> fetchSupportedEvents(
+    boost::optional<std::vector<QnUuid>> fetchSupportedEvents(
         const QUrl& url,
         const QAuthenticator& auth);
 
-    boost::optional<std::vector<nxpl::NX_GUID>> eventsFromParameters(
+    boost::optional<std::vector<QnUuid>> eventsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters);
 
     QUrl buildAttributesUrl(const QUrl& resourceUrl) const;
-    QByteArray buildDeviceManifest(const std::vector<nxpl::NX_GUID>& supportedEvents) const;
+    QByteArray buildDeviceManifest(const std::vector<QnUuid>& supportedEvents) const;
 
 private:
     QByteArray m_manifest;
+    Hanwha::DriverManifest m_parsedManifest;
 };
 
 } // namespace plugins

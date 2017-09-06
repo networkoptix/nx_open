@@ -77,7 +77,7 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
     };
 
     m_handler = handler;
-    m_monitor = std::make_unique<HanwhaMetadataMonitor>(m_url, m_auth);
+    m_monitor = std::make_unique<HanwhaMetadataMonitor>(m_manifest, m_url, m_auth);
     m_monitor->setHandler(monitorHandler);
     m_monitor->startMonitoring();
     
@@ -97,14 +97,14 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
 
 const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
 {
-    if (m_manifest.isEmpty())
+    if (m_serializedManifest.isEmpty())
     {
         *error = Error::unknownError;
         return nullptr;
     }
 
     *error = Error::noError;
-    return m_manifest.constData();
+    return m_serializedManifest.constData();
 }
 
 void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
@@ -116,9 +116,10 @@ void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourc
     m_auth.setPassword(resourceInfo.password);
 }
 
-void HanwhaMetadataManager::setCapabilitiesManifest(const QByteArray& manifest)
+void HanwhaMetadataManager::setCapabilitiesManifest(const QByteArray& serializedManifest)
 {
-    m_manifest = manifest;
+    m_serializedManifest = serializedManifest;
+    m_manifest = QJson::deserialized<Hanwha::DriverManifest>(serializedManifest);
 }
 
 } // namespace plugins

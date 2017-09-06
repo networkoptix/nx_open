@@ -37,10 +37,11 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
     void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
-    void setCapabilitiesManifest(const QByteArray& manifest);
+    void setCapabilitiesManifest(const QByteArray& serialized);
 
 private:
-    QByteArray m_manifest;
+    Hanwha::DriverManifest m_manifest;
+    QByteArray m_serializedManifest;
 
     QUrl m_url;
     QString m_model;

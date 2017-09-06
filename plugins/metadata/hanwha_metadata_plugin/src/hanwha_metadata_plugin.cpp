@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
@@ -31,25 +32,13 @@ const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+
 HanwhaMetadataPlugin::HanwhaMetadataPlugin()
 {
-    m_manifest = QString(kPluginManifestTemplate)
-        .arg(str(kHanwhaFaceDetectionEventId))
-        .arg(str(kHanwhaVirtualLineEventId))
-        .arg(str(kHanwhaEnteringEventId))
-        .arg(str(kHanwhaExitingEventId))
-        .arg(str(kHanwhaAppearingEventId))
-        .arg(str(kHanwhaIntrusionEventId))
-        .arg(str(kHanwhaAudioDetectionEventId))
-        .arg(str(kHanwhaTamperingEventId))
-        .arg(str(kHanwhaDefocusingEventId))
-        .arg(str(kHanwhaDryContactInputEventId))
-        .arg(str(kHanwhaMotionDetectionEventId))
-        .arg(str(kHanwhaSoundScreamEventId))
-        .arg(str(kHanwhaSoundGunShotEventId))
-        .arg(str(kHanwhaSoundExplosionEventId))
-        .arg(str(kHanwhaSoundGlassBreakEventId))
-        .arg(str(kHanwhaLoiteringEventId)).toUtf8();
+    QFile f(":manifest.json");
+    if (f.open(QFile::ReadOnly))
+        m_manifest = f.readAll();
+    m_parsedManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
 }
 
 void* HanwhaMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -149,7 +138,7 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::fetchSupportedEvents(
+boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     const QUrl& url,
     const QAuthenticator& auth)
 {
@@ -185,14 +174,14 @@ QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
 }
 
 QByteArray HanwhaMetadataPlugin::buildDeviceManifest(
-    const std::vector<nxpl::NX_GUID>& supportedEvents) const
+    const std::vector<QnUuid>& supportedEvents) const
 {
     QString manifest = kDeviceManifestTemplate;
     QString supportedEventsStr;
 
     for (auto i = 0; i < supportedEvents.size(); ++i)
     {
-        supportedEventsStr.append(lit("\"%1\"").arg(str(supportedEvents[i])));
+        supportedEventsStr.append(lit("\"%1\"").arg(supportedEvents[i].toString()));
         if (i < supportedEvents.size() - 1)
             supportedEventsStr.append(",\r\n");
     }
@@ -200,7 +189,7 @@ QByteArray HanwhaMetadataPlugin::buildDeviceManifest(
     return manifest.arg(supportedEventsStr).toUtf8();
 }
 
-boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromParameters(
+boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters)
 {
     if (!parameters.isValid())
@@ -212,16 +201,16 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromPara
     if (!supportedEventsParameter.is_initialized())
         return boost::none;
 
-    std::vector<nxpl::NX_GUID> result;
+    std::vector<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName : supportedEvents)
     {
         bool gotValidParameter = false;
 
-        auto guid = HanwhaStringHelper::fromStringToEventType(eventName);
-        if (guid)
-            result.push_back(*guid);
+        auto guid = m_parsedManifest.eventTypeByInternalName(eventName);
+        if (!guid.isNull())
+            result.push_back(guid);
 
         if (eventName == kVideoAnalytics)
         {
@@ -238,13 +227,13 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromPara
 
                 for (const auto& videoAnalytics: supportedAreaAnalytics)
                 {
-                    guid = HanwhaStringHelper::fromStringToEventType(
+                    guid = m_parsedManifest.eventTypeByInternalName(
                         lit("%1.%2")
                             .arg(kVideoAnalytics)
                             .arg(videoAnalytics));
 
-                    if (guid)
-                        result.push_back(*guid);
+                    if (!guid.isNull())
+                        result.push_back(guid);
                 }
             }
 
@@ -256,13 +245,13 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromPara
 
             if (gotValidParameter)
             {
-                guid = HanwhaStringHelper::fromStringToEventType(
+                guid = m_parsedManifest.eventTypeByInternalName(
                     lit("%1.%2")
                     .arg(kVideoAnalytics)
                     .arg(lit("Passing")));
 
-                if (guid)
-                    result.push_back(*guid);
+                if (!guid.isNull())
+                    result.push_back(guid);
             }
             
         }
@@ -280,19 +269,24 @@ boost::optional<std::vector<nxpl::NX_GUID>> HanwhaMetadataPlugin::eventsFromPara
                 auto supportedAudioTypes = supportedAudioTypesParameter->possibleValues();
                 for (const auto& audioAnalytics : supportedAudioTypes)
                 {
-                    guid = HanwhaStringHelper::fromStringToEventType(
+                    guid = m_parsedManifest.eventTypeByInternalName(
                         lit("%1.%2")
                             .arg(kAudioAnalytics)
                             .arg(audioAnalytics));
 
-                    if (guid)
-                        result.push_back(*guid);
+                    if (!guid.isNull())
+                        result.push_back(guid);
                 }
             }
         }
     }
 
     return result;
+}
+
+const Hanwha::DriverManifest& HanwhaMetadataPlugin::manifest() const
+{
+    return m_parsedManifest;
 }
 
 } // namespace plugins

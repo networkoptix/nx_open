@@ -20,7 +20,12 @@ namespace {
 } // namespace 
 
 
-HanwhaMetadataMonitor::HanwhaMetadataMonitor(const QUrl& url, const QAuthenticator& auth):
+HanwhaMetadataMonitor::HanwhaMetadataMonitor(
+    const Hanwha::DriverManifest& manifest,
+    const QUrl& url, 
+    const QAuthenticator& auth)
+    :
+    m_manifest(manifest),
     m_url(buildMonitoringUrl(url)),
     m_auth(auth)
 {
@@ -98,7 +103,7 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
 
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
     m_contentParser->setForceParseAsBinary(true);
-    m_contentParser->setNextFilter(std::make_shared<HanwhaBytestreamFilter>(handler));
+    m_contentParser->setNextFilter(std::make_shared<HanwhaBytestreamFilter>(m_manifest, handler));
 
     httpClient->doGet(m_url);
 

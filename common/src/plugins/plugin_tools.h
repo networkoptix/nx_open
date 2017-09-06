@@ -296,6 +296,13 @@ namespace nxpt
     class NxGuidHelper
     {
     public:
+        static nxpl::NX_GUID fromRawData(const char* data)
+        {
+            nxpl::NX_GUID result;
+            memcpy(result.bytes, data, sizeof(result.bytes));
+            return result;
+        }
+
         static std::string toStdString(
             const nxpl::NX_GUID& guid,
             unsigned int format = NxGuidFormatOption::applyAll)

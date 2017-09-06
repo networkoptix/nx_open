@@ -19,7 +19,7 @@ class HanwhaBytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilte
 public:
     using Handler = std::function<void(const HanwhaEventList&)>;
 
-    HanwhaBytestreamFilter(Handler handler);
+    HanwhaBytestreamFilter(const Hanwha::DriverManifest& manifest, Handler handler);
     virtual ~HanwhaBytestreamFilter();
     virtual bool processData(const QnByteArrayConstRef& notification) override;
 
@@ -27,18 +27,14 @@ private:
     std::vector<HanwhaEvent> parseMetadataState(const QnByteArrayConstRef& buffer) const;
     boost::optional<HanwhaEvent> createEvent(const QString& eventSource, const QString& eventSourceState) const;
 
-    boost::optional<nxpl::NX_GUID> eventTypeId(const QString& eventSource) const;
     boost::optional<int> eventChannel(const QString& eventSource) const;
     boost::optional<int> eventRegion(const QString& eventSource) const;
     bool isEventActive(const QString& eventSourceState) const;
-    HanwhaEventItemType eventItemType(const QString& eventSource, const QString& eventState) const;
+    Hanwha::EventItemType eventItemType(const QString& eventSource, const QString& eventState) const;
     
-    void fillCaption(HanwhaEvent* inOutEvent) const;
-    void fillDescription(HanwhaEvent* inOutEvent) const;
-
 private:
+    const Hanwha::DriverManifest m_manifest;
     Handler m_handler;
-
 };
 
 } // namespace plugins

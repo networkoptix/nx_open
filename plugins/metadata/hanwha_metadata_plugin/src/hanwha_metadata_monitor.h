@@ -26,7 +26,10 @@ class HanwhaMetadataMonitor: public QObject
 public:
     using Handler = std::function<void(const HanwhaEventList&)>;
 
-    HanwhaMetadataMonitor(const QUrl& resourceUrl, const QAuthenticator& auth);
+    HanwhaMetadataMonitor(
+        const Hanwha::DriverManifest& manifest,
+        const QUrl& resourceUrl, 
+        const QAuthenticator& auth);
     virtual ~HanwhaMetadataMonitor();
 
     void startMonitoring();
@@ -44,6 +47,7 @@ private:
     void at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient);
 
 private:
+    const Hanwha::DriverManifest& m_manifest;
     mutable QnMutex m_mutex;
     QUrl m_url;
     QAuthenticator m_auth;

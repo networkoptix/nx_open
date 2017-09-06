@@ -1,156 +1,71 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QFlag>
 
 #include <boost/optional/optional.hpp>
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-static const char* kPluginManifestTemplate = R"manifest(
+struct Hanwha
+{
+    Q_GADGET
+    Q_ENUMS(EventTypeFlag EventItemType)       
+    Q_FLAGS(EventTypeFlags)
+
+public:
+    enum EventTypeFlag
     {
-        "driverId": "{6541F47D-99B8-4049-BF55-697BD6DD1BBD}",
-        "driverName": {
-            "value": "Hanwha metadata driver",
-            "localization": {
-            }
-        },
-        "outputEventTypes": [
-            {
-                "eventTypeId": "%1",
-                "eventName": {
-                    "value": "Face detection",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%2",
-                "eventName": {
-                    "value": "Virtual line",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%3",
-                "eventName": {
-                    "value": "Entering",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%4",
-                "eventName": {
-                    "value": "Exiting",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%5",
-                "eventName": {
-                    "value": "Appearing/Disappearing",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%6",
-                "eventName": {
-                    "value": "Intrusion",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%7",
-                "eventName": {
-                    "value": "Audio detection",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%8",
-                "eventName": {
-                    "value": "Tampering",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%9",
-                "eventName": {
-                    "value": "Defocusing",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%10",
-                "eventName": {
-                    "value": "Dry contact input",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%11",
-                "eventName": {
-                    "value": "Motion detection",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%12",
-                "eventName": {
-                    "value": "Sound - Scream",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%13",
-                "eventName": {
-                    "value": "Sound - Gunshot",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%14",
-                "eventName": {
-                    "value": "Sound - Explosion",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%15",
-                "eventName": {
-                    "value": "Sound - Glass break",
-                    "localization": {
-                    }
-                }
-            },
-            {
-                "eventTypeId": "%16",
-                "eventName": {
-                    "value": "Loitering",
-                    "localization": {
-                    }
-                }
-            }
-        ]
-    }
-    )manifest";
+        stateDependent = 0x1,
+        regionDependent = 0x2,
+        itemDependent = 0x4
+    };
+    Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
+
+    enum class EventItemType
+    {
+        // TODO: #dmishin fill proper event item types
+        none,
+        ein,
+        zwei,
+        drei
+    };
+
+    struct EventDescriptor: public nx::api::AnalyticsEventType
+    {
+        QString internalName;
+        QString description;
+        QString positiveState;
+        QString negativeState;
+        EventTypeFlags flags;
+        QString regionDescription;
+    };
+    #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)(description)(positiveState)(negativeState)(flags)(regionDescription)
+
+    struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
+    {
+        QList<EventDescriptor> outputEventTypes;
+
+        QnUuid eventTypeByInternalName(const QString& internalEventName) const;
+        const Hanwha::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
+    private:
+        mutable QMap<QString, QnUuid> m_idByInternalName;
+        mutable QMap<QnUuid, EventDescriptor> m_recordById;
+
+    };
+    #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+
+};
+Q_DECLARE_OPERATORS_FOR_FLAGS(Hanwha::EventTypeFlags)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventTypeFlag)
 
 static const char* kDeviceManifestTemplate = R"manifest(
     {
@@ -160,67 +75,10 @@ static const char* kDeviceManifestTemplate = R"manifest(
     }
     )manifest";
 
-static const nxpl::NX_GUID kHanwhaFaceDetectionEventId =
-    {{0x5D,0xFC, 0x6D, 0x1B, 0x3B, 0x92, 0x4E, 0x55, 0xA6, 0x27, 0x0D, 0xB2, 0xA2, 0x42, 0x2D, 0xB3}};
-
-static const nxpl::NX_GUID kHanwhaVirtualLineEventId =
-    {{0x67, 0xED, 0xDD, 0x6A, 0xA3, 0x1F, 0x41, 0xC4, 0x91, 0xB6, 0xB6, 0x29, 0x8F, 0xE2, 0x57, 0xA1}};
-
-static const nxpl::NX_GUID kHanwhaEnteringEventId =
-    {{0x6F, 0x60, 0x24, 0x03, 0xCC, 0xA4, 0x4F, 0x85, 0x87, 0x77, 0xF3, 0x40, 0xE8, 0x23, 0x9A, 0x23}};
-
-static const nxpl::NX_GUID kHanwhaExitingEventId =
-    {{0x2C, 0x21, 0x87, 0x43, 0x60, 0x4C, 0x47, 0x5D, 0xAE, 0xD9, 0xA8, 0x48, 0xF4, 0x0F, 0x13, 0xF9}};
-
-static const nxpl::NX_GUID kHanwhaAppearingEventId =
-    {{0xA4, 0x52, 0xE4, 0x9A, 0xD1, 0xD8, 0x44, 0xEA, 0x84, 0xDA, 0xF5, 0x81, 0x41, 0x4E, 0x81, 0x53}};
-
-static const nxpl::NX_GUID kHanwhaIntrusionEventId =
-    {{0x42, 0xD4, 0x99, 0x4A, 0xA2, 0x67, 0x4C, 0x39, 0x98, 0xAA, 0xCB, 0xC4, 0xD4, 0x1C, 0xA4, 0x2B}};
-
-static const nxpl::NX_GUID kHanwhaAudioDetectionEventId =
-    {{0xCA, 0xBB, 0x46, 0x44, 0xF6, 0xC2, 0x4F, 0x09, 0x8E, 0xDF, 0xE0, 0xFA, 0xFC, 0xC4, 0xF8, 0x33}};
-
-static const nxpl::NX_GUID kHanwhaTamperingEventId =
-    {{0x65, 0x7B, 0x39, 0xC2, 0x36, 0xC1, 0x46, 0x44, 0x93, 0x57, 0x58, 0x59, 0x36, 0x58, 0xD5, 0x67}};
-
-static const nxpl::NX_GUID kHanwhaDefocusingEventId =
-    {{0x21, 0x66, 0x68, 0xD9, 0xEA, 0x9B, 0x48, 0x3A, 0xA4, 0x3E, 0x94, 0x14, 0xED, 0x76, 0x0A, 0x01}};
-
-static const nxpl::NX_GUID kHanwhaDryContactInputEventId =
-    {{0x1B, 0xAB, 0x8A, 0x57, 0x5F, 0x19, 0x4E, 0x3A, 0xB7, 0x3B, 0x36, 0x41, 0x05, 0x8D, 0x46, 0xB8}};
-
-static const nxpl::NX_GUID kHanwhaMotionDetectionEventId =
-    {{0xF1, 0xF7, 0x23, 0xBB, 0x20, 0xC8, 0x45, 0x3A, 0xAF, 0xCE, 0x86, 0xF3, 0x18, 0xCB, 0xF0, 0x97}};
-
-static const nxpl::NX_GUID kHanwhaLoiteringEventId =
-    {{0x1B, 0x54, 0x1C, 0xB7, 0xE3, 0x77, 0x48, 0x18, 0x88, 0x01, 0x32, 0x32, 0x81, 0x53, 0x0E, 0x7B}};
-
-static const nxpl::NX_GUID kHanwhaSoundScreamEventId =
-    {{0x79, 0xF0, 0x3C, 0xE5, 0xAF, 0xD1, 0x49, 0x42, 0x90, 0x5C, 0x46, 0xA9, 0x81, 0x94, 0x24, 0x22}};
-
-static const nxpl::NX_GUID kHanwhaSoundGunShotEventId =
-    {{0x02, 0x56, 0x7E, 0x19, 0x33, 0xAC, 0x44, 0x0B, 0x86, 0x47, 0x16, 0xD9, 0x5E, 0xF6, 0xB2, 0x95}};
-
-static const nxpl::NX_GUID kHanwhaSoundExplosionEventId =
-    {{0xBD, 0x27, 0x5A, 0x24, 0xF7, 0x58, 0x4F, 0xD5, 0x92, 0x39, 0xFB, 0xE8, 0x7B, 0x13, 0x31, 0xCE}};
-
-static const nxpl::NX_GUID kHanwhaSoundGlassBreakEventId =
-    {{0xBA, 0x9D, 0xFE, 0x3C, 0x55, 0xE6, 0x42, 0x98, 0xBC, 0x8E, 0xCA, 0xA9, 0x47, 0xCB, 0x94, 0x40}};
-
 inline QString str(const nxpl::NX_GUID& guid)
 {
     return QString::fromStdString(nxpt::NxGuidHelper::toStdString(guid));
 }
-
-enum class HanwhaEventItemType
-{
-    // TODO: #dmishin fill proper event item types
-    ein,
-    zwei,
-    drei,
-    none
-};
 
 struct HanwhaEvent
 {
@@ -230,7 +88,7 @@ struct HanwhaEvent
     boost::optional<int> channel;
     boost::optional<int> region;
     bool isActive = false;
-    HanwhaEventItemType itemType; //< e.g Gunshot for sound classification
+    Hanwha::EventItemType itemType; //< e.g Gunshot for sound classification
 };
 
 using HanwhaEventList = std::vector<HanwhaEvent>;
@@ -238,3 +96,15 @@ using HanwhaEventList = std::vector<HanwhaEvent>;
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::mediaserver::plugins::Hanwha::EventTypeFlag)
+    (nx::mediaserver::plugins::Hanwha::EventTypeFlags)
+    (nx::mediaserver::plugins::Hanwha::EventItemType),
+    (metatype)(numeric)(lexical)
+)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::mediaserver::plugins::Hanwha::EventDescriptor)
+    (nx::mediaserver::plugins::Hanwha::DriverManifest),
+    (json)(metatype)
+)

@@ -14,18 +14,24 @@ namespace api {
 /**
 * Description of the analytics driver, which can generate different events.
 */
-struct AnalyticsDriverManifest
+
+struct AnalyticsDriverManifestBase
 {
-   QnUuid driverId;
-   TranslatableString driverName;
-   QStringList acceptedDataTypes;
-   QStringList supportedCodecs;
-   QStringList supportedHandleTypes;
-   QStringList supportedPixelFormats;
+    QnUuid driverId;
+    TranslatableString driverName;
+    QStringList acceptedDataTypes;
+    QStringList supportedCodecs;
+    QStringList supportedHandleTypes;
+    QStringList supportedPixelFormats;
+};
+#define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
+    (supportedHandleTypes)(supportedPixelFormats)
+
+struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
+{
    QList<AnalyticsEventType> outputEventTypes;
 };
-#define AnalyticsDriverManifest_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
-    (supportedHandleTypes)(supportedPixelFormats)(outputEventTypes)
+#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json)(metatype))
 
