@@ -70,6 +70,7 @@
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
+#include <ui/workbench/workbench_license_notifier.h>
 
 #include <utils/applauncher_utils.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
@@ -92,6 +93,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
+
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -675,10 +677,10 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
 
     auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-    if (!watcher->hasMismatches())
-        return;
+    if (watcher->hasMismatches())
+        menu()->trigger(action::VersionMismatchMessageAction);       
 
-    menu()->trigger(action::VersionMismatchMessageAction);
+    context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
 
 void QnWorkbenchConnectHandler::stopReconnecting()
