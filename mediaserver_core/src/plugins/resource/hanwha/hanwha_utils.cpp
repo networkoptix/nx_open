@@ -24,9 +24,9 @@ boost::optional<bool> toBool(const boost::optional<QString>& str)
         return boost::none;
 
     auto lowerCase = str->toLower();
-    if (lowerCase == kHanwhaTrue)
+    if (lowerCase == kHanwhaTrue.toLower())
         return true;
-    else if (lowerCase == kHanwhaFalse)
+    else if (lowerCase == kHanwhaFalse.toLower())
         return false;
 
     return boost::none;

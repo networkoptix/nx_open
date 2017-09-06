@@ -18,6 +18,7 @@ namespace plugins {
 class HanwhaCgiParameters
 {
 public:
+    HanwhaCgiParameters() = default;
     explicit HanwhaCgiParameters(nx_http::StatusCode::Value statusCode);
     explicit HanwhaCgiParameters(
         const nx::Buffer& rawBuffer,

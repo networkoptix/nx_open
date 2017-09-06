@@ -16,6 +16,7 @@ class HanwhaAttributes
 {
     static const int kNoChannel = -1;
 public:
+    HanwhaAttributes() = default;
     explicit HanwhaAttributes(nx_http::StatusCode::Value statusCode);
     explicit HanwhaAttributes(const QString& attributesXml, nx_http::StatusCode::Value statusCode);
 

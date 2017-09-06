@@ -221,7 +221,7 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
             [split[1] /*Channel*/]
             [split[2] /*Codec*/]
             [split[3] /*StreamType*/]
-            [split[4] /*Resolution*/];
+            [split[4].toLower() /*Resolution*/];
         
         limits.setLimit(split[5], parameterValue);
     }

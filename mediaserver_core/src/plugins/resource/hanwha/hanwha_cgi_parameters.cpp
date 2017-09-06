@@ -241,6 +241,24 @@ bool HanwhaCgiParameters::parseDataType(
 
         reader.readNextStartElement();
     }
+    else if (reader.name() == kHanwhaFloatNodeName)
+    {
+        parameter.setType(HanwhaCgiParameterType::floating);
+        const auto& attributes = reader.attributes();
+        bool success = false;
+
+        const int min = attributes.value(kHanwhaMinValueAttribute).toFloat(&success);
+        if (success)
+            parameter.setFloatMin(min);
+
+        const int max = attributes.value(kHanwhaMaxValueAttribute).toFloat(&success);
+        if (success)
+            parameter.setFloatMax(max);
+
+        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
+
+        reader.readNextStartElement();
+    }
     else if (reader.name() == kHanwhaBooleanNodeName)
     {
         const auto attributes = reader.attributes();

@@ -15,6 +15,7 @@ enum class HanwhaCgiParameterType
     unknown,
     boolean,
     integer,
+    floating,
     enumeration,
     string
 };
@@ -44,8 +45,18 @@ public:
     int max() const;
     void setMax(int max);
 
+    // TODO: #dmishin it looks really weird. Get rid of the float* methods
+    float floatMin() const;
+    void setFloatMin(float floatMin);
+
+    float floatMax() const;
+    void setFloatMax(float floatMax);
+
     std::pair<int, int> range() const;
     void setRange(const std::pair<int, int> range);
+
+    std::pair<float, float> floatRange() const;
+    void setFloatRange(const std::pair<float, float> range);
 
     QString falseValue() const;
     void setFalseValue(const QString& falseValue);
@@ -71,6 +82,9 @@ private:
 
     int m_min = 0;
     int m_max = 0;
+
+    float m_floatMin = 0;
+    float m_floatMax = 0;
 
     QString m_falseValue = lit("False");
     QString m_trueValue = lit("True");

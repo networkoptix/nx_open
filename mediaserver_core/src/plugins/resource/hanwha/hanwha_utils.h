@@ -147,7 +147,6 @@ HanwhaTransportProtocol fromHanwhaString(const QString& str);
 template<>
 HanwhaClientType fromHanwhaString(const QString& str);
 
-
 QString toHanwhaString(bool value);
 
 QString toHanwhaString(AVCodecID codecId);

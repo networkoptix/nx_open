@@ -5,6 +5,7 @@
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/onvif/onvif_resource.h>
+#include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
@@ -69,6 +70,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
 
 private:
+    CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
@@ -148,6 +150,8 @@ private:
     QnPtzLimits m_ptzLimits;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
+    HanwhaAttributes m_attributes;
+    HanwhaCgiParameters m_cgiParameters;
 };
 
 } // namespace plugins

@@ -252,7 +252,11 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
-    CameraDiagnostics::Result result = initMedia();
+    CameraDiagnostics::Result result = initAttributes();
+    if (!result)
+        return result;
+
+    result = initMedia();
     if (!result)
         return result;
     
@@ -288,11 +292,34 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
     return controller;
 }
 
+CameraDiagnostics::Result HanwhaResource::initAttributes()
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    m_attributes = helper.fetchAttributes(lit("attributes"));
+    
+    if (!m_attributes.isValid())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Camera attributes are invalid"));
+    }
+
+    m_cgiParameters = helper.fetchCgiParameters(lit("cgis"));
+
+    if (!m_cgiParameters.isValid())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Camera cgi parameters are invalid"));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+
+}
+
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
     HanwhaRequestHelper helper(toSharedPointer(this));
-
     const auto profiles = helper.view(lit("media/videoprofile"));
+
     if (!profiles.isSuccessful())
     {
         return error(
@@ -316,17 +343,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             ++fixedProfileCount;
     }
 
-    const auto mediaAttributes = helper.fetchAttributes(lit("attributes/Media"));
-    if (!mediaAttributes.isValid())
-    {
-        return error(
-            mediaAttributes,
-            CameraDiagnostics::RequestFailedResult(
-                lit("attributes/Media"),
-                lit("Invalid response")));
-    }
-
-    const auto maxProfileCount = mediaAttributes.attribute<int>(
+    const auto maxProfileCount = m_attributes.attribute<int>(
         lit("Media/MaxProfile/%1").arg(channel));
 
     if (!maxProfileCount.is_initialized())
@@ -359,7 +376,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             lit("Can not fetch primary stream limits."));
     }
 
-    const bool hasAudio = mediaAttributes.attribute<int>(
+    const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
@@ -371,15 +388,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
 CameraDiagnostics::Result HanwhaResource::initIo()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    
-    const auto parameters = helper.fetchCgiParameters(lit("eventstatus"));
-    if (!parameters.isValid())
-        return CameraDiagnostics::NoErrorResult();
-
     QnIOPortDataList ioPorts;
 
-    const auto alarmInputs = parameters.parameter(lit("eventstatus/eventstatus/check/AlarmInput"));
+    const auto alarmInputs = m_cgiParameters.parameter(
+        lit("eventstatus/eventstatus/check/AlarmInput"));
+
     if (alarmInputs && alarmInputs->isValid())
     {
         const auto inputs = alarmInputs->possibleValues();
@@ -397,7 +410,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         }
     }
 
-    const auto alarmOutputs = parameters.parameter(lit("eventstatus/eventstatus/check/AlarmOutput"));
+    const auto alarmOutputs = m_cgiParameters
+        .parameter(lit("eventstatus/eventstatus/check/AlarmOutput"));
+
     if (alarmOutputs && alarmOutputs->isValid())
     {
         const auto outputs = alarmOutputs->possibleValues();
@@ -422,25 +437,18 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-
-    const auto attributes = helper.fetchAttributes(lit("attributes/PTZSupport"));
     m_ptzCapabilities = Ptz::NoPtzCapabilities;
-
-    if (!attributes.isValid())
-    {
-        NX_WARNING(this, lit("Can not fetch PTZ capabilities."));
-        return CameraDiagnostics::NoErrorResult();
-    }
-
     for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
     {
-        const auto& name = attributeToCheck.first;
+        const auto& name = lit("PTZSupport/%1/%2")
+            .arg(attributeToCheck.first)
+            .arg(getChannel());
+
         const auto& capability = attributeToCheck.second;
 
-        const auto attr = attributes.attribute<bool>(name);
+        const auto attr = m_attributes.attribute<bool>(name);
         if (!attr.is_initialized())
-            continue;
+            return CameraDiagnostics::NoErrorResult();
 
         if (!attr.get())
             continue;
@@ -461,9 +469,6 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!result)
         return CameraDiagnostics::NoErrorResult();
 
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    auto cgiParameters = helper.fetchCgiParameters(lit("cgis"));
-
     for (const auto& id: parameters.allParameterIds())
     {
         const auto parameter = parameters.getParameterById(id);
@@ -475,7 +480,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         m_advancedParameterInfos.emplace(id, info);
     }
     
-    bool success = fillRanges(&parameters, cgiParameters);
+    bool success = fillRanges(&parameters, m_cgiParameters);
     if (!success)
         return CameraDiagnostics::NoErrorResult();
 
@@ -492,13 +497,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 
 CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-
-    const auto attributes = helper.fetchAttributes(lit("Media"));
-    if (!attributes.isValid())
-        return CameraDiagnostics::NoErrorResult();
-
-    const auto maxAudioOutput = attributes.attribute<int>(lit("Media/Limit/MaxAudioOutput"));
+    const auto maxAudioOutput = m_attributes.attribute<int>(lit("Media/Limit/MaxAudioOutput"));
     if (!maxAudioOutput.is_initialized())
         return CameraDiagnostics::NoErrorResult();
 
@@ -735,21 +734,9 @@ CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* 
             lit("Fetch stream limits: no output limits provided"));
     }
 
-    HanwhaRequestHelper helper(toSharedPointer(this));
-
-    const auto parameters = helper.fetchCgiParameters(lit("media"));
-    if (!parameters.isValid())
-    {
-        return error(
-            parameters,
-            CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile"),
-                lit("Request failed")));
-    }
-
     for (const auto& limitParameter: kHanwhaStreamLimitParameters)
     {
-        const auto parameter = parameters.parameter(
+        const auto parameter = m_cgiParameters.parameter(
             lit("media/videoprofile/add_update/%1").arg(limitParameter));
 
         if (!parameter.is_initialized())
@@ -771,7 +758,8 @@ CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCod
     HanwhaRequestHelper helper(toSharedPointer(this));
     auto response = helper.view(
         lit("media/videocodecinfo"),
-        {{lit("ViewMode"), lit("All")}});
+        {{lit("ViewMode"), lit("All")}},
+        kHanwhaChannelProperty);
 
     if (!response.isSuccessful())
     {
@@ -805,7 +793,39 @@ void HanwhaResource::sortResolutions(std::vector<QSize>* resolutions) const
 
 CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimits)
 {
-    // TODO: #dmishin implement;
+    NX_ASSERT(outPtzLimits, lit("No output ptz limits provided"));
+
+    auto setRange = [this](qreal* outMin, qreal* outMax, const QString& parameterName)
+        {
+            const auto parameter = m_cgiParameters.parameter(parameterName);
+            if (!parameter)
+                return false;
+
+            if (parameter->type() != HanwhaCgiParameterType::floating)
+                return false;
+
+            std::tie(*outMin, *outMax) = parameter->floatRange();
+            return true;
+        };
+
+    setRange(
+        &outPtzLimits->minPan,
+        &outPtzLimits->maxPan,
+        lit("ptzcontrol/absolute/Pan"));
+
+    setRange(
+        &outPtzLimits->minTilt,
+        &outPtzLimits->maxTilt,
+        lit("ptzcontrol/absolute/Tilt"));
+
+    setRange(
+        &outPtzLimits->minFov,
+        &outPtzLimits->maxFov,
+        lit("ptzcontrol/absolute/Zoom"));
+
+    // TODO: #dmishin don't forget it
+    outPtzLimits->maxPresetNumber;
+
     return CameraDiagnostics::NoErrorResult();
 }
 

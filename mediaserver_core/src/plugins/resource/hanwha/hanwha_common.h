@@ -151,6 +151,7 @@ static const QString kHanwhaEnumEntryNodeName = lit("entry");
 static const QString kHanwhaIntegerNodeName = lit("int");
 static const QString kHanwhaBooleanNodeName = lit("bool");
 static const QString kHanwhaStringNodeName = lit("string");
+static const QString kHanwhaFloatNodeName = lit("float");
 
 static const QString kHanwhaParameterIsRequestAttribute = lit("request");
 static const QString kHanwhaParameterIsResponseAttribute = lit("response");

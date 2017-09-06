@@ -146,7 +146,7 @@ bool HanwhaResourceSearcher::processPacket(
 	{
 		QnMutexLocker lock(&m_mutex);
 		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) != m_alreadFoundMacAddresses.end())
-            return;
+            return true;
         m_alreadFoundMacAddresses.insert(cameraMac.toString());
 	}
 

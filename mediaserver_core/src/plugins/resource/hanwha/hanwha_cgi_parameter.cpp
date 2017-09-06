@@ -28,6 +28,9 @@ bool HanwhaCgiParameter::isValid() const
     if (parameterType == HanwhaCgiParameterType::integer)
         return max() >= min();
 
+    if (parameterType == HanwhaCgiParameterType::floating)
+        return floatMax() >= floatMin();
+
     return true;
 }
 
@@ -91,6 +94,26 @@ void HanwhaCgiParameter::setMax(int max)
     m_max = max;
 }
 
+float HanwhaCgiParameter::floatMin() const
+{
+    return m_floatMin;
+}
+
+void HanwhaCgiParameter::setFloatMin(float floatMin)
+{
+    m_floatMin = floatMin;
+}
+
+float HanwhaCgiParameter::floatMax() const
+{
+    return m_floatMax;
+}
+
+void HanwhaCgiParameter::setFloatMax(float floatMax)
+{
+    m_floatMax = floatMax;
+}
+
 std::pair<int, int> HanwhaCgiParameter::range() const
 {
     return std::make_pair(m_min, m_max);
@@ -100,6 +123,17 @@ void HanwhaCgiParameter::setRange(const std::pair<int, int> range)
 {
     m_min = range.first;
     m_max = range.second;
+}
+
+std::pair<float, float> HanwhaCgiParameter::floatRange() const
+{
+    return std::make_pair(m_floatMin, m_floatMax);
+}
+
+void HanwhaCgiParameter::setFloatRange(const std::pair<float, float> range)
+{
+    m_floatMin = range.first;
+    m_floatMax = range.second;
 }
 
 QString HanwhaCgiParameter::falseValue() const

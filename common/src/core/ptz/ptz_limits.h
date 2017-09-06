@@ -11,26 +11,17 @@
 
 #include <utils/math/math.h>
 
-struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits> {
-    QnPtzLimits(): 
-        minPan(0),
-        maxPan(360),
-        minTilt(-90),
-        maxTilt(90),
-        minFov(0),
-        maxFov(360),
-        maxPresetNumber(-1) //< Unlimited
-    {}
-
+struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits>
+{    
     friend bool operator==(const QnPtzLimits &l, const QnPtzLimits &r);
 
-    qreal minPan;
-    qreal maxPan;
-    qreal minTilt;
-    qreal maxTilt;
-    qreal minFov;
-    qreal maxFov;
-    int maxPresetNumber;
+    qreal minPan = 0;
+    qreal maxPan = 360;
+    qreal minTilt = -90;
+    qreal maxTilt = 90;
+    qreal minFov = 0;
+    qreal maxFov = 360;
+    int maxPresetNumber = 0; //< -1 means unlimited
 };
 #define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)(maxPresetNumber)
 
