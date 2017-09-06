@@ -13,7 +13,7 @@ namespace handler {
 using TunnelCreatedHandler = 
     nx::utils::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
-        std::vector<StringType> /*REST request parameters*/)>;
+        std::vector<StringType> /*REST request parameters values*/)>;
 
 /**
  * Upgrades HTTP connection to the protocol specified.
