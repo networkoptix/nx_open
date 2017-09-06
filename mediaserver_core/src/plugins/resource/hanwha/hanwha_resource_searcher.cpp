@@ -145,13 +145,12 @@ bool HanwhaResourceSearcher::processPacket(
 
 	{
 		QnMutexLocker lock(&m_mutex);
-
-		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) == m_alreadFoundMacAddresses.end())
-		{
-			m_alreadFoundMacAddresses.insert(cameraMac.toString());
-			createResource( devInfo, cameraMac, cameraAuth, m_foundUpnpResources);
-		}
+		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) != m_alreadFoundMacAddresses.end())
+            return;
+        m_alreadFoundMacAddresses.insert(cameraMac.toString());
 	}
+
+    createResource(devInfo, cameraMac, cameraAuth, m_foundUpnpResources);
 
 	return true;
 }
