@@ -131,7 +131,7 @@ void AnimatorGroup::updateCurrentTime(int currentTime) {
 int AnimatorGroup::estimatedDuration() const {
     int result = 0;
     foreach(AbstractAnimator *animator, m_animators)
-        result = qMax(result, animator->estimatedDuration());
+        result = qMax(result, qMin(animator->estimatedDuration(), animator->timeLimit()));
     return result;
 }
 
