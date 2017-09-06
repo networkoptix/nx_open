@@ -33,7 +33,7 @@ public:
 
     void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection,
         const QString& userName, 
-        const QString &userId);
+        const QString& userId);
 
     quint32 incCSeq(const TCPSocketPtr& socket);
 
@@ -49,7 +49,7 @@ private:
     struct ClientConnectionInfo;
 
     static QnSecurityCamResourcePtr cameraFromConnection(const ClientConnectionInfo& info);
-    void log(const QByteArray &message, const ClientConnectionInfo &info) const;
+    void log(const QByteArray& message, const ClientConnectionInfo& info) const;
 
     void cleanupConnections();
 
@@ -57,9 +57,9 @@ private:
      * Check if this uniqueId is present in the connections list.
      * Does NOT lock the mutex.
      */
-    bool isClientConnectedInternal(const QString &uniqueId) const;
-
+    bool isClientConnectedInternal(const QString& uniqueId) const;
     
+private:
     QList<ClientConnectionInfo> m_connections;
     QnMutex m_mutex;
 };

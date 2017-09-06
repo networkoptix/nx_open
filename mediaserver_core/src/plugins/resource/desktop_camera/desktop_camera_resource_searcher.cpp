@@ -93,7 +93,7 @@ void QnDesktopCameraResourceSearcher::registerCamera(
     const ClientConnectionInfo info(connection, userName, userId);
     m_connections << info;
 
-    // add camera to the pool immediately
+    // Add camera to the pool immediately.
     QnResourceList resources;
     const auto desktopCamera = cameraFromConnection(info);
     resources << desktopCamera;
@@ -117,12 +117,13 @@ QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(
 }
 
 
-bool QnDesktopCameraResourceSearcher::isClientConnectedInternal(const QString &uniqueId) const
+bool QnDesktopCameraResourceSearcher::isClientConnectedInternal(const QString& uniqueId) const
 {
-    return std::find_if(m_connections.cbegin(), m_connections.cend(), [&uniqueId](const ClientConnectionInfo &info)
-    {
-        return info.userId == uniqueId;
-    }) != m_connections.end();
+    return std::find_if(m_connections.cbegin(), m_connections.cend(), 
+        [&uniqueId](const ClientConnectionInfo& info)
+        {
+            return info.userId == uniqueId;
+        }) != m_connections.end();
 }
 
 
