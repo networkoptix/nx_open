@@ -149,10 +149,6 @@ angular.module('cloudApp')
                 });
         };
 
-        $scope.$watch('locked', function(){
-            console.log($scope.locked);
-        }, true);
-
         $scope.$watch('system.info.name',function(value){
             page.title(value + ' -');
         });
