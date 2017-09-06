@@ -198,7 +198,7 @@ angular.module('nxCommon')
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
-                                if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hack for android bug. remove it later
+                                if(scope.player == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hack for android bug. remove it later
                                     if(autoshow){
                                         $timeout.cancel(autoshow);
                                     }
@@ -332,8 +332,6 @@ angular.module('nxCommon')
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 
 
-                var format = null;
-
                 function initNewPlayer(){
                     switch(scope.player){
                         case "flashls":
@@ -350,20 +348,18 @@ angular.module('nxCommon')
 
                         case "webm":
                         default:
-                            initNativePlayer(format);
+                            initNativePlayer(scope.player);
                             break;
                     }
                 }
 
-                function resetPlayer(playerType){
+                function resetPlayer(){
                     if(scope.vgApi){
                         scope.vgApi.kill();
                     }
                     if(videoPlayers){
                         videoPlayers.pop();
                     }
-
-                    scope.player = playerType || null;
                     scope.vgPlayerReady({$API: null});
 
                     //Turn off all players to reset ng-class for rotation
@@ -385,10 +381,10 @@ angular.module('nxCommon')
                     scope.preview = getFormatSrc('jpeg');
 
                     if(scope.vgSrc ) {
-                        format = detectBestFormat();
-                        resetPlayer(format);
+                        scope.player = detectBestFormat();
+                        resetPlayer();
 
-                        if(!format){
+                        if(!scope.player){
                             scope.loading = false; // no supported format - no loading
                             return;
                         }
@@ -442,7 +438,7 @@ angular.module('nxCommon')
                 };
 
                 scope.getRotation = function(){
-                    if(format == "webm"){
+                    if(scope.player == "webm"){
                         return "";
                     }
                     switch(scope.rotation){
