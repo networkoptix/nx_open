@@ -134,6 +134,12 @@ $header-collapsing-width-1: 1px;
                 }
             }
         }
+        &>a>span.no-dropdown{
+            &.glyphicon{
+                margin-left: -2px;
+                margin-right: 14px;
+            }
+        }
     }
 
     .dropdown-menu {
