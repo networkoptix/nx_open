@@ -24,7 +24,7 @@ endif()
 
 set(client.mediafolder.name "${product.name} Media")
 
-if(targetDevice STREQUAL "bpi|bananapi|rpi|edge1")
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     set(liteMode "true")
 else()
     set(liteMode "false")
