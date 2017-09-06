@@ -320,20 +320,21 @@ void QnLoginDialog::accept()
                     // In most cases we will connect succesfully by this url. Sow we can store it.
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                    const bool storePassword =
-                        (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
+                    QUrl lastUrlForLoginDialog = url;
+                    if (!autoLogin)
+                        lastUrlForLoginDialog.setPassword(QString());
 
-                    QUrl lastUrl = url;
-                    if (!storePassword || !autoLogin)
-                        lastUrl.setPassword(QString());
-                    qnSettings->setLastLocalConnectionUrl(lastUrl);
+                    qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog);
                     qnSettings->save();
+
+                    const bool storePasswordForTile =
+                        (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
 
                     action::Parameters params;
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::StoreSessionRole, true);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
-                    params.setArgument(Qn::StorePasswordRole, storePassword);
+                    params.setArgument(Qn::StorePasswordRole, storePasswordForTile);
                     params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(action::ConnectAction, params);
 
