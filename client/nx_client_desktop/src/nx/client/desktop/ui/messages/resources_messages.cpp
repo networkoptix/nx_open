@@ -40,16 +40,9 @@ static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayou
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
 
-static const QnResourceListView::Options kSimpleOptions =
-    []
-    {
-        QnResourceListView::Options result;
-        result.set(QnResourceListView::HideStatus);
-        result.set(QnResourceListView::ServerAsHealthMonitor);
-        result.set(QnResourceListView::SortAsInTree);
-        return result;
-    }();
-
+static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption 
+    | QnResourceListView::ServerAsHealthMonitorOption
+    | QnResourceListView::SortAsInTreeOption);
 
 bool showCompositeDialog(
     QWidget* parent,
