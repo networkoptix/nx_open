@@ -7,7 +7,7 @@ from pip.req import parse_requirements
 install_reqs = parse_requirements('requirements.txt', session=False)
 
 setup(name='monitoring_simple',
-      version='1.4',
+      version='1.5',
       description='Simple cloud portal API tests for the purpose of monitoring',
       author='Ivan Vigasin',
       author_email='ivigasin@networkoptix.com',
