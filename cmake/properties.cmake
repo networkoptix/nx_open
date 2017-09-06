@@ -26,7 +26,12 @@ endif()
 
 set(client.mediafolder.name "${product.name} Media")
 
-set(liteMode "false")
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+    set(liteMode "true")
+else()
+    set(liteMode "false")
+endif()
+
 set(launcher.version.file "launcher.version")
 set(installation.root "/opt/${deb.customization.company.name}")
 
