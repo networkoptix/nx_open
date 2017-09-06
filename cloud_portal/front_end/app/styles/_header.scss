@@ -119,25 +119,16 @@ $header-collapsing-width-1: 1px;
                 }
             }
         }
-
-        &.dropdown{
-            &>a>span{
-                &.glyphicon{
-                    margin-left: -2px;
-                    margin-right: 14px;
-                }
-
-                &.icon-caret{
-                    margin-left: 14px;
-                    margin-right: -2px;
-                    margin-bottom: -2px;
-                }
-            }
-        }
-        &>a>span.no-dropdown{
+        &>a>span{
             &.glyphicon{
                 margin-left: -2px;
                 margin-right: 14px;
+            }
+
+            &.icon-caret{
+                margin-left: 14px;
+                margin-right: -2px;
+                margin-bottom: -2px;
             }
         }
     }
