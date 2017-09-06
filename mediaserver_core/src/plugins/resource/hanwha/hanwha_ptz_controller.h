@@ -14,13 +14,10 @@ static const std::map<QString, Ptz::Capability> kHanwhaPtzCapabilityAttributes =
     {lit("Absolute.Pan"), Ptz::Capability::AbsolutePanCapability},
     {lit("Absolute.Tilt"), Ptz::Capability::AbsoluteTiltCapability},
     {lit("Absolute.Zoom"), Ptz::Capability::AbsoluteZoomCapability},
-    {lit("Absolute.Focus"), Ptz::Capability::AbsoluteFocusCapability},
-    {lit("Absolute.Iris"), Ptz::Capability::AbsoluteIrisCapability},
     {lit("Continuous.Pan"), Ptz::Capability::ContinuousPanCapability},
     {lit("Continuous.Tilt"), Ptz::Capability::ContinuousTiltCapability},
     {lit("Continuous.Zoom"), Ptz::Capability::ContinuousZoomCapability},
     {lit("Continuous.Focus"), Ptz::Capability::ContinuousFocusCapability},
-    {lit("Continuous.Iris"), Ptz::Capability::ContinuousIrisCapability},
     {lit("Preset"), Ptz::Capability::NativePresetsPtzCapability},
     {lit("AreaZoom"), Ptz::Capability::ViewportPtzCapability},
     {lit("Home"), Ptz::Capability::HomePtzCapability}
