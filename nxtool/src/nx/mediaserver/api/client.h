@@ -160,9 +160,10 @@ public:
         , const QString &systemName
         , const OperationCallbackEx &callback);
 
-    static void sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
+    static void sendSetPasswordAndLocalIdRequest(const BaseServerInfoPtr &baseInfo
         , const QString &currentPassword
         , const QString &password
+        , const QUuid &localSystemId
         , bool useNewPassword
         , const OperationCallbackEx &callback);
 

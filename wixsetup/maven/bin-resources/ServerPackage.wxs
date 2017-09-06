@@ -59,7 +59,7 @@
         </bal:Condition>
 
         <bal:Condition Message="Update to this version is not allowed. You should first upgrade to version 2.6">
-            <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3" ]]>
+            <![CDATA[ (NOT (ServerInstalled = 5)) OR InstalledServerVersion >= "2.3" ]]>
         </bal:Condition>
     </Fragment>
 

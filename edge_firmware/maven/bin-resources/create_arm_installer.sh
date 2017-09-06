@@ -16,12 +16,21 @@ fi
 LIB_BUILD_DIR="$BUILD_DIR/lib$LIB_AND_BIN_DIR_SUFFIX"
 BIN_BUILD_DIR="$BUILD_DIR/bin$LIB_AND_BIN_DIR_SUFFIX"
 
+# VMS files will be copied to this path.
+INSTALL_PATH="opt/$CUSTOMIZATION"
+
+# If not empty, a symlink will be created from this path to $INSTALL_PATH.
+SYMLINK_INSTALL_PATH=""
+
+# To save storage space on the device, Qt .so files can be copied to an alternative location
+# defined by QT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
+# to these .so files will be created in the regular LIB_INSTALL_DIR.
+QT_LIB_INSTALL_PATH=""
+
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
-    SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION" #< If not empty, will symlink to $INSTALL_PATH.
-    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service" #< If not empty, Qt .so files go here.
-else
-    INSTALL_PATH="opt/$CUSTOMIZATION"
+    SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
+    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
 fi
 
 if [ "$BOX" = "bpi" ]; then
@@ -180,9 +189,6 @@ copyBuildLibs()
 # [in] LIB_INSTALL_DIR
 copyQtLibs()
 {
-    # To save storage space on the device, Qt .so files can be copied to an alternative location
-    # defined by QT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
-    # to these .so files will be created in the regular LIB_INSTALL_DIR.
     if [ ! -z "$QT_LIB_INSTALL_PATH" ]; then
         local -r QT_LIB_INSTALL_DIR="$TAR_DIR/$QT_LIB_INSTALL_PATH"
         mkdir -p "$QT_LIB_INSTALL_DIR"
