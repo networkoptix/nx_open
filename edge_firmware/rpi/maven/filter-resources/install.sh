@@ -9,6 +9,7 @@ configure()
     CUSTOMIZATION="@deb.customization.company.name@"
     INSTALL_PATH="opt/$CUSTOMIZATION"
     MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
+    LITE_CLIENT_PATH="$INSTALL_PATH/lite_client"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
     TAR_FILE="./$DISTRIB.tar.gz"
@@ -110,6 +111,7 @@ upgradeVms()
     # Clean up potentially unwanted files from previous installations.
     rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
     rm -rf "/opt/deb"
+    rm -rf "/$LITE_CLIENT_PATH"
 
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
