@@ -144,10 +144,14 @@ angular.module('cloudApp')
                         $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
-                }).finally(function(){
+                }, function(){
                     $scope.locked[user.email] = false;
                 });
         };
+
+        $scope.$watch('locked', function(){
+            console.log($scope.locked);
+        }, true);
 
         $scope.$watch('system.info.name',function(value){
             page.title(value + ' -');
