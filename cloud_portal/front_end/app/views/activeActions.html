@@ -50,6 +50,12 @@
         </form>
     </div>
 
+    <div ng-if="reactivatingSuccess">
+        <h1 class="process-success">
+            Confirmation message is sent to Email <br>{{data.email}}
+        </h1>
+    </div>
+
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
             Password reset instructions are sent to Email <br>{{data.email}}

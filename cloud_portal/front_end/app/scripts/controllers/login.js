@@ -27,7 +27,9 @@ angular.module('cloudApp')
             setTimeout(function(){
                 document.location.reload();
             });
-        },function(){
-            $location.path('/activate');
+        },function(result){
+            if(result.data.resultCode != "notAuthorized"){
+                $location.path('/activate');
+            }
         });
     }]);
