@@ -355,7 +355,7 @@ angular.module('nxCommon')
                     }
                 }
 
-                function resetPlayer(player){
+                function resetPlayer(playerType){
                     if(scope.vgApi){
                         scope.vgApi.kill();
                     }
@@ -363,7 +363,7 @@ angular.module('nxCommon')
                         videoPlayers.pop();
                     }
 
-                    scope.player = player || null;
+                    scope.player = playerType || null;
                     scope.vgPlayerReady({$API: null});
 
                     //Turn off all players to reset ng-class for rotation
