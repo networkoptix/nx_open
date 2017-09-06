@@ -47,16 +47,14 @@ public:
     const Hanwha::DriverManifest& driverManifest() const;
 
 private:
-    boost::optional<std::vector<QnUuid>> fetchSupportedEvents(
+    boost::optional<QList<QnUuid>> fetchSupportedEvents(
         const QUrl& url,
         const QAuthenticator& auth);
 
-    boost::optional<std::vector<QnUuid>> eventsFromParameters(
+    boost::optional<QList<QnUuid>> eventsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters);
 
     QUrl buildAttributesUrl(const QUrl& resourceUrl) const;
-    QByteArray buildDeviceManifest(const std::vector<QnUuid>& supportedEvents) const;
-
 private:
     QByteArray m_manifest;
     Hanwha::DriverManifest m_driverManifest;

@@ -10,6 +10,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
+#include <nx/api/analytics/device_manifest.h>
 
 namespace nx {
 namespace mediaserver {
@@ -115,11 +116,13 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     if (!supportedEvents)
         return nullptr;
 
-    auto manifest = buildDeviceManifest(*supportedEvents);
+    nx::api::AnalyticsDeviceManifest deviceManifest;
+    deviceManifest.supportedEventTypes = *supportedEvents;
+
     auto manager = new HanwhaMetadataManager();
 
     manager->setResourceInfo(resourceInfo);
-    manager->setDeviceManifest(manifest);
+    manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
     return manager;
@@ -139,7 +142,7 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
+boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     const QUrl& url,
     const QAuthenticator& auth)
 {
@@ -174,23 +177,7 @@ QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
     return url;
 }
 
-QByteArray HanwhaMetadataPlugin::buildDeviceManifest(
-    const std::vector<QnUuid>& supportedEvents) const
-{
-    QString manifest = kDeviceManifestTemplate;
-    QString supportedEventsStr;
-
-    for (auto i = 0; i < supportedEvents.size(); ++i)
-    {
-        supportedEventsStr.append(lit("\"%1\"").arg(supportedEvents[i].toString()));
-        if (i < supportedEvents.size() - 1)
-            supportedEventsStr.append(",\r\n");
-    }
-
-    return manifest.arg(supportedEventsStr).toUtf8();
-}
-
-boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
+boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters)
 {
     if (!parameters.isValid())
@@ -202,7 +189,7 @@ boost::optional<std::vector<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     if (!supportedEventsParameter.is_initialized())
         return boost::none;
 
-    std::vector<QnUuid> result;
+    QList<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName : supportedEvents)

@@ -67,14 +67,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Hanwha::EventTypeFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventTypeFlag)
 
-static const char* kDeviceManifestTemplate = R"manifest(
-    {
-        "supportedEventTypes": [
-            %1
-        ]
-    }
-    )manifest";
-
 struct HanwhaEvent
 {
     nxpl::NX_GUID typeId;
