@@ -39,6 +39,7 @@ def testmethod(f):
         except AssertionError as e:
             log.error('Test {}: failure. Message: '.format(f.__name__))
             log.error(e)
+            raise
         except:
             log.error('Test {}: failure'.format(f.__name__))
             raise
