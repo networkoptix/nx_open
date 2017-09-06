@@ -392,7 +392,7 @@ angular.module('nxCommon')
                             scope.loading = false; // no supported format - no loading
                             return;
                         }
-                        $timeout(initNewPlayer());
+                        $timeout(initNewPlayer);
                         $timeout(updateWidth);
                     }
 
