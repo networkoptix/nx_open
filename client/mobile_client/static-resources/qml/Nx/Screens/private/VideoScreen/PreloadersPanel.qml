@@ -14,6 +14,8 @@ Item
     property bool privateAutoFocusPressed: false
     readonly property vector2d zeroVector: Qt.vector2d(0, 0)
 
+    property alias customRotation: loader.rotation
+
     function showCommonPreloader()
     {
         privateAutoFocusPressed = true; //< Shows autofocus preloader.
@@ -65,6 +67,7 @@ Item
     Loader
     {
         id: loader
+
 
         anchors.centerIn: parent
         onItemChanged:
