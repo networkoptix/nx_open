@@ -50,22 +50,7 @@ CameraDiagnostics::Result error(
     return CameraDiagnostics::NotAuthorisedResult(authorizedResult.errorParams[0]);
 }
 
-template<typename ContainerOfQString>
-QString join(ContainerOfQString container, QString delimiter)
-{
-    QString result;
-    for (auto itr = container.cbegin(); itr != container.cend(); ++itr)
-    {
-        if (itr != container.cbegin())
-            result += delimiter;
-
-        result += *itr;
-    }
-
-    return result;
-}
-
-std::set<QString> fromHanwhaInternalRange(const std::set<QString>& internalRange);
+QStringList fromHanwhaInternalRange(const QStringList& internalRange);
 
 QString channelParameter(int channelNumber, const QString& parameterName);
 
@@ -89,7 +74,6 @@ template<typename T>
 T fromHanwhaString(const QString& str)
 {
     static_assert(std::is_same<T, bool>::value
-        || std::is_same<T, int>::value
         || std::is_same<T, AVCodecID>::value
         || std::is_same<T, QSize>::value
         || std::is_same<T, Qn::BitrateControl>::value
@@ -105,11 +89,17 @@ T fromHanwhaString(const QString& str)
         "No specialization for type");
 }
 
-template<>
-bool fromHanwhaString(const QString& str);
+template<typename T>
+T fromHanwhaString(const QString& str, bool* outSuccess)
+{
+    static_assert(std::is_same<T, int>::value, "No specialization for type");
+}
 
 template<>
-int fromHanwhaString(const QString& str);
+int fromHanwhaString<int>(const QString& str, bool* outSuccess);
+
+template<>
+bool fromHanwhaString(const QString& str);
 
 template<>
 AVCodecID fromHanwhaString(const QString& str);
@@ -168,6 +158,10 @@ QString toHanwhaString(HanwhaStreamingType encodingPriority);
 QString toHanwhaString(HanwhaTransportProtocol codecId);
 
 QString toHanwhaString(HanwhaClientType entropyCoding);
+
+bool areaComparator(const QString& lhs, const QString& rhs);
+
+bool ratioComparator(const QString& lhs, const QString& rhs);
 
 } // namespace plugins
 } // namespace mediaserver_core

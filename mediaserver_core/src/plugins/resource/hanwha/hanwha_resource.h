@@ -49,6 +49,10 @@ public:
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
     QSize streamResolution(Qn::ConnectionRole role) const;
     int streamGovLength(Qn::ConnectionRole role) const;
+    Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
+    int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality) const;
+    int streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality) const;
+
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
     int profileByRole(Qn::ConnectionRole role) const;
@@ -100,6 +104,8 @@ private:
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
     int defaultGovLengthForStream(Qn::ConnectionRole role) const;
+    Qn::BitrateControl defaultBitrateControlForStream(Qn::ConnectionRole role) const;
+    int defaultBitrateForStream(Qn::ConnectionRole role) const;
 
     QSize bestSecondaryResolution(
         const QSize& primaryResolution,
@@ -136,6 +142,23 @@ private:
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& parameterInfo,
         const QString& str) const;
+
+    void reopenStreams(bool reopenPrimary, bool reopenSecondary);
+
+    int suggestBitrate(
+        const HanwhaCodecLimits& limits,
+        Qn::BitrateControl bitrateControl,
+        double coefficient) const;
+
+    bool isBitrateInLimits(
+        const HanwhaCodecLimits& limits,
+        Qn::BitrateControl bitrateControl,
+        int bitrate) const;
+
+    double bitrateCoefficient(Qn::StreamQuality quality) const;
+    double bitrateCoefficient(Qn::SecondStreamQuality quality) const;
+    
+    int streamBitrateInternal(Qn::ConnectionRole role, double coefficient) const;
 
 private:
     using AdvancedParameterId = QString;

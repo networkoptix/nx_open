@@ -13,6 +13,7 @@ static const QString kProfileAux = lit("profile");
 static const QString kNoChannelAux = lit("noChannel");
 static const QString kCodecAux = lit("codec");
 static const QString kResourceProperty = lit("resourceProperty");
+static const QString kSortingAux = lit("sorting");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -103,6 +104,11 @@ QString HanwhaAdavancedParameterInfo::resourceProperty() const
     return m_resourceProperty;
 }
 
+QString HanwhaAdavancedParameterInfo::sorting() const
+{
+    return m_sorting;
+}
+
 QString HanwhaAdavancedParameterInfo::cgi() const
 {
     return m_cgi;
@@ -172,6 +178,8 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             m_isCodecDependent = fromString<bool>(auxValue);
         else if (auxName == kResourceProperty)
             m_resourceProperty = auxValue;
+        else if (auxName == kSortingAux)
+            m_sorting = auxValue;
     }
 }
 

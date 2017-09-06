@@ -22,6 +22,7 @@ public:
     bool isChannelIndependent() const;
     bool isCodecDependent() const;
     QString resourceProperty() const;
+    QString sorting() const;
 
     QString cgi() const;
     QString submenu() const;
@@ -45,6 +46,7 @@ private:
     bool m_channelIndependent = false;
     bool m_isCodecDependent = false;
     QString m_resourceProperty;
+    QString m_sorting;
 
     QString m_cgi;
     QString m_submenu;

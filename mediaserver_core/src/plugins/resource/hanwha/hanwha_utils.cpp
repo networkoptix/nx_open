@@ -5,7 +5,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-std::set<QString> fromHanwhaInternalRange(const std::set<QString>& internalRange)
+QStringList fromHanwhaInternalRange(const QStringList& internalRange)
 {
     return internalRange; //< TODO: #dmishin implement
 }
@@ -136,15 +136,16 @@ bool isNxProfile(const QString& profileName)
 }
 
 template<>
-bool fromHanwhaString(const QString& str)
+int fromHanwhaString<int>(const QString& str, bool* outSuccess)
 {
-    return str == kHanwhaTrue;
+    NX_ASSERT(outSuccess);
+    return str.toInt(outSuccess);
 }
 
 template<>
-int fromHanwhaString(const QString& str)
+bool fromHanwhaString(const QString& str)
 {
-    return str.toInt();
+    return str.toLower() == kHanwhaTrue.toLower();
 }
 
 template<>
@@ -429,6 +430,100 @@ QString toHanwhaString(HanwhaClientType clientType)
         default:
             return kHanwhaPcClient;
     }
+}
+
+bool areaComparator(const QString& lhs, const QString& rhs)
+{
+    const auto firstWidthAndHeight = lhs.toLower().split(L'x');
+    const auto secondWidthAndHeight = rhs.toLower().split(L'x');
+
+    bool firstIsValid = firstWidthAndHeight.size() == 2;
+    bool secondIsValid = secondWidthAndHeight.size() == 2;
+
+    if (!firstIsValid || !secondIsValid)
+    {
+        if (!firstIsValid && !secondIsValid)
+            return lhs > rhs;
+
+        return firstIsValid > secondIsValid;
+    }
+
+    bool success = false;
+    int width1 = firstWidthAndHeight[0].toInt(&success);
+    if (!success)
+        firstIsValid = false;
+
+    int height1 = firstWidthAndHeight[1].toInt(&success);
+    if (!success)
+        firstIsValid = false;
+
+    int width2 = secondWidthAndHeight[0].toInt(&success);
+    if (!success)
+        secondIsValid = false;
+
+    int height2 = secondWidthAndHeight[1].toInt(&success);
+    if (!success)
+        secondIsValid = false;
+
+    if (!firstIsValid || !secondIsValid)
+    {
+        if (!firstIsValid && !secondIsValid)
+            return lhs > rhs;
+
+        return firstIsValid > secondIsValid;
+    }
+
+    return width1 * height1 > width2 * height2;
+}
+
+bool ratioComparator(const QString& lhs, const QString& rhs)
+{
+    auto numDen1 = lhs.split(L'/');
+    auto numDen2 = rhs.split(L'/');
+
+    if (numDen1.size() == 1)
+        numDen1.push_back(lit("1"));
+
+    if (numDen2.size() == 1)
+        numDen2.push_back(lit("1"));
+
+    bool firstIsValid = numDen1.size() == 2;
+    bool secondIsValid = numDen2.size() == 2;
+
+    if (!firstIsValid || !secondIsValid)
+    {
+        if (!firstIsValid && !secondIsValid)
+            return lhs > rhs;
+
+        return firstIsValid > secondIsValid;
+    }
+
+    bool success = false;
+    int num1 = numDen1[0].toInt(&success);
+    if (!success)
+        firstIsValid = false;
+
+    int den1 = numDen1[1].toInt(&success);
+    if (!success || den1 == 0)
+        firstIsValid = false;
+
+    int num2 = numDen2[0].toInt(&success);
+    if (!success)
+        secondIsValid = false;
+
+    int den2 = numDen2[1].toInt(&success);
+    if (!success || den2 == 0)
+        secondIsValid = false;
+
+    if (!firstIsValid || !secondIsValid)
+    {
+        if (!firstIsValid && !secondIsValid)
+            return lhs > rhs;
+
+        return firstIsValid > secondIsValid;
+    }
+
+    return ((double) num1 / den1) > ((double) num2 / den2);
 }
 
 } // namespace plugins

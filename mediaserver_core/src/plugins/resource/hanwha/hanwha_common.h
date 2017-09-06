@@ -41,7 +41,6 @@ enum class HanwhaClientType
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
-
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaInvalidFps = -1;
@@ -96,6 +95,7 @@ static const QString kHanwhaProfileNameProperty = lit("Name");
 static const QString kHanwhaProfileNumberProperty = lit("Profile");
 static const QString kHanwhaEncodingTypeProperty = lit("EncodingType");
 static const QString kHanwhaFrameRateProperty = lit("FrameRate");
+static const QString kHanwhaBitrateProperty = lit("Bitrate");
 static const QString kHanwhaResolutionProperty = lit("Resolution");
 static const QString kHanwhaAudioInputEnableProperty = lit("AudioInputEnable");
 static const QString kHanwhaMediaTypeProperty = lit("MediaType");

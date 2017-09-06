@@ -206,7 +206,7 @@ bool HanwhaCgiParameters::parseDataType(
 
     if (reader.name() == kHanwhaEnumNodeName || reader.name() == kHanwhaCsvNodeName)
     {
-        std::set<QString> possibleValues;
+        QStringList possibleValues;
         while (reader.readNextStartElement() && reader.name() == kHanwhaEnumEntryNodeName)
         {
             auto entryValue = reader.attributes()
@@ -214,7 +214,7 @@ bool HanwhaCgiParameters::parseDataType(
                 .toString();
 
             if (!entryValue.isEmpty())
-                possibleValues.insert(entryValue);
+                possibleValues.push_back(entryValue);
 
             reader.skipCurrentElement();
         }

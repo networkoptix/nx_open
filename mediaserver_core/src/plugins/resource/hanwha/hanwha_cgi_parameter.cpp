@@ -176,12 +176,12 @@ void HanwhaCgiParameter::setFormatInfo(const QString& formatInfo)
     m_formatInfo = formatInfo;
 }
 
-std::set<QString> HanwhaCgiParameter::possibleValues() const
+QStringList HanwhaCgiParameter::possibleValues() const
 {
     return m_possibleValues;
 }
 
-void HanwhaCgiParameter::setPossibleValues(std::set<QString> possibleValues)
+void HanwhaCgiParameter::setPossibleValues(QStringList possibleValues)
 {
     m_possibleValues = possibleValues;
 }

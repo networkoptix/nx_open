@@ -37,7 +37,10 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
                     : lit("secondary")));
     }
 
-    auto result = updateProfile(nxProfileNumber, params);
+    CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
+    if (isCameraControlRequired)
+        result = updateProfile(nxProfileNumber, params);
+
     if (!result)
         return result;
 
@@ -60,29 +63,40 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     const auto resolution = m_hanwhaResource->streamResolution(role);
     const auto frameRate = m_hanwhaResource->closestFrameRate(role, parameters.fps);
     const auto govLength = m_hanwhaResource->streamGovLength(role);
+    const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role);
+    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters.quality);
 
     const auto govLengthParameterName = 
         lit("%1.GOVLength").arg(toHanwhaString(codec));
+    
+    const auto bitrateControlParameterName =
+        lit("%1.BitrateControlType").arg(toHanwhaString(codec));
 
-    const bool govLengthParameterIsNeeded = 
-        (codec == AVCodecID::AV_CODEC_ID_H264
-        || codec == AVCodecID::AV_CODEC_ID_HEVC)
-            && govLength != kHanwhaInvalidGovLength;
+    const bool isH26x = codec == AVCodecID::AV_CODEC_ID_H264
+        || codec == AVCodecID::AV_CODEC_ID_HEVC;
 
     HanwhaProfileParameters result = 
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
         {kHanwhaEncodingTypeProperty, toHanwhaString(codec)},
-        {kHanwhaFrameRateProperty, QString::number(
-            m_hanwhaResource->closestFrameRate(role, frameRate))},
         {kHanwhaResolutionProperty, toHanwhaString(resolution)}
     };
+
     if (m_hanwhaResource->isAudioSupported())
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(m_hanwhaResource->isAudioEnabled()));
 
-    if (govLengthParameterIsNeeded)
+    if (isH26x && govLength != kHanwhaInvalidGovLength)
         result.emplace(govLengthParameterName, QString::number(govLength));
+
+    if (isH26x && bitrateControl != Qn::BitrateControl::undefined)
+        result.emplace(bitrateControlParameterName, toHanwhaString(bitrateControl));
+
+    if (bitrate != kHanwhaInvalidBitrate)
+        result.emplace(kHanwhaBitrateProperty, QString::number(bitrate));
+
+    if (frameRate != kHanwhaInvalidFps)
+        result.emplace(kHanwhaFrameRatePriority, QString::number(frameRate));
 
     return result;
 }

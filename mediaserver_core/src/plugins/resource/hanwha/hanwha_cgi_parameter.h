@@ -70,8 +70,8 @@ public:
     QString formatInfo() const;
     void setFormatInfo(const QString& formatInfo);
 
-    std::set<QString> possibleValues() const;
-    void setPossibleValues(std::set<QString> possibleValues);
+    QStringList possibleValues() const;
+    void setPossibleValues(QStringList possibleValues);
 
 private:
     QString m_name;
@@ -92,7 +92,7 @@ private:
     QString m_formatString;
     QString m_formatInfo;
 
-    std::set<QString> m_possibleValues;
+    QStringList m_possibleValues;
 };
 
 } // namespace plugins

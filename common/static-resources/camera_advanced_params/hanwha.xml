@@ -70,7 +70,7 @@
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;"/>
                         
                 <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -259,7 +259,7 @@
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;sorting=area"/>
                         
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -566,10 +566,12 @@
                         range="Low,Middle,High"/>
                 <param id="image/camera/AutoShortShutterSpeed"
                         name="Minimum Shutter"
-                        dataType="Enumeration"/>
+                        dataType="Enumeration"
+                        aux="sorting=ratio"/>
                 <param id="image/camera/AutoLongShutterSpeed"
                         name="Maximum Shutter"
-                        dataType="Enumeration"/>
+                        dataType="Enumeration"
+                        aux="sorting=ratio"/>
                 <param id="image/camera/AFLKMode"
                         name="Anti Flicker"
                         dataType="Enumeration"
