@@ -107,24 +107,9 @@ QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(c
     return cam;
 }
 
-QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
+QnResourceList QnDesktopCameraResourceSearcher::findResources()
 {
-#ifdef DESKTOP_CAMERA_DEBUG
-    qDebug() << "QnDesktopCameraResourceSearcher::findResources cycle entered";
-#endif
-
-    cleanupConnections();
-
-    QnResourceList result;
-
-    QnMutexLocker lock( &m_mutex );
-
-    for(const auto &info: m_connections)
-    {
-        if (auto camera = cameraFromConnection(info))
-            result << camera;
-    }
-    return result;
+    return QnResourceList();
 }
 
 QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
