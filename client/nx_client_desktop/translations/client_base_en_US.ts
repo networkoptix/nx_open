@@ -3875,14 +3875,14 @@ to %1</source>
         <source>At least %n %1 are required</source>
         <translation>
             <numerusform>At least %n %1 is required</numerusform>
-            <numerusform>At least %n %1s are required</numerusform>
+            <numerusform>At least %n %1 are required</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n %1 is currently in use</numerusform>
-            <numerusform>%n %1s are currently in use</numerusform>
+            <numerusform>%n %1 are currently in use</numerusform>
         </translation>
     </message>
     <message>

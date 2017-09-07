@@ -58,7 +58,6 @@ function(detect_package_versions)
         set(_qt_version "5.6.1")
         set(_quazip_version "0.7.2")
         set(_openssl_version "1.0.0j")
-        set(_festival_version "2.4")
     endif()
 
     if(box STREQUAL "edge1")
@@ -85,7 +84,6 @@ function(detect_package_versions)
     set(directx_version ${_directx_version} CACHE STRING "")
     set(cassandra_version ${_cassandra_version} CACHE STRING "")
     set(server-external_version "" CACHE STRING "")
-
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 
@@ -133,7 +131,7 @@ function(get_dependencies)
         nx_rdep_add_package(opengl-es-mali)
     endif()
 
-    if(box MATCHES "bananapi|rpi")
+    if(box MATCHES "rpi")
         nx_rdep_add_package(cifs-utils)
     endif()
 
@@ -152,6 +150,9 @@ function(get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
+        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
+        set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
+        nx_rdep_add_package("vmaxproxy-2.1")
     endif()
 
     if(box STREQUAL "edge1")

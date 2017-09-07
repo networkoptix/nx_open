@@ -8,10 +8,9 @@
 
 namespace test {
 
-static const int kMaxChunkBufferSize = 16 * 1024;
+static constexpr std::size_t kMaxChunkBufferSize = 16 * 1024;
 
-class StreamingChunkInputStream:
-    public ::testing::Test
+class StreamingChunkInputStream: public ::testing::Test
 {
 protected:
     void givenChunkInputStream()
@@ -25,7 +24,7 @@ protected:
     {
         m_chunk = std::make_shared<StreamingChunk>(m_chunkParams, kMaxChunkBufferSize);
         m_chunkData = nx::utils::random::generate(
-            nx::utils::random::number<int>(1, kMaxChunkBufferSize));
+            nx::utils::random::number<size_t>(1, kMaxChunkBufferSize));
         ASSERT_TRUE(m_chunk->openForModification());
         m_chunk->appendData(m_chunkData);
     }

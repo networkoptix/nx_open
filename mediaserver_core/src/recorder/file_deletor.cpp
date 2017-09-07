@@ -15,9 +15,6 @@ QnFileDeletor* QnFileDeletor_inst = 0;
 QnFileDeletor::QnFileDeletor(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    m_postponeTimer.start();
-    m_storagesTimer.start();
-    start();
     QnFileDeletor_inst = this;
 }
 
@@ -60,6 +57,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
     m_firstTime = true;
     m_mediaRoot = closeDirPath(tmpRoot);
     m_deleteCatalog.setFileName(m_mediaRoot +  QLatin1String("delete_latter.csv"));
+
+    m_postponeTimer.start();
+    m_storagesTimer.start();
+    start();
 }
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)

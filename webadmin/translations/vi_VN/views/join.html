@@ -1,19 +1,18 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h3 class="modal-title">Merge Systems</h3>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times; </span> <span class="sr-only"> Đóng </span></button> <h3 class="modal-title"> Kết hợp Hệ thống </h3>
     </div>
 
     <div class="col-sm-12">
         <ng-form name="findSystemForm">
             <div class="form-group">
-                <label for="otherSystemUrl" class="control-label">Other System URL</label>
+                <label for="otherSystemUrl" class="control-label">Hệ thống URL khác</label>
                 <div class="">
                     <div class="input-group" dropdown>
-                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="máy chủ: port" required />
 
                         <ul class="dropdown-menu" role="menu" id="discoveredUrls">
-                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Không tìm thấy Hệ thống</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
                                 <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
@@ -30,7 +29,7 @@
 
 
             <div class="form-group">
-                <label for="otherSystemLogin" class="control-label">Other System Login</label>
+                <label for="otherSystemLogin" class="control-label"> Đăng nhập hệ thống khác </label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
                            placeholder="Đăng nhập" required>
@@ -38,7 +37,7 @@
             </div>
 
             <div class="form-group">
-                <label for="otherSystemPassword" class="control-label">Other System Password</label>
+                <label for="otherSystemPassword" class="control-label"> Nhập Mật khẩu </label>
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
@@ -48,23 +47,20 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this system)</label>
+            <label for="currentSystemPassword" class="control-label"> Mật khẩu hiện tại (cho hệ thống này) </label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Mật khẩu" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current system is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>Hệ thống hiện tại sắp sáp nhập <b> {{systems.systemName}} </b> Với Hệ thống <b> {{systems.joinSystemName}} </b></p>
             <p>
-                The new system will have password and name from the following system:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                Hệ thống mới sẽ có mật khẩu và tên từ hệ thống sau: <0 /> <label> <2 /> {{systems.systemName}} (hiện tại) </label> <0 /> <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}} </label>
             </p>
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Find system</button>
-        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid"> Tìm hệ thống </button> <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid"> Hợp nhất với {{systems.joinSystemName}} </button>
     </div>
 </form>

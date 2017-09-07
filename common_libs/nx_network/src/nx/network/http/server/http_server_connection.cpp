@@ -332,6 +332,15 @@ void HttpServerConnection::someMsgBodyRead(
 
     if (buf.isEmpty())
     {
+        if (!m_currentMsgBody->contentLength())
+        {
+            // The only way to signal about the end of message body is to close a connection 
+            // if Content-Length is not specified.
+            // Connection will be closed after sending this response if noone takes socket 
+            // for any reason (like establishing some tunnel, etc...).
+            m_isPersistent = false;
+        }
+
         // Done with message body.
         fullMessageHasBeenSent();
         return;

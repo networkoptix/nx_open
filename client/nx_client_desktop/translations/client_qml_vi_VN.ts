@@ -5,22 +5,22 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation type="unfinished">Searching servers in your local network...</translation>
+      <translation>Tìm kiếm các máy chủ trong mạng cục bộ của bạn...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation type="unfinished">No servers found</translation>
+      <translation>Không tìm thấy máy chủ</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation type="unfinished">Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>Kiểm tra kết nối mạng của bạn hoặc nhấn nút &quot;Kết nối với Server&quot; để nhập địa chỉ máy chủ đã biết</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation type="unfinished">Click to setup</translation>
+      <translation>Nhấp để cài đặt</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>Tự động đăng nhập</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -57,34 +57,34 @@
     <name>SystemTile</name>
     <message>
       <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
+      <translation>CHẾ ĐỘ AN TOÀN</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>KHÔNG THÍCH HỢP</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>Không thể sử dụng được</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Máy chủ mới</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
+      <translation>Bạn không có quyền truy cập vào %1. Một số tính năng có thể không khả dụng.</translation>
     </message>
     <message>
       <source>Loading...</source>

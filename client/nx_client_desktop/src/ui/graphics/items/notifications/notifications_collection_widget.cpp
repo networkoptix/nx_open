@@ -263,7 +263,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
 
     NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
-        return
+        return;
 
     widget->setCloseButtonAvailable(false);
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
@@ -688,13 +688,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 );
-            break;
-
-        case QnSystemHealth::NoPrimaryTimeServer:
-            item->addActionButton(
-                qnSkin->icon("events/settings.png"),
-                action::SelectTimeServerAction,
-                actionParams);
             break;
 
         case QnSystemHealth::SystemIsReadOnly:

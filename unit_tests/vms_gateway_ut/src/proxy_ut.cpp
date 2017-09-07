@@ -18,6 +18,13 @@ static const QString checkuedTestPathAndQuery(lit("%1?%2&chunked").arg(testPath)
 static const nx_http::BufferType testMsgBody("bla-bla-bla");
 static const nx_http::BufferType testMsgContentType("text/plain");
 
+class UndefinedContentLengthBufferSource: public nx_http::BufferSource
+{
+public:
+    UndefinedContentLengthBufferSource(): nx_http::BufferSource(testMsgContentType, testMsgBody) {}
+    virtual boost::optional<uint64_t> contentLength() const override { return boost::none; }
+};
+
 class VmsGatewayProxyTestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
@@ -44,23 +51,24 @@ public:
         if (request.requestLine.url.path() == testPath &&
             requestQuery.hasQueryItem(testQuery))
         {
+            std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource;
             if (requestQuery.hasQueryItem("chunked"))
             {
                 response->headers.emplace("Transfer-Encoding", "chunked");
-                completionHandler(
-                    nx_http::RequestResult(
-                        nx_http::StatusCode::ok,
-                        std::make_unique< nx_http::BufferSource >(
-                            testMsgContentType,
-                            nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n")));
+                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType,
+                    nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
+            }
+            else if (requestQuery.hasQueryItem("undefinedContentLength"))
+            {
+                bodySource = std::make_unique<UndefinedContentLengthBufferSource>();
             }
             else
             {
-                completionHandler(
-                    nx_http::RequestResult(
-                        nx_http::StatusCode::ok,
-                        std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody)));
+                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType, testMsgBody);
             }
+
+            completionHandler(nx_http::RequestResult(
+                nx_http::StatusCode::ok, std::move(bodySource)));
         }
         else
         {
@@ -342,6 +350,21 @@ TEST_F(Proxy, proxyingChunkedBody)
     const QUrl targetUrl =
        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(checkuedTestPathAndQuery);
+    nx_http::HttpClient httpClient;
+    httpClient.setProxyVia(endpoint());
+    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+}
+
+TEST_F(Proxy, proxyingUndefinedContentLength)
+{
+    addArg("-http/allowTargetEndpointInUrl", "true");
+    addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
+
+    const QUrl targetUrl =
+        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
+        .arg(lit("%1?%2&undefinedContentLength").arg(testPath).arg(testQuery));
+
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
