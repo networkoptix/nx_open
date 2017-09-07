@@ -17,6 +17,7 @@ class AnalyticsSdkEventModel: public QAbstractListModel
 {
     Q_OBJECT
     using base_type = QAbstractListModel;
+
 public:
     enum DataRole
     {
@@ -25,6 +26,7 @@ public:
     };
 
     AnalyticsSdkEventModel(QObject* parent = nullptr);
+    ~AnalyticsSdkEventModel();
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
@@ -36,6 +38,7 @@ public:
 private:
     struct Private;
     std::unique_ptr<Private> d;
+
 };
 
 } // namespace ui

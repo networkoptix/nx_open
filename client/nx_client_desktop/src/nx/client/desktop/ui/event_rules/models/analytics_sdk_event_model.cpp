@@ -25,6 +25,8 @@ AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
 {
 }
 
+AnalyticsSdkEventModel::~AnalyticsSdkEventModel() = default;
+
 int AnalyticsSdkEventModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid()
