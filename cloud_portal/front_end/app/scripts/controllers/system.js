@@ -17,7 +17,7 @@ angular.module('cloudApp')
 
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
-            return $scope.system.getInfo();
+            return $scope.system.getInfo(true); // Force reload system info when opening page
         }, {
             errorCodes: {
                 forbidden: function(error){
@@ -33,6 +33,7 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.systemNoAccess = false;
             if($scope.system.permissions.editUsers){
                 $scope.gettingSystemUsers.run();
             }else{
@@ -42,8 +43,12 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-                return $scope.system.update();
-            },Config.updateInterval);
+                return $scope.system.update().catch(function(error){
+                    if(error.data.resultCode == 'forbidden' || error.data.resultCode == 'notFound'){
+                        connectionLost();
+                    }
+                });
+            }, Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemUpdate);
@@ -162,10 +167,12 @@ angular.module('cloudApp')
             }
         });
 
-        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
-             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.name || L.errorCodes.thisSystem), 'warning');
-             $location.path("/systems");
-        });
+        function connectionLost(){
+            dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
+                           $scope.system.info.name || L.errorCodes.thisSystem), 'warning');
+            $location.path("/systems");
+        }
+        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId, connectionLost);
 
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();

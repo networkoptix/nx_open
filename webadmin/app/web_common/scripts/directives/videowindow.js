@@ -402,8 +402,9 @@ angular.module('nxCommon')
 
                 scope.$on('$destroy',function(){
                     recyclePlayer(null);
-                    scope.vgApi.kill();
-
+                    if(scope.vgApi){
+                        scope.vgApi.kill();
+                    }
                     if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
