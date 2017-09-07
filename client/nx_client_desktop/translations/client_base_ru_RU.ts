@@ -870,14 +870,6 @@ to view more bookmarks</source>
       <translation>Удалить из прокрутки</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>Запустить прокрутки</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Остановить прокрутку</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>Сделать прокрутку</translation>
     </message>
@@ -1025,6 +1017,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>Листать вниз</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Запустить прокрутки</translation>
     </message>
   </context>
   <context>
@@ -6267,10 +6266,6 @@ to %1</source>
       <translation>Не настроен сервер Email</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Установите сервер для синхронизации времени</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>Система запущена в безопасном режиме</translation>
     </message>
@@ -6301,10 +6296,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Сервер Email не настроен.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Время на серверах не может быть синхронизировано, так как точное время не может быть определено.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7879,6 +7870,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Остановить прокрутку</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Запустить прокрутки</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8147,8 +8157,8 @@ to %1</source>
       <translation>Используйте клавиши со стрелками для переключения раскладок. Для выхода из проктутки нажмите Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>Используйте клавиши со стрелками для переключения камер. Для выхода из проктутки нажмите Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>
