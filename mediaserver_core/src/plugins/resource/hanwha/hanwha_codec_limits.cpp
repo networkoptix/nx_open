@@ -48,10 +48,10 @@ bool HanwhaCodecLimits::setLimit(const QString& limitName, const QString& limitV
         return setValue(&defaultCbrBitrate, value);
 
     if (limitName == kHanwhaMaxFpsProperty)
-        return setValue(&maxFps, value);
+        return setValue(&maxFps, value / 1000);
 
     if (limitName == kHanwhaDefaultFpsProperty)
-        return setValue(&defaultFps, value);
+        return setValue(&defaultFps, value / 1000);
 
     return false;
 }
