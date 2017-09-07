@@ -53,23 +53,31 @@ Item
                 Rtu.ChangesSummary
                 {
                     id: summary;
-                    
-                    visible: model.changesCount;
+
+                    property int changesCount: model ? model.changesCount : 0
+                    property int failedChangesCount: failedSummary && failedSummary.model
+                        ? failedSummary.model.changesCount
+                        : 0
+
+                    visible: changesCount;
                     caption: (qsTr("%1 of %2 change(s) applied successfully")
-                            .arg(model.changesCount).arg(failedSummary.model.changesCount + model.changesCount));
+                        .arg(changesCount)
+                        .arg(failedChangesCount + changesCount));
                     anchors
                     {
                         left: parent.left;
                         right: parent.right;
                     }
 
-                    model: rtuContext.progressTask.successfulModel;
-                    expanded: !failedSummary.model.changesCount;
+                    model: rtuContext.progressTask && rtuContext.progressTask.successfulModel;
+                    expanded: !failedChangesCount;
                 }
                 
                 Rtu.ChangesSummary
                 {
                     id: failedSummary;
+
+                    property int changesCount: model ? model.changesCount : 0
 
                     anchors
                     {
@@ -77,9 +85,9 @@ Item
                         right: parent.right;
                     }
                     successfulSummary: false;
-                    visible: model.changesCount;
-                    caption: qsTr("%1 errors").arg(model.changesCount);
-                    model: rtuContext.progressTask.failedModel;
+                    visible: changesCount;
+                    caption: qsTr("%1 errors").arg(changesCount);
+                    model: rtuContext.progressTask && rtuContext.progressTask.failedModel;
                 }
             }
         }

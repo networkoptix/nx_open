@@ -4,11 +4,13 @@
 
 #include <helpers/cloud_url_helper.h>
 #include <nx/network/app_info.h>
-#include <nx/utils/string.h>
 #include <ui/style/helper.h>
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
 #include <watchers/cloud_status_watcher.h>
+
+#include <nx/utils/string.h>
+#include <nx/utils/log/assert.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -22,8 +24,6 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Email server is not set");
         case QnSystemHealth::UsersEmailIsEmpty:
             return tr("Some users have not set their email addresses");
-        case QnSystemHealth::NoPrimaryTimeServer:
-            return tr("Select server for others to synchronize time with");
         case QnSystemHealth::SystemIsReadOnly:
             return tr("System is in safe mode");
         case QnSystemHealth::EmailSendError:
@@ -117,9 +117,6 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
             messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
-            break;
-        case QnSystemHealth::NoPrimaryTimeServer:
-            messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");
             break;
         case QnSystemHealth::SystemIsReadOnly:
             messageParts << tr("System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");

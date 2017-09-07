@@ -19,6 +19,7 @@
 #include "camera_pool.h"
 
 #include <utils/media/ffmpeg_initializer.h>
+#include <nx/core/access/access_types.h>
 
 extern "C"
 {
@@ -120,7 +121,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, /*&common*/nullptr));
+    std::unique_ptr<QnCommonModule> commonModule(
+        new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
+    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, commonModule.get()));
     QnCameraPool::instance()->start();
     for (int i = 1; i < argc; ++i)
     {

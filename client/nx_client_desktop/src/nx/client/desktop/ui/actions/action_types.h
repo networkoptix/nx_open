@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/client/desktop/condition/condition_types.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -147,12 +149,6 @@ enum ClientMode
 };
 Q_DECLARE_FLAGS(ClientModes, ClientMode)
 
-enum MatchMode
-{
-    Any,            /**< Match if at least one resource satisfies the criterion. */
-    All,            /**< Match only if all resources satisfy the criterion. */
-    ExactlyOne      /**< Match only if exactly one resource satisfies condition. */
-};
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(ClientModes);

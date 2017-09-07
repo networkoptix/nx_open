@@ -5,82 +5,82 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Thành công.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Đăng nhập hoặc mật khẩu không hợp lệ.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Yêu cầu hoạt động không được phép với các chứng chỉ được cung cấp.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Tài khoản này chưa được kích hoạt. Vui lòng kiểm tra email của bạn.</translation>
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation type="unfinished">This account is blocked.</translation>
+      <translation>Tài khoản này đã bị khóa.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation type="unfinished">Requested feature is not implemented.</translation>
+      <translation>Yêu cầu tính năng không được thực thi.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation type="unfinished">Unknown realm.</translation>
+      <translation>Lĩnh vực không rõ.</translation>
     </message>
     <message>
       <source>Bad request.</source>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Yêu cầu xấu.</translation>
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation type="unfinished">Invalid nonce.</translation>
+      <translation>Không hợp lệ.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Thông tin xác thực không hợp lệ.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Đã nhận dữ liệu không hợp lệ.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Lỗi không rõ.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Unexpected network error. Please check your Internet connection and try again.</translation>
+      <translation>Lỗi mạng không mong muốn Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Đăng nhập không hợp lệ.</translation>
     </message>
     <message>
       <source>Requested object is not found.</source>
-      <translation type="unfinished">Requested object is not found.</translation>
+      <translation>Yêu cầu đối tượng không được tìm thấy.</translation>
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation type="unfinished">Object already exists.</translation>
+      <translation>Đối tượng đã tồn tại.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Lỗi nội bộ %1. Vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
+      <translation>Xin lỗi, %1 Dịch vụ tạm thời không khả dụng. Chúng tôi đang cố gắng hết sức để khôi phục nó. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
+      <translation>Xin lỗi, %1 dịch vụ không thể xử lý yêu cầu của bạn. Xin vui lòng thử lại sau ít phút.</translation>
     </message>
   </context>
   <context>
@@ -88,23 +88,23 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Chủ sở hữu: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Hệ thống của bạn</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Hệ thống</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>Hệ thống (%1)</translation>
     </message>
   </context>
   <context>
@@ -112,11 +112,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Chủ sở hữu: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Hệ thống của bạn</translation>
     </message>
   </context>
 </TS>

@@ -485,7 +485,10 @@
                 "Pravis*|HDR-1600",
                 "Customer|9534E2",
                 "*|NVR201-08LP",
-                "UNIVIEW|NVR302-08E-P8"
+                "UNIVIEW|NVR302-08E-P8",
+                "Samsung Techwin|SPE-400*",
+                "VIVOTEK|VS8102",
+                "TCS-300|TCAM"
             ],
             "analogEncoder": true
         },
@@ -664,7 +667,8 @@
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
                 "H264|N51820L",
                 "onvif|v047-1",
-                "iPIXA|*"
+                "iPIXA|*",
+                "Rhodium|RBU-PZ-4461-EB"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -789,6 +793,12 @@
                 "Hikvision|DS-2CD2132F-IWS"
             ],
             "parseOnvifNotificationsWithHttpReader": true
+        },
+        {
+            "keys": [
+                "Hikvision|DS-2CD2132F-IWS"
+            ],
+            "relayOutputInversed": true
         },
         {
             "keys": [

@@ -279,6 +279,9 @@ private:
 
     void initSoftwareTriggers();
 
+    void updateTriggersAvailability();
+    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
+
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 

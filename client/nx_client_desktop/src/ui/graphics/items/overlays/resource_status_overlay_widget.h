@@ -65,6 +65,9 @@ private:
     QnViewportBoundWidget* const m_centralHolder;
     QnViewportBoundWidget* const m_extrasHolder;
 
+    QWidget* const m_centralContainer;
+    QWidget* const m_extrasContainer;
+
     // Preloader
     QnBusyIndicatorGraphicsWidget* m_preloader;
 

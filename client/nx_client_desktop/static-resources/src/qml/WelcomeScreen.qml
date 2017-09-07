@@ -310,6 +310,8 @@ Rectangle
                     height: grid.cellHeight;
                     width: grid.width;
                 }
+
+                Component.onCompleted: setPage(0)
             }
 
             NxPageSwitcher

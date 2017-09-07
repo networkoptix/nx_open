@@ -22,7 +22,7 @@ run_watchdog() {
 
 stop() {
     SERVICE_PID="`ps -eO command | grep nx1button | grep python | grep -v grep | awk {'print $1'}`"
-	WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep |  awk {'print $1'}`"
+    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep |  awk {'print $1'}`"
     if [ "$SERVICE_PID" ]; then
         echo "Stopping Button Service... PID: " $SERVICE_PID
         kill -9 $SERVICE_PID
@@ -58,22 +58,22 @@ start_watchdog() {
 }
 
 case "$1" in
-  start)
-    start
-    start_watchdog
-	;;
-  restart|reload|force-reload)
-	echo "Error: argument '$1' not supported" >&2
-	exit 3
-	;;
+    start)
+        start
+        start_watchdog
+        ;;
+    restart|reload|force-reload)
+        echo "Error: argument '$1' not supported" >&2
+        exit 3
+        ;;
   run_watchdog)
-    run_watchdog
-    ;;
+      run_watchdog
+      ;;
   stop)
-    stop
-    ;;
+      stop
+      ;;
   *)
-	echo "Usage: nx1boot [start]" >&2
-	exit 3
-	;;
+      echo "Usage: nx1boot [start]" >&2
+      exit 3
+      ;;
 esac

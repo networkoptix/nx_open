@@ -117,12 +117,16 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     if (!m_widget)
         return;
 
+    const auto isVisibleToParent =
+        [](const QGraphicsWidget* widget)
+        {
+            return widget->isVisibleTo(widget->parentItem());
+        };
+
     /* As graphics widgets don't have "setUpdatesEnabled",
        temporarily make the widget invisible instead: */
     QnScopedTypedPropertyRollback<bool, QGraphicsWidget> visibilityRollback(
-        m_widget.data(), &QGraphicsWidget::setVisible,
-        &QGraphicsWidget::isVisible,
-        false);
+        m_widget.data(), &QGraphicsWidget::setVisible, isVisibleToParent, false);
 
     m_widget->setCaption(captionText(m_statusOverlay));
     m_widget->setDescription(descriptionText(m_statusOverlay));

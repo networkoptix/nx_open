@@ -23,8 +23,7 @@ static const int kReadOnlyBufferFlag = 0;
 GenericMulticastStreamReader::GenericMulticastStreamReader(const QUrl& url):
     m_refManager(this),
     m_interrupted(false),
-    m_url(url),
-    m_ioDevice(new GenericMulticastIoDevice(url))
+    m_url(url)
 {
 }
 
@@ -60,32 +59,35 @@ unsigned int GenericMulticastStreamReader::releaseRef()
 
 bool GenericMulticastStreamReader::open()
 {
+    close();
     m_interrupted = false;
 
-    if (!m_ioDevice->isOpen())
-        m_ioDevice->open(QIODevice::ReadOnly);
+    m_formatContext = avformat_alloc_context();
+    if (!m_formatContext)
+        return false;
+
+    auto ioDevice = new GenericMulticastIoDevice(m_url);
+    ioDevice->open(QIODevice::ReadOnly);
 
     auto buffer = (unsigned char*)av_malloc(kBufferSize);
     auto avioContext = avio_alloc_context(
         buffer,
         kBufferSize,
         kReadOnlyBufferFlag,
-        m_ioDevice.get(),
+        ioDevice,
         readFromIoDevice,
         nullptr,
         nullptr);
 
-    m_formatContext = avformat_alloc_context();
-
-    if (!m_formatContext)
-        return false;
-
     m_formatContext->pb = avioContext;
     m_formatContext->interrupt_callback.callback = checkIoDevice;
-    m_formatContext->interrupt_callback.opaque = m_ioDevice.get();
+    m_formatContext->interrupt_callback.opaque = ioDevice;
 
     if (avformat_open_input(&m_formatContext, "", nullptr, nullptr) < 0)
+    {
+        QnFfmpegHelper::closeFfmpegIOContext(avioContext); //< m_formatContext became null here
         return false;
+    }
 
     if (avformat_find_stream_info(m_formatContext, 0) < 0)
         return false;
@@ -99,17 +101,15 @@ bool GenericMulticastStreamReader::open()
 
 void GenericMulticastStreamReader::close()
 {
-    m_interrupted = true;
-    avformat_close_input(&m_formatContext);
-    m_formatContext = nullptr;
-
-    if (m_avioContext)
+    if (m_formatContext)
     {
-        av_freep(&m_avioContext->buffer);
-        av_freep(&m_avioContext);
+        QnFfmpegHelper::closeFfmpegIOContext(m_formatContext->pb);
+        m_formatContext->pb = 0;
+        avformat_close_input(&m_formatContext);
     }
 
-    m_ioDevice->close();
+    m_interrupted = true;
+    m_formatContext = nullptr;
 }
 
 int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket)

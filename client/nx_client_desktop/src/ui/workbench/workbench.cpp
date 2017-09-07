@@ -4,8 +4,8 @@
 #include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/layout_resource.h>
-
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <ui/style/globals.h>
 
@@ -342,24 +342,32 @@ void QnWorkbench::updateCentralRoleItem() {
     setItem(Qn::CentralRole, bestItemForRole(m_itemByRole, Qn::CentralRole));
 }
 
-void QnWorkbench::update(const QnWorkbenchState &state) {
+void QnWorkbench::update(const QnWorkbenchState& state)
+{
     clear();
 
-    for (int i = 0; i < state.layoutUuids.size(); i++)
+    for (const auto& id: state.layoutUuids)
     {
-        const auto id = state.layoutUuids[i];
-        const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id);
-        if (!layout)
+        if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
         {
-            const auto tour = layoutTourManager()->tour(id);
-            if (tour.isValid())
-                menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, id});
+            const auto factory = LayoutsFactory::instance(this);
+            const auto workbenchLayout = factory->create(layout, this);
+            addLayout(workbenchLayout);
             continue;
         }
 
-        const auto factory = LayoutsFactory::instance(this);
-        const auto workbenchLayout = factory->create(layout, this);
-        addLayout(workbenchLayout);
+        if (const auto videoWall = resourcePool()->getResourceById<QnVideoWallResource>(id))
+        {
+            menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            continue;
+        }
+
+        const auto tour = layoutTourManager()->tour(id);
+        if (tour.isValid())
+        {
+            menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, id});
+            continue;
+        }
     }
 
     if (!state.currentLayoutId.isNull())
@@ -384,15 +392,23 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             if (!layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull())
                 return true;
 
+            if (layout->data().contains(Qn::VideoWallResourceRole))
+                return true;
+
             // Ignore other service layouts, e.g. videowall control layouts.
             if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
                 return false;
             return true;
         };
 
-    // TODO: #GDM support videowall reviews
     auto sourceId = [](const QnLayoutResourcePtr& layout)
         {
+            if (const auto videoWall = layout->data(Qn::VideoWallResourceRole)
+                .value<QnVideoWallResourcePtr>())
+            {
+                return videoWall->getId();
+            }
+
             const auto tourId = layout->data(Qn::LayoutTourUuidRole).value<QnUuid>();
             return tourId.isNull()
                 ? layout->getId()

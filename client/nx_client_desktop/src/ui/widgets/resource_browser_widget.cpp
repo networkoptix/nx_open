@@ -677,6 +677,16 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     QnUserResourcePtr user;
     QnUuid uuid = index.data(Qn::UuidRole).value<QnUuid>();
 
+    switch (nodeType)
+    {
+        case Qn::SharedLayoutsNode:
+            user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            uuid = parentIndex.data(Qn::UuidRole).value<QnUuid>();
+            break;
+        default:
+            break;
+    }
+
     switch (parentNodeType)
     {
         case Qn::LayoutsNode:
@@ -694,8 +704,12 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
             break;
     }
 
-    result.setArgument(Qn::UserResourceRole, user);
-    result.setArgument(Qn::UuidRole, uuid);
+    if (user)
+        result.setArgument(Qn::UserResourceRole, user);
+
+    if (!uuid.isNull())
+        result.setArgument(Qn::UuidRole, uuid);
+
     result.setArgument(Qn::NodeTypeRole, nodeType);
     return result;
 }

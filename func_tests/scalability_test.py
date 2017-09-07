@@ -27,8 +27,8 @@ log = logging.getLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
-CHECK_METHOD_TIMEOUT = datetime.timedelta(minutes=10)
-CHECK_METHOD_RETRY_COUNT = 10
+CHECK_METHOD_TIMEOUT = datetime.timedelta(minutes=2)
+CHECK_METHOD_RETRY_COUNT = 5
 
 
 @pytest.fixture
@@ -166,7 +166,7 @@ def get_response(server, method, api_object, api_method):
         except Exception as x:
             log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
     log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
-                      CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
+              CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
     server.make_core_dump()
     raise  # reraise last exception
 

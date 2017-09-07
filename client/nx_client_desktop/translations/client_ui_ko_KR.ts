@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>모든 경고를 다시 설정</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -2056,14 +2066,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>주의: 이미 같은 이름의 파일 또는 폴더가 있습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>업데이트 서버</translation>
     </message>
   </context>
   <context>
