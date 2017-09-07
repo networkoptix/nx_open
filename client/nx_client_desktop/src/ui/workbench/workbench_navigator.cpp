@@ -44,8 +44,6 @@ extern "C"
 
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <redass/redass_controller.h>
-
 #include <server/server_storage_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -2148,8 +2146,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
                 {
                     reader->jumpTo(value * 1000, 0);
                 }
-                //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
-                //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else
                 {
                     reader->setSkipFramesToTime(value * 1000); /* Precise seek. */
