@@ -66,6 +66,7 @@ namespace
     const int kRtpTimeoutMsDefault(10000);
 
     const int kMaxDifferenceBetweenSynchronizedAndInternetDefault(20000);
+    const int kMaxDifferenceBetweenSynchronizedAndLocalTimeMsDefault(1000);
 }
 
 using namespace nx::settings_names;
@@ -266,6 +267,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
             kMaxDifferenceBetweenSynchronizedAndInternetDefault,
             this);
     timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
+
+    m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndLocalTime,
+            kMaxDifferenceBetweenSynchronizedAndLocalTimeMsDefault,
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -836,6 +844,12 @@ std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndI
 {
     return std::chrono::milliseconds(
         m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor->value());
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndLocalTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
 }
 
 QString QnGlobalSettings::cloudAccountName() const
