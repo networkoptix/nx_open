@@ -48,7 +48,7 @@ function pushns()
 
 function push()
 {
-    $(aws ecr get-login)
+    $(aws ecr get-login --no-include-email)
 
     echo "Pushing $MODULE:$VERSION to the ECR registry"
     docker tag $MODULE:$VERSION 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/$MODULE:$VERSION
