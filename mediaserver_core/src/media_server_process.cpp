@@ -3258,8 +3258,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
         user->setName(login);
-        user->setPassword(password);
-        user->generateHash();
+        user->setPasswordAndGenerateHash(password);
 
         ec2::ApiUserData userData;
         fromResourceToApi(user, userData);

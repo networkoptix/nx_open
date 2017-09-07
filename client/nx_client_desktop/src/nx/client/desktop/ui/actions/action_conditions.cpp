@@ -1041,17 +1041,25 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
     if (!parameters.hasArgument(Qn::NodeTypeRole))
         return InvisibleAction;
 
-    Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto user = parameters.hasArgument(Qn::UserResourceRole)
+        ? parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>()
+        : parameters.resource().dynamicCast<QnUserResource>();
 
     /* Create layout for self. */
     if (nodeType == Qn::LayoutsNode)
         return EnabledAction;
 
-    /* Create layout for other user. */
-    if (nodeType != Qn::ResourceNode)
-        return InvisibleAction;
-    QnUserResourcePtr user = parameters.resource().dynamicCast<QnUserResource>();
+    // No other nodes must provide a way to create own layout.
     if (!user || user == context->user())
+        return InvisibleAction;
+
+    // Create layout for the custom user, but not for role.
+    if (nodeType == Qn::SharedLayoutsNode && user)
+        return EnabledAction;
+
+    // Create layout for other user is allowed on this user's node.
+    if (nodeType != Qn::ResourceNode)
         return InvisibleAction;
 
     return context->accessController()->canCreateLayout(user->getId())

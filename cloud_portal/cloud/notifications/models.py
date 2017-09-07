@@ -3,6 +3,7 @@ from django.utils import timezone
 from jsonfield import JSONField
 from django.conf import settings
 from django.db.models import Q
+from rest_framework import serializers
 
 
 class Event(models.Model):
@@ -52,6 +53,7 @@ class Subscription(models.Model):
 
 class Message(models.Model):
     user_email = models.CharField(max_length=255)
+    external_id = models.CharField(max_length=64, db_index=True, unique=True, blank=True, null=True)
     task_id = models.CharField(max_length=50, blank=True, editable=False)
     type = models.CharField(max_length=255)
     customization = models.CharField(max_length=255, default='default')
@@ -76,3 +78,9 @@ class Message(models.Model):
             self.task_id = 'sync'
 
         self.save()
+
+
+class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status
+    class Meta:
+        model = Message
+        fields = ('external_id', 'task_id', 'type', 'customization', 'created_date', 'send_date')

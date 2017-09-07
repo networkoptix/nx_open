@@ -2,7 +2,14 @@
 
 bool QnSystemHealth::isMessageVisible(MessageType message)
 {
-    return message != QnSystemHealth::ArchiveFastScanFinished;
+    switch (message)
+    {
+        case QnSystemHealth::ArchiveFastScanFinished:
+        case QnSystemHealth::NoPrimaryTimeServer:
+            return false;
+    }
+
+    return true;
 }
 
 bool QnSystemHealth::isMessageOptional(MessageType message)
@@ -23,7 +30,6 @@ bool QnSystemHealth::isMessageLocked(MessageType message)
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::UsersEmailIsEmpty:
-        case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::StoragesAreFull:

@@ -23,6 +23,7 @@ private:
     QTransform m_originalTransform;
     QTransform::TransformationType m_type;
     QTransform m_transform;
+    bool m_alignable = false;
 };
 
 } // namespace ui

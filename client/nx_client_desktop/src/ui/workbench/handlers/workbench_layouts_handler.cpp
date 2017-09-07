@@ -807,7 +807,11 @@ bool LayoutsHandler::closeAllLayouts(bool force)
 
 void LayoutsHandler::at_newUserLayoutAction_triggered()
 {
-    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
+    const auto parameters = menu()->currentParameters(sender());
+    auto user = parameters.hasArgument(Qn::UserResourceRole)
+        ? parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>()
+        : parameters.resource().dynamicCast<QnUserResource>();
+
     if (!user)
         user = context()->user();
 

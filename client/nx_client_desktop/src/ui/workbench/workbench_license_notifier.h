@@ -11,10 +11,5 @@ public:
     QnWorkbenchLicenseNotifier(QObject *parent = nullptr);
     virtual ~QnWorkbenchLicenseNotifier();
 
-private:
-    void checkLicenses();
-    void at_context_userChanged();
-
-private:
-    bool m_checked;
+    void checkLicenses() const;
 };

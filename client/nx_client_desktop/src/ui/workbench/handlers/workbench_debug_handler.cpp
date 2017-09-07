@@ -131,7 +131,10 @@ public:
             {
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
+
+                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
+                    QnResourceListView::SortByNameOption,
+                    messageBox));
                 messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });

@@ -170,13 +170,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this](bool animated)
         {
-            const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, animated);
+            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
+                ? Invisible
+                : Visible;
+            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
             updateOverlayButton();
         });
 
-    addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
-    setOverlayWidgetVisible(m_statusOverlay, false, false);
+    addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
 
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
