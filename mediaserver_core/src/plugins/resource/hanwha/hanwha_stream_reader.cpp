@@ -84,7 +84,10 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     };
 
     if (m_hanwhaResource->isAudioSupported())
-        result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(m_hanwhaResource->isAudioEnabled()));
+    {
+        result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(
+            m_hanwhaResource->isAudioEnabled()));
+    }
 
     if (isH26x && govLength != kHanwhaInvalidGovLength)
         result.emplace(govLengthParameterName, QString::number(govLength));

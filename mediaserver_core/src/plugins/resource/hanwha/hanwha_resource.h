@@ -160,6 +160,11 @@ private:
     
     int streamBitrateInternal(Qn::ConnectionRole role, double coefficient) const;
 
+    QnCameraAdvancedParamValueList filterGroupParameters(
+        const QnCameraAdvancedParamValueList& values);
+
+    QString groupLead(const QString& groupName) const;
+
 private:
     using AdvancedParameterId = QString;
 

@@ -7,6 +7,8 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
 
+#include <QtCore/QMap>
+
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/resource/camera_advanced_param.h>
 #include <camera/camera_pool.h>
@@ -51,6 +53,28 @@ bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
 
     return false;
 }
+
+struct GroupParameterInfo
+{
+    GroupParameterInfo() = default;
+
+    GroupParameterInfo(
+        const QString& parameterValue,
+        const QString& name,
+        const QString& lead,
+        const QString& condition)
+        :
+        value(parameterValue),
+        groupName(name),
+        groupLead(lead),
+        groupIncludeCondition(condition)
+    {};
+
+    QString value;
+    QString groupName;
+    QString groupLead;
+    QString groupIncludeCondition;
+};
 
 } // namespace
 
@@ -187,7 +211,9 @@ bool HanwhaResource::setParamsPhysical(
     bool reopenSecondaryStream = false;
 
     std::map<UpdateInfo, ParameterMap> requests;
-    for (const auto& value: values)
+
+    const auto filteredParameters = filterGroupParameters(values);
+    for (const auto& value: filteredParameters)
     {
         UpdateInfo updateInfo;
         const auto info = advancedParameterInfo(value.id);
@@ -378,7 +404,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     auto primaryStreamLimits = m_codecInfo.limits(
         getChannel(),
-        streamCodec(Qn::ConnectionRole::CR_LiveVideo),
+        defaultCodecForStream(Qn::ConnectionRole::CR_LiveVideo),
         lit("General"),
         streamResolution(Qn::ConnectionRole::CR_LiveVideo));
 
@@ -393,7 +419,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps / 1000);
+    setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
 
     return createNxProfiles();
 }
@@ -1470,6 +1496,122 @@ int HanwhaResource::streamBitrateInternal(Qn::ConnectionRole role, double coeffi
         return suggestBitrate(*limits, bitrateControl, coefficient);
 
     return result;
+}
+
+QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
+    const QnCameraAdvancedParamValueList& values)
+{
+    using GroupParameterId = QString;
+
+    QnCameraAdvancedParamValueList result;
+    QMap<GroupParameterId, GroupParameterInfo> groupParameters;
+
+    // Fill group info if needed and fill group info for group parameters. 
+    for (const auto& value: values)
+    {
+        const auto info = advancedParameterInfo(value.id);
+        if (!info)
+            continue;
+
+        const auto group = info->group();
+        if (group.isEmpty())
+        {
+            result.push_back(value);
+            continue;
+        }
+
+        groupParameters[value.id] = 
+            GroupParameterInfo(
+                value.value,
+                group,
+                groupLead(group),
+                info->groupIncludeCondition());
+    }
+
+
+    // resolve group parameters
+    QSet<QString> groupLeadsToFetch;
+    QList<QString> parametersToResolve;
+
+    for (const auto& parameterName: groupParameters.keys())
+    {
+        if (!groupParameters.contains(parameterName))
+            continue;
+
+        const auto info = groupParameters.value(parameterName);
+        const auto groupLead = info.groupLead;
+
+        if (parameterName == groupLead)
+        {
+            result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
+            continue;
+        }
+
+        if (!groupParameters.contains(groupLead))
+        {
+            groupLeadsToFetch.insert(groupLead);
+            parametersToResolve.push_back(parameterName);
+            continue;
+        }
+
+        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+            result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
+    }
+
+    if (groupLeadsToFetch.isEmpty())
+        return result;
+
+    // fetch group leads;
+    QnCameraAdvancedParamValueList groupLeadValues;
+    bool success = getParamsPhysical(groupLeadsToFetch, groupLeadValues);
+
+    for (const auto& lead: groupLeadValues)
+    {
+        const auto info = advancedParameterInfo(lead.id);
+        if (!info)
+            continue;
+
+        groupParameters[lead.id] = GroupParameterInfo(
+            lead.value,
+            info->group(),
+            lead.id,
+            info->groupIncludeCondition());
+    }
+
+    for (const auto& parameterName: parametersToResolve)
+    {
+        if (!groupParameters.contains(parameterName))
+            continue;
+
+        const auto info = groupParameters.value(parameterName);
+        const auto groupLead = info.groupLead;
+
+        if (parameterName == groupLead)
+        {
+            result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
+            continue;
+        }
+
+        if (!groupParameters.contains(groupLead))
+            continue;
+
+        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+            result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
+    }
+
+    return result;
+}
+
+QString HanwhaResource::groupLead(const QString& groupName) const
+{
+    for (const auto& entry: m_advancedParameterInfos)
+    {
+        const auto info = entry.second;
+        if (info.group() == groupName && info.isGroupLead())
+            return info.id();
+    }
+
+    return QString();
 }
 
 } // namespace plugins

@@ -14,6 +14,9 @@ static const QString kNoChannelAux = lit("noChannel");
 static const QString kCodecAux = lit("codec");
 static const QString kResourceProperty = lit("resourceProperty");
 static const QString kSortingAux = lit("sorting");
+static const QString kGroupAux = lit("group");
+static const QString kGroupLeadAux = lit("groupLead");
+static const QString kGropupIncludeAux = lit("groupInclude");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -49,6 +52,11 @@ HanwhaAdavancedParameterInfo::HanwhaAdavancedParameterInfo(
     const QnCameraAdvancedParameter& parameter)
 {
     parseParameter(parameter);
+}
+
+QString HanwhaAdavancedParameterInfo::id() const
+{
+    return m_id;
 }
 
 QString HanwhaAdavancedParameterInfo::supportAttribute() const
@@ -109,6 +117,21 @@ QString HanwhaAdavancedParameterInfo::sorting() const
     return m_sorting;
 }
 
+QString HanwhaAdavancedParameterInfo::group() const
+{
+    return m_group;
+}
+
+bool HanwhaAdavancedParameterInfo::isGroupLead() const
+{
+    return m_isGroupLead;
+}
+
+QString HanwhaAdavancedParameterInfo::groupIncludeCondition() const
+{
+    return m_groupIncludeCondition;
+}
+
 QString HanwhaAdavancedParameterInfo::cgi() const
 {
     return m_cgi;
@@ -159,7 +182,7 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
 
     for (const auto& auxPart : auxParts)
     {
-        const auto split = auxPart.split(L'=');
+        const auto split = auxPart.trimmed().split(L'=');
         if (split.size() != 2)
             continue;
 
@@ -180,11 +203,22 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             m_resourceProperty = auxValue;
         else if (auxName == kSortingAux)
             m_sorting = auxValue;
+        else if (auxName == kGroupAux)
+            m_group = auxValue;
+        else if (auxName == kGropupIncludeAux)
+            m_groupIncludeCondition = auxValue;
+        else if (auxName == kGroupLeadAux)
+        {
+            m_group = auxValue;
+            m_isGroupLead = true;
+        }
     }
 }
 
 void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 {
+    m_id = idString;
+
     QString idInfoPart;
     auto split = idString.split(L'%');
     if (split.size() == 2)

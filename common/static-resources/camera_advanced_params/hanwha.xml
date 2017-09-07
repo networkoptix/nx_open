@@ -63,7 +63,7 @@
                         name="Codec"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/EncodingType;profile=primary;resourceProperty=primaryStreamCodec">
+                        aux="range=media/videoprofile/add_update/EncodingType;profile=primary;resourceProperty=primaryStreamCodec;groupLead=primaryCodec">
                 </param>
                 
                 <param id="PRIMARY%media/videoprofile/Resolution"
@@ -77,7 +77,7 @@
                         dataType="Enumeration"
                         range="CBR,VBR"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -94,7 +94,7 @@
                         dataType="Enumeration"
                         range="CBR,VBR"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl">
+                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -110,7 +110,7 @@
                         name="Encoding Priority"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=primary">
+                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=primary;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -129,7 +129,7 @@
                         name="Encoding Priority"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=primary">
+                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=primary;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -154,7 +154,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength">
+                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -170,7 +170,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength">
+                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -186,7 +186,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;">
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -202,7 +202,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High">
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -218,7 +218,7 @@
                         name="Entropy coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC">
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -234,7 +234,7 @@
                         name="Entropy coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=primary;default=CABAC">
+                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -252,20 +252,20 @@
                         name="Codec"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/EncodingType;profile=secondary;resourceProperty=secondaryStreamCodec">
+                        aux="range=media/videoprofile/add_update/EncodingType;profile=secondary;resourceProperty=secondaryStreamCodec;groupLead=secondaryCodec">
                 </param>
                 
                 <param id="SECONDARY%media/videoprofile/Resolution"
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;sorting=area"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;"/>
                         
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -281,7 +281,7 @@
                         name="Bitrate Control Type"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl">
+                        aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -297,7 +297,7 @@
                         name="Encoding Priority"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=secondary">
+                        aux="range=media/videoprofile/add_update/H264.PriorityType;profile=secondary;group=secondaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -316,7 +316,7 @@
                         name="Encoding Priority"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=secondary">
+                        aux="range=media/videoprofile/add_update/H265.PriorityType;profile=secondary;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -341,7 +341,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength">
+                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -357,7 +357,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength">
+                        aux="range=media/videoprofile/add_update/H265.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -373,7 +373,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary">
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -389,7 +389,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;">
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -405,7 +405,7 @@
                         name="Entropy coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;">
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -421,7 +421,7 @@
                         name="Entropy coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=secondary;">
+                        aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -562,8 +562,7 @@
             <group name="Exposure">
                 <param id="image/imageenhancements/Brightness"
                         name="Brightness"
-                        dataType="Enumeration"
-                        range="Low,Middle,High"/>
+                        dataType="Number"/>
                 <param id="image/camera/AutoShortShutterSpeed"
                         name="Minimum Shutter"
                         dataType="Enumeration"
@@ -656,13 +655,16 @@
         <group name="Maintenance">
             <param id="system/factoryreset/ExcludeSettings=Network"
                         name="Soft Reset"
-                        dataType="Button"/>
+                        dataType="Button"
+                        action="control"/>
             <param id="system/factoryreset/ExludeSettings=None"
                         name="Hard Reset"
-                        dataType="Button"/>
+                        dataType="Button"
+                        writeCmd="control"/>
             <param id="system/power/Type=Restart"
                         name="Reboot"
-                        dataType="Button"/>
+                        dataType="Button"
+                        action="control"/>
         </group>
     </parameters>
 </plugin>

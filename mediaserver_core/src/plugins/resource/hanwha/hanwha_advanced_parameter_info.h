@@ -13,6 +13,7 @@ class HanwhaAdavancedParameterInfo
 public:
     HanwhaAdavancedParameterInfo(const QnCameraAdvancedParameter& parameter);
 
+    QString id() const;
     QString supportAttribute() const;
     QString viewAction() const;
     QString updateAction() const;
@@ -23,6 +24,9 @@ public:
     bool isCodecDependent() const;
     QString resourceProperty() const;
     QString sorting() const;
+    QString group() const;
+    QString groupIncludeCondition() const;
+    bool isGroupLead() const;
 
     QString cgi() const;
     QString submenu() const;
@@ -37,6 +41,7 @@ private:
     void parseId(const QString& idString);
 
 private:
+    QString m_id;
     QString m_supportAttribute;
     QString m_viewAction = lit("view");
     QString m_updateAction = lit("set");
@@ -47,6 +52,9 @@ private:
     bool m_isCodecDependent = false;
     QString m_resourceProperty;
     QString m_sorting;
+    QString m_group;
+    QString m_groupIncludeCondition;
+    bool m_isGroupLead = false;
 
     QString m_cgi;
     QString m_submenu;
