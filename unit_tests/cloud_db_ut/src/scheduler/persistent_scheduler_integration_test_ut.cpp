@@ -3,8 +3,8 @@
 #include <unordered_set>
 #include <QtSql>
 #include <nx/utils/test_support/test_options.h>
-#include <persistent_scheduler/persistent_scheduler.h>
-#include <persistent_scheduler/persistent_scheduler_db_helper.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
 namespace nx {

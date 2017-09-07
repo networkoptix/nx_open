@@ -1,6 +1,6 @@
 #pragma once
 
-#include <persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
 
 namespace nx {
 namespace cdb {
