@@ -78,6 +78,8 @@ const char* toString(AttributeType val)
             return "isListening";
         case trafficRelayUrl:
             return "trafficRelayUrl";
+        case trafficRelayUrlList:
+            return "trafficRelayUrlList";
 
         case udpHolePunchingResultCode:
             return "udpHolePunchingResultCode";

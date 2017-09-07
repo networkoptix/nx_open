@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <boost/optional.hpp>
 
 #include <nx/network/abstract_socket.h>
@@ -39,7 +41,12 @@ public:
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
+    /**
+     * This field left for compatibility between internal 3.1 builds. 
+     * TODO: #ak Remove in 3.2.
+     */
     boost::optional<nx::String> trafficRelayUrl;
+    std::vector<nx::String> trafficRelayUrls;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);
