@@ -171,13 +171,13 @@ public:
                     nx::api::AnalyticsDriverManifest manifest;
                     manifest.driverId = QnUuid::createUuid();
                     manifest.driverName.value = lit("Driver %1").arg(i);
-                    manifest.driverName.localization[lit("ru_RU")] = lit("Äנאיגונ %1").arg(i);
+                    manifest.driverName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::api::AnalyticsEventType eventType;
                         eventType.eventTypeId = QnUuid::createUuid();
                         eventType.eventName.value = lit("Event %1").arg(j);
-                        eventType.eventName.localization[lit("ru_RU")] = lit("Ñמבûעטו %1").arg(j);
+                        eventType.eventName.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
                         manifest.outputEventTypes.push_back(eventType);
                     }
 

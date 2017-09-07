@@ -183,7 +183,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
         return;
 
     auto resourceId = camera->getId();
-    auto& events = qnServerModule
+    auto events = qnServerModule
         ->metadataRuleWatcher()
         ->watchedEventsForResource(resourceId);
 

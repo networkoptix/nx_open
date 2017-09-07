@@ -149,7 +149,7 @@ QString HanwhaAdavancedParameterInfo::parameterName() const
 
 QString HanwhaAdavancedParameterInfo::parameterValue() const
 {
-    return m_parameterValue.isEmpty();
+    return m_parameterValue;
 }
 
 bool HanwhaAdavancedParameterInfo::isValid() const

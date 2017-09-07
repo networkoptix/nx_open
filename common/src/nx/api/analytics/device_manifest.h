@@ -13,7 +13,7 @@ struct AnalyticsDeviceManifest
 
 #define AnalyticsDeviceManifest_Fields (supportedEventTypes)
 
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDeviceManifest, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDeviceManifest, (json))
 
 } // namespace api
 } // namespace nx

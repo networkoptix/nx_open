@@ -79,7 +79,7 @@ bool HanwhaStreamLimits::setCollectionLimits(
     {
         collection->clear();
         for (const auto& value: parameter.possibleValues())
-            collection->insert(collection->cend(), fromHanwhaString<Element>(value));
+            collection->insert(collection->end(), fromHanwhaString<Element>(value));
 
         return true;
     }
@@ -95,7 +95,7 @@ bool HanwhaStreamLimits::setCollectionLimits(
     {
         collection->clear();
         for (auto i = parameter.min(); i < parameter.max() + 1; ++i)
-            collection->insert(collection->cend(), i);
+            collection->insert(collection->end(), i);
 
         return true;
     }

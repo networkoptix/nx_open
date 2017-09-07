@@ -8,7 +8,7 @@
 
 namespace nxpt {
 
-QnUuid fromPluginGuidToQnUuid(nxpl::NX_GUID& guid)
+QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
 {
     return QnUuid(QUuid(
         ntohl(*(unsigned int*)guid.bytes),

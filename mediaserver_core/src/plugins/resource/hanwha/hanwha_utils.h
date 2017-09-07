@@ -85,7 +85,7 @@ T fromHanwhaString(const QString& str)
         || std::is_same<T, HanwhaStreamingMode>::value
         || std::is_same<T, HanwhaStreamingType>::value
         || std::is_same<T, HanwhaTransportProtocol>::value
-        || std::is_same<T, HanwhaClientType>::value
+        || std::is_same<T, HanwhaClientType>::value,
         "No specialization for type");
 }
 

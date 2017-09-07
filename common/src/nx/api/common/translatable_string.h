@@ -17,7 +17,7 @@ struct TranslatableString
 };
 #define TranslatableString_Fields (value)(localization)
 
-QN_FUSION_DECLARE_FUNCTIONS(TranslatableString, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(TranslatableString, (json))
 
 } // namespace api
 } // namespace nx

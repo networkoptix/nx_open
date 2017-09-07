@@ -240,14 +240,14 @@ bool HanwhaPtzController::getPresets(QnPtzPresetList* presets) const
 
     response.isSuccessful();
 
-    for (const auto& preset: response.response())
+    for (const auto& presetEntry: response.response())
     {
-        const auto split = preset.first.split(L'.');
+        const auto split = presetEntry.first.split(L'.');
         if (split.size() != 5)
             continue;
 
         const auto& presetNumber = split[4];
-        const auto& presetName = preset.second;
+        const auto& presetName = presetEntry.second;
 
         QnPtzPreset preset(presetNumber, presetName);
         presets->push_back(preset);

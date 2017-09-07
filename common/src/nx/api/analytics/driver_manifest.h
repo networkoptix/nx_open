@@ -33,7 +33,7 @@ struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
 } // namespace api
 } // namespace nx

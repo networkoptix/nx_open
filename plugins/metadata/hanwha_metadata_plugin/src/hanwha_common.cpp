@@ -7,9 +7,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, Ev
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventItemType)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver::plugins::Hanwha::EventDescriptor, (json), EventDescriptor_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver::plugins::Hanwha::DriverManifest, (json), DriverManifest_Fields)
-
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -47,6 +44,9 @@ const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const
 
     return Hanwha::EventDescriptor();
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::EventDescriptor, (json), EventDescriptor_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::DriverManifest, (json), DriverManifest_Fields)
 
 } // plugins
 } // mediaserver

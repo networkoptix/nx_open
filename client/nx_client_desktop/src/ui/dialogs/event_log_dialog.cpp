@@ -220,8 +220,8 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
     if (rootItem)
         rootItem->appendRow(item);
 
-    for (auto value: vms::event::childEvents(value))
-        createEventTree(item, value);
+    for (auto childValue: vms::event::childEvents(value))
+        createEventTree(item, childValue);
 
     if (value == nx::vms::event::EventType::analyticsSdkEvent)
         createAnalyticsEventTree(item);

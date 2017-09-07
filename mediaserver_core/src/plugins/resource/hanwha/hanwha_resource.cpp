@@ -1291,10 +1291,10 @@ boost::optional<int> HanwhaResource::calculateDefaultGovLength(
 
 std::tuple<int, int, AVCodecID> HanwhaResource::channelProfileCodec(const QString& parameterString) const
 {
-    const std::tuple<int, int, AVCodecID> invalidResult = {
+    const std::tuple<int, int, AVCodecID> invalidResult = std::make_tuple(
         kHanwhaInvalidChannel,
         kHanwhaInvalidProfile,
-        AV_CODEC_ID_NONE};
+        AV_CODEC_ID_NONE);
 
     const auto split = parameterString.split(L'.');
     if (split.size() < 6)
@@ -1315,7 +1315,7 @@ std::tuple<int, int, AVCodecID> HanwhaResource::channelProfileCodec(const QStrin
 
     const auto codec = fromHanwhaString<AVCodecID>(split[4]);
 
-    return {channel, profile, codec};
+    return std::make_tuple(channel, profile, codec);
 }
 
 QString HanwhaResource::toHanwhaAdvancedParameterValue(

@@ -17,7 +17,7 @@ struct AnalyticsEventType
 };
 #define AnalyticsEventType_Fields (eventTypeId)(eventName)
 
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 
 } // namespace api
 } // namespace nx

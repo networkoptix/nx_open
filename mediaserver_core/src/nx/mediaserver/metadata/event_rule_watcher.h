@@ -32,8 +32,8 @@ private:
     RuleHolder m_ruleHolder;
 };
 
-Q_DECLARE_METATYPE(std::set<QnUuid>);
-
 } // namespace metadata
 } // namespace mediaserver
 } // namespace nx
+
+Q_DECLARE_METATYPE(std::set<QnUuid>);

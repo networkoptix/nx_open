@@ -80,6 +80,12 @@ struct HanwhaEvent
 
 using HanwhaEventList = std::vector<HanwhaEvent>;
 
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Hanwha::EventDescriptor)
+    (Hanwha::DriverManifest),
+    (json)
+)
+
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
@@ -89,9 +95,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::mediaserver::plugins::Hanwha::EventTypeFlags)
     (nx::mediaserver::plugins::Hanwha::EventItemType),
     (metatype)(numeric)(lexical)
-)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::mediaserver::plugins::Hanwha::EventDescriptor)
-    (nx::mediaserver::plugins::Hanwha::DriverManifest),
-    (json)(metatype)
 )

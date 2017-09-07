@@ -5,6 +5,6 @@
 
 namespace nxpt {
 
-QnUuid fromPluginGuidToQnUuid(nxpl::NX_GUID& guid);
+QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid);
 
 } // namespace nxpt

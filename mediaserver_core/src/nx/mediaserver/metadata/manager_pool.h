@@ -17,6 +17,7 @@
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace mediaserver {
