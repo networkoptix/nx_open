@@ -40,6 +40,7 @@
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <utils/server_interface_watcher.h>
 
 using namespace nx::mobile_client;
 
@@ -130,6 +131,7 @@ QnMobileClientModule::QnMobileClientModule(
         });
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
+    commonModule->instance<QnServerInterfaceWatcher>();
 }
 
 QnMobileClientModule::~QnMobileClientModule()

@@ -160,6 +160,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -662,6 +663,20 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
+    /**
+     * When we add widget (possibliy with animation) to the scene, whole scene may loose
+     * ability to handle hover events.
+     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
+     */
+    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
+        ? QnRaiiGuard::create(
+            []() { QCursor::setPos(QPoint(0, 0)); },
+            [this, mp = QCursor::pos()]()
+            {
+                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
+            })
+        : QnRaiiGuardPtr();
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);

@@ -20,34 +20,34 @@ stop_led () {
 }
 
 case "$1" in
-  start)
-    exit 0
-	;;
-  restart|reload|force-reload)
-	echo "Error: argument '$1' not supported" >&2
-	exit 3
-	;;
-  stop)
-	# No-op
-	stop_led
-    ;;
-  boot_sd)
-	stop_led
-    nohup python /root/tools/gpio/led/nx1led-sd.py 2>&1&
-    echo $! > /tmp/nx1led.pid
-	;;
-  boot_hdd)
-	stop_led
-    nohup python /root/tools/gpio/led/nx1led-hdd.py 2>&1&
-    echo $! > /tmp/nx1led.pid
-	;;
-  restore)
-	stop_led
-    nohup python /root/tools/gpio/led/nx1led-restore.py 2>&1&
-    echo $! > /tmp/nx1led.pid
-	;;
-  *)
-	echo "Usage: nx1boot [start|stop|boot_sd|boot_hdd|restore]" >&2
-	exit 3
-	;;
+    start)
+        exit 0
+        ;;
+    restart|reload|force-reload)
+        echo "Error: argument '$1' not supported" >&2
+        exit 3
+        ;;
+    stop)
+        # No-op
+        stop_led
+        ;;
+    boot_sd)
+        stop_led
+        nohup python /root/tools/gpio/led/nx1led-sd.py 2>&1&
+        echo $! > /tmp/nx1led.pid
+        ;;
+    boot_hdd)
+        stop_led
+        nohup python /root/tools/gpio/led/nx1led-hdd.py 2>&1&
+        echo $! > /tmp/nx1led.pid
+        ;;
+    restore)
+        stop_led
+        nohup python /root/tools/gpio/led/nx1led-restore.py 2>&1&
+        echo $! > /tmp/nx1led.pid
+        ;;
+    *)
+        echo "Usage: nx1boot [start|stop|boot_sd|boot_hdd|restore]" >&2
+        exit 3
+        ;;
 esac

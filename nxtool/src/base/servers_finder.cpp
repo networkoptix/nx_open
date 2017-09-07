@@ -24,7 +24,7 @@
 #if defined(Q_OS_WIN)
     #include <WinSock2.h>
     #include <WS2tcpip.h>
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <netinet/ip.h>

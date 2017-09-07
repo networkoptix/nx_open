@@ -50,10 +50,12 @@ public:
 
     /** Return initial signature as filler */
     static QByteArray getSignPattern(QnLicensePool* licensePool);
-    static int getMaxSignSize();
     static char getSignPatternDelim();
 
     static QByteArray getSignMagic();
+
+    /** Fix signature to make it precisely signSize() bytes length, filled with spaces. */
+    static QByteArray makeSignature(QByteArray source);
 
     void setVersionStr(const QString& value);
     void setHwIdStr(const QString& value);

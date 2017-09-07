@@ -367,24 +367,48 @@ upgrade() {
     chmod 600 /etc/crontab
 }
 
-#only if boot from SD Card for the first time after upgrading 2.5 to 3.0
+# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+installDebs() # package [version]
+{
+    local -r PACKAGE="$1"; shift
+    local VERSION=""
+    if [ $# -ge 2 ]; then
+        VERSION="$2"
+    fi
+
+    local -r DEB_DIR="/opt/deb/$PACKAGE"
+    if [ ! -d "$DEB_DIR" ]; then # The deb is missing from /opt/deb.
+        return
+    fi
+
+    local -r INSTALLED_VERSION=$(dpkg -l |grep "$PACKAGE" |grep "$VERSION" |awk '{print $3}')
+    if [ -z "$INSTALLED_VERSION" ]; then
+        dpkg -i "$DEB_DIR"/*.deb
+    fi
+}
+
+# Called on booting from SD Card.
 upgrade_sd() {
-    tar xfv /root/$DISTRIB -C / --exclude "./etc/init.d/nx1*"
+    # Commented out because there is no .tar.gz on sdcard anymore.
+    #tar xfv /root/$DISTRIB -C / --exclude "./etc/init.d/nx1*"
+
     touch /dev/cedar_dev
     chmod 777 /dev/disp
     chmod 777 /dev/cedar_dev
     usermod -aG video root
     sync
-    LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1) | awk '{print $3}'
-    if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
-    FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11) | awk '{print $3}'
-    if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
+    installDebs cifs-utils
+    installDebs libvdpau 0.4.1
+    installDebs fontconfig 2.11
+    installDebs fonts-takao-mincho
+    installDebs fonts-baekmuk
+    installDebs fonts-arphic-ukai
 }
 
 default_sequence () {
     get_reset_button_presense
-    #upgrading from 2.x to 3.x on first boot
+    # Upgrading sdcard on first boot.
     if [ "$BOOTDEVICE" = "mmc" ]; then upgrade_sd; fi
     if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi
     stop_server

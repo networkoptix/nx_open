@@ -108,6 +108,12 @@ if(WINDOWS)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
+    endif()
     unset(_extra_linker_flags)
 endif()
 
@@ -175,7 +181,11 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi")
+if(targetDevice MATCHES "bpi|bananapi|rpi"
+    OR targetDevice STREQUAL "linux-x64"
+    OR targetDevice STREQUAL "linux-x86"
+    OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
+)
     set(strip_binaries OFF)
 endif()
 

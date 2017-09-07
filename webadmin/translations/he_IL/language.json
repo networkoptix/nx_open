@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"התנתק",
     "disconnectedSuccess":"מערכת נותקה, בהצלחה",
     "connectedSuccess":"מערכת חובר בהצלחה",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"צור מנהל המקומי",
     "confirmChangePassword":"שנה סיסמת מנהל מערכת",
     "confirmChangePasswordTitle":"האם לשנות את סיסמת המערכת? פעולה זו תשפיע על המשתמש 'admin' ועל סיסמת ה root עבור שרתים מסוימים",

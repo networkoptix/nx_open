@@ -49,7 +49,7 @@ private:
         auto admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
         admin->setId(QnUserResource::kAdminGuid);
         admin->setName("admin");
-        admin->setPassword("admin");
+        admin->setPasswordAndGenerateHash("admin");
         admin->setOwner(true);
         m_commonModule.resourcePool()->addResource(admin);
     }

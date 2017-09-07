@@ -12,12 +12,12 @@
                 </tab>
                 <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Below is a list of storage locations available on this server</p>
+                    <p>Dưới đây là danh Hdd lưu trữ có sẵn trên máy chủ này</p>
                     <table class="table">
                         <thead>
                         <tr>
                             <th>
-                                nơi
+                                Đường dẫn
                             </th>
                             <th >
                                 Spacebar
@@ -43,8 +43,7 @@
                 <tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
-                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary"> Làm mới </a> <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default"> Mở trong cửa sổ mới </a>
                 </tab>
             </tabset>
         </div>

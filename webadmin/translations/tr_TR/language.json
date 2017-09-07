@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Bağlantıyı kes",
     "disconnectedSuccess":"Sistemden çıkış başarılı",
     "connectedSuccess":"Sistem bağlantısı başarılı",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Yerel yönetici oluştur",
     "confirmChangePassword":"Yönetici parolasını değiştir",
     "confirmChangePasswordTitle":"Sistem şifresi değiştirilsin mi? Bu işlem 'admin' kullanıcısının kök kullanıcıların şifrelerini etkileyebilir",

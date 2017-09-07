@@ -10,11 +10,13 @@ set(traytool.name "${display.product.name} Tray Assistant")
 set(minilauncher.binary.name "applauncher-bin")
 set(mediaserver.name "${company.name} Media Server")
 set(mediaserver.display.name "${display.product.name} Media Server")
+set(testcamera.binary.name "testcamera")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")
     set(applauncher.binary.name "applauncher.exe")
     set(minilauncher.binary.name "${product.name} Launcher.exe")
+    set(testcamera.binary.name "testcamera.exe")
     set(installation.root "C:/Program Files/${company.name}/${display.product.name}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(client.binary.name "${display.product.name}")
@@ -24,7 +26,12 @@ endif()
 
 set(client.mediafolder.name "${product.name} Media")
 
-set(liteMode "false")
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+    set(liteMode "true")
+else()
+    set(liteMode "false")
+endif()
+
 set(launcher.version.file "launcher.version")
 set(installation.root "/opt/${deb.customization.company.name}")
 

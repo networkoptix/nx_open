@@ -9,6 +9,7 @@ configure()
     CUSTOMIZATION="@deb.customization.company.name@"
     INSTALL_PATH="opt/$CUSTOMIZATION"
     MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
+    LITE_CLIENT_PATH="$INSTALL_PATH/lite_client"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
     TAR_FILE="./$DISTRIB.tar.gz"
@@ -66,7 +67,9 @@ copyToBootPartition()
 # [in] MNT
 copyToDataPartition()
 {
+    # Clean up sdcard from potentially unwanted files from previous installations.
     rm -rf "$MNT/$INSTALL_PATH" || true
+    rm -rf "$MNT/opt/deb"
 
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
@@ -81,27 +84,38 @@ copyToDataPartition()
     fi
 }
 
-installDeb() # package version
+# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+installDebs() # package [version]
 {
-    local PACKAGE="$1"
-    local VERSION="$2"
+    local -r PACKAGE="$1"; shift
+    local VERSION=""
+    if [ $# -ge 2 ]; then
+        VERSION="$2"
+    fi
 
-    local PRESENT=$(dpkg -l |grep "$PACKAGE" |grep "$VERSION" |awk '{print $3}')
-    if [ -z "$PRESENT" ]; then
-        dpkg -i "/opt/deb/$PACKAGE"/*.deb
+    local -r DEB_DIR="/opt/deb/$PACKAGE"
+    if [ ! -d "$DEB_DIR" ]; then # The deb is missing from /opt/deb.
+        return
+    fi
+
+    local -r INSTALLED_VERSION=$(dpkg -l |grep "$PACKAGE" |grep "$VERSION" |awk '{print $3}')
+    if [ -z "$INSTALLED_VERSION" ]; then
+        dpkg -i "$DEB_DIR"/*.deb
     fi
 }
 
 upgradeVms()
 {
     rm -rf "../$DISTRIB.zip" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
-    rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin"/core* || true
+
+    # Clean up potentially unwanted files from previous installations.
+    rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
+    rm -rf "/opt/deb"
+    rm -rf "/$LITE_CLIENT_PATH"
+
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
-    local CIFS_UTILS=$(dpkg --get-selections |grep -v deinstall |grep cifs-utils |awk '{print $1}')
-    if [ -z "$CIFS_UTILS" ]; then
-        dpkg -i cifs-utils/*.deb
-    fi
+    installDebs cifs-utils
 
     if [ "$BOX" = "bpi" ]; then
         # Avoid grabbing libstdc++ from mediaserver lib folder.
@@ -111,11 +125,11 @@ upgradeVms()
 
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
-        installDeb libvdpau 0.4.1
-        installDeb fontconfig 2.11
-        installDeb fonts-takao-mincho ""
-        installDeb fonts-baekmuk "" || return $?
-        installDeb fonts-arphic-ukai "" || return $?
+        installDebs libvdpau 0.4.1
+        installDebs fontconfig 2.11
+        installDebs fonts-takao-mincho
+        installDebs fonts-baekmuk
+        installDebs fonts-arphic-ukai
 
         touch "/dev/cedar_dev"
         chmod 777 "/dev/disp"
@@ -126,6 +140,8 @@ upgradeVms()
 
         /etc/init.d/nx1boot upgrade
     fi
+
+    rm -rf "/opt/deb" #< Delete deb packages to free some space.
 }
 
 getPidWhichUsesPort() # port
@@ -176,7 +192,10 @@ restartMediaserver()
 
 main()
 {
-    redirectOutput "/var/log/vms-upgrade.log"
+    if [ $# = 0 ] || ( [ "$1" != "-v" ] && [ "$1" != "--verbose" ] ); then
+        redirectOutput "/var/log/vms-upgrade.log"
+    fi
+
     set -x #< Log each command.
     checkRunningUnderRoot
     configure

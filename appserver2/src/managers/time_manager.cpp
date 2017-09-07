@@ -939,8 +939,6 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( qui
         .arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16)
         .arg(m_localTimePriorityKey.toUInt64(), 0, 16),
         cl_logDEBUG2);
-
-    //emit primaryTimeServerSelectionRequired();
 }
 
 
@@ -1005,7 +1003,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
             const auto maxDifferenceBetweenSynchronizedAndInternetTime =
                 m_messageBus->commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
 
-            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > 
+            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) >
                 duration_cast<milliseconds>(
                     maxDifferenceBetweenSynchronizedAndInternetTime).count() )
             {
