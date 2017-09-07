@@ -75,7 +75,7 @@ private:
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
-        enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther, kCloud };
+        enum Priority { kDefault, kOther, kLocalHost, kLocalNetwork, kIp, kCloud };
         typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
 
         Priority hostPriority(const HostAddress& host) const;

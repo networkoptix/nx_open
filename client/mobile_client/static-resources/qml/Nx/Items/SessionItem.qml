@@ -46,6 +46,8 @@ Pane
             if (startRow === 0)
                 updateDefaultAddress()
         }
+
+        onRowsMoved: updateDefaultAddress()
         onCountChanged: updateDefaultAddress()
 
         function updateDefaultAddress()
