@@ -61,6 +61,18 @@ void setInterfaceListFilter(const QList<QHostAddress>& ifList)
     allowedInterfaces = ifList;
 }
 
+QHostAddress QnInterfaceAndAddr::broadcastAddress() const
+{
+    quint32 broadcastIpv4 = address.toIPv4Address() | ~netMask.toIPv4Address();
+    return QHostAddress(broadcastIpv4);
+}
+
+QHostAddress QnInterfaceAndAddr::networkAddress() const
+{
+    quint32 broadcastIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(broadcastIpv4);
+}
+
 QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
     struct LocalCache

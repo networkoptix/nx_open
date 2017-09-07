@@ -9,9 +9,10 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-/** Helper class for serializing / deserializing STUN messages.
-    Contains set of utility methods
-*/
+/**
+ * Helper class for serializing / deserializing STUN messages.
+ * Contains set of utility methods.
+ */
 class NX_NETWORK_API StunMessageParseHelper
 {
 public:
@@ -121,7 +122,8 @@ protected:
     bool readAttributeValue(
         const nx::stun::Message& message,
         const int type,
-        std::chrono::duration<Rep, Period>* const value)
+        std::chrono::duration<Rep, Period>* const value,
+        typename std::enable_if<std::is_arithmetic<Rep>::value>::type* = nullptr)
     {
         const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
         if (!attribute)
