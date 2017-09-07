@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Szétkapcsolás",
     "disconnectedSuccess":"Rendszer sikeresen leválasztva",
     "connectedSuccess":"Rendszer sikeresen csatlakoztatva",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Helyi adminisztrátor létrehozása",
     "confirmChangePassword":"Admin jelszó módosítása",
     "confirmChangePasswordTitle":"Megváltoztatja a renszerjelszót? Ez hatással lesz az 'admin', és a root jelszavakra egyes szervereken",

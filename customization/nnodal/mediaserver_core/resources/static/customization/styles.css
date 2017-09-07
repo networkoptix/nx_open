@@ -35,7 +35,12 @@ $btn-primary-border:             darken($brand-primary, 5%) !default;
     border-color: $btn-primary-border
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
+.btn-primary:hover, 
+.btn-primary:focus, 
+.btn-primary:active, 
+.btn-primary:active:hover, 
+.btn-primary:active:focus, 
+.btn-primary.active {
     color: white;
     background-color: $btn-primary-border;
     border-color: darken($btn-primary-border, 5%)
@@ -46,6 +51,8 @@ $btn-primary-border:             darken($brand-primary, 5%) !default;
 .btn-primary.disabled:hover,
 .btn-primary.disabled:focus,
 .btn-primary.disabled:active,
+.btn-primary.disabled:active:hover,
+.btn-primary.disabled:active:focus,
 .btn-primary.disabled.active,
 .btn-primary[disabled],
 .btn-primary[disabled]:hover,
@@ -56,6 +63,8 @@ fieldset[disabled] .btn-primary,
 fieldset[disabled] .btn-primary:hover,
 fieldset[disabled] .btn-primary:focus,
 fieldset[disabled] .btn-primary:active,
+fieldset[disabled] .btn-primary:hover,
+fieldset[disabled] .btn-primary:focus,
 fieldset[disabled] .btn-primary.active {
     background-color: $brand-primary;
     border-color: $btn-primary-border;

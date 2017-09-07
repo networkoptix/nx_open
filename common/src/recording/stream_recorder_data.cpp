@@ -1,4 +1,3 @@
-
 #include "stream_recorder_data.h"
 
 StreamRecorderErrorStruct::StreamRecorderErrorStruct() :
@@ -13,14 +12,3 @@ StreamRecorderErrorStruct::StreamRecorderErrorStruct(StreamRecorderError lastErr
     storage(storage)
 {
 }
-
-StreamRecorderContext::StreamRecorderContext(const QString& fileName,
-    const QnStorageResourcePtr& storage)
-    :
-    fileName(fileName),
-    formatCtx(nullptr),
-    storage(storage),
-    totalWriteTimeNs(0)
-{
-}
-

@@ -11,9 +11,9 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-Manager::Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* resourcePool):
-    QnCommonModuleAware(commonModule),
-    m_resourcePool(resourcePool)
+Manager::Manager(bool clientMode, QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
     qRegisterMetaType<nx::vms::discovery::ModuleEndpoint>();
     initializeConnector();
@@ -218,7 +218,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
             [this]()
             {
                 const auto id = commonModule()->moduleGUID();
-                if (const auto s = m_resourcePool->getResourceById<QnMediaServerResource>(id))
+                if (const auto s = resourcePool()->getResourceById<QnMediaServerResource>(id))
                     m_multicastFinder->multicastInformation(s->getModuleInformationWithAddresses());
             });
     }
@@ -249,7 +249,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
 
 void Manager::monitorServerUrls()
 {
-    connect(m_resourcePool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr &resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
@@ -260,7 +260,7 @@ void Manager::monitorServerUrls()
             }
         });
 
-    connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr &resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())

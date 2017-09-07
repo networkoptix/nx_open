@@ -3,14 +3,15 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 
-    <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${product.title}" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+    <?include BuildVars.wxi ?>
+    <Product Id="*" Name="$(var.productName) Client" Language="1033" Version="$(var.releaseVersionFull)" Manufacturer="$(var.companyName)" UpgradeCode="$(var.clientUpgradeCode)">
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="$(var.ProductTitle)" Manufacturer="$(var.companyName)" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
 
         <Property Id="CLIENT_NAME" Value="$(var.clientInternalName)"/>
         <Property Id="REINSTALLMODE" Value="dmus"/>
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"></Property>        
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"/>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -43,8 +44,8 @@
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
 
         <!-- Logo -->
-        <Icon Id="icon_menu.exe" SourceFile="favicon.ico"/>
-        <Icon Id="icon_desktop.exe" SourceFile="favicon.ico"/>
+        <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
@@ -53,7 +54,7 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${product.title}" />
+        <Property Id="WelcomeDlg_Title" Value="$(var.ProductTitle)" />
 
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -63,7 +64,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${product.name}"
+                            Key="Software\[Manufacturer]\$(var.clientName)"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
@@ -72,7 +73,7 @@
         <Property Id="CLIENT_DIRECTORY_REG32" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg32"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${client.name}"
+                            Key="Software\[Manufacturer]\$(var.clientInternalName)"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -90,17 +91,17 @@
 
         <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[$(var.clientDirId)]${minilauncher.binary.name}&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[$(var.clientDirId)]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <!-- Trying to kill old applauncher forcibly. -->
         <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${minilauncher.binary.name}"' Execute="immediate" />
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.minilauncherBinaryName)"' Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <MajorUpgrade 
+        <MajorUpgrade
             AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
             MigrateFeatures="yes" />
@@ -142,18 +143,18 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
+                <Directory Id="$(var.customization)BgDir" Name="$(var.clientName) Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="${company.name}">
-                    <Directory Id="INSTALLDIR" Name="${display.product.name}">
+                <Directory Id="NetworkOptix" Name="$(var.companyName)">
+                    <Directory Id="INSTALLDIR" Name="$(var.productName)">
                     </Directory>
                 </Directory>
             </Directory>
 
             <Directory Id="ProgramMenuFolder" Name="Programs">
-                <Directory Id="ProgramMenuDir" Name="${company.name}">
+                <Directory Id="ProgramMenuDir" Name="$(var.companyName)">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
                         <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />

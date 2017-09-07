@@ -7,7 +7,7 @@
             <MsiPackage
                 Id="ServerPackage"
                 Name="$(var.ServerMsiName)"
-                SourceFile="bin/strip/$(var.ServerMsiName)"
+                SourceFile="$(var.InstallerTargetDir)/strip/$(var.ServerMsiName)"
                 InstallCondition="InstallServerOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
                 Compressed="yes">
@@ -20,21 +20,21 @@
         <?include BuildVars.wxi ?>
 
         <util:RegistrySearch
-          Id='SearchForIsConnectedToCloud' 
-          Variable="IsConnectedToCloud" 
+          Id='SearchForIsConnectedToCloud'
+          Variable="IsConnectedToCloud"
           Result="value"
           Root="HKLM"
-          Key="$(var.ServerRegPath)" 
+          Key="$(var.ServerRegPath)"
           Value="isConnectedToCloud"
           Format="raw"
           Win64="yes"/>
 
         <util:RegistrySearch
-          Id='SearchForCloudHost' 
-          Variable="CloudHost" 
+          Id='SearchForCloudHost'
+          Variable="CloudHost"
           Result="value"
           Root="HKLM"
-          Key="$(var.ServerRegPath)" 
+          Key="$(var.ServerRegPath)"
           Value="cloudHost"
           Format="raw"
           Win64="yes"/>
@@ -59,7 +59,7 @@
         </bal:Condition>
 
         <bal:Condition Message="Update to this version is not allowed. You should first upgrade to version 2.6">
-            <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3" ]]>
+            <![CDATA[ (NOT (ServerInstalled = 5)) OR InstalledServerVersion >= "2.3" ]]>
         </bal:Condition>
     </Fragment>
 

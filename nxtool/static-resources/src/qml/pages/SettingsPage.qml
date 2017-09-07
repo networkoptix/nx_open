@@ -89,7 +89,7 @@ FocusScope
         if (rtuContext.selection.safeMode)
         {
             rtuContext.changesManager().clearChanges();
-            errorDialog.message = safeModeWarningText.text;
+            errorDialog.message = warningText.text;
             errorDialog.show();
             return;
         }
@@ -166,23 +166,23 @@ FocusScope
 
     Rectangle
     {
-        id: safeModeWarning;
+        id: warningPanel;
 
-        height: safeModeWarningText.height + Common.SizeManager.spacing.medium * 2;
+        height: warningText.height + Common.SizeManager.spacing.medium * 2;
 
         anchors
         {
             left: parent.left;
             right: parent.right;
         }
-        visible: rtuContext.selection.safeMode;
+        visible: rtuContext.selection.safeMode || rtuContext.selection.isNewSystem;
 
         color: "#F0E9D9"
         border.color: "#DBC9B7";
 
         Base.Text
         {
-            id: safeModeWarningText;
+            id: warningText;
 
             anchors
             {
@@ -197,9 +197,15 @@ FocusScope
             thin: true;
             font.pixelSize: Common.SizeManager.fontSizes.medium;
 
-            text: (rtuContext.selection.count == 1
-                ? qsTr("Selected server is in Safe Mode.\nNo changes can be applied")
-                : qsTr("Some of selected servers are in Safe Mode.\nNo changes can be applied"))
+            text:
+            {
+                if (rtuContext.selection.isNewSystem)
+                    return systemAndPasswordSettings.newSystemExplanationMessage;
+
+                return (rtuContext.selection.count == 1
+                    ? qsTr("Selected server is in Safe Mode.\nNo changes can be applied")
+                    : qsTr("Some of selected servers are in Safe Mode.\nNo changes can be applied"))
+            }
             color: "#4B1010";
         }
     }
@@ -209,8 +215,8 @@ FocusScope
         width: parent.width;
         anchors
         {
-            top: (outdatedWarning.visible || !safeModeWarning.visible
-                  ? outdatedWarning.bottom : safeModeWarning.bottom);
+            top: (outdatedWarning.visible || !warningPanel.visible
+                  ? outdatedWarning.bottom : warningPanel.bottom);
             bottom: buttonsPanel.top;
         }
         
@@ -258,7 +264,7 @@ FocusScope
                 {
                     id: systemAndPasswordSettings;
 
-                    extraWarned: rtuContext.selection.safeMode;
+                    extraWarned: rtuContext.selection.safeMode || rtuContext.selection.isNewSystem;
                     enabled: !rtuContext.selection.safeMode;
                 }
 

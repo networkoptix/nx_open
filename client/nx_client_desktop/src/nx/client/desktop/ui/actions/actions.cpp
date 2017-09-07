@@ -1524,7 +1524,7 @@ void initialize(Manager* manager, Action* root)
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(MakeLayoutTourAction)
-        .flags(Tree | MultiTarget | ResourceTarget)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
         .condition(condition::hasFlags(Qn::layout, All)
             && !condition::isSafeMode());

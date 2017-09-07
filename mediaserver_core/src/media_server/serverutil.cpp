@@ -134,8 +134,7 @@ bool updateUserCredentials(
     if (!data.password.isEmpty())
     {
         /* set new password */
-        updatedUser->setPassword(data.password);
-        updatedUser->generateHash();
+        updatedUser->setPasswordAndGenerateHash(data.password);
     }
     else if (!data.passwordHash.isEmpty())
     {
@@ -160,7 +159,7 @@ bool updateUserCredentials(
             *errString = lit("Internal server database error: %1").arg(toString(errCode));
         return false;
     }
-    updatedUser->setPassword(QString());
+    updatedUser->resetPassword();
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;

@@ -704,12 +704,12 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Legalacsonyabb</translation>
+      <translation>La</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Alacsony</translation>
+      <translation>A</translation>
     </message>
     <message>
       <source>Me</source>
@@ -719,7 +719,7 @@
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Magas</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Bst</source>

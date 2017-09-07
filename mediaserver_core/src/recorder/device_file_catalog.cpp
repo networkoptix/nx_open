@@ -959,11 +959,11 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         --itr;
 
         /* Case if previous chunk does not contain startTime. */
-        if (itr->endTimeMs() < startTime)
+        if (itr->endTimeMs() <= startTime)
             ++itr;
     }
 
-    if (itr == m_chunks.end())
+    if (itr == m_chunks.end() || itr->startTimeMs >= endTime)
         return result;
 
     result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
