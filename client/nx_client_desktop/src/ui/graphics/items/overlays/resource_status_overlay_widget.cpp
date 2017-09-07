@@ -162,19 +162,16 @@ void setupLabel(QLabel* label, LabelStyleFlags style)
 
 QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     base_type(parent),
-
     m_visibleControls(Control::kNoControl),
     m_initialized(false),
     m_errorStyle(false),
-
     m_preloaderHolder(new QnViewportBoundWidget(this)),
     m_centralHolder(new QnViewportBoundWidget(this)),
     m_extrasHolder(new QnViewportBoundWidget(this)),
-
+    m_centralContainer(new QWidget()),
+    m_extrasContainer(new QWidget()),
     m_preloader(new QnBusyIndicatorGraphicsWidget()),
-
     m_imageItem(new QGraphicsPixmapItem(this)),
-
     m_centralAreaImage(new QLabel()),
     m_caption(new QLabel()),
     m_description(new QLabel()),
@@ -223,8 +220,10 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
 
     m_centralAreaImage->setVisible(iconVisible);
     m_caption->setVisible(captionVisible);
-
     m_description->setVisible(descriptionVisible);
+
+    m_centralContainer->adjustSize();
+    m_extrasContainer->adjustSize();
 
     m_visibleControls = controls;
     updateAreasSizes();
@@ -303,12 +302,11 @@ void QnStatusOverlayWidget::setupCentralControls()
     setupLabel(m_description, getDescriptionStyle(m_errorStyle));
     m_description->setVisible(false);
 
-    const auto container = new QWidget();
-    container->setObjectName(lit("centralContainer"));
-    container->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setPaletteColor(container, QPalette::Window, Qt::transparent);
+    m_centralContainer->setObjectName(lit("centralContainer"));
+    m_centralContainer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setPaletteColor(m_centralContainer, QPalette::Window, Qt::transparent);
 
-    const auto layout = new QVBoxLayout(container);
+    const auto layout = new QVBoxLayout(m_centralContainer);
     layout->setSpacing(0);
 
     layout->addWidget(m_centralAreaImage, 0, Qt::AlignHCenter);
@@ -317,7 +315,7 @@ void QnStatusOverlayWidget::setupCentralControls()
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(container, m_centralHolder, true));
+    horizontalLayout->addItem(makeMaskedProxy(m_centralContainer, m_centralHolder, true));
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
@@ -338,17 +336,16 @@ void QnStatusOverlayWidget::setupExtrasControls()
      * a container widget with a layout must be created, otherwise
      * graphics proxy doesn't handle size hint changes at all. */
 
-    const auto container = new QWidget();
-    container->setAttribute(Qt::WA_TranslucentBackground);
-    container->setObjectName(lit("extrasContainer"));
+    m_extrasContainer->setAttribute(Qt::WA_TranslucentBackground);
+    m_extrasContainer->setObjectName(lit("extrasContainer"));
 
-    const auto layout = new QHBoxLayout(container);
+    const auto layout = new QHBoxLayout(m_extrasContainer);
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_button);
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(container, m_extrasHolder, false));
+    horizontalLayout->addItem(makeMaskedProxy(m_extrasContainer, m_extrasHolder, false));
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);

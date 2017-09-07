@@ -69,6 +69,8 @@ public:
     const QString& videoCodec() const;
     const QString& audioCodec() const;
 
+    QString streamingSessionId() const;
+
     //!true, if live stream requested. false if archive requested
     bool live() const;
 
@@ -91,7 +93,7 @@ private:
     QSize m_pictureSizePixels;
     QString m_videoCodec;
     QString m_audioCodec;
-    //std::multimap<QString, QString> m_auxiliaryParams;
+    std::multimap<QString, QString> m_auxiliaryParams;
 };
 
 uint qHash( const StreamingChunkCacheKey& key );

@@ -1,74 +1,60 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Công cụ phát triển</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Bạn có vui khi sử dụng công cụ tích hợp phát triển không? Hãy cho chúng tôi biết.
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Để lại phản hồi</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3><h1> Tạo các sự kiện chung </h1></h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+            Sự kiện Chung là một loại sự kiện đặc biệt cho hệ thống của bên thứ ba để kích hoạt các hành động trong VMS.
+            Để tạo hệ thống tích hợp Sự kiện Chung cần tạo yêu cầu HTTP tới Máy chủ (sử dụng API Máy chủ).
+            Tác vụ cho sự kiện chung có thể được định cấu hình bằng hộp thoại sự kiện và quy tắc trong ứng dụng máy tính để bàn.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events"><h1> Tạo các sự kiện chung </h1></a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>API máy chủ</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            API máy chủ cung cấp tập hợp các chuẩn API cho các hệ thống của bên thứ ba. Nó cung cấp cho các nhà phát triển khả năng truy cập hầu hết các tính năng hệ thống có sẵn trong máy tính để: truy vấn / quản lý các tài nguyên hệ thống (máy chủ, camera, người dùng, quyền hạn), kéo video trực tiếp hoặc ghi ra khỏi hệ thống, tạo các sự kiện, tạo quy tắc, điều khiển PTZ camera, và hơn thế nữa.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a href="#/developers/api"><b> Công cụ Kiểm tra API (mới) </b></a> - tài liệu tương tác để thử nghiệm các cuộc gọi API <br> <a href="#/developers/changelog"> Thay đổi API </a> - danh sách các thay đổi trong API <br> <a id="api-doc" href="api.xml" target="_blank"> tài liệu API </a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Thông tin về camera</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            Bảng điều khiển đặc biệt dành cho webclient hiển thị thông tin bổ sung cho camera:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Tên Camera</li>
+            <li>Liên kết cho tất cả các dòng video có sẵn</li>
+            <li>Trực tiếp xuất video từ trình duyệt</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            Để mở Bảng điều khiển Chi tiết Máy ảnh - mở <a href="#/view"> trình khách web </a>, Chọn camera, biểu tượng cài đặt (bánh răng), sau đó chọn "Chi tiết Camera"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">mở bảng thông tin về camera</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Nguồn video tích hợp SDK</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Tích hợp nguồn video SDK cung cấp khả năng tích hợp hầu hết các nguồn video trực tiếp hoặc ghi lại (Máy quay IP, NVR, DVR, v. v...) vào Hệ thống. SDK tạo ra các phương pháp để phát hiện, hiển thị, phân tích và ghi video. Nó cũng cho phép tích hợp cổng I/O của thiết bị và thông tin phát hiện chuyển động.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >nhận được SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK lưu trữ</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Bộ nhớ SDK cung cấp khả năng tích hợp lưu trữ tiềm năng vào Hệ thống. Nó cho phép các nhà phát triển đọc hoặc ghi vào bất kỳ vị trí lưu trữ nào: địa phương, từ xa và thậm chí cả dữ liệu đám mây. Tạo một plugin lưu trữ đòi hỏi phải thực hiện các chức năng tiêu chuẩn như: luồng I/O, nếu tệp tồn tại, xóa tệp, danh sách tệp trong thư mục, etc.Storage SDK cũng chứa một ví dụ để sử dụng máy chủ FTP làm vị trí lưu trữ.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >nhận được SDK</a></p>
     </div>
 </div>

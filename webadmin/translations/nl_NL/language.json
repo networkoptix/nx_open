@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Verbinding verbreken",
     "disconnectedSuccess":"Verbinding maken met het systeem is gelukt",
     "connectedSuccess":"Verbinding maken met het systeem is mislukt",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Maak een lokaal administrator account aan",
     "confirmChangePassword":"Verander het administrator wachtwoord",
     "confirmChangePasswordTitle":"Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",

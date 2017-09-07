@@ -16,7 +16,7 @@ enum MessageType
     NoLicenses,
     SmtpIsNotSet,
     UsersEmailIsEmpty,  /*< Other user's email is empty. */
-    NoPrimaryTimeServer,
+    NoPrimaryTimeServer, //< Message is not used any more. Leaving here to avoid protocol change.
     SystemIsReadOnly,
 
     /* These messages are sent from server */

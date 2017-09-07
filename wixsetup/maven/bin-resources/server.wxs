@@ -6,41 +6,41 @@
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="${customization}MediaServerDir" Name="MediaServer">
+            <Directory Id="$(var.customization)MediaServerDir" Name="MediaServer">
                 <Component Id="ServerExecutable">
                     <File Id="mediaserver.exe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes" DiskId="11">
-                        <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
+                        <fire:FirewallException Id="FirewallExceptionMediaServer" Name="$(var.mediaserverName)" Scope="any" IgnoreFailure="yes"/>
                     </File>
 
-                    <ServiceInstall Id="${customization}MediaServerService"
-                                                Name="${customization}MediaServer"
-                                                DisplayName="${mediaserver.name}"
+                    <ServiceInstall Id="$(var.customization)MediaServerService"
+                                                Name="$(var.customization)MediaServer"
+                                                DisplayName="$(var.mediaserverName)"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="${mediaserver.name}">
+                                                Description="$(var.mediaserverName)">
                         <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                     </ServiceInstall>
 
                     <ServiceControl
-                        Id="Start${customization}ServerService"
-                        Name="${customization}MediaServer"
+                        Id="Start$(var.customization)ServerService"
+                        Name="$(var.customization)MediaServer"
                         Start="install"
                         Wait="no" />
                     <ServiceControl
-                        Id="Stop${customization}ServerService"
-                        Name="${customization}MediaServer"
+                        Id="Stop$(var.customization)ServerService"
+                        Name="$(var.customization)MediaServer"
                         Stop="both"
                         Wait="yes"
                         Remove="uninstall" />
                 </Component>
 
                 <Component Id="ServerVersion">
-                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}'/>
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='$(var.releaseVersionFull)'/>
                 </Component>
 
                 <Component Id="ServerConfiguration">
-                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
                         <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
@@ -50,7 +50,7 @@
                 <Component Id="ServerConfigurationStatisticsFlag">
                     <Condition>STATISTICS_REPORT_ALLOWED</Condition>
 
-                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
                         <RegistryValue Type="string" Name="statisticsReportAllowed" Value="[STATISTICS_REPORT_ALLOWED]"/>
                     </RegistryKey>
                 </Component>
@@ -58,7 +58,7 @@
                 <Component Id="ServerConfigurationPassword">
                     <Condition>SERVER_PASSWORD</Condition>
 
-                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
                         <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
                         <RegistryValue Type="string" Name="lowPriorityPassword" Value="1"/>
                     </RegistryKey>
@@ -70,10 +70,10 @@
                     </Component>
                     <Component Id="ServerHttpPlugin">
                         <File Id="mjpg_link.dll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" DiskId="10" />
-                    </Component> 
+                    </Component>
                     <Component Id="ServerMulticastPlugin">
                         <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
-                    </Component>                                              
+                    </Component>
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
@@ -83,10 +83,10 @@
                 </Component>
 
                 <?if $(var.vmax) = true?>
-                <Directory Id="${customization}VmaxDir" Name="VmaxProxy">
+                <Directory Id="$(var.customization)VmaxDir" Name="VmaxProxy">
                     <Component Id="vmaxproxy.exe">
                         <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="$(var.SourceDir)/vmaxproxy/vmaxproxy.exe" KeyPath="yes" DiskId="10" >
-                            <fire:FirewallException Id="FirewallException${customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
+                            <fire:FirewallException Id="FirewallException$(var.customization)VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
                         </File>
                     </Component>
 
@@ -98,7 +98,7 @@
 
             </Directory>
         </DirectoryRef>
-        <ComponentGroup Id="ServerLibs" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerLibs" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
@@ -114,7 +114,7 @@
         </ComponentGroup>
 
         <!-- Component groups -->
-        <ComponentGroup Id="ServerFFmpegLibraries" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerFFmpegLibraries" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
             </Component>
@@ -147,13 +147,13 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerWeb" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerWeb" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat" DiskId="10" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerQTLibraries" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
             </Component>
@@ -193,13 +193,13 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQuazip" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerQuazip" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerOpenSSL" Directory="${customization}MediaServerDir">
+        <ComponentGroup Id="ServerOpenSSL" Directory="$(var.customization)MediaServerDir">
             <Component>
                 <File Id="ssl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
             </Component>
@@ -209,7 +209,7 @@
         </ComponentGroup>
 
         <?if $(var.vmax) = true?>
-        <ComponentGroup Id="VmaxProxySDK" Directory="${customization}VmaxDir">
+        <ComponentGroup Id="VmaxProxySDK" Directory="$(var.customization)VmaxDir">
             <Component>
                 <File Id="acs_stream_source_mr.dll.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll" DiskId="10"/>
             </Component>
@@ -219,7 +219,7 @@
         </ComponentGroup>
         <?endif?>
 
-        <Feature Id="ServerFeature" Title="${display.product.name} Media Server" Level="1"
+        <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 

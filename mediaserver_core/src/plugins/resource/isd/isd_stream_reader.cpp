@@ -40,8 +40,8 @@ QString QnISDStreamReader::serializeStreamParams(
     static const int kMinBitrate = 256; //< kbps
     const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(params.quality, resolution, params.fps));
 
-    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << res->getSecondaryResolution().width()
-      << "x" << res->getSecondaryResolution().height() << "\r\n";
+    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << resolution.width()
+      << "x" << resolution.height() << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".FrameRate=" << params.fps << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateControl=vbr\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";

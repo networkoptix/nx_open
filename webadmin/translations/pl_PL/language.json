@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Rozłącz",
     "disconnectedSuccess":"System został odłączony pomyślnie",
     "connectedSuccess":"System został podłączony pomyślnie",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Utwórz lokalnego administratora",
     "confirmChangePassword":"Zmień hasło administratora",
     "confirmChangePasswordTitle":"Zmienić hasło systemu? Wpłynie to na konto 'admin' i na hasło root na niektórych serwerach",

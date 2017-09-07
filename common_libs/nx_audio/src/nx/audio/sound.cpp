@@ -213,13 +213,7 @@ qint64  Sound::extraAudioDelayUs() const
 
 qint64 Sound::maxAudioJitterUs() const
 {
-#ifdef Q_OS_ANDROID
-    // I am not sure about this expression. I've found it by experiment
-    int bufferedSamples =  2 * AudioDevice::internalBufferInSamples(m_device);
-    return 1000000ll * bufferedSamples / m_frequency;
-#else
     return kDefaultMaxAudioJitterUs;
-#endif
 }
 
 qint64 Sound::playTimeElapsedUsec()

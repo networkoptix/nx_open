@@ -99,6 +99,7 @@ void QnAudioStreamDisplay::clearDeviceBuffer()
 {
     if (m_sound)
         m_sound->clear();
+    m_tooFewDataDetected = true;
 }
 
 void QnAudioStreamDisplay::clearAudioBuffer()
@@ -109,7 +110,6 @@ void QnAudioStreamDisplay::clearAudioBuffer()
         m_audioQueue.dequeue();
 
     clearDeviceBuffer();
-    m_tooFewDataDetected = true;
     m_lastAudioTime = qint64(AV_NOPTS_VALUE);
 }
 
