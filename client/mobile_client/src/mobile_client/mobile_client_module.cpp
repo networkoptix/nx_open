@@ -24,6 +24,7 @@
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
+#include <watchers/server_interface_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -130,6 +131,7 @@ QnMobileClientModule::QnMobileClientModule(
         });
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
+    commonModule->instance<QnServerInterfaceWatcher>();
 }
 
 QnMobileClientModule::~QnMobileClientModule()
