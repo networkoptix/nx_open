@@ -144,6 +144,8 @@ angular.module('cloudApp')
                         $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
+                }, function(){
+                    $scope.locked[user.email] = false;
                 });
         };
 
