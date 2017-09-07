@@ -26,7 +26,7 @@ Drawer
             id: layoutsList
 
             anchors.fill: parent
-            anchors.topMargin: getStatusBarHeight()
+            anchors.topMargin: deviceStatusBarHeight
             anchors.bottomMargin: bottomContent.height
             bottomMargin: 8
             flickableDirection: Flickable.VerticalFlick
