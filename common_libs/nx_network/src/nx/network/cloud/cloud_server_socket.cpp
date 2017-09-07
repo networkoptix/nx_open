@@ -583,9 +583,9 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
-    if (response.trafficRelayUrl)
+    for (const auto& trafficRelayUrl: response.trafficRelayUrls)
     {
-        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(*response.trafficRelayUrl);
+        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(trafficRelayUrl);
         trafficRelayUrlWithCredentials.setUserName(credentials.hostName());
         trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(

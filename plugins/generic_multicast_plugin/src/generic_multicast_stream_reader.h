@@ -82,10 +82,8 @@ private:
     nxpt::CommonRefManager m_refManager;
     std::atomic<bool> m_interrupted = {false};
     QUrl m_url;
-    std::unique_ptr<QIODevice> m_ioDevice;
     CyclicAllocator m_allocator;
 
-    AVIOContext* m_avioContext = nullptr;
     AVFormatContext* m_formatContext = nullptr;
     int64_t m_startTimeUs = 0;
     std::map<int64_t, int64_t> m_streamIndexToChannelNumber;
