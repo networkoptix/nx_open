@@ -249,7 +249,7 @@ void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& sock
 void QnDesktopCameraResourceSearcher::log(const QByteArray& message, 
     const ClientConnectionInfo& info) const
 {
-    NX_VERBOSE(this) message << info.userName << info.userId << info.useCount;
+    NX_VERBOSE(this) << message << info.userName << info.userId << info.useCount;
 }
 
 #endif //ENABLE_DESKTOP_CAMERA
