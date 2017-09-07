@@ -53,6 +53,9 @@ void ListenResponse::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(attrs::cloudConnectOptions, (int) cloudConnectOptions);
     if (trafficRelayUrl)
         message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
+    message->newAttribute<attrs::StringList>(
+        nx::stun::extension::attrs::trafficRelayUrlList,
+        std::move(trafficRelayUrls));
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
@@ -71,9 +74,22 @@ bool ListenResponse::parseAttributes(const nx::stun::Message& message)
     if (!readEnumAttributeValue(message, attrs::cloudConnectOptions, &cloudConnectOptions))
         cloudConnectOptions = emptyCloudConnectOptions;
 
-    nx::String trafficRelayEndpointLocal;
-    if (readStringAttributeValue<attrs::TrafficRelayUrl>(message, &trafficRelayEndpointLocal))
-        trafficRelayUrl = std::move(trafficRelayEndpointLocal);
+    nx::String trafficRelayUrlLocal;
+    if (readStringAttributeValue<attrs::TrafficRelayUrl>(message, &trafficRelayUrlLocal))
+        trafficRelayUrl = std::move(trafficRelayUrlLocal);
+
+    readAttributeValue<attrs::StringList>(
+        message,
+        attrs::trafficRelayUrlList,
+        &trafficRelayUrls);
+
+    if (trafficRelayUrl && trafficRelayUrls.empty())
+    {
+        // For compatibility between internal 3.1 builds.
+        // TODO: #ak Remove in 3.2.
+        trafficRelayUrls.push_back(std::move(*trafficRelayUrl));
+        trafficRelayUrl.reset();
+    }
 
     return true;
 }
