@@ -684,19 +684,9 @@ enum IDType
     ToggleInfoAction,
 
     /**
-     * Changes RADASS mode to auto.
+     * Changes RADASS mode for the given layout or item. Mode provided with ResolutionModeRole.
      */
-    RadassAutoAction,
-
-    /**
-     * Changes RADASS mode to high resolution.
-     */
-    RadassHighAction,
-
-    /**
-     * Changes RADASS mode to low resolution.
-     */
-    RadassLowAction,
+    RadassAction,
 
     /**
      * Connect incompatible server to current system

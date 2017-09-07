@@ -21,6 +21,8 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
+#include <client/client_module.h>
+
 #include <common/common_meta_types.h>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -30,7 +32,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
-#include <redass/redass_controller.h>
+#include <nx/client/desktop/radass/radass_controller.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
@@ -1194,9 +1196,11 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
                 }
             }
+
+            // Zoom windows must not be controlled by radass.
+            if (!mediaWidget->isZoomWindow())
+                qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
         }
-        if (qnRedAssController)
-            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -1241,10 +1245,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
     if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-    {
-        if (qnRedAssController)
-            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
-    }
+        qnClientModule->radassController()->unregisterConsumer(mediaWidget->display()->camDisplay());
 
     if (destroyWidget)
     {
