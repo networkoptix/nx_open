@@ -247,8 +247,8 @@ void OnvifResourceInformationFetcher::findResources(
     }
 
     if (model.isEmpty() || manufacturer.isEmpty() ||
-        // Optional fields are to be updated only if camera is authorized, to prevent brute force
-        // attacks for unauthorized cameras (Hikvision is blocked after several attempts).
+        // Optional fields are to be updated only if the camera is authorized, to prevent brute force
+        // attacks for unauthorized cameras (Hikvision blocks after several attempts).
         (isAuthorized && (firmware.isEmpty() || QnMacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
