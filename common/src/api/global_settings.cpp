@@ -286,7 +286,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
     m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             kMaxDifferenceBetweenSynchronizedAndLocalTime,
-            kMaxDifferenceBetweenSynchronizedAndLocalTimeMsDefault,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault).count(),
             this);
     timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
 
