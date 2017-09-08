@@ -62,7 +62,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), kHanwhaCameraName);
+    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -91,7 +91,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     resource->setName(*model);
     if (firmware)
         resource->setFirmware(*firmware);
-    resource->setTypeId(rt);
+    resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
     result << resource;
     const int channel = resource->getChannel();
@@ -162,7 +162,7 @@ void HanwhaResourceSearcher::createResource(
     QnResourceList& result)
 {
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), kHanwhaCameraName);
+    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
     if (rt.isNull())
         return;
 
@@ -172,7 +172,7 @@ void HanwhaResourceSearcher::createResource(
 
     HanwhaResourcePtr resource( new HanwhaResource() );
 
-    resource->setTypeId(rt);
+    resource->setTypeId(rt->getId());
     resource->setVendor(devInfo.manufacturer);
     resource->setName(devInfo.modelName);
     resource->setModel(devInfo.modelName);
@@ -220,11 +220,11 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             HanwhaResourcePtr resource(new HanwhaResource());
 
-            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), kHanwhaCameraName);
+            auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
             if (rt.isNull())
                 return;
 
-            resource->setTypeId(rt);
+            resource->setTypeId(rt->getId());
             resource->setVendor(kHanwhaManufacturerName);
             resource->setName(firstResource->getName());
             resource->setModel(firstResource->getName());

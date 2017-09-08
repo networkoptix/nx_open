@@ -15,6 +15,7 @@ namespace {
 static const float kLowerPtzLimit = -100;
 static const float kHigherPtzLimit = 100;
 static const int kPtzCoefficient = 100;
+static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 
 } // namespace
 
@@ -38,6 +39,11 @@ void HanwhaPtzController::setPtzCapabilities(Ptz::Capabilities capabilities)
 void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)
 {
     m_ptzLimits = limits;
+}
+
+void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
+{
+    m_ptzTraits = traits;
 }
 
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
@@ -74,6 +80,9 @@ bool HanwhaPtzController::continuousFocus(qreal speed)
 
 bool HanwhaPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D& position, qreal /*speed*/)
 {
+    if (space != Qn::DevicePtzCoordinateSpace)
+        return false;
+
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto hanwhaPosition = toHanwhaPosition(position);
 
@@ -91,7 +100,11 @@ bool HanwhaPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
 
 bool HanwhaPtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
 {
-    // TODO: #dmishin implement.
+    HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.control(
+        lit("ptzcontrol/areazoom"),
+        makeViewPortParameters(aspectRatio, viewport));
+
     return false;
 }
 
@@ -101,6 +114,7 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setAllowLocks(true);
 
     const auto response = helper.view(
         lit("ptzcontrol/query"),
@@ -135,6 +149,9 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
 
 bool HanwhaPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
 {
+    if (space != Qn::DevicePtzCoordinateSpace)
+        return false;
+
     *limits = m_ptzLimits;
     return true;
 }
@@ -147,7 +164,7 @@ bool HanwhaPtzController::getFlip(Qt::Orientations* flip) const
     if (!response.isSuccessful())
         return false;
 
-    flip = 0;
+    *flip = 0;
 
     const auto horizontalFlip = response.parameter<bool>(
         channelParameter(m_hanwhaResource->getChannel(), kHanwhaHorizontalFlipProperty));
@@ -164,6 +181,7 @@ bool HanwhaPtzController::getFlip(Qt::Orientations* flip) const
     return true;
 }
 
+#if 0
 bool HanwhaPtzController::createPreset(const QnPtzPreset& preset)
 {
     HanwhaRequestHelper helper(m_hanwhaResource);
@@ -256,6 +274,31 @@ bool HanwhaPtzController::getPresets(QnPtzPresetList* presets) const
 
     return true;
 }
+#endif
+
+bool HanwhaPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+{
+    *auxilaryTraits = m_ptzTraits;
+    return true;
+}
+
+bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, const QString& data)
+{
+    if (!m_ptzCapabilities.testFlag(Ptz::AuxilaryPtzCapability))
+        return false;
+
+    if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
+    {
+        HanwhaRequestHelper helper(m_hanwhaResource);
+        auto response = helper.control(
+            lit("image/focus"),
+            {{lit("Mode"), lit("AutoFocus")}});
+
+        return response.isSuccessful();
+    }
+    
+    return false;
+}
 
 QString HanwhaPtzController::channel() const
 {
@@ -329,6 +372,54 @@ QString HanwhaPtzController::presetNumberFromId(const QString& presetId) const
         return QString();
 
     return itr->second;
+}
+
+std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
+    qreal aspectRatio,
+    const QRectF rect) const
+{
+    std::map<QString, QString> result;
+
+    if (rect.width() > 1 || rect.height() > 1)
+    {
+        result.emplace(lit("Type"), lit("1x"));
+        return result;
+    }
+    
+    result.emplace(lit("Type"), lit("ZoomIn"));
+
+    auto topLeft = rect.topLeft();
+    auto bottomRight = rect.bottomRight();
+
+    QString x1;
+    QString y1;
+    QString x2;
+    QString y2;
+
+    bool toPoint = qFuzzyIsNull(rect.width() - 1.0)
+        && qFuzzyIsNull(rect.height() - 1.0);
+
+    if (toPoint)
+    {
+        x1 = QString::number(qBound(0, (int)std::round(((topLeft.x() + 0.5) * 10000)), 10000));
+        y1 = QString::number(qBound(0, (int)std::round(((topLeft.y() + 0.5) * 10000)), 10000));
+        x2 = QString::number(qBound(0, (int)std::round(((topLeft.x() + 0.5) * 10000)), 10000));
+        y2 = QString::number(qBound(0, (int)std::round(((topLeft.y() + 0.5) * 10000)), 10000));
+    }
+    else
+    {
+        x1 = QString::number(qBound(0, (int)(topLeft.x() * 10000), 10000));
+        y1 = QString::number(qBound(0, (int)(topLeft.y() * 10000), 10000));
+        x2 = QString::number(qBound(0, (int)(bottomRight.x() * 10000), 10000));
+        y2 = QString::number(qBound(0, (int)(bottomRight.y() * 10000), 10000));
+    }
+
+    result.emplace(lit("X1"), x1);
+    result.emplace(lit("Y1"), y1);
+    result.emplace(lit("X2"), x2);
+    result.emplace(lit("Y2"), y2);
+
+    return result;
 }
 
 } // namespace plugins

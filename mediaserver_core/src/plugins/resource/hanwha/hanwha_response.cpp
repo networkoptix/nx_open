@@ -35,7 +35,8 @@ HanwhaResponse::HanwhaResponse(
 
 bool HanwhaResponse::isSuccessful() const
 {
-    return m_errorCode == HanwhaError::kNoError;
+    return m_errorCode == HanwhaError::kNoError
+        && nx_http::StatusCode::isSuccessCode(m_statusCode);
 }
 
 int HanwhaResponse::errorCode() const

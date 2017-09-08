@@ -290,7 +290,11 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
-    CameraDiagnostics::Result result = initAttributes();
+    CameraDiagnostics::Result result = initSystem();
+    if (!result)
+        return result;
+
+    result = initAttributes();
     if (!result)
         return result;
 
@@ -326,8 +330,35 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
     auto controller = new HanwhaPtzController(toSharedPointer(this));
     controller->setPtzCapabilities(m_ptzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
+    controller->setPtzTraits(m_ptzTraits);
 
     return controller;
+}
+
+CameraDiagnostics::Result HanwhaResource::initSystem()
+{
+    if (!getFirmware().isEmpty())
+        return CameraDiagnostics::NoErrorResult();
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(lit("system/deviceinfo"));
+
+    if (!response.isSuccessful())
+    {
+        return error(
+            response,
+            CameraDiagnostics::CameraInvalidParams(
+                lit("Can not fetch device information")));
+    }
+
+    const auto firmware = response.parameter<QString>(lit("FirmwareVersion"));
+    if (!firmware.is_initialized())
+        return CameraDiagnostics::NoErrorResult();
+
+    if (!firmware->isEmpty())
+        setFirmware(firmware.get());
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HanwhaResource::initAttributes()
@@ -475,6 +506,8 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
+    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, lit("true"));
+
     m_ptzCapabilities = Ptz::NoPtzCapabilities;
     for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
     {
@@ -492,7 +525,36 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             continue;
 
         m_ptzCapabilities |= capability;
+        if (capability == Ptz::NativePresetsPtzCapability)
+            m_ptzCapabilities |= Ptz::PresetsPtzCapability;
     }
+
+    if (m_ptzCapabilities ==Ptz::NoPtzCapabilities)
+        return CameraDiagnostics::NoErrorResult();
+
+    if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
+        m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
+
+
+    auto autoFocusParameter = m_cgiParameters.parameter(lit("image/focus/control/Mode"));
+
+    if (!autoFocusParameter)
+        return CameraDiagnostics::NoErrorResult();
+
+    auto possibleValues = autoFocusParameter->possibleValues();
+    if (possibleValues.contains(lit("AutoFocus")))
+    {
+        m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
+        m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
+    }
+
+#if 0
+    auto maxPresetParameter = m_attributes.attribute<int>(
+        lit("PTZSupport/MaxPreset/%1").arg(getChannel()));
+
+    if (maxPresetParameter)
+        m_ptzLimits.maxPresetNumber = maxPresetParameter.get();
+#endif
 
     return CameraDiagnostics::NoErrorResult();
 }

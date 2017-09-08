@@ -33,6 +33,7 @@ public:
     virtual Ptz::Capabilities getCapabilities() const override;
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
+    void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
 
     virtual bool continuousMove(const QVector3D& speed) override;
     virtual bool continuousFocus(qreal speed) override;
@@ -46,11 +47,18 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
 
+#if 0
     virtual bool createPreset(const QnPtzPreset& preset) override;
     virtual bool updatePreset(const QnPtzPreset& preset) override;
     virtual bool removePreset(const QString& presetId) override;
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
+#endif
+
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
+    virtual bool runAuxilaryCommand(
+        const QnPtzAuxilaryTrait& trait,
+        const QString& data) override;
 
 private:
     QString channel() const;
@@ -59,6 +67,9 @@ private:
     QVector3D toHanwhaPosition(const QVector3D& position) const;
     QString toHanwhaFocusCommand(qreal speed) const;
     QString presetNumberFromId(const QString& presetId) const;
+    std::map<QString, QString> makeViewPortParameters(
+        qreal aspectRatio,
+        const QRectF rect) const;
 
 private:
     using PresetNumber = QString;
@@ -67,6 +78,7 @@ private:
     HanwhaResourcePtr m_hanwhaResource;
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
+    QnPtzAuxilaryTraitList m_ptzTraits;
 
     mutable std::map<PresetId, PresetNumber> m_presetNumberById;
 };

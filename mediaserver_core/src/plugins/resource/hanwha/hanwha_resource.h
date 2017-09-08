@@ -11,6 +11,8 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 
+#include <core/ptz/ptz_auxilary_trait.h>
+
 extern "C" {
 
 #include <libavcodec/avcodec.h>
@@ -74,6 +76,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
 
 private:
+    CameraDiagnostics::Result initSystem();
     CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
@@ -174,8 +177,9 @@ private:
     HanwhaCodecInfo m_codecInfo;
     std::map<Qn::ConnectionRole, int> m_profileByRole;
 
-    Ptz::Capabilities m_ptzCapabilities;
+    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
+    QnPtzAuxilaryTraitList m_ptzTraits;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
     HanwhaAttributes m_attributes;
