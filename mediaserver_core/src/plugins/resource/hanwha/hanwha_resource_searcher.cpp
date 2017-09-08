@@ -16,7 +16,7 @@ namespace
 {
     static const QString kUpnpBasicDeviceType("Basic");
     static const QString kHanwhaManufacturerName("Hanwha Techwin");
-    static const QString kHanwhaAltManufacturerName("Samsung Techwin");
+    static const QString kHanwhaAltManufacturerName("Samsung");
     static const QString kHanwhaCameraName("Hanwha_Common");
 }
 

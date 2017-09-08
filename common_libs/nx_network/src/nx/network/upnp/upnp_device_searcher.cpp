@@ -118,8 +118,7 @@ void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& dev
         return;
 
     // try to register for specified deviceType
-    const auto now = QDateTime::currentDateTimeUtc().toTime_t();
-    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, now ) );
+    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, (uint) handler) );
     if( !itBool.second )
         return;
 
