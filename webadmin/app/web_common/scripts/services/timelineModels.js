@@ -871,6 +871,10 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
 
+    if(this.liveMode){ // In live mode ignore whatever they have to say
+        this.playedPosition = timeManager.nowToDisplay();
+        return;
+    }
     var oldPosition =  this.playedPosition;
 
     this.played = position;
@@ -989,7 +993,8 @@ ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline.
     var needZoomOut = !this.checkZoomOut();
 
     var end = timeManager.nowToDisplay();
-    if(this.playedPosition > this.end && this.liveMode){
+    if(this.playedPosition >= this.end || this.playedPosition >= end){
+        // Something strange is happening here - playing position in future
         end = this.playedPosition;
     }
 
