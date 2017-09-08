@@ -298,9 +298,6 @@ void QnLayoutsModelUnsorted::at_resourceAdded(const QnResourcePtr& resource)
     connect(layout, &QnLayoutResource::parentIdChanged,
         this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
-    if (const bool exists = itemRow(layout->getId()) >= 0)
-        return;
-
     if (!isLayoutSuitable(layout))
         return;
 
@@ -360,6 +357,9 @@ void QnLayoutsModelUnsorted::updateItem(const QnUuid& id)
 void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout)
 {
     const auto layoutId = layout->getId();
+
+    if (const bool layoutExists = itemRow(layoutId) >= 0)
+        return;
 
     const auto watcher = QSharedPointer<LayoutCamerasWatcher>(new LayoutCamerasWatcher(this));
     watcher->setLayout(layout);
