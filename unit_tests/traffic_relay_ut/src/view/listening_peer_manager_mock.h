@@ -2,7 +2,7 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/listening_peer_manager.h>
+#include <nx/cloud/relay/controller/listening_peer_manager.h>
 
 namespace nx {
 namespace cloud {

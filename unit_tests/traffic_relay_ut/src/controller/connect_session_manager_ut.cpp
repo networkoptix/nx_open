@@ -12,13 +12,13 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/connect_session_manager.h>
-#include <controller/listening_peer_manager.h>
-#include <controller/traffic_relay.h>
-#include <model/client_session_pool.h>
-#include <model/listening_peer_pool.h>
-#include <model/remote_relay_peer_pool.h>
-#include <settings.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/listening_peer_manager.h>
+#include <nx/cloud/relay/controller/traffic_relay.h>
+#include <nx/cloud/relay/model/client_session_pool.h>
+#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/settings.h>
 
 #include "../settings_loader.h"
 

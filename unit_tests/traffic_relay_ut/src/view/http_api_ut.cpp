@@ -8,8 +8,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/connect_session_manager.h>
-#include <controller/listening_peer_manager.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/listening_peer_manager.h>
 
 #include "connect_session_manager_mock.h"
 #include "listening_peer_manager_mock.h"

@@ -2,7 +2,7 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
 
 namespace nx {
 namespace cloud {
@@ -14,13 +14,8 @@ class ConnectSessionManagerMock:
 {
 public:
     ConnectSessionManagerMock(
-        //utils::SyncQueue<api::BeginListeningRequest>* receivedBeginListeningRequests,
         utils::SyncQueue<api::CreateClientSessionRequest>* receivedCreateClientSessionRequests,
         utils::SyncQueue<api::ConnectToPeerRequest>* receivedConnectToPeerRequests);
-
-    //virtual void beginListening(
-    //    const api::BeginListeningRequest& request,
-    //    BeginListeningHandler completionHandler) override;
 
     virtual void createClientSession(
         const api::CreateClientSessionRequest& request,
