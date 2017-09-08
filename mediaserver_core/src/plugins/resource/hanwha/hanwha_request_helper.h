@@ -56,6 +56,8 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
+    void setAllowLocks(bool allowLocks);
+
 private:
     QUrl buildRequestUrl(
         const QString& cgi,
@@ -79,6 +81,7 @@ private:
 
 private:
     const QnSecurityCamResourcePtr m_resource;
+    bool m_allowLocks = false;
 };
 
 } // namespace plugins

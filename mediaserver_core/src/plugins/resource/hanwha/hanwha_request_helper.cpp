@@ -104,6 +104,11 @@ HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameter
     return splitAndDoRequest(lit("control"), path, parameters);
 }
 
+void HanwhaRequestHelper::setAllowLocks(bool allowLocks)
+{
+    m_allowLocks = allowLocks;
+}
+
 QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
@@ -147,6 +152,7 @@ bool HanwhaRequestHelper::doRequestInternal(
 
     nx_http::HttpClient httpClient;
 
+    httpClient.setAllowLocks(m_allowLocks);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
     httpClient.setSendTimeoutMs(kHttpTimeout.count());
