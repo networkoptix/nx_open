@@ -298,6 +298,9 @@ void QnLayoutsModelUnsorted::at_resourceAdded(const QnResourcePtr& resource)
     connect(layout, &QnLayoutResource::parentIdChanged,
         this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
+    if (const bool exists = itemRow(layout->getId()) >= 0)
+        return;
+
     if (!isLayoutSuitable(layout))
         return;
 
