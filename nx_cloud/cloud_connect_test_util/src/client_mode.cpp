@@ -214,7 +214,9 @@ void printHttpClientOptions(std::ostream* const outStream)
         "Http client mode:\n"
         "  --http-client                            Enable Http client mode\n"
         "  --url={http url}                         Url to trigger\n"
-        "  -o path/to/message/body/output/file      Save message received to the file specified\n";
+        "\n"
+        "  -o file\n"
+        "  --output-document=file                   Save message received to the file specified\n";
 }
 
 int runInHttpClientMode(const nx::utils::ArgumentParser& args)
@@ -228,6 +230,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 
     QString messageBodyFilePath;
     args.read("o", &messageBodyFilePath);
+    args.read("output-document", &messageBodyFilePath);
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(

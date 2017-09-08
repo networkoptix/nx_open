@@ -9,14 +9,12 @@ namespace test {
 
 TEST(Url, normalizePath)
 {
-    ASSERT_EQ("/sample/url/path", normalizePath("/sample/url/path"));
-    ASSERT_EQ("/sample/url/path/", normalizePath("/sample/url/path/"));
-    ASSERT_EQ("sampleUrlPath", normalizePath("sampleUrlPath"));
-
-    ASSERT_EQ("/sample/url/path", normalizePath("//sample//url/path"));
-    
-    // TODO: #ak
-    //ASSERT_EQ("/sample/url/path", normalizePath("///sample//url/path"));
+    ASSERT_EQ("/sample/url/path", normalizePath(std::string("/sample/url/path")));
+    ASSERT_EQ("/sample/url/path/", normalizePath(std::string("/sample/url/path/")));
+    ASSERT_EQ("sampleUrlPath", normalizePath(std::string("sampleUrlPath")));
+    ASSERT_EQ("/sample/url/path", normalizePath(std::string("//sample//url/path")));
+    ASSERT_EQ("/sample/url/path", normalizePath(std::string("///sample//url/path")));
+    ASSERT_EQ("/sample/url/path/", normalizePath(std::string("/sample///url/path////")));
 }
 
 } // namespace test
