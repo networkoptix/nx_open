@@ -270,9 +270,16 @@ void QnLayoutsModelUnsorted::resetModel()
 
 bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout) const
 {
-    return m_user
-        && !layout->isServiceLayout()
-        && resourceAccessProvider()->hasAccess(m_user, layout);
+    if (!m_user || layout->isServiceLayout()
+        || !resourceAccessProvider()->hasAccess(m_user, layout))
+    {
+        return false;
+    }
+
+    // We show only user's and shared layouts.
+    const auto parentId = layout->getParentId();
+    const bool isSharedLayout = parentId.isNull();
+    return isSharedLayout || parentId == m_user->getId();
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
