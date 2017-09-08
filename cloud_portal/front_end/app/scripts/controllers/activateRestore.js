@@ -121,7 +121,6 @@ angular.module('cloudApp')
                 errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
                 setContext('reactivatingSuccess');
-                $location.path('/activate/send', false); // Change url, do not reload
                 dialogs.notify(L.account.activationLinkSent, 'success');
             });
 
