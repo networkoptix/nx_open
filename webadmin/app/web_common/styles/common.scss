@@ -73,6 +73,7 @@ placeholder{ /* Hack to have full-screen */
     z-index:1000;
     background-color: $dark9;
     opacity: 0.6;
+    position: relative;
 
     &.has-preloader{
         background-color: transparent;

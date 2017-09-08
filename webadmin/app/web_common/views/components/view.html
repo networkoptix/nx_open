@@ -85,7 +85,8 @@
                                           camera-links="cameraLinks"></camera-links>
                             <camera-view-informer flags="{'status':activeCamera.status,
                                                           'positionSelected': positionSelected,
-                                                          'iOSVideoTooLarge': iOSVideoTooLarge}">
+                                                          'iOSVideoTooLarge': iOSVideoTooLarge}"
+                                                  preview="preview">
                             </camera-view-informer>
                             <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                         (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
