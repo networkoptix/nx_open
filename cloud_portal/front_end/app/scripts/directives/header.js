@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route',
-    function (dialogs, cloudApi, account, $location, $route) {
+    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', '$poll',
+    function (dialogs, cloudApi, account, $location, $route, $poll) {
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/header.html',
@@ -44,15 +44,25 @@ angular.module('cloudApp')
                         scope.activeSystem = scope.systems[0];
                     }
                 }
-                updateActive();
-                account.get().then(function(account){
-                    scope.account = account;
-                    cloudApi.systems().then(function(result){
+                function updateSystems(){
+                    return cloudApi.systems().then(function(result){
                         scope.systems = cloudApi.sortSystems(result.data);
                         scope.singleSystem = scope.systems.length == 1;
                         scope.systemCounter = scope.systems.length;
                         updateActiveSystem();
                     });
+                }
+                function delayedUpdateSystems(){
+                    var pollingSystemsUpdate = $poll(updateSystems,Config.updateInterval);
+
+                    scope.$on('$destroy', function( event ) {
+                        $poll.cancel(pollingSystemsUpdate);
+                    } );
+                }
+                updateActive();
+                account.get().then(function(account){
+                    scope.account = account;
+                    updateSystems().then(delayedUpdateSystems);
 
                     $('body').removeClass('loading');
                     $('body').addClass('authorized');
@@ -63,7 +73,13 @@ angular.module('cloudApp')
 
 
                 scope.$on('$locationChangeSuccess', function(next, current) {
-                    updateActiveSystem();
+                    if($route.current.params.systemId){
+                        if(!scope.systems){
+                            updateSystems();
+                        }else{
+                            updateActiveSystem();
+                        }
+                    }
                     updateActive();
                 });
 

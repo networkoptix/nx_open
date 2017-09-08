@@ -258,9 +258,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = Config.webclient.flashChromelessPath;
+                    scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessPath;
                     if(scope.debugMode){
-                        scope.flashSource = Config.webclient.flashChromelessDebugPath;
+                        scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessDebugPath;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -402,8 +402,9 @@ angular.module('nxCommon')
 
                 scope.$on('$destroy',function(){
                     recyclePlayer(null);
-                    scope.vgApi.kill();
-
+                    if(scope.vgApi){
+                        scope.vgApi.kill();
+                    }
                     if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);
