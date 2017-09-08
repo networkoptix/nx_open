@@ -511,8 +511,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                         context.fillStyle = chunkLoadingTexture;
                         chunkLoadingTextureSize = this.width;
                     };
-                    var imagePath = self.hasHighDpi ? '../images/timeline-loading-filled@2x.png' : '../images/timeline-loading-filled.png';
-                    img.src = Config.viewsDirCommon + imagePath;
+                    var imagePath = self.hasHighDpi ? 'images/timeline-loading-filled@2x.png' : 'images/timeline-loading-filled.png';
+                    img.src = Config.webclient.staticResources + imagePath;
                     chunkLoadingTextureImg = img;
                 }
                 context.fillStyle = blurColor(timelineConfig.loadingChunkColor,1);
@@ -563,8 +563,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     context.fillStyle = lastMinuteTexture;
                     lastMinuteTextureSize = this.width;
                 };
-                var imagePath = self.hasHighDpi ? '../images/timeline-loading@2x.png' : '../images/timeline-loading.png';
-                img.src = Config.viewsDirCommon + imagePath;
+                var imagePath = self.hasHighDpi ? 'images/timeline-loading@2x.png' : 'images/timeline-loading.png';
+                img.src = Config.webclient.staticResources + imagePath;
                 lastMinuteTextureImg = img;
             }
             context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);

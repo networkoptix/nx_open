@@ -246,9 +246,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = Config.webclient.flashChromelessPath;
+                    scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessPath;
                     if(scope.debugMode){
-                        scope.flashSource = Config.webclient.flashChromelessDebugPath;
+                        scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessDebugPath;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);

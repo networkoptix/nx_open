@@ -308,6 +308,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_timeDrift(0),
+    m_isRelayOutputInversed(false),
     m_inputMonitored(false),
     m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
@@ -724,6 +725,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initializePtz(const CapabilitiesRes
 
 CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp& onvifCapabilities)
 {
+    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
+
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs(&relayOutputs);
@@ -749,7 +753,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp
 
     fetchRelayInputInfo(onvifCapabilities);
 
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.contains(QString("relayInputCountForced")))
     {
         setCameraCapability(
@@ -3982,6 +3985,9 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         auth.user(),
         auth.password(),
         m_timeDrift );
+
+    if (m_isRelayOutputInversed)
+        active = !active;
 
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;
