@@ -17,7 +17,7 @@
         <guid>${hanwha_metadata_plugin.guid}</guid>
         <product.title>${hanwha_metadata_plugin.name}</product.title>
 
-        <qt.libs>core network</qt.libs>
+        <qt.libs>core network gui</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core</global.libs>
     </properties>
     <dependencies>
