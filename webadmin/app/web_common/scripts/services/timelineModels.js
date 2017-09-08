@@ -944,6 +944,13 @@ function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initial
     this.pixelAspectRatio = pixelAspectRatio || 1;
     this.$q = $q;
 
+    this.watch = {
+        playing: false,
+        live: false,
+        forcedToStop:false
+    };
+
+
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
         labels:     {index:0,level:RulerModel.levels[0]},
@@ -1042,19 +1049,19 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
 
 ScaleManager.prototype.stopWatching = function(){
-    this.watchPlayingPosition = false;
-    this.watchLivePosition = false;
-    this.wasForcedToStopWatchPlaying = true;
+    this.watch.playing = false;
+    this.watch.live = false;
+    this.watch.forcedToStop = true;
 };
 
 ScaleManager.prototype.releaseWatching = function(){
-    this.wasForcedToStopWatchPlaying = false;
+    this.watch.forcedToStop = false;
 };
 
 ScaleManager.prototype.watchPlaying = function(date, liveMode){
-    this.watchPlayingPosition = !liveMode;
-    this.watchLivePosition = liveMode;
-    this.wasForcedToStopWatchPlaying = false;
+    this.watch.playing = !liveMode;
+    this.watch.live = liveMode;
+    this.watch.forcedToStop = false;
 
     if(!date){
         return;
@@ -1097,18 +1104,18 @@ ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
 
     this.setEnd();
 
-    if(!this.wasForcedToStopWatchPlaying && this.watchLivePosition){
+    if(!this.watch.forcedToStop && this.watch.live){
         this.setAnchorDateAndPoint(this.end, 1);
         return;
     }
-/*    if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
+/*    if(!this.watch.forcedToStop && !this.watch.playing){
         this.checkWatchPlaying(this.end, true);
         return;
     } */
-    if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
+    if(!this.watch.forcedToStop && !this.watch.playing){
         this.checkWatchPlaying(this.playedPosition, liveMode);
     }
-    if(this.watchPlayingPosition){
+    if(this.watch.playing){
         this.setAnchorDateAndPoint(this.playedPosition, liveMode ? 1:this.anchorPoint);
     }
 };
@@ -1259,7 +1266,7 @@ ScaleManager.prototype.canScroll = function(left){
     }
 
     return this.visibleEnd != this.end
-        && !(this.watchPlayingPosition && this.liveMode);
+        && !(this.watch.playing && this.liveMode);
 };
 ScaleManager.prototype.scrollSlider = function(){
     var relativeWidth =  this.getRelativeWidth();

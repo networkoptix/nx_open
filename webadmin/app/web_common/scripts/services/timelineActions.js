@@ -32,7 +32,7 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
 TimelineActions.prototype.goToLive = function(){
     var self = this;
     var moveDate = self.scaleManager.screenCoordinateToDate(1);
-    if(self.scaleManager.watchLivePosition){
+    if(self.scaleManager.watch.live){
         // we are already watching live position - no need for animation
         return;
     }
@@ -66,7 +66,7 @@ TimelineActions.prototype.delayWatchingPlayingPosition = function(){
     self.stopDelay = setTimeout(function(){
         self.scaleManager.releaseWatching();
         self.stopDelay = null;
-    },self.timelineConfig.animationDuration);
+    }, self.timelineConfig.animationDuration);
 };
 
 
