@@ -11,6 +11,7 @@
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <nx/api/analytics/device_manifest.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace mediaserver {
