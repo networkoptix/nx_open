@@ -8,7 +8,7 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 #include <nx/api/analytics/driver_manifest.h>
-#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace mediaserver {

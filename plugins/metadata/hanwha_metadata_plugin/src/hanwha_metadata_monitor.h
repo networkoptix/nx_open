@@ -49,8 +49,8 @@ private:
 private:
     const Hanwha::DriverManifest& m_manifest;
     mutable QnMutex m_mutex;
-    QUrl m_url;
-    QAuthenticator m_auth;
+    const QUrl m_url;
+    const QAuthenticator m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
     Handler m_handler;

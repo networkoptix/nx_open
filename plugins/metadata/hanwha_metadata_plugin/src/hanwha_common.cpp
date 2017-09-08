@@ -1,7 +1,6 @@
 #include "hanwha_common.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/fusion/fusion/fusion_adaptor.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlag)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlags)
