@@ -18,7 +18,7 @@
         <product.title>${hanwha_metadata_plugin.name}</product.title>
 
         <qt.libs>core network</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_utils -lmediaserver_core</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core</global.libs>
     </properties>
     <dependencies>
         <dependency>
@@ -45,6 +45,14 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+	<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
