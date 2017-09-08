@@ -55,11 +55,19 @@ std::vector<SocketAddress> View::httpEndpoints() const
 void View::registerApiHandlers()
 {
     registerApiHandler<view::BeginListeningHandler>(
-        nx_http::Method::options,
+        nx_http::Method::post,
         &m_controller->listeningPeerManager());
     registerApiHandler<view::CreateClientSessionHandler>(
         nx_http::Method::post,
         &m_controller->connectSessionManager());
+    registerApiHandler<view::ConnectToPeerHandler>(
+        nx_http::Method::post,
+        &m_controller->connectSessionManager());
+
+    // TODO: #ak Following handlers are here for compatiblity with 3.1-beta. Remove after 3.1 release.
+    registerApiHandler<view::BeginListeningHandler>(
+        nx_http::Method::options,
+        &m_controller->listeningPeerManager());
     registerApiHandler<view::ConnectToPeerHandler>(
         nx_http::Method::options,
         &m_controller->connectSessionManager());
