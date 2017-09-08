@@ -14,13 +14,13 @@ class ConnectSessionManagerMock:
 {
 public:
     ConnectSessionManagerMock(
-        utils::SyncQueue<api::BeginListeningRequest>* receivedBeginListeningRequests,
+        //utils::SyncQueue<api::BeginListeningRequest>* receivedBeginListeningRequests,
         utils::SyncQueue<api::CreateClientSessionRequest>* receivedCreateClientSessionRequests,
         utils::SyncQueue<api::ConnectToPeerRequest>* receivedConnectToPeerRequests);
 
-    virtual void beginListening(
-        const api::BeginListeningRequest& request,
-        BeginListeningHandler completionHandler) override;
+    //virtual void beginListening(
+    //    const api::BeginListeningRequest& request,
+    //    BeginListeningHandler completionHandler) override;
 
     virtual void createClientSession(
         const api::CreateClientSessionRequest& request,
@@ -31,7 +31,7 @@ public:
         ConnectToPeerHandler completionHandler) override;
 
 private:
-    utils::SyncQueue<api::BeginListeningRequest>* m_receivedBeginListeningRequests;
+    //utils::SyncQueue<api::BeginListeningRequest>* m_receivedBeginListeningRequests;
     utils::SyncQueue<api::CreateClientSessionRequest>* m_receivedCreateClientSessionRequests;
     utils::SyncQueue<api::ConnectToPeerRequest>* m_receivedConnectToPeerRequests;
 };

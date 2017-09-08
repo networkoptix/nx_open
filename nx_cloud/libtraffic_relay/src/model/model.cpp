@@ -1,5 +1,7 @@
 #include "model.h"
+
 #include "remote_relay_peer_pool.h"
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {
@@ -7,7 +9,7 @@ namespace relay {
 
 Model::Model(const conf::Settings& settings):
     m_clientSessionPool(settings),
-    m_listeningPeerPool(settings),
+    m_listeningPeerPool(settings.listeningPeer()),
     m_remoteRelayPeerPool(model::RemoteRelayPeerPoolFactory::create(settings))
 {
 }

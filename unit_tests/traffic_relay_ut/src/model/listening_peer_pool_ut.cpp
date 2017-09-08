@@ -276,7 +276,7 @@ private:
 
         m_settingsLoader.load();
         m_pool = std::make_unique<model::ListeningPeerPool>(
-            m_settingsLoader.settings());
+            m_settingsLoader.settings().listeningPeer());
 
         nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
         m_pool->peerConnectedSubscription().subscribe(

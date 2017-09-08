@@ -2,23 +2,26 @@
 
 #include <tuple>
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/utils/type_utils.h>
-
-#include "../controller/connect_session_manager.h"
 
 namespace nx {
 namespace cloud {
 namespace relay {
 namespace view {
 
-template<typename Request, typename RequestBodyData, typename CompletionHandler, typename ... Response>
+template<
+    typename Manager,
+    typename Request,
+    typename RequestBodyData,
+    typename CompletionHandler,
+    typename ... Response>
 class BasicHandler:
     public nx_http::AbstractFusionRequestHandler<
         RequestBodyData,
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type>
 {
-    using Manager = controller::AbstractConnectSessionManager;
     using ManagerFunc = void(Manager::*)(const Request&, CompletionHandler);
 
 public:
@@ -81,11 +84,11 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename Request, typename CompletionHandler, typename ... Response>
+template<typename Manager, typename Request, typename CompletionHandler, typename ... Response>
 class BasicHandlerWithoutRequestBody:
-    public BasicHandler<Request, void, CompletionHandler, Response...>
+    public BasicHandler<Manager, Request, void, CompletionHandler, Response...>
 {
-    using base_type = BasicHandler<Request, void, CompletionHandler, Response...>;
+    using base_type = BasicHandler<Manager, Request, void, CompletionHandler, Response...>;
 
 public:
     template<typename ... Args>
@@ -109,11 +112,11 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename Request, typename CompletionHandler, typename ... Response>
+template<typename Manager, typename Request, typename CompletionHandler, typename ... Response>
 class BasicHandlerWithRequestBody:
-    public BasicHandler<Request, Request, CompletionHandler, Response...>
+    public BasicHandler<Manager, Request, Request, CompletionHandler, Response...>
 {
-    using base_type = BasicHandler<Request, Request, CompletionHandler, Response...>;
+    using base_type = BasicHandler<Manager, Request, Request, CompletionHandler, Response...>;
 
 public:
     template<typename ... Args>

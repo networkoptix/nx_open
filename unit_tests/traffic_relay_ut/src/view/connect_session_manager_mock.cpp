@@ -6,27 +6,27 @@ namespace relay {
 namespace test {
 
 ConnectSessionManagerMock::ConnectSessionManagerMock(
-    utils::SyncQueue<api::BeginListeningRequest>* receivedBeginListeningRequests,
+    //utils::SyncQueue<api::BeginListeningRequest>* receivedBeginListeningRequests,
     utils::SyncQueue<api::CreateClientSessionRequest>* receivedCreateClientSessionRequests,
     utils::SyncQueue<api::ConnectToPeerRequest>* receivedConnectToPeerRequests)
     :
-    m_receivedBeginListeningRequests(receivedBeginListeningRequests),
+    //m_receivedBeginListeningRequests(receivedBeginListeningRequests),
     m_receivedCreateClientSessionRequests(receivedCreateClientSessionRequests),
     m_receivedConnectToPeerRequests(receivedConnectToPeerRequests)
 {
 }
 
-void ConnectSessionManagerMock::beginListening(
-    const api::BeginListeningRequest& request,
-    BeginListeningHandler completionHandler)
-{
-    m_receivedBeginListeningRequests->push(request);
-
-    completionHandler(
-        api::ResultCode::ok,
-        api::BeginListeningResponse(),
-        nx_http::ConnectionEvents());
-}
+//void ConnectSessionManagerMock::beginListening(
+//    const api::BeginListeningRequest& request,
+//    BeginListeningHandler completionHandler)
+//{
+//    m_receivedBeginListeningRequests->push(request);
+//
+//    completionHandler(
+//        api::ResultCode::ok,
+//        api::BeginListeningResponse(),
+//        nx_http::ConnectionEvents());
+//}
 
 void ConnectSessionManagerMock::createClientSession(
     const api::CreateClientSessionRequest& request,

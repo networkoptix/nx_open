@@ -22,7 +22,7 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-namespace conf { class Settings; }
+namespace conf { struct ListeningPeer; }
 
 namespace model {
 
@@ -32,7 +32,7 @@ using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
 class ListeningPeerPool
 {
 public:
-    ListeningPeerPool(const conf::Settings& settings);
+    ListeningPeerPool(const conf::ListeningPeer& settings);
     ~ListeningPeerPool();
 
     void addConnection(
@@ -95,7 +95,7 @@ private:
     /** multimap<full peer name, connection context> */
     using PeerConnections = std::map<std::string, PeerContext>;
 
-    const conf::Settings& m_settings;
+    const conf::ListeningPeer& m_settings;
     PeerConnections m_peers;
     mutable QnMutex m_mutex;
     bool m_terminated;

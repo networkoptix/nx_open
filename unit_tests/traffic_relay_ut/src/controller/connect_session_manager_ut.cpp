@@ -13,6 +13,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <controller/connect_session_manager.h>
+#include <controller/listening_peer_manager.h>
 #include <controller/traffic_relay.h>
 #include <model/client_session_pool.h>
 #include <model/listening_peer_pool.h>
@@ -306,6 +307,21 @@ protected:
         return *m_connectSessionManager;
     }
 
+    controller::ListeningPeerManager& listeningPeerManager()
+    {
+        if (!m_listeningPeerManager)
+        {
+            m_settingsLoader.load();
+
+            m_listeningPeerManager =
+                std::make_unique<controller::ListeningPeerManager>(
+                    m_settingsLoader.settings(),
+                    &listeningPeerPool());
+        }
+
+        return *m_listeningPeerManager;
+    }
+
     model::ListeningPeerPool& listeningPeerPool()
     {
         if (!m_listeningPeerPool)
@@ -314,7 +330,7 @@ protected:
 
             m_listeningPeerPool =
                 std::make_unique<model::ListeningPeerPool>(
-                    m_settingsLoader.settings());
+                    m_settingsLoader.settings().listeningPeer());
         }
 
         return *m_listeningPeerPool;
@@ -342,7 +358,7 @@ protected:
         api::BeginListeningRequest request;
         request.peerName = std::move(peerName);
 
-        connectSessionManager().beginListening(
+        listeningPeerManager().beginListening(
             request,
             std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
     }
@@ -383,6 +399,7 @@ private:
     TrafficRelayStub m_trafficRelayStub;
     RemoteRelayPeerPoolStub m_remoteRelayPeerPoolStub;
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
+    std::unique_ptr<controller::ListeningPeerManager> m_listeningPeerManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
     nx::network::test::StreamSocketStub* m_lastListeningPeerConnection = nullptr;

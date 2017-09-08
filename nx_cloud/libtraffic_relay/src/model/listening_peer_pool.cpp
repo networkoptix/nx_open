@@ -10,12 +10,12 @@ namespace cloud {
 namespace relay {
 namespace model {
 
-ListeningPeerPool::ListeningPeerPool(const conf::Settings& settings):
+ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
     m_settings(settings),
     m_terminated(false)
 {
     m_periodicTasksTimer.start(
-        m_settings.listeningPeer().internalTimerPeriod,
+        m_settings.internalTimerPeriod,
         std::bind(&ListeningPeerPool::doPeriodicTasks, this));
 }
 
@@ -57,7 +57,7 @@ void ListeningPeerPool::addConnection(
         peerContext.expirationTimer = boost::none;
     }
 
-    if (!connection->setKeepAlive(m_settings.listeningPeer().tcpKeepAlive))
+    if (!connection->setKeepAlive(m_settings.tcpKeepAlive))
     {
         const auto sysErrorCode = SystemError::getLastOSErrorCode();
         NX_DEBUG(this, lm("Could not enable keep alive on connection from host %1 (%2). %3")
@@ -226,7 +226,7 @@ void ListeningPeerPool::startWaitingForNewConnection(
     TakeIdleConnectionHandler completionHandler)
 {
     auto expirationTime = 
-        nx::utils::monotonicTime() + m_settings.listeningPeer().takeIdleConnectionTimeout;
+        nx::utils::monotonicTime() + m_settings.takeIdleConnectionTimeout;
     // NOTE: Client request timer cannot last beyond peer offline timeout.
     if (peerContext->expirationTimer)
         expirationTime = std::min(expirationTime, (*peerContext->expirationTimer)->first);
@@ -331,7 +331,7 @@ void ListeningPeerPool::startPeerExpirationTimer(
     NX_ASSERT(!static_cast<bool>(peerContext->expirationTimer));
 
     auto timerIter = m_peerExpirationTimers.emplace(
-        nx::utils::monotonicTime() + m_settings.listeningPeer().disconnectedPeerTimeout,
+        nx::utils::monotonicTime() + m_settings.disconnectedPeerTimeout,
         peerName);
     peerContext->expirationTimer = timerIter;
 }
@@ -382,7 +382,7 @@ void ListeningPeerPool::doPeriodicTasks()
 
     m_periodicTasksTimer.cancelSync();
     m_periodicTasksTimer.start(
-        m_settings.listeningPeer().internalTimerPeriod,
+        m_settings.internalTimerPeriod,
         std::bind(&ListeningPeerPool::doPeriodicTasks, this));
 }
 

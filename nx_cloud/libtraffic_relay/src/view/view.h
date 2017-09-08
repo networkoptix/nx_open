@@ -43,8 +43,10 @@ private:
     MultiHttpServerPtr m_multiAddressHttpServer;
 
     void registerApiHandlers();
-    template<typename Handler> void registerApiHandler(
-        const nx_http::StringType& method);
+    template<typename Handler, typename Manager>
+        void registerApiHandler(
+            const nx_http::StringType& method,
+            Manager* manager);
 
     void startAcceptor();
 };

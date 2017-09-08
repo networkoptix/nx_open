@@ -1,6 +1,8 @@
 #pragma once
 
 #include "basic_handler.h"
+#include "../controller/connect_session_manager.h"
+#include "../controller/listening_peer_manager.h"
 
 namespace nx {
 namespace cloud {
@@ -9,22 +11,24 @@ namespace view {
 
 class BeginListeningHandler:
     public BasicHandlerWithoutRequestBody<
+        controller::AbstractListeningPeerManager,
         api::BeginListeningRequest,
-        controller::AbstractConnectSessionManager::BeginListeningHandler,
+        controller::AbstractListeningPeerManager::BeginListeningHandler,
         api::BeginListeningResponse>
 {
     using self_type = BeginListeningHandler;
     using base_type = 
         BasicHandlerWithoutRequestBody<
+            controller::AbstractListeningPeerManager,
             api::BeginListeningRequest,
-            controller::AbstractConnectSessionManager::BeginListeningHandler,
+            controller::AbstractListeningPeerManager::BeginListeningHandler,
             api::BeginListeningResponse>;
 
 public:
     static const char* kPath;
 
     BeginListeningHandler(
-        controller::AbstractConnectSessionManager* connectSessionManager);
+        controller::AbstractListeningPeerManager* listeningPeerManager);
 
 protected:
     virtual api::BeginListeningRequest prepareRequestData() override;
@@ -34,6 +38,7 @@ protected:
 
 class CreateClientSessionHandler:
     public BasicHandlerWithRequestBody<
+        controller::AbstractConnectSessionManager,
         api::CreateClientSessionRequest,
         controller::AbstractConnectSessionManager::CreateClientSessionHandler,
         api::CreateClientSessionResponse>
@@ -41,6 +46,7 @@ class CreateClientSessionHandler:
     using self_type = CreateClientSessionHandler;
     using base_type = 
         BasicHandlerWithRequestBody<
+            controller::AbstractConnectSessionManager,
             api::CreateClientSessionRequest,
             controller::AbstractConnectSessionManager::CreateClientSessionHandler,
             api::CreateClientSessionResponse>;
@@ -59,12 +65,14 @@ protected:
 
 class ConnectToPeerHandler:
     public BasicHandlerWithoutRequestBody<
+        controller::AbstractConnectSessionManager,
         api::ConnectToPeerRequest,
         controller::AbstractConnectSessionManager::ConnectToPeerHandler>
 {
     using self_type = ConnectToPeerHandler;
     using base_type =
         BasicHandlerWithoutRequestBody<
+            controller::AbstractConnectSessionManager,
             api::ConnectToPeerRequest,
             controller::AbstractConnectSessionManager::ConnectToPeerHandler>;
 
