@@ -34,7 +34,7 @@ void LocalFiles::fileIsBusy(QWidget* parent, const QString& filename)
 void LocalFiles::fileCannotBeWritten(QWidget* parent, const QString& filename)
 {
     QnMessageBox::warning(parent,
-        tr("File \"%1\" cannot be written.")
+        tr("File \"%1\" cannot be written. Please try another name.")
         .arg(QFileInfo(filename).fileName()));
 }
 
