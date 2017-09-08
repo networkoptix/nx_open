@@ -809,8 +809,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp
 
     m_portNamePrefixToIgnore = resourceData.value<QString>(
         lit("portNamePrefixToIgnore"), QString());
-    m_portNamePrefixToIgnore = resourceData.value<QString>(
-        lit("portNamePrefixToIgnore"), QString());
 
     return CameraDiagnostics::NoErrorResult();
 }

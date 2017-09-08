@@ -802,7 +802,8 @@
             "keys": [
                 "Hikvision|DS-2CD2132F-IWS"
             ],
-            "relayOutputInversed": true
+            "relayOutputInversed": true,
+            "portNamePrefixToIgnore": "AlarmOut"
         },
         {
             "keys": [
