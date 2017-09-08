@@ -333,6 +333,9 @@ angular.module('webadminApp')
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
+            disconnectFromSystem:function(){
+                return wrapPost(proxy + '/web/api/detachFromSystem');
+            },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');
             },
