@@ -19,7 +19,6 @@ angular.module('cloudApp')
             $scope.reactivating = $routeParams.reactivating;
             $scope.restoring = $routeParams.restoring;
 
-            $scope.reactivatingSuccess = $routeParams.reactivatingSuccess;
             $scope.activationSuccess = $routeParams.activationSuccess;
             $scope.restoringSuccess = $routeParams.restoringSuccess;
             $scope.changeSuccess = $routeParams.changeSuccess;
@@ -48,7 +47,6 @@ angular.module('cloudApp')
 
             // Check session context
             if( checkContext('activateSuccess',  $routeParams.activationSuccess) ||
-                checkContext('reactivatingSuccess',$routeParams.reactivatingSuccess) ||
                 checkContext('restoringSuccess', $routeParams.restoringSuccess) ||
                 checkContext('changeSuccess',    $routeParams.changeSuccess)){
                 setContext(null);
@@ -120,7 +118,6 @@ angular.module('cloudApp')
                 holdAlerts:true,
                 errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
-                setContext('reactivatingSuccess');
                 dialogs.notify(L.account.activationLinkSent, 'success');
             });
 

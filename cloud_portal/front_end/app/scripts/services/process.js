@@ -90,7 +90,7 @@ angular.module('cloudApp')
                             }
 
                             var formatted = formatError(data.data || data, errorCodes);
-                            if(formatted !== false && data.data.resultCode != "accountNotActivated"){
+                            if(formatted !== false){
                                 self.errorMessage = formatted;
                                 // Error handler here
                                 dialogs.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
