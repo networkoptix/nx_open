@@ -1254,7 +1254,7 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
     static const QString kForbiddenChars =
         nx::utils::AppInfo::isWindows() ? lit("\\|/:*?\"<>")
       : nx::utils::AppInfo::isLinux()   ? lit("/")
-      : nx::utils::AppInfo::isMacOsX()  ? lit(":")
+      : nx::utils::AppInfo::isMacOsX()  ? lit("/:")
       : QString();
 
     for (const auto character: newFileName)
