@@ -1,8 +1,7 @@
 #pragma once
 
-#include <nx/fusion/serialization/lexical_functions.h>
-#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/network/http/http_types.h>
 #include <utils/common/util.h>
 
 #include "request_handler.h"
@@ -17,28 +16,7 @@ static void serialize(
     const OutputData& outputData, QByteArray& result, QByteArray& contentType,
     Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false)
 {
-    if (format == Qn::UnsupportedFormat)
-        format = Qn::JsonFormat;
-
-    switch(format)
-    {
-        case Qn::UbjsonFormat:
-            result = QnUbjson::serialized(outputData);
-            break;
-        case Qn::JsonFormat:
-            result = QJson::serialized(outputData);
-            if (extraFormatting)
-                formatJSonString(result);
-            break;
-        case Qn::CsvFormat:
-            result = QnCsv::serialized(outputData);
-            break;
-        case Qn::XmlFormat:
-            result = QnXml::serialized(outputData, lit("reply"));
-            break;
-        default:
-            NX_ASSERT(false);
-    }
+    result = Qn::serialized(outputData, format, extraFormatting);
     contentType = Qn::serializationFormatToHttpContentType(format);
 }
 
