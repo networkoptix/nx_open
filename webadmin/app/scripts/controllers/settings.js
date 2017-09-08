@@ -328,17 +328,42 @@ angular.module('webadminApp')
                     });
                 });
         };
-        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
 
+        $scope.disconnectFromSystem = function(){ // Detach server from the system
+            dialogs.confirmWithPassword(
+                L.settings.confirmDisconnectFromSystemTitle,
+                L.settings.confirmDisconnectFromSystem,
+                L.settings.confirmDisconnectFromSystemAction,
+                'danger').then(function (oldPassword) {
+                    //1. Check password
+                    return mediaserver.checkCurrentPassword(oldPassword).
+                        then(function(){
+                            return mediaserver.disconnectFromSystem().then(function(){
+                                return dialogs.alert(L.settings.disconnectedFromSystemSuccess).
+                                    finally(function(){
+                                        window.location.reload();
+                                    });
+                            }, function(error){
+                                dialogs.alert(L.settings.unexpectedError);
+                                console.error(error);
+                            });
+                        },function(){
+                            dialogs.alert(L.settings.wrongPassword);
+                        });
+                });
+        };
+
+        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
-                        window.location.reload();
-                    });
+                    dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
+                                  Config.cloud.productName)).finally(function(){
+                                      window.location.reload();
+                                  });
                 }, function(error){
-                    console.error(error);
                     dialogs.alert(L.settings.unexpectedError);
+                    console.error(error);
                 });
             }
             dialogs.confirmWithPassword(

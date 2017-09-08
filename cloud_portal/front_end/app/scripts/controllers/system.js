@@ -172,7 +172,7 @@ angular.module('cloudApp')
                            $scope.system.info.name || L.errorCodes.thisSystem), 'warning');
             $location.path("/systems");
         }
-        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId, connectionLost);
+        var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
