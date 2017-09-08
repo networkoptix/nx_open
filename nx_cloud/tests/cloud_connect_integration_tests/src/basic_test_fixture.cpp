@@ -4,14 +4,14 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
-#include <controller/connect_session_manager.h>
 
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-#include <libtraffic_relay/src/controller/relay_public_ip_discovery.h>
-#include <libtraffic_relay/src/model/listening_peer_pool.h>
-#include <libtraffic_relay/src/model/model.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
+#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relay/model/model.h>
 
 namespace nx {
 namespace network {

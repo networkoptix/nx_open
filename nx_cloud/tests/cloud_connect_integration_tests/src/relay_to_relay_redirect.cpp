@@ -1,10 +1,13 @@
+#include <algorithm>
+
 #include <gtest/gtest.h>
 
-#include <algorithm>
-#include "basic_test_fixture.h"
-#include <controller/connect_session_manager.h>
-#include <controller/../settings.h>
 #include <nx/utils/std/future.h>
+
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/settings.h>
+
+#include "basic_test_fixture.h"
 
 namespace nx {
 namespace network {

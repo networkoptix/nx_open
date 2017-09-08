@@ -10,11 +10,11 @@ namespace view {
 const char* BeginListeningHandler::kPath = api::kServerIncomingConnectionsPath;
 
 BeginListeningHandler::BeginListeningHandler(
-    controller::AbstractConnectSessionManager* connectSessionManager)
+    controller::AbstractListeningPeerManager* listeningPeerManager)
     :
     base_type(
-        connectSessionManager,
-        &controller::AbstractConnectSessionManager::beginListening)
+        listeningPeerManager,
+        &controller::AbstractListeningPeerManager::beginListening)
 {
 }
 

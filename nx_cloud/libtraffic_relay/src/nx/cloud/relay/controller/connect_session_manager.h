@@ -33,10 +33,6 @@ public:
     //---------------------------------------------------------------------------------------------
     // Completion handler types.
 
-    using BeginListeningHandler =
-        nx::utils::MoveOnlyFunc<void(
-            api::ResultCode, api::BeginListeningResponse, nx_http::ConnectionEvents)>;
-
     using CreateClientSessionHandler =
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::CreateClientSessionResponse)>;
 
@@ -47,10 +43,6 @@ public:
 
     virtual ~AbstractConnectSessionManager() = default;
 
-    virtual void beginListening(
-        const api::BeginListeningRequest& request,
-        BeginListeningHandler completionHandler) = 0;
-
     virtual void createClientSession(
         const api::CreateClientSessionRequest& request,
         CreateClientSessionHandler completionHandler) = 0;
@@ -60,7 +52,8 @@ public:
         ConnectToPeerHandler completionHandler) = 0;
 };
 
-class ConnectSessionManager: public AbstractConnectSessionManager
+class ConnectSessionManager:
+    public AbstractConnectSessionManager
 {
 public:
     ConnectSessionManager(
@@ -71,10 +64,6 @@ public:
         controller::AbstractTrafficRelay* trafficRelay);
     ~ConnectSessionManager();
 
-    virtual void beginListening(
-        const api::BeginListeningRequest& request,
-        BeginListeningHandler completionHandler) override;
-
     virtual void createClientSession(
         const api::CreateClientSessionRequest& request,
         CreateClientSessionHandler completionHandler) override;
@@ -82,7 +71,6 @@ public:
     virtual void connectToPeer(
         const api::ConnectToPeerRequest& request,
         ConnectToPeerHandler completionHandler) override;
-
 
 private:
     struct RelaySession
@@ -104,10 +92,6 @@ private:
     std::list<RelaySession> m_relaySessions;
     QnMutex m_mutex;
     bool m_terminated = false;
-
-    void saveServerConnection(
-        const std::string& peerName,
-        nx_http::HttpServerConnection* httpConnection);
 
     void onAcquiredListeningPeerConnection(
         const std::string& connectSessionId,

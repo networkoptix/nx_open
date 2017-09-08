@@ -1,4 +1,5 @@
 #include "controller.h"
+
 #include "relay_public_ip_discovery.h"
 #include "../model/model.h"
 #include "../model/remote_relay_peer_pool.h"
@@ -19,6 +20,9 @@ Controller::Controller(
             &model->listeningPeerPool(),
             &model->remoteRelayPeerPool(),
             &m_trafficRelay)),
+    m_listeningPeerManager(
+        controller::ListeningPeerManagerFactory::instance().create(
+            settings, &model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
 {
@@ -33,6 +37,11 @@ Controller::~Controller()
 controller::AbstractConnectSessionManager& Controller::connectSessionManager()
 {
     return *m_connectSessionManager;
+}
+
+controller::AbstractListeningPeerManager& Controller::listeningPeerManager()
+{
+    return *m_listeningPeerManager;
 }
 
 bool Controller::discoverPublicAddress()
