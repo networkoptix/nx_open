@@ -122,8 +122,6 @@ angular.module('cloudApp')
             }).then(function(){
                 setContext('reactivatingSuccess');
                 $location.path('/activate/send', false); // Change url, do not reload
-                $scope.reactivating = false;
-                $scope.reactivatingSuccess = true;
                 dialogs.notify(L.account.activationLinkSent, 'success');
             });
 
