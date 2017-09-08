@@ -1,9 +1,11 @@
 {{&event}} {{#source}}on {{&source}}{{/source}} 
 {{#aggregated}}
 
+{{#msConflicts}}
 Number: {{&number}}
 Server IP: {{&ip}}
 Camera Physical ID: {{&mac}}
+{{/msConflicts}}
 
 {{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

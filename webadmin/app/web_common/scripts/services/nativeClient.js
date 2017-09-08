@@ -99,7 +99,8 @@ angular.module('nxCommon')
                             $log("could not decode JSON from string: " + authObject);
                         }
                     }
-                    $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
+                    $log.log("got credentials from client. cloudEmail: " + authObject.cloudEmail +
+                             " localLogin:" + authObject.localLogin);
                     return authObject;
                 });
             },
