@@ -21,14 +21,35 @@ void LocalFiles::fileExists(QWidget* parent, const QString& filename)
 {
     QnMessageBox::warning(parent,
         tr("File \"%1\" already exists. Please try another name.")
-        .arg(QFileInfo(filename).completeBaseName()));
+        .arg(QFileInfo(filename).fileName()));
 }
 
 void LocalFiles::fileIsBusy(QWidget* parent, const QString& filename)
 {
     QnMessageBox::warning(parent,
-        tr("File \"%1\" is used by another process. Please try another name.")
-        .arg(QFileInfo(filename).completeBaseName()));
+        tr("File \"%1\" is used by another process.")
+        .arg(QFileInfo(filename).fileName()));
+}
+
+void LocalFiles::fileCannotBeWritten(QWidget* parent, const QString& filename)
+{
+    QnMessageBox::warning(parent,
+        tr("File \"%1\" cannot be written.")
+        .arg(QFileInfo(filename).fileName()));
+}
+
+void LocalFiles::invalidChars(QWidget* parent, const QString& invalidSet)
+{
+    QnMessageBox::warning(parent,
+        tr("Filename should not contain the following reserved characters:\n%1", "", invalidSet.size())
+        .arg(invalidSet));
+}
+
+void LocalFiles::reservedFilename(QWidget* parent, const QString& filename)
+{
+    QnMessageBox::warning(parent,
+        tr("Filename \"%1\" is reserved by operating system. Please try another name.")
+        .arg(filename));
 }
 
 } // namespace messages
