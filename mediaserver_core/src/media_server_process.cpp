@@ -2154,7 +2154,7 @@ void MediaServerProcess::run()
     if (ipVersion.isEmpty())
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
+    SocketFactory::setIpVersion(ipVersion);
 
     std::unique_ptr<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
 
