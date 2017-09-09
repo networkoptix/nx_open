@@ -49,15 +49,6 @@ class ContextAdmin(CMSAdmin):
                     'url', 'translatable')
     search_fields = ('name', 'description', 'url')
 
-    def changelist_view(self, request, extra_context=None):
-        if request.user.has_perm('cms.edit_content'):
-            self.list_display = ('context_actions', 'name', 'description',
-                            'url', 'translatable')
-        else:
-            self.list_display = ('name', 'description',
-                    'url', 'translatable')
-        return super(ContextAdmin, self).changelist_view(request, extra_context)
-
     def context_actions(self, obj):
         return format_html('<a class="button" href="{}">edit content</a>',
                            reverse('context_editor', args=[obj.id]))
@@ -100,17 +91,6 @@ class ContentVersionAdmin(CMSAdmin):
     list_display = ('content_version_actions', 'id', 'customization', 'name',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by')
-
-    def changelist_view(self, request, extra_context=None):
-        if request.user.has_perm('cms.edit_content'):
-            self.list_display = ('content_version_actions', 'id', 'customization', 'name',
-                            'created_date', 'created_by',
-                            'accepted_date', 'accepted_by')
-        else:
-            self.list_display = ('id', 'customization', 'name',
-                    'created_date', 'created_by',
-                    'accepted_date', 'accepted_by')
-        return super(ContentVersionAdmin, self).changelist_view(request, extra_context)
 
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',
