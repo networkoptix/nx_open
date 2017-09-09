@@ -736,6 +736,11 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+.blur-preview{
+  -webkit-filter: blur(5px);
+  filter: blur(5px);
+}
+
 .video-preview{
   background-color: $dark1;
   max-width: 100%;
