@@ -185,6 +185,7 @@ angular.module('nxCommon')
                 // TODO: Support new players
 
                 var videoPlayers = [];
+                var makingPlayer = false;
 
                 function initNativePlayer(nativeFormat) {
 
@@ -195,6 +196,7 @@ angular.module('nxCommon')
                     var autoshow = null;
                     $timeout(function(){
                         nativePlayer.init(element.find(".videoplayer"), function (api) {
+                            makingPlayer = false;
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
@@ -260,6 +262,7 @@ angular.module('nxCommon')
                     }else {
                         $timeout(function () {// Force DOM to refresh here
                             flashlsAPI.init(playerId, function (api) {
+                                makingPlayer = false;
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     scope.vgApi.load(getFormatSrc('hls'));
@@ -302,6 +305,7 @@ angular.module('nxCommon')
                                       Config.webclient.hlsLoadingTimeout,
                                       scope.debugMode,
                                       function (api) {
+                                            makingPlayer = false;
                                             scope.vgApi = api;
                                             if (scope.vgSrc) {
                                                 scope.vgApi.load(getFormatSrc('hls'));
@@ -333,6 +337,10 @@ angular.module('nxCommon')
                 
 
                 function initNewPlayer(){
+                    if( makingPlayer ){
+                        return;
+                    }
+                    makingPlayer = true;
                     switch(scope.player){
                         case "flashls":
                             initFlashls();
