@@ -198,7 +198,6 @@ angular.module('nxCommon')
 
                 var pausedLive = false;
                 function playPause(){
-                    timelineActions.playPause();
                     if(scope.positionProvider.playing){
                         pausedLive = scope.positionProvider.liveMode;
                         scope.playHandler(false);
@@ -212,6 +211,8 @@ angular.module('nxCommon')
                     }else{
                         scope.playHandler(true);
                     }
+
+                    timelineActions.playPause();
                 }
 
                 function timelineClick(mouseX){

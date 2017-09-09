@@ -1058,66 +1058,70 @@ ScaleManager.prototype.releaseWatching = function(){
     this.watch.forcedToStop = false;
 };
 
-ScaleManager.prototype.watchPlaying = function(date, liveMode){
-    this.watch.playing = !liveMode;
-    this.watch.live = liveMode;
+ScaleManager.prototype.watchPosition = function(date, livePosition){
+    this.watch.playing = !livePosition;
+    this.watch.live = livePosition;
     this.watch.forcedToStop = false;
 
-    if(!date){
+    if(!date){ // Date not specified - do nothing
         return;
     }
     var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
-    if(targetPoint > 1){
+    if(targetPoint > 1){  // Try to set playing position in the middle of the screen
         targetPoint = 0.5;
-    }
-    if(liveMode){
-        targetPoint = 1;
     }
     this.setAnchorDateAndPoint(date, targetPoint);
 };
 
-ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
-    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
-
-    if(this.anchorDate == date){
-        this.watchPlaying(date);
+ScaleManager.prototype.checkWatch = function(){
+    if(this.watch.forcedToStop){
+        return;  // was forced to stop - wait for release
     }
 
-    if(0 <= targetPoint && targetPoint <= 1 ){ 
-        this.watchPlaying(date); // Let's watch
+    // Logic:
+    // We are playing?
+    //      yes: playing position is visible?
+    //              yes: watch playing and return
+    //      no: live position is visible or close to right border?
+    //           yes: watch live and return
+
+    if(this.playing){
+        // check current playing position is visible
+        var playingPoint = this.dateToScreenCoordinate(this.playedPosition);
+        if(0 <= playingPoint && playingPoint <= this.viewportWidth - 1){ // playing position is visible on the screen
+            return this.watchPosition(this.playedPosition, false);
+        }
     }
 
-    if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.watchPlaying(date, liveMode);
+    // playing position is outside the screen - try to watch live
+    if(this.end - this.visibleEnd < this.stickToLiveMs ){
+        // Watch live!
+        return this.watchPosition(this.end, true);
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
-    if(playing !== null){
-        this.playedPosition = playing;
+ScaleManager.prototype.updateWatching = function(){
+    if(this.watch.forcedToStop){
+        return; // Was forced to stop - do nothing
     }
-    this.liveMode = liveMode;
+    if(this.watch.live){ // watching live position - set anchor to end
+        return this.setAnchorDateAndPoint(this.end, 1);
+    }
+    if(this.watch.playing){ // watching position - update anchor point
+        return this.setAnchorDateAndPoint(this.playedPosition, this.anchorPoint); //updateWatching
+    }
+    this.checkWatch(); // not watching now - check if we can now
+};
 
-    if(this.anchorDate == playing){
-        return;
+ScaleManager.prototype.updatePlayingState = function(playedPosition, liveMode, playing){
+    this.liveMode = liveMode;
+    this.playing = playing;
+    if(playedPosition !== null){
+        this.playedPosition = playedPosition;
     }
 
     this.setEnd();
-
-    if(!this.watch.forcedToStop && this.watch.live){
-        this.setAnchorDateAndPoint(this.end, 1);
-        return;
-    }
-/*    if(!this.watch.forcedToStop && !this.watch.playing){
-        this.checkWatchPlaying(this.end, true);
-        return;
-    } */
-    if(!this.watch.forcedToStop && !this.watch.playing){
-        this.checkWatchPlaying(this.playedPosition, liveMode);
-    }
-    if(this.watch.playing){
-        this.setAnchorDateAndPoint(this.playedPosition, liveMode ? 1:this.anchorPoint);
-    }
+    this.updateWatching();
 };
 
 

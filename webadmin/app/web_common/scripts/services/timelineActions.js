@@ -39,20 +39,24 @@ TimelineActions.prototype.goToLive = function(){
     self.animateScope.progress(self.scope, 'goingToLive' ).then(
         function(){
             var activeDate = timeManager.nowToDisplay();
-            self.scaleManager.setAnchorDateAndPoint(activeDate,1);
-            self.scaleManager.watchPlaying(activeDate, true);
+            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
+            self.scaleManager.watchPosition(activeDate, true); // goToLive animation
         },
         function(){},
         function(val){
             var activeDate = moveDate + val * (timeManager.nowToDisplay() - moveDate);
-            self.scaleManager.setAnchorDateAndPoint(activeDate,1);
+            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
         });
 };
+TimelineActions.prototype.updatePlayingState = function(playingPosition){
+    this.scaleManager.updatePlayingState(playingPosition, this.positionProvider.liveMode, this.positionProvider.playing);
 
+}
 TimelineActions.prototype.playPause = function() {
-    if (!this.positionProvider.playing) {
-        this.scaleManager.watchPlaying();
-    }
+    this.updatePlayingState(null);
+
+    // Maybe we need to scroll to playing position smoothly?
+    // this.scaleManager.watchPosition();
 };
 
 
@@ -84,7 +88,7 @@ TimelineActions.prototype.updatePosition = function(){
                 self.nextPlayedPosition = false;
             }
             // Update live position anyways
-            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
+            self.updatePlayingState(null);
             return; // ignore changes until played position wasn't changed
         }
 
@@ -93,8 +97,7 @@ TimelineActions.prototype.updatePosition = function(){
         var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
 
         if(intervalMs == 0){
-            // Update live position anyways
-            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
+            self.updatePlayingState(null); // No need to animate, update position
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
@@ -105,11 +108,11 @@ TimelineActions.prototype.updatePosition = function(){
                 function () {},
                 function (value) {
                     if(self.nextPlayedPosition){
-                        console.log("problem with playing position",value,self.nextPlayedPosition);
                         self.scope.lastPlayedPosition = self.nextPlayedPosition;
+                        console.error("problem with playing position",value,self.nextPlayedPosition);
                         return;
                     }
-                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode);
+                    self.updatePlayingState(value); // animate played position
                 });
         }
     }
@@ -124,7 +127,8 @@ TimelineActions.prototype.setClickedCoordinate = function(mouseX){
 
     this.stopAnimatingMove(); // Instantly jump to new position
     this.scope.lastPlayedPosition = position;
-    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode);
+
+    this.updatePlayingState(position); // Force set clicked position as playing
 
     return position;
 };
