@@ -16,7 +16,6 @@ namespace
 {
     static const QString kUpnpBasicDeviceType("Basic");
     static const QString kHanwhaManufacturerName("Hanwha Techwin");
-    static const QString kHanwhaAltManufacturerName("Samsung");
     static const QString kHanwhaCameraName("Hanwha_Common");
 }
 
@@ -116,11 +115,19 @@ QnResourceList HanwhaResourceSearcher::findResources(void)
     return upnpResults;
 }
 
-bool HanwhaResourceSearcher::isHanwhaCamera(const QString &vendorName, const QString& model) const
+bool HanwhaResourceSearcher::isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const
 {
-    const auto vendor = vendorName.toLower().trimmed();
-    return vendor.startsWith(kHanwhaManufacturerName.toLower()) ||
-        vendor.startsWith(kHanwhaAltManufacturerName.toLower());
+    auto simplifyStr = [](const QString& value)
+    {
+        return value.toLower().trimmed().replace(lit(" "), lit(""));
+    };
+
+    const auto vendor = simplifyStr(devInfo.manufacturer);
+    if (vendor.startsWith(lit("hanwha")))
+        return true;
+
+    static const QString kSamsung(lit("samsungtechwin"));
+    return vendor.contains(kSamsung) || simplifyStr(devInfo.manufacturerUrl).contains(kSamsung);
 }
 
 bool HanwhaResourceSearcher::processPacket(
@@ -129,7 +136,7 @@ bool HanwhaResourceSearcher::processPacket(
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
-    if (!isHanwhaCamera(devInfo.manufacturer, devInfo.modelName))
+    if (!isHanwhaCamera(devInfo))
         return false;
 
     QnMacAddress cameraMac(devInfo.udn.split(L'-').last());

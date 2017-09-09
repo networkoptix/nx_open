@@ -96,6 +96,8 @@ bool DeviceDescriptionHandler::charactersInDevice( const QString& ch )
         lastDev.friendlyName = ch;
     else if( m_paramElement == lit("manufacturer") )
         lastDev.manufacturer = ch;
+    else if (m_paramElement == lit("manufacturerURL"))
+        lastDev.manufacturerUrl = ch;
     else if( m_paramElement == lit("modelName") )
         lastDev.modelName = ch;
     else if( m_paramElement == lit("serialNumber") )

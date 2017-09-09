@@ -48,7 +48,7 @@ private:
         const QAuthenticator& auth,
         QnResourceList& result );
 
-    bool isHanwhaCamera(const QString& vendorName, const QString& model) const;
+    bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
     int getChannels(const HanwhaResourcePtr& resource);
 
     template<typename T>
