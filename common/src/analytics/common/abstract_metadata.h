@@ -4,6 +4,8 @@
 
 struct QnAbstractMetadata
 {
+    virtual ~QnAbstractMetadata() = default;
+
     virtual QnCompressedMetadataPtr serialize() const = 0;
     virtual bool deserialize(const QnConstCompressedMetadataPtr& data) = 0;
 };
