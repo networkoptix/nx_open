@@ -2,8 +2,10 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/literal.h>
+#include <nx/utils/string.h>
 
 #include "model_functions_fwd.h"
+////#include "model_functions.h"
 
 namespace Qn {
 
@@ -39,7 +41,7 @@ QByteArray serialized(
         {
             QByteArray result = QJson::serialized(outputData);
             if (extraFormatting)
-                result = formatJSonString(result);
+                result = nx::utils::formatJsonString(result);
             return result;
         }
 

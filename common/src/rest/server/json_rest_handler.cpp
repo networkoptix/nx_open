@@ -1,8 +1,12 @@
 #include "json_rest_handler.h"
+
+#include <nx/utils/string.h>
 #include <utils/common/util.h>
 
 namespace {
-    const static QLatin1String kExtraFormatting("extraFormatting");
+
+static const QLatin1String kExtraFormatting("extraFormatting");
+
 } // namespace
 
 QnJsonRestHandler::QnJsonRestHandler():
@@ -24,7 +28,7 @@ int QnJsonRestHandler::executeGet(
 
     result = QJson::serialized(jsonResult);
     if (paramsMap.contains(kExtraFormatting))
-        result  = formatJSonString(result);
+        result  = nx::utils::formatJsonString(result);
 
     contentType = m_contentType;
 
@@ -41,7 +45,7 @@ int QnJsonRestHandler::executeDelete(
 
     result = QJson::serialized(jsonResult);
     if (paramsMap.contains(kExtraFormatting))
-        result = formatJSonString(result);
+        result = nx::utils::formatJsonString(result);
 
     contentType = m_contentType;
 
@@ -59,7 +63,7 @@ int QnJsonRestHandler::executePost(
 
     result = QJson::serialized(jsonResult);
     if (paramsMap.contains(kExtraFormatting))
-        result = formatJSonString(result);
+        result = nx::utils::formatJsonString(result);
 
     contentType = m_contentType;
 
@@ -77,7 +81,7 @@ int QnJsonRestHandler::executePut(
 
     result = QJson::serialized(jsonResult);
     if (paramsMap.contains(kExtraFormatting))
-        result  = formatJSonString(result);
+        result  = nx::utils::formatJsonString(result);
 
     contentType = m_contentType;
 

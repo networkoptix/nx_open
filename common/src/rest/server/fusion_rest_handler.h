@@ -3,6 +3,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_types.h>
 #include <utils/common/util.h>
+#include <nx/utils/string.h>
 
 #include "request_handler.h"
 #include "json_rest_result.h"
@@ -29,7 +30,7 @@ static void serializeJsonRestReply(
     jsonRestResult.setReply(outputData);
     result = QJson::serialized(jsonRestResult);
     if (params.contains(lit("extraFormatting")))
-        formatJSonString(result);
+        nx::utils::formatJsonString(result);
 
     contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 }
