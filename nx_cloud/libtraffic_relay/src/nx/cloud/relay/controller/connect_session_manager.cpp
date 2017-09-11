@@ -52,46 +52,6 @@ ConnectSessionManager::~ConnectSessionManager()
         relaySession.listeningPeerConnection->pleaseStopSync();
 }
 
-void ConnectSessionManager::beginListening(
-    const api::BeginListeningRequest& request,
-    BeginListeningHandler completionHandler)
-{
-    using namespace std::placeholders;
-
-    NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
-
-    // TODO: #ak Using getConnectionCountByPeerName makes folowing code not atomic.
-    //   That can lead to server registering more connections than was allowed.
-
-    const auto peerConnectionCount =
-        m_listeningPeerPool->getConnectionCountByPeerName(request.peerName);
-    if (peerConnectionCount >=
-            (std::size_t)m_settings.listeningPeer().maxPreemptiveConnectionCount)
-    {
-        NX_LOGX(lm("Refusing beginListening for peer %1 since there are already "
-            "%2 connections with maximum of %3")
-            .arg(request.peerName).arg(peerConnectionCount)
-            .arg(m_settings.listeningPeer().maxPreemptiveConnectionCount),
-            cl_logDEBUG2);
-        completionHandler(
-            api::ResultCode::preemptiveConnectionCountAtMaximum,
-            api::BeginListeningResponse(),
-            nx_http::ConnectionEvents());
-        return;
-    }
-
-    api::BeginListeningResponse response;
-    response.preemptiveConnectionCount =
-        m_settings.listeningPeer().recommendedPreemptiveConnectionCount;
-
-    nx_http::ConnectionEvents connectionEvents;
-    connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectSessionManager::saveServerConnection, this,
-            request.peerName, _1);
-
-    completionHandler(api::ResultCode::ok, std::move(response), std::move(connectionEvents));
-}
-
 void ConnectSessionManager::createClientSession(
     const api::CreateClientSessionRequest& request,
     CreateClientSessionHandler completionHandler)
@@ -174,15 +134,6 @@ void ConnectSessionManager::connectToPeer(
                 resultCode,
                 std::move(serverConnection));
         });
-}
-
-void ConnectSessionManager::saveServerConnection(
-    const std::string& peerName,
-    nx_http::HttpServerConnection* httpConnection)
-{
-    m_listeningPeerPool->addConnection(
-        peerName,
-        httpConnection->takeSocket());
 }
 
 void ConnectSessionManager::onAcquiredListeningPeerConnection(

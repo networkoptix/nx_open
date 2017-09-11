@@ -11,8 +11,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <model/listening_peer_pool.h>
-#include <settings.h>
+#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relay/settings.h>
 
 #include "../settings_loader.h"
 
@@ -276,7 +276,7 @@ private:
 
         m_settingsLoader.load();
         m_pool = std::make_unique<model::ListeningPeerPool>(
-            m_settingsLoader.settings());
+            m_settingsLoader.settings().listeningPeer());
 
         nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
         m_pool->peerConnectedSubscription().subscribe(

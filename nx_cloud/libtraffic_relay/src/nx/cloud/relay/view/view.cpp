@@ -54,19 +54,35 @@ std::vector<SocketAddress> View::httpEndpoints() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<view::BeginListeningHandler>(nx_http::Method::options);
-    registerApiHandler<view::CreateClientSessionHandler>(nx_http::Method::post);
-    registerApiHandler<view::ConnectToPeerHandler>(nx_http::Method::options);
+    registerApiHandler<view::BeginListeningHandler>(
+        nx_http::Method::post,
+        &m_controller->listeningPeerManager());
+    registerApiHandler<view::CreateClientSessionHandler>(
+        nx_http::Method::post,
+        &m_controller->connectSessionManager());
+    registerApiHandler<view::ConnectToPeerHandler>(
+        nx_http::Method::post,
+        &m_controller->connectSessionManager());
+
+    // TODO: #ak Following handlers are here for compatiblity with 3.1-beta. Remove after 3.1 release.
+    registerApiHandler<view::BeginListeningHandler>(
+        nx_http::Method::options,
+        &m_controller->listeningPeerManager());
+    registerApiHandler<view::ConnectToPeerHandler>(
+        nx_http::Method::options,
+        &m_controller->connectSessionManager());
 }
 
-template<typename Handler>
-void View::registerApiHandler(const nx_http::StringType& method)
+template<typename Handler, typename Manager>
+void View::registerApiHandler(
+    const nx_http::StringType& method,
+    Manager* manager)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         Handler::kPath,
-        [this]() -> std::unique_ptr<Handler>
+        [this, manager]() -> std::unique_ptr<Handler>
         {
-            return std::make_unique<Handler>(&m_controller->connectSessionManager());
+            return std::make_unique<Handler>(manager);
         },
         method);
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <nx/utils/subscription.h>
+
 #include "connect_session_manager.h"
+#include "listening_peer_manager.h"
 #include "traffic_relay.h"
 
 namespace nx {
@@ -21,11 +23,13 @@ public:
     ~Controller();
 
     controller::AbstractConnectSessionManager& connectSessionManager();
+    controller::AbstractListeningPeerManager& listeningPeerManager();
     bool discoverPublicAddress();
 
 private:
     controller::TrafficRelay m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
+    std::unique_ptr<controller::AbstractListeningPeerManager> m_listeningPeerManager;
     Model* m_model;
     const conf::Settings* m_settings;
     std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
