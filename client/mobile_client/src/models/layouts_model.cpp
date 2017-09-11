@@ -277,9 +277,7 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
     }
 
     // We show only user's and shared layouts.
-    const auto parentId = layout->getParentId();
-    const bool isSharedLayout = parentId.isNull();
-    return isSharedLayout || parentId == m_user->getId();
+    return layout->isShared() || layout->getParentId() == m_user->getId();
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
