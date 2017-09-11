@@ -112,17 +112,17 @@ void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& dev
     const auto lock = m_handlerGuard->lock();
     NX_ASSERT(lock);
 
-    // check if handler is registred without deviceType
+    // check if handler is registered without deviceType
     const auto& allDev = m_handlers[ QString() ];
     if( allDev.find( handler ) != allDev.end() )
         return;
 
     // try to register for specified deviceType
-    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, (uint) handler) );
+    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, (uintptr_t) handler) );
     if( !itBool.second )
         return;
 
-    // if deviceType was not wspecified, delete all previous registrations with deviceType
+    // if deviceType was not specified, delete all previous registrations with deviceType
     if( deviceType.isEmpty() )
         for( auto& specDev : m_handlers )
             if( !specDev.first.isEmpty() )
