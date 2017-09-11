@@ -1,0 +1,17 @@
+{{#count}}
+{{&event}} "{{&triggerName}}" has been activated {{&count}} times, first on {{&timestampDate}} at {{&timestampTime}}
+{{#aggregated}}
+
+#{{&index}} on {{&timestampDate}} at {{&timestampTime}}
+Source: {{&source}} ({{&sourceIp}})
+User: {{&user}}
+{{/aggregated}}
+{{/count}}
+{{^count}}
+{{&event}} "{{&triggerName}}" has been activated on {{&timestampDate}} at {{&timestampTime}}
+{{#aggregated}}
+
+Source: {{&source}} ({{&sourceIp}})
+User: {{&user}}
+{{/aggregated}}
+{{/count}}

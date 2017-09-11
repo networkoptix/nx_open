@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD Grafik kann Probleme aufweisen, wenn die Trübung aktiviert ist. Wir empfehlen dringend die Option so zu belassen.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Trübung deaktivieren</translation>
     </message>
   </context>
   <context>

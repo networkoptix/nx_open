@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation>הסר מהסרטון</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>עצור סרטון</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>צור סרטון</translation>
     </message>
@@ -1024,6 +1016,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>גלול למטה</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>התחל סרטון</translation>
     </message>
   </context>
   <context>
@@ -6327,10 +6326,6 @@ to %1</source>
       <translation>שרת דואר לא מוגדר</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>בחר שרת איתו יסנכרנו שאר השרתים את השעה</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>המערכת במצב בטוח</translation>
     </message>
@@ -6361,10 +6356,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>שרת דואר אינו מוגדר.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>שעת השרת אינה מסונכרנת וזמן משותף לא זוהה באופן אוטומטי.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7970,6 +7961,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>עצור סרטון</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>התחל סרטון</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8245,8 +8255,8 @@ to %1</source>
       <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסרטון לחץ על Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>השתמש בחיצים במקלדת כדי להחליף מצלמות. כדי לצאת מהסרטון לחץ על Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

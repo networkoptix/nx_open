@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Blurオプションが有効になっていると、Intel HDグラフィックスディスプレイに問題が発生することがあります。オプションを使用しない事を強くお勧めします</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Blurを無効にする</translation>
     </message>
   </context>
   <context>
@@ -447,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>テスト</translation>
     </message>
   </context>
   <context>
