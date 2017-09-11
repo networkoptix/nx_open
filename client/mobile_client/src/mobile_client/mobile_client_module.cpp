@@ -48,7 +48,8 @@ QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
     QObject* parent)
     :
-    QObject(parent)
+    QObject(parent),
+    m_clientCoreModule(new QnClientCoreModule())
 {
     Q_INIT_RESOURCE(mobile_client);
 
@@ -65,8 +66,6 @@ QnMobileClientModule::QnMobileClientModule(
     translationManager->updateTranslation();
 
     /* Init singletons. */
-    m_clientCoreModule = new QnClientCoreModule(this);
-
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
@@ -136,6 +135,9 @@ QnMobileClientModule::QnMobileClientModule(
 
 QnMobileClientModule::~QnMobileClientModule()
 {
+    if (auto longRunnablePool = QnLongRunnablePool::instance())
+        longRunnablePool->stopAll();
+
     qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 }
