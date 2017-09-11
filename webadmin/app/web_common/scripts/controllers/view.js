@@ -213,12 +213,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                setTimeout(function(){
+                $timeout(function(){
                     $scope.switchPlaying($scope.positionProvider.playing);
                     if($scope.playerAPI){
                         $scope.playerAPI.volume($scope.volumeLevel);
                     }
-                },100);
+                }, 100);
             }
         };
 

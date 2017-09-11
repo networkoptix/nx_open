@@ -202,12 +202,8 @@ angular.module('nxCommon')
                         pausedLive = scope.positionProvider.liveMode;
                         scope.playHandler(false);
                     }else if(pausedLive){
-                        goToLive(true);
-                        // This is an attempt to fix WEB-696: Play archive after pause on LIVE (didn't work out yet)
-                        // jumpToPosition(scope.positionProvider.playedPosition);
-                        // timeout(function(){
-                        //     scope.playHandler(true);
-                        // });
+                        jumpToPosition(scope.positionProvider.playedPosition);
+                        scope.playHandler(true);
                     }else{
                         scope.playHandler(true);
                     }
