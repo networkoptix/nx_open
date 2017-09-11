@@ -184,7 +184,6 @@ angular.module('nxCommon')
                 // TODO: move supported info to config
                 // TODO: Support new players
 
-                var videoPlayers = [];
                 var makingPlayer = false;
 
                 function initNativePlayer(nativeFormat) {
@@ -288,8 +287,6 @@ angular.module('nxCommon')
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
-
-                            videoPlayers.push(flashlsAPI);
                         });
                     }
                 }
@@ -329,7 +326,6 @@ angular.module('nxCommon')
                                             scope.vgPlayerReady({$API: null});
                                             console.error(error);
                                       });
-                        videoPlayers.push(jsHlsAPI);
                     });
                 }
 
@@ -365,22 +361,12 @@ angular.module('nxCommon')
                     if(scope.vgApi){
                         scope.vgApi.kill();
                     }
-                    if(videoPlayers){
-                        videoPlayers.pop();
-                    }
                     scope.vgPlayerReady({$API: null});
 
                     //Turn off all players to reset ng-class for rotation
                     scope.native = false;
                     scope.flashls = false;
                     scope.jsHls = false;
-                }
-
-                function cleanExcessPlayers(){
-                    while(videoPlayers.length > 0){
-                        var player = videoPlayers.pop();
-                        player.kill();
-                    }
                 }
 
                 function srcChanged(){
@@ -399,23 +385,12 @@ angular.module('nxCommon')
                         $timeout(initNewPlayer);
                         $timeout(updateWidth);
                     }
-
-                    if(videoPlayers.length > 0){
-                        $log.error('Problem with deallocating video players');
-                        cleanExcessPlayers();
-                    }
                 }
 
                 scope.$watch("vgSrc",srcChanged, true);
 
                 scope.$on('$destroy',function(){
                     resetPlayer();
-
-                    if(videoPlayers.length > 0){
-                        $log.error('Problem with deallocating video players');
-                        $log.error(videoPlayers);
-                        cleanExcessPlayers();
-                    }
                 });
 
                 if(scope.debugMode){
@@ -424,7 +399,6 @@ angular.module('nxCommon')
                 
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
-                    // TODO: Nick, remove html from js code
                     
                     if(!flashPlayer){
                         $.ajax({
