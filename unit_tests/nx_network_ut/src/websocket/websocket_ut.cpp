@@ -745,7 +745,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
             if (ecode != SystemError::noError || transferred == 0)
                 return;
 
-            ASSERT_EQ(kFrameBuffer.size()*kMessageFrameCount, serverReadBuf.size());
+            ASSERT_EQ(kFrameBuffer.size() * kMessageFrameCount, serverReadBuf.size());
 
             receivedMessageCount++;
             if (receivedMessageCount >= kTotalMessageCount)
