@@ -12,7 +12,7 @@
 
 #include <ui/common/aligner.h>
 #include <ui/common/palette.h>
-#include <ui/dialogs/cloud/private/cloud_result_messages_p.h>
+#include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
