@@ -55,6 +55,11 @@ public:
      */
     std::string findListeningPeerByDomain(const std::string& domainName) const;
 
+    /**
+     * If peerName is not known, then api::ResultCode::notFound is reported.
+     * If peer is found, but no connections from it at the moment, then it will wait 
+     * for some timeout for peer to establish new connection.
+     */
     void takeIdleConnection(
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler);

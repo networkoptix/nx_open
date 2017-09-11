@@ -102,7 +102,7 @@ private:
 
     std::unique_ptr<controller::AbstractListeningPeerManager>
         createListeningPeerManager(
-            const conf::Settings& /*settings*/,
+            const conf::ListeningPeer& /*settings*/,
             model::ListeningPeerPool* /*listeningPeerPool*/)
     {
         auto listeningPeerManager =

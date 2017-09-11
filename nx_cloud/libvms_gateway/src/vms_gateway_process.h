@@ -6,13 +6,12 @@
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/public_ip_discovery.h>
 #include <nx/utils/service.h>
 
 #include "settings.h"
 #include "run_time_options.h"
-
-namespace nx_http { class MessageDispatcher; }
 
 namespace nx {
 namespace cloud {
@@ -57,7 +56,7 @@ private:
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
-        nx_http::MessageDispatcher* const msgDispatcher);
+        nx_http::server::rest::MessageDispatcher* const msgDispatcher);
 };
 
 } // namespace cloud
