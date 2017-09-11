@@ -50,7 +50,6 @@ std::vector<HanwhaEvent> HanwhaBytestreamFilter::parseMetadataState(
 
     for (const auto& entry: split)
     {
-        qDebug() << "ENTRY" << entry;
         auto trimmed = entry.trimmed();
         auto nameAndValue = trimmed.split(L'=');
 
