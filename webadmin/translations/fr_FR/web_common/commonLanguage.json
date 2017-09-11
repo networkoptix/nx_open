@@ -4,9 +4,9 @@
     "lowStream":"Flux Bas",
     "transcoding":"Transcodage",
     "unknown":"Inconnu",
-    "copyToClipboard":"Copier vers Presse-Papier",
-    "copyDefaultText":"Copier",
-    "copyActiveText":"Copié dans le presse-papiers"
+    "copyToClipboard":"copy to clipboard",
+    "copyDefaultText":"copy",
+    "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Hors ligne",
   "cameraStates":{

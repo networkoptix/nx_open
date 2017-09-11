@@ -85,6 +85,7 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
     m_overlayWidgets.append(overlay);
 
     updateOverlayWidgetsGeometry();
+    updateOverlayWidgetsVisibility(false);
 }
 
 void detail::OverlayedBase::removeOverlayWidget(QGraphicsWidget *widget) {

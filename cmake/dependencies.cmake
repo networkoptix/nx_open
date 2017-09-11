@@ -57,7 +57,6 @@ function(detect_package_versions)
         set(_qt_version "5.6.1")
         set(_quazip_version "0.7.2")
         set(_openssl_version "1.0.0j")
-        set(_festival_version "2.4")
     endif()
 
     if(box STREQUAL "edge1")
@@ -126,7 +125,7 @@ function(get_dependencies)
         nx_rdep_add_package(opengl-es-mali)
     endif()
 
-    if(box MATCHES "bananapi|rpi")
+    if(box MATCHES "rpi")
         nx_rdep_add_package(cifs-utils)
     endif()
 

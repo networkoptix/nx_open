@@ -49,6 +49,7 @@ bool updateInFile(QIODevice* file, const QByteArray& source, const QByteArray& t
     NX_ASSERT(source.size() == target.size());
 
     // 16Kb ought to be enough for anybody.
+    file->seek(0);
     QByteArray data = file->read(1024 * 16);
     int pos = data.indexOf(source);
     if (pos < 0)
@@ -162,14 +163,14 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     const auto placeholder = QnSignHelper::getSignMagic();
 
     // Update old metadata.
-    if (updateInFile(file.data(), placeholder, QnSignHelper::getSignFromDigest(getSignature())))
-        NX_VERBOSE(this) "SignVideo: signature tag was updated";
-    else
-        NX_VERBOSE(this) "SignVideo: signature tag was not found";
+    const bool tagUpdated = updateInFile(file.data(), placeholder, QnSignHelper::getSignFromDigest(
+        getSignature()));
+    NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
 
     // Update new metadata.
     auto& metadata = context->metadata;
     QByteArray signPattern = metadata.signature;
+    QByteArray signPlaceholder = signPattern;
 
     NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
     signPattern.replace(QnSignHelper::getSignMagic(),
@@ -178,10 +179,9 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     metadata.signature = QnSignHelper::makeSignature(signPattern);
 
     //New metadata is stored as json, so signature is written base64 - encoded.
-    if (updateInFile(file.data(), signPattern.toBase64(), metadata.signature.toBase64()))
-        NX_VERBOSE(this) "SignVideo: metadata was updated";
-    else
-        NX_VERBOSE(this) "SignVideo: metadata was not found";
+    const bool metadataUpdated = updateInFile(file.data(), signPlaceholder.toBase64(),
+        metadata.signature.toBase64());
+    NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
 }
 
 void QnStreamRecorder::close()

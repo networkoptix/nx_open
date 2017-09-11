@@ -10,6 +10,7 @@
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/layout_tour/layout_tour_actions.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -1451,19 +1452,17 @@ void initialize(Manager* manager, Action* root)
     factory(ToggleLayoutTourModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("Start Showreel"))
-        .conditionalText(ContextMenu::tr("Stop Showreel"), condition::tourIsRunning())
+        .dynamicText(new LayoutTourTextFactory(manager))
         .shortcut(lit("Alt+T"))
         .checkable()
         .autoRepeat(false)
         .condition(condition::tourIsRunning()
-            || (condition::treeNodeType(Qn::LayoutTourNode)
-                && ConditionWrapper(new ToggleTourCondition())));
+            || (condition::treeNodeType(Qn::LayoutTourNode) && condition::canStartTour()));
 
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("Start Showreel")) //< To be displayed on the button
+        .text(LayoutTourTextFactory::tr("Start Showreel")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
         .icon(qnSkin->icon("buttons/play.png"))
         .condition(
@@ -1505,7 +1504,7 @@ void initialize(Manager* manager, Action* root)
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(MakeLayoutTourAction)
-        .flags(Tree | MultiTarget | ResourceTarget)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
         .condition(condition::hasFlags(Qn::layout, MatchMode::All)
             && !condition::isSafeMode());

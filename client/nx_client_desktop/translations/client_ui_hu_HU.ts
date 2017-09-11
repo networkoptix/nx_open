@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Az Intel HD Graphics megjelenítésének problémái lehetnek, ha az elmosódás engedélyezve van. Javasoljuk, hogy hagyja el az opciót alapbeállításon.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Elmosódás letiltása</translation>
     </message>
   </context>
   <context>

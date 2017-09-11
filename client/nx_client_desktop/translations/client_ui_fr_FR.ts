@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>L'affichage 'Intel HD Graphics' peut rencontrer des problèmes si le flou est activé. Nous vous recommandons fortement de laisser l'option telle quelle.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Désactiver le flou</translation>
     </message>
   </context>
   <context>

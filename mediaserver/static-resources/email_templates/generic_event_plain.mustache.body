@@ -1,19 +1,19 @@
-{{event}} {{#source}}from {{source}}{{/source}}
+{{&event}} {{#source}}from {{&source}}{{/source}}
 {{#caption}}
-{{caption}}
-{{/caption}} {{#description}}
-{{description}}
+{{&caption}}
+{{/caption}}{{#description}}
+{{&description}}
 {{/description}} {{#hasCameras}}
 
 Related cameras: 
 {{#cameras}}
-{{name}} ({{cameraIP}})
+{{&name}} ({{&cameraIP}})
 {{#urlint}}
-Play archive from the local network: {{urlint}}
+Play archive from the local network: {{&urlint}}
 {{/urlint}} {{#urlext}}
-Play archive from the web: {{urlext}}
+Play archive from the web: {{&urlext}}
 {{/urlext}}
 {{/cameras}} {{/hasCameras}}
 {{#aggregated}}
-{{timestampDate}} {{timestampTime}}
+{{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

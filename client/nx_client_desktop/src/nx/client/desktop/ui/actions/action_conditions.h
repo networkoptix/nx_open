@@ -321,12 +321,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class ToggleTourCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class StartCurrentLayoutTourCondition: public Condition
 {
 public:
@@ -605,9 +599,6 @@ inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{
 
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();
-
-/** Layout tour is running. */
-ConditionWrapper tourIsRunning();
 
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();

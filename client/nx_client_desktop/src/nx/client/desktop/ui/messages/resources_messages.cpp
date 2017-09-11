@@ -40,16 +40,9 @@ static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayou
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
 
-static const QnResourceListView::Options kSimpleOptions =
-    []
-    {
-        QnResourceListView::Options result;
-        result.set(QnResourceListView::HideStatus);
-        result.set(QnResourceListView::ServerAsHealthMonitor);
-        result.set(QnResourceListView::SortAsInTree);
-        return result;
-    }();
-
+static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption 
+    | QnResourceListView::ServerAsHealthMonitorOption
+    | QnResourceListView::SortAsInTreeOption);
 
 bool showCompositeDialog(
     QWidget* parent,
@@ -204,7 +197,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -224,7 +217,7 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from showreel?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -312,7 +305,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     }
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(text);
     messageBox.setInformativeText(extras);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
