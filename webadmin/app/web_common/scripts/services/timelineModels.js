@@ -1270,7 +1270,7 @@ ScaleManager.prototype.canScroll = function(left){
     }
 
     return this.visibleEnd != this.end
-        && !(this.watch.playing && this.liveMode);
+        && !((this.watch.playing || this.watch.live) && this.liveMode); // canScroll
 };
 ScaleManager.prototype.scrollSlider = function(){
     var relativeWidth =  this.getRelativeWidth();
