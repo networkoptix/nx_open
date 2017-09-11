@@ -208,6 +208,9 @@
       <item row="9" column="1" colspan="2">
        <widget class="QWidget" name="linksWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>12</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -257,6 +260,19 @@
             <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>1</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>

@@ -1,7 +1,7 @@
-{{event}}
+{{&event}}
 {{#aggregated}}
-{{reason}}
+{{&reason}}
 
-Camera: {{.}}  
-Time: {{timestampDate}} {{timestampTime}}
+Camera: {{.}}
+Time: {{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

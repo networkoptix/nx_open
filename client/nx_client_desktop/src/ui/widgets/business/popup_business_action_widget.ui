@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>79</height>
+    <width>404</width>
+    <height>96</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,11 +53,22 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="forceAcknoledgementCheckBox">
-     <property name="text">
-      <string>Force Acknowledgment</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+     <item>
+      <widget class="QCheckBox" name="forceAcknoledgementCheckBox">
+       <property name="text">
+        <string>Force Acknowledgment</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="hintLabel">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

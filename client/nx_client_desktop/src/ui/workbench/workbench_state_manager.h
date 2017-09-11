@@ -54,6 +54,8 @@ public:
 
     bool tryClose(bool force);
 
+    QnWorkbenchState state() const;
+
     /**
      * Saves currently opened layouts and running tours for the logged in user.
      */

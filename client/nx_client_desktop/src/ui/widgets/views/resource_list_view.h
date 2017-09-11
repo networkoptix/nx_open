@@ -17,10 +17,10 @@ class QnResourceListView: public QnTreeView
 public:
     enum Option
     {
-        HideStatusOption,
-        ServerAsHealthMonitorOption,
-        SortByNameOption,
-        SortAsInTreeOption
+        HideStatusOption            = 0x01,
+        ServerAsHealthMonitorOption = 0x02,
+        SortByNameOption            = 0x04,
+        SortAsInTreeOption          = 0x08,
     };
     Q_DECLARE_FLAGS(Options, Option)
 

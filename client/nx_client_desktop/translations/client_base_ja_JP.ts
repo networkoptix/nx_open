@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation>シーケンス表示から削除</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>シーケンス表示開始</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>シーケンス表示停止</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>シーケンス表示作成</translation>
     </message>
@@ -1024,6 +1016,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>スクロールダウン</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>シーケンス表示開始</translation>
     </message>
   </context>
   <context>
@@ -1391,7 +1390,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>操作履歴再表示</translation>
     </message>
   </context>
   <context>
@@ -6134,10 +6133,6 @@ to %1</source>
       <translation>Emailサーバーが設定されていません</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>時刻同期を行うサーバー選択</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>セーフモード</translation>
     </message>
@@ -6168,10 +6163,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Emailサーバーが設定されていません</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>サーバーの時間と同期できませんでした　また時間の自動検出ができませんでした</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7684,6 +7675,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>シーケンス表示停止</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>シーケンス表示開始</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7938,8 +7948,8 @@ to %1</source>
       <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キーでカメラの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>
