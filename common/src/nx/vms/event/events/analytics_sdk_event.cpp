@@ -11,11 +11,15 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnUuid& driverId,
     const QnUuid& eventId,
     EventState toggleState,
+    const QString& caption,
+    const QString& description,
     qint64 timeStampUsec)
     :
     base_type(analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_driverId(driverId),
-    m_eventId(eventId)
+    m_eventId(eventId),
+    m_caption(caption),
+    m_description(description)
 {
 }
 
@@ -41,8 +45,8 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
     const EventParameters& ruleEventParams) const
 {
     auto params = getRuntimeParams();
-    params.caption = ruleEventParams.caption;
-    params.description = ruleEventParams.description;
+    params.caption = m_caption;
+    params.description = m_description;
     return params;
 }
 

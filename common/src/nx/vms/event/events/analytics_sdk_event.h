@@ -17,6 +17,8 @@ public:
         const QnUuid& driverId,
         const QnUuid& eventId,
         EventState toggleState,
+        const QString& caption,
+        const QString& description,
         qint64 timeStampUsec);
 
     const QnUuid& driverId() const;
@@ -31,6 +33,8 @@ public:
 private:
     const QnUuid m_driverId;
     const QnUuid m_eventId;
+    const QString m_caption;
+    const QString m_description;
 };
 
 } // namespace event

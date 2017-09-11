@@ -124,6 +124,8 @@ public slots:
         const QnUuid& driverId,
         const QnUuid& eventId,
         vms::event::EventState toggleState,
+        const QString& caption,
+        const QString& description,
         qint64 timeStampUsec);
 
     bool createEventFromParams(const nx::vms::event::EventParameters& params,

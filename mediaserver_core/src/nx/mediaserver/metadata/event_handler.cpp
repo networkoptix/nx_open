@@ -19,7 +19,6 @@ void EventHandler::handleMetadata(
     Error error,
     AbstractMetadataPacket* metadata)
 {
-    // TODO: #dmishin check reference counting here;
     nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
     if (error != Error::noError)
         return;
@@ -39,15 +38,27 @@ void EventHandler::handleMetadata(
         if (!eventData)
             return;
 
-        auto eventState = eventData->isActive()
+        const auto eventState = eventData->isActive()
             ? nx::vms::event::EventState::active
             : nx::vms::event::EventState::inactive;
+
+        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+
+        bool dublicate = eventState == nx::vms::event::EventState::inactive
+            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+
+        if (dublicate)
+            continue;
+
+        setLastEventState(eventTypeId, eventState);
 
         qnEventRuleConnector->at_analyticsSdkEvent(
             m_resource,
             m_pluginId,
-            nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId()),
+            eventTypeId,
             eventState,
+            eventData->caption(),
+            eventData->description(),
             eventPacket->timestampUsec());
     }
 }
@@ -60,6 +71,19 @@ void EventHandler::setResource(const QnResourcePtr& resource)
 void EventHandler::setPluginId(const QnUuid& pluginId)
 {
     m_pluginId = pluginId;
+}
+
+nx::vms::event::EventState EventHandler::lastEventState(const QnUuid& eventId) const
+{
+    if (m_eventStateMap.contains(eventId))
+        return m_eventStateMap[eventId];
+
+    return nx::vms::event::EventState::inactive;
+}
+
+void EventHandler::setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState)
+{
+    m_eventStateMap[eventId] = eventState;
 }
 
 } // namespace metadata

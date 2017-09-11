@@ -128,6 +128,7 @@
                 "localization": {
                 }
             },
+            "internalName": "DryContactInput",
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",

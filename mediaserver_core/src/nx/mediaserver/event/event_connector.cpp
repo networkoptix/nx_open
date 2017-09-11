@@ -215,13 +215,15 @@ void EventConnector::at_analyticsSdkEvent(const QnResourcePtr& resource,
     const QnUuid& driverId,
     const QnUuid& eventId,
     vms::event::EventState toggleState,
+    const QString& caption,
+    const QString& description,
     qint64 timeStampUsec)
 {
     if (!resource)
         return;
 
     vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
-        resource->toSharedPointer(), driverId, eventId, toggleState, timeStampUsec));
+        resource->toSharedPointer(), driverId, eventId, toggleState, caption, description, timeStampUsec));
 
     qnEventRuleProcessor->processEvent(event);
 }
@@ -496,7 +498,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 return false;
 
             at_analyticsSdkEvent(resource, params.analyticsDriverId(), params.analyticsEventId(),
-                eventState, params.eventTimestampUsec);
+                eventState, params.caption, params.description, params.eventTimestampUsec);
             return true;
         }
 
