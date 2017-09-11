@@ -25,7 +25,8 @@ QString replaceProhibitedChars(const QString& s)
         }
         else
         {
-            result.append(c);
+            if (replacementOccurred)
+                result.append(c);
         }
     }
 
