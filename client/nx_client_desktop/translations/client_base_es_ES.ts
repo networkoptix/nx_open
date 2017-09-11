@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
@@ -1024,6 +1016,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>Desplazamiento hacia abajo</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -6201,10 +6200,6 @@ a %1</translation>
       <translation>Servidor de correo electrónico no está configurado</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Seleccione servidor para que otros sincronizen al tiempo</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>Sistema está en modo seguro</translation>
     </message>
@@ -6235,10 +6230,6 @@ a %1</translation>
     <message>
       <source>Email server is not set.</source>
       <translation>Servidor de correo electrónico no está configurado.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Los tiempos del servidor no están sincronizados y un tiempo común no podía ser descubierto automáticamente.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7784,6 +7775,25 @@ Forma plural</numerusform>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8045,8 +8055,8 @@ Forma plural</numerusform>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

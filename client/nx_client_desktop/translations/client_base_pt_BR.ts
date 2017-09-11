@@ -870,14 +870,6 @@ to view more bookmarks</translation>
       <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
@@ -1025,6 +1017,13 @@ to view more bookmarks</translation>
     <message>
       <source>Scroll Down</source>
       <translation>Scroll Abaixo</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -6203,10 +6202,6 @@ to %1</translation>
       <translation>O servidor Email não está definido</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Seleccione o servidor com que os outros vão sincronizar a hora</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>O sistema está em modo Safe</translation>
     </message>
@@ -6237,10 +6232,6 @@ to %1</translation>
     <message>
       <source>Email server is not set.</source>
       <translation>O servidor Email não está definido.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Os servidores de hora não estão sincronizado e uma hora comum não foi detectada automaticamente.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7784,6 +7775,25 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8045,8 +8055,8 @@ to %1</translation>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

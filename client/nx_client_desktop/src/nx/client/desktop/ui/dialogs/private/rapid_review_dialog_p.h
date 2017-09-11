@@ -26,7 +26,7 @@ public:
 
     int absoluteSpeed() const;
     void setAbsoluteSpeed(int absoluteSpeed);
-    int minAbsoluteSpeed() const;
+    static int minAbsoluteSpeed();
     int maxAbsoluteSpeed() const;
 
     int sliderSpeed() const;

@@ -881,24 +881,6 @@ ActionVisibility PanicCondition::check(const Parameters& /*parameters*/, QnWorkb
     return context->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? EnabledAction : DisabledAction;
 }
 
-ActionVisibility ToggleTourCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
-{
-    const auto tourId = parameters.argument(Qn::UuidRole).value<QnUuid>();
-    if (tourId.isNull())
-    {
-        if (context->workbench()->currentLayout()->items().size() > 1)
-            return EnabledAction;
-    }
-    else
-    {
-        const auto tour = context->layoutTourManager()->tour(tourId);
-        if (tour.isValid() && tour.items.size() > 0)
-            return EnabledAction;
-    }
-
-    return DisabledAction;
-}
-
 ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
     const auto tourId = context->workbench()->currentLayout()->data()
@@ -1666,15 +1648,6 @@ ConditionWrapper isLayoutTourReviewMode()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->workbench()->currentLayout()->isLayoutTourReview();
-        });
-}
-
-ConditionWrapper tourIsRunning()
-{
-    return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
-        {
-            return context->action(action::ToggleLayoutTourModeAction)->isChecked();
         });
 }
 

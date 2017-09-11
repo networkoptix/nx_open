@@ -25,7 +25,7 @@
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
-                                        <span class="label label-danger" ng-if="function.proprietary">独自</span>
+                                        <span class="label label-danger" ng-if="function.proprietary">所有</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
                                               ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
@@ -48,7 +48,7 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <span class="label label-danger" ng-if="function.proprietary">所有</span>
                                             <a ng-click="setActiveFunction(group,function,$event)"
                                                ng-href="#/developers/api{{function.url}}">
                                                 <b ng-if="function.caption"
@@ -68,7 +68,7 @@
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
                                 </h2>
-                                <span class="label label-danger" ng-if="activeFunction.proprietary">独自</span>
+                                <span class="label label-danger" ng-if="activeFunction.proprietary">所有</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
                                 <ng-include src="Config.viewsDir + 'devtools/api_form.html'"
@@ -79,7 +79,7 @@
                                     <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
-                                            <div class="label label-danger" ng-if="param.proprietary">独自</div>
+                                            <div class="label label-danger" ng-if="param.proprietary">所有</div>
                                             <div class="label label-danger" ng-if="param.optional=='false'">必須</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>

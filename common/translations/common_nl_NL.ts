@@ -37,50 +37,50 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Slechts één Starter licentie is toegestaan ​​per systeem, dus de tweede licentie wordt gedeactiveerd.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Toch samenvoegen?</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation type="unfinished">System was not found.</translation>
+      <translation>Systeem werd niet gevonden.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>Het ontdekte systeem %1 heeft een incompatibele versie %2.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
+      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
+      <translation>Het ontdekte systeem %1 staat in de veilige modus.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">Could not configure the remote System %1.</translation>
+      <translation>Kon het externe systeem %1 niet configureren.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
+      <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
+      <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
     </message>
   </context>
   <context>
@@ -88,7 +88,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Systeemgebeurtenis</translation>
     </message>
   </context>
   <context>
@@ -99,159 +99,159 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation type="unfinished">Server has been stopped.</translation>
+      <translation>Server is gestopt.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
+      <translation>Media stream is geopend, maar er zijn geen mediagegevens ontvangen.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation type="unfinished">Unknown error. Please contact support.</translation>
+      <translation>Onbekende fout. Neem contact op met support.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation type="unfinished">(unknown)</translation>
+      <translation>(onbekend)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation type="unfinished">Server %1 is not available.</translation>
+      <translation>Server %1 is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation type="unfinished">Check that Server is up and running.</translation>
+      <translation>Controleer of de Server gebruiksklaar is.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Kreeg slechte reactie van de Server %1: "%2";.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
+      <translation>Controleer of Server online is en de juiste versie heeft.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation type="unfinished">Cannot connect to http port %1.</translation>
+      <translation>Kan geen verbinding maken met http poort %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
+      <translation>Probeer de firmware te updaten. Als het probleem blijft bestaan, neem dan contact op met onze ondersteuning.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation type="unfinished">Failed to configure parameter %1.</translation>
+      <translation>Kan parameter %1 niet configureren.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation type="unfinished">Please contact support.</translation>
+      <translation>Neem contact op met support.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Er is een invoer- / uitvoerfout opgetreden. OS bericht: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
-      <translation type="unfinished">Parameters:</translation>
+      <translation>Parameters:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
+      <translation>Probeer het apparaat opnieuw te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
+      <translation>Probeer de camera opnieuw te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
+      <translation>Zorg ervoor dat het apparaat is aangesloten op het netwerk. Probeer het apparaat opnieuw te starten.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
+      <translation>Zorg ervoor dat de camera is aangesloten op het netwerk. Probeer de camera opnieuw op te starten.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Apparaatverzoek &quot;%1&quot; is mislukt met fout &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Camera verzoek &quot;%1&quot; is mislukt met fout &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation type="unfinished">Unknown device issue.</translation>
+      <translation>Onbekend apparaat probleem.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation type="unfinished">Unknown camera issue.</translation>
+      <translation>Onbekend camera probleem.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation type="unfinished">Invalid data was received from the device %1.</translation>
+      <translation>Er zijn ongeldige gegevens ontvangen van het apparaat %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation type="unfinished">Invalid data was received from the camera %1.</translation>
+      <translation>Er zijn ongeldige gegevens ontvangen van de camera %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
+      <translation>Te veel mediafouten. Open het dialoogvenster Device Issues voor meer informatie.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
+      <translation>Te veel mediafouten. Open het dialoogvenster voor camera-problemen voor meer informatie.</translation>
     </message>
     <message>
       <source>Camera plugin error. %1</source>
-      <translation type="unfinished">Camera plugin error. %1</translation>
+      <translation>Camera plugin fout. %1</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
+      <translation>Probeer de I / O-module opnieuw te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
+      <translation>Zorg ervoor dat de I / O-module in het netwerk is aangesloten. Probeer de I / O-module opnieuw te starten.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I / O-moduleverzoek &quot;%1&quot; mislukt met fout &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation type="unfinished">Unknown I/O module issue.</translation>
+      <translation>Onbekend I / O-module probleem.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
+      <translation>Er zijn ongeldige gegevens ontvangen van de I / O-module %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>Te veel mediafouten. Open de I / O-module problemen dialoog voor meer details.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>Apparaat initialisatieproces wordt uitgevoerd.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>Camera initialisatie proces is aan de gang.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>I/O-Module initialisatieproces wordt uitgevoerd.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>Zorg ervoor dat poort %1 toegankelijk is (bijv. geforward).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
+      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in apparaatinstellingen.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
+      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in camera-instellingen.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
@@ -525,15 +525,15 @@
     </message>
     <message>
       <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
+      <translation>Ongeldig type</translation>
     </message>
     <message>
       <source>Only single license is allowed for this device</source>
-      <translation type="unfinished">Only single license is allowed for this device</translation>
+      <translation>Voor dit apparaat is alleen een enkele licentie toegestaan</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>Dit licentietype vereist een hogere softwareversie</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -555,30 +555,30 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
+      <translation>
+        <numerusform>%n Camera (s)</numerusform>
+        <numerusform>%n Camera (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
+      <translation>
+        <numerusform>%n camera (s)</numerusform>
+        <numerusform>%n camera (s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
+      <translation>
+        <numerusform>%n Apparaat (en)</numerusform>
+        <numerusform>%n Apparaat (en)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
+      <translation>
+        <numerusform>%n apparaat (en)</numerusform>
+        <numerusform>%n apparaat (en)</numerusform>
       </translation>
     </message>
     <message>
@@ -587,7 +587,7 @@
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>camera's</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -595,7 +595,7 @@
     </message>
     <message>
       <source>camera</source>
-      <translation type="unfinished">camera</translation>
+      <translation>camera</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>apparaten</translation>
     </message>
     <message>
       <source>Device</source>
@@ -611,18 +611,18 @@
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>apparaat</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>I/O modules</source>
-      <translation type="unfinished">I/O modules</translation>
+      <translation>I/O modules</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -656,15 +656,15 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>Gelicencieerd aan: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>Watermerk: %1</translation>
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Hardware ID</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -695,83 +695,83 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Ongedefineerd</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Laagst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Medium</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Hoog</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Beste</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Preset</translation>
     </message>
   </context>
   <context>
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>Corresponderende container in FFMPEG-bibliotheek werd niet gevonden.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Kon outputbestand niet maken voor video-opname.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Kan de audio output stream niet toewijzen.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Ongeldige audio codec informatie.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Video- of audiocodec is niet compatible met het geselecteerde formaat.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Schrijffout van het bestand. Niet genoeg vrije ruimte.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Naamloos systeem</translation>
     </message>
   </context>
   <context>
@@ -782,23 +782,23 @@
     </message>
     <message>
       <source>Not Found</source>
-      <translation type="unfinished">Not Found</translation>
+      <translation>Niet gevonden</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation type="unfinished">Not Implemented</translation>
+      <translation>Niet geïmplementeerd</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
-      <translation type="unfinished">Unsupported Transport</translation>
+      <translation>Niet-ondersteund vervoer</translation>
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation type="unfinished">Internal Server Error</translation>
+      <translation>Interne serverfout</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
-      <translation type="unfinished">Invalid Parameter</translation>
+      <translation>Ongeldige parameter</translation>
     </message>
   </context>
   <context>
@@ -806,7 +806,7 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
@@ -816,47 +816,47 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>u</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>j</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
@@ -1183,123 +1183,123 @@
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation type="unfinished">Any Camera Issue</translation>
+      <translation>Elk camera probleem</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation type="unfinished">Undefined event has occurred on %1</translation>
+      <translation>Ongedefinieerde gebeurtenis heeft plaatsgevonden op %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>Apparaat %1 is losgekoppeld</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>Apparaat %1 is losgekoppeld</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>I/O module %1 is losgekoppeld</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Invoer op %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Beweging op %1</translation>
     </message>
     <message>
       <source>Storage Failure at %1</source>
-      <translation type="unfinished">Storage Failure at %1</translation>
+      <translation>Opslagfout bij %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Netwerkprobleem op %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Server &quot;%1&quot; Fout</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Device IP Conflict op %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Camera IP Conflict op %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Server &quot;%1&quot; Conflict</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Server &quot;%1&quot; Gestart</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Server &quot;%1&quot; heeft een licentieprobleem</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Server &quot;%1&quot; heeft een archief back-up beëindigd</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Generic event op %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation type="unfinished">An unknown event has occurred</translation>
+      <translation>Een onbekend voorval is opgetreden</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Er zijn meerdere %1 gebeurtenissen opgetreden</translation>
     </message>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Event: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Bron: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Bijschrift: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Inkomende poort: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Reden: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Conflicterend adres: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Conflicterende Server #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Conflicterende Server: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1309,98 +1309,98 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n keer, eerste: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n keer, eerste: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Tijd: %1 op %2</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Eerste gebeurtenis: %1 op %2 (%n keer totaal)</numerusform>
+        <numerusform>Eerste gebeurtenis: %1 op %2 (%n keer totaal)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Geen gegevens ontvangen tijdens de laatste %n seconden.</numerusform>
+        <numerusform>Geen gegevens ontvangen tijdens de laatste %n seconden.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Verbinding met apparaat is onverwacht verbroken.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Verbinding met de camera (primaire stream) is onverwacht verbroken.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Verbinding met de camera (sub stream) werd onverwacht verbroken.</translation>
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation type="unfinished">RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
+      <translation>RTP-pakketverlies gedetecteerd, prev seq. = %1 volgende sequentie = %2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP-pakketverlies gedetecteerd.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Apparaat reageert niet op netwerkverzoeken.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Verbinding met de server is verloren.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Server is onverwacht gestopt.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>I/O fout opgetreden op %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Niet genoeg snelheid HDD/SSD voor opname naar %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD / SSD-schijf &quot;%1&quot; is vol. Disk bevat te veel gegevens die niet door VMS worden beheerd.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Systeemschijf &quot;%1&quot; is bijna vol.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation type="unfinished">Archive backup failed: No available backup storages with sufficient free space</translation>
+      <translation>Archief backup mislukt: Geen beschikbare reserveopslagruimte met voldoende vrije ruimte</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation type="unfinished">Archive backup failed: Target storage failure</translation>
+      <translation>De back-up van het archief mislukt: fout in de gekozen opslaglocatie</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation type="unfinished">Archive backup failed: Source file open/read error</translation>
+      <translation>Archief backup mislukt: bronbestand openen/lezen fout</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation type="unfinished">Archive backup failed: Target file create/write error</translation>
+      <translation>Archief backup mislukt: Doel bestand maken/schrijven fout</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation type="unfinished">Archive backup failed: File catalog error</translation>
+      <translation>Archief backup mislukt: File catalog error</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
