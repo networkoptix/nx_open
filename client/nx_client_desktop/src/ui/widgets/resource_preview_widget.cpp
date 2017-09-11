@@ -162,7 +162,12 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     }
     else
     {
-        painter.drawPixmap(QPoint(), m_preview);
+        const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
+        const auto paintSize = QnGeometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
+        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+            size(), QRect(QPoint(), paintSize.toSize()));
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+        painter.drawPixmap(paintRect, m_preview);
     }
 }
 
