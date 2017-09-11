@@ -1,4 +1,4 @@
-#include "detach_rest_handler.h"
+#include "detach_from_cloud_rest_handler.h"
 
 #include <nx/cloud/cdb/api/connection.h>
 #include <nx/network/http/http_types.h>
