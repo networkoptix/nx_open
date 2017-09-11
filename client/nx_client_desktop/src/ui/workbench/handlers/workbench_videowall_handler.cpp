@@ -103,6 +103,7 @@
 #include <utils/common/uuid_pool.h>
 #include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -1865,8 +1866,14 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 
-    // new layout should not be marked as changed
-    saveVideowallAndReviewLayout(videoWall, layout);
+    // New layout should not be marked as changed, make sure it will be done after layout opening.
+    executeDelayedParented(
+        [this, videoWall, layout]
+        {
+            saveVideowallAndReviewLayout(videoWall, layout);
+        },
+        kDefaultDelay,
+        this);
 }
 
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()
