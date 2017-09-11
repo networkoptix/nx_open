@@ -112,7 +112,6 @@ private:
         typename ... Response
     >
     void issueUpgradeRequest(
-        nx_http::Method::ValueType httpMethod,
         const nx_http::StringType& protocolToUpgradeTo,
         Request request,
         const char* requestPathTemplate,
@@ -140,7 +139,6 @@ private:
 
     template<typename HttpClient, typename CompletionHandler, typename ... Response>
     void executeUpgradeRequest(
-        nx_http::Method::ValueType httpMethod,
         const nx_http::StringType& protocolToUpgradeTo,
         HttpClient httpClient,
         CompletionHandler completionHandler);
