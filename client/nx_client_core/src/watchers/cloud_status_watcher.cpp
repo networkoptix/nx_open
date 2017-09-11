@@ -373,6 +373,10 @@ void QnCloudStatusWatcher::updateSystems()
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
                                 QnCloudStatusWatcher::InvalidCredentials);
                             break;
+                        case api::ResultCode::accountNotActivated:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::AccountNotActivated);
+                            break;
                         default:
                             d->setStatus(QnCloudStatusWatcher::Offline,
                                 QnCloudStatusWatcher::UnknownError);
