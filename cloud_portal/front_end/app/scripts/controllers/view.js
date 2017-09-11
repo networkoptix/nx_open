@@ -29,7 +29,7 @@ angular.module('cloudApp')
             });
         }
 
-        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
+        var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId,function(event,data){
             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
                            $scope.currentSystem.info.name || L.errorCodes.thisSystem), 'warning');
             $location.path("/systems");
