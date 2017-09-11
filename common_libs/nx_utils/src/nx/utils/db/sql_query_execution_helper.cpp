@@ -52,13 +52,13 @@ bool validateParams(const QSqlQuery& query)
 
 } // namespace
 
-bool nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details)
+bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details)
 {
     QSqlQuery query(database);
     return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
 }
 
-bool nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details)
+bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details)
 {
     NX_EXPECT(validateParams(*query));
     if (!query->exec())
@@ -73,7 +73,7 @@ bool nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, cons
     return true;
 }
 
-bool nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details)
+bool SqlQueryExecutionHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details)
 {
     if (!query->prepare(queryStr))
     {
@@ -84,7 +84,7 @@ bool nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(QSqlQuery *query, c
     return true;
 }
 
-bool nx::utils::db::SqlQueryExecutionHelper::execSQLScript(
+bool SqlQueryExecutionHelper::execSQLScript(
     const QByteArray& scriptData,
     QSqlDatabase& database)
 {
@@ -111,7 +111,7 @@ bool nx::utils::db::SqlQueryExecutionHelper::execSQLScript(
     return true;
 }
 
-bool nx::utils::db::SqlQueryExecutionHelper::execSQLFile(
+bool SqlQueryExecutionHelper::execSQLFile(
     const QString& fileName,
     QSqlDatabase& database)
 {
@@ -128,6 +128,17 @@ bool nx::utils::db::SqlQueryExecutionHelper::execSQLFile(
         return false;
     }
     return true;
+}
+
+void SqlQueryExecutionHelper::bindId(QSqlQuery* query,
+    const QString& parameter,
+    const QnUuid& id,
+    bool optional)
+{
+    if (optional && id.isNull())
+        query->bindValue(parameter, QByteArray());
+    else
+        query->bindValue(parameter, id.toRfc4122());
 }
 
 } // namespace db

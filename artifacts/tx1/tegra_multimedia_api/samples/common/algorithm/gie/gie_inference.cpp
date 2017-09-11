@@ -36,6 +36,7 @@
 #include <cmath>
 #include <cuda_runtime_api.h>
 
+namespace {
 static const int TIMING_ITERATIONS = 1;
 static const int NUM_BINDINGS = 3;
 static const float THRESH = 0.8;
@@ -61,7 +62,63 @@ const char *OUTPUT_BBOX_NAME = "bboxes";
 const char *HEL_OUTPUT_BLOB_NAME = "Layer19_cov";
 const char *HEL_OUTPUT_BBOX_NAME = "Layer19_bbox";
 
+struct float6
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    float v;
+    float u;
+};
 
+static inline float6 make_float6( float x, float y, float z, float w, float v, float u )
+{
+    float6 f;
+    f.x = x;
+    f.y = y;
+    f.z = z;
+    f.w = w;
+    f.v = v;
+    f.u = u;
+    return f;
+}
+
+inline static bool rectOverlap(const float6& r1, const float6& r2)
+{
+    return ! ( r2.x > r1.z
+        || r2.z < r1.x
+        || r2.y > r1.w
+        || r2.w < r1.y
+        );
+}
+
+static void mergeRect( std::vector<float6>& rects, const float6& rect )
+{
+    const uint32_t num_rects = rects.size();
+
+    bool intersects = false;
+
+    for( uint32_t r=0; r < num_rects; r++ )
+    {
+        if( rectOverlap(rects[r], rect) )
+        {
+            intersects = true;
+
+            if( rect.x < rects[r].x ) 	rects[r].x = rect.x;
+            if( rect.y < rects[r].y ) 	rects[r].y = rect.y;
+            if( rect.z > rects[r].z )	rects[r].z = rect.z;
+            if( rect.w > rects[r].w ) 	rects[r].w = rect.w;
+
+            break;
+        }
+    }
+
+    if( !intersects )
+        rects.push_back(rect);
+}
+
+} // namespace
 
 #define CHECK(status)                                   \
 {                                                       \
@@ -248,6 +305,7 @@ GIE_Context::GIE_Context()
     helnet_scale[2] = HELNET_SCALE2;
     helnet_scale[3] = HELNET_SCALE3;
     hel_net = 0;
+    ped_net = 0;
     forced_fp32 = 0;
     elapsed_frame_num = 0;
     elapsed_time = 0;
@@ -557,15 +615,24 @@ GIE_Context::doInference(
     vector<cv::Rect> rectList;
     for (unsigned int i = 0; i < batch_size; i++)
     {
-        if (!hel_net)
+        if (ped_net)
         {
-            parseBbox(rectList, i);
+            printf("The net is ped_net\n");
+            parsePed100Bbox(rectList, i);
         }
-        else
+        else if (hel_net)
         {
+            printf("The net is hel_net\n");
             //hel net is multiclass,  here we only fetch car
             parseHelBbox(rectList, HEL_NET_CAR, i);
         }
+        else
+        {
+            printf("The net is for cars\n");
+            parseBbox(rectList, i);
+        }
+
+
         if (dump_result)
         {
             fstream << "frame:" << frame_num++ << " has rect:"
@@ -649,6 +716,44 @@ GIE_Context::parseBbox(vector<cv::Rect>& rectList, int batch_th)
     cv::groupRectangles(rectList, GROUP_THRESHOLD, EPS);
 }
 
+void
+GIE_Context::parsePed100Bbox(vector<cv::Rect>& rectList, int batch_th)
+{
+    auto ow = outputDimsBBOX.w;
+    auto oh = outputDimsBBOX.h;
+    auto owh = ow * oh;
+
+    auto cellWidth = 1024 / ow;
+    auto cellHeight = 512 / oh;
+
+    for (auto y = 0; y < oh; ++y)
+    {
+        for (auto x = 0; x < ow; ++x)
+        {
+            const float coverage = output_cov_buf[ow * y + x];
+
+#if 0
+            if (y * ow + x < 100) 
+                std::cout << "coverage: " << coverage << std::endl;
+#endif
+
+            if (coverage > thresh)
+            {
+                const float mx = x * cellWidth;
+                const float my = y * cellHeight;
+
+                auto x1 = output_bbox_buf[0 * owh + y * ow + x] + mx;
+                auto y1 = output_bbox_buf[1 * owh + y * ow + x] + my;
+                auto x2 = output_bbox_buf[2 * owh + y * ow + x] + mx;
+                auto y2 = output_bbox_buf[3 * owh + y * ow + x] + my;
+
+                rectList.push_back(cv::Rect((int)x1, (int)y1, (int)(x2 -x1), (int)(y2 - y1)));
+            }
+        }
+    }
+
+    cv::groupRectangles(rectList, GROUP_THRESHOLD, EPS);
+}
 
 void
 GIE_Context::parseHelBbox(
@@ -737,14 +842,22 @@ GIE_Context::parseNet(const string& deployfile)
     }
     int iterator = 0;
 
+    bool input_shape_found = false;
     while (1)
     {
-        getline(readfile, line);
-        string::size_type index;
+        if (!getline(readfile, line))
+            return 0;
 
+        string::size_type index;        
+        
         index = line.find("input_dim");
-        if (index ==std::string::npos)
+        if (!input_shape_found && index ==std::string::npos)
         {
+            index = line.find("input_shape");
+            if (index != std::string::npos)
+            {
+                input_shape_found = true;
+            }
             continue;
         }
 
@@ -787,6 +900,10 @@ GIE_Context::parseNet(const string& deployfile)
     if (net_height == 480 && net_width == 640)
     {
         hel_net = 1;
+    }
+    else if (net_height == 512 && net_width == 1024)
+    {
+        ped_net = 1;
     }
 
     if (hel_net)

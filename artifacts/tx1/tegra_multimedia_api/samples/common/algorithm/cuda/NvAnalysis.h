@@ -29,6 +29,8 @@
 #ifndef __NVANALYSIS_H
 #define __NVANALYSIS_H
 
+#include <vector_types.h>
+
 //interface to cuda kernel
 //@pDevPtr: ptr to buffer data
 //@pitch: stride per line
@@ -36,4 +38,13 @@ int addLabels(CUdeviceptr pDevPtr, int pitch);
 
 int convertIntToFloat(CUdeviceptr pDevPtr, int width, int height,
                 void* cuda_buf, int pitch);
+
+int convertIntToFloatWithMean(
+    int* rgba,
+    int width,
+    int height,
+    void* cuda_buf,
+    int pitch,
+    float3 mean);
+
 #endif

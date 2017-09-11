@@ -1,4 +1,5 @@
 #include "actions.h"
+#include "config.h"
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -357,6 +358,15 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
+
+    if (ini().enableAnalytics)
+    {
+        factory(StartAnalyticsAction)
+            .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+            .text(ContextMenu::tr("Start Analytics..."))
+            .childFactory(new AnalyticsModeActionFactory(manager))
+            .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
+    }
 
     factory()
         .flags(TitleBar)
@@ -1288,7 +1298,7 @@ void initialize(Manager* manager, Action* root)
             lit("Convert to Normal Camera"),
             condition::isEntropixCamera())
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::isTrue(ini().enableEntropixEnhancer)
+        .condition(condition::isTrue(nx::client::desktop::ini().enableEntropixEnhancer)
             && condition::hasFlags(Qn::live_cam, MatchMode::Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,

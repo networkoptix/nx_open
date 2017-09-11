@@ -33,7 +33,7 @@
 
 Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
-static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
+static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
 static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 
@@ -1157,9 +1157,14 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     if (itr != queue.begin())
         --itr;
 
-    const QnMetaDataV1Ptr& metadata = itr->second;
+    const QnAbstractCompressedMetadataPtr& metadata = itr->second;
     if (metadata->containTime(video->timestamp))
+    {
         video->motion = metadata;
+        qnMetadataAnalyticsController->gotMetadataPacket(
+            m_resource.dynamicCast<QnVirtualCameraResource>(),
+            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+    }
     queue.erase(queue.begin(), itr);
 }
 
@@ -1170,7 +1175,9 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return true;
 
-    QnMetaDataV1Ptr metadata = std::dynamic_pointer_cast<QnMetaDataV1>(data);
+    QnAbstractCompressedMetadataPtr metadata =
+        std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+
     if (metadata) {
         int ch = metadata->channelNumber;
         m_lastMetadata[ch][metadata->timestamp] = metadata;

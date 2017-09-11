@@ -1,6 +1,9 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
+#include <mutex>
+#include <map>
+
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
@@ -11,13 +14,13 @@
 #include "network_resource.h"
 #include "common/common_globals.h"
 #include <nx/vms/event/event_fwd.h>
+
 #include "api/model/api_ioport_data.h"
+#include <nx/api/analytics/supported_events.h>
+
 #include "core/dataconsumer/audio_data_transmitter.h"
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
-
-#include <mutex>
-#include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -28,7 +31,6 @@ typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
-
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -231,6 +233,9 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
+    nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
+    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
         \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
@@ -287,6 +292,9 @@ public:
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 
+    virtual void analyticsEventStarted(const QString& caption, const QString& description);
+    virtual void analyticsEventEnded(const QString& caption, const QString& description);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -324,6 +332,18 @@ signals:
         const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
+        qint64 timestamp );
+
+    void analyticsEventStart(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
+    void analyticsEventEnd(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
         qint64 timestamp );
 
 protected slots:
@@ -379,6 +399,7 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
+    CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
 
 private slots:
     void resetCachedValues();

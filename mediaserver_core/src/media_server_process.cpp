@@ -1832,7 +1832,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated
+    reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
@@ -2678,14 +2678,9 @@ void MediaServerProcess::run()
         Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
-    CommonPluginContainer pluginContainer;
-
-    //Initializing plugin manager
-    PluginManager pluginManager(QString(), &pluginContainer);
-    PluginManager::instance()->loadPlugins( qnServerModule->roSettings() );
-
+    auto pluginManager = qnServerModule->pluginManager();
     for (const auto storagePlugin :
-         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+         pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
             storagePlugin->storageType(),
