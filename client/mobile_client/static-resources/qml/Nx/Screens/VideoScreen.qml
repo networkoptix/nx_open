@@ -323,6 +323,12 @@ PageBase
                     leftPadding: 8 + mainWindow.leftPadding
                     compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        onClicked: toggleUi()
+                    }
                 }
             }
         }
