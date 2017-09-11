@@ -870,14 +870,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Eltávolítás a showreelből</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>Showreel indítása</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Showreel leállítása</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>Showreel készítése</translation>
     </message>
@@ -1025,6 +1017,13 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Scroll Down</source>
       <translation>Görgetés le</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel indítása</translation>
     </message>
   </context>
   <context>
@@ -6201,10 +6200,6 @@ to %1</source>
       <translation>Nincs e-mail szerver beállítva</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Válassza ki a szervert amivel a többit szeretné szinkronizálni</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>A rendszer biztonsági módban fut</translation>
     </message>
@@ -6235,10 +6230,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Nincs e-mail szerver beállítva.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Szerveridők nincsenek szinkronban és a közös idő nem detektálható automatikusan.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7782,6 +7773,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Showreel leállítása</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel indítása</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8043,8 +8053,8 @@ to %1</source>
       <translation>Elrendezések váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>Kamerák váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

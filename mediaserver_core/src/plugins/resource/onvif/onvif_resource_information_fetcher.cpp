@@ -234,7 +234,7 @@ void OnvifResourceInformationFetcher::findResources(
     if (m_shouldStop)
         return;
 
-    //Trying to get name and manufacturer
+    bool isAuthorized = false;
     if (existResource)
     {
         if (model.isEmpty())
@@ -245,11 +245,14 @@ void OnvifResourceInformationFetcher::findResources(
             mac = existResource->getMAC().toString();
         if (firmware.isEmpty())
             firmware = existResource->getFirmware();
+        if (existResource->getStatus() != Qn::Unauthorized)
+            isAuthorized = true;
     }
 
     if (model.isEmpty() || manufacturer.isEmpty() ||
-        (!existResource && firmware.isEmpty()) || //< Optional field
-        (!existResource && QnMacAddress(mac).isNull())) //< Optional field
+        // Optional fields are to be updated only if the camera is authorized, to prevent brute force
+        // attacks for unauthorized cameras (Hikvision blocks after several attempts).
+        (isAuthorized && (firmware.isEmpty() || QnMacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;

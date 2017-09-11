@@ -207,6 +207,7 @@ angular.module('nxCommon')
             function serverSorter(server){
                 server.url = self.extractDomain(server.url);
                 server.collapsed = self.storage.serverStates[server.id];
+                server.active = server.id == Config.currentServerId;
 
 
                 if(typeof(server.visible) === 'undefined'){

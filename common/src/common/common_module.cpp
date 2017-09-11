@@ -153,7 +153,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_metadataPluginFactory = new nx::analytics::MetadataPluginFactory(this); //< Depends on nothing.    
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
-    m_moduleDiscoveryManager = new nx::vms::discovery::Manager(this, clientMode, m_resourcePool);
+    // Depends on resource pool.
+    m_moduleDiscoveryManager = new nx::vms::discovery::Manager(clientMode, this);
     // TODO: bind m_moduleDiscoveryManager to resPool server changes
     m_router = new QnRouter(this, m_moduleDiscoveryManager);
 

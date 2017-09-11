@@ -42,22 +42,27 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
             return result;
         }();
 
-    const auto getPtzPresetName =
-        [presetIdHotkeyHash](const QnPtzPreset& preset) -> QString
+    const auto getPtzPresetHotkeyNumber =
+        [presetIdHotkeyHash](const QString& id) -> int
         {
-            const auto it = presetIdHotkeyHash.find(preset.id);
-            if (it == presetIdHotkeyHash.end())
-                return preset.name;
-
-            return QString::number(it.value()) + preset.name;
+            /**
+             * Since we have only digit hotkeys (0-9) we suppose that invalid preset number is
+             * large enought to make sorting easer: each preset with hotkey is always less than
+             * preset without it.
+             */
+            static const int kNoPresetNumberValue = 10;
+            const auto it = presetIdHotkeyHash.find(id);
+            return it == presetIdHotkeyHash.end() ? kNoPresetNumberValue : it.value();
         };
 
     std::sort(presets.begin(), presets.end(),
-        [getPtzPresetName](const QnPtzPreset& left, const QnPtzPreset& right)
+        [getPtzPresetHotkeyNumber](const QnPtzPreset& left, const QnPtzPreset& right)
         {
-            return nx::utils::naturalStringLess(
-                getPtzPresetName(left),
-                getPtzPresetName(right));
+            const int leftPresetNumber = getPtzPresetHotkeyNumber(left.id);
+            const int rightPresetNumber = getPtzPresetHotkeyNumber(right.id);
+            return leftPresetNumber == rightPresetNumber
+                ? nx::utils::naturalStringLess(left.name, right.name)
+                : leftPresetNumber < rightPresetNumber;
         });
 
     return presets;

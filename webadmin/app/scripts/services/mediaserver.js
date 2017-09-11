@@ -34,6 +34,7 @@ angular.module('webadminApp')
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                     Config.cloud.systemId = data.cloudSystemId;
                     Config.protoVersion = data.protoVersion;
+                    Config.currentServerId = data.id;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){
@@ -331,6 +332,9 @@ angular.module('webadminApp')
                 }: null;
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
+            },
+            disconnectFromSystem:function(){
+                return wrapPost(proxy + '/web/api/detachFromSystem');
             },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');

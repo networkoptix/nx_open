@@ -870,14 +870,6 @@ to view more bookmarks</source>
       <translation>从幻灯片中移除</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>启动幻灯片</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>停止幻灯片</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>制作幻灯片</translation>
     </message>
@@ -1025,6 +1017,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>下滚动</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>启动幻灯片</translation>
     </message>
   </context>
   <context>
@@ -6135,10 +6134,6 @@ to %1</source>
       <translation>邮件服务器未设置</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>请给其它服务器选择服务器时间同步</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>系统处于安全模式</translation>
     </message>
@@ -6169,10 +6164,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>邮件服务器未设置.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>系统时间未同步，无法自动检测共同时间.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7685,6 +7676,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>停止幻灯片</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>启动幻灯片</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7939,8 +7949,8 @@ to %1</source>
       <translation>使用键盘方向键切换布局。退出幻灯片按Esc键。</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>使用键盘箭头切换摄像机。退出幻灯片请按Esc键。</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

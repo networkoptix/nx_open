@@ -1,31 +1,32 @@
 {{#systemName}}
-{{systemName}}
+{{&systemName}}
 {{#systemSignature}}
-{{systemSignature}}
+{{&systemSignature}}
 {{/systemSignature}}
 {{#cloudOwnerEmail}}
-{{cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
-{{event}} {{triggerName}} has been activated
-
 {{#count}}
-    {{#aggregated}}
-        {{index}}: {{source}} ({{sourceIp}}) - {{user}} - {{timestampDate}} {{timestampTime}
-    {{/aggregated}}
+{{&event}} "{{&triggerName}}" has been activated {{&count}} times, first on {{&timestampDate}} at {{&timestampTime}}
+{{#aggregated}}
 
-    Trigger has been activated {{count}} times, first:
-    {{timestampDate}} {{timestampTime}}
+#{{&index}} on {{&timestampDate}} at {{&timestampTime}}
+Source: {{&source}} ({{&sourceIp}})
+User: {{&user}}
+{{/aggregated}}
 {{/count}}
-
 {{^count}}
-    {{#aggregated}}
-        {{source}} ({{sourceIp}}) - {{user}} - {{timestampDate}} {{timestampTime}}
-    {{/aggregated}}
+{{&event}} "{{&triggerName}}" has been activated on {{&timestampDate}} at {{&timestampTime}}
+{{#aggregated}}
+
+Source: {{&source}} ({{&sourceIp}})
+User: {{&user}}
+{{/aggregated}}
 {{/count}}
 
 
-Website: {{companyUrl}}
-Support: {{supportLinkText}}
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
 

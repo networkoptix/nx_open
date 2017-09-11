@@ -921,11 +921,19 @@ QVariantList ExtendedRuleProcessor::aggregatedEventDetailsMap(
     int index = 0;
     QVariantList result;
 
-    for (const auto& detail: aggregationDetailList)
+    auto sortedList = aggregationDetailList;
+    std::sort(sortedList.begin(), sortedList.end(),
+        [](const vms::event::InfoDetail& left, const vms::event::InfoDetail& right)
+        {
+            return left.runtimeParams().eventTimestampUsec
+                < right.runtimeParams().eventTimestampUsec;
+        });
+
+    for (const auto& detail: sortedList)
     {
         auto detailsMap = eventDetailsMap(action, detail, detailLevel);
         detailsMap[tpIndex] = (++index);
-        result << eventDetailsMap(action, detail, detailLevel);
+        result << detailsMap;
     }
 
     return result;

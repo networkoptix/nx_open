@@ -87,7 +87,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::UsersEmailIsEmpty:
-        case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildCanceled:
