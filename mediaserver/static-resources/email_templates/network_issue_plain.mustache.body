@@ -1,2 +1,2 @@
-{{event}} 
-{{source}} ({{sourceIp}}) {{reason}} {{timestampDate}} {{timestampTime}}
+{{&event}}
+{{&source}} ({{&sourceIp}}) {{&reason}} {{&timestampDate}} {{&timestampTime}}

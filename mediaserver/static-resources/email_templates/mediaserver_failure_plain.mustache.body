@@ -1,4 +1,4 @@
-Server {{#source}}"{{source}}" {{/source}}failed 
+Server {{#source}}"{{&source}}" {{/source}}failed 
 
-Reason: {{reason}}
-Time: {{timestampDate}} {{timestampTime}}
+Reason: {{&reason}}
+Time: {{&timestampDate}} {{&timestampTime}}

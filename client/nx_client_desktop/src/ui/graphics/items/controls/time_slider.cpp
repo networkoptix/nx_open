@@ -2249,6 +2249,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     if (qFuzzyIsNull(m_totalLineStretch))
     {
         drawSolidBackground(painter, rect());
+        painter->fillRect(lineBarRect, m_colors.pastRecording);
     }
     else
     {
@@ -2269,8 +2270,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-                lineRect
-            );
+                lineRect);
 
             lineTop += lineHeight;
         }

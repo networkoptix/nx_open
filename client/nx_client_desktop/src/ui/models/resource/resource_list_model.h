@@ -26,8 +26,8 @@ public:
     // TODO: #GDM really these options must be present in delegate, not in model.
     enum Option
     {
-        HideStatusOption,
-        ServerAsHealthMonitorOption
+        HideStatusOption                = 0x01,
+        ServerAsHealthMonitorOption     = 0x02,
     };
     Q_DECLARE_FLAGS(Options, Option)
 
