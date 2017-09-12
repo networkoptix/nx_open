@@ -48,7 +48,7 @@ set(ios.skip.sign "false")
 set(ios.bundle_identifier "com.hanwhasecurity.htawave")
 set(ios.new_bundle_identifier "com.hanwhasecurity.htawavemobile")
 set(ios.group_identifier "group.com.hanwhasecurity.htawave")
-#set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
+set(ios.sign.identity "iPhone Distribution: Ethan Kim (Q5VL4R39XK)")
 set(ios.old_app_appstore_id "")
 
 set(mac.skip.sign "false")
