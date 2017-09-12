@@ -45,7 +45,10 @@ void TargetPeerConnector::connectAsync(ConnectHandler handler)
         
             m_completionHandler = std::move(handler);
 
-            takeConnectionFromListeningPeerPool();
+            if (m_listeningPeerPool)
+                takeConnectionFromListeningPeerPool();
+            else
+                initiateDirectConnection();
         });
 }
 
