@@ -160,7 +160,7 @@ angular.module('nxCommon')
                  *
                  * Scrollbar:
                  *      + Click - Scroll to one screen
-                 *      + DblClick - Scroll to clicked point
+                 *      + DblClick - Scroll two screens
                  *      + Hold -  Constant Scrolling
                  *
                  * Scrollbar buttons (left/right):
@@ -171,7 +171,6 @@ angular.module('nxCommon')
                  * Other timeline parts:
                  *      Over - Show timemarker, no actions
                  *      + Click - Playing position
-                 *      + DblClick - Playing position and zoom in
                  *      + Drag - Scroll
                  *      + MouseWheel - right-left - Scroll
                  *      + MouseWheel - up-down - Zoom
@@ -241,9 +240,6 @@ angular.module('nxCommon')
                 }
                 function scrollButtonDblClick(left){
                     timelineActions.animateScroll(left ? 0 : 1);
-                    if(!left){
-                        goToLive();
-                    }
                 }
 
 
