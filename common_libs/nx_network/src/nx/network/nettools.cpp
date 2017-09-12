@@ -16,7 +16,6 @@
 
 #include "nettools.h"
 #include "ping.h"
-#include "netstate.h"
 
 #if defined(Q_OS_LINUX)
 #   include <arpa/inet.h>
@@ -308,48 +307,6 @@ bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_e
 
     }
     return false;
-
-}
-
-bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
-{
-
-    quint32 curr = state.currHostAddress.toIPv4Address();
-    quint32 maxaddr = state.maxHostAddress.toIPv4Address();
-
-    quint32 original = curr;
-
-    CLPing ping;
-
-    while(1)
-    {
-
-        ++curr;
-        if (curr>maxaddr)
-        {
-            quint32 minaddr = state.minHostAddress.toIPv4Address();
-            curr = minaddr; // start from min
-        }
-
-        if (curr==original)
-            return false; // all addresses are busy
-
-        if (busy_lst.contains(curr))// this ip is already in use
-            continue;
-
-        if (!ping.ping(QHostAddress(curr).toString(), 2, ping_timeout))
-        {
-            // is this free addr?
-            // let's check with ARP request also; might be it's not pingable device
-
-            //if (getMacByIP(QHostAddress(curr)).isEmpty()) // to long
-            break;
-
-        }
-    }
-
-    state.currHostAddress = QHostAddress(curr);
-    return true;
 
 }
 
