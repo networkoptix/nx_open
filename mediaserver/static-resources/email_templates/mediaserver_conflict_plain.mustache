@@ -1,26 +1,26 @@
 {{#systemName}}
-{{systemName}}
+{{&systemName}}
 {{#systemSignature}}
-{{systemSignature}}
+{{&systemSignature}}
 {{/systemSignature}}
 {{#cloudOwnerEmail}}
-{{cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
-{{event}} {{#source}}on {{source}}{{/source}} 
+{{&event}} {{#source}}on {{&source}}{{/source}} 
 {{#aggregated}}
 
 {{#msConflicts}}
-Number: {{number}}
-Server IP: {{ip}}
-Camera Physical ID: {{mac}}
+Number: {{&number}}
+Server IP: {{&ip}}
+Camera Physical ID: {{&mac}}
 {{/msConflicts}}
 
-{{timestampDate}} {{timestampTime}}
+{{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}
 
 
-Website: {{companyUrl}}
-Support: {{supportLinkText}}
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
 

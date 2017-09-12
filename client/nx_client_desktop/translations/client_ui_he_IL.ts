@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>תצוגת Intel HD Graphics עשויה להיתקל בבעיות אם הטשטוש מופעל. אנו ממליצים בחום להשאיר את האופציה כמו שהיא.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>בטל טשטוש</translation>
     </message>
   </context>
   <context>

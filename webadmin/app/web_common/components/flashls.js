@@ -52,7 +52,7 @@ function FlashlsAPI (flashObject) {
             //console.log('videoSize',width, height);
         },
         complete: function() {
-            this.positionHandler(null);
+            this.positionHandler(null, null);
         },
         error: function(code, url, message) {
             this.errorHandler({message:message,code:code,url:url});

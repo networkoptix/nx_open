@@ -8,7 +8,7 @@
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>
-      <translation>hanwha-vms</translation>
+      <translation>hta-vms</translation>
     </message>
     <message>
       <source>{{VMS_NAME}}</source>
@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>mailto:WAVEsupport@hanwha.com</translation>
+      <translation>mailto:support@hanwhasecurity.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>WAVEsupport@hanwha.com</translation>
+      <translation>support@hanwhasecurity.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

@@ -54,6 +54,19 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     return true;
 }
 
+QnWorkbenchState QnWorkbenchStateManager::state() const
+{
+    QnWorkbenchState state;
+    state.localSystemId = helpers::currentSystemLocalId(commonModule());
+    if (const auto user = context()->user())
+        state.userId = context()->user()->getId();
+    workbench()->submit(state);
+    for (const auto& d: m_delegates)
+        d->submitState(&state);
+
+    return state;
+}
+
 void QnWorkbenchStateManager::saveState()
 {
     if (!canSaveState())
@@ -70,12 +83,7 @@ void QnWorkbenchStateManager::saveState()
     NX_DEBUG(kWorkbenchStateTag, lm("System ID: %1").arg(localSystemId));
     NX_DEBUG(kWorkbenchStateTag, lm("User ID: %1").arg(userId));
 
-    QnWorkbenchState state;
-    state.localSystemId = localSystemId;
-    state.userId = userId;
-    workbench()->submit(state);
-    for (const auto& d: m_delegates)
-        d->submitState(&state);
+    const auto state = this->state();
     NX_DEBUG(kWorkbenchStateTag, lm("Full state:\n%1").arg(QJson::serialized(state)));
 
     auto states = qnSettings->workbenchStates();

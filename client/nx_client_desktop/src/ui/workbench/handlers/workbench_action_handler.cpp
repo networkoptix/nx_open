@@ -1213,8 +1213,44 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
 {
+    auto newFileName = newName;
+    if (nx::utils::AppInfo::isWindows())
+    {
+        while (newFileName.endsWith(QChar(L' ')) || newFileName.endsWith(QChar(L'.')))
+            newFileName.resize(newFileName.size() - 1);
+
+        const QSet<QString> kReservedFilenames{
+            lit("CON"), lit("PRN"), lit("AUX"), lit("NUL"),
+            lit("COM1"), lit("COM2"), lit("COM3"), lit("COM4"),
+            lit("COM5"), lit("COM6"), lit("COM7"), lit("COM8"), lit("COM9"),
+            lit("LPT1"), lit("LPT2"), lit("LPT3"), lit("LPT4"), lit("LPT5"),
+            lit("LPT6"), lit("LPT7"), lit("LPT8"), lit("LPT9") };
+
+        const auto upperCaseName = newFileName.toUpper();
+        if (kReservedFilenames.contains(upperCaseName))
+        {
+            messages::LocalFiles::reservedFilename(mainWindow(), upperCaseName);
+            return;
+        }
+    }
+
+    static const QString kForbiddenChars =
+        nx::utils::AppInfo::isWindows() ? lit("\\|/:*?\"<>")
+      : nx::utils::AppInfo::isLinux()   ? lit("/")
+      : nx::utils::AppInfo::isMacOsX()  ? lit("/:")
+      : QString();
+
+    for (const auto character: newFileName)
+    {
+        if (kForbiddenChars.contains(character))
+        {
+            messages::LocalFiles::invalidChars(mainWindow(), kForbiddenChars);
+            return;
+        }
+    }
+
     QFileInfo fi(resource->getUrl());
-    QString filePath = fi.absolutePath() + L'/' + newName;
+    QString filePath = fi.absolutePath() + QDir::separator() + newFileName;
 
     if (QFileInfo::exists(filePath))
     {
@@ -1229,6 +1265,15 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         return;
     }
 
+    QFile writabilityTest(filePath);
+    if (!writabilityTest.open(QIODevice::WriteOnly))
+    {
+        messages::LocalFiles::fileCannotBeWritten(mainWindow(), filePath);
+        return;
+    }
+
+    writabilityTest.remove();
+
     // If video is opened right now, it is quite hard to close it synchronously.
     static const int kTimeToCloseResourceMs = 300;
 
@@ -1237,10 +1282,11 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         [this, resource, filePath]()
         {
             QnResourcePtr result = resource;
+            const auto oldPath = resource->getUrl();
 
-            if (!QFile::rename(resource->getUrl(), filePath))
+            if (!QFile::rename(oldPath, filePath))
             {
-                messages::LocalFiles::fileIsBusy(mainWindow(), filePath);
+                messages::LocalFiles::fileIsBusy(mainWindow(), oldPath);
             }
             else
             {

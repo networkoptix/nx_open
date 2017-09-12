@@ -4,9 +4,9 @@
     "lowStream":"Niski strumień",
     "transcoding":"Transkodowanie",
     "unknown":"Nieznany",
-    "copyToClipboard":"Kopiuj do schowka",
-    "copyDefaultText":"Kopiuj",
-    "copyActiveText":"Skopiowane do schowka"
+    "copyToClipboard":"kopiuj do schowka",
+    "copyDefaultText":"kopiuj",
+    "copyActiveText":"skopiowano do schowka"
   },
   "systemOffline":"Serwer jest odłączony",
   "cameraStates":{

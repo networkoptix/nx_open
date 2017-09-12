@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
@@ -1024,6 +1016,13 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>아래로 스크롤</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -6134,10 +6133,6 @@ to %1</source>
       <translation>이메일서버 설정 안됨</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>서버끼리 동기화를 위해 서버 선택하세요</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>시스템 안전모드 상태 입니다</translation>
     </message>
@@ -6168,10 +6163,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>이메일서버 설정안됨</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>서버 시간이 동기화 되지 않았으며 공용시간이 자동으로 검색되지 않았습니다.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7684,6 +7675,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7938,8 +7948,8 @@ to %1</source>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>
