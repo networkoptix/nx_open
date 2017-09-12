@@ -22,11 +22,12 @@ public:
 
     virtual bool isCompatible(const QnAudioFormat& /* format */) const { return true; }
     virtual void setOutputFormat(const QnAudioFormat& /* format */) override {}
-    virtual bool isInitialized() const override { return m_initialized; }
 
     static const QByteArray kFixedPostRequest;
 protected:
     virtual void endOfRun() override;
+private:
+    bool isInitialized() const { return m_initialized; }
 private:
     QnResourcePtr m_camera;
     bool m_initialized;

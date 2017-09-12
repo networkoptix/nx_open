@@ -189,6 +189,9 @@ public:
         QPair<int,int> interleaved;
 
         QnRtspIoDevice* ioDevice;
+
+        bool isBackChannel = false;
+        int timeBase = 0;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -292,7 +295,7 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
-    void sendBynaryResponse(quint8* buffer, int size);
+    void sendBynaryResponse(const quint8* buffer, int size);
 
     QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
     int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
@@ -305,6 +308,8 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
+    
+    void setTrackInfo(const TrackMap& tracks);
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
