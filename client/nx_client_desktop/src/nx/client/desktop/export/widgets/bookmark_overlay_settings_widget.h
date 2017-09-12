@@ -10,7 +10,6 @@ namespace Ui { class BookmarkOverlaySettingsWidget; }
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class BookmarkOverlaySettingsWidget: public QWidget
 {
@@ -45,7 +44,6 @@ private:
     Data m_data;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

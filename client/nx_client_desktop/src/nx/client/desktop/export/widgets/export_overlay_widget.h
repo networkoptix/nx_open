@@ -8,7 +8,6 @@ class QPixmapFilter;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class ExportOverlayWidget: public QWidget
 {
@@ -70,7 +69,6 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

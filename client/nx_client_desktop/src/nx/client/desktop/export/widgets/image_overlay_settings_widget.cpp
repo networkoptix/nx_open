@@ -13,7 +13,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 ImageOverlaySettingsWidget::Data::Data()
 {
@@ -139,7 +138,6 @@ void ImageOverlaySettingsWidget::setMaxOverlayWidth(int value)
     return ui->sizeSlider->setMaximum(value);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

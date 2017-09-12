@@ -2,6 +2,8 @@
 
 #include <ui/widgets/common/panel.h>
 
+#include <nx/client/desktop/common/utils/filesystem.h>
+
 namespace Ui {
 class FilenamePanel;
 }
@@ -19,14 +21,14 @@ public:
     explicit FilenamePanel(QWidget *parent = 0);
     virtual ~FilenamePanel() override;
 
-    QStringList allowedExtesions() const;
-    void setAllowedExtensions(const QStringList& extensions);
+    FileExtensionList allowedExtesions() const;
+    void setAllowedExtensions(const FileExtensionList& extensions);
 
-    QString filename() const;
-    void setFilename(const QString& value);
+    Filename filename() const;
+    void setFilename(const Filename& value);
 
 signals:
-    bool filenameChanged(const QString& filename);
+    bool filenameChanged(const Filename& filename);
 
 private:
     void updateExtension();

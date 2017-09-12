@@ -51,8 +51,8 @@ void ExportMediaTool::start()
 
     d->camera->exportMediaPeriodToFile(
         d->settings.timePeriod,
-        d->settings.fileName,
-        QFileInfo(d->settings.fileName).suffix(),
+        d->settings.fileName.completeFileName(),
+        QFileInfo(d->settings.fileName.completeFileName()).suffix(),
         QnStorageResourcePtr(),
         StreamRecorderRole::fileExport,
         d->settings.serverTimeZoneMs,
@@ -87,9 +87,9 @@ void ExportMediaTool::at_camera_exportStopped()
 void ExportMediaTool::finishExport(bool success)
 {
     if (!success)
-        QFile::remove(d->settings.fileName);
+        QFile::remove(d->settings.fileName.completeFileName());
 
-    emit finished(success, d->settings.fileName);
+    emit finished(success, d->settings.fileName.completeFileName());
 }
 
 } // namespace desktop

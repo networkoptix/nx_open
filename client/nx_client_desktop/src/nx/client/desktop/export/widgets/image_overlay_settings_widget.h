@@ -10,7 +10,6 @@ namespace Ui { class ImageOverlaySettingsWidget; }
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class ImageOverlaySettingsWidget: public QWidget
 {
@@ -47,7 +46,6 @@ private:
     QString m_lastImageDir;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

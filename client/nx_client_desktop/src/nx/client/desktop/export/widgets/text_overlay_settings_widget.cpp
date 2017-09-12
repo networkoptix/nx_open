@@ -9,7 +9,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 namespace {
 
@@ -101,7 +100,6 @@ void TextOverlaySettingsWidget::setMaxOverlayWidth(int value)
     ui->widthSlider->setMaximum(value);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

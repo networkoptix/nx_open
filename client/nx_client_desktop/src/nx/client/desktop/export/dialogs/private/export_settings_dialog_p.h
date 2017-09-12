@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
@@ -25,8 +26,6 @@ namespace client {
 namespace desktop {
 
 class LayoutThumbnailLoader;
-
-namespace ui {
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -56,13 +55,16 @@ public:
     void setMediaResource(const QnMediaResourcePtr& media);
     void setLayout(const QnLayoutResourcePtr& layout);
     void setTimePeriod(const QnTimePeriod& period);
-    void setFilename(const QString& filename);
+    void setFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
 
     ErrorCode status() const;
     static bool isExportAllowed(ErrorCode code);
 
-    ExportSettingsDialog::Mode mode();
+    Mode mode() const;
+    void setMode(Mode mode);
+
+    FileExtensionList allowedFileExtensions() const;
 
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
@@ -87,6 +89,8 @@ public:
 
     const BookmarkOverlaySettingsWidget::Data& bookmarkOverlaySettings() const;
     void setBookmarkOverlaySettings(const BookmarkOverlaySettingsWidget::Data& settings);
+
+    void validateSettings();
 
 signals:
     void statusChanged(ErrorCode value);
@@ -117,7 +121,6 @@ private:
     QSize m_fullFrameSize;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

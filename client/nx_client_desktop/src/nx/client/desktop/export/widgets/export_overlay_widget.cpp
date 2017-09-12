@@ -14,7 +14,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 namespace {
 
@@ -408,7 +407,6 @@ bool ExportOverlayWidget::event(QEvent* event)
     return base_type::event(event);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

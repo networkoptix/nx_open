@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtWidgets/QDialog>
-
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/common/button_box_dialog.h>
@@ -19,8 +17,6 @@ namespace desktop {
 
 struct ExportMediaSettings;
 struct ExportLayoutSettings;
-
-namespace ui {
 
 /**
  * Dialog with generic video export settings. Can be opened from the timeline context menu - this
@@ -63,6 +59,8 @@ private:
     void setupSettingsButtons();
     void setMediaResource(const QnMediaResourcePtr& media);
     void updateSettingsWidgets();
+    void updateMode();
+    void updateAlerts();
 
     void addSingleCameraAlert(const QString& text);
     void addMultiVideoAlert(const QString& text);
@@ -73,7 +71,6 @@ private:
     QScopedPointer<Ui::ExportSettingsDialog> ui;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

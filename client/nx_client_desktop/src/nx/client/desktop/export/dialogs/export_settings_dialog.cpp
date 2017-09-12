@@ -3,8 +3,8 @@
 #include "ui_export_settings_dialog.h"
 
 #include <camera/single_thumbnail_loader.h>
+
 #include <ui/common/palette.h>
-#include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
@@ -19,7 +19,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 namespace {
 
@@ -137,13 +136,6 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     updateSettingsWidgets();
 
-    // TODO: #GDM bound to tab change
-    QStringList filters{
-        lit("Matroska (*.mkv)"),
-        lit("MP4 (*.mp4)"),
-        lit("AVI (*.avi)") };
-
-    ui->filenamePanel->setAllowedExtensions(filters);
     connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
@@ -173,19 +165,22 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
         ui->rapidReviewSettingsPage->frameStepMs());
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
-        ui->timestampButton, &SelectableTextButton::deactivate);
+        ui->timestampButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::deleteClicked,
-        ui->imageButton, &SelectableTextButton::deactivate);
+        ui->imageButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::deleteClicked,
-        ui->textButton, &SelectableTextButton::deactivate);
+        ui->textButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::deleteClicked,
-        ui->bookmarkButton, &SelectableTextButton::deactivate);
+        ui->bookmarkButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::deleteClicked,
-        ui->speedButton, &SelectableTextButton::deactivate);
+        ui->speedButton, &ui::SelectableTextButton::deactivate);
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
+    updateMode();
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -197,7 +192,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
         lit("buttons/settings_hovered.png"),
         lit("buttons/settings_selected.png")));
-    ui->cameraExportSettingsButton->setState(SelectableTextButton::State::selected);
+    ui->cameraExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
     ui->cameraExportSettingsButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->exportMediaSettingsPage));
 
@@ -205,7 +200,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
         lit("buttons/settings_hovered.png"),
         lit("buttons/settings_selected.png")));
-    ui->layoutExportSettingsButton->setState(SelectableTextButton::State::selected);
+    ui->layoutExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
@@ -220,7 +215,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->timestampButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::timestamp)));
     connect(d->overlay(Private::OverlayType::timestamp), &ExportOverlayWidget::pressed,
-        ui->timestampButton, &SelectableTextButton::click);
+        ui->timestampButton, &ui::SelectableTextButton::click);
 
     ui->imageButton->setDeactivatable(true);
     ui->imageButton->setDeactivatedText(tr("Add Image"));
@@ -235,7 +230,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::image)));
     connect(d->overlay(Private::OverlayType::image), &ExportOverlayWidget::pressed,
-        ui->imageButton, &SelectableTextButton::click);
+        ui->imageButton, &ui::SelectableTextButton::click);
 
     ui->textButton->setDeactivatable(true);
     ui->textButton->setDeactivatedText(tr("Add Text"));
@@ -250,7 +245,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::text)));
     connect(d->overlay(Private::OverlayType::text), &ExportOverlayWidget::pressed,
-        ui->textButton, &SelectableTextButton::click);
+        ui->textButton, &ui::SelectableTextButton::click);
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
@@ -275,9 +270,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(d->overlay(Private::OverlayType::bookmark)));
     connect(d->overlay(Private::OverlayType::bookmark), &ExportOverlayWidget::pressed,
-        ui->bookmarkButton, &SelectableTextButton::click);
+        ui->bookmarkButton, &ui::SelectableTextButton::click);
 
-    auto group = new SelectableTextButtonGroup(this);
+    auto group = new ui::SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
     group->add(ui->bookmarkButton);
     group->add(ui->timestampButton);
@@ -286,8 +281,8 @@ void ExportSettingsDialog::setupSettingsButtons()
     group->add(ui->speedButton);
     group->setSelectionFallback(ui->cameraExportSettingsButton);
 
-    connect(group, &SelectableTextButtonGroup::selectionChanged, this,
-        [this](SelectableTextButton* /*old*/, SelectableTextButton* selected)
+    connect(group, &ui::SelectableTextButtonGroup::selectionChanged, this,
+        [this](ui::SelectableTextButton* /*old*/, ui::SelectableTextButton* selected)
         {
             if (!selected)
                 return;
@@ -296,15 +291,15 @@ void ExportSettingsDialog::setupSettingsButtons()
             ui->mediaExportSettingsWidget->setCurrentWidget(page);
         });
 
-    connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
-        [this](SelectableTextButton* button)
+    connect(group, &ui::SelectableTextButtonGroup::buttonStateChanged, this,
+        [this](ui::SelectableTextButton* button)
         {
             NX_EXPECT(button);
             const auto overlay = button->property(kOverlayPropertyName).value<ExportOverlayWidget*>();
             if (overlay)
             {
-                const bool selected = button->state() == SelectableTextButton::State::selected;
-                overlay->setHidden(button->state() == SelectableTextButton::State::deactivated);
+                const bool selected = button->state() == ui::SelectableTextButton::State::selected;
+                overlay->setHidden(button->state() == ui::SelectableTextButton::State::deactivated);
                 overlay->setBorderVisible(selected);
                 if (selected)
                     overlay->raise();
@@ -345,6 +340,23 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->textSettingsPage->setData(d->textOverlaySettings());
 }
 
+void ExportSettingsDialog::updateMode()
+{
+    const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
+        ? Mode::Media
+        : Mode::Layout;
+    d->setMode(currentMode);
+
+    ui->filenamePanel->setAllowedExtensions(d->allowedFileExtensions());
+
+}
+
+void ExportSettingsDialog::updateAlerts()
+{
+    d->validateSettings();
+
+}
+
 void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
 {
     d->setMediaResource(media);
@@ -367,7 +379,6 @@ void ExportSettingsDialog::addMultiVideoAlert(const QString& text)
     addAlert(ui->layoutAlertsLayout, text);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

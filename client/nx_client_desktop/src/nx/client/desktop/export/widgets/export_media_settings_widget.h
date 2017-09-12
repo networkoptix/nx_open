@@ -11,7 +11,6 @@ class QnTimePeriod;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class ExportMediaSettingsWidget: public QWidget
 {
@@ -25,7 +24,6 @@ private:
     QScopedPointer<Ui::ExportMediaSettingsWidget> ui;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -63,9 +63,8 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_settings(settings),
-    m_realFilename(m_settings.filename)
+    m_realFilename(m_settings.filename.completeFileName())
 {
-    NX_ASSERT(!m_settings.filename.startsWith(lit("layout:")));
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(m_settings.layout->getId()); //before update() uuid's must be the same
     m_layout->update(m_settings.layout);
@@ -78,9 +77,8 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
 
 bool ExportLayoutTool::prepareStorage()
 {
-    const bool isExeFile = nx::utils::AppInfo::isWindows()
-        ? m_settings.filename.endsWith(lit(".exe"))
-        : false;
+    const auto isExeFile = nx::utils::AppInfo::isWindows()
+        && FileExtensionUtils::isExecutable(m_settings.filename.extension);
 
     if (isExeFile || m_realFilename == m_layout->getUrl())
     {
@@ -95,7 +93,7 @@ bool ExportLayoutTool::prepareStorage()
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != QnNovLauncher::ErrorCode::Ok)
         {
             m_errorMessage = tr("File \"%1\" is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).completeBaseName());
-            emit finished(false, m_settings.filename);   //file is not created, finishExport() is not required
+            emit finished(false, m_settings.filename.completeFileName());   //file is not created, finishExport() is not required
             return false;
         }
     }
@@ -269,8 +267,8 @@ bool ExportLayoutTool::start() {
     ItemInfoList items = prepareLayout();
 
     if (!exportMetadata(items)) {
-        m_errorMessage = tr("Could not create output file %1...").arg(m_settings.filename);
-        emit finished(false, m_settings.filename);   //file is not created, finishExport() is not required
+        m_errorMessage = tr("Could not create output file %1...").arg(m_settings.filename.completeFileName());
+        emit finished(false, m_settings.filename.completeFileName());   //file is not created, finishExport() is not required
         return false;
     }
 
@@ -318,14 +316,14 @@ void ExportLayoutTool::finishExport(bool success)
     if (!success)
     {
         QFile::remove(m_realFilename);
-        emit finished(false, m_settings.filename);
+        emit finished(false, m_settings.filename.completeFileName());
         return;
     }
 
-    if (m_realFilename != m_settings.filename)
-        m_storage->renameFile(m_storage->getUrl(), m_settings.filename);
+    if (m_realFilename != m_settings.filename.completeFileName())
+        m_storage->renameFile(m_storage->getUrl(), m_settings.filename.completeFileName());
 
-    auto existing = resourcePool()->getResourceByUrl(m_settings.filename)
+    auto existing = resourcePool()->getResourceByUrl(m_settings.filename.completeFileName())
         .dynamicCast<QnLayoutResource>();
 
     switch (m_settings.mode)
@@ -354,7 +352,7 @@ void ExportLayoutTool::finishExport(bool success)
                 /* Something went wrong */
                 m_errorMessage = tr("Unknown error has occurred.");
                 QFile::remove(m_realFilename);
-                emit finished(false, m_settings.filename);
+                emit finished(false, m_settings.filename.completeFileName());
                 return;
             }
             resourcePool()->addResource(layout);
@@ -363,7 +361,7 @@ void ExportLayoutTool::finishExport(bool success)
         default:
             break;
     }
-    emit finished(success, m_settings.filename);
+    emit finished(success, m_settings.filename.completeFileName());
 
     /*
     else if (m_mode == Qn::LayoutLocalSaveAs)
@@ -423,7 +421,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
                                     QnImageFilterHelper()
                                     );
 
-    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename).fileName()));
+    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
 }
 

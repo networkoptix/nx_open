@@ -1,55 +1,13 @@
 #include "filename_panel.h"
 #include "ui_filename_panel.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QRegularExpression>
-
 #include <client/client_settings.h>
 
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/app_info.h>
-#include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/log/log.h>
-
-namespace {
-
-// TODO: #GDM make better place for these methods, together with constructing one.
-QString getDirectory(const QString& path)
-{
-    QFileInfo info = QFileInfo(QDir::current(), path);
-    if (info.exists() && info.isDir())
-        return QDir::cleanPath(info.absoluteFilePath());
-    info.setFile(info.absolutePath());
-    if (info.exists() && info.isDir())
-        return info.absoluteFilePath();
-    return QString();
-}
-
-QString getFilename(const QString& path)
-{
-    if (!path.isEmpty())
-    {
-        QFileInfo info(path);
-        if (!info.isDir())
-            return info.fileName();
-    }
-    return QString();
-}
-
-QString getExtension(const QString& path)
-{
-    QRegularExpression re(QLatin1String(".*(\\.\\w+)[^\\.]*"));
-    const auto match = re.match(path);
-    NX_ASSERT(match.hasMatch());
-    if (match.hasMatch())
-        return match.captured(1);
-
-    return QString();
-}
-
-}
 
 namespace nx {
 namespace client {
@@ -57,10 +15,8 @@ namespace desktop {
 
 struct FilenamePanel::Private
 {
-    QString folder;
-    QString name;
-    QString extension; //< Extension of the result file (including dot).
-    QStringList allowedExtesions;
+    Filename filename;
+    FileExtensionModel model;
 };
 
 FilenamePanel::FilenamePanel(QWidget* parent):
@@ -69,13 +25,18 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     d(new Private)
 {
     ui->setupUi(this);
+    ui->extensionsComboBox->setModel(&d->model);
 
-    connect(this, &FilenamePanel::filenameChanged, ui->filenameLineEdit, &QWidget::setToolTip);
+    connect(this, &FilenamePanel::filenameChanged, this,
+        [this](const Filename& filename)
+        {
+            ui->filenameLineEdit->setToolTip(filename.completeFileName());
+        });
 
     connect(ui->filenameLineEdit, &QLineEdit::textChanged, this,
         [this](const QString& text)
         {
-            d->name = text;
+            d->filename.name = text;
             emit filenameChanged(filename());
         });
 
@@ -84,7 +45,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
         {
             const auto folder = QnFileDialog::getExistingDirectory(this,
                 tr("Select folder..."),
-                d->folder,
+                d->filename.path,
                 QFileDialog::ShowDirsOnly);
 
             // Workaround for bug QTBUG-34767
@@ -94,15 +55,16 @@ FilenamePanel::FilenamePanel(QWidget* parent):
             if (folder.isEmpty())
                 return;
 
-            d->folder = folder;
+            d->filename.path = folder;
             ui->folderLineEdit->setText(folder);
             emit filenameChanged(filename());
         });
 
-    connect(ui->extensionsComboBox, &QComboBox::currentTextChanged, this,
-        [this](const QString& text)
+    connect(ui->extensionsComboBox, QnComboboxCurrentIndexChanged, this,
+        [this](int /*row*/)
         {
-            d->extension = getExtension(text);
+            d->filename.extension = ui->extensionsComboBox->currentData(
+                FileExtensionModel::Role::ExtensionRole).value<FileExtension>();
             emit filenameChanged(filename());
         });
 
@@ -112,50 +74,36 @@ FilenamePanel::~FilenamePanel()
 {
 }
 
-QStringList FilenamePanel::allowedExtesions() const
+FileExtensionList FilenamePanel::allowedExtesions() const
 {
-    return d->allowedExtesions;
+    return d->model.extensions();
 }
 
-void FilenamePanel::setAllowedExtensions(const QStringList& extensions)
+void FilenamePanel::setAllowedExtensions(const FileExtensionList& extensions)
 {
-    d->allowedExtesions = extensions;
-
-    ui->extensionsComboBox->clear();
-    ui->extensionsComboBox->addItems(extensions);
-
+    d->model.setExtensions(extensions);
     ui->extensionsComboBox->setEnabled(!extensions.empty());
-    if (extensions.empty())
-    {
-        d->extension = QString();
-        return;
-    }
-
     updateExtension();
 
     emit filenameChanged(filename());
 }
 
-QString FilenamePanel::filename() const
+Filename FilenamePanel::filename() const
 {
-    QDir folder(d->folder);
-    return folder.absoluteFilePath(d->name + d->extension);
+    return d->filename;
 }
 
-void FilenamePanel::setFilename(const QString& value)
+void FilenamePanel::setFilename(const Filename& value)
 {
-    d->folder = getDirectory(value);
-    if (d->folder.isEmpty())
-        d->folder = qnSettings->lastExportDir();
-    if (d->folder.isEmpty())
-        d->folder = qnSettings->mediaFolder();
+    d->filename = value;
+    if (d->filename.path.isEmpty())
+        d->filename.path = qnSettings->lastExportDir();
+    if (d->filename.path.isEmpty())
+        d->filename.path = qnSettings->mediaFolder();
 
-    ui->folderLineEdit->setText(d->folder);
+    ui->folderLineEdit->setText(d->filename.path);
 
-    d->name = getFilename(value);
-    ui->filenameLineEdit->setText(d->name);
-
-    d->extension = getExtension(value);
+    ui->filenameLineEdit->setText(d->filename.name);
     updateExtension();
 
     emit filenameChanged(filename());
@@ -163,17 +111,19 @@ void FilenamePanel::setFilename(const QString& value)
 
 void FilenamePanel::updateExtension()
 {
-    int selectedIndex = utils::algorithm::index_of(d->allowedExtesions,
-        [ext = d->extension](const QString& elem) { return elem.contains(ext); });
+    if (d->model.extensions().empty())
+        return;
 
-    if (selectedIndex < 0)
+    const auto index = d->model.extensions().indexOf(d->filename.extension);
+    if (index < 0)
     {
         ui->extensionsComboBox->setCurrentIndex(0);
-        d->extension = d->allowedExtesions.first();
+        d->filename.extension = ui->extensionsComboBox->currentData(
+            FileExtensionModel::Role::ExtensionRole).value<FileExtension>();
     }
     else
     {
-        ui->extensionsComboBox->setCurrentIndex(selectedIndex);
+        ui->extensionsComboBox->setCurrentIndex(index);
     }
 }
 

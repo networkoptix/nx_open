@@ -4,6 +4,8 @@
 
 #include <recording/time_period.h>
 
+#include <nx/client/desktop/common/utils/filesystem.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -20,7 +22,7 @@ struct ExportLayoutSettings
     ExportLayoutSettings() = default;
     ExportLayoutSettings(QnLayoutResourcePtr layout,
         QnTimePeriod period,
-        QString filename,
+        Filename filename,
         Mode mode,
         bool readOnly)
         :
@@ -33,7 +35,7 @@ struct ExportLayoutSettings
 
     QnLayoutResourcePtr layout; //< Layout that should be exported.
     QnTimePeriod period;        //< Time period to export.
-    QString filename;           //< Target filename.
+    Filename filename;           //< Target filename.
     Mode mode = Mode::Export;   //< Export mode.
     bool readOnly = false;      //< Make exported layout read-only.
 };

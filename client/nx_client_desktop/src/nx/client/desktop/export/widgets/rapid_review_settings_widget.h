@@ -8,7 +8,6 @@ namespace Ui { class RapidReviewSettingsWidget; }
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class RapidReviewSettingsWidgetPrivate;
 class RapidReviewSettingsWidget: public QWidget
@@ -45,7 +44,6 @@ private:
     bool m_updating = false;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

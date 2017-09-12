@@ -2,20 +2,25 @@
 
 #include <QtCore/QFileInfo>
 
-#include <camera/camera_thumbnail_manager.h>
-#include <camera/single_thumbnail_loader.h>
-#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+
+#include <camera/camera_thumbnail_manager.h>
+#include <camera/single_thumbnail_loader.h>
+
+#include <nx/client/desktop/export/tools/export_media_validator.h>
+#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+
 #include <ui/common/palette.h>
-#include <utils/common/delayed.h>
+
 #include <utils/common/synctime.h>
+
 #include <nx/utils/log/assert.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 ExportSettingsDialog::Private::Private(const QSize& previewSize, QObject* parent):
     base_type(parent),
@@ -93,7 +98,7 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
     m_exportLayoutSettings.period = period;
 }
 
-void ExportSettingsDialog::Private::setFilename(const QString& filename)
+void ExportSettingsDialog::Private::setFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;
     m_exportLayoutSettings.filename = filename;
@@ -121,9 +126,40 @@ bool ExportSettingsDialog::Private::isExportAllowed(ErrorCode code)
     }
 }
 
-ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode()
+ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode() const
 {
     return m_mode;
+}
+
+void ExportSettingsDialog::Private::setMode(Mode mode)
+{
+    m_mode = mode;
+}
+
+FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions() const
+{
+    FileExtensionList result;
+    switch(m_mode)
+    {
+        case Mode::Media:
+            result
+                << FileExtension::mkv
+                << FileExtension::avi
+                << FileExtension::mp4;
+            break;
+        case Mode::Layout:
+            result << FileExtension::nov;
+            if (utils::AppInfo::isWin64())
+                result << FileExtension::exe64;
+            else if (utils::AppInfo::isWin32())
+                result << FileExtension::exe86;
+            break;
+        default:
+            NX_ASSERT(false, "Should never get here");
+            break;
+    }
+
+    return result;
 }
 
 ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
@@ -235,6 +271,19 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     m_bookmarkSettings = settings;
     // TODO: #vkutin Generate text from bookmark information and passed settings
     updateOverlay(OverlayType::bookmark);
+}
+
+void ExportSettingsDialog::Private::validateSettings()
+{
+    if (m_mode == Mode::Media)
+    {
+        const auto result = ExportMediaValidator::validateSettings(exportMediaSettings());
+    }
+    else
+    {
+
+    }
+
 }
 
 void ExportSettingsDialog::Private::updateOverlays()
@@ -369,7 +418,6 @@ QSize ExportSettingsDialog::Private::fullFrameSize() const
     return m_fullFrameSize;
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

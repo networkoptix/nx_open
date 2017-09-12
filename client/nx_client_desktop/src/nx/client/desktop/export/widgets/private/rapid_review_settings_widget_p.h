@@ -7,7 +7,6 @@ class QStandardItemModel;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class RapidReviewSettingsWidgetPrivate: public QObject
 {
@@ -68,7 +67,6 @@ private:
     qreal m_maxResultLengthInSelectedUnits;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

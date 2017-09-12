@@ -4,7 +4,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -13,7 +12,6 @@ ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -15,7 +15,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 namespace {
 
@@ -176,7 +175,6 @@ qint64 RapidReviewSettingsWidget::minimalSourcePeriodLength()
         * RapidReviewSettingsWidgetPrivate::kMinimalSpeed;
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -45,7 +45,6 @@ void addModelItem(const QString& text, qint64 measureUnit, QStandardItemModel* m
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 RapidReviewSettingsWidgetPrivate::RapidReviewSettingsWidgetPrivate(QObject* parent):
     base_type(parent),
@@ -297,7 +296,6 @@ qint64 RapidReviewSettingsWidgetPrivate::selectedLengthMeasureUnitInMs() const
     return std::max(measureUnit, 1ll);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

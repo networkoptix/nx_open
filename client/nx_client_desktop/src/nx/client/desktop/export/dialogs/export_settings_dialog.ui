@@ -251,12 +251,12 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="nx::client::desktop::ui::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
-         <widget class="nx::client::desktop::ui::BookmarkOverlaySettingsWidget" name="bookmarkSettingsPage"/>
-         <widget class="nx::client::desktop::ui::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
-         <widget class="nx::client::desktop::ui::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
-         <widget class="nx::client::desktop::ui::TextOverlaySettingsWidget" name="textSettingsPage"/>
-         <widget class="nx::client::desktop::ui::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
+         <widget class="nx::client::desktop::ExportMediaSettingsWidget" name="exportMediaSettingsPage"/>
+         <widget class="nx::client::desktop::BookmarkOverlaySettingsWidget" name="bookmarkSettingsPage"/>
+         <widget class="nx::client::desktop::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
+         <widget class="nx::client::desktop::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
+         <widget class="nx::client::desktop::TextOverlaySettingsWidget" name="textSettingsPage"/>
+         <widget class="nx::client::desktop::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
         </widget>
        </item>
       </layout>
@@ -298,7 +298,7 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="nx::client::desktop::ui::ExportLayoutSettingsWidget" name="exportLayoutSettingsPage"/>
+         <widget class="nx::client::desktop::ExportLayoutSettingsWidget" name="exportLayoutSettingsPage"/>
         </widget>
        </item>
        <item row="0" column="0" colspan="2">
@@ -471,13 +471,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::ui::ExportMediaSettingsWidget</class>
+   <class>nx::client::desktop::ExportMediaSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/export_media_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::ExportLayoutSettingsWidget</class>
+   <class>nx::client::desktop::ExportLayoutSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/export_layout_settings_widget.h</header>
    <container>1</container>
@@ -488,25 +488,25 @@
    <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::TimestampOverlaySettingsWidget</class>
+   <class>nx::client::desktop::TimestampOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::ImageOverlaySettingsWidget</class>
+   <class>nx::client::desktop::ImageOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/image_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::TextOverlaySettingsWidget</class>
+   <class>nx::client::desktop::TextOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/text_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::RapidReviewSettingsWidget</class>
+   <class>nx::client::desktop::RapidReviewSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/rapid_review_settings_widget.h</header>
    <container>1</container>
@@ -524,7 +524,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::BookmarkOverlaySettingsWidget</class>
+   <class>nx::client::desktop::BookmarkOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.h</header>
    <container>1</container>

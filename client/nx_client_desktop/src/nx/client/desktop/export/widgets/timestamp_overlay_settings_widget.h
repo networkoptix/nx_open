@@ -10,7 +10,6 @@ namespace Ui { class TimestampOverlaySettingsWidget; }
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class TimestampOverlaySettingsWidget: public QWidget
 {
@@ -38,7 +37,6 @@ private:
     Data m_data;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
