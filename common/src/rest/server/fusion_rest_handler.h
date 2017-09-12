@@ -30,7 +30,7 @@ static void serializeJsonRestReply(
     jsonRestResult.setReply(outputData);
     result = QJson::serialized(jsonRestResult);
     if (params.contains(lit("extraFormatting")))
-        nx::utils::formatJsonString(result);
+        result = nx::utils::formatJsonString(result);
 
     contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 }

@@ -21,7 +21,8 @@ QString replaceProhibitedChars(const QString& s)
                 result.reserve(s.size() + 100); //< Optimize potential re-allocations.
                 result = s.left(i); //< Copy all the preceding chars (they are valid).
             }
-            result.append(nx::utils::stringFormat("\\u%04x", c).c_str());
+            result.append(lit("\\u%1").arg(
+                c.unicode(), /*fieldWidth*/ 4, /*base*/ 16, /*fillChar*/ QChar('0')));
         }
         else
         {
