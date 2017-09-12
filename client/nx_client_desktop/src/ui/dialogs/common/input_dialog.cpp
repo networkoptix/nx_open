@@ -13,6 +13,8 @@ QnInputDialog::QnInputDialog(QWidget *parent)
 
     connect(ui->valueLineEdit, &QLineEdit::textChanged, this, &QnInputDialog::validateInput);
     validateInput();
+
+    setResizeToContentsMode(Qt::Horizontal | Qt::Vertical);
 }
 
 QnInputDialog::~QnInputDialog()
@@ -72,4 +74,23 @@ void QnInputDialog::validateInput()
     }
 
     ui->errorLabel->setVisible(false);
+}
+
+QString QnInputDialog::getText(QWidget* parent,
+    const QString& title, const QString& label,
+    QDialogButtonBox::StandardButtons buttons,
+    const QString& placeholder,
+    const QString& initialText)
+{
+    QnInputDialog dialog(parent);
+    dialog.setWindowTitle(title);
+    dialog.setCaption(label);
+    dialog.setButtons(buttons);
+    dialog.setPlaceholderText(placeholder);
+    dialog.setValue(initialText);
+
+    if (dialog.exec() != Accepted)
+        return QString();
+
+    return dialog.value();
 }

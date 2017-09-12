@@ -1483,10 +1483,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
-    const auto buffering = widgetLoaded
-        && m_currentMediaWidget->display()->camDisplay()->isBuffering();
-
-    if (!m_pausedOverride && !buffering)
+    if (!m_pausedOverride)
     {
         // TODO: #GDM #vkutin #refactor logic in 3.1
         auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
@@ -1496,21 +1493,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
-            {
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
-            }
-            else if (mediaWidget->resource()->toResource()->flags().testFlag(Qn::local_media))
-            {
-                // #vkutin Workaround for local files doing seek after quite a delay
-                // which caused time marker to jump back and forth.
-                // It happened even before QnCamDisplay::isBuffering became true.
-                // So for local files we use position of next frame, it seems working.
-                timeUSec = mediaWidget->display()->camDisplay()->getNextTime();
-            }
             else
-            {
                 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
-            }
 
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
