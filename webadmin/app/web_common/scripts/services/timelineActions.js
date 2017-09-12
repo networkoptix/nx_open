@@ -342,7 +342,7 @@ TimelineActions.prototype.zoomingStart = function(zoomIn) {
 // Double click zoom out button - zoom out completely
 TimelineActions.prototype.fullZoomOut = function(){
     this.zoomingStop(); // stop slow zooming
-    this.zoomTo(1); // zoom out completely
+    this.zoomTo(this.scaleManager.fullZoomOutValue()); // zoom out completely
 };
 
 // Zoom by wheel logic - slighly different for Mac and Win (Mac does smooth scroll on OS level, Win - does not
