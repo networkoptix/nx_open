@@ -14,6 +14,7 @@ class RadassController: public QObject
     Q_OBJECT
 public:
     RadassController();
+    ~RadassController();
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
@@ -34,7 +35,7 @@ private:
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    Private* d;
 };
 
 } // namespace desktop

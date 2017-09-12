@@ -531,6 +531,12 @@ RadassController::RadassController():
     timer->start(kTimerIntervalMs);
 }
 
+RadassController::~RadassController()
+{
+    delete d;
+    d = nullptr;
+}
+
 void RadassController::onSlowStream(QnArchiveStreamReader* reader)
 {
     QnMutexLocker lock(&d->mutex);
