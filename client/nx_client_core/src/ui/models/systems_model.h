@@ -34,7 +34,7 @@ public:
         IsConnectableRoleId,
         IsCompatibleToMobileClient,
         IsCompatibleVersionRoleId,
-        IsCompatibleToThickClient,
+        IsCompatibleToDesktopClient,
 
         WrongVersionRoleId,
         CompatibleVersionRoleId,

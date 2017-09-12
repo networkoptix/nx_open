@@ -253,7 +253,7 @@ Rectangle
 
                         wrongVersion: (model.wrongVersion && !model.wrongVersion.isNull()
                             && model.wrongVersion.toString()) || "";
-                        isCompatible: model.isCompatibleToThickClient;
+                        isCompatible: model.isCompatibleToDesktopClient;
                         compatibleVersion:(model.compatibleVersion
                             && !model.compatibleVersion.isNull()
                             && model.compatibleVersion.toString()) || "";

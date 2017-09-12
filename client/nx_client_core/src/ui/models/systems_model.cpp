@@ -32,7 +32,7 @@ namespace
         {QnSystemsModel::IsConnectableRoleId, "isConnectable"},
         {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
         {QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion"},
-        {QnSystemsModel::IsCompatibleToThickClient, "isCompatibleToThickClient"},
+        {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"}};
@@ -208,7 +208,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->isConnectable();
         case IsCompatibleToMobileClient:
             return d->isCompatibleSystem(system);
-        case IsCompatibleToThickClient:
+        case IsCompatibleToDesktopClient:
             return d->isCompatibleInternal(system);
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
