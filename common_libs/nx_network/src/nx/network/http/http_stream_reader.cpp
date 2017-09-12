@@ -396,6 +396,19 @@ bool HttpStreamReader::prepareToReadMessageBody()
         m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
     if (contentLengthIter != m_httpMessage.headers().end())
         m_contentLength = contentLengthIter->second.toULongLong();
+
+    // TODO: #ak Not sure whether following condition is true with rfc.
+    auto connectionHeaderIter = m_httpMessage.headers().find("Connection");
+    auto contentTypeHeaderIter = m_httpMessage.headers().find("Content-Type");
+
+    if (!m_contentLength && 
+        contentTypeHeaderIter == m_httpMessage.headers().end() &&
+        connectionHeaderIter != m_httpMessage.headers().end() &&
+        connectionHeaderIter->second.toLower() == "upgrade")
+    {
+        m_contentLength = 0;
+    }
+
     return true;
 }
 
