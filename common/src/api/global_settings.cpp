@@ -74,6 +74,7 @@ namespace
     const bool kCloudConnectRelayingEnabledDefault = true;
 
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
 }
 
 using namespace nx::settings_names;
@@ -281,6 +282,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
             duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndInternetDefault).count(),
             this);
     timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
+
+    m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndLocalTime,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -889,6 +897,12 @@ std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndI
 {
     return std::chrono::milliseconds(
         m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor->value());
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndLocalTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
 }
 
 QString QnGlobalSettings::cloudAccountName() const

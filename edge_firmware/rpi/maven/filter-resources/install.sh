@@ -5,11 +5,13 @@ set -u #< Prohibit undefined variables.
 configure()
 {
     BOX="@box@"
-    FAILURE_FLAG="/var/log/vms-upgrade-failed.flag"
     CUSTOMIZATION="@deb.customization.company.name@"
     INSTALL_PATH="opt/$CUSTOMIZATION"
     MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
     LITE_CLIENT_PATH="$INSTALL_PATH/lite_client"
+    LOGS_DIR="/$MEDIASERVER_PATH/var/log"
+    FAILURE_FLAG="$LOGS_DIR/vms-upgrade-failed.flag"
+    LOG_FILE="$LOGS_DIR/vms-upgrade.log"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
     TAR_FILE="./$DISTRIB.tar.gz"
@@ -18,7 +20,7 @@ configure()
 checkRunningUnderRoot()
 {
     if [ "$(id -u)" != "0" ]; then
-        echo "ERROR: $0 should be run under root"
+        echo "ERROR: $0 should be run under root" >&2
         exit 1
     fi
 }
@@ -26,22 +28,31 @@ checkRunningUnderRoot()
 # Redirect all output of this script to the log file.
 redirectOutput() # log_file
 {
-    LOG_FILE="$1"
+    local -r LOG_FILE="$1"
     echo "$0: All further output goes to $LOG_FILE"
 
-    exec 1<&- #< Close stdout fd.
-    exec 2<&- #< Close stderr fd.
-    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
-    exec 2>&1 #< Redirect stderr to stdout.
+    local -i RESULT
+
+    mkdir -p "$(dirname "$LOG_FILE")" \
+        || ( RESULT=$?; echo "ERROR: Cannot create dir for log file $LOG_FILE" >&2; exit $RESULT )
+
+    exec 1<&- \
+        || ( RESULT=$?; echo "ERROR: Cannot close stdout fd" >&2; exit $RESULT )
+    exec 1<>"$LOG_FILE" \
+        || ( RESULT=$?; echo "ERROR: Cannot redirect stdout to $LOG_FILE" >&2; exit $RESULT )
+    exec 2<&- \
+        || ( RESULT=$?; echo "ERROR: Cannot close stderr fd" >&2; exit $RESULT )
+    exec 2>&1 \
+        || ( RESULT=$?; echo "ERROR: Cannot redirect stderr to stdout" `# >stdout`; exit $RESULT )
 }
 
 # Call the specified command after mounting dev, setting MNT to the mount point.
 # ATTENTION: The command is called without "exit-on-error".
 callMounted() # filesystem dev MNT cmd [args...]
 {
-    local FILESYSTEM_callMounted="$1"; shift
-    local DEV_callMounted="$1"; shift
-    local MNT="$1"; shift
+    local -r FILESYSTEM_callMounted="$1"; shift
+    local -r DEV_callMounted="$1"; shift
+    local -r MNT="$1"; shift
 
     mkdir -p "$MNT"
     umount "$DEV_callMounted" || true #< Unmount in case it was mounted.
@@ -84,7 +95,8 @@ copyToDataPartition()
     fi
 }
 
-# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+# Install all deb packages from /opt/deb/<package>/, but do nothing if the directory is missing, or
+# the specified version of a deb package with the same name as the directory is already installed.
 installDebs() # package [version]
 {
     local -r PACKAGE="$1"; shift
@@ -193,12 +205,14 @@ restartMediaserver()
 main()
 {
     if [ $# = 0 ] || ( [ "$1" != "-v" ] && [ "$1" != "--verbose" ] ); then
-        redirectOutput "/var/log/vms-upgrade.log"
+        configure #< Called to set the values required for log redirection.
+        redirectOutput "$LOG_FILE"
     fi
 
     set -x #< Log each command.
+    configure #< If the output was redirected, called again to log the values.
     checkRunningUnderRoot
-    configure
+
     rm -rf "$FAILURE_FLAG" || true
 
     echo "Stopping mediaserver..."
@@ -220,13 +234,17 @@ main()
 
 onExit() # Called on exit via trap.
 {
-    local RESULT=$?
-
-    set +e #< Disable stopping on errors.
-
+    local -r -i RESULT=$?
     if [ $RESULT != 0 ]; then
-        touch "$FAILURE_FLAG" || echo "ERROR: Unable to create flag file $FAILURE_FLAG"
-        echo "ERROR: VMS upgrade script failed with exit status $RESULT; created $FAILURE_FLAG"
+        local -r MESSAGE="ERROR: VMS upgrade script failed with exit status $RESULT"
+        mkdir -p "$(dirname "$FAILURE_FLAG")" \
+            || echo "ERROR: Unable to create dir for flag file $FAILURE_FLAG" >&2
+        if touch "$FAILURE_FLAG"; then
+            echo "$MESSAGE; created $FAILURE_FLAG" >&2
+        else
+            echo "ERROR: Unable to create flag file $FAILURE_FLAG" >&2
+            echo "$MESSAGE" >&2
+        fi
     fi
     return $RESULT
 }

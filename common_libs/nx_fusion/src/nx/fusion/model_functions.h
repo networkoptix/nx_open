@@ -1,5 +1,4 @@
-#ifndef QN_FUSION_AUTOMATION_H
-#define QN_FUSION_AUTOMATION_H
+#pragma once
 
 #include <nx/utils/uuid.h>
 #include <nx/fusion/fusion/fusion_adaptor.h>
@@ -92,10 +91,3 @@ __VA_ARGS__ bool operator==(const TYPE &l, const TYPE &r) {                     
 __VA_ARGS__ bool operator!=(const TYPE &l, const TYPE &r) {                     \
     return !(l == r);                                                           \
 }
-
-
-
-#endif // QN_FUSION_AUTOMATION_H
-
-
-
