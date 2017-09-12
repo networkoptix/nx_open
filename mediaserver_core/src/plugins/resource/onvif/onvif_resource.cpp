@@ -605,7 +605,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     initializePtz(capabilitiesResponse);
-    
+
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -639,7 +639,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
 
     QAuthenticator auth = getAuth();
 
-    std::unique_ptr<DeviceSoapWrapper> deviceSoapWrapper = 
+    std::unique_ptr<DeviceSoapWrapper> deviceSoapWrapper =
         std::make_unique<DeviceSoapWrapper>(
             deviceOnvifUrl.toStdString(),
             auth.user(),
@@ -649,7 +649,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     auto result = fetchOnvifCapabilities(deviceSoapWrapper.get(), outCapabilitiesResponse);
     if (!result)
         return result;
-    
+
     updateFirmware();
     fillFullUrlInfo(*outCapabilitiesResponse);
 
@@ -2039,7 +2039,7 @@ bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result&
     bool notAuthorized = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised;
     if (notAuthorized && getStatus() != Qn::Unauthorized)
         setStatus(Qn::Unauthorized);
-        
+
     return !!result;
 }
 
@@ -3297,7 +3297,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
     }
 
     const auto result = subscribeToCameraNotifications();
-    NX_LOGX( lit("Port monitoring has started: %1").arg(result) );
+    NX_LOGX(lit("Port monitoring has started: %1").arg(result), cl_logDEBUG1);
     return result;
 }
 
@@ -3309,7 +3309,7 @@ void QnPlOnvifResource::scheduleRetrySubscriptionTimer()
     NX_LOGX(lm("Schedule new subscription in %1").arg(kTimeout), cl_logDEBUG2);
     updateTimer(&m_renewSubscriptionTimerID, kTimeout,
         [this](quint64 timerId)
-        { 
+        {
             QnMutexLocker lock(&m_ioPortMutex);
             if (timerId != m_renewSubscriptionTimerID)
                 return;
@@ -3373,8 +3373,8 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
-    
-    NX_LOGX( lit("Port monitoring is stopped") );
+
+    NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
 }
 
 
