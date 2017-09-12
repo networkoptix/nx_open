@@ -157,7 +157,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFileDeletor(commonModule()));
 
     store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(), commonModule()));
+        downloadsDirectory(), commonModule(), nullptr, this));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
