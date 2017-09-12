@@ -58,7 +58,7 @@ function TimelineConfig(){
         slowZoomSpeed: 0.02, // Zoom speed for holding buttons
         maxVerticalScrollForZoom: 250, // value for adjusting zoom
         maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
-        animationDuration: 400, // 300, // 200-400 for smooth animation
+        animationDuration: 200, // 300, // 200-400 for smooth animation
 
         levelsSettings:{
             labels:{
