@@ -1,11 +1,9 @@
 #pragma once
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/literal.h>
 #include <nx/utils/string.h>
 
 #include "model_functions_fwd.h"
-////#include "model_functions.h"
 
 namespace Qn {
 
@@ -26,39 +24,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 const char* serializationFormatToHttpContentType(SerializationFormat format);
 SerializationFormat serializationFormatFromHttpContentType(
     const QByteArray& httpContentType);
-
-template<typename OutputData>
-QByteArray serialized(
-    const OutputData& outputData, Qn::SerializationFormat format, bool extraFormatting)
-{
-    switch(format)
-    {
-        case Qn::UbjsonFormat:
-            return QnUbjson::serialized(outputData);
-
-        case Qn::JsonFormat:
-        case Qn::UnsupportedFormat:
-        {
-            QByteArray result = QJson::serialized(outputData);
-            if (extraFormatting)
-                result = nx::utils::formatJsonString(result);
-            return result;
-        }
-
-        case Qn::CsvFormat:
-            return QnCsv::serialized(outputData);
-
-        case Qn::XmlFormat:
-        {
-            QByteArray result = QnXml::serialized(outputData, lit("reply"));
-            return result;
-        }
-
-        default:
-            NX_ASSERT(false);
-            return QJson::serialized(outputData);
-    }
-}
 
 } // namespace Qn
 
