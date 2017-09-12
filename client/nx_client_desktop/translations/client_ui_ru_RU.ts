@@ -447,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Проверка</translation>
     </message>
   </context>
   <context>

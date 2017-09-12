@@ -870,14 +870,6 @@ to view more bookmarks</translation>
       <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
@@ -1025,6 +1017,13 @@ to view more bookmarks</translation>
     <message>
       <source>Scroll Down</source>
       <translation>เลื่อนลงล่าง</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -2098,7 +2097,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -2625,7 +2624,7 @@ to %1</translation>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>เรียนรู้เพิ่มเติมเกี่ยวกับ %1</translation>
     </message>
   </context>
   <context>
@@ -2641,7 +2640,7 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
     </message>
   </context>
   <context>
@@ -2663,7 +2662,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>สร้างบัญชี</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3025,7 +3024,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation type="unfinished">Enter password to continue.</translation>
+      <translation>ป้อนรหัสผ่านเพื่อดำเนินการต่อ</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3061,7 +3060,7 @@ to %1</translation>
     </message>
     <message>
       <source>All cloud users will be deleted.</source>
-      <translation type="unfinished">All cloud users will be deleted.</translation>
+      <translation>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบ</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
@@ -4128,7 +4127,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>สร้างบัญชี</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4141,7 +4140,7 @@ to %1</translation>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4193,7 +4192,7 @@ to %1</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>ไม่มีภาพ</translation>
     </message>
   </context>
   <context>
@@ -4224,7 +4223,7 @@ to %1</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>ความละเอียดสูง</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -4244,7 +4243,7 @@ to %1</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>ความละเอียดต่ำ</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -4789,7 +4788,7 @@ to %1</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>empty</source>
@@ -6139,10 +6138,6 @@ to %1</translation>
       <translation>เซิร์ฟเวอร์อีเมลที่ไม่ได้ตั้งค่า</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>เลือกเซิร์ฟเวอร์อื่น ๆ ในการตั้งค่าเวลากับ</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>ระบบในเซฟโหมด</translation>
     </message>
@@ -6173,10 +6168,6 @@ to %1</translation>
     <message>
       <source>Email server is not set.</source>
       <translation>เซิร์ฟเวอร์อีเมลที่ไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>เวลาเซิร์ฟเวอร์ไม่ตรงกันและเวลาทั่วไปไม่สามารถตรวจพบโดยอัตโนมัติ.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7689,6 +7680,25 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Layout Tour</source>
+      <translation type="unfinished">Stop Layout Tour</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Layout Tour</source>
+      <translation type="unfinished">Start Layout Tour</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7943,8 +7953,8 @@ to %1</translation>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>

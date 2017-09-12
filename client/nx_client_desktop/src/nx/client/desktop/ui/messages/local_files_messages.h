@@ -19,6 +19,9 @@ public:
     static void pathInvalid(QWidget* parent, const QString& path);
     static void fileExists(QWidget* parent, const QString& filename);
     static void fileIsBusy(QWidget* parent, const QString& filename);
+    static void fileCannotBeWritten(QWidget* parent, const QString& filename);
+    static void invalidChars(QWidget* parent, const QString& invalidSet);
+    static void reservedFilename(QWidget* parent, const QString& filename);
 };
 
 } // namespace messages

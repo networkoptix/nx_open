@@ -5,6 +5,7 @@
 #include <tchar.h>
 #include <Windows.h>
 #include <Commctrl.h>
+#include <Shlobj.h>
 #include "version.h"
 #include "progress.h"
 #include "resource.h"
@@ -46,6 +47,8 @@ using namespace std;
 static const int IO_BUFFER_SIZE = 1024*1024;
 static const int64_t MAGIC = 0x73a0b934820d4055ll;
 
+wofstream logfile;
+
 wstring loadString(UINT id)
 {
     enum { BUFFER_SIZE = 1024 };
@@ -82,13 +85,16 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
     return value;
 }
 
-wstring getDstDir()
+wstring getTempPath()
 {
     wchar_t path[MAX_PATH];
-
     GetTempPath(MAX_PATH, path);
-    return wstring(closeDirPath(path) + L"nov_video");
-    //return L"c:/client test/123";
+    return wstring(closeDirPath(path));
+}
+
+wstring getDstDir()
+{
+    return getTempPath() + L"nov_video";
 }
 
 wstring extractFilePath(const wstring& fileName)
@@ -115,11 +121,21 @@ wstring toNativeSeparator(const wstring& path)
 
 bool createDirectory(const wstring& path)
 {
-    return CreateDirectory(path.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
+    logfile << L"Create directory: " << path << L"\n";
+    const auto result = SHCreateDirectoryExW(NULL, path.c_str(), NULL);
+    const bool success = result == ERROR_SUCCESS
+        || result == ERROR_ALREADY_EXISTS
+        || result == ERROR_FILE_EXISTS;
+
+    if (!success)
+        logfile << L"Error: directory was not created: " << result << L"\n";
+     
+    return success;
 }
 
 void checkDir(set<wstring>& checkedDirs, const wstring& dir)
 {
+    logfile << L"Check Dir: " << dir.c_str() << L"\n";
     if (dir.empty())
         return;
     wstring normalizedName = toNativeSeparator(dir);
@@ -234,6 +250,9 @@ int launchFile(const wstring& executePath)
         delete [] buffer;
         wstring dstDir = getDstDir();
 
+        logfile.open(getTempPath() + L"nov_file_launcher.log", std::ofstream::out);
+        logfile << L"Preparing folder: " << dstDir << "\n";
+
         set<wstring> checkedDirs;
         checkDir(checkedDirs, dstDir);
 
@@ -247,11 +266,13 @@ int launchFile(const wstring& executePath)
             for (int i = 0; i < filePosList.size() - 1; ++i)
             {
                 wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
+                logfile << L"Export file: " << fullFileName.c_str() << L"\n";
                 checkDir(checkedDirs, extractFilePath(fullFileName));
                 extractFile(srcFile, fullFileName, filePosList[i], filePosList[i+1] - filePosList[i], progress);
             }
         }
 
+        logfile.close();
         srcFile.close();
 
         // start client
