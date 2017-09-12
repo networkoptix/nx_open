@@ -52,8 +52,8 @@ Object
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        property bool resumeOnActivate: false
-        property bool resumeOnOnline: false
+        property bool playing: false
+
         property real lastPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
@@ -69,16 +69,10 @@ Object
             if (!Utils.isMobile())
                 return
 
-            if (applicationActive)
-            {
-                if (d.resumeOnActivate)
-                    mediaPlayer.play()
-            }
-            else
-            {
-                d.resumeOnActivate = mediaPlayer.playing
+            if (!applicationActive)
                 mediaPlayer.pause()
-            }
+            else if (d.playing)
+                mediaPlayer.play()
         }
     }
 
@@ -116,26 +110,25 @@ Object
         }
     }
 
+    function tryPlay()
+    {
+        // We try to play even if camera is offline.
+        if (!cameraUnauthorized && d.playing && !mediaPlayer.playing)
+            mediaPlayer.play()
+    }
+
     onFailedChanged:
     {
         if (failed)
-        {
-            d.resumeOnOnline = offline
             mediaPlayer.stop()
-        }
     }
 
-    onOfflineChanged:
-    {
-        if (!offline && d.resumeOnOnline)
-        {
-            d.resumeOnOnline = false
-            mediaPlayer.play()
-        }
-    }
+    onCameraUnauthorizedChanged: tryPlay()
 
     onResourceIdChanged:
     {
+        tryPlay();
+
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
 
@@ -167,22 +160,26 @@ Object
 
     function play()
     {
+        d.playing = true
         mediaPlayer.play()
         d.savePosition()
     }
 
     function playLive()
     {
+        d.playing = true
         mediaPlayer.playLive()
     }
 
     function stop()
     {
+        d.playing = false
         mediaPlayer.stop()
     }
 
     function pause()
     {
+        d.playing = false
         mediaPlayer.pause()
         d.savePosition();
     }
