@@ -31,7 +31,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
-            $scope.showCameraPanel = false;
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
@@ -82,11 +81,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             });
             $scope.hasMobileApp = !!found;
         }
-
-        if(!$scope.storage.cameraId){
-            $scope.showCameraPanel = true;
-        }
-
 
         var supportsHls = browserSupports('hls',true,true),
             supportsWebm = browserSupports('webm', true, true);
@@ -404,7 +398,12 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.camerasProvider.requestResources().then(function(res){
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
                 if(!$scope.activeCamera){
-                    $scope.showCameraPanel = true;
+                    $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+
+                    //Just in case there are no camera
+                    if(!$scope.activeCamera){
+                        $scope.showCameraPanel = true;
+                    }
                 }
 
                 $scope.ready = true;
@@ -471,8 +470,14 @@ angular.module('nxCommon').controller('ViewCtrl',
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
             $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+
             if(!$scope.activeCamera){
-                $scope.showCameraPanel = true;
+                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+
+                //Just in case there are no camera
+                if(!$scope.activeCamera){
+                    $scope.showCameraPanel = true;
+                }
             }
         });
 

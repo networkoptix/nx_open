@@ -302,10 +302,11 @@ angular.module('nxCommon')
                 var serverId = tmpServerList[i].id;
                 for(var j in tmpCamerasList[serverId]){
                     if(tmpCamerasList[serverId][j] && tmpCamerasList[serverId][j].id){
-                        return tmpCamerasList[serverId][j].id;
+                        return tmpCamerasList[serverId][j];
                     }
                 }
             }
+            return null;
         };
 
         return {
