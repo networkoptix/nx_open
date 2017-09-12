@@ -26,7 +26,6 @@ public:
     virtual void setOutputFormat(const QnAudioFormat& format) override;
     virtual void setBitrateKbps(int value) override;
     virtual void setAudioUploadHttpMethod(nx_http::StringType method);
-    virtual bool isInitialized() const override;
     virtual void prepare() override;
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& audioData) override;
 
@@ -51,6 +50,7 @@ protected:
     bool startTransmission();
 
 private:
+    bool isInitialized() const;
     void at_requestHeadersHasBeenSent(
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse);
