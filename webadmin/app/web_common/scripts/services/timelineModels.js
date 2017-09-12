@@ -251,8 +251,8 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 4000 , topW: 0, topFormat:'yyyy' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 9000 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy'                    , marksW:15, smallW: 40, middleW: 400,      width: 4000 , topW: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy'                    , marksW:15, smallW: 40, middleW: 400,      width: 9000 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
@@ -264,22 +264,22 @@ var RulerModel = {
             topW: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
-        { name:'3Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 100000,   width: 600 , topW: 170, topFormat:'mmmm yyyy'},
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 100,      width: 200 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
-        { name:'12h'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
-        { name:'6h'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 600,      width: 1800 },
-        { name:'3h'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 900 },
-        { name:'1h'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 },
-        { name:'30m' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 1500 },
-        { name:'10m' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5m'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 250,      width: 500 },
-        { name:'1m'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
-        { name:'30s' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
-        { name:'10s' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5s'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
-        { name:'1s'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
+        { name:'6Months'    , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 360,      width: 3600 },
+        { name:'3Months'    , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 1800,     width: 9000 },
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 100000,   width: 600  , topW: 170, topFormat:'mmmm yyyy'},
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'                       , marksW:5,  smallW: 20, middleW: 100,      width: 200  , topW: 170, topFormat:'d mmmm yyyy', contained:1},
+        { name:'12h'        , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 200,      width: 1200 },
+        { name:'6h'         , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 600,      width: 1800 },
+        { name:'3h'         , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 300,      width: 900  },
+        { name:'1h'         , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 100,      width: 300  },
+        { name:'30m'        , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10m'        , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5m'         , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 250,      width: 500  },
+        { name:'1m'         , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 100,      width: 300  , topW: 170, topFormat: TimelineConfig.dateFormat + ' ' + TimelineConfig.hourFormat},
+        { name:'30s'        , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10s'        , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5s'         , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 250,      width: 100000 },
+        { name:'1s'         , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 100000,   width: 100000, topW: 200, topFormat: TimelineConfig.dateFormat + ' ' + TimelineConfig.timeFormat}
         //{ name:'500ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
         //{ name:'100ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
     ],

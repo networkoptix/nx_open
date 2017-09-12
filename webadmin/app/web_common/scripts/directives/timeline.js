@@ -79,7 +79,7 @@ angular.module('nxCommon')
                     return 1;
                 }();
 
-                var timelineConfig = TimelineConfig();
+                var timelineConfig = TimelineConfig;
 
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
                     timelineConfig.maxMsPerPixel,
