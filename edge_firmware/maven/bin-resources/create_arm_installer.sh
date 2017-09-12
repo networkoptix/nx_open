@@ -45,8 +45,8 @@ fi
 help()
 {
     echo "Options:"
-    echo "--no-client: Do not pack Lite Client."
-    echo "-v, --verbose: Do not redirect output to a log file."
+    echo " --no-client: Do not pack Lite Client."
+    echo " -v, --verbose: Do not redirect output to a log file."
 }
 
 # [out] LITE_CLIENT
