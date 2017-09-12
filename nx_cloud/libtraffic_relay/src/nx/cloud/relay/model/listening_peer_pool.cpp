@@ -2,6 +2,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "../settings.h"
 
@@ -460,6 +461,26 @@ void ListeningPeerPool::raiseScheduledEvents()
     }
     for (auto& raiseEventFunc: scheduledEvents)
         raiseEventFunc();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+ListeningPeerPoolFactory::ListeningPeerPoolFactory():
+    base_type(std::bind(&ListeningPeerPoolFactory::defaultFactoryFunction, 
+        this, std::placeholders::_1))
+{
+}
+
+ListeningPeerPoolFactory& ListeningPeerPoolFactory::instance()
+{
+    static ListeningPeerPoolFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractListeningPeerPool>
+    ListeningPeerPoolFactory::defaultFactoryFunction(const conf::ListeningPeer& settings)
+{
+    return std::make_unique<ListeningPeerPool>(settings);
 }
 
 } // namespace model

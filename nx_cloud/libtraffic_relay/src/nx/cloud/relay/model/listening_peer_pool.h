@@ -13,6 +13,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
@@ -29,40 +30,80 @@ namespace model {
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
     void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
-class ListeningPeerPool
+class AbstractListeningPeerPool
 {
 public:
-    ListeningPeerPool(const conf::ListeningPeer& settings);
-    ~ListeningPeerPool();
+    virtual ~AbstractListeningPeerPool() = default;
 
-    void addConnection(
+    virtual void addConnection(
         const std::string& peerName,
-        std::unique_ptr<AbstractStreamSocket> connection);
+        std::unique_ptr<AbstractStreamSocket> connection) = 0;
 
-    std::size_t getConnectionCountByPeerName(const std::string& peerName) const;
+    virtual std::size_t getConnectionCountByPeerName(const std::string& peerName) const = 0;
 
     /**
      * Peer is online if:
      * - There are active connections.
      * - Or emptyPoolTimeout has not passed since loss of the last connection.
      */
-    bool isPeerOnline(const std::string& peerName) const;
+    virtual bool isPeerOnline(const std::string& peerName) const = 0;
+    /**
+     * E.g., if we have peers server1.nx.com and server2.nx.com then
+     * findListeningPeerByPrefix("nx.com") will return any of that peers.
+     * At the same time findListeningPeerByPrefix("server1.nx.com") will return server1.nx.com.
+     * @return Empty string if nothing found.
+     */
+    virtual std::string findListeningPeerByDomain(const std::string& domainName) const = 0;
+
+    /**
+     * If peerName is not known, then api::ResultCode::notFound is reported.
+     * If peer is found, but no connections from it at the moment, then it will wait
+     * for some timeout for peer to establish new connection.
+     */
+    virtual void takeIdleConnection(
+        const std::string& peerName,
+        TakeIdleConnectionHandler completionHandler) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class ListeningPeerPool:
+    public AbstractListeningPeerPool
+{
+public:
+    ListeningPeerPool(const conf::ListeningPeer& settings);
+    ~ListeningPeerPool();
+
+    virtual void addConnection(
+        const std::string& peerName,
+        std::unique_ptr<AbstractStreamSocket> connection) override;
+
+    virtual std::size_t getConnectionCountByPeerName(
+        const std::string& peerName) const override;
+
+    /**
+     * Peer is online if:
+     * - There are active connections.
+     * - Or emptyPoolTimeout has not passed since loss of the last connection.
+     */
+    virtual bool isPeerOnline(const std::string& peerName) const override;
     /**
      * E.g., if we have peers server1.nx.com and server2.nx.com then 
      * findListeningPeerByPrefix("nx.com") will return any of that peers.
      * At the same time findListeningPeerByPrefix("server1.nx.com") will return server1.nx.com.
      * @return Empty string if nothing found.
      */
-    std::string findListeningPeerByDomain(const std::string& domainName) const;
+    virtual std::string findListeningPeerByDomain(
+        const std::string& domainName) const override;
 
     /**
      * If peerName is not known, then api::ResultCode::notFound is reported.
      * If peer is found, but no connections from it at the moment, then it will wait 
      * for some timeout for peer to establish new connection.
      */
-    void takeIdleConnection(
+    virtual void takeIdleConnection(
         const std::string& peerName,
-        TakeIdleConnectionHandler completionHandler);
+        TakeIdleConnectionHandler completionHandler) override;
 
     nx::utils::Subscription<std::string /*peer full name*/>& peerConnectedSubscription();
     nx::utils::Subscription<std::string /*peer full name*/>& peerDisconnectedSubscription();
@@ -165,6 +206,26 @@ private:
     void scheduleEvent(nx::utils::MoveOnlyFunc<void()> raiseEventFunc);
     void forcePeriodicTasksProcessing();
     void raiseScheduledEvents();
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using ListeningPeerPoolFactoryFunction =
+    std::unique_ptr<AbstractListeningPeerPool>(const conf::ListeningPeer& /*settings*/);
+
+class ListeningPeerPoolFactory:
+    public nx::utils::BasicFactory<ListeningPeerPoolFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<ListeningPeerPoolFactoryFunction>;
+
+public:
+    ListeningPeerPoolFactory();
+
+    static ListeningPeerPoolFactory& instance();
+
+private:
+    std::unique_ptr<AbstractListeningPeerPool> defaultFactoryFunction(
+        const conf::ListeningPeer& settings);
 };
 
 } // namespace model
