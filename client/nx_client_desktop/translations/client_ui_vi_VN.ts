@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>Giữ trạng thái đăng nhập</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Email hoặc mật khẩu không chính xác</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Duy trì đăng nhập</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Email hoặc mật khẩu không chính xác</translation>
     </message>
   </context>
   <context>

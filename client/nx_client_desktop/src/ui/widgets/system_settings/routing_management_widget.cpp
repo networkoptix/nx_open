@@ -20,6 +20,7 @@
 
 #include <ui/common/read_only.h>
 #include <ui/delegates/switch_item_delegate.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -424,7 +425,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     if (!m_server)
         return;
 
-    QString urlString = QInputDialog::getText(this, tr("Enter URL"), tr("URL"));
+    QString urlString = QnInputDialog::getText(this, tr("Enter URL"), tr("URL"));
     if (urlString.isEmpty())
         return;
 

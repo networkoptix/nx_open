@@ -157,7 +157,7 @@
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>ใช่</translation>
     </message>
     <message>
       <source>Yes to All</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>ไม่</translation>
     </message>
     <message>
       <source>No to All</source>

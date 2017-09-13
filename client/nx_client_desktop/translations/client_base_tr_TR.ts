@@ -1036,8 +1036,26 @@ to view more bookmarks</source>
       <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1664,10 +1682,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>Yapı numarası</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Geçersiz yapı numarası</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2647,6 +2661,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 hakkında daha fazla bilgi</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4595,6 +4620,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>Yer imleri yöneticisi</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -7771,20 +7800,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>Showreel'i durdur</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>Showreel'i başlat</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8049,8 +8078,8 @@ to %1</source>
       <translation>Düzeni değiştirmek için klavye oklarını kullanın. Showreel'den çıkmak için Esc tuşuna basın.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

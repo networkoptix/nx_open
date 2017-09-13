@@ -92,7 +92,7 @@ angular.module('nxCommon')
             getCredentials:function(){
                 return this.getCredentialsRaw().then(function(authObject){
                     if (typeof authObject === 'string' || authObject instanceof String) {
-                        $log.log("got string from client, try to decode JSON: " + authObject);
+                        $log.log("got string from client, try to decode JSON");
                         try {
                             authObject = JSON.parse(authObject);
                         } catch (a) {

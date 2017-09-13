@@ -1,18 +1,18 @@
 {
   "cameraLinks":{
-    "highStream":"High stream",
-    "lowStream":"Low stream",
-    "transcoding":"Transcoding",
-    "unknown":"Unknown",
+    "highStream":"고해상도 스트림",
+    "lowStream":"낮은 스트림",
+    "transcoding":"트랜스코딩",
+    "unknown":"알 수 없음",
     "copyToClipboard":"copy to clipboard",
     "copyDefaultText":"copy",
     "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Offline",
   "cameraStates":{
-    "offline":"Offline",
-    "error":"Error",
-    "unauthorized":"Authentication required",
+    "offline":"오프라인",
+    "error":"오류",
+    "unauthorized":"인증이 필요합니다",
     "noData":"No data",
     "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
     "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",

@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
     </message>
   </context>
   <context>

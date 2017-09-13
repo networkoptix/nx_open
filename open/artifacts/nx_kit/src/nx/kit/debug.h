@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <functional>
 #include <sstream>
+#include <memory>
 
 #if defined(QT_CORE_LIB)
     // To be supported in NX_PRINT_VALUE.
@@ -90,8 +91,8 @@ NX_KIT_API std::ostream*& stream();
  */
 #define NX_PRINT /* << args... */ \
     /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
-    ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; return Endl(); }() ) \
-    /*operator,*/, \
+    ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
+        return std::make_shared<Endl>(); }() ) /*operator,*/, \
     NX_DEBUG_STREAM << NX_PRINT_PREFIX
 
 /**
