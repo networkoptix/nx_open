@@ -191,6 +191,8 @@ Item
             {
                 id: kinetics
 
+                deceleration: 0.005
+
                 property point startPosition
 
                 onPositionChanged:
