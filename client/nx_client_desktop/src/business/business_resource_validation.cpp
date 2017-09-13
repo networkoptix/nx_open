@@ -20,6 +20,9 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
+
 #include <utils/email/email.h>
 
 namespace {
@@ -117,6 +120,10 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
 
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnCameraInputPolicy
+//-------------------------------------------------------------------------------------------------
+
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
@@ -129,6 +136,10 @@ QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool
     return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have no input ports", "", invalid), invalid);
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnCameraOutputPolicy
+//-------------------------------------------------------------------------------------------------
+
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
@@ -140,6 +151,10 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
     int invalid = invalidResourcesCount<QnCameraOutputPolicy>(cameras);
     return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
+
+//-------------------------------------------------------------------------------------------------
+// QnCameraMotionPolicy
+//-------------------------------------------------------------------------------------------------
 
 bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
@@ -161,6 +176,10 @@ QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bo
     return getShortResourceName(camera);
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnCameraMotionPolicy
+//-------------------------------------------------------------------------------------------------
+
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return !camera->isScheduleDisabled() && camera->hasMotion();
@@ -172,6 +191,10 @@ QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const boo
     int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
     return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
 }
+
+//-------------------------------------------------------------------------------------------------
+// QnCameraAudioTransmitPolicy
+//-------------------------------------------------------------------------------------------------
 
 bool QnCameraAudioTransmitPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
@@ -191,6 +214,10 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
         return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnCameraRecordingPolicy
+//-------------------------------------------------------------------------------------------------
+
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
     return !camera->isScheduleDisabled();
@@ -202,6 +229,28 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
     int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(cameras);
     return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
 }
+
+//-------------------------------------------------------------------------------------------------
+// QnCameraAnalyticsPolicy
+//-------------------------------------------------------------------------------------------------
+
+bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+{
+    return !camera->analyticsSupportedEvents().isEmpty();
+}
+
+QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+
+    int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
+    return genericCameraText<QnCameraAnalyticsPolicy>(cameras, detailed,
+        tr("Analytics is not available for %1", "", invalid), invalid);
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnSendEmailActionDelegate
+//-------------------------------------------------------------------------------------------------
 
 QnSendEmailActionDelegate::QnSendEmailActionDelegate(QWidget* parent):
     QnResourceSelectionDialogDelegate(parent),
@@ -302,7 +351,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     QStringList receivers;
     QSet<QnUserResourcePtr> invalidUsers;
 
-    for (const auto& user : users)
+    for (const auto& user: users)
     {
         QString userMail = user->getEmail();
         if (isValidUser(user))
@@ -358,7 +407,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)
 {
     QStringList result;
-    for (auto email : additional.split(L';', QString::SkipEmptyParts))
+    for (auto email: additional.split(L';', QString::SkipEmptyParts))
     {
         if (email.trimmed().isEmpty())
             continue;
@@ -435,7 +484,7 @@ bool hasAccessToSource(const nx::vms::event::EventParameters& params,
 
 } // namespace QnBusiness
 
-// ------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // QnSubjectValidationPolicy
 
 QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
@@ -568,7 +617,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
         : QString();
 }
 
-// ------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // QnDefaultSubjectValidationPolicy
 
 QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
@@ -586,7 +635,7 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
     return true;
 }
 
-// ------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(

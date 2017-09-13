@@ -292,6 +292,9 @@
             </params>
         </resource>        
         <resource name = "AXISP7210" public = "AXISP7210Group1">
-        </resource>        
+        </resource>      
+        <resource name = "AXISM3047" public = "AXISM3104"/>
+        <resource name = "AXISP1367" public = "AXISM3104"/>
+        <resource name = "AXISP1368" public = "AXISM3104"/>
     </oem>
 </resources>

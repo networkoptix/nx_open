@@ -57,7 +57,11 @@ Rectangle
         {
             id: gridHolder;
 
-            y: Math.max((control.height - height) / 2, 212);
+            readonly property real singleLineY: (control.height - height) / 2
+            y: grid.rowsCount > 1 && searchEdit.visible
+                ? Math.max(singleLineY, 212)
+                : singleLineY
+
             height: grid.tileHeight * 2 + grid.tileSpacing;
             width: parent.width;
 

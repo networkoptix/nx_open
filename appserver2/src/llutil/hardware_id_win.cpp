@@ -35,19 +35,20 @@
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
 
+namespace {
+
+const int kWbemTimeoutMs = 5000;
+const int kInterfaceWaitingTries = 10;
+const int kInterfaceWaitingTime = 500;
+const QString kEmptyMac = lit("");
+
+} // namespace
+
 namespace LLUtil {
 
-    namespace {
-        const int kWbemTimeoutMs = 5000;
-        const int kInterfaceWaitingTries = 10;
-        const int kInterfaceWaitingTime = 500;
-        const QString kEmptyMac = lit("");
-    }
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
-	void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
-
-	typedef std::map<_bstr_t, QnMacAndDeviceClass> QnPathToMacAndDeviceClassMap;
-
+typedef std::map<_bstr_t, QnMacAndDeviceClass> QnPathToMacAndDeviceClassMap;
 
 HRESULT GetDisabledNICSWithEmptyMac(IWbemServices* pSvc, std::vector<_bstr_t>& paths, const QnPathToMacAndDeviceClassMap& devices)
 {
@@ -59,10 +60,8 @@ HRESULT GetDisabledNICSWithEmptyMac(IWbemServices* pSvc, std::vector<_bstr_t>& p
 
     if (FAILED(hres))
     {
-        NX_LOG(QString(lit("GetDisabledNICS(): ExecQuery failed. Error code = 0x%1, Message: %2"))
-            .arg((long)hres, 0, 16)
-            .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
-            , cl_logINFO);
+        NX_WARNING(QnLog::HWID_LOG, lm("Unable to get disabled NICS, code=%1: %2")
+            .args(hres, _com_error(hres).ErrorMessage()));
         return 1;
     }
 
@@ -109,6 +108,7 @@ HRESULT GetDisabledNICSWithEmptyMac(IWbemServices* pSvc, std::vector<_bstr_t>& p
 	 });
 	paths.erase(it, paths.end());
 
+    NX_DEBUG(QnLog::HWID_LOG, lm("Got disabled NICS: %1").container(paths));
     return S_OK;
 }
 
@@ -118,31 +118,33 @@ HRESULT ExecuteMethodAtPaths(IWbemServices* pSvc, const TCHAR* methodName, const
 
     for (const _bstr_t& path: paths)
     {
+        NX_VERBOSE(QnLog::HWID_LOG, lm("ExecMethod '%1' is called for %2")
+            .args(methodName, containerString(paths)));
+
         IWbemCallResult *result = NULL;
         hres = pSvc->ExecMethod(path, _bstr_t(methodName), 0, NULL, NULL, NULL, &result);
         if (hres != WBEM_S_NO_ERROR)
         {
-            NX_LOG(QString(lit("ExecuteMethodAtPaths Method: %1 failed. Error code = 0x%2, Message: %3"))
-                .arg(QString::fromWCharArray(methodName))
-                .arg((long)hres, 0, 16)
-                .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
-                , cl_logINFO);
+            NX_WARNING(QnLog::HWID_LOG, lm("ExecMethod '%1' for '%2' has failed, code=%3: %3")
+                .args(methodName, path, hres, _com_error(hres).ErrorMessage()));
 
             continue;
         }
+
+        NX_VERBOSE(QnLog::HWID_LOG, lm("GetCallStatus '%1' is called for %2")
+            .args(methodName, containerString(paths)));
 
         LONG lStatus;
         result->GetCallStatus(kWbemTimeoutMs, &lStatus);
         if (lStatus != WBEM_S_NO_ERROR)
         {
-            NX_LOG(QString(lit("ExecuteMethodAtPaths Method: %1 failed. GetCallStatus() failed. Error code = 0x%2, Message: %3"))
-                .arg(QString::fromWCharArray(methodName))
-                .arg((long)hres, 0, 16)
-                .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
-                , cl_logINFO);
+            NX_WARNING(QnLog::HWID_LOG, lm("GetCallStatus '%1' for %2 has failed, code=%3: %4")
+                .args(methodName, path, hres, _com_error(hres).ErrorMessage()));
         }
     }
 
+    NX_DEBUG(QnLog::HWID_LOG, lm("Method '%1' for %2 returned %3")
+        .args(methodName, containerString(paths), hres));
     return hres;
 }
 

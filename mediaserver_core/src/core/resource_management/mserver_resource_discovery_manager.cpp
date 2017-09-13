@@ -31,7 +31,6 @@
 
 namespace {
 
-static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
 static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
@@ -41,7 +40,6 @@ static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
     QnResourceDiscoveryManager(commonModule)
 {
-    netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
         qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
     m_serverOfflineTimeout = qnServerModule->roSettings()->value(
@@ -131,13 +129,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     QnResourceList extraResources;
-
-    if (netStateTime.elapsed() > NETSTATE_UPDATE_TIME) {
-        netState.updateNetState();
-        netStateTime.restart();
-    }
-
-
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip

@@ -513,7 +513,9 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         if (data->motion) {
             while (m_motionMap.size() > MAX_DECODE_THREAD+1)
                 m_motionMap.remove(0);
-            m_motionMap << QPair<qint64, QnMetaDataV1Ptr>(data->timestamp, data->motion);
+
+            m_motionMap
+                << QPair<qint64, QnAbstractCompressedMetadataPtr>(data->timestamp, data->motion);
         }
 
         // -------------------------

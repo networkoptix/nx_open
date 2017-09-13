@@ -453,6 +453,11 @@ enum IDType
     OpenVideoWallReviewAction,
 
     /**
+     * Opens given camera in analytics mode.
+     */
+    StartAnalyticsAction,
+
+    /**
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,

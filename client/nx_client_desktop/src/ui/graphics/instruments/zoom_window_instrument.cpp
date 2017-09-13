@@ -22,6 +22,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <core/resource_management/resource_runtime_data.h>
+
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
 #include "selection_item.h"
@@ -85,6 +87,91 @@ QGraphicsSceneMouseEvent* constructSceneMouseEvent(
     mouseEvent->setSource(event->source());
     mouseEvent->setFlags(event->flags());
     return mouseEvent;
+}
+
+enum Direction
+{
+    NoDirection = 0x0,
+    Top         = 0x1,
+    Left        = 0x2,
+    Bottom      = 0x4,
+    Right       = 0x8,
+    TopLeft     = Top | Left,
+    BottomLeft  = Bottom | Left,
+    BottomRight = Bottom | Right,
+    TopRight    = Top | Right
+};
+
+Direction inversed(Direction value)
+{
+    switch (value)
+    {
+        case Direction::Top:
+            return Direction::Bottom;
+        case Direction::TopLeft:
+            return Direction::BottomRight;
+        case Direction::Left:
+            return Direction::Right;
+        case Direction::BottomLeft:
+            return Direction::TopRight;
+        case Direction::Bottom:
+            return Direction::Top;
+        case Direction::BottomRight:
+            return Direction::TopLeft;
+        case Direction::Right:
+            return Direction::Left;
+        case Direction::TopRight:
+            return Direction::BottomLeft;
+    }
+
+    return NoDirection;
+}
+
+Direction calculateDirection(const QRectF& from, const QRectF& to)
+{
+    int result = NoDirection;
+    if (from.top() >= to.bottom())
+        result |= Top;
+    else if (from.bottom() <= to.top())
+        result |= Bottom;
+
+    if (from.left() >= to.right())
+        result |= Left;
+    else if (from.right() <= to.left())
+        result |= Right;
+
+    return static_cast<Direction>(result);
+}
+
+QPointF sourceDirectionPoint(const QRectF& from, Direction direction)
+{
+    QPointF center = from.center();
+    switch (direction)
+    {
+        case Direction::Top:
+            return QPointF(center.x(), from.top());
+        case Direction::TopLeft:
+            return from.topLeft();
+        case Direction::Left:
+            return QPointF(from.left(), center.y());
+        case Direction::BottomLeft:
+            return from.bottomLeft();
+        case Direction::Bottom:
+            return QPointF(center.x(), from.bottom());
+        case Direction::BottomRight:
+            return from.bottomRight();
+        case Direction::Right:
+            return QPointF(from.right(), center.y());
+        case Direction::TopRight:
+            return from.topRight();
+    }
+
+    return center;
+}
+
+QPointF targetDirectionPoint(const QRectF& to, Direction direction)
+{
+    return sourceDirectionPoint(to, inversed(direction));
 }
 
 } // namespace
@@ -208,8 +295,26 @@ protected:
     virtual void paintWindowFrame(
         QPainter* painter,
         const QStyleOptionGraphicsItem* /*option*/,
-        QWidget* /*windget*/) override
+        QWidget* /*widget*/) override
     {
+        if (m_zoomWidget && m_zoomWidget->options().testFlag(QnResourceWidget::AnalyticsModeSlave))
+        {
+            const auto originalRegion = qnResourceRuntimeDataManager->layoutItemData(
+                m_zoomWidget->item()->uuid(),
+                Qn::ItemAnalyticsModeSourceRegionRole).value<QRectF>().
+                intersected(QRectF(0, 0, 1, 1));
+
+            // Main frame also must not be painted in this way.
+            if (originalRegion.isEmpty())
+                return;
+
+            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * 0.5);
+            const QRectF fullRect = QnGeometry::unsubRect(rect(), m_zoomWidget->item()->zoomRect());
+            const QRectF scaled = QnGeometry::subRect(fullRect, originalRegion);
+            QnNxStyle::paintCosmeticFrame(painter, scaled, m_frameColor, 1, 1);
+
+        }
+
         QnNxStyle::paintCosmeticFrame(painter, rect(), m_frameColor,
             m_frameWidth, m_frameWidth / 2);
     }
@@ -343,6 +448,35 @@ public:
 
         if (!qFuzzyEquals(oldSize, size()))
             updateLayout();
+    }
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* w) override
+    {
+        if (m_target && m_target->options().testFlag(QnResourceWidget::AnalyticsModeMaster))
+        {
+            const QRectF masterItemGeometry = m_target->item()->combinedGeometry();
+
+            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * 0.5);
+            QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(rect().toRect()));
+
+            for (auto widget: m_rectByWidget.keys())
+            {
+                if (m_rectByWidget[widget].isEmpty())
+                    continue;
+
+                const QRectF slaveItemGeometry = widget->zoomWidget()->item()->combinedGeometry();
+                const Direction direction = calculateDirection(masterItemGeometry, slaveItemGeometry);
+                QPointF p1 = sourceDirectionPoint(widget->geometry(), direction);
+                QPointF p2 = mapFromScene(
+                    targetDirectionPoint(widget->zoomWidget()->geometry(), direction));
+
+                QPen cosmetic(widget->frameColor());
+                cosmetic.setCosmetic(true);
+                QnScopedPainterPenRollback penRollback(painter, cosmetic);
+                painter->drawLine(p1, p2);
+            }
+
+        }
     }
 
 private:

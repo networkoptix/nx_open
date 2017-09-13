@@ -6,8 +6,14 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/helpers/event_log_request_data.h>
+#include <api/server_rest_connection.h>
+
 #include <common/common_module.h>
+
 #include <client_core/client_core_module.h>
+
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -16,6 +22,7 @@
 
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -48,19 +55,49 @@ using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
-    const int ProlongedActionRole = Qt::UserRole + 2;
 
-    const int kQueryTimeoutMs = 15000;
+enum EventListRoles
+{
+    EventTypeRole = Qt::UserRole + 1,
+    EventSubtypeRole,
+};
 
-    /* Really here can be any number, that is not equal to zero (success code). */
-    const int kTimeoutStatus = -1;
+enum ActionListRoles
+{
+    ActionTypeRole = Qt::UserRole + 1,
+    ProlongedActionRole,
+};
 
-    QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
-    {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-        return resourcePool->getResources<QnVirtualCameraResource>(ids);
-    }
+nx::vms::event::ActionType actionType(const QModelIndex& index)
+{
+    return index.isValid()
+        ? (nx::vms::event::ActionType) index.data(ActionTypeRole).toInt()
+        : nx::vms::event::ActionType::undefinedAction;
 }
+
+nx::vms::event::EventType eventType(const QModelIndex& index)
+{
+    return index.isValid()
+        ? (nx::vms::event::EventType) index.data(EventTypeRole).toInt()
+        : nx::vms::event::EventType::undefinedEvent;
+}
+
+QnUuid eventSubtype(const QModelIndex& index)
+{
+    return index.isValid()
+        ? index.data(EventSubtypeRole).value<QnUuid>()
+        : QnUuid();
+}
+
+const int kQueryTimeoutMs = 15000;
+
+QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return resourcePool->getResources<QnVirtualCameraResource>(ids);
+}
+
+} // namespace
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent):
@@ -95,24 +132,19 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     //ui->gridEvents->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    // init events model
-    {
-        QStandardItem* rootItem = createEventTree(0, vms::event::anyEvent);
-        m_eventTypesModel->appendRow(rootItem);
-        ui->eventComboBox->setModel(m_eventTypesModel);
-    }
+    initEventsModel();
 
     // init actions model
     {
         QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
-        anyActionItem->setData(vms::event::undefinedAction);
+        anyActionItem->setData(vms::event::undefinedAction, ActionTypeRole);
         anyActionItem->setData(false, ProlongedActionRole);
         m_actionTypesModel->appendRow(anyActionItem);
 
-
-        for (vms::event::ActionType actionType: vms::event::allActions()) {
+        for (vms::event::ActionType actionType: vms::event::allActions())
+        {
             QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
-            item->setData(actionType);
+            item->setData(actionType, ActionTypeRole);
             item->setData(vms::event::hasToggleState(actionType), ProlongedActionRole);
 
             QList<QStandardItem *> row;
@@ -179,17 +211,82 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 QnEventLogDialog::~QnEventLogDialog() {
 }
 
-QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, vms::event::EventType value)
+QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
+    vms::event::EventType value)
 {
-    QStandardItem* item = new QStandardItem(m_helper->eventName(value));
-    item->setData(value);
+    auto item = new QStandardItem(m_helper->eventName(value));
+    item->setData(value, EventTypeRole);
 
     if (rootItem)
         rootItem->appendRow(item);
 
-    foreach(vms::event::EventType value, vms::event::childEvents(value))
-        createEventTree(item, value);
+    for (auto childValue: vms::event::childEvents(value))
+        createEventTree(item, childValue);
+
+    if (value == nx::vms::event::EventType::analyticsSdkEvent)
+        createAnalyticsEventTree(item);
+
     return item;
+}
+
+void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
+{
+    NX_ASSERT(rootItem);
+
+    using AnalyticsHelper = nx::vms::event::AnalyticsHelper;
+
+    auto allEventTypes = m_filterCameraList.empty()
+        ? AnalyticsHelper(commonModule()).analyticsEvents()
+        : AnalyticsHelper::analyticsEvents(cameras(m_filterCameraList));
+
+    if (allEventTypes.empty())
+        return;
+
+    auto eventName =
+        [hasDifferentDrivers = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(allEventTypes),
+            locale = qnRuntime->locale()]
+        (const AnalyticsHelper::EventDescriptor& eventType)
+        {
+            if (!hasDifferentDrivers)
+                return eventType.eventName.text(locale);
+
+            return lit("%1 - %2")
+                .arg(eventType.driverName.text(locale))
+                .arg(eventType.eventName.text(locale));
+        };
+
+    for (const auto& eventType: allEventTypes)
+    {
+        auto item = new QStandardItem(eventName(eventType));
+        item->setData(nx::vms::event::EventType::analyticsSdkEvent, EventTypeRole);
+        item->setData(qVariantFromValue(eventType.eventTypeId), EventSubtypeRole);
+        rootItem->appendRow(item);
+    }
+
+    rootItem->sortChildren(0);
+}
+
+void QnEventLogDialog::updateAnalyticsEvents()
+{
+    const auto found = m_eventTypesModel->match(
+        m_eventTypesModel->index(0, 0),
+        EventTypeRole,
+        /*value*/ nx::vms::event::EventType::analyticsSdkEvent,
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
+    NX_ASSERT(found.size() ==  1);
+    if (!found.size() == 1)
+        return;
+
+    const auto index = found[0];
+    auto item = m_eventTypesModel->itemFromIndex(index);
+    NX_ASSERT(item);
+    if (!item)
+        return;
+
+    item->removeRows(0, item->rowCount());
+    createAnalyticsEventTree(item);
 }
 
 bool QnEventLogDialog::isFilterExist() const
@@ -197,17 +294,47 @@ bool QnEventLogDialog::isFilterExist() const
     if (!cameras(m_filterCameraList).isEmpty())
         return true;
 
-    QModelIndex idx = ui->eventComboBox->currentIndex();
-    if (idx.isValid()) {
-        vms::event::EventType eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
-        if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
-            return true;
-    }
+    const auto eventType = ::eventType(ui->eventComboBox->currentIndex());
+    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
+        return true;
 
     if (ui->actionComboBox->currentIndex() > 0)
         return true;
 
     return false;
+}
+
+void QnEventLogDialog::initEventsModel()
+{
+    QStandardItem* rootItem = createEventTree(nullptr, vms::event::anyEvent);
+    m_eventTypesModel->appendRow(rootItem);
+    ui->eventComboBox->setModel(m_eventTypesModel);
+
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
+                return;
+
+            connect(resource, &QnResource::propertyChanged, this,
+                [this](const QnResourcePtr& /*res*/, const QString& key)
+                {
+                    if (key == Qn::kAnalyticsDriversParamName)
+                        updateAnalyticsEvents();
+                });
+
+            updateAnalyticsEvents();
+        });
+
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
+                return;
+
+            resource->disconnect(this);
+            updateAnalyticsEvents();
+        });
 }
 
 void QnEventLogDialog::reset()
@@ -222,37 +349,37 @@ void QnEventLogDialog::reset()
 
 void QnEventLogDialog::updateData()
 {
-    if (m_updateDisabled) {
+    if (m_updateDisabled)
+    {
         m_dirty = true;
         return;
     }
     m_updateDisabled = true;
 
-    vms::event::EventType eventType = vms::event::undefinedEvent;
-    {
-        QModelIndex idx = ui->eventComboBox->currentIndex();
-        if (idx.isValid())
-            eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
+    vms::event::EventType eventType = ::eventType(ui->eventComboBox->currentIndex());
+    bool serverIssue = vms::event::parentEvent(eventType) == vms::event::anyServerEvent
+        || eventType == vms::event::anyServerEvent;
+    ui->cameraButton->setEnabled(!serverIssue);
+    if (serverIssue)
+        setCameraList(QSet<QnUuid>());
 
-        bool serverIssue = vms::event::parentEvent(eventType) == vms::event::anyServerEvent || eventType == vms::event::anyServerEvent;
-        ui->cameraButton->setEnabled(!serverIssue);
-        if (serverIssue)
-            setCameraList(QSet<QnUuid>());
+    bool istantOnly = !vms::event::hasToggleState(eventType)
+        && eventType != vms::event::undefinedEvent;
 
-        bool istantOnly = !vms::event::hasToggleState(eventType) && eventType != vms::event::undefinedEvent;
-        updateActionList(istantOnly);
-    }
+    updateActionList(istantOnly);
 
-    vms::event::ActionType actionType = vms::event::undefinedAction;
-    {
-        int idx = ui->actionComboBox->currentIndex();
-        actionType = (vms::event::ActionType) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
-    }
+    const auto actionType = ::actionType(m_actionTypesModel->index(
+        ui->actionComboBox->currentIndex(), 0));
+
+    const QnUuid eventSubtype = eventType == nx::vms::event::EventType::analyticsSdkEvent
+        ? ::eventSubtype(ui->eventComboBox->currentIndex())
+        : QnUuid();
 
     query(ui->dateRangeWidget->startTimeMs(),
-          ui->dateRangeWidget->endTimeMs(),
-          eventType,
-          actionType);
+        ui->dateRangeWidget->endTimeMs(),
+        eventType,
+        eventSubtype,
+        actionType);
 
     // update UI
 
@@ -272,30 +399,64 @@ void QnEventLogDialog::updateData()
     m_dirty = false;
 }
 
-void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
-                             vms::event::EventType eventType,
-                             vms::event::ActionType actionType)
+void QnEventLogDialog::query(qint64 fromMsec,
+    qint64 toMsec,
+    vms::event::EventType eventType,
+    const QnUuid& eventSubtype,
+    vms::event::ActionType actionType)
 {
     m_requests.clear();
     m_allEvents.clear();
 
+    QnEventLogRequestData request;
+    request.cameras = cameras(m_filterCameraList);
+    request.period = QnTimePeriod(fromMsec, toMsec - fromMsec);
+    request.eventType = eventType;
+    request.eventSubtype = eventSubtype;
+    request.actionType = actionType;
+
+    QPointer<QnEventLogDialog> guard(this);
+    auto callback =
+        [this, guard](bool success, rest::Handle handle, rest::EventLogData data)
+        {
+            if (!guard)
+                return;
+
+            if (!m_requests.contains(handle))
+                return;
+            m_requests.remove(handle);
+
+            if (success)
+            {
+                auto& events = data.data;
+                m_allEvents.reserve(m_allEvents.size() + events.size());
+                std::move(events.begin(), events.end(), std::back_inserter(m_allEvents));
+            }
+            else if (!success)
+            {
+                NX_DEBUG(this, lm("Error %1 while requesting even log (%2)")
+                    .args(data.error, data.errorString));
+            }
+
+            if (m_requests.isEmpty())
+                requestFinished();
+        };
+
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for(const QnMediaServerResourcePtr& mserver: onlineServers)
+    for (const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        int handle = mserver->apiConnection()->getEventLogAsync(
-            fromMsec, toMsec,
-            cameras(m_filterCameraList),
-            eventType,
-            actionType,
-            QnUuid(),
-            this, SLOT(at_gotEvents(int, const nx::vms::event::ActionDataListPtr&, int)));
+        auto handle = mserver->restConnection()->getEvents(request,
+            callback, this->thread());
+
+        if (handle <= 0)
+            continue;
 
         m_requests << handle;
 
         const auto timerCallback =
-            [this, handle]
+            [this, handle, callback]
             {
-                at_gotEvents(kTimeoutStatus, vms::event::ActionDataListPtr(), handle);
+                callback(false, handle, rest::EventLogData());
             };
 
         executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
@@ -327,24 +488,9 @@ void QnEventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(action::BusinessEventsAction));
 }
 
-void QnEventLogDialog::at_gotEvents(int httpStatus, const vms::event::ActionDataListPtr& events, int requestNum)
-{
-    if (!m_requests.contains(requestNum))
-        return;
-    m_requests.remove(requestNum);
-
-    if (httpStatus == 0 && events && !events->empty())
-        m_allEvents << events;
-    else if (httpStatus != 0)
-        NX_LOG(lit("Error %1 while requesting even log").arg(httpStatus), cl_logDEBUG1);
-
-    if (m_requests.isEmpty())
-        requestFinished();
-}
-
 void QnEventLogDialog::requestFinished()
 {
-    m_model->setEvents(m_allEvents);
+    m_model->setEvents(std::move(m_allEvents));
     m_allEvents.clear();
     setCursor(Qt::ArrowCursor);
 
@@ -397,12 +543,13 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 
 void QnEventLogDialog::setEventType(vms::event::EventType value)
 {
-    QModelIndexList found = m_eventTypesModel->match(
-                m_eventTypesModel->index(0, 0),
-                Qt::UserRole + 1,
-                value,
-                1,
-                Qt::MatchExactly | Qt::MatchRecursive);
+    const auto found = m_eventTypesModel->match(
+        m_eventTypesModel->index(0, 0),
+        EventTypeRole,
+        /*value*/value,
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
     if (found.isEmpty())
         ui->eventComboBox->setCurrentIndex(QModelIndex());
     else
@@ -421,6 +568,7 @@ void QnEventLogDialog::setCameraList(const QSet<QnUuid>& ids)
 
     m_filterCameraList = ids;
     retranslateUi();
+    updateAnalyticsEvents();
     updateData();
 }
 
@@ -428,9 +576,11 @@ void QnEventLogDialog::setActionType(vms::event::ActionType value)
 {
     for (int i = 0; i < m_actionTypesModel->rowCount(); ++i)
     {
-        QModelIndex idx = m_actionTypesModel->index(i, 0);
-        if (idx.data(Qt::UserRole + 1).toInt() == value)
+        if (actionType(m_actionTypesModel->index(i, 0)) == value)
+        {
             ui->actionComboBox->setCurrentIndex(i);
+            break;
+        }
     }
 }
 
@@ -546,12 +696,17 @@ void QnEventLogDialog::setVisible(bool value)
 
 void QnEventLogDialog::updateActionList(bool instantOnly)
 {
-    QModelIndexList prolongedActions = m_actionTypesModel->match(m_actionTypesModel->index(0,0),
-                                                                 ProlongedActionRole, true, -1, Qt::MatchExactly);
+    const auto prolongedActions = m_actionTypesModel->match(
+        m_actionTypesModel->index(0, 0),
+        ProlongedActionRole,
+        /*value*/ true,
+        /*hits*/ -1,
+        Qt::MatchExactly);
 
     // what type of actions to show: prolonged or instant
     bool enableProlongedActions = !instantOnly;
-    foreach (QModelIndex idx, prolongedActions) {
+    for (const auto& idx: prolongedActions)
+    {
         m_actionTypesModel->item(idx.row())->setEnabled(enableProlongedActions);
         m_actionTypesModel->item(idx.row())->setSelectable(enableProlongedActions);
     }

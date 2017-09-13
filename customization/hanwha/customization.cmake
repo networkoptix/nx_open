@@ -5,12 +5,12 @@ set(parent.customization "digitalwatchdog")
 # Components Namings
 set(display.product.name "WAVE")
 set(display.mobile.name "WAVE Mobile")
-set(product.name "WAVE")
-set(product.name.short "hanwha")
+set(product.name "HTA WAVE")
+set(product.name.short "hta_wave")
 set(product.appName "wave")
 set(company.name "Hanwha")
-set(short.company.name "hanwha")
-set(uri.protocol "hanwha-vms")
+set(short.company.name "hta")
+set(uri.protocol "hta-vms")
 set(cloudName "WAVE Sync")
 
 # Default settings
@@ -20,14 +20,14 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "")
-set(supportEmail "WAVEsupport@hanwha.com")
+set(supportEmail "support@hanwhasecurity.com")
 set(supportPhone "")
 set(licenseEmail "WAVElicense@hanwha.com")
 
-set(installer.name "wave")
-set(android.packageName "com.hanwhasecurity.wavemobile")
-set(android.oldPackageName "com.hanwhasecurity.wave")
-set(android.alias "wave")
+set(installer.name "hta-wave")
+set(android.packageName "com.hanwhasecurity.htawavemobile")
+set(android.oldPackageName "com.hanwhasecurity.htawave")
+set(android.alias "htawave")
 set(android.storepass "5B4M2Gn5")
 set(android.keypass "S6rtgPMk")
 
@@ -42,12 +42,12 @@ set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}"
 set(#customization.nxtoolBundleUpgradeCode "")
 set(#customization.axBundleUpgradeCode "")
 
-set(deb.customization.company.name "hanwha")
+set(deb.customization.company.name "hta-hanwha")
 
 set(ios.skip.sign "false")
-set(ios.bundle_identifier "com.hanwhasecurity.wave")
-set(ios.new_bundle_identifier "com.hanwhasecurity.wavemobile")
-set(ios.group_identifier "group.com.hanwhasecurity.wave")
+set(ios.bundle_identifier "com.hanwhasecurity.htawave")
+set(ios.new_bundle_identifier "com.hanwhasecurity.htawavemobile")
+set(ios.group_identifier "group.com.hanwhasecurity.htawave")
 #set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
 set(ios.old_app_appstore_id "")
 
@@ -55,7 +55,7 @@ set(mac.skip.sign "false")
 #set(mac.sign.identity "Developer ID Application: RAS Bvba (CJ7G58V6NE)")
 #set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
 #set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")
-set(mac.bundle.identifier "com.hanwhasecurity.wave2")
+set(mac.bundle.identifier "com.hanwhasecurity.htawave2")
 set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler")
 
 # Other customizations.
@@ -70,4 +70,20 @@ set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations en_GB fr_FR de_DE ru_RU es_ES ja_JP ko_KR tr_TR zh_CN zh_TW he_IL hu_HU)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
+)

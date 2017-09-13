@@ -1,5 +1,5 @@
 Config.helpLinks.push({
-    url: "WAVEsupport@hanwha.com",
+    url: "support@hanwhasecurity.com",
     title: "Support",
     target: "new" // new|frame
 });
@@ -32,4 +32,4 @@ Config.allowDebugMode = false;
 Config.productName = 'WAVE';
 Config.cloud.productName = 'WAVE Sync';
 
-Config.supportedLanguages = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'ja_JP', 'ko_KR', 'tr_TR', 'zh_CN', 'zh_TW', 'hu_HU', 'he_IL'];
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'ja_JP', 'ko_KR', 'tr_TR', 'zh_CN', 'zh_TW', 'hu_HU', 'he_IL', 'nl_NL', 'pl_PL', 'vi_VN'];

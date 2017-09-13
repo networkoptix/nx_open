@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>plugins</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>metadata_plugins</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Witness Metadata Plugins</name>
+
+    <properties>
+        <root.dir>${basedir}/../../..</root.dir>
+        <template>lib</template>
+        <libtype>plugin</libtype>
+        <buildLib>sharedlib</buildLib>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_environment</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_environment/pom.xml</systemPath>            
+        </dependency>
+    </dependencies>
+</project>

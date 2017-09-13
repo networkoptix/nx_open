@@ -1,0 +1,37 @@
+{
+    "driverId": "{09E793F0-917D-4D0D-BF64-9CB05CDEA5A8}",
+    "driverName": 
+    {   
+        "value": "Example Driver",
+        "localization": {
+            "ru_RU": "Пример драйвера",
+            "uk_UA": "Приклад драйвера"
+            }
+    },
+    "acceptedDataTypes": ["compressedVideo", "decompressedVideo"],
+    "supportedCodecs": ["video/avc"],
+    "supportedHandleTypes": ["eglImage"],
+    "supportedPixelFormats": ["YUV_444"],
+    "outputEventTypes": [
+        {
+            "eventTypeId": "{59306203-F37F-44D5-ACC4-1AE9CAA7CBCB}",
+            "eventName": {
+                "value": "Line crossing",
+                "localization": {
+                    "ru_RU": "Пересечение линии",
+                    "uk_UA": "Перетин лiнiї"
+                }
+            }
+        },
+        {
+            "eventTypeId": "{AC08F9B9-FB06-4D81-886B-C81EA5009933}",
+            "eventName": {
+                "value": "Object in the area",
+                "localization": {
+                    "ru_RU": "Объект внутри области",
+                    "uk_UA": "Об'єкт всередині області"
+                }
+            }
+        }
+    ]
+}

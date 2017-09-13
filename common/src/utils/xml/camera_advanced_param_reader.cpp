@@ -141,6 +141,7 @@ namespace QnXmlTag {
     const QString param                 = lit("param");
     const QString groupName             = lit("name");
     const QString groupDescription      = lit("description");
+    const QString groupAux              = lit("aux");
     const QString paramId               = lit("id");
     const QString paramDataType         = lit("dataType");
     const QString paramName             = lit("name");
@@ -151,6 +152,7 @@ namespace QnXmlTag {
     const QString paramReadOnly         = lit("readOnly");
     const QString paramReadCmd          = lit("readCmd");
     const QString paramWriteCmd         = lit("writeCmd");
+    const QString paramAux              = lit("aux");
 
     const QString dependenciesRoot      = lit("dependencies");
     const QString dependenciesShow      = lit("dependencies-ranges");
@@ -216,6 +218,7 @@ bool QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, 
 
 	group.name = groupXml.attribute(QnXmlTag::groupName);
 	group.description = groupXml.attribute(QnXmlTag::groupDescription);
+    group.aux = groupXml.attribute(QnXmlTag::groupAux);
 
 	for (QDomNode node = groupXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		if (node.nodeName() == QnXmlTag::group) {
@@ -244,6 +247,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
 	param.readOnly      = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramReadOnly));
     param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
     param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
+    param.aux           = elementXml.attribute(QnXmlTag::paramAux);
 
     auto childNodes = elementXml.childNodes();
 

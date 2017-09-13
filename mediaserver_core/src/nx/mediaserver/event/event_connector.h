@@ -63,6 +63,20 @@ public slots:
     void at_cameraInput(const QnResourcePtr& resource, const QString& inputPortID,
         bool value, qint64 timeStampUsec);
 
+    /** Some objects have been detected on the scene */
+    void at_analyticsEventStart(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
+    /** No objects detected on the scene */
+    void at_analyticsEventEnd(
+        const QnResourcePtr& resource,
+        const QString& caption,
+        const QString& description,
+        qint64 timestamp);
+
     void at_customEvent(const QString& resourceName, const QString& caption,
         const QString& description, const vms::event::EventMetaData& metadata,
         vms::event::EventState eventState, qint64 timeStamp);
@@ -105,6 +119,14 @@ public slots:
 
     void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId,
         const QnUuid& userId, qint64 timeStamp, vms::event::EventState toggleState);
+
+    void at_analyticsSdkEvent(const QnResourcePtr& resource,
+        const QnUuid& driverId,
+        const QnUuid& eventId,
+        vms::event::EventState toggleState,
+        const QString& caption,
+        const QString& description,
+        qint64 timeStampUsec);
 
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::event::EventState eventState, const QnUuid& userId = QnUuid(),
