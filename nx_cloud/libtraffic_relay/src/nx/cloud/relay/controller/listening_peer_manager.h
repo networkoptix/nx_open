@@ -10,7 +10,7 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-namespace conf { class Settings; };
+namespace conf { struct ListeningPeer; };
 namespace model { class ListeningPeerPool; }
 
 namespace controller {
@@ -36,7 +36,7 @@ class ListeningPeerManager:
 {
 public:
     ListeningPeerManager(
-        const conf::Settings& settings,
+        const conf::ListeningPeer& settings,
         model::ListeningPeerPool* listeningPeerPool);
 
     virtual void beginListening(
@@ -44,7 +44,7 @@ public:
         BeginListeningHandler completionHandler) override;
 
 private:
-    const conf::Settings& m_settings;
+    const conf::ListeningPeer& m_settings;
     model::ListeningPeerPool* m_listeningPeerPool;
 
     void saveServerConnection(
@@ -56,7 +56,7 @@ private:
 
 using ListeningPeerManagerFactoryFunction =
     std::unique_ptr<AbstractListeningPeerManager>(
-        const conf::Settings&,
+        const conf::ListeningPeer&,
         model::ListeningPeerPool*);
 
 class ListeningPeerManagerFactory:
@@ -71,7 +71,7 @@ public:
 
 private:
     std::unique_ptr<AbstractListeningPeerManager> defaultFactoryFunction(
-        const conf::Settings&,
+        const conf::ListeningPeer&,
         model::ListeningPeerPool*);
 };
 

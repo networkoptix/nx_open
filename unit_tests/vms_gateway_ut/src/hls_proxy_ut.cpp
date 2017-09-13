@@ -179,13 +179,13 @@ private:
     }
 
     std::unique_ptr<AbstractStreamSocket> createStreamSocket(
-        bool /*sslRequired*/,
+        bool sslRequired,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)
     {
         auto socket = std::make_unique<TestCloudStreamSocket>();
         socket->setForeignHostFullCloudName(m_hlsServerFullCloudName);
 
-        if (m_sslEnabled)
+        if (m_sslEnabled && sslRequired)
             return std::make_unique<nx::network::deprecated::SslSocket>(std::move(socket), false);
         else
             return std::move(socket);

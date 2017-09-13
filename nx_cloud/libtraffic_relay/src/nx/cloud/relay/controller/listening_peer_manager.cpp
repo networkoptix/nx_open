@@ -11,7 +11,7 @@ namespace relay {
 namespace controller {
 
 ListeningPeerManager::ListeningPeerManager(
-    const conf::Settings& settings,
+    const conf::ListeningPeer& settings,
     model::ListeningPeerPool* listeningPeerPool)
     :
     m_settings(settings),
@@ -33,12 +33,12 @@ void ListeningPeerManager::beginListening(
     const auto peerConnectionCount =
         m_listeningPeerPool->getConnectionCountByPeerName(request.peerName);
     if (peerConnectionCount >=
-        (std::size_t)m_settings.listeningPeer().maxPreemptiveConnectionCount)
+        (std::size_t)m_settings.maxPreemptiveConnectionCount)
     {
         NX_LOGX(lm("Refusing beginListening for peer %1 since there are already "
             "%2 connections with maximum of %3")
             .arg(request.peerName).arg(peerConnectionCount)
-            .arg(m_settings.listeningPeer().maxPreemptiveConnectionCount),
+            .arg(m_settings.maxPreemptiveConnectionCount),
             cl_logDEBUG2);
         completionHandler(
             api::ResultCode::preemptiveConnectionCountAtMaximum,
@@ -49,7 +49,7 @@ void ListeningPeerManager::beginListening(
 
     api::BeginListeningResponse response;
     response.preemptiveConnectionCount =
-        m_settings.listeningPeer().recommendedPreemptiveConnectionCount;
+        m_settings.recommendedPreemptiveConnectionCount;
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
@@ -87,7 +87,7 @@ ListeningPeerManagerFactory& ListeningPeerManagerFactory::instance()
 }
 
 std::unique_ptr<AbstractListeningPeerManager> ListeningPeerManagerFactory::defaultFactoryFunction(
-    const conf::Settings& settings,
+    const conf::ListeningPeer& settings,
     model::ListeningPeerPool* listeningPeerPool)
 {
     return std::make_unique<ListeningPeerManager>(
